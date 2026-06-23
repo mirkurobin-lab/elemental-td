@@ -104,8 +104,8 @@ Reference each by its Higgsfield job id.
 | 🔥 Fire | eliteboss | Hellhound | fierce fire demon hound | `b9ae26e0-ad4f-4075-b0fd-e3bc8573b3c9` |
 | 🔥 Fire | bigboss | Infernal Dragon | winged molten fire dragon | `ad410b8f-e0f5-427a-83f9-f046a620d7a5` |
 | ✨ Light | normal | Lumen Acolyte | glowing robed acolyte | `f7002859-b63a-4c8f-a10e-484a2c192408` |
-| ✨ Light | fast | Glimmer Wisp | fast radiant light wisp | `e41211c2-41e0-4a6e-b327-6bbdedda3329` |
-| ✨ Light | swarm | Mote Swarm | small glowing light mote | `97cc7e42-b44a-4486-bc9b-7e75933b0e9d` |
+| ✨ Light | fast | Glimmer Wisp | single radiant light creature | `97cc7e42-b44a-4486-bc9b-7e75933b0e9d` |
+| ✨ Light | swarm | Mote Swarm | running swarm of light wisps | `4ec880f9-9b7a-4630-8446-214face57ca1` |
 | ✨ Light | armored | Sun Sentinel | golden shielded sentinel | `b088ce47-16f1-453d-9e29-0311cabbe23e` |
 | ✨ Light | eliteboss | Seraph Knight | winged radiant seraph knight | `638e931d-7ae6-42a7-99dc-9d19e70b5a86` |
 | ✨ Light | bigboss | Radiant Archon | towering winged archon | `ace4a98c-a66e-4ba2-abc0-12028497b581` |
