@@ -32,6 +32,25 @@ Each wave also has an **archetype** (`makeWave`, by wave index):
 repeated element keeps feeling fresh through a level (matches "fire wave → imps, later →
 demons → dragon").
 
+### STYLE FORMULA (locked — insert byte-identical into every creature prompt)
+
+> Painterly semi-stylized mobile fantasy game art, rich digital painting with soft
+> volumetric glow and crisp highlights; bold rounded chunky creature silhouettes with
+> subtle dark outlines and clear readable shapes; each creature colored to its element —
+> fire molten red-orange, water icy cyan-blue, nature verdant green, earth ochre
+> stone-brown, light radiant gold-white, darkness violet-shadow — with its elemental
+> energy as the glowing signal hue, plus small contrasting accent details (eyes, teeth,
+> claws, gems, runic markings) in a complementary pop color, creatures popping against the
+> backdrop; dramatic elemental rim-light, dark moody atmosphere, epic yet playful; high
+> contrast, clean readable silhouettes, consistent three-quarter front-facing view across
+> all creatures.
+
+Generation: model `nano_banana_2`, `1k`, AR `1:1`. Prompt = sprite template + 3-4 word
+description + STYLE FORMULA (verbatim) + sprite suffix on a key-color background
+(magenta `#FF00FF`; green `#00FF00` for darkness/violet creatures), to be keyed to
+transparency before use. Approved sample look: fire imp / fire demon hound / fire dragon /
+ice golem.
+
 ### Element visual language (palette from `ELEMENT`, FX from the signature attack `PURE`)
 
 | Element     | Core color | Glow      | Motif & FX (tie to its attack)                  |
