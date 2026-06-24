@@ -266,7 +266,7 @@ function newGame(campaignLevel = 1) {
   setLevelMap(campaignLevel); // pick this level's map layout (different path per level)
   const u = (typeof META !== "undefined" && META.upg) ? META.upg : { gold: 0, life: 0, soul: 0 };
   G = {
-    gold: 180 + (u.gold || 0) * 20, lives: 20 + (u.life || 0), souls: (u.soul || 0), wave: 0, campaignLevel,
+    gold: 180 + (u.gold || 0) * 40, lives: 20 + (u.life || 0), souls: (u.soul || 0), wave: 0, campaignLevel,
     elementLvl: { fire: 0, water: 0, nature: 0, earth: 0, light: 0, darkness: 0 },
     towers: [], creeps: [], shots: [], fx: [],
     grid: Array.from({ length: ROWS }, () => Array(COLS).fill(null)), // tower ref or null
@@ -1876,14 +1876,14 @@ const MON = {}; MONSTERS.forEach((m) => (MON[m.key] = m));
 // permanent ACCOUNT upgrades — bought with ✦ points (CAMPAIGN.points); apply across every run.
 // This closes the loop: campaign clears earn points → points buy power → campaign gets easier.
 const UPGRADES = [
-  { key: "dmg",  name: "Arcane Might",    sym: "⚔️", max: 10, base: 60,  unit: "+3% tower damage", desc: "Every tower hits harder — in the campaign AND Tower Wars." },
-  { key: "gold", name: "War Chest",       sym: "💰", max: 10, base: 55,  unit: "+20 starting gold", desc: "Begin each campaign level with more gold to spend." },
-  { key: "life", name: "Fortified Rift",  sym: "❤️", max: 3,  base: 130, unit: "+1 starting life", desc: "Take more leaks before the rift falls." },
-  { key: "soul", name: "Soul Attunement", sym: "✦",  max: 2,  base: 160, unit: "+1 starting soul", desc: "Start each level already holding element souls to spend." },
+  { key: "dmg",  name: "Arcane Might",    sym: "⚔️", max: 10, base: 60,  unit: "+6% tower damage", desc: "Every tower hits harder — in the campaign AND Tower Wars." },
+  { key: "gold", name: "War Chest",       sym: "💰", max: 10, base: 55,  unit: "+40 starting gold", desc: "Begin each campaign level with more gold to spend." },
+  { key: "life", name: "Fortified Rift",  sym: "❤️", max: 5,  base: 130, unit: "+1 starting life", desc: "Take more leaks before the rift falls." },
+  { key: "soul", name: "Soul Attunement", sym: "✦",  max: 5,  base: 160, unit: "+1 starting soul", desc: "Start each level already holding element souls to spend." },
 ];
 const UPG = {}; UPGRADES.forEach((u) => (UPG[u.key] = u));
 const upgCost = (u, lvl) => Math.round(u.base * Math.pow(1.55, lvl)); // escalates per level owned
-const dmgMult = () => 1 + (META.upg ? (META.upg.dmg || 0) : 0) * 0.03;
+const dmgMult = () => 1 + (META.upg ? (META.upg.dmg || 0) : 0) * 0.06;
 function metaBuyUpgrade(key) {
   const u = UPG[key], lvl = META.upg[key] || 0;
   if (lvl >= u.max) return false;
