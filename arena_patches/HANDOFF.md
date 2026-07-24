@@ -210,6 +210,38 @@ er die Aktion ausführt. Alternative: Timeout, der nach ~20s automatisch weiters
 
 ---
 
+## 6. Karten-Progression (neu) — `DESIGN_PROGRESSION.md` + `arena_cards.js`
+
+**Was es ist:** Das komplette Sammel- und Booster-Pack-System nach dem Vorbild von
+"Arcane Arena" (Panteon/MWM). Karten haben Level 1–100, die Rarität ist ein Level-Band
+derselben Karte (Gewöhnlich → Selten → Episch → Legendär → Relikt → Suprem), Packs droppen
+Karten-**Kopien** in Bündeln, jeder Raritäts-Aufstieg ab Selten bringt eine Perk-Wahl.
+
+- **`arena_patches/DESIGN_PROGRESSION.md`** — vollständige Design-Spezifikation: Level-/Kopien-/
+  Gold-Tabellen, Stat-Kurve `statMul(lvl) = 1.018^(lvl-1) × 1.10^tierIndex`, Zeit-bis-Farbwechsel,
+  Perk-Registry (64 Slots, 32 ausformuliert), 4 Pack-Typen mit Drop-Gewichten + Pity + Overflow,
+  Pack-Öffnungs-Zeremonie, Trophy-Road/Season-Pass/Daily-Loop, Migration, Test-Checkliste,
+  plus ein Abschnitt mit den **verifizierten Fakten zum echten AA** (Quellenliste).
+- **`arena_patches/arena_cards.js`** — reines Logik-Modul (kein DOM), `window.ArenaCards`.
+  Selbsttest: `node arena_patches/arena_cards.js` (10 000 simulierte Bronze-Packs, Quoten,
+  Pity, Level-Kurve, Bank-Mechanik, Migration → "ALLE TESTS OK").
+
+**⚠ Ersetzt bestehende Systeme:**
+1. **`metaMul = 1.12^(lvl-1)` in `arena_pan.html` MUSS raus** — auf einer 1–100-Leiter wären das
+   ~10⁴-fache Werte. Ersatz: `ArenaCards.statMul(lvl)` (Lv100 ≈ 10.8×).
+2. **`shardsBank` aus `arena_profile.js` wird ersetzt.** Packs droppen ab jetzt Karten-Kopien
+   statt Splitter → `PACK_SHARDS`, `LOSS_SHARDS`, `applyShardsToHub()` stilllegen und in
+   `applyMatchResult()` bei `packAwarded` stattdessen
+   `ArenaCards.openPack('bronze', POOL_IDS, HERO_IDS)` aufrufen. Bestehende Splitter einmalig
+   kulant abgelten (siehe Design-Doku §E) — sie hatten nie eine definierte Umrechnung.
+3. **Einmal-Migration** beim Hub-Start: `ArenaCards.migrateFromHub(...)` → alte
+   `arenaHub.coll`-Level × 5 (Lv8 → Lv40/Episch). Läuft nur einmal (Flag im State),
+   `arenaHub` bleibt unangetastet.
+
+Der WIRING-Block oben in `arena_cards.js` listet alle vier Einbaustellen mit Code.
+
+---
+
 ## Reihenfolge & Aufwand
 
 Empfohlen, weil jedes Modul auf dem Verständnis des vorherigen aufbaut und `arena_profile.js`
