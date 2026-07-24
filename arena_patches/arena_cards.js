@@ -182,7 +182,7 @@
       ],
       legendary: [], relic: [],
     },
-    nature: { // STONE (Namens-Mapping aus dem Briefing — vor Einbau prüfen)
+    nature: { // THORN
       rare: [
         { id: "nature_rare_tick",  txt: "Gift tickt 0.2s schneller", mod: { stat: "poisonTick", add: -0.2 } },
         { id: "nature_rare_range", txt: "+12% Reichweite",           mod: { stat: "range", mul: 1.12 } },
@@ -193,7 +193,7 @@
       ],
       legendary: [], relic: [],
     },
-    earth: { // THORN (Namens-Mapping aus dem Briefing — vor Einbau prüfen)
+    earth: { // STONE
       rare: [
         { id: "earth_rare_armor", txt: "-10% gegnerische Rüstung im Radius", mod: { stat: "armorShred", mul: 1.10 } },
         { id: "earth_rare_rate",  txt: "+8% Angriffstempo",                  mod: { stat: "attackSpeed", mul: 1.08 } },

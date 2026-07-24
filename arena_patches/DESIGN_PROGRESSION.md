@@ -188,8 +188,8 @@ erst in Monat 2–3 des Spielerlebens relevant und sollten mit echten Build-Date
 |---|---|---|---|---|---|
 | **EMBER** | fire | +15 % Burn-Dauer · +8 % Splash-Radius | Burn stapelt bis 3× statt 2× · +12 % Schaden gegen brennende Ziele | TBD | TBD |
 | **FROST** | water | Freeze braucht 3 statt 4 Stacks · +10 % Slow | Slow wirkt 1.5 s länger nach · Eingefrorene Ziele erleiden +20 % Schaden | TBD | TBD |
-| **STONE** | nature | Gift tickt 0.2 s schneller · +12 % Reichweite | Wurzeln halten 0.5 s länger · Gift springt auf 1 zusätzliches Ziel über | TBD | TBD |
-| **THORN** | earth | −10 % gegnerische Rüstung im Radius · +8 % Angriffstempo | Jeder 6. statt 7. Treffer betäubt 0.4 s · +18 % Schaden gegen Bosse | TBD | TBD |
+| **THORN** | nature | Gift tickt 0.2 s schneller · +12 % Reichweite | Wurzeln halten 0.5 s länger · Gift springt auf 1 zusätzliches Ziel über | TBD | TBD |
+| **STONE** | earth | −10 % gegnerische Rüstung im Radius · +8 % Angriffstempo | Jeder 6. statt 7. Treffer betäubt 0.4 s · +18 % Schaden gegen Bosse | TBD | TBD |
 | **DAWN** | light | +6 % Kritchance · +5 % Schaden für Nachbartürme | Strahl trifft 1 Ziel mehr · +12 % Ult-Ladung pro Kill | TBD | TBD |
 | **HOLLOW** | darkness | Fluch hält 1 s länger · +10 % Lebensraub auf die Burg | Hinrichtung unter 12 % statt 8 % HP · Fluch springt beim Tod auf ein Ziel über | TBD | TBD |
 | **SOLARA** | Held | −8 % Ult-Abklingzeit · +3 % Burgheilung bei Boss-Kill | Sonnenstrahl +15 % Breite · +7 % Schaden für alle Licht-Türme | TBD | TBD |
@@ -199,11 +199,10 @@ Alle Perks liegen in `arena_cards.js` als `PERKS[cardId][tier]` mit maschinenles
 `mod: {stat, mul}` bzw. `{stat, add}` — die Match-Engine liest sie über `ArenaCards.modsOf(id)`
 als gebündeltes `{stat: {mul, add}}`-Objekt und muss keine Texte parsen.
 
-> **⚠ Zu prüfen vor dem Einbau:** Die Zuordnung `nature → STONE` und `earth → THORN` stammt aus
-> der Briefing-Reihenfolge und wirkt vertauscht (STONE klingt nach earth, THORN nach nature).
-> Die Perk-Mechaniken in `arena_cards.js` hängen an den **Element-Keys** (`nature` = Gift/Wurzeln,
-> `earth` = Rüstung/Betäubung), nicht an den Anzeigenamen — wenn die Namen getauscht werden
-> müssen, ändert sich nur die `// KOMMENTAR`-Zeile, keine Logik.
+> Anzeigenamen laut Spiel-Doku: fire=EMBER, water=FROST, **earth=STONE, nature=THORN**,
+> light=DAWN, darkness=HOLLOW. Die Perk-Mechaniken in `arena_cards.js` hängen an den
+> **Element-Keys** (`nature` = Gift/Wurzeln, `earth` = Rüstung/Betäubung), nicht an den
+> Anzeigenamen.
 
 ### Helden
 
