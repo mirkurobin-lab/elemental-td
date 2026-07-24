@@ -5,6 +5,17 @@ bzw. `~/elemental-td/public/vs.html` integrieren. Sie liegen hier im Repo unter 
 und sind bewusst **in sich geschlossen** (IIFE, `window.XYZ`-Export, keine Abhängigkeit
 untereinander, defensiv gegen fehlende Callbacks).
 
+**Inhalt des Ordners:**
+
+| Datei | Was |
+|---|---|
+| `arena_profile.js` · `arena_rivals.js` · `arena_pity.js` · `arena_surrender.js` · `arena_tutorial.js` | die fünf Match-Module (§1–§5) |
+| `arena_cards.js` | **Karten-Progression v2** — Merge + Upgrade-Material (§6) |
+| `ui_prototype.html` | **lauffähiger UI-Nachbau** der vier Meta-Screens (§6) |
+| `AA_UI_REFERENZ.md` | verifizierte Referenz zum Vorbild (Video-Analyse) — **Wahrheitsquelle** |
+| `DESIGN_PROGRESSION.md` | Design-Spezifikation der Karten-Progression (v2, inkl. v1-Anhang) |
+| `GAMEPLAY_OPTIMIERUNG.md` | Abgleich der AA-**Match**-Mechanik gegen unseren Spielstand |
+
 ## ⚠ Vor dem Einbau: Identifier VERIFIZIEREN
 
 Die Module sind gegen die **Namen aus der Doku** (Stand 2026-07-19) gebaut, nicht gegen den
@@ -40,6 +51,10 @@ weniger Reibung — dann aber daran denken, den WIRING-Kommentar mitzunehmen.
 **Was es tut:** Ersetzt die kosmetische "+30 Trophäen"-Anzeige durch ein persistiertes Profil
 in `localStorage.arenaProfile` (Trophäen, Rang mit 7 Stufen, Siegesserie, Booster-Pack alle
 3 Siege, Splitter-Bank für den Hub). Liefert fertiges Result-HTML.
+
+> **Siehe auch `GAMEPLAY_OPTIMIERUNG.md` §4:** AA vergibt **fixe, arenagebundene** Siegprämien
+> (+39 Trophäen / 610 Gold, doppelt belegt). Empfehlung dort: fixe Basis pro Arena + Streak-Bonus,
+> `T_STAR` streichen.
 
 **Einbau:**
 1. Script einbinden/einfügen.
@@ -210,33 +225,69 @@ er die Aktion ausführt. Alternative: Timeout, der nach ~20s automatisch weiters
 
 ---
 
-## 6. Karten-Progression (neu) — `DESIGN_PROGRESSION.md` + `arena_cards.js`
+## 6. Karten-Progression **v2** — Merge + Upgrade-Material
 
-**Was es ist:** Das komplette Sammel- und Booster-Pack-System nach dem Vorbild von
-"Arcane Arena" (Panteon/MWM). Karten haben Level 1–100, die Rarität ist ein Level-Band
-derselben Karte (Gewöhnlich → Selten → Episch → Legendär → Relikt → Suprem), Packs droppen
-Karten-**Kopien** in Bündeln, jeder Raritäts-Aufstieg ab Selten bringt eine Perk-Wahl.
+**⚠ v2 seit 2026-07-24.** Das ursprüngliche Modell (Rarität = Level-Band, Level-Up kostet
+Kartenkopien) ist durch die **Videoanalyse des echten Spiels** widerlegt und ersetzt. Grundlage
+ist jetzt `arena_patches/AA_UI_REFERENZ.md` (§2 Turm-Detailkarte, §4 Merge, §5 Upgrade-Material).
 
-- **`arena_patches/DESIGN_PROGRESSION.md`** — vollständige Design-Spezifikation: Level-/Kopien-/
-  Gold-Tabellen, Stat-Kurve `statMul(lvl) = 1.018^(lvl-1) × 1.10^tierIndex`, Zeit-bis-Farbwechsel,
-  Perk-Registry (64 Slots, 32 ausformuliert), 4 Pack-Typen mit Drop-Gewichten + Pity + Overflow,
-  Pack-Öffnungs-Zeremonie, Trophy-Road/Season-Pass/Daily-Loop, Migration, Test-Checkliste,
-  plus ein Abschnitt mit den **verifizierten Fakten zum echten AA** (Quellenliste).
+**Das Modell in drei Sätzen.** Eine Karte hat **zwei getrennte Achsen**: Die **Rarität** steigt,
+indem man **3 identische Karten derselben Stufe verschmilzt** — das hebt das **Level-Cap** und
+schaltet einen **permanenten kartenspezifischen Bonus** frei. Das **Level** steigt gegen
+**Upgrade-Material + Gold** und verbraucht **keine** Kartenkopien. Booster-Packs droppen
+**Karten** (meist Gewöhnlich, seltener vorgemergt), **Material** und **Gold**.
+
+| Stufe | Farbe | Level-Cap | Material/Level-Up |
+|---|---|---|---|
+| Gewöhnlich | Grau `#9aa3ad` | 25 | 3 |
+| Gut | Grün `#58c26a` | 40 | 4 |
+| Selten | Blau `#3d9df2` | 55 | 5 |
+| Episch | Lila `#a45ef2` | 70 | 6 |
+| Legendär | Orange `#f2a13d` | 85 | 7 |
+| Suprem | Rot `#ff5e7e` | 100 | 8 |
+
+**Die vier Dateien:**
+
 - **`arena_patches/arena_cards.js`** — reines Logik-Modul (kein DOM), `window.ArenaCards`.
-  Selbsttest: `node arena_patches/arena_cards.js` (10 000 simulierte Bronze-Packs, Quoten,
-  Pity, Level-Kurve, Bank-Mechanik, Migration → "ALLE TESTS OK").
+  API: `statMul(lvl, mergeBoni)` · `goldFor(lvl)` · `materialFor(lvl, tierIdx)` · `tierOf(key|idx)`
+  · `addDrop(id, tier, n)` · `addMaterial(n)` · `canMerge` / `merge` / `mergeAll` /
+  `chooseMergeBonus` / `pendingBonusChoices` / `progressToNextMerge` · `canLevelUp(id, gold)` /
+  `levelUp(id)` · `view(id)` · `openPack(type, poolIds, heroIds, rng)` · `modsOf(id)` ·
+  `migrateV1()`. Selbsttest: `node arena_patches/arena_cards.js` → **ALLE TESTS OK**.
+- **`arena_patches/ui_prototype.html`** — **lauffähiger UI-Nachbau** der AA-Screens mit unserem
+  Content (eine Datei, kein Build, lädt `./arena_cards.js` relativ; einfach im Browser öffnen).
+  Vier Views mit Bottom-Nav: **Collection** (Deck-Zeile, Tabs, 5-Spalten-Raster mit
+  Raritätsrahmen, LvL-Badge, Merge-Punkte ●●○, Red Dot), **Turm-Detail** (Vollbild-Modal,
+  animierter Loop-Slot, 2×2-Stat-Grid mit „aktuell → nachher"-Vorschau, Attack Rate als
+  **negativer** Prozentwert, Merge-Hinweiszeile, Material-Block, funktionaler Upgrade-Button),
+  **Forge** (Required-Cards-Panel, „Alle verschmelzen", Bonus-Wahl-Dialog, Zeremonie-FX) und
+  **Packs** (verdeckter Stapel, Glühen vor dem Flip, Burst ab Episch, Zusammenfassung).
+  **Dient als Vorlage für den Einbau in `deck.html`** — Markup, CSS und Event-Logik sind
+  durchgetestet, es fehlen nur die echten Turm-Assets.
+- **`arena_patches/DESIGN_PROGRESSION.md`** — Design-Spezifikation v2: Leiter, Cap-Begründung,
+  Gold-Plateaus, Stat-Kurve, **Pyramiden-Ökonomie** (243 Gewöhnlich-Kopien = 1 Suprem) mit
+  Zeitschätzungen für Pool 8/20/40, Merge-Bonus-Registry, Pack-Tabellen, Pity, Zeremonie-Spec,
+  Migration. Der alte v1-Text steht als **Anhang §Z (ÜBERHOLT)** vollständig erhalten darin.
+- **`arena_patches/GAMEPLAY_OPTIMIERUNG.md`** — **neu:** Abgleich der verifizierten
+  AA-**Match**-Mechanik gegen unseren Spielstand. Wichtigster Punkt: **AA hat Match-Gold und
+  In-Match-Upgrades** — unsere Entfernung vom 19.07. beruhte auf einer falschen Annahme.
+  Dazu: Per-Karten-Cooldowns statt „1 Build/Runde", In-Match-Sternstufen (+ Curse-Anbindung),
+  fixe Arena-Prämien, 10 ausformulierte Ladebildschirm-Tipps, Clan-Tag, Turm-Grundflächen 1×2.
 
 **⚠ Ersetzt bestehende Systeme:**
-1. **`metaMul = 1.12^(lvl-1)` in `arena_pan.html` MUSS raus** — auf einer 1–100-Leiter wären das
-   ~10⁴-fache Werte. Ersatz: `ArenaCards.statMul(lvl)` (Lv100 ≈ 10.8×).
-2. **`shardsBank` aus `arena_profile.js` wird ersetzt.** Packs droppen ab jetzt Karten-Kopien
-   statt Splitter → `PACK_SHARDS`, `LOSS_SHARDS`, `applyShardsToHub()` stilllegen und in
-   `applyMatchResult()` bei `packAwarded` stattdessen
-   `ArenaCards.openPack('bronze', POOL_IDS, HERO_IDS)` aufrufen. Bestehende Splitter einmalig
-   kulant abgelten (siehe Design-Doku §E) — sie hatten nie eine definierte Umrechnung.
-3. **Einmal-Migration** beim Hub-Start: `ArenaCards.migrateFromHub(...)` → alte
-   `arenaHub.coll`-Level × 5 (Lv8 → Lv40/Episch). Läuft nur einmal (Flag im State),
-   `arenaHub` bleibt unangetastet.
+1. **`metaMul = 1.12^(lvl-1)` in `arena_pan.html` MUSS raus.** Ersatz:
+   `ArenaCards.statMul(cs.lvl, cs.mergeBoni)` (Lv100 ≈ 8.6×). Einzelstat-Boni separat über
+   `ArenaCards.modsOf(id)`.
+2. **`shardsBank` aus `arena_profile.js` wird ersetzt.** Bei `packAwarded` stattdessen
+   `ArenaCards.openPack('bronze', POOL_IDS, HERO_IDS)`; die Pack-Zeremonie ruft pro Flip
+   `addDrop()` / `addMaterial()`, das **Gold bucht der Hub**. Bestehende Splitter einmalig
+   kulant abgelten: `ArenaCards.addMaterial(shardsBank * 2)`.
+3. **Einmal-Migration** beim Hub-Start: `ArenaCards.migrateV1()` — alte v1-Stände behalten ihre
+   **Farbe** (grün → Gut, blau → Selten, lila → Episch, orange → Legendär), das Level wird auf
+   das Cap der Stufe gekappt, alte `copies` + `dust/10` werden zu **Material**, alte `perks`
+   werden zu `mergeBoni`.
+4. **Gold liegt bewusst NICHT in diesem Modul** (`state.gold === null`). `levelUp()` zieht nur
+   Material ab und **meldet** die Goldkosten zurück; den Abzug macht die Hub-Wallet.
 
 Der WIRING-Block oben in `arena_cards.js` listet alle vier Einbaustellen mit Code.
 
@@ -254,9 +305,13 @@ die Datenbasis für `arena_rivals.js` liefert:
 | 3 | `arena_pity.js` | Braucht das echte `drawCard()`-Kartenliteral → erst Code lesen, dann anpassen | ~30–40 min |
 | 4 | `arena_surrender.js` | Unabhängig, zwei getrennte Hooks (Button + Boss-Kill) | ~25–35 min |
 | 5 | `arena_tutorial.js` | Am invasivsten (Pause-Logik im Game-Loop), am besten mit frischem Kopf | ~40–60 min |
+| 6 | **`arena_cards.js` (v2)** + `migrateV1()` + Pack-Vergabe | Eigenes Arbeitspaket; siehe die 9-Schritt-Reihenfolge in `DESIGN_PROGRESSION.md` §F | ~10–13 h |
+| 7 | **UI aus `ui_prototype.html`** nach `deck.html` überführen (Collection / Detail / Forge / Packs) | Teil von #6, aber getrennt planbar — die Vorlage ist fertig und getestet | (in #6 enthalten) |
 
-**Gesamt: ca. 2.5–4 Stunden** inklusive Testen. Nach jedem Modul einzeln testen und committen —
-nicht alle fünf auf einmal einbauen.
+**Gesamt Module 1–5: ca. 2.5–4 Stunden** inklusive Testen. Nach jedem Modul einzeln testen und
+committen — nicht alle fünf auf einmal einbauen. Die Karten-Progression (#6/#7) ist ein eigenes
+Projekt und sollte **nach** den fünf Match-Modulen kommen: Sie braucht ein Spiel, das schon
+Trophäen und Packs vergibt.
 
 ---
 
@@ -293,6 +348,30 @@ nicht alle fünf auf einmal einbauen.
 - Schritt 2/3: Aktion ausführen → "✓ Sehr gut!" und automatischer Weitersprung.
 - Nach Abschluss oder "Überspringen": `localStorage.arenaTutorialDone === "1"`, Reload zeigt es
   **nicht** erneut, und das Spiel läuft (nicht dauerhaft pausiert!) weiter.
+
+**arena_cards.js (v2)**
+- `node arena_patches/arena_cards.js` → **ALLE TESTS OK** (Leiter/Kurven, 10 000 Bronze-Packs,
+  Garantien aller vier Pack-Typen, Pity, Merge-Pyramide, Cap-Gating, Migration v1→v2).
+- `localStorage.arenaCards` hat nach dem ersten Pack `v: 2`, `material > 0`, `gold === null` und
+  pro Karte `{tier, lvl, copies:{common…supreme}, mergeBoni, pendingBoni}`.
+- **Cap-Gating:** Karte auf Gewöhnlich hochleveln → stoppt bei **Lv25**,
+  `ArenaCards.canLevelUp(id).reason === 'cap'`; nach `merge(id,'common')` geht es bis **Lv40**.
+- **Merge-Pyramide:** `addDrop(id,'common',243)` + `mergeAll(id)` → 121 Merges, Endstufe
+  **Suprem**, keine Restkopien darunter.
+- **Level-Up zieht Material, keine Kopien:** `copies` unverändert, `material` −(3+tierIndex),
+  `goldCost` wird nur gemeldet.
+- **Suprem droppt nie** aus Packs; jedes Bronze-Pack enthält ≥1 Gut-Karte.
+
+**ui_prototype.html**
+- Datei im Browser öffnen (kein Server nötig; `arena_cards.js` muss **daneben** liegen).
+- Beim ersten Start wird ein Demo-Zustand geseedet: EMBER Lv18/Gut **mergebar**, THORN Lv12
+  mergebar, STONE Lv25 **am Cap**, 64 Material, 248 500 Gold. Reset-Knopf unten in der Sammlung.
+- Durchklicken: Sammlung → Karte antippen → **Upgrade** (Level/Power/Gold ändern sich live) →
+  Schmiede → 3 identische Karten antippen → **VERSCHMELZEN** → Bonus wählen (Rahmenfarbe wechselt)
+  → Packs → **Bronze-Pack öffnen** → einzeln flippen → „Alle aufdecken" → Zusammenfassung →
+  zurück zur Sammlung (Red-Dot-Zähler hat sich aktualisiert).
+- **Konsole muss leer bleiben** — automatisiert geprüft mit einem Playwright-Skript (29 Schritte,
+  Screenshots je View, 0 JS-Fehler).
 
 ---
 
