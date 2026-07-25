@@ -247,6 +247,138 @@ footer{padding:6px 12px 14px;text-align:center}
   border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;
   z-index:90;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.on{opacity:1}
+
+/* ==================================================================
+ * GOLD-GRADIENT-TEXT — die sprachunabhängige Beschriftungs-Ebene
+ * ------------------------------------------------------------------
+ * ALLE generierten Assets (arena_patches/ui_assets.json) sind bewusst
+ * TEXT-FREI. Jede Beschriftung ist HTML-Text mit dieser Klasse, damit
+ * eine Lokalisierung nur die Strings tauscht — nie eine Grafik.
+ * Serif-Kapitälchen + Gold-Verlauf, wie im gewählten Style-Sheet.
+ * Fürs echte Spiel: Cinzel als Webfont (siehe HANDOFF.md).
+ * ================================================================== */
+.goldtext{
+  font-family:Cinzel,Georgia,"Times New Roman",serif;
+  font-variant:small-caps;font-weight:700;letter-spacing:.07em;
+  background-image:linear-gradient(180deg,#fff7d6 0%,#f4e3a6 32%,#e0b94a 62%,#8a6a1f 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  filter:drop-shadow(0 1px 1px rgba(0,0,0,.85)) drop-shadow(0 0 7px rgba(224,185,74,.30));
+}
+/* Auf farbigen Flächen (Rarität, Gefahr) soll der Verlauf neutral-hell sein. */
+.goldtext.pale{background-image:linear-gradient(180deg,#ffffff 0%,#e6eef5 55%,#9fb3c1 100%)}
+
+/* ==================================================================
+ * ASSET-EBENE
+ * ------------------------------------------------------------------
+ * Technik: MEHRFACH-HINTERGRUND. Die Asset-URL steht als ERSTER
+ * background-image-Layer, der bisherige Gradient als LETZTER. Lädt
+ * das CDN nicht (Offline, Proxy, file://), bleibt der Gradient sichtbar
+ * und der Prototyp funktioniert unverändert weiter.
+ * Die Assets liegen mittig auf größerer Leinwand; darum bei Buttons/
+ * Bändern background-size 100% 200% + center (zeigt die Bildmitte).
+ * ================================================================== */
+.asset{background-repeat:no-repeat;background-position:center center}
+.asset-btn{background-size:100% 210%,100% 100%}
+.asset-wide{background-size:100% 240%,100% 100%}
+.asset-fill{background-size:cover,cover}
+.asset-frame{background-size:100% 100%,100% 100%}
+
+/* ==================================================================
+ * HOME-VIEW (Status-Arenen) — Inszenierung nach AA_UI_REFERENZ §9.5b
+ * ------------------------------------------------------------------
+ * AA baut den Home-Screen von oben nach unten so auf:
+ *   Key-Art VOLLFLÄCHIG als Hintergrund (kein gerahmtes Banner)
+ *   → Arenaname zweizeilig zentriert bei ~28-33 % Höhe
+ *   → Modifier-Chip direkt darunter
+ *   → Trophäen-Fortschrittsleiste mit Belohnungs-Icon am rechten Ende
+ *   → Arena-Wappen (Schild mit Krone) als Status-Emblem
+ *   → große BATTLE-Taste, links daneben eine kleine EVENTS-Kachel
+ * In UNSEREM Spiel sind die Match-Welten random — diese Arenen sind
+ * daher REINE STATUS-OPTIK (Aufstiegs-Genugtuung), genau wie in AA.
+ * ================================================================== */
+#viewHome{padding:0 0 88px;position:relative}
+.arenahero{position:relative;min-height:330px;display:flex;flex-direction:column;
+  align-items:center;padding:26px 14px 16px;
+  background-repeat:no-repeat;background-position:center center;
+  background-size:cover,cover;
+  background-image:linear-gradient(165deg,#1d2a3a,#0e1418 70%)}
+.arenahero::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,#0e141866 0%,#0e141800 34%,#0e1418cc 82%,#0e1418 100%)}
+.arenahero>*{position:relative;z-index:2}
+.arenakicker{font-size:11px;letter-spacing:.24em;font-weight:800;color:#b9c9d6;
+  text-transform:uppercase;text-shadow:0 1px 3px #000}
+.arenaname{font-size:31px;line-height:1.05;text-align:center;margin:4px 0 0}
+.arenachip{margin-top:9px;background:#0b1116b3;border:1px solid #3a4c5c;border-radius:20px;
+  padding:4px 13px;font-size:10.5px;font-weight:800;letter-spacing:.1em;color:#cfe0ec}
+.crest{margin-top:14px;width:70px;height:78px;display:flex;align-items:center;justify-content:center;
+  font-size:30px;clip-path:polygon(50% 0,100% 22%,100% 68%,50% 100%,0 68%,0 22%);
+  background:linear-gradient(180deg,#4a5f78,#1b2735);border:0;box-shadow:0 0 0 2px #e0b94a55}
+.progwrap{width:100%;margin-top:16px;display:flex;align-items:center;gap:8px}
+.progbar{flex:1;height:22px;border-radius:12px;position:relative;overflow:hidden;
+  background-repeat:no-repeat;background-position:center;background-size:100% 240%,100% 100%;
+  background-image:linear-gradient(180deg,#0b1116,#16202a);border:1px solid #e0b94a4d}
+.progfill{position:absolute;left:2px;top:2px;bottom:2px;border-radius:10px;
+  background:linear-gradient(180deg,#f4e3a6,#e0b94a 60%,#a8842a);box-shadow:0 0 10px #e0b94a80}
+.proglabel{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:900;letter-spacing:.05em;color:#0e1418;text-shadow:0 1px 0 #ffffff55}
+.homerow{display:flex;gap:10px;align-items:stretch;padding:14px 14px 0}
+.eventtile{flex:0 0 88px;border-radius:14px;border:1px solid #3a4c5c;
+  background:linear-gradient(180deg,#243342,#141d26);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;font-size:22px;position:relative}
+.eventtile span{font-size:9px;font-weight:900;letter-spacing:.09em;color:#a9bccb}
+.eventtile .nb2{position:absolute;right:-4px;top:-4px;min-width:16px;height:16px;line-height:16px;
+  border-radius:8px;background:var(--danger);color:#fff;font-size:9.5px;font-weight:900;padding:0 4px}
+.battlebtn{flex:1;min-height:70px;border-radius:14px;font-size:23px;
+  background-repeat:no-repeat;background-position:center;
+  background-size:100% 175%,100% 100%;
+  background-image:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);
+  box-shadow:0 4px 0 #6d551a;display:flex;align-items:center;justify-content:center}
+.battlebtn:active{transform:translateY(2px);box-shadow:0 2px 0 #6d551a}
+.ladder{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:16px 14px 0}
+.rung{position:relative;border-radius:11px;overflow:hidden;aspect-ratio:16/10;border:1px solid #2b3b47;
+  background-repeat:no-repeat;background-position:center;background-size:cover,cover;
+  background-image:linear-gradient(150deg,#243342,#111a21);display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-end;padding:5px 4px}
+.rung.locked{filter:grayscale(.85) brightness(.42)}
+.rung.here{border-color:#e0b94a;box-shadow:0 0 0 1px #e0b94a,0 0 14px #e0b94a55}
+.rung .shade{position:absolute;inset:0;background:linear-gradient(180deg,#0e141833,#0e1418e0)}
+.rung .rn{position:relative;font-size:9.5px;text-align:center;line-height:1.15}
+.rung .rt{position:relative;font-size:8.5px;font-weight:800;color:#9fb3c1;margin-top:1px}
+.rung .lk{position:absolute;top:4px;right:5px;font-size:11px;z-index:3}
+.homenote{padding:14px 14px 0;font-size:11px;color:var(--dim);line-height:1.55}
+.homenote b{color:var(--gold)}
+
+/* ---------- Merge-Vorschau + Zeremonie (§13.1) ---------- */
+.mergepreview{margin-top:10px;font-size:11px;line-height:1.6;color:#c6d3dd;display:none}
+.mergepreview.on{display:block}
+.mergepreview .pr{display:flex;justify-content:space-between;gap:8px;
+  border-top:1px solid var(--line);padding:4px 0}
+.mergepreview .pr b{color:#fff;font-weight:800}
+.mergepreview .pr em{font-style:normal;color:var(--up);font-weight:800}
+.mergepreview .free{margin-top:6px;color:var(--up);font-weight:800;font-size:10.5px;
+  letter-spacing:.04em}
+#mergeCeremony .cersheet{background:#05090ceb;align-items:center;justify-content:center;
+  padding:24px 18px;gap:14px}
+.certitle{font-size:27px;text-align:center;line-height:1.1}
+.cercard{width:132px;aspect-ratio:3/4;border-radius:12px;position:relative;
+  background-repeat:no-repeat;background-position:center;background-size:100% 100%,100% 100%;
+  background-image:linear-gradient(160deg,#2c3a4b,#131c25);border:2px solid #e0b94a;
+  display:flex;align-items:center;justify-content:center;font-size:52px;
+  box-shadow:0 0 26px #e0b94a66;animation:cerpop .9s ease-out}
+@keyframes cerpop{0%{transform:scale(.4) rotate(-8deg);opacity:0}
+  60%{transform:scale(1.14) rotate(2deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+.cercard .cerlvl{position:absolute;left:0;right:0;bottom:0;background:#000b;font-size:11px;
+  text-align:center;font-weight:900;padding:3px 0;letter-spacing:.06em}
+.certable{width:100%;max-width:300px;background:#0e1418cc;border:1px solid #2b3b47;
+  border-radius:12px;padding:10px 12px;font-size:12px;line-height:1.7}
+.certable .row2{display:flex;justify-content:space-between;gap:10px}
+.certable .k2{color:var(--dim);font-size:10px;letter-spacing:.09em;text-transform:uppercase;
+  font-weight:800}
+.certable .v2 s{text-decoration:none;color:#8fa0ad}
+.certable .v2 em{font-style:normal;color:var(--up);font-weight:900}
+.cerbtn{font-size:16px;padding:10px 30px;border-radius:12px;
+  background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);box-shadow:0 3px 0 #6d551a}
 </style>
 </head>
 <body>
@@ -265,8 +397,40 @@ footer{padding:6px 12px 14px;text-align:center}
     <div class="cur"><i style="color:var(--gold)">🪙</i><span id="curGold">0</span><span class="plus">+</span></div>
   </div>
 
+  <!-- ===== VIEW 0: HOME — Status-Arenen (§9.4 / §9.5b) =====
+       WICHTIG: Die Match-Welten von Arcane Prism TD sind RANDOM pro Spiel.
+       Die Arenen hier sind REINE STATUS-OPTIK an der Trophäenzahl — sie
+       liefern die Aufstiegs-Genugtuung und sind vom Gameplay entkoppelt.
+       Genau so macht es AA auch (dort heißt der Match-Modifier "Neutral",
+       wenn kein Map Objective aktiv ist).
+       Reihenfolge der Elemente 1:1 nach den §9.5b-Messungen aus Video 6. -->
+  <section id="viewHome" class="view active">
+    <div class="arenahero" id="arenaHero">
+      <div class="arenakicker" id="arenaKicker">Arena 1</div>
+      <div class="arenaname goldtext" id="arenaName">Kristallhof</div>
+      <div class="arenachip" id="arenaChip">◎ Neutral</div>
+      <button class="crest" id="arenaCrest" title="Arena-Rang">👑</button>
+      <div class="progwrap">
+        <span style="font-size:15px">🏆</span>
+        <div class="progbar" id="arenaProg">
+          <div class="progfill" id="arenaProgFill" style="width:0%"></div>
+          <div class="proglabel" id="arenaProgLabel">—</div>
+        </div>
+        <span style="font-size:15px" id="arenaProgIcon">🎁</span>
+      </div>
+    </div>
+
+    <div class="homerow">
+      <button class="eventtile" id="tileEvents">🎪<span>EVENTS</span><i class="nb2">3</i></button>
+      <button class="battlebtn" id="btnBattle"><span class="goldtext">Kampf</span></button>
+    </div>
+
+    <div class="ladder" id="arenaLadder"></div>
+    <p class="homenote" id="homeNote">—</p>
+  </section>
+
   <!-- ===== VIEW 1: COLLECTION (§7) ===== -->
-  <section id="viewCollection" class="view active">
+  <section id="viewCollection" class="view">
     <h2 class="title">Battle Deck</h2>
     <div class="deckrow" id="deckRow"></div>
 
@@ -298,6 +462,10 @@ footer{padding:6px 12px 14px;text-align:center}
     <div class="reqpanel">
       <div class="lbl">Benötigte Karten</div>
       <div class="reqslots" id="reqSlots"></div>
+      <!-- Merge-VORSCHAU. Video 7 (§13.1) zeigt: AA blendet vor dem Merge
+           MAX LEVEL alt → neu plus zwei Stat-Vorschauen ein und verlangt
+           KEIN Gold. Beides ist hier nachgebaut. -->
+      <div class="mergepreview" id="mergePreview"></div>
       <div class="forgeactions">
         <button class="btn ghost" id="btnClearReq" style="flex:1">Leeren</button>
         <button class="btn up" id="btnMerge" style="flex:1.4" disabled>VERSCHMELZEN</button>
@@ -334,8 +502,9 @@ footer{padding:6px 12px 14px;text-align:center}
   </section>
 
   <!-- ===== Bottom-Nav ===== -->
-  <nav class="bottom">
-    <button id="navCollection" class="on"><i>🗂</i>Sammlung<span id="navBadge" class="nb" style="display:none">0</span></button>
+  <nav class="bottom" style="grid-template-columns:repeat(5,1fr)">
+    <button id="navHome" class="on"><i>🏛</i>Start</button>
+    <button id="navCollection"><i>🗂</i>Sammlung<span id="navBadge" class="nb" style="display:none">0</span></button>
     <button id="navTower"><i>🗼</i>Turm</button>
     <button id="navForge"><i>⚒</i>Schmiede</button>
     <button id="navPack"><i>🎁</i>Packs</button>
@@ -396,6 +565,21 @@ footer{padding:6px 12px 14px;text-align:center}
       <p id="bonusSub">Wähle einen permanenten Bonus für diese Karte.</p>
       <div id="bonusList"></div>
     </div>
+  </div>
+</div>
+
+<!-- ===== MERGE-ZEREMONIE (§13.1, Video 7) =====
+     AA-Ablauf: großer Titel "PERFECT MERGE!" (≈ y 270-310), die Karte in
+     der Mitte mit hochzählendem Level-Badge, darunter die Vorher/Nachher-
+     Tafel (MAX LEVEL / zwei Stats), Abschluss unten erst "CONTINUE",
+     danach "TAP TO CLOSE". Dauer ≈ 7 s. -->
+<div class="modal" id="mergeCeremony">
+  <div class="sheet cersheet">
+    <div class="certitle goldtext" id="cerTitle">Perfekte Verschmelzung!</div>
+    <div class="cercard" id="cerCard"><span id="cerArt">✨</span>
+      <div class="cerlvl" id="cerLvl">LvL 1</div></div>
+    <div class="certable" id="cerTable"></div>
+    <button class="cerbtn goldtext" id="cerBtn">Weiter</button>
   </div>
 </div>
 
@@ -472,6 +656,78 @@ footer{padding:6px 12px 14px;text-align:center}
      NICHT genug für DAWN Lv44 (18 000). Das ist der dokumentierte
      Gold-Bottleneck, im Prototyp bewusst sichtbar. */
   var DEMO_TROPHIES = 1136, DEMO_GEMS = 245, DEMO_GOLD = 12500;
+
+  /* ==================================================================
+   * ASSET-MANIFEST (Spiegel von arena_patches/ui_assets.json)
+   * ------------------------------------------------------------------
+   * Stil "Edel & Kristallin", 25 Assets, alle TEXT-FREI (per OCR geprüft).
+   * Die URLs zeigen aufs Higgsfield-CDN. Für die echte App die Dateien
+   * nach public/assets/ herunterladen (curl-Einzeiler in HANDOFF.md) und
+   * ASSET_BASE unten auf "./assets/" umstellen.
+   *
+   * ROBUSTHEIT: Jede Verwendung setzt die URL als ERSTEN
+   * background-image-Layer, der bisherige Gradient bleibt als LETZTER
+   * Layer stehen. Lädt das Bild nicht (offline, file://, Proxy), sieht
+   * man den Gradient — der Prototyp bleibt voll funktionsfähig.
+   * ================================================================== */
+  var CDN = "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/";
+  var ASSETS = {
+    btn_primary:    CDN + "hf_20260725_094652_c3235d59-6aa8-4e7b-bf6e-8a86ae45e738.png",
+    btn_secondary:  CDN + "hf_20260725_094715_3b933e5e-6d2f-488b-8093-f545aa5af6c5.png",
+    btn_danger:     CDN + "hf_20260725_094716_0dfb3958-3823-42a2-a67f-754b847e263d.png",
+    pill_topbar:    CDN + "hf_20260725_095631_56a56b7e-7e2e-454a-8ff2-b7ecb71bea8e.png",
+    panel:          CDN + "hf_20260725_095635_27685aa1-c11f-4320-a385-b859dd0914b5.png",
+    tab:            CDN + "hf_20260725_095638_48493952-a47a-4ed8-acc8-1f47a65a5da0.png",
+    frame_common:   CDN + "hf_20260725_095642_526164c7-6bb9-4c1f-93b2-ef48d8687b51.png",
+    frame_good:     CDN + "hf_20260725_095652_0e76b98e-5bc1-41d1-b7d6-1a7addd64c58.png",
+    frame_rare:     CDN + "hf_20260725_095656_f9462654-444a-47fb-af6d-01e758b3d09e.png",
+    frame_epic:     CDN + "hf_20260725_095700_af4f1396-00ca-4392-baea-e034d09706d4.png",
+    frame_legendary:CDN + "hf_20260725_095704_08f4478c-de30-4653-aecb-5c659d420821.png",
+    frame_supreme:  CDN + "hf_20260725_095707_1878e9e4-ecb1-4eb1-89bc-6f1c60238b2f.png",
+    banner_rarity:  CDN + "hf_20260725_095716_6936452c-84d2-4fc4-ba15-4fa77ef8e6bd.png",
+    banner_title:   CDN + "hf_20260725_095720_71db8bf1-f9c9-4acd-9d17-8ce7462e384d.png",
+    pack_bronze:    CDN + "hf_20260725_095725_5c0984d9-f669-49ec-82f2-81817f8eab56.png",
+    pack_silver:    CDN + "hf_20260725_095727_a48313e3-3fb7-4156-b276-9622a9f313a6.png",
+    pack_gold:      CDN + "hf_20260725_095735_28c01416-737f-414d-b8b6-0dd21a18e8a9.png",
+    pack_arcane:    CDN + "hf_20260725_095739_dad6b23f-bd87-42bb-934a-f0e05d24d4c3.png",
+    progress_frame: CDN + "hf_20260725_095742_a6bc63f3-733e-416b-b018-8358ca597e98.png",
+    arena1:         CDN + "hf_20260725_095747_28a90d71-c3ab-4911-afd5-969483bfa22c.png",
+    arena2:         CDN + "hf_20260725_095757_8ddd3202-0a7c-4f43-82a7-1d9d6a06d038.png",
+    arena3:         CDN + "hf_20260725_095801_d277827e-8704-485f-b0bb-b0f4498a2eba.png",
+    arena4:         CDN + "hf_20260725_095808_72fb7754-d381-4be7-b741-6ff63150bcfb.png",
+    arena5:         CDN + "hf_20260725_095811_7a6408ea-43bf-45d2-b9e3-e02d03d0f9c7.png",
+    arena6:         CDN + "hf_20260725_095815_26d38ce0-2889-4351-8b4c-ac50183d32ea.png",
+  };
+  /* Setzt das Asset als ersten Hintergrund-Layer; die bereits im
+     Stylesheet definierten Gradienten bleiben als Fallback dahinter. */
+  function layer(el, key) {
+    if (!el || !ASSETS[key]) return;
+    var cur = getComputedStyle(el).backgroundImage;
+    if (!cur || cur === "none") cur = "linear-gradient(180deg,#243342,#141d26)";
+    el.style.backgroundImage = 'url("' + ASSETS[key] + '"), ' + cur;
+  }
+
+  /* ==================================================================
+   * ARENA_TIERS — Status-Arenen (§9.5b)
+   * ------------------------------------------------------------------
+   * Reine Optik an der Trophäenzahl. Die Match-Welt wird pro Spiel
+   * ZUFÄLLIG gewählt und hat mit diesen Orten nichts zu tun; sie sind
+   * Aufstiegs-Belohnung fürs Auge — genauso wie in AA.
+   * Schwellen an AAs Kurve angelehnt (§9.5: 600 / 1200 / ~1500 / …).
+   * ================================================================== */
+  var ARENA_TIERS = [
+    { n:1, name:"Kristallhof",      at:0,    url:ASSETS.arena1, key:"arena1" },
+    { n:2, name:"Smaragdtal",       at:600,  url:ASSETS.arena2, key:"arena2" },
+    { n:3, name:"Saphirfeste",      at:1200, url:ASSETS.arena3, key:"arena3" },
+    { n:4, name:"Sturmspitze",      at:1500, url:ASSETS.arena4, key:"arena4" },
+    { n:5, name:"Obsidian-Thron",   at:2200, url:ASSETS.arena5, key:"arena5" },
+    { n:6, name:"Prisma-Zitadelle", at:2900, url:ASSETS.arena6, key:"arena6" },
+  ];
+  function arenaIndexFor(troph) {
+    var i = 0;
+    for (var k = 0; k < ARENA_TIERS.length; k++) if (troph >= ARENA_TIERS[k].at) i = k;
+    return i;
+  }
 
   /* ================= Demo-Seed ================= */
   var SEED_KEY = "arenaUiProtoSeed";
@@ -618,8 +874,16 @@ footer{padding:6px 12px 14px;text-align:center}
     var m = BY_ID[curId], v = AC.view(curId), t = tierOf(v.tier);
     $("dName").textContent = m.name;
     var bn = $("dBanner");
-    bn.textContent = t.name;
+    // Raritäts-Banner: das text-freie Kristallband-Asset wird per CSS-Filter
+    // auf die Raritätsfarbe getönt; der Name kommt als Gold-Gradient-Text.
+    bn.innerHTML = '<span class="goldtext">' + t.name + "</span>";
     bn.style.background = t.color;
+    bn.style.backgroundImage = 'url("' + ASSETS.banner_rarity + '"), linear-gradient(180deg,' +
+      t.color + "," + t.color + ")";
+    bn.style.backgroundSize = "100% 300%, 100% 100%";
+    bn.style.backgroundPosition = "center";
+    bn.style.backgroundRepeat = "no-repeat";
+    bn.style.boxShadow = "inset 0 0 0 999px " + t.color + "38";
     $("dArt").textContent = m.art;
     $("dTower").style.background = "linear-gradient(180deg," + m.color + "cc,#1b2b3d)";
     $("dTarget").innerHTML = m.target;
@@ -731,6 +995,7 @@ footer{padding:6px 12px 14px;text-align:center}
       return '<div class="reqslot">＋</div>';
     }).join("");
     $("btnMerge").disabled = req.n < 3;
+    renderMergePreview();
     $("forgeGrid").innerHTML = forgeEntries().map(function (e) {
       var sel = (req.id === e.id && req.tier === e.tier) ? "sel" : "";
       var t = tierOf(e.tier), m = BY_ID[e.id], v = AC.view(e.id);
@@ -744,12 +1009,87 @@ footer{padding:6px 12px 14px;text-align:center}
     var els = $("forgeGrid").querySelectorAll("[data-id]");
     for (var i = 0; i < els.length; i++) {
       (function (el) {
+        // Raritätsrahmen-Asset über den Farbgradienten legen (Fallback bleibt).
+        layer(el, "frame_" + tierOf(el.getAttribute("data-tier")).key);
+        el.style.backgroundSize = "100% 100%, 100% 100%";
         el.addEventListener("click", function () {
           pickForge(el.getAttribute("data-id"), el.getAttribute("data-tier"));
         });
       })(els[i]);
     }
   }
+  /* Merge-Vorschau — Struktur 1:1 nach AA (§13.1): MAX LEVEL alt → neu,
+     darunter zwei Stat-Vorschauen, plus der ausdrückliche Hinweis, dass
+     der Merge KEIN Gold kostet (in Video 7 arithmetisch belegt: der
+     Kontostand war vor und nach dem Merge identisch 19 918). */
+  function mergePreviewData() {
+    if (!req.id || !req.tier) return null;
+    var nk = AC.nextTierKey(req.tier);
+    if (!nk) return null;
+    var from = tierOf(req.tier), to = tierOf(nk), m = BY_ID[req.id];
+    var v = AC.view(req.id);
+    // Stat-Vorschau: die zwei ersten Stats mit dem Merge-Faktor der Zielstufe.
+    var boni = AC.perksFor ? null : null;
+    var f = 1 + 0.16 + (to.index - 1) * 0.02; // Näherung; echte Werte via PERKS
+    return { m: m, from: from, to: to, lvl: v.lvl, f: f };
+  }
+  function renderMergePreview() {
+    var el = $("mergePreview"), d = mergePreviewData();
+    if (!d || req.n < 1) { el.className = "mergepreview"; el.innerHTML = ""; return; }
+    el.className = "mergepreview on";
+    var s = d.m.stats;
+    function line(k, a, b) {
+      return '<div class="pr"><span>' + k + '</span><span class="v2"><s>' + a +
+        '</s> → <em>' + b + "</em></span></div>";
+    }
+    el.innerHTML =
+      '<div class="pr"><span>Stufe</span><span><b style="color:' + d.from.color + '">' +
+        d.from.name + '</b> → <b style="color:' + d.to.color + '">' + d.to.name + "</b></span></div>" +
+      line("Max. Level", d.from.cap, d.to.cap) +
+      (s[0] ? line(s[0].k, r1(s[0].b), r1(s[0].b * d.f)) : "") +
+      (s[1] ? line(s[1].k, r1(s[1].b), r1(s[1].b * d.f)) : "") +
+      '<div class="free">✓ Kostet kein Gold — nur die 3 Kopien (AA-Befund §13.1)</div>' +
+      '<div class="free" style="color:var(--dim);font-weight:700">Level bleibt bei ' + d.lvl +
+      " — nur das Cap steigt.</div>";
+  }
+  function r1(n) { return (Math.round(n * 10) / 10).toString().replace(".", ","); }
+
+  /* Merge-Zeremonie (§13.1): Titel, Karte mit hochzählendem Level-Badge,
+     Vorher/Nachher-Tafel, Abschluss "Weiter" → "Tippen zum Schließen". */
+  function playCeremony(id, fromTierKey, newTierKey, lvl, copyOnly) {
+    var from = tierOf(fromTierKey), to = tierOf(newTierKey), m = BY_ID[id];
+    var box = $("mergeCeremony");
+    $("cerTitle").textContent = copyOnly
+      ? "Verschmolzen!" : "Perfekte Verschmelzung!";
+    $("cerArt").textContent = m.art;
+    $("cerCard").style.borderColor = to.color;
+    layer($("cerCard"), "frame_" + to.key);
+    $("cerTable").innerHTML =
+      '<div class="row2"><span class="k2">Max. Level</span><span class="v2"><s>' + from.cap +
+        "</s> → <em>" + to.cap + "</em></span></div>" +
+      '<div class="row2"><span class="k2">Stufe</span><span class="v2"><s>' + from.name +
+        "</s> → <em>" + to.name + "</em></span></div>" +
+      '<div class="row2"><span class="k2">Kosten</span><span class="v2"><em>0 🪙</em> + 3 Kopien</span></div>';
+    $("cerBtn").textContent = "Weiter";
+    box.classList.add("open");
+    // Level zählt von 1 auf den echten Wert hoch — genau das zeigt AA
+    // (t=21 "LvL 1" → t=22 "LvL 16" auf derselben Karte).
+    var n = 1, tgt = Math.max(1, lvl | 0);
+    $("cerLvl").textContent = "LvL " + n;
+    if (window.__cerTimer) clearInterval(window.__cerTimer);
+    window.__cerTimer = setInterval(function () {
+      n += Math.max(1, Math.ceil(tgt / 14));
+      if (n >= tgt) { n = tgt; clearInterval(window.__cerTimer); window.__cerTimer = null;
+        $("cerBtn").textContent = "Tippen zum Schließen"; }
+      $("cerLvl").textContent = "LvL " + n;
+    }, 70);
+  }
+  function closeCeremony() {
+    if (window.__cerTimer) { clearInterval(window.__cerTimer); window.__cerTimer = null; }
+    $("mergeCeremony").classList.remove("open");
+    maybeAskBonus(window.__cerId || null);
+  }
+
   function pickForge(id, tier) {
     if (req.id !== id || req.tier !== tier) { req = { id: id, tier: tier, n: 0 }; }
     var have = AC.get().cards[id].copies[tier];
@@ -770,9 +1110,13 @@ footer{padding:6px 12px 14px;text-align:center}
     var neu = $("forgeGrid").querySelector('[data-id="' + id + '"][data-tier="' +
       AC.nextTierKey(tier) + '"]');
     if (neu) { neu.classList.remove("ceremony"); void neu.offsetWidth; neu.classList.add("ceremony"); }
-    toast(r.tierUp ? "✨ " + BY_ID[id].name + " ist jetzt " + tierOf(r.newTier).name +
-      " (Cap " + r.cap + ")" : "＋1 " + tierOf(AC.nextTierKey(tier)).name + "-Kopie");
-    maybeAskBonus(id);
+    // Vollbild-Zeremonie wie in AA — sie läuft bei JEDEM geglückten Merge,
+    // auch wenn dabei "nur" eine Kopie der nächsten Stufe entsteht (in
+    // Video 7 war genau das der Fall und AA zeigte trotzdem die volle
+    // "PERFECT MERGE!"-Sequenz). Die Bonus-Wahl kommt erst danach.
+    window.__cerId = id;
+    playCeremony(id, tier, r.tierUp ? r.newTier : AC.nextTierKey(tier),
+                 AC.view(id).lvl, !r.tierUp);
   }
   function doMergeAll() {
     var total = 0, ids = [];
@@ -935,24 +1279,140 @@ footer{padding:6px 12px 14px;text-align:center}
     if (n) { b.style.display = ""; b.textContent = n; } else { b.style.display = "none"; }
   }
 
-  /* ================= Navigation ================= */
-  var NAVS = { navCollection: "viewCollection", navForge: "viewForge", navPack: "viewPack" };
-  function setNav(which) {
-    ["navCollection", "navTower", "navForge", "navPack"].forEach(function (k) {
-      $(k).classList.toggle("on", k === which);
+  /* ================= HOME-VIEW (Status-Arenen, §9.5b) ================= */
+  function renderHome() {
+    var t = DEMO_TROPHIES;
+    var i = arenaIndexFor(t);
+    var cur = ARENA_TIERS[i], nxt = ARENA_TIERS[i + 1] || null;
+
+    $("arenaKicker").textContent = "Arena " + cur.n;
+    $("arenaName").textContent = cur.name;
+    // AA zeigt hier den aktiven Map-Modifier; ohne Objective steht dort
+    // wörtlich "Neutral". Bei uns immer neutral — die Welt ist random.
+    $("arenaChip").textContent = "◎ Zufallswelt";
+
+    // Key-Art vollflächig hinter dem Hero (AA rahmt sie NICHT ein).
+    layer($("arenaHero"), cur.key);
+    layer($("arenaProg"), "progress_frame");
+    layer($("btnBattle"), "btn_primary");
+
+    // Fortschritt bis zur nächsten Arena.
+    var from = cur.at, to = nxt ? nxt.at : cur.at;
+    var pct = nxt ? Math.max(0, Math.min(100, (t - from) / (to - from) * 100)) : 100;
+    $("arenaProgFill").style.width = pct.toFixed(1) + "%";
+    $("arenaProgLabel").textContent = nxt
+      ? (fmt(t) + " / " + fmt(to) + " 🏆")
+      : (fmt(t) + " 🏆 — Höchste Arena");
+    $("arenaProgIcon").textContent = nxt ? "🎁" : "👑";
+
+    // Arena-Leiter: erreichte farbig, kommende abgedunkelt mit 🔒 + Schwelle.
+    $("arenaLadder").innerHTML = ARENA_TIERS.map(function (a, k) {
+      var locked = t < a.at, here = k === i;
+      return '<button class="rung' + (locked ? " locked" : "") + (here ? " here" : "") +
+        '" data-arena="' + k + '">' +
+        '<div class="shade"></div>' +
+        (locked ? '<span class="lk">🔒</span>' : "") +
+        '<div class="rn ' + (locked ? "" : "goldtext") + '">' + a.name + "</div>" +
+        '<div class="rt">' + (a.at === 0 ? "Start" : fmt(a.at) + " 🏆") + "</div>" +
+        "</button>";
+    }).join("");
+    Array.prototype.forEach.call($("arenaLadder").querySelectorAll(".rung"), function (b) {
+      var a = ARENA_TIERS[b.getAttribute("data-arena") | 0];
+      layer(b, a.key);
+      b.addEventListener("click", function () {
+        toast(DEMO_TROPHIES >= a.at
+          ? "Arena " + a.n + ": " + a.name + " — erreicht"
+          : "Arena " + a.n + ": " + a.name + " — noch " + fmt(a.at - DEMO_TROPHIES) + " 🏆");
+      });
     });
+
+    $("homeNote").innerHTML = nxt
+      ? ("Noch <b>" + fmt(to - t) + " 🏆</b> bis <b>" + nxt.name + "</b>. " +
+         "Arenen sind reine Status-Optik — die Match-Welt wird pro Spiel zufällig gewählt.")
+      : "Höchste Arena erreicht. Arenen sind reine Status-Optik — die Match-Welt wird pro Spiel zufällig gewählt.";
+    renderTop();
+  }
+
+  /* Assets, die außerhalb des Home-Views liegen, einmalig auflegen.
+     Fällt das CDN aus, greifen überall die vorhandenen Gradienten. */
+  function applyAssets() {
+    layer($("btnToForge"), "btn_primary");
+    layer($("btnMergeAll"), "btn_primary");
+    layer($("btnMerge"), "btn_primary");
+    layer($("btnUpgrade"), "btn_primary");
+    layer($("btnClearReq"), "btn_secondary");
+    layer($("btnUnequip"), "btn_danger");
+    var pb = $("btnOpenBronze");
+    if (pb) {
+      layer(pb, "pack_bronze");
+      pb.style.backgroundSize = "auto 150%, 100% 100%";
+      pb.style.backgroundPosition = "left -18px center, center";
+      pb.style.backgroundRepeat = "no-repeat";
+    }
+    layer(document.querySelector(".reqpanel"), "panel");
+    // Top-Bar-Pillen: die Kapsel bekommt das Asset, Zahl/Icon bleiben HTML.
+    Array.prototype.forEach.call(document.querySelectorAll(".topbar .cur"), function (el) {
+      layer(el, "pill_topbar");
+      el.style.backgroundSize = "100% 320%, 100% 100%";
+      el.style.backgroundPosition = "center";
+      el.style.backgroundRepeat = "no-repeat";
+    });
+    // Titel: Banner-Asset auf das <h2>, Gold-Gradient-Text auf ein inneres
+    // <span> — sonst würde background-clip:text auch das Bild auf die
+    // Buchstaben beschneiden.
+    Array.prototype.forEach.call(document.querySelectorAll("h2.title"), function (h) {
+      if (!h.querySelector(".goldtext")) {
+        h.innerHTML = '<span class="goldtext">' + h.textContent + "</span>";
+      }
+      layer(h, "banner_title");
+      h.style.backgroundSize = "100% 330%, 100% 100%";
+      h.style.backgroundPosition = "center";
+      h.style.backgroundRepeat = "no-repeat";
+      h.style.padding = "10px 0";
+      h.style.textAlign = "center";
+      h.style.fontSize = "17px";
+    });
+    // Button-Beschriftungen auf die Gold-Text-Ebene heben (deutsche Strings
+    // bleiben im Markup — das ist der Lokalisierungs-Nachweis).
+    ["btnToForge", "btnMergeAll", "btnMerge", "btnOpenBronze"].forEach(function (id) {
+      var el = $(id); if (el) el.classList.add("goldtext");
+    });
+    ["btnClearReq", "btnUnequip"].forEach(function (id) {
+      var el = $(id); if (el) el.classList.add("goldtext", "pale");
+    });
+  }
+
+  /* ================= Navigation ================= */
+  var NAVS = { navHome: "viewHome", navCollection: "viewCollection",
+               navForge: "viewForge", navPack: "viewPack" };
+  var NAV_IDS = ["navHome", "navCollection", "navTower", "navForge", "navPack"];
+  function setNav(which) {
+    NAV_IDS.forEach(function (k) { $(k).classList.toggle("on", k === which); });
   }
   function show(navId) {
     if (navId === "navTower") { openDetail(curId); return; }
     $("detailModal").classList.remove("open");
     for (var k in NAVS) $(NAVS[k]).classList.toggle("active", k === navId);
     setNav(navId);
+    if (navId === "navHome") renderHome();
     if (navId === "navCollection") renderCollection();
     if (navId === "navForge") renderForge();
     if (navId === "navPack") { renderPackHeader(); renderTop(); }
   }
 
   /* ================= Events ================= */
+  $("navHome").addEventListener("click", function () { show("navHome"); });
+  // Home → Kampf: im Prototyp gibt es kein Match, also führt der Button in
+  // die Sammlung (dort wird das Deck fürs nächste Match zusammengestellt).
+  $("btnBattle").addEventListener("click", function () {
+    toast("Match startet — im Prototyp geht es zum Deck");
+    show("navCollection");
+  });
+  $("tileEvents").addEventListener("click", function () { toast("Events sind im Prototyp Deko"); });
+  $("arenaCrest").addEventListener("click", function () {
+    var a = ARENA_TIERS[arenaIndexFor(DEMO_TROPHIES)];
+    toast("Arena " + a.n + " von " + ARENA_TIERS.length + ": " + a.name);
+  });
   $("navCollection").addEventListener("click", function () { show("navCollection"); });
   $("navTower").addEventListener("click", function () { show("navTower"); });
   $("navForge").addEventListener("click", function () { show("navForge"); });
@@ -965,6 +1425,10 @@ footer{padding:6px 12px 14px;text-align:center}
   $("btnMerge").addEventListener("click", doMerge);
   $("btnMergeAll").addEventListener("click", doMergeAll);
   $("btnClearReq").addEventListener("click", function () { req = { id: null, tier: null, n: 0 }; renderForge(); });
+  $("cerBtn").addEventListener("click", closeCeremony);
+  $("mergeCeremony").addEventListener("click", function (e) {
+    if (e.target === $("mergeCeremony")) closeCeremony();
+  });
   $("btnOpenBronze").addEventListener("click", openBronze);
   $("btnRevealAll").addEventListener("click", revealAll);
   // Sortierung: beide Dropdowns teilen denselben Modus und bleiben synchron.
@@ -998,10 +1462,14 @@ footer{padding:6px 12px 14px;text-align:center}
 
   /* ================= Start ================= */
   setSort("level");
+  applyAssets();
   renderCollection();
   renderPackHeader();
+  renderHome();
+  setNav("navHome");
   window.__proto = { AC: AC, openDetail: openDetail, show: show, seed: seed,
-                     setSort: setSort, sortedIds: sortedIds };
+                     setSort: setSort, sortedIds: sortedIds,
+                     ASSETS: ASSETS, ARENA_TIERS: ARENA_TIERS, renderHome: renderHome };
 })();
 </script>
 </body>

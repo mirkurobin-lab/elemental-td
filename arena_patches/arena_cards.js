@@ -132,15 +132,30 @@
   var STAT_BASE = 1.022;
 
   /* ---------- Gold-Plateaus (Kosten des Level-Ups AB diesem Level) ----------
-   * AA-Beleg: 8000 Gold bei Lv15/16 (Good/Rare). Wir liegen bei Lv15 mit 600
-   * bewusst darunter und erreichen 8000 erst bei Lv31-35 — kalibrierbar,
-   * sobald echte Telemetrie vorliegt (siehe DESIGN_PROGRESSION.md §B). */
+   * KALIBRIERT AUF ECHTE AA-ZAHLEN (Video 7, AA_UI_REFERENZ.md §13).
+   *
+   * In Video 7 wurden drei Upgrades ausgeführt; die Kosten sind über den
+   * Gold-Kontostand ARITHMETISCH BEWIESEN (nicht nur OCR-gelesen):
+   *   Boulder (Gewöhnlich, Cap 10): Lv1→2 = 1.000 · Lv2→3 = 2.000 · Lv3→4 = 3.000
+   *   Catapult (Selten,     Cap 30): Lv16→17 = 15.000 · Lv17→18 = 18.000
+   * → AA-Kurve ≈ 1.000 × Level, oberhalb Lv15 mit Sprüngen von ~3.000.
+   *
+   * SKALIERUNG AUF UNSERE SPANNE: AA-Karten laufen bis ~Lv50 (Legendär),
+   * unsere bis Lv100 — Faktor 2 auf der Level-Achse. Aus 1.000×n_AA wird
+   * damit ≈ 500×n_uns. Genau daran liegen die Bänder bis Lv40 an:
+   *   unser Lv6 ↔ AA Lv3  → 2.500 (AA 3.000)
+   *   unser Lv32 ↔ AA Lv16 → 16.500 (AA 15.000)
+   *   unser Lv34 ↔ AA Lv17 → 16.500 (AA 18.000; AAs Ein-Level-Sprung
+   *                          15k→18k wird bei uns zu einem Plateau geglättet)
+   * Ab Lv41 wird die Kurve überlinear — das entspricht AAs eigener
+   * Versteilung oberhalb Lv15 und liefert den Endgame-Gold-Sink.
+   * Erste Bänder absichtlich unter der 500×L-Linie (sanftes Onboarding). */
   var GOLD_BANDS = [
-    { to: 5,   gold: 100 },    { to: 10,  gold: 250 },    { to: 15,  gold: 600 },
-    { to: 20,  gold: 1500 },   { to: 25,  gold: 3000 },   { to: 30,  gold: 5000 },
-    { to: 35,  gold: 8000 },   { to: 40,  gold: 12000 },  { to: 50,  gold: 18000 },
-    { to: 60,  gold: 26000 },  { to: 70,  gold: 38000 },  { to: 80,  gold: 55000 },
-    { to: 90,  gold: 80000 },  { to: 100, gold: 120000 },
+    { to: 4,   gold: 800 },    { to: 8,   gold: 2500 },   { to: 12,  gold: 4500 },
+    { to: 16,  gold: 7000 },   { to: 20,  gold: 9500 },   { to: 25,  gold: 11500 },
+    { to: 30,  gold: 14000 },  { to: 35,  gold: 16500 },  { to: 40,  gold: 19000 },
+    { to: 50,  gold: 26000 },  { to: 60,  gold: 38000 },  { to: 70,  gold: 55000 },
+    { to: 80,  gold: 80000 },  { to: 90,  gold: 115000 }, { to: 100, gold: 165000 },
   ];
 
   /* ---------- Pack-Definitionen ----------
@@ -203,12 +218,25 @@
     return i >= TIERS.length - 1 ? null : TIERS[i + 1].key;
   }
 
-  // Material für den Level-Up AB lvl. Bedarf hängt an der Stufe (3 … 8),
-  // nicht am Level — AA zeigt Bedarfe von 3 und 5 bei Lv15/16.
+  /* Material für den Level-Up AB lvl.
+   * KALIBRIERT AUF AA (Video 7, §13): der Bedarf hängan BEIDEM —
+   * am Level UND an der Raritätsstufe:
+   *   Boulder  (Gewöhnlich, Lv1)  → Bedarf 1   ("50/1")
+   *   Skyflare (Gut,        Lv?)  → Bedarf 3   ("40/3")
+   *   Catapult (Selten,     Lv16) → Bedarf 5   ("12/5")
+   *   Divine Sword (Gut,    Lv15) → Bedarf 5   ("19/5")
+   * Die alte Annahme "nur Stufe" (3+tierIdx) konnte den Wert 1 bei
+   * Gewöhnlich/Lv1 nicht erklären. Formel: 1 + tierIdx + floor(lvl/10).
+   * Auf unsere Lv-100-Spanne skaliert (AA Lv n ↔ unser Lv 2n):
+   *   unser Lv2,  Gewöhnlich → 1  (AA 1)  ✓
+   *   unser Lv30, Gut        → 5  (AA 5)  ✓
+   *   unser Lv32, Selten     → 6  (AA 5)  ~
+   * Obergrenze 16, damit der Bedarf nicht ins Absurde läuft. */
   function materialFor(lvl, tierIdx) {
     if (typeof tierIdx === "string") tierIdx = tierOf(tierIdx).index;
     tierIdx = Math.max(0, Math.min(TIERS.length - 1, tierIdx | 0));
-    return 3 + tierIdx;
+    var n = 1 + tierIdx + Math.floor(clampLvl(lvl) / 10);
+    return n > 16 ? 16 : n;
   }
 
   // Gold für den Level-Up AB lvl (Plateau-Kurve in 5er-/10er-Bändern).
@@ -999,7 +1027,16 @@
     check("Merge-Boni erhöhen statMul", statMul(50, ["fire_good_rate", "fire_rare_exec"]) > statMul(50),
       r2(statMul(50)) + " → " + r2(statMul(50, ["fire_good_rate", "fire_rare_exec"])));
     check("Caps 25/40/55/70/85/100", TIERS.map(function (t) { return t.cap; }).join("/") === "25/40/55/70/85/100");
-    check("materialFor 3…8", materialFor(1, 0) === 3 && materialFor(99, 5) === 8);
+    // AA-kalibriert (§13): 1 + tierIdx + floor(lvl/10), Deckel 16.
+    check("materialFor(Lv1,Gewöhnlich)==1 (AA-Beleg Boulder 50/1)", materialFor(1, 0) === 1, materialFor(1, 0));
+    check("materialFor(Lv30,Gut)==5 (AA-Beleg Divine Sword 19/5)", materialFor(30, 1) === 5, materialFor(30, 1));
+    check("materialFor(Lv99,Suprem)==15, Deckel 16", materialFor(99, 5) === 15 && materialFor(200, 5) <= 16,
+      materialFor(99, 5));
+    check("materialFor monoton in Level und Stufe", (function () {
+      for (var l = 2; l <= 100; l++) if (materialFor(l, 2) < materialFor(l - 1, 2)) return false;
+      for (var t = 1; t < 6; t++) if (materialFor(50, t) <= materialFor(50, t - 1)) return false;
+      return true;
+    })());
 
     var gSum = totalGoldTo(100);
     console.log("\nGold kumulativ bis Lv100: " + fmt(gSum) + " Gold");
@@ -1010,7 +1047,12 @@
       for (var l = 2; l <= 100; l++) if (goldFor(l) < goldFor(l - 1)) return false;
       return true;
     })());
-    check("Gold-Summe bis Lv100 in [3.0M, 3.8M]", gSum > 3.0e6 && gSum < 3.8e6, fmt(gSum));
+    // Nach der AA-Kalibrierung (§13) liegt die Summe höher als in v2:
+    // AAs echte Frühkosten (1.000 Gold schon bei Lv1→2) sind deutlich härter
+    // als unsere alte Annahme (100 Gold), dafür ist Lv100 der absolute Endgame.
+    check("Gold-Summe bis Lv100 in [4.5M, 5.6M]", gSum > 4.5e6 && gSum < 5.6e6, fmt(gSum));
+    check("AA-Anker: goldFor(6)≈2.500 (AA Lv3 = 3.000)", goldFor(6) === 2500, goldFor(6));
+    check("AA-Anker: goldFor(32)=16.500 (AA Lv16 = 15.000)", goldFor(32) === 16500, goldFor(32));
     check("Pack-Gewichte summieren auf 100", Object.keys(PACKS).every(function (k) {
       return Math.abs(PACKS[k].weights.reduce(function (a, b) { return a + b; }, 0) - 100) < 1e-9;
     }));
@@ -1208,8 +1250,9 @@
     var gS = getMaterials();
     console.log("\nSorten-Verbrauch: EMBER (" + materialInfoOf("fire").name + ") Lv1→Lv" +
       (luS && luS.newLvl) + "  " + JSON.stringify(gS));
-    check("levelUp zieht genau 3 von 'attack' ab", luS && luS.materialSpent === 3 &&
-      gS.attack === 7, gS.attack);
+    // AA-kalibriert: Gewöhnlich auf Lv1 braucht nur 1 Material (§13).
+    check("levelUp zieht genau 1 von 'attack' ab", luS && luS.materialSpent === 1 &&
+      gS.attack === 9, gS.attack);
     check("levelUp lässt 'speed'/'special' unberührt", gS.speed === 50 && gS.special === 50);
     check("levelUp meldet die Sorte mit", luS && luS.materialType === "attack" &&
       luS.materialName === "Angriffs-Essenz");
@@ -1242,8 +1285,11 @@
              lu.goldCost + " Gold"));
     check("Gold-Kosten werden nur gemeldet, nicht abgezogen", get().gold === null);
     API._reset();
-    addDrop("light", "common", 1); addMaterial(2, "speed");
-    check("canLevelUp meldet Material-Mangel", canLevelUp("light").reason === "material");
+    // LIGHT verbraucht Tempo-Essenz; ohne Vorrat dieser Sorte → Material-Mangel.
+    addDrop("light", "common", 1);
+    check("canLevelUp meldet Material-Mangel", canLevelUp("light").reason === "material",
+      "brauche " + canLevelUp("light").needMaterial + ", habe " + canLevelUp("light").haveMaterial);
+    addMaterial(20, "speed");
     addMaterial(10, "speed");
     check("canLevelUp meldet Gold-Mangel", canLevelUp("light", 50).reason === "gold");
 
@@ -1257,7 +1303,7 @@
       }
       console.log("\nEine Karte von Lv1 auf Lv100: " + mat + " Material + " + fmt(gold) +
         " Gold + 243 Gewöhnlich-Kopien (Merge-Pyramide)");
-      check("Material-Gesamtbedarf 400-700", mat > 400 && mat < 700, mat);
+      check("Material-Gesamtbedarf 650-900 (AA-kalibriert)", mat > 650 && mat < 900, mat);
     })();
 
     /* --- 6b. Sichtbarer Pity-Counter (AA-Muster §8.2) --- */

@@ -1,0 +1,165 @@
+{
+  "_meta": {
+    "titel": "Arcane Prism TD — Meta-UI-Assetsatz",
+    "stil": "Edel & Kristallin (Style-Variante 2)",
+    "styleSheetJob": "22646ce4-8685-46af-ad73-9ec32482c2c2",
+    "modell": "nano_banana_pro (Higgsfield), resolution 1k, Style-Sheet als Bild-Referenz",
+    "erzeugt": "2026-07-25",
+    "credits": "25 Generationen x 2 = 50 Credits, 0 Retakes",
+    "palette": {
+      "gold": "#e0b94a", "violett": "#7a4fd6", "bg": "#0e1418",
+      "raritaeten": ["#9aa3ad", "#58c26a", "#3d9df2", "#a45ef2", "#f2a13d", "#ff5e7e"]
+    },
+    "hinweise": [
+      "ALLE Assets sind TEXT-FREI (per Tesseract-OCR verifiziert). Beschriftung kommt als HTML-Ebene obendrauf (.goldtext).",
+      "Hintergrund ist flaches Dunkel #0e1418 — kein Freistellen nötig, die Meta-UI liegt ohnehin auf dunklem Grund.",
+      "Wo echte Transparenz gebraucht wird: in einer Sandbox mit ImageMagick `convert x.png -fuzz 12% -transparent '#0e1418' x.png`.",
+      "Die UI-Elemente sind mittig auf einer größeren Leinwand platziert. Im CSS deshalb mit background-size 100% 200% + background-position center arbeiten (zeigt das mittlere Drittel/Hälfte), oder `contain` und die dunklen Ränder mitlaufen lassen.",
+      "CDN-URLs sind aus der Agent-Umgebung NICHT erreichbar (Proxy), im Browser des Users schon. Der Prototyp hat für jedes Asset einen CSS-Gradient-Fallback."
+    ],
+    "cdnBase": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/"
+  },
+
+  "btn_primary": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_094652_c3235d59-6aa8-4e7b-bf6e-8a86ae45e738.png",
+    "job": "c3235d59-6aa8-4e7b-bf6e-8a86ae45e738", "type": "button", "size": "1200x896",
+    "beschreibung": "Primär-Button, breite Gold-Kristall-Plakette mit leerem Label-Feld. Für UPGRADE / BATTLE / VERSCHMELZEN."
+  },
+  "btn_secondary": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_094715_3b933e5e-6d2f-488b-8093-f545aa5af6c5.png",
+    "job": "3b933e5e-6d2f-488b-8093-f545aa5af6c5", "type": "button", "size": "1200x896",
+    "beschreibung": "Sekundär-Button, dunkler Stein mit Silber-Filigran, leer. Für Zurück / Leeren / neutrale Aktionen."
+  },
+  "btn_danger": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_094716_0dfb3958-3823-42a2-a67f-754b847e263d.png",
+    "job": "0dfb3958-3823-42a2-a67f-754b847e263d", "type": "button", "size": "1200x896",
+    "beschreibung": "Gefahr/Ablegen-Button, violett-dunkles Amethyst-Kristall, leer. Für Ablegen / Zurücksetzen."
+  },
+  "pill_topbar": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095631_56a56b7e-7e2e-454a-8ff2-b7ecb71bea8e.png",
+    "job": "56a56b7e-7e2e-454a-8ff2-b7ecb71bea8e", "type": "pill", "size": "1376x768",
+    "beschreibung": "Schmale Top-Bar-Pille mit leerem runden Icon-Sockel links. Für Trophäen / Gems / Gold."
+  },
+  "panel": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095635_27685aa1-c11f-4320-a385-b859dd0914b5.png",
+    "job": "27685aa1-c11f-4320-a385-b859dd0914b5", "type": "panel", "size": "1200x896",
+    "beschreibung": "Rechteckiges Content-Panel, Glas-Interieur mit Goldrahmen und Gem-Cabochons, leer. Als border-image oder Hintergrund."
+  },
+  "tab": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095638_48493952-a47a-4ed8-acc8-1f47a65a5da0.png",
+    "job": "48493952-a47a-4ed8-acc8-1f47a65a5da0", "type": "tab", "size": "1376x768",
+    "beschreibung": "Kleines Tab-/Segment-Element, leer. Für Türme / Skills / Items."
+  },
+
+  "frame_common": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095642_526164c7-6bb9-4c1f-93b2-ef48d8687b51.png",
+    "job": "526164c7-6bb9-4c1f-93b2-ef48d8687b51", "type": "cardframe", "size": "848x1264",
+    "tier": "common", "farbe": "#9aa3ad",
+    "beschreibung": "Kartenrahmen Gewöhnlich — schlicht, graues Stahl-Filigran, leeres dunkles Zentrum."
+  },
+  "frame_good": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095652_0e76b98e-5bc1-41d1-b7d6-1a7addd64c58.png",
+    "job": "0e76b98e-5bc1-41d1-b7d6-1a7addd64c58", "type": "cardframe", "size": "848x1264",
+    "tier": "good", "farbe": "#58c26a",
+    "beschreibung": "Kartenrahmen Gut — grüner Kristall, ein Gem oben, noch zurückhaltend."
+  },
+  "frame_rare": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095656_f9462654-444a-47fb-af6d-01e758b3d09e.png",
+    "job": "f9462654-444a-47fb-af6d-01e758b3d09e", "type": "cardframe", "size": "848x1264",
+    "tier": "rare", "farbe": "#3d9df2",
+    "beschreibung": "Kartenrahmen Selten — blauer Kristall, Splitter an den Ecken, kühler Glow."
+  },
+  "frame_epic": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095700_af4f1396-00ca-4392-baea-e034d09706d4.png",
+    "job": "af4f1396-00ca-4392-baea-e034d09706d4", "type": "cardframe", "size": "848x1264",
+    "tier": "epic", "farbe": "#a45ef2",
+    "beschreibung": "Kartenrahmen Episch — violette Amethyst-Cluster an allen Ecken, Lichtpartikel."
+  },
+  "frame_legendary": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095704_08f4478c-de30-4653-aecb-5c659d420821.png",
+    "job": "08f4478c-de30-4653-aecb-5c659d420821", "type": "cardframe", "size": "848x1264",
+    "tier": "legendary", "farbe": "#f2a13d",
+    "beschreibung": "Kartenrahmen Legendär — bernsteinfarben glühend, Flügel-Splitter, Ember-Partikel."
+  },
+  "frame_supreme": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095707_1878e9e4-ecb1-4eb1-89bc-6f1c60238b2f.png",
+    "job": "1878e9e4-ecb1-4eb1-89bc-6f1c60238b2f", "type": "cardframe", "size": "848x1264",
+    "tier": "supreme", "farbe": "#ff5e7e",
+    "beschreibung": "Kartenrahmen Suprem — Höchststufe, karmesinroter Riesen-Gem, große Kristallflügel, Partikelkaskade."
+  },
+
+  "banner_rarity": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095716_6936452c-84d2-4fc4-ba15-4fa77ef8e6bd.png",
+    "job": "6936452c-84d2-4fc4-ba15-4fa77ef8e6bd", "type": "banner", "size": "1376x768",
+    "beschreibung": "Raritäts-Banner: Kristallband mit Flügelchen links/rechts, neutral-gold — per CSS-filter hue-rotate/sepia je Rarität tönbar."
+  },
+  "banner_title": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095720_71db8bf1-f9c9-4acd-9d17-8ce7462e384d.png",
+    "job": "71db8bf1-f9c9-4acd-9d17-8ce7462e384d", "type": "banner", "size": "1584x672",
+    "beschreibung": "Breites Titel-/Wave-Banner, Goldfiligran mit Schnörkeln, leer. Für Screen-Titel und Wellen-Ankündigung."
+  },
+
+  "pack_bronze": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095725_5c0984d9-f669-49ec-82f2-81817f8eab56.png",
+    "job": "5c0984d9-f669-49ec-82f2-81817f8eab56", "type": "pack", "size": "848x1264",
+    "beschreibung": "Bronze-Pack, kupfern, geschlossen, Hochformat."
+  },
+  "pack_silver": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095727_a48313e3-3fb7-4156-b276-9622a9f313a6.png",
+    "job": "a48313e3-3fb7-4156-b276-9622a9f313a6", "type": "pack", "size": "848x1264",
+    "beschreibung": "Silber-Pack, poliertes Silber, geschlossen, Hochformat."
+  },
+  "pack_gold": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095735_28c01416-737f-414d-b8b6-0dd21a18e8a9.png",
+    "job": "28c01416-737f-414d-b8b6-0dd21a18e8a9", "type": "pack", "size": "848x1264",
+    "beschreibung": "Gold-Pack, strahlendes Gold mit Bernstein-Kristall, geschlossen, Hochformat."
+  },
+  "pack_arcane": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095739_dad6b23f-bd87-42bb-934a-f0e05d24d4c3.png",
+    "job": "dad6b23f-bd87-42bb-934a-f0e05d24d4c3", "type": "pack", "size": "848x1264",
+    "beschreibung": "Arkan-Pack, violettes Obsidian-Kristall mit prismatischen Refraktionen, geschlossen, Hochformat."
+  },
+
+  "progress_frame": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095742_a6bc63f3-733e-416b-b018-8358ca597e98.png",
+    "job": "a6bc63f3-733e-416b-b018-8358ca597e98", "type": "gauge", "size": "1376x768",
+    "beschreibung": "Fortschrittsbalken-Rahmen, leere Kapsel-Rinne mit Gold-Rand und Gem-Kappen. Füllung per CSS obendrauf."
+  },
+
+  "arena1": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095747_28a90d71-c3ab-4911-afd5-969483bfa22c.png",
+    "job": "28a90d71-c3ab-4911-afd5-969483bfa22c", "type": "arena", "size": "1376x768",
+    "name": "Kristallhof", "at": 0,
+    "beschreibung": "Arena 1 — ruhiger Steinhof mit ersten Kristallen, Tageslicht. Status-Key-Art, KEINE Match-Welt."
+  },
+  "arena2": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095757_8ddd3202-0a7c-4f43-82a7-1d9d6a06d038.png",
+    "job": "8ddd3202-0a7c-4f43-82a7-1d9d6a06d038", "type": "arena", "size": "1376x768",
+    "name": "Smaragdtal", "at": 600,
+    "beschreibung": "Arena 2 — grüne Kristallgärten in Terrassen, Nachmittagslicht."
+  },
+  "arena3": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095801_d277827e-8704-485f-b0bb-b0f4498a2eba.png",
+    "job": "d277827e-8704-485f-b0bb-b0f4498a2eba", "type": "arena", "size": "1376x768",
+    "name": "Saphirfeste", "at": 1200,
+    "beschreibung": "Arena 3 — blaue Kristallfestung, abendlich, wehrhaft."
+  },
+  "arena4": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095808_72fb7754-d381-4be7-b741-6ff63150bcfb.png",
+    "job": "72fb7754-d381-4be7-b741-6ff63150bcfb", "type": "arena", "size": "1376x768",
+    "name": "Sturmspitze", "at": 1500,
+    "beschreibung": "Arena 4 — schwebende Felsen um eine Zackenspitze, Blitze, Gewitterwolken."
+  },
+  "arena5": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095811_7a6408ea-43bf-45d2-b9e3-e02d03d0f9c7.png",
+    "job": "7a6408ea-43bf-45d2-b9e3-e02d03d0f9c7", "type": "arena", "size": "1376x768",
+    "name": "Obsidian-Thron", "at": 2200,
+    "beschreibung": "Arena 5 — schwarze Glas-Thronhalle, violette Runen, bedrohlich."
+  },
+  "arena6": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095815_26d38ce0-2889-4351-8b4c-ac50183d32ea.png",
+    "job": "26d38ce0-2889-4351-8b4c-ac50183d32ea", "type": "arena", "size": "1376x768",
+    "name": "Prisma-Zitadelle", "at": 2900,
+    "beschreibung": "Arena 6 — strahlende Kristall-Zitadelle mit Regenbogen-Lichtsaum. Einziges Asset mit Prisma-Signatur."
+  }
+}

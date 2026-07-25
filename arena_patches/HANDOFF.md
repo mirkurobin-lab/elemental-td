@@ -539,3 +539,100 @@ Gold-Wallet abhängig, aber ohne Gold-Einkommen und ohne Trophäenstand hat sie 
   Danach pro Modul ein eigener Commit, dann ist ein Rollback ein `git revert`.
 - **Vor dem Einbau ein Backup:** `cp public/arena_pan.html public/arena_pan.html.bak` — kostet
   nichts und rettet den Abend, falls git doch noch nicht eingerichtet ist.
+
+---
+
+## UI-Assets & Home-View (Stand 2026-07-25)
+
+### Was neu dazugekommen ist
+
+| Datei | Inhalt |
+|---|---|
+| `arena_patches/ui_assets.json` | **Manifest aller 25 Meta-UI-Assets** — Key → `{url, job, type, beschreibung}`. Stil „Edel & Kristallin", erzeugt mit `nano_banana_pro` und dem Style-Sheet `22646ce4-…` als Bild-Referenz. |
+| `arena_patches/ui_prototype.html` | Neue **fünfte Ansicht „HOME"** (Status-Arenen), **Asset-Ebene** über allen Buttons/Panels/Rahmen/Bändern, **Gold-Gradient-Text-Ebene** (`.goldtext`), Merge-Vorschau + Merge-Zeremonie. |
+| `arena_patches/AA_UI_REFERENZ.md` | §4.4 (Merge-Ablauf), §9.5b (visuelle Inszenierung der Arenen), **§13** (alle Video-7-Befunde und -Korrekturen). |
+
+### Die zwei Regeln, an denen alles hängt
+
+**1. Assets sind TEXT-FREI. Beschriftung ist immer HTML.**
+Alle 25 Assets wurden bewusst ohne Buchstaben generiert und danach per Tesseract-OCR
+gegengeprüft (Ergebnis: sauber). Jede Beschriftung liegt als deutscher String im Markup
+und bekommt die Klasse `.goldtext` (Serif-Kapitälchen + Gold-Verlauf via
+`background-clip:text`). **Lokalisierung tauscht damit nur Strings, nie eine Grafik.**
+Beim Übernehmen ins Spiel: diese Trennung nicht aufweichen — sobald ein Wort im PNG
+landet, ist die Sprachumschaltung tot.
+
+**2. Jedes Asset hat einen Fallback.**
+Technik: Mehrfach-Hintergrund. Die Asset-URL steht als **erster**
+`background-image`-Layer, der bisherige CSS-Gradient als **letzter**:
+
+```css
+background-image: url("…/asset.png"), linear-gradient(180deg,#243342,#141d26);
+```
+
+Lädt das Bild nicht (offline, `file://`, Proxy, CDN weg), bleibt der Gradient sichtbar
+und die UI funktioniert unverändert. Im Prototyp macht das die Hilfsfunktion `layer()`.
+Der Playwright-Lauf verifiziert genau das: 82 Bild-Ladefehler, **0 JS-Fehler**,
+alle 25 Prüfschritte grün.
+
+### Assets vom CDN nach `public/assets/` holen (für die Mac-Session)
+
+Die URLs zeigen aufs Higgsfield-CDN. Für die echte App die Dateien einmal lokal ziehen:
+
+```bash
+cd public && mkdir -p assets && \
+python3 -c "
+import json
+d=json.load(open('../arena_patches/ui_assets.json'))
+for k,v in d.items():
+    if k.startswith('_'): continue
+    print(k, v['url'])
+" | while read key url; do
+  curl -sfL -o "assets/$key.png" "$url" && echo "ok   $key" || echo "FAIL $key"
+done
+```
+
+Danach im Prototyp bzw. im Spiel nur noch die Basis umstellen:
+
+```js
+// ui_prototype.html, Abschnitt ASSET-MANIFEST
+var CDN = "./assets/";              // statt der cloudfront-URL
+// und die Dateinamen auf "<key>.png" kürzen
+```
+
+**Wichtig:** Die CDN-URLs sind nicht dauerhaft garantiert. Der Download sollte vor dem
+ersten Release passieren, damit das Spiel nicht von fremder Infrastruktur abhängt.
+
+### Schrift-Empfehlung fürs echte Spiel
+
+`.goldtext` fällt derzeit auf `Georgia / Times New Roman` zurück. Fürs Spiel:
+
+* **Cinzel** (Google Fonts, OFL) — römische Kapitälchen, trifft die Anmutung des
+  Style-Sheets fast exakt, gibt es in 400/600/700/900.
+* Einbindung als **selbst gehostete WOFF2** (nicht per Google-CDN — dasselbe
+  Abhängigkeitsargument wie oben), `font-display: swap`, nur die Latin-Subsets.
+* Für Zahlen (Gold, Level, Trophäen) besser bei einer **tabellarischen Sans** bleiben —
+  Kapitälchen-Ziffern springen beim Hochzählen. Empfehlung: Systemschrift mit
+  `font-variant-numeric: tabular-nums`.
+* Fallback-Kette dann:
+  `font-family: Cinzel, Georgia, "Times New Roman", serif;`
+
+### Arena-Definitionen
+
+`ARENA_TIERS` steht als `const` in `ui_prototype.html` (und gespiegelt in
+`ui_assets.json`):
+
+| # | Name | ab 🏆 |
+|---|---|---|
+| 1 | Kristallhof | 0 |
+| 2 | Smaragdtal | 600 |
+| 3 | Saphirfeste | 1 200 |
+| 4 | Sturmspitze | 1 500 |
+| 5 | Obsidian-Thron | 2 200 |
+| 6 | Prisma-Zitadelle | 2 900 |
+
+Die Schwellen sind an AAs eigene Kurve angelehnt (§9.5). **Die Arenen sind reine
+Status-Optik** — die Match-Welt wird in Arcane Prism TD pro Spiel zufällig gewählt.
+Deshalb steht auf dem Home-Screen „Zufallswelt" statt AAs „Neutral". Wer die Schwellen
+verschiebt, muss nur `ARENA_TIERS` anfassen; Fortschrittsbalken, Leiter und der
+„noch N 🏆 bis …"-Text rechnen sich daraus.

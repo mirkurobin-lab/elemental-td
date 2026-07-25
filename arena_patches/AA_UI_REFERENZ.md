@@ -2,10 +2,16 @@
 
 Referenzdokumentation für den Nachbau in **Arcane Prism TD**.
 
-> **Stand: 2. Durchgang (Video 6 eingearbeitet).** Video 6 hat mehrere Lücken geschlossen
-> (Trophy Road, Champions Peak, Season, Leaderboard, Clans, Season-Pass, Fortress-Upgrades)
-> und **vier Befunde der ersten Fassung korrigiert** — allen voran die Zuordnung der
-> Top-Bar-Währungen. **Alle Abweichungen sind in §12 gesammelt; bitte zuerst dort lesen.**
+> **Stand: 3. Durchgang (Video 7 eingearbeitet).** Video 7 schließt die beiden größten
+> Lücken — die **Merge-Ausführung samt Zeremonie** (§4.4) und die **Level→Gold-Kurve**
+> (§13.2) — und verwirft dabei den bisherigen Wert „8000 Gold". Neu ist außerdem §9.5b:
+> **wie AA die Status-Arenen visuell inszeniert** (Grundlage des HOME-Views im Prototyp).
+>
+> **Abweichungen bitte ZUERST lesen: §13 (Video 7), danach §12 (Video 6).**
+>
+> *2. Durchgang:* Video 6 schloss Trophy Road, Champions Peak, Season, Leaderboard, Clans,
+> Season-Pass und Fortress-Upgrades und korrigierte vier Befunde der ersten Fassung —
+> allen voran die Zuordnung der Top-Bar-Währungen (§12).
 Quelle: Screen-Recordings des Users (Google Drive), analysiert per ffmpeg + Tesseract-OCR
 (wortgenaue Koordinaten via `tesseract tsv`), Bewegungsanalyse (Frame-Differenz) und
 Farb-Quantisierung in einer Cloud-Sandbox.
@@ -41,7 +47,8 @@ sind dagegen exakt, weil sie aus Pixelkoordinaten stammen.
 | 2 | `ScreenRecording_07-17 19-59` · `1f8wCYEb6UBf-W84NOlUs9qlkb5Vd_Jpl` | 7:24 | PvP-Match Arena 4, *FlashDovey20U3* vs. *HelloThaiLanD* — **mit Sieg + Belohnungsscreen** | 78 Match-HUD mit Turmauswahl · 198 Skill-Beschreibung („star levels") · **438 VICTORY** · **441 Belohnungsscreen (+39 Trophäen, +610 Gold)** |
 | 3 | `ScreenRecording_07-17 19-46` · `1p5cDo0-bWSW-d3c4RfV6gktynhCESwuy` | 6:06 | PvP-Match Arena 4, *Netherghost* vs. *DirtyDansen* — **mit Sieg + Belohnungsscreen**; enthält zusätzlich die Turm-Platzierungs-Hinweise („1x2 TOWER PATH") | 0-8 Matchmaking · Match-HUD · **358 VICTORY** (bei Restzeit 02:18) · **365 Belohnungsscreen (+39 Trophäen, 610 Gold, „TAP TO CLOSE")** |
 | 6 | `ScreenRecording_07-05 16-04` · `12-pNrsLpUwnnySckbYh8IOwbhRFc6RY2` (Kopie: `1CM1fn9aw7hjkA7FF3BSzHfl1fcxrbF5L`) | 4:25 | **Zweite große Menü-Tour — komplementär zu Video 11.** Anderer Account-Stand: *Netherghost*, **Level 4, Arena 2, 425 Trophäen**. Enthält alles, was Video 11 fehlte: Trophy Road komplett, Champions Peak, Season, Leaderboard, Clans, Golden-Fortune-Pass und das **Fortress-Upgrade-System** | 0-22 Shop (Daily Deals, Arcane Supplies Chest mit Pity-Counter, Truhen, Gem-Bundles) · 25-32 Battle Deck + Collection („By Rarity", RESOURCES, **TO BE FOUND**) · **34-98 Golden Fortune (Season-Pass, FREE/EPIC/LEGENDARY)** · 100 Home (Level 4, Arena 2) · 105-112 **Map Objectives + Trick Cards** · **115-190 Trophy Road / Arena-Liste mit allen Schwellen** · 150-215 Champions Peak + Season + Leaderboard · **220 CLANS** · **226-264 FORTRESS-UPGRADES mit Goldkosten** |
-| 4-5, 7-9 | weitere 07-05-Aufnahmen | — | nicht ausgewertet | — |
+| 7 | `ScreenRecording_07-25 09-16-41` · `1gQBeekSjfY4QNwTa5SOXBXZsb9v6tJl3` | 0:54 | **Die Aufnahme, die §10.1 und §10.4 schließt: MERGE-AUSFÜHRUNG + drei echte TURM-UPGRADES.** Kurz, aber die dichteste Aufnahme überhaupt. Account: 521 💎 / **19 918 🪙** | 4 Battle Deck · 5-6 „SELECT CARDS TO MERGE!" · **7-16 Merge-Auswahl CATAPULT + Vorschau (MAX LEVEL 20→30)** · **17-24 „PERFECT MERGE!"-Zeremonie** · 29-32 Deck (Gold unverändert!) · **33-37 Catapult-Detailkarte RARE + Upgrade Lv16→17** · **40-53 Boulder COMMON + zwei Upgrades Lv1→3** |
+| 4-5, 8-9 | weitere 07-05-Aufnahmen | — | nicht ausgewertet | — |
 | 10 | YouTube „ARROW PLAY" | — | nicht ausgewertet | — |
 
 ---
@@ -187,12 +194,25 @@ konversionsstarkes Muster und sollte übernommen werden.
   Beobachtet: **GOOD → Cap 20**, **RARE → Cap 30**. Extrapoliert (nicht direkt belegt):
   Common → 10, Epic → 40, Legendary → 50 (jeweils +10 pro Raritätsstufe).
   Ein Deck-Turm mit `LvL 23` bestätigt, dass Level >20 nur oberhalb von GOOD existieren.
-* **Upgrade-Kosten:** Nur ein einziger Gold-Betrag war lesbar: **8000 Gold**, und zwar bei
-  drei verschiedenen Karten (Divine Sword Lv15, Catapult Lv16, Ice Blaster Lv15) mit
-  *unterschiedlichen* Materialständen. Das legt nahe, dass die **Goldkosten in Stufen/
-  Plateaus** wachsen (nicht pro Level einzeln), oder dass die drei Karten zufällig im selben
-  Kostenband lagen. **Eine vollständige Level→Kosten-Tabelle war in den Videos nicht sichtbar**
-  (siehe Lücken, §10).
+* ✅ **Level-Caps jetzt dreifach belegt** (Video 7): **Common → 10** (Boulder zeigt `…/10`),
+  **Good → 20** und **Rare → 30** (die Merge-Vorschau schreibt wörtlich `MAX LEVEL 20 ⇒ 30`).
+  Die Schrittweite +10 pro Raritätsstufe ist damit bestätigt, nicht mehr nur extrapoliert.
+* ✅ **Upgrade-Kosten — Lücke geschlossen (Video 7, §13.2).** Es wurden drei Upgrades
+  ausgeführt; die Beträge sind über den **Gold-Kontostand arithmetisch bewiesen**:
+
+  | Karte | Stufe | Level-Up | Gold | Material | Beleg (Kontostand) |
+  |---|---|---|---|---|---|
+  | Boulder | Common | 1 → 2 | **1 000** | 1 (50→49) | 4 918 → 3 918 |
+  | Boulder | Common | 2 → 3 | **2 000** | 1 (49→48) | 3 918 → 1 918 |
+  | Boulder | Common | 3 → 4 | **3 000** *(angezeigt)* | 1 | — |
+  | Catapult | Rare | 16 → 17 | **15 000** | 5 (12→7) | 19 918 → 4 918 |
+  | Catapult | Rare | 17 → 18 | **18 000** *(angezeigt)* | 5 | — |
+
+  → Die Kurve liegt bei **≈ 1 000 Gold × Level**, oberhalb Lv15 mit Sprüngen von ~3 000.
+  Der ältere „8000 Gold"-Wert aus Video 11 passt **nicht** in diese Reihe (Lv15/16 müssten
+  dort 15 000-16 000 kosten) — er ist als OCR-Fehllesung des stilisierten Fonts einzustufen
+  (er stand in §2.3 ohnehin unter Vorbehalt). **Video 7 hat Vorrang**, weil die Beträge dort
+  aus Kontostand-Differenzen folgen und nicht aus OCR.
 
 ---
 
@@ -292,10 +312,47 @@ Beobachteter Ablauf:
    auf einmal (Convenience-Feature, wichtig für den Nachbau!).
 5. „Back" links unten.
 
-**Nicht beobachtet:** eine explizite Gold-Kosten-Anzeige im Merge-Screen, die
-Merge-Zeremonie/Animation selbst, und ob Skill- und Helden-Karten ebenfalls mergebar sind
-(die Tabs „Towers / Skills / Items" existieren, ein Merge wurde aber nur im Turm-Kontext
-gezeigt). Siehe §10.
+### 4.4 Merge-AUSFÜHRUNG und Zeremonie — **Lücke geschlossen (Video 7)**
+
+Der vollständige Ablauf, Schritt für Schritt aus Video 7 (t = 4-33 s):
+
+| t | Zustand | Was zu sehen ist |
+|---|---|---|
+| 4 s | Battle Deck | Gold **19 918**, Gems 521. Einstieg über **Forge**. |
+| 5-6 s | `SELECT CARDS TO MERGE!` | Raster aller Karten, Dropdown **By Level**, **Merge All**, **Back**. |
+| 7-10 s | Karte angetippt | Der Panel-Kopf wechselt auf den **Kartennamen** (`CATAPULT`, x 850 / y 233). Darunter **`REQUIRED CARDS`** (x 837 / y 495) mit Slot-Reihe, und ein **`Merge`**-Button (x ≈ 941-1130 / y 1200). |
+| 11-16 s | **Merge-VORSCHAU** klappt auf | Rechts oben, unter dem Kartennamen: **`MAX LEVEL  20 ⇒ 30`** · **`AREA DAMAGE  324.9 ⇒ 377.1`** · **`ATTACK RATE  2.45 sec ⇒ 2.34 sec`**. Unter `REQUIRED CARDS` steht die Anforderungszeile **`x1 GOOD CATAPULT`**. **Nirgends ein Gold-Betrag.** |
+| **17 s** | **Zeremonie startet** | Großer Titel **`PERFECT MERGE!`** (y ≈ 270-310), Karte animiert in der Mitte, unten ein **`CONTINUE`**-Button (y ≈ 2715). |
+| 19-23 s | Zeremonie hält | Die Vorher/Nachher-Tafel wandert groß in die Bildmitte (y 1609-2234): `MAX LEVEL 20 / 30`, `AREA DAMAGE 324.9 ⇒ 377.1`, `ATTACK RATE 2.45 sec ⇒ 2.34 sec`. Der Abschluss wechselt von `CONTINUE` auf **`TAP TO CLOSE`**. |
+| 21→22 s | **Level-Zähler** | Auf der Karte steht erst **`LvL 1`**, eine Sekunde später **`LvL 16`** — das Level wird **hochgezählt** und ist damit erhalten geblieben. |
+| 24 s | Ausklang | Nur noch `PERFECT MERGE!` + `MAX LEVEL 20/30` + `TAP TO CLOSE`. Gesamtdauer ≈ **7 s**. |
+| 29-32 s | zurück im Deck | Gold **19 918** — **unverändert**. |
+
+**Die vier Kernbefunde:**
+
+1. **Der Merge kostet KEIN Gold.** Der Kontostand ist vor (t=4) und nach (t=29) dem Merge
+   identisch 19 918. Bezahlt wird ausschließlich mit den **3 Kartenkopien**.
+2. **Das Level bleibt erhalten, nur das Cap steigt.** Catapult war Lv16 vorher und ist
+   Lv16 nachher (`16/30` auf der Detailkarte bei t=33) — die Zeremonie zelebriert das,
+   indem sie den Zähler von 1 auf 16 hochlaufen lässt.
+3. **Die Vorschau ist Teil der Kaufentscheidung.** AA zeigt *vor* dem Merge exakt drei
+   Zeilen: Level-Cap plus die zwei Stats, die der Merge-Bonus anfasst — jeweils als
+   `alt ⇒ neu`. Das ist dasselbe Muster wie die Upgrade-Vorschau auf der Detailkarte (§2.3).
+4. **Der Merge-Bonus wird beim Merge WIRKSAM, nicht erst danach.** Die Vorschau
+   `324.9 ⇒ 377.1` entspricht **+16,1 %** und `2.45 ⇒ 2.34 sec` entspricht **−4,5 %** —
+   also genau dem Bonus, den die **Good**-Karte als „Merge 3 identical Catapult cards to
+   unlock: Area Damage +16 % and Attack Rate −5 %" angekündigt hatte (Video 11, §4.2).
+   Die *neue* Rare-Karte kündigt anschließend die *nächste* Stufe an: **„+18 % / −7 %"**
+   (t=33). **Der Bonus wächst also pro Raritätsstufe** — der Text auf der Karte beschreibt
+   immer den Bonus des **nächsten** Merges.
+
+Was ausgerüstete Karten angeht: Das Raster zeigt weiterhin `Equipped`-Bänder, ein
+Konflikt („ausgerüstete Karte wird verschmolzen") trat nicht auf und wird von AA
+offenbar dadurch vermieden, dass die aufgewertete Karte dieselbe Identität behält.
+
+**Noch offen:** die genaue Semantik der Zeile `x1 GOOD CATAPULT` unter `REQUIRED CARDS`
+(1 zusätzliche Kopie? oder „1× der Sorte Good Catapult" pro Slot?), und ob Skill-/
+Item-Karten ebenfalls mergebar sind (die Tabs existieren, gezeigt wurde nur der Turm-Fall).
 
 ---
 
@@ -669,6 +726,81 @@ Die großen `xK`-Werte sind Gold, die kleinen Zahlen Karten/Material/Gems.
 Am Ende einer Sektion gibt es einen **„Okay"**-Bestätigungsbutton und einen **„Top"**-Sprung-
 Button (springt an die Spitze der Leiter).
 
+### 9.5b Visuelle Inszenierung der Status-Arenen (Video 6, t=100 / 118-190) — neu
+
+> **Warum das für uns zählt:** In **Arcane Prism TD** werden die Match-Welten **zufällig
+> pro Spiel** gewählt. Die Arenen sind damit **reine Status-Optik** — sie liefern die
+> Genugtuung des Aufstiegs und sind vom Gameplay entkoppelt. **Genau so hält es AA auch:**
+> Der Home-Screen zeigt neben der Arena den Modifier **„Neutral"**, d. h. die Arena selbst
+> bringt gerade gar keine Regel mit; ihre Funktion ist Rang und Bild.
+
+**A) Home-Screen (Video 6, t=100; Screen 1320 × 2868, Account 425 🏆 = Arena 2).**
+Gemessene Positionen:
+
+```
+y  213      TOP-BAR: 425 🏆 (x504) | 245 💎 (x786) | 1446 🪙 (x1114)
+y  348      Avatar + Spielername "Netherghost" (x322) + "Level 4" (x729)
+y  592      Event-Banner "GOLDEN FORTUNE" (zentriert)
+y  815      »Arena 2:«            ← ZEILE 1 des Arenanamens, zentriert
+y  876      »Dustfall Temple«     ← ZEILE 2, groß, zentriert (x405-917)
+y  968      ◎ »Neutral«           ← Modifier-Chip direkt darunter
+y ~1650-1760  Trophäen-Fortschrittsleiste, Trophäen-Icon links,
+              Belohnungs-/Truhen-Icon am RECHTEN Ende
+y ~1820-2050  ARENA-WAPPEN: sechseckiges Schild mit goldener Krone,
+              blau-violett, ~70 px breit, mittig — das Status-Emblem
+y ~2110-2370  Reihe: [kleine EVENTS-Kachel mit Truhe + „7" + roter Punkt]
+              ‖ [große BATTLE-Taste, goldgelb, ~55 % Breite, weiße Schrift
+                 mit dunkler Kontur, dicker Goldrahmen]
+y ~2590-2860  Bottom-Nav, 5 Tabs; der mittlere („Battle") ist ERHÖHT,
+              größer und trägt eigene Grafik
+```
+
+**Entscheidend für den Nachbau:**
+* Die **Key-Art ist VOLLFLÄCHIGER HINTERGRUND**, kein gerahmtes Banner. Der obere
+  Bildschirmteil *ist* die Arena (blauer Himmel, Tempelbauwerk); die UI liegt darüber.
+* Der **Arenaname steht zweizeilig zentriert auf ~28-33 % Bildhöhe**, direkt über der Mitte —
+  also im „Himmel" der Key-Art, wo garantiert ruhige Fläche ist.
+* Der Name ist **Text auf Bild**, nicht ins Bild gebrannt. Das ist genau unsere
+  Text-freie-Assets-Strategie.
+* **Ein Bildschirm = ein Ziel.** Zwischen Wappen und Battle-Taste steht nichts Ablenkendes.
+
+**B) Arena-Liste / Trophy Road (Video 6, t=118-190).**
+Die Arenen erscheinen **nicht** als kleine Kacheln, sondern als **große, hochkant
+eingeschobene Banner-Karten** in einem endlosen Vertikal-Scroll. Gemessen an
+„Aztec Grounds" (t=134):
+
+```
+y  709   ◎ Neutral                       ← Modifier-Chip
+y  802   »Aztec Grounds«                 ← Arenaname, groß, zentriert (x447-974)
+y  952   »Arena 5«  (x405)     🏆 »1200« (x843)   ← Nummer links, Schwelle rechts
+y 1130   »Unlocks:«                      ← Freischaltungs-Vorschau
+y 1563   [Map Objective …]
+y 1805   [Trick Card] »Defense Jam«      ← die konkreten Freischaltungen
+y 2092   »1150«  (x102)                  ← Trophy-Road-Knoten auf der LINKEN Schiene
+y 2286   »x5«                            ← Belohnungsmenge
+```
+
+* Der linke Rand (x ≈ 100) ist eine durchlaufende **Schiene mit Trophäenzahlen**
+  (…1150, …4600, 4700…); rechts daneben hängen die Belohnungen.
+* An jeder Arena-Grenze wird die Schiene von einer **Banner-Karte mit Key-Art**
+  unterbrochen, die etwa **45 % der Bildschirmhöhe** einnimmt.
+* Die **Liga-Tore** (Champions Peak) sind genauso aufgebaut: Key-Art-Block plus
+  zweizeilige Beschriftung `Champions Peak` / `Gate 4 Bronzeward` (t=166, y 2343/2391).
+* Ein **Locked-Zustand als Grau-Overlay** war im Ausschnitt nicht isolierbar (der Account
+  scrollte durch bereits sichtbare Bereiche); die Sperrlogik kommuniziert AA statt dessen
+  über die **Trophäenschwelle auf der Karte** und die Position im Scroll.
+
+**Nachbau-Empfehlung (so umgesetzt in `ui_prototype.html`, View „HOME"):**
+1. Key-Art vollflächig hinter dem oberen Drittel, mit Verlauf nach unten ins UI-Dunkel.
+2. Arenaname zweizeilig zentriert darauf, als **HTML-Text** (Gold-Gradient) — nie als Grafik.
+3. Modifier-Chip darunter; bei uns steht dort **„Zufallswelt"** statt „Neutral", weil
+   das bei uns die ehrliche Aussage ist.
+4. Wappen als Status-Emblem, dann die Trophäenleiste mit Belohnungs-Icon rechts.
+5. Eine große Kampf-Taste, links davon eine schmale Event-Kachel.
+6. Zusätzlich (AA hat das nur im Trophy-Road-Scroll) eine kompakte **Arena-Leiter aus
+   6 Kacheln**: erreichte in Key-Art-Farbe, kommende abgedunkelt mit **🔒 + Schwelle**.
+   Das bringt die Statusleiter auf den Home-Screen, ohne den Scroll nachbauen zu müssen.
+
 ### 9.6 Champions Peak, Season & Leaderboard (Video 6, t=150-215) — **Lücke geschlossen**
 
 * Oberhalb der normalen Arenen liegt die Liga **„Champions Peak"**, unterteilt in
@@ -963,3 +1095,109 @@ Festung          ←  Gold + Account-Level (DPS / Attack Speed / Max Health / Po
 * Trophy-Road-Schrittweite 50 im unteren Bereich.
 * Bottom-Navigation, Arena-Modifier „Neutral", Event-/Challenge-Kacheln.
 * Die 5-spaltige Rastergeometrie der Kartenlisten.
+
+---
+
+## 13. Korrekturen und Neubefunde aus Video 7 (Merge + Upgrades)
+
+> Video 7 ist mit 54 Sekunden die **kürzeste** und zugleich **dichteste** Aufnahme: Sie
+> schließt die beiden größten Lücken aus §10 (Merge-Ausführung, Level→Gold-Kurve) und
+> korrigiert einen Wert, auf dem bereits Systeme gebaut waren.
+>
+> **Methodisch wichtig:** Alle Geldbeträge in diesem Abschnitt sind über **Differenzen des
+> Gold-Kontostands** hergeleitet, nicht über OCR der stilisierten Kostenschrift. Sie sind
+> damit belastbarer als alle Zahlenangaben der Abschnitte davor.
+
+### 13.1 ✅ Merge-Ausführung, Zeremonie und Kosten (schließt §10.4)
+
+Vollständig ausformuliert in **§4.4**. Die vier Kernbefunde in Kurzform:
+
+| Frage aus §10.4 | Antwort |
+|---|---|
+| Kostet der Merge Gold? | **Nein.** 19 918 🪙 vor dem Merge, 19 918 🪙 danach. Bezahlt wird nur mit 3 Kopien. |
+| Wie sieht die Zeremonie aus? | Vollbild, Titel **„PERFECT MERGE!"**, Karte animiert, Vorher/Nachher-Tafel, Abschluss `CONTINUE` → `TAP TO CLOSE`. Dauer ≈ **7 s**. |
+| Was passiert mit dem Level? | Es **bleibt erhalten** (Lv16 → Lv16). Die Zeremonie lässt den Zähler von 1 auf 16 **hochlaufen** — reine Inszenierung. |
+| Was springt? | Das **Level-Cap** (`MAX LEVEL 20 ⇒ 30`) und die zwei Stats des Merge-Bonus. |
+| Was mit ausgerüsteten Karten? | Kein Konflikt sichtbar — die Karte behält ihre Identität, `Equipped` bleibt bestehen. |
+
+**Neu und wichtig:** Der Text „Merge 3 identical X cards to unlock: A und B" beschreibt
+**immer den NÄCHSTEN Merge**, und der Bonus **wächst pro Stufe**:
+Catapult als **Good** kündigte „+16 % / −5 %" an → die Vorschau lieferte exakt
++16,1 % / −4,5 % → als **Rare** kündigt dieselbe Karte nun „**+18 % / −7 %**" an.
+Damit ist §4.2 präzisiert: Die Boni sind nicht nur pro Karte, sondern auch **pro
+Raritätsstufe** balanciert.
+
+### 13.2 ✅ Die Level→Gold-Kurve (schließt §10.1) — und ⚠ Korrektur von „8000 Gold"
+
+| Karte | Stufe | Level-Up | **Gold** | **Material** | Herleitung |
+|---|---|---|---|---|---|
+| Boulder | Common | 1 → 2 | **1 000** | 1 | Konto 4 918 → 3 918 |
+| Boulder | Common | 2 → 3 | **2 000** | 1 | Konto 3 918 → 1 918 |
+| Boulder | Common | 3 → 4 | **3 000** | 1 | Button-Anzeige |
+| Catapult | Rare | 16 → 17 | **15 000** | 5 | Konto 19 918 → 4 918 |
+| Catapult | Rare | 17 → 18 | **18 000** | 5 | Button-Anzeige (Digit-Whitelist-OCR, zweifach) |
+
+* Die Kurve verläuft **≈ 1 000 Gold × Level** und wird oberhalb Lv15 **steiler**
+  (+3 000 statt +1 000 pro Stufe).
+* **Materialbedarf hängt an BEIDEM — Level und Stufe.** Boulder (Common, Lv1) braucht **1**,
+  Catapult (Rare, Lv16) braucht **5**, Divine Sword (Good, Lv15) braucht **5**,
+  Skyflare braucht **3**. Die alte Annahme aus §5 („Bedarf hängt nur an der Stufe")
+  konnte den Wert 1 nicht erklären und ist damit **überholt**.
+* ⚠ **Korrektur zu §2.3:** Der dort dreifach notierte Wert **„8000 Gold"** (Divine Sword
+  Lv15, Catapult Lv16, Ice Blaster Lv15) ist **mit der neuen Reihe unvereinbar** — auf
+  Lv15/16 müsste ein Upgrade 15 000-16 000 kosten. Er war schon damals als
+  *unsicher* markiert (stilisierter Font). **Verworfen zugunsten der Video-7-Werte.**
+
+### 13.3 ✅ Level-Caps dreifach belegt (präzisiert §2.4)
+
+`MAX LEVEL 20 ⇒ 30` in der Merge-Vorschau belegt **Good = 20** und **Rare = 30** direkt;
+Boulders Badge `…/10` belegt **Common = 10**. Die Schrittweite **+10 pro Raritätsstufe**
+ist damit gemessen, nicht mehr extrapoliert. Für Epic/Legendary bleibt 40/50 die
+naheliegende Fortschreibung.
+
+### 13.4 Neu: ein dritter Button auf der Turm-Detailkarte — „Max Level"
+
+Die Detailkarte trägt in Video 7 **drei** Aktionen statt der in §2.1 notierten zwei:
+
+```
+[ Unequip / Equip ]      [ Upgrade  🪙 <Kosten> ]      [ Max Level ]
+  x 167-417 / y 2325       x 532-793  / y 2300-2420      x 881-1213 / y 2330
+```
+
+**„Max Level"** ist offenbar ein **Sammel-Upgrade** („so weit hochziehen, wie Gold und
+Material reichen") — das Pendant zu „Merge All" im Forge-Screen (§4.3). Ausgeführt wurde
+es im Video nicht; die Funktion ist daher **wahrscheinlich, nicht bewiesen**.
+**Nachbau-Empfehlung:** unbedingt übernehmen — bei 100 Leveln ist Einzel-Tippen zumutbar
+nur bis etwa Level 20.
+
+### 13.5 Kleinere Beobachtungen
+
+* **Stat-Vorschau auch beim Merge.** Nicht nur das Upgrade zeigt `alt → neu` (§2.3),
+  sondern auch der Merge. AA benutzt dasselbe Vorher/Nachher-Muster konsequent überall.
+* **Power ist ein zusammengesetzter Wert.** Catapult: 1 701 (Good Lv16) → **2 301**
+  (Rare Lv16, allein durch den Merge, +35 %) → **2 486** (Rare Lv17, durch ein Upgrade,
+  +8 %). Der Merge ist also der weit größere Sprung als ein Level.
+* **Ressourcenbestände** im Collection-Raster dieses Accounts: `x60 · x60 · x56 · x53`
+  (t=39) — bestätigt erneut mehrere getrennte Materialsorten (§7.1).
+* Die Ressourcen-Sektion trug hier das Label **„JOKER ITEMS"** statt „HERO ITEMS"
+  (OCR, mittlere Konfidenz) — entweder eine weitere Gruppe oder eine Fehllesung.
+
+### 13.6 Auswirkung auf unsere Systeme (bereits eingearbeitet)
+
+| Datei | Änderung |
+|---|---|
+| `arena_cards.js` → `GOLD_BANDS` | Auf die AA-Reihe kalibriert. AA-Karten laufen bis ~Lv50, unsere bis Lv100 → Faktor 2 auf der Level-Achse, aus `1 000 × n_AA` wird **`≈ 500 × n_uns`**. Bänder bis Lv40 liegen exakt an dieser Linie (unser Lv32 ≈ AA Lv16 → 16 500 vs. 15 000), darüber überlinear als Endgame-Sink. Summe Lv1→100: **5,03 Mio Gold**. |
+| `arena_cards.js` → `materialFor` | Von „nur Stufe" (`3 + tierIdx`) auf **`1 + tierIdx + floor(lvl/10)`**, Deckel 16 — trifft AAs Anker `Common/Lv1 → 1` und `Good/Lv15 → 5` beide. |
+| `ui_prototype.html` → Forge | **Merge-Vorschau** (Stufe, `MAX LEVEL alt → neu`, zwei Stats) und der ausdrückliche Hinweis **„Kostet kein Gold"**. |
+| `ui_prototype.html` → Zeremonie | Vollbild-Overlay „Perfekte Verschmelzung!" mit hochzählendem Level-Badge, Vorher/Nachher-Tafel und `Weiter` → `Tippen zum Schließen`. |
+| `ui_prototype.html` → HOME | Neue fünfte Ansicht nach den §9.5b-Messungen (Key-Art vollflächig, Name als Text darauf, Trophäenleiste, Kampf-Taste, Arena-Leiter mit 🔒). |
+
+### 13.7 Was nach Video 7 noch offen ist
+
+1. ❌ **Pack-/Truhen-Öffnungs-Zeremonie** — in keiner der sieben Aufnahmen geöffnet.
+2. ❌ **Merge für Skills/Items** — weiterhin nur der Turm-Fall gezeigt.
+3. ❌ **Niederlagen-Screen**, **Epic/Legendary-Rahmenfarben**, **Hero Pass / Hero Vault**.
+4. 🟡 **`x1 GOOD CATAPULT`** unter `REQUIRED CARDS` — Semantik nicht eindeutig geklärt.
+5. 🟡 **„Max Level"-Button** — existiert sicher, Wirkung nur erschlossen (§13.4).
+6. 🟡 **Epic/Legendary-Caps (40/50)** — weiterhin Extrapolation, jetzt aber auf einer
+   dreifach gemessenen Schrittweite von +10 aufsetzend.
