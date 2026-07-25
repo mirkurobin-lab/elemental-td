@@ -1,9 +1,10 @@
 # Karten-Progression & Booster-Packs (AA-Modell)
 
-**Status:** Design-Spezifikation **v2**, implementiert in `arena_patches/arena_cards.js`
-(Logik-Modul, `node arena_patches/arena_cards.js` = Selbsttest) und sichtbar in
-`arena_patches/ui_prototype.html` (lauffähiger UI-Nachbau). Alle Zahlen in diesem Dokument sind
-die Quelle der Wahrheit für das Modul — Änderungen hier **und** dort nachziehen.
+**Status:** Design-Spezifikation **v2** (State **v3**), implementiert in
+`arena_patches/arena_cards.js` und `arena_patches/arena_fortress.js` (Logik-Module, beide mit
+Selbsttest via `node <datei>`) und sichtbar in `arena_patches/ui_prototype.html` (lauffähiger
+UI-Nachbau). Alle Zahlen in diesem Dokument sind die Quelle der Wahrheit für die Module —
+Änderungen hier **und** dort nachziehen.
 
 > ### ⚠ v2 — was sich am 2026-07-24 geändert hat
 > Die **Videoanalyse des echten „Arcane Arena"** (`arena_patches/AA_UI_REFERENZ.md`) hat das
@@ -16,6 +17,21 @@ die Quelle der Wahrheit für das Modul — Änderungen hier **und** dort nachzie
 > Die Kapitel **B** und **C** sind vollständig neu. Die alten Tabellen sind **nicht gelöscht**,
 > sondern stehen unverändert im Anhang **§Z — ÜBERHOLT (v1)** am Ende dieses Dokuments.
 > Ebenfalls neu: **`arena_patches/GAMEPLAY_OPTIMIERUNG.md`** (Match-Mechanik-Abgleich).
+
+> ### ⚠ Nachtrag 2026-07-25 — die Befunde aus Video 6
+> Die zweite UI-Tour (`AA_UI_REFERENZ.md` §12) hat vier Stellen dieses Dokuments korrigiert
+> und eine ergänzt:
+>
+> | Was | Vorher | Jetzt |
+> |---|---|---|
+> | **Upgrade-Material** | eine generische Ressource | **3 Sorten** je Karten-Rolle (§B „Material-Sorten"), State **v3** |
+> | **Pity-Counter** | Stand versteckt, Regel offen | **offen angezeigt** — „Episch garantiert in ≤N Packs" (§C) |
+> | **Season-Pass** | 60 Stufen, 2 Spuren, Medaillen aus Quests | **3 Spuren** FREE/EPIC/LEGENDARY, ~30 Tage, Medals über **Siegesserien**, Overflow-Regel nach dem Cap (§D) |
+> | **Arena-Schwellen** | geschätzt 250 / 700 | **belegt 600 / 1200 / 1500**, Liga ab ~2900; Trophy-Road-Schrittweite 50 → 100 → 200 (§D) |
+> | **Festungs-Upgrades** | fehlte vollständig | **neue dritte Achse**, `arena_fortress.js` (§B „Festungs-Upgrades") |
+>
+> Die Korrekturen sind an ihrer jeweiligen Stelle als **⚠ KORREKTUR** markiert, damit
+> nachvollziehbar bleibt, welche Entscheidung auf welcher Datenlage getroffen wurde.
 
 **Ersetzt:** die Splitter-Ökonomie aus `arena_profile.js` (`shardsBank`, `PACK_SHARDS`,
 `LOSS_SHARDS`, `applyShardsToHub()`) und die Match-Skalierung `metaMul = 1.12^(lvl-1)`
@@ -76,7 +92,7 @@ steht, ist unser Design.
 | Season läuft über **Medals** (Quests sammeln Medaillen über die Saison) | Store-Beschreibung | Begriff übernommen: unsere Season-Währung heißt **Medaillen**. |
 | **Beide Spieler bekommen identische Wellen** („face identical waves in fair, real-time duels"), **3 zufällige Turm-Karten pro Runde** | Store-Beschreibung | Deckt sich exakt mit unserer 3-Karten-Hand. Die identischen Wellen sind ein Fairness-Prinzip, das wir in §E festschreiben. |
 | **„Trick cards"** als Kern-Feature fürs Disruption-Play | Store-Beschreibung | Bestätigt unseren Curse-Karten-Plan — nicht optional, sondern Kern-Loop des Vorbilds. |
-| **Arenen / Maps / Chapters** schalten sich über Spieler-Level bzw. Trophäen frei; PvP-Leaderboard vorhanden | Store-Beschreibung | Deckt sich mit unserer Trophy-Road (Arena-Unlocks bei 250 / 700). |
+| **Arenen / Maps / Chapters** schalten sich über Spieler-Level bzw. Trophäen frei; PvP-Leaderboard vorhanden | Store-Beschreibung | Deckt sich mit unserer Trophy-Road. **Schwellen seit Video 6 belegt: 600 / 1200 / 1500**, darüber die Liga *Champions Peak* ab ≈ 2900 (§9.5) — die früheren 250 / 700 waren geschätzt und sind in §D korrigiert. |
 
 **Quellen:**
 - https://www.exophase.com/game/arcane-arena-tower-defense-td-apple/achievements/
@@ -142,10 +158,59 @@ die Endstufe **Suprem** ist unsere Ergänzung — in AA existiert oberhalb Legen
 * **Attack-Rate-Boni werden als NEGATIVE Prozente angezeigt** (−6 % = schneller) — direkt aus dem
   Vorbild übernommen (§4.2), weil „kleiner ist besser" sonst niemand intuitiv liest.
 
+### Material-**Sorten** (korrigiert 2026-07-25, Video 6)
+
+> **⚠ KORREKTUR.** Die erste Fassung dieses Kapitels nahm **eine generische** Ressource an
+> („Arkan-Essenz"), gestützt darauf, dass zwei Turmkarten identisch **19** anzeigten. Video 6
+> zeigt das RESOURCES-Raster ausgescrollt (§7.1) und widerlegt das: Es gibt dort **mindestens
+> 8 verschiedene Materialsorten** mit **unabhängigen** Beständen (18 / 16 / 10 / 8 / 7 / 6 / 2
+> / 1) und Kategorie-Labels — wörtlich lesbar waren **„speed"** und **„special"**. Die
+> Gleichheit der beiden „19" war Zufall; Skyflares abweichendes „40/3" ist der Gegenbeweis
+> (§12.3).
+
+**Wir starten mit DREI Sorten**, nicht mit acht:
+
+| Sorte | Symbol | Abnehmer | Begründung |
+|---|---|---|---|
+| **Angriffs-Essenz** | ⚔️ | EMBER (fire), STONE (earth) | die beiden reinen Schadensbringer |
+| **Tempo-Essenz** | ⚡ | FROST (water), DAWN (light) | Slow/Support, beide über Tempo skaliert |
+| **Spezial-Essenz** | ✨ | THORN (nature), HOLLOW (darkness), SOLARA, MAGMOR | Status-Effekt-Türme und Helden-Ults |
+
+**Warum drei und nicht acht.** Bei einem Pool von 8 Karten hätte jede der 8 Sorten **genau
+einen** Abnehmer — dann ist der Vorrat keine Entscheidung mehr, sondern nur eine zweite
+Schreibweise für „Fortschritt an dieser Karte". Drei Sorten mit je 2-4 Abnehmern erzeugen
+dagegen die Frage, die das System interessant macht: *„Reicht meine Tempo-Essenz für FROST
+oder für DAWN?"* Das ist genau die Rolle, die Material in AA hat — es entscheidet **welche**
+Karte hochgezogen wird, nicht **ob**. Mit dem Pool wächst die Zahl der Sorten mit
+(Faustregel: eine Sorte je 2-3 Karten, also 8-10 Sorten bei Pool 20 — dann sind wir bei AAs
+Größenordnung).
+
+Implementiert als `MATERIALS` + `CARD_MATERIAL`-Registry in `arena_cards.js`;
+`materialTypeOf(cardId)` liefert die Sorte, **unbekannte IDs fallen auf `special`** (damit
+später eingeführte Skill-, Item- und Trick-Karten nicht ins Leere greifen). Der Bestand liegt
+als `state.materials = {attack, speed, special}` (**State v3**); `canLevelUp()` und
+`levelUp()` prüfen und verbrauchen **ausschließlich die Sorte der Karte** — ein Berg
+Tempo-Essenz hilft EMBER nicht. Migration siehe §E.
+
+**„TO BE FOUND" übernehmen (§7.1).** AA zeigt unterhalb des RESOURCES-Rasters einen eigenen
+Abschnitt mit den **noch nicht besessenen** Materialien und direkt darunter, **in welcher
+Arena** sie freigeschaltet werden („Arena 4", „Arena 5", „Arena 8") bzw. „Not found" für
+Unbekannte. Das ist ein außergewöhnlich starkes Retention-Element, weil es aus einer leeren
+Zelle ein **konkretes Ziel** macht: Der Spieler weiß nicht nur, dass ihm etwas fehlt, sondern
+**wohin er dafür muss**. Für uns:
+
+* Im Material-Panel der Sammlung alle Sorten zeigen — auch die **noch nicht existierenden**,
+  als graue Platzhalter mit der Arena-Angabe darunter („Ab Arena 5").
+* In der Turm-Detailkarte steht die Sorte des Turms **mit Namen und Symbol** (im Prototyp
+  umgesetzt: „⚡ Tempo-Essenz 16 / 5"), darunter kleingedruckt die anderen Bestände mit dem
+  Hinweis *„für diesen Turm nicht verwendbar"*. Ohne diese Zeile wirkt ein leerer Vorrat wie
+  ein Bug, obwohl er eine Designentscheidung ist.
+
 ### Level-Kosten
 
-**Material:** `materialFor(lvl, tierIdx) = 3 + tierIdx` — also 3 auf Gewöhnlich bis 8 auf Suprem.
-AA zeigt Bedarfe von **3** und **5** bei Level 15/16 (§5); die Größenordnung stimmt, die
+**Material:** `materialFor(lvl, tierIdx) = 3 + tierIdx` — also 3 auf Gewöhnlich bis 8 auf Suprem,
+**unverändert von der Sorten-Aufteilung** (die Sorte bestimmt *welches* Material, nicht *wie
+viel*). AA zeigt Bedarfe von **3** und **5** bei Level 15/16 (§5); die Größenordnung stimmt, die
 Kopplung an die Stufe ist unsere Interpretation (AA zeigte 5 sowohl bei Good als auch bei Rare —
 die Datenlage lässt beides zu).
 
@@ -230,8 +295,13 @@ das Modell ist ehrlicher, und eine Gut-Karte ist rechnerisch exakt drei Gewöhnl
 
 **Material ist der zweite, stillere Bottleneck:** 517 Material pro Karte bis Lv100 bei ~24
 Material/Tag für die **gesamte** Sammlung. Material ist damit die Ressource, die entscheidet,
-**welche** Karte man hochzieht — genau die Rolle, die sie in AA hat (ein gemeinsamer Vorrat, in
-zwei Karten identisch mit **19** ausgewiesen, §5).
+**welche** Karte man hochzieht — genau die Rolle, die sie in AA hat (§5 / §7.1). Durch die
+**drei Sorten** verschärft sich das gezielt: Pro Sorte kommen nur ~8 Stück/Tag herein, und
+eine Sorte versorgt 2-4 Karten. Der Engpass ist damit nicht mehr „mein Vorrat", sondern
+„mein Vorrat **für diese Rolle**" — die Entscheidung wird enger und dadurch spürbarer.
+Pack-Material-Slots droppen eine **zufällige** Sorte (gleichverteilt, gemessen 33.4 / 33.4 /
+33.2 % über 20 000 Slots), es gibt also keinen Weg, gezielt zu farmen — was die
+Kaufentscheidung für gezielte Sorten-Angebote im Shop erst interessant macht.
 
 ### Merge-Bonus-Registry
 
@@ -281,6 +351,83 @@ Unverändert: Fusionen und Triples erben im Match das **Durchschnitts-Level der 
 (2) es macht das Investment in Basis-Türme **universell wertvoll**; (3) es hält die Fusion als
 *taktische* Entscheidung im Match statt als weitere Meta-Ressource.
 
+### Festungs-Upgrades (die DRITTE Achse) — neu 2026-07-25
+
+> Implementiert in **`arena_patches/arena_fortress.js`** (`window.ArenaFortress`, Selbsttest:
+> `node arena_patches/arena_fortress.js`). Beleg: **AA-Referenz §9.9 / §12.6** — ein in der
+> ersten Fassung **komplett fehlendes System**, das Video 6 als eigenes Bottom-Nav-Tab
+> „Upgrade" zeigt.
+
+```
+Karten-Level    ←  Upgrade-Material (3 Sorten) + Gold      [arena_cards.js]
+Karten-Rarität  ←  3 identische Karten mergen              [arena_cards.js]
+FESTUNG         ←  Gold + Trophäen-Gate                    [arena_fortress.js]
+```
+
+AA wertet die **Festung/Basis des Spielers** dauerhaft auf — völlig getrennt von den
+Turmkarten. Belegte Tracks: *DPS* („Increases fortress attack power", **+17 % → +16 %**),
+*Attack Speed*, *Max Health*; Goldkosten **6 000 → 9 000 → … → 17 000**, also grob **+1 000
+pro Stufe**; gegated per **Account-Level** (Button zeigt dann „Level Too Low"); je Stufe
+zusätzlich **Power +170**; und der Prozentwert **sinkt** mit der Stufe.
+
+**Unsere drei Tracks** (die Stellschrauben, die unser Spiel tatsächlich hat — Burg und
+Prisma-Laser existieren beide):
+
+| Track | Wirkt auf | Bonus Stufe 1 → 12 | Summe (12 Stufen) |
+|---|---|---|---|
+| 🛡 **Burg-Stabilität** (`hp`) | Burg-HP | +6.0 % → +2.7 % | **+49.8 %** → `hpMul 1.498` |
+| 🔺 **Prisma-Fokus** (`prismDmg`) | Prisma-Schaden | +8.0 % → +3.6 % | **+66.4 %** → `prismDmgMul 1.664` |
+| ⚡ **Prisma-Taktung** (`prismRate`) | Prisma-Abklingzeit | +5.0 % → +2.3 % | **+41.5 %** → `prismRateMul 1.415` |
+
+**Abnehmender Grenznutzen:** Bonus × **0.93** je gekaufter Stufe desselben Tracks. Nach 12
+Stufen liegt der Zugewinn bei 45 % des Startwerts (`0.93¹¹`) — die Kurve, nicht die
+Endpunkte, ist die Vorgabe. Voll ausgebaut: Burg 15 000 → **22 475 HP**, Prisma-Abklingzeit
+**×0.707**, Power **+6 120**.
+
+**Ein gemeinsamer Kostenzähler über ALLE Tracks:** `6 000 + 1 000 × (bereits gekaufte
+Gesamtstufen)`, also **6 000 · 7 000 · 8 000 · … · 41 000** über 36 Stufen (3 × 12),
+**Gesamtsumme 846 000 Gold**. Das ist der interessanteste Teil des Vorbilds und bewusst
+übernommen: Weil die nächste Stufe **unabhängig vom Track** teurer wird, ist die
+**Reihenfolge** eine echte Entscheidung — wer zuerst Burg-HP kauft, zahlt für Prisma-Schaden
+mehr. Drei Tracks mit je eigener Kostenkurve wären dagegen drei voneinander unabhängige
+Balken ohne Entscheidung.
+
+**Gates über TROPHÄEN statt Account-Level**, weil wir kein Account-Level haben — und das ist
+die bessere Bindung, weil sie die Trophy Road mit Bedeutung auflädt:
+
+| Gesamtstufen | benötigt | entspricht |
+|---|---|---|
+| 1 – 6 | **frei** | Start |
+| 7 – 12 | **600 🏆** | Arena 3 |
+| 13 – 24 | **1 200 🏆** | Arena 5 |
+| 25 – 36 | **1 500 🏆** | Arena 6 |
+
+Die Schwellen sind AAs belegte Arena-Aufstiege (§9.5) — **dieselbe Tabelle** wie in
+`GAMEPLAY_OPTIMIERUNG.md` §4 und bei der Objective-Freischaltung. `trackInfo(key).locked`
+liefert das AA-Äquivalent zu „Level Too Low", `lockAt` die fehlende Schwelle.
+
+**Warum das unser dokumentiertes Gold-Problem entschärft.** Oben in diesem Kapitel steht:
+*„Der eigentliche Bottleneck ist Gold, nicht die Pyramide"* — eine Karte von Lv1 auf Lv100
+kostet **3.4 Mio Gold ≈ 600 Tage**, das Vier- bis Vierzehnfache des Raritätsaufstiegs. Bisher
+gab es dafür nur drei Stellschrauben (Einkommen anheben / obere Goldbänder senken / Lv100 als
+Jahresziel akzeptieren). Der Festungsbaum ist eine **vierte, elegantere**: eine **zweite
+sinnvolle Gold-Senke**, die
+
+* **planbar** ist (846 000 Gold, 36 Stufen, feste Reihe — kein Zufall, keine Pyramide),
+* **abgeschlossen** ist (sie endet; sie konkurriert also nicht dauerhaft mit den Karten),
+* in **jedem** Match wirkt statt nur für eine Karte, und
+* dem Spieler in der Frühphase, in der 3.4 Mio Gold unvorstellbar sind, ein **erreichbares**
+  Goldziel gibt.
+
+Sie löst das Problem nicht auf — 846 000 sind ein Viertel einer einzigen Lv100-Karte —, aber
+sie nimmt der Karten-Goldkurve den Druck, ohne die Sammlung zu entwerten. **Empfehlung:
+Festung vor der Feinjustierung der oberen Goldbänder bauen** und danach neu messen; es kann
+gut sein, dass die Bänder dann gar nicht angefasst werden müssen.
+
+**Gold-Handling wie bei den Karten:** `arena_fortress.js` verwaltet **kein** Gold.
+`buy(key, goldAvailable)` prüft den Betrag mit und **meldet** die Kosten zurück; den Abzug
+macht die Hub-Wallet. `totalMultipliers()` ist die einzige Funktion, die das Match braucht.
+
 ---
 
 ## C) Booster-Pack-System **v2**
@@ -300,7 +447,11 @@ den Merge erreichbar. Das ist der Reveal-Moment: Der Spieler dreht eine Karte um
 | **Gold** | Trophy-Road-Knoten, Rang-Aufstieg | 9 | 4 | 4 000-8 000 | 38 / 38 / 18.4 / 4.6 / 1 |
 | **Arkan** | Season-Pass-Premium, Events | 11 | 6 | 12 000-25 000 | 18 / 34 / 29 / 15 / 4 |
 
-Pro Material-Slot fallen **2-5** Material an (Bronze also ⌀ 7, Arkan ⌀ 21).
+Pro Material-Slot fallen **2-5** Material an (Bronze also ⌀ 7, Arkan ⌀ 21) — **in einer
+zufälligen der drei Sorten** (gleichverteilt). Jeder Material-Slot ist damit ein eigener
+kleiner Reveal („welche Essenz?"), und gezieltes Farmen einer Sorte ist unmöglich.
+`openPack()` liefert die Slots als `[{type, amount, name, sym, color}]`, die Zeremonie ruft
+pro Flip `addMaterial(amount, type)`.
 
 ### Kommunikation: Raritätsspannen statt Prozente
 
@@ -332,7 +483,7 @@ nehmen Misstrauen aus dem Kauf; sie zu verstecken hat noch nie ein Spiel besser 
 
 ⌀ 7.0 Material und ⌀ 602 Gold pro Bronze-Pack; 6.31 % aller Kartenslots landen auf Helden.
 
-### Pity (versteckt in der Mechanik, offen in der Doku)
+### Pity — **offen angezeigt** (korrigiert 2026-07-25, Video 6)
 
 Ein Zähler über **alle** Packs hinweg, unabhängig vom Pack-Typ:
 
@@ -340,13 +491,32 @@ Ein Zähler über **alle** Packs hinweg, unabhängig vom Pack-Typ:
 - **75 Packs ohne Legendär → der nächste Pack erzwingt einen Legendären Slot.**
 - Reset auch bei einem **natürlichen** Drop dieser Stufe, nicht nur bei einem erzwungenen.
 
-Messung über 10 000 Bronze-Packs: Episch-Pity griff **222×**, Legendär-Pity **123×**, die
+Messung über 10 000 Bronze-Packs: Episch-Pity griff **228×**, Legendär-Pity **121×**, die
 längste Durststrecke betrug exakt **25** bzw. **75** Packs — das Sicherheitsnetz greift
 nachweislich und niemand fällt hindurch.
 
-**Der Zählerstand wird im Spiel nicht angezeigt.** Die *Regel* steht im Info-Panel
-(„spätestens alle 25 Packs eine Epische Karte"), der Stand nicht — sonst wird das Öffnen von
-Packs zum Zählspiel und der Zufall verliert seine Wirkung.
+> **⚠ KORREKTUR: Der Zählerstand wird SEHR WOHL angezeigt.** Die erste Fassung dieses
+> Kapitels entschied „Regel offen, Stand versteckt" — mit der Begründung, ein sichtbarer
+> Zähler mache das Öffnen zum Zählspiel. **Video 6 zeigt, dass das Vorbild es genau
+> umgekehrt macht** (§8.2): Die ARCANE SUPPLIES CHEST trägt die Zeile
+> **„Get [Legendary] in <N> opens"** direkt auf der Truhe, im Kaufbildschirm, neben dem
+> Preis. Und AA blendet **nirgends** Prozent-Drop-Raten ein — der sichtbare Pity-Counter
+> **ersetzt** sie. Das ist die stärkere Lösung: Ein Versprechen mit Countdown („in ≤19
+> Packs") liest sich besser als eine Wahrscheinlichkeit, es ist nicht anfechtbar, und es
+> gibt dem Öffnen eine zweite, planbare Belohnungsachse neben dem Zufall. Das „Zählspiel",
+> das wir vermeiden wollten, ist in Wahrheit **das Feature**.
+
+**Umsetzung.** `ArenaCards.getPityStatus()` → `{epicIn, legendaryIn}` liefert die
+verbleibenden Packs bis zur jeweiligen Garantie; der Pack-Screen rendert daraus
+**„🛟 Episch garantiert in ≤N Packs · Legendär in ≤M"** direkt unter dem Öffnen-Button (im
+Prototyp umgesetzt, aktualisiert sich nach jedem Pack). `openPack()` gibt denselben Stand als
+`pityStatus` mit zurück, damit der Zeremonie-Screen ihn ohne zweiten Lesezugriff hat.
+
+*Zur Zählweise:* `epicIn = PITY_EPIC − Zähler + 1`. Das **+1** ist kein Rundungsfehler,
+sondern die Reihenfolge im Code: Der Zähler wird **nach** dem Pack erhöht, geprüft wird
+**davor**. Bei frischem Zähler sind es also 26 Packs — deckungsgleich mit der gemessenen
+längsten Durststrecke von 25 Packs **ohne** Episches. Ein reines `PITY_EPIC − Zähler` wäre
+um eins zu optimistisch, und ein Countdown, der einmal lügt, ist schlimmer als keiner.
 
 ### Kein Overflow-Verfall mehr
 
@@ -378,19 +548,55 @@ Implementiert und lauffähig in **`arena_patches/ui_prototype.html`** (View „P
 
 Kein Belohnungssystem trägt allein. Vier Schleifen mit unterschiedlichem Takt greifen ineinander:
 
-**Trophy-Road (Takt: pro Match).** Alle **25 Trophäen** ein Knoten mit Gold / Pack / Material /
-Kosmetik, alle **100 Trophäen** ein **Gold-Pack**. **Arena-Unlocks bei 250 und 700 Trophäen** —
-neue Arena = neue Optik + neuer Bot-Rivalen-Band (siehe `arena_rivals.js`, gleiche Schwellen).
+**Trophy-Road (Takt: pro Match).** Knoten mit Gold / Pack / Material / Kosmetik, mit
+**wachsender Schrittweite** — im Vorbild belegt (§9.5): **50** Trophäen bis ~1300, **100** bis
+~3400, danach **200**. Das übernehmen wir statt der ursprünglich geplanten konstanten 25er-
+Schritte: dichte kleine Belohnungen am Anfang, seltenere große später, und pro Knoten mehr
+Inhalt. **Arena-Unlocks bei 600 / 1200 / 1500 Trophäen** (belegte AA-Schwellen, §9.5 —
+die früheren 250/700 waren geraten), darüber die Liga **Champions Peak ab ≈ 2900** mit eigenen
+Gates. Neue Arena = neue Optik, neuer Bot-Rivalen-Band (`arena_rivals.js`, Schwellen dort
+nachziehen), **neues Map Objective und eine neue Curse-Karte**
+(`GAMEPLAY_OPTIMIERUNG.md` §8) und **neue Festungs-Stufen** (`arena_fortress.js`).
 Die Road ist immer sichtbar, mit dem nächsten Knoten und der Distanz dorthin. Nach jedem Match
 bewegt sich der Marker — auch nach einer Niederlage, weil `arena_profile.js` nur −10 abzieht.
 
-**Season-Pass (Takt: monatlich).** **60 Stufen**, Free- und Premium-Spur. Stufen werden mit
-**Medaillen** aus Quests gefüllt (Begriff aus AA übernommen). Monatlicher Reset, exklusive
-Kosmetik, die danach nie wiederkommt. Der Season-Pass ist die einzige Stelle, an der ein
-*Zeit*-Druck existiert — und genau deshalb darf er nichts enthalten, was das Powerlevel dauerhaft
-entscheidet. **Der „Arkan-Kern" der v1 entfällt** (er war der Deckel auf der Suprem-Aszension,
-die es nicht mehr gibt); an seine Stelle treten großzügige **Material**-Stufen — Material ist
-im v2-Modell die knappste Ressource und damit die wirksamste Pass-Belohnung.
+**Season-Pass (Takt: ~30 Tage) — Struktur nach AAs „Golden Fortune" (§9.10).**
+Video 6 zeigt das Season-Event vollständig; die erste Fassung dieses Kapitels hatte es als
+reine Shard-Quelle fehlinterpretiert (§12.5). Übernommen wird:
+
+* **DREI Spuren statt zwei:** **FREE**, **EPIC PASS**, **LEGENDARY PASS**. Die dritte Stufe ist
+  der eigentliche Trick — sie verkauft nicht „Premium ja/nein", sondern lässt den Spieler die
+  *Höhe* seines Einsatzes wählen. Bei zwei Spuren ist die Entscheidung binär und der
+  Zahlungsunwillige ist dauerhaft draußen; bei drei gibt es eine mittlere Option, die
+  Ersteinsteiger holt.
+* **Saisonlänge ≈ 30 Tage** (belegter Season-Timer „Season Ends In 29d 9h", §9.6). Zusätzlich
+  laufen **kürzere Events innerhalb** der Season — „Golden Fortune" selbst lief mit
+  **„Ends in 9 day(s)"**. Zwei verschachtelte Takte: Season = Rahmen, Event = Sprint.
+* **Event-Währung „Medals" über SIEGESSERIEN**, wörtlich: *„Keep your win streaks and earn
+  bonus medals."* Das ist der wichtigste Unterschied zu unserer bisherigen Planung
+  (Medaillen aus **Quests**): Eine Siegesserie belohnt **Können und Kontinuität am Stück**,
+  eine Quest-Checkliste belohnt Anwesenheit. Empfehlung: **beides**, aber der Streak-Anteil
+  ist der größere — Quests als Grundeinkommen, Streaks als Multiplikator. Das verzahnt sich
+  direkt mit `arena_profile.js` (`streak` existiert dort schon) und mit dem Streak-Bonus aus
+  `GAMEPLAY_OPTIMIERUNG.md` §4.
+* **Endgame-Overflow als Vorbild** — der wörtliche Tooltip aus AA (§9.10):
+  > „After reaching level 120, you get 1 Silver Chest with taps for every 100 exp you earn.
+  > You can get a maximum of 20 chests in total."
+
+  Also: **Pass-Level-Cap 120**, danach läuft die Progression als **Endlos-Overflow** weiter —
+  je **100 EXP** eine **Silber-Truhe**, **maximal 20**. Das löst elegant das Problem, dass
+  Vielspieler den Pass nach zwei Wochen durch haben und den Rest der Season ohne Ziel
+  spielen: Es gibt weiter etwas zu holen, aber gedeckelt, also nicht farmbar. **Für uns
+  1:1 übernehmen**, nur mit unseren Zahlen: Cap bei **60 Stufen**, danach je **100 Medaillen**
+  ein **Silber-Pack**, maximal **20** — das sind 20 zusätzliche Packs für die obersten paar
+  Prozent, kein zweiter Pass.
+* **Kein Powerlevel-Deckel im Pass.** Bleibt so: Der Pass ist die einzige Stelle mit
+  *Zeit*-Druck und darf deshalb nichts enthalten, was dauerhaft über PvP entscheidet.
+  **Der „Arkan-Kern" der v1 entfällt** (er war der Deckel auf der Suprem-Aszension, die es
+  nicht mehr gibt); an seine Stelle treten großzügige **Material**-Stufen — und zwar
+  **sortenrein wählbar** (der Spieler entscheidet bei der Belohnung, welche der drei Essenzen
+  er nimmt). Material ist im v2-Modell die knappste Ressource und damit die wirksamste
+  Pass-Belohnung; die Wahl der Sorte macht daraus eine Entscheidung statt einer Gutschrift.
 
 **Daily-Loop (Takt: täglich).** Drei Quests: **„2 Siege" / „2 Bosse besiegen" / „5 Fusionen
 spielen"** → Medaillen. Der **1. Tagessieg** gibt zusätzlich ein **Silber-Pack** — das ist der
@@ -446,6 +652,24 @@ Die **Farbe bleibt also erhalten** — das ist die einzige Größe, die ein Spie
 Sammlung im Kopf hat. Eine v1-Karte auf Lv45 (blau) ist danach eine **Selten**-Karte auf Lv45
 mit Cap 55: gleiche Farbe, gleiches Level, und der Weg nach oben ist wieder offen.
 
+**v2 → v3** (Material-Sorten, `ArenaCards.migrateV1()` läuft **beide** Stufen in einem
+Durchlauf, ein v1-Stand also v1→v2→v3):
+
+| v2 | v3 |
+|---|---|
+| `material: n` (eine Zahl) | `materials: {attack, speed, special}` |
+| — | Verteilung: **gleichmäßig gedrittelt**, Rest (0-2 Stück) auf `attack` |
+| `cards`, `lvl`, `copies`, `mergeBoni`, `pendingBoni` | **unangetastet** |
+| `pityEpic`, `pityLegendary`, `packsOpened` | **unangetastet** |
+
+Beispiel: 100 Material → **34 / 33 / 33**. Niemand verliert etwas, und die Sorten starten
+ausbalanciert — welche Sorte ein Spieler in v2 „gemeint" hat, ist nicht rekonstruierbar, jede
+Ungleichverteilung wäre also willkürlich. Das alte Zahlenfeld `material` wird beim Lesen
+entfernt, damit kein Code versehentlich weiter darauf zugreift; `getMaterials()` liefert
+stattdessen `{attack, speed, special, total}`. `addMaterial(n)` **ohne** Sortenangabe bleibt
+rückwärtskompatibel und verteilt round-robin über die drei Sorten (mit wanderndem Rest-Zeiger,
+damit zehn Einzelaufrufe nicht alle auf `attack` landen).
+
 Der ältere Pfad **arenaHub → arenaCards** (`newLvl = min(100, round(oldLvl × 5))`) entfällt: Die
 v1-Migration hat ihn bereits ausgeführt; wer direkt von `arenaHub` kommt, bekommt beim ersten
 Start ohnehin eine leere v2-Bank und wird über die normalen Packs versorgt.
@@ -486,9 +710,10 @@ Start ohnehin eine leere v2-Bank und wird über die normalen Packs versorgt.
 | 6 | **Turm-Detailkarte** (§2 der AA-Referenz): Stat-Vorschau, Material-Block, Upgrade-Button | Der meistbesuchte Screen des Spiels — **Vorlage: `ui_prototype.html`, View „Turm"** | ~2–3 h |
 | 7 | **Forge/Merge-Screen** inkl. „Alle verschmelzen" + Bonus-Wahl-Dialog | Ohne ihn ist die Raritätsachse nicht spielbar — **Vorlage: `ui_prototype.html`, View „Schmiede"** | ~2 h |
 | 8 | Red-Dot-Ökonomie + Daily-Quests | Retention-Schicht, sinnvoll erst wenn 1–7 stabil laufen | ~1.5 h |
-| 9 | Trophy-Road / Season-Pass (Medaillen) | Größter Brocken, eigenes Arbeitspaket | ~4–6 h |
+| 8b | **`arena_fortress.js` + Festungs-Tab** (`totalMultipliers()` in `arena_pan.html`, Tab im Hub) | Unabhängig von 1–8 baubar, aber erst sinnvoll, wenn Meta-Gold fließt (Schritt 3). Löst die Gold-Senke — siehe §B „Festungs-Upgrades" | ~2–2.5 h |
+| 9 | Trophy-Road / Season-Pass (3 Spuren, Medals über Siegesserien) | Größter Brocken, eigenes Arbeitspaket | ~4–6 h |
 
-**Gesamt Schritte 1–8: ca. 10–13 Stunden.** Nach jedem Schritt einzeln testen und committen.
+**Gesamt Schritte 1–8b: ca. 12–16 Stunden.** Nach jedem Schritt einzeln testen und committen.
 Die Schritte 4, 6 und 7 haben mit `arena_patches/ui_prototype.html` eine **lauffähige, gegen
 `ArenaCards` verdrahtete Vorlage** — dort ist Markup, CSS und Event-Logik bereits durchgetestet
 (Playwright, 4 Views) und muss im Wesentlichen nur an die echten Turm-Assets angeschlossen werden.
@@ -497,8 +722,21 @@ Die Schritte 4, 6 und 7 haben mit `arena_patches/ui_prototype.html` eine **lauff
 
 - [ ] `node arena_patches/arena_cards.js` → **ALLE TESTS OK** (Leiter, Kurven, 10 000
       Bronze-Packs, Garantien aller vier Pack-Typen, Pity, Merge-Pyramide, Cap-Gating, Migration).
-- [ ] `localStorage.arenaCards` existiert nach dem ersten Pack, hat `v: 2` und enthält
-      `{cards, material, gold: null, pityEpic, pityLegendary, packsOpened}`.
+- [ ] `localStorage.arenaCards` existiert nach dem ersten Pack, hat **`v: 3`** und enthält
+      `{cards, materials: {attack, speed, special}, matRR, gold: null, pityEpic,
+      pityLegendary, packsOpened}` — **kein** Zahlenfeld `material` mehr.
+- [ ] **Material-Sorten:** `materialTypeOf('fire') === 'attack'`, `('water') === 'speed'`,
+      `('nature') === 'special'`, unbekannte ID → `'special'`.
+- [ ] **Sorten-Verbrauch:** ein Level-Up an FROST senkt **nur** `materials.speed`;
+      `canLevelUp('fire')` meldet `reason: 'material'`, solange nur Tempo-Essenz im Vorrat
+      liegt (auch bei Bergen davon).
+- [ ] **Pack-Sorten:** `openPack().materialSlots` ist ein Array aus `{type, amount}`, die
+      Summe der `amount` entspricht `material`, und die Sorten sind über viele Packs
+      gleichverteilt (gemessen 33.4 / 33.4 / 33.2 % über 20 000 Slots).
+- [ ] **Offener Pity:** `getPityStatus()` → `{epicIn, legendaryIn}`; bei frischem Zähler
+      **26 / 76**, und nach genau `epicIn` Packs war nachweislich ein Episches dabei.
+- [ ] **Migration v2→v3:** Stand mit `material: 100` → `materials {34, 33, 33}`, Karten,
+      Level, Kopien, Boni und Pity-Zähler unverändert, `v: 3`; zweiter Aufruf `{skipped: true}`.
 - [ ] Eine Karte hat `{tier, lvl, copies: {common…supreme}, mergeBoni, pendingBoni}` —
       `copies` ist ein **Objekt pro Stufe**, kein Zähler.
 - [ ] `openPack('bronze')`-Verteilung über 10 000 Simulationen: Gewöhnlich ~74 %, Gut ~22 %,
@@ -518,8 +756,17 @@ Die Schritte 4, 6 und 7 haben mit `arena_patches/ui_prototype.html` eine **lauff
 - [ ] Match: ein Lv40-Turm richtet ~2.3× Schaden eines Lv1-Turms an — **nicht** ~10 000×
       (= alte Formel läuft noch irgendwo).
 - [ ] Fusion im Match: erbt weiterhin `mlvl` der Basis-Türme, keine eigene Karte im Grid.
+- [ ] **Festung:** `node arena_patches/arena_fortress.js` → **ALLE TESTS OK**. Kostenreihe
+      beginnt **6 000 · 7 000 · 8 000 · 9 000**, letzte (36.) Stufe **41 000**, Summe
+      **846 000**; bei 0 🏆 sind genau **6** Stufen kaufbar, dann `locked` mit
+      `lockAt: 600`; voll ausgebaut `hpMul 1.498` / `prismDmgMul 1.664` /
+      `prismRateMul 1.415`, Power **6 120**.
+- [ ] **Festung im Match:** ein Kauf auf `hp` erhöht die Burg-HP im nächsten Match sichtbar;
+      ohne Käufe sind alle Multiplikatoren **exakt 1.0** (kein stiller Balance-Eingriff).
 - [ ] **UI:** `arena_patches/ui_prototype.html` im Browser öffnen → alle vier Views ohne
-      JS-Fehler durchklickbar (Playwright-Skript im Scratchpad, 29 Schritte grün).
+      JS-Fehler durchklickbar (Playwright-Skript im Scratchpad, **37 Schritte** grün):
+      Top-Bar-Reihenfolge 🏆|💎|🪙, Material-Sorte in der Detailkarte, Sortierung „Nach
+      Rarität", Pity-Zeile auf dem Pack-Screen.
 
 ---
 
@@ -529,7 +776,7 @@ Die Schritte 4, 6 und 7 haben mit `arena_patches/ui_prototype.html` eine **lauff
 |---|---|---|
 | 2 | **Skill-Karten** als dritter Track: eigenes Meta-Level für die 3 Hero-Spells, eigene Drop-Slots in Silber+ Packs. Im Vorbild eine getrennte Währung; für uns erst sinnvoll, wenn die Spells mechanisch ausgebaut sind. | AA: „upgrade your skills with skill cards" |
 | 2 | **Trick-/Curse-Karten** in den Pool (Disruption-Play), gleiche Level-Leiter. | AA-Kern-Feature |
-| 3 | **Clan-System mit Karten-Donations**: anfragen + spenden, **Spenden gibt Gold**. Der stärkste soziale Retention-Hebel im Vorbild, weil Geben sich selbst belohnt. | AA: „request donations …, donate to earn gold" |
+| 3 | **Clan-System mit Karten-Donations**: anfragen + spenden, **Spenden gibt Gold**. Der stärkste soziale Retention-Hebel im Vorbild, weil Geben sich selbst belohnt. **Konkretisiert 2026-07-25 aus dem belegten Clan-Screen (§9.8):** max. **40 Mitglieder** (beobachtet 39/40, 38/40, 37/40, 27/40); Beitrittsmodus **„Nur auf Anfrage"** oder **„Offen"** pro Clan; **Clan-Gesamttrophäen** als Sortier-/Prestigewert (beobachtet 72.6K bis 25.3K); und als Aufnahmekriterium das Feld **„Min *Peak* Trophy Requirement"** — es zählt der **historische Höchststand**, nicht der aktuelle Stand. Letzteres unbedingt übernehmen: Es macht eine Pechsträhne unschädlich für die Clan-Zugehörigkeit (niemand fliegt raus, weil er drei Matches verloren hat) und verlangt trotzdem einen echten Nachweis. Dafür muss `arena_profile.js` ein Feld **`peakTrophies`** mitführen — billig jetzt, nachträglich nicht rekonstruierbar. | AA: „request donations …, donate to earn gold" · §9.8 |
 | 3 | **Ghost-PvP** nach Karten-Power-Score (`Σ lvl`), gebändert. | §E |
 | 4 | **Gems als Zweitwährung + Monats-Abo** (Referenz: „Royal Monthly Letter", 1200 Gems + 300/Tag). Erst wenn Retention steht — eine Monetarisierung auf einem undichten Eimer ist verschwendete Arbeit. | AA-Shop |
 

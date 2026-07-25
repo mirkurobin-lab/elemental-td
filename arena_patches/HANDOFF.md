@@ -10,7 +10,8 @@ untereinander, defensiv gegen fehlende Callbacks).
 | Datei | Was |
 |---|---|
 | `arena_profile.js` · `arena_rivals.js` · `arena_pity.js` · `arena_surrender.js` · `arena_tutorial.js` | die fünf Match-Module (§1–§5) |
-| `arena_cards.js` | **Karten-Progression v2** — Merge + Upgrade-Material (§6) |
+| `arena_cards.js` | **Karten-Progression v2** — Merge + Material-**Sorten** (§6) |
+| `arena_fortress.js` | **Festungs-Upgrades** — die dritte Progressions-Achse (§7) |
 | `ui_prototype.html` | **lauffähiger UI-Nachbau** der vier Meta-Screens (§6) |
 | `AA_UI_REFERENZ.md` | verifizierte Referenz zum Vorbild (Video-Analyse) — **Wahrheitsquelle** |
 | `DESIGN_PROGRESSION.md` | Design-Spezifikation der Karten-Progression (v2, inkl. v1-Anhang) |
@@ -115,6 +116,13 @@ den simulierten Bot-HP-Drain gegen Matchende so nachjustiert, dass Finishes knap
 **Tuning:** `REMATCH_CHANCE` (0.35), `DRIFT_MIN` (0.55) / `DRIFT_MAX` (1.60), `K` (0.85 = Hebel),
 die Intensitätsschwelle `0.6` (= Eingriff beginnt im letzten 40% der Matchzeit), die tote Zone
 `|margin| < 0.06`, sowie `bandOf()`-Schwellen (250 / 700 Trophäen).
+
+> **⚠ `bandOf()`-Schwellen nachziehen.** Die 250/700 stammen aus der geschätzten Arena-Tabelle.
+> Belegt sind seit Video 6 **600 / 1200 / 1500** (`AA_UI_REFERENZ.md` §9.5). Damit die
+> Rivalen-Bänder mit den Arenen zusammenfallen — sonst wechselt der Gegnertyp mitten in einer
+> Arena —, beim Einbau auf **600 / 1200** umstellen (bzw. ein viertes Band ab 1500 ergänzen).
+> Dieselbe Tabelle gaten `arena_fortress.js` und die Objectives aus
+> `GAMEPLAY_OPTIMIERUNG.md` §8.
 
 **Fairness-Garantie (bewusst so gebaut):** Der Faktor greift **nur** am Bot-Drain — nie an
 Spieler-HP, Monster-HP oder Turmschaden. In der ersten Match-Hälfte ist er exakt `1.0`, ein
@@ -250,10 +258,12 @@ schaltet einen **permanenten kartenspezifischen Bonus** frei. Das **Level** stei
 
 - **`arena_patches/arena_cards.js`** — reines Logik-Modul (kein DOM), `window.ArenaCards`.
   API: `statMul(lvl, mergeBoni)` · `goldFor(lvl)` · `materialFor(lvl, tierIdx)` · `tierOf(key|idx)`
-  · `addDrop(id, tier, n)` · `addMaterial(n)` · `canMerge` / `merge` / `mergeAll` /
+  · `addDrop(id, tier, n)` · `addMaterial(n, typeKey)` · `canMerge` / `merge` / `mergeAll` /
   `chooseMergeBonus` / `pendingBonusChoices` / `progressToNextMerge` · `canLevelUp(id, gold)` /
   `levelUp(id)` · `view(id)` · `openPack(type, poolIds, heroIds, rng)` · `modsOf(id)` ·
-  `migrateV1()`. Selbsttest: `node arena_patches/arena_cards.js` → **ALLE TESTS OK**.
+  `migrateV1()`. **Neu (State v3):** `materialTypeOf(id)` / `materialInfoOf(id)` /
+  `getMaterials()` / `getPityStatus()`. Selbsttest: `node arena_patches/arena_cards.js`
+  → **ALLE TESTS OK**.
 - **`arena_patches/ui_prototype.html`** — **lauffähiger UI-Nachbau** der AA-Screens mit unserem
   Content (eine Datei, kein Build, lädt `./arena_cards.js` relativ; einfach im Browser öffnen).
   Vier Views mit Bottom-Nav: **Collection** (Deck-Zeile, Tabs, 5-Spalten-Raster mit
@@ -272,7 +282,9 @@ schaltet einen **permanenten kartenspezifischen Bonus** frei. Das **Level** stei
   AA-**Match**-Mechanik gegen unseren Spielstand. Wichtigster Punkt: **AA hat Match-Gold und
   In-Match-Upgrades** — unsere Entfernung vom 19.07. beruhte auf einer falschen Annahme.
   Dazu: Per-Karten-Cooldowns statt „1 Build/Runde", In-Match-Sternstufen (+ Curse-Anbindung),
-  fixe Arena-Prämien, 10 ausformulierte Ladebildschirm-Tipps, Clan-Tag, Turm-Grundflächen 1×2.
+  fixe Arena-Prämien (Schwellen **600 / 1200 / 1500**, korrigiert), 10 ausformulierte
+  Ladebildschirm-Tipps, Clan-Tag, Turm-Grundflächen 1×2 und **§8 arena-gebundene
+  Map-Objectives + Curse-Karten-Freischaltung** (Priorität 2).
 
 **⚠ Ersetzt bestehende Systeme:**
 1. **`metaMul = 1.12^(lvl-1)` in `arena_pan.html` MUSS raus.** Ersatz:
@@ -293,6 +305,72 @@ Der WIRING-Block oben in `arena_cards.js` listet alle vier Einbaustellen mit Cod
 
 ---
 
+## 7. `arena_fortress.js` — Festungs-Upgrades (dritte Achse)
+
+**⚠ Neu 2026-07-25.** Video 6 hat ein **komplett fehlendes System** aufgedeckt: AA hat ein
+eigenes Bottom-Nav-Tab **„Upgrade"**, das die Festung des Spielers dauerhaft aufwertet —
+getrennt von den Turmkarten (`AA_UI_REFERENZ.md` §9.9 / §12.6).
+
+**Was es tut:** Drei Gold-Tracks à 12 Stufen — `hp` (Burg-HP), `prismDmg` (Prisma-Schaden),
+`prismRate` (Prisma-Tempo). **Ein gemeinsamer Kostenzähler über alle Tracks**
+(`6000 + 1000 × gekaufte Gesamtstufen` → 6 000 · 7 000 · … · 41 000, Summe **846 000 Gold**
+für alle 36 Stufen), abnehmender Grenznutzen (Bonus × 0.93 je Stufe), Gates über **Trophäen**
+(1-6 frei · 7-12 ab 600 🏆 · 13-24 ab 1200 · 25-36 ab 1500 — AAs belegte Arena-Schwellen).
+Voll ausgebaut: `hpMul 1.498` / `prismDmgMul 1.664` / `prismRateMul 1.415`, Power +6 120.
+
+**Einbau (arena_pan.html):**
+1. Script einbinden.
+2. Bei Match-Start die drei Multiplikatoren ziehen:
+   ```js
+   const fm = ArenaFortress.totalMultipliers();
+   const CASTLE_MAX = Math.round(15000 * fm.hpMul);
+   castleHP = CASTLE_MAX;
+   const PRISM_DMG_EFF = PRISM_DMG * fm.prismDmgMul;
+   const PRISM_CD_EFF  = PRISM_CD  / fm.prismRateMul;   // Tempo → CD KÜRZER
+   ```
+3. **⚠ Jede hartverdrahtete `15000`** muss auf `CASTLE_MAX` umgestellt werden — auch die in
+   `arena_surrender.js` (`castleHP = Math.min(15000, …)` in der Boss-Heilung), sonst heilt die
+   Comeback-Mechanik auf den alten Deckel und die gekaufte Stufe verpufft.
+
+**Einbau (Hub / deck.html):** neuer Tab **„Festung"** neben Sammlung / Schmiede / Packs, eine
+Karte pro Track:
+```js
+ArenaFortress.TRACKS.forEach(tr => {
+  const i = ArenaFortress.trackInfo(tr.key);
+  // i.locked  → Button "Ab " + i.lockAt + " 🏆"   (AAs "Level Too Low"-Äquivalent)
+  // sonst     → "🪙 " + i.nextCost  und  i.stat + " +" + i.nextPct + " %"
+  //             plus "Power +" + ArenaFortress.POWER_PER_STEP
+});
+const r = ArenaFortress.buy('hp', hubGold);   // Gold zieht der HUB ab:
+if (r.ok) setHubGold(hubGold - r.cost);
+```
+Red Dot auf dem Tab: `ArenaFortress.anyAffordable(hubGold)`.
+
+**Gold-Handling identisch zu `arena_cards.js`:** Das Modul kennt **keine Wallet**.
+`buy(key, goldAvailable)` prüft nur mit und meldet `cost` zurück; den Abzug macht der Hub.
+Persistiert werden ausschließlich die Stufen (`localStorage.arenaFortress`).
+
+**Trophäen-Anbindung:** liest defensiv `ArenaProfile.get().trophies`. Fehlt das Modul, gilt 0
+— dann sind genau die sechs freien Stufen kaufbar und nichts wirft eine Exception. Für Tests
+und Sonderfälle nehmen `trackInfo(key, trophies)` und `buy(key, gold, trophies)` einen
+expliziten Wert, der Vorrang hat.
+
+**Tuning:** `LEVELS_PER_TRACK` (12), `TOTAL_CAP` (36), `COST_BASE` (6000), `COST_STEP` (1000),
+`DECAY` (0.93), `POWER_PER_STEP` (170), die `base`-Werte der drei Tracks (0.06 / 0.08 / 0.05)
+und die `GATES`-Schwellen.
+
+**Warum es wichtig ist:** `DESIGN_PROGRESSION.md` dokumentiert Gold als Endgame-Bottleneck
+(eine Karte Lv1→100 = 3.4 Mio Gold ≈ 600 Tage). Die Festung ist die **zweite sinnvolle
+Gold-Senke** — planbar, abgeschlossen und in **jedem** Match wirksam. Details und Begründung:
+`DESIGN_PROGRESSION.md` §B „Festungs-Upgrades (die DRITTE Achse)".
+
+**Offene Entscheidungen:** (a) Soll `prismRate` auch die Ult-Ladung beschleunigen oder nur die
+Laser-Abklingzeit? (b) Braucht die Festung eine **vierte** Spur (z. B. Start-Handkarten +1),
+oder verwässert das die drei klaren Achsen? (c) Soll ein Respec möglich sein — bei einem
+gemeinsamen Kostenzähler ist eine Rückerstattung nicht trivial (welche Stufe war die teure?).
+
+---
+
 ## Reihenfolge & Aufwand
 
 > **✅ Bestätigte Ausbaustufe (User, 2026-07-25) — diese 3 Systeme werden eingebaut:**
@@ -306,6 +384,24 @@ Der WIRING-Block oben in `arena_cards.js` listet alle vier Einbaustellen mit Cod
 > **⛔ Ausdrücklich NICHT gewünscht:** In-Match-Gold. In der Arena kosten Türme, Upgrades und
 > Refresh **kein Gold** — `GAMEPLAY_OPTIMIERUNG.md` §1 ist entschieden abgelehnt (Referenz
 > bleibt dokumentiert). Das Match bleibt ökonomie-frei; Gold existiert nur als Belohnung/Meta.
+>
+> **📼 Nachgeführt 2026-07-25 nach Video 6** (`AA_UI_REFERENZ.md` §12) — vier Punkte, die die
+> bestätigten Systeme betreffen:
+> * **Material-Sorten statt generischem Material.** AA führt ≥8 Materialsorten mit
+>   Kategorie-Labels („speed", „special"), nicht eine gemeinsame Ressource (§12.3). Wir starten
+>   mit **drei** Sorten (⚔️ Angriffs- / ⚡ Tempo- / ✨ Spezial-Essenz), je Karte fest zugeordnet.
+>   `arena_cards.js` ist auf **State v3** angehoben, die Migration v2→v3 drittelt Altbestände.
+> * **Pity-Counter wird OFFEN angezeigt.** AA schreibt ihn direkt auf die Truhe („Get Legendary
+>   in ~50 opens", §8.2) und verzichtet dafür ganz auf Prozent-Drop-Raten. Unsere frühere
+>   Entscheidung „Stand verstecken" ist damit revidiert — `getPityStatus()` + Pity-Zeile im
+>   Pack-Screen.
+> * **Top-Bar-Reihenfolge war vertauscht.** Richtig ist **🏆 Trophäen | 💎 Gems | 🪙 Gold**
+>   (§12.1, belegt über „Your Trophies: 425" und Icon-Farbmessung). Im UI-Prototyp korrigiert;
+>   beim Einbau in den Hub darauf achten. Nebenwirkung: Die Trophäenzahlen der Spielerschaft
+>   liegen **~Faktor 7 niedriger** als angenommen (Leaderboard-Spitze ~6500, nicht ~40 000) —
+>   alle Arena-Schwellen in `GAMEPLAY_OPTIMIERUNG.md` §4 sind entsprechend korrigiert.
+> * **Dritte Progressions-Achse ergänzt:** `arena_fortress.js` (§7 dieses Dokuments) — in der
+>   ersten Fassung fehlte das System vollständig (§12.6).
 
 Empfohlen, weil jedes Modul auf dem Verständnis des vorherigen aufbaut und `arena_profile.js`
 die Datenbasis für `arena_rivals.js` liefert:
@@ -317,13 +413,15 @@ die Datenbasis für `arena_rivals.js` liefert:
 | 3 | `arena_pity.js` | Braucht das echte `drawCard()`-Kartenliteral → erst Code lesen, dann anpassen | ~30–40 min |
 | 4 | `arena_surrender.js` | Unabhängig, zwei getrennte Hooks (Button + Boss-Kill) | ~25–35 min |
 | 5 | `arena_tutorial.js` | Am invasivsten (Pause-Logik im Game-Loop), am besten mit frischem Kopf | ~40–60 min |
-| 6 | **`arena_cards.js` (v2)** + `migrateV1()` + Pack-Vergabe | Eigenes Arbeitspaket; siehe die 9-Schritt-Reihenfolge in `DESIGN_PROGRESSION.md` §F | ~10–13 h |
+| 6 | **`arena_cards.js` (v2, State v3)** + `migrateV1()` + Pack-Vergabe | Eigenes Arbeitspaket; siehe die 9-Schritt-Reihenfolge in `DESIGN_PROGRESSION.md` §F | ~10–13 h |
 | 7 | **UI aus `ui_prototype.html`** nach `deck.html` überführen (Collection / Detail / Forge / Packs) | Teil von #6, aber getrennt planbar — die Vorlage ist fertig und getestet | (in #6 enthalten) |
+| 8 | **`arena_fortress.js`** + Festungs-Tab im Hub | **Nach dem Kartensystem**: braucht ein Spiel, in dem Meta-Gold fließt (#6, Schritt 3) und Trophäen laufen (#1) — sonst sind alle Stufen entweder unbezahlbar oder gesperrt. Danach der kleinste Eingriff mit dem größten Ökonomie-Effekt | ~2–2.5 h |
 
 **Gesamt Module 1–5: ca. 2.5–4 Stunden** inklusive Testen. Nach jedem Modul einzeln testen und
 committen — nicht alle fünf auf einmal einbauen. Die Karten-Progression (#6/#7) ist ein eigenes
 Projekt und sollte **nach** den fünf Match-Modulen kommen: Sie braucht ein Spiel, das schon
-Trophäen und Packs vergibt.
+Trophäen und Packs vergibt. Die **Festung (#8)** kommt zuletzt: Sie ist von #6 nur über die
+Gold-Wallet abhängig, aber ohne Gold-Einkommen und ohne Trophäenstand hat sie nichts zu tun.
 
 ---
 
@@ -361,11 +459,23 @@ Trophäen und Packs vergibt.
 - Nach Abschluss oder "Überspringen": `localStorage.arenaTutorialDone === "1"`, Reload zeigt es
   **nicht** erneut, und das Spiel läuft (nicht dauerhaft pausiert!) weiter.
 
-**arena_cards.js (v2)**
-- `node arena_patches/arena_cards.js` → **ALLE TESTS OK** (Leiter/Kurven, 10 000 Bronze-Packs,
-  Garantien aller vier Pack-Typen, Pity, Merge-Pyramide, Cap-Gating, Migration v1→v2).
-- `localStorage.arenaCards` hat nach dem ersten Pack `v: 2`, `material > 0`, `gold === null` und
-  pro Karte `{tier, lvl, copies:{common…supreme}, mergeBoni, pendingBoni}`.
+**arena_cards.js (v2, State v3)**
+- `node arena_patches/arena_cards.js` → **ALLE TESTS OK** (Material-Sorten, Leiter/Kurven,
+  10 000 Bronze-Packs, Garantien aller vier Pack-Typen, Pity + `getPityStatus()`,
+  Merge-Pyramide, Cap-Gating, Migration v1→v2→v3).
+- `localStorage.arenaCards` hat nach dem ersten Pack `v: 3`,
+  `materials: {attack, speed, special}` (**kein** Zahlenfeld `material` mehr), `gold === null`
+  und pro Karte `{tier, lvl, copies:{common…supreme}, mergeBoni, pendingBoni}`.
+- **Material-Sorten:** `ArenaCards.materialTypeOf('fire') === 'attack'`, `('water') ===
+  'speed'`, `('nature') === 'special'`, unbekannte ID → `'special'`.
+- **Sorten-Verbrauch:** Level-Up an FROST senkt **nur** `materials.speed`;
+  `canLevelUp('fire')` meldet `reason: 'material'`, solange nur Tempo-Essenz im Vorrat liegt.
+- **Pack-Material:** `openPack().materialSlots` ist `[{type, amount, name, sym}]`, Summe der
+  `amount` == `material`; die Zeremonie ruft pro Flip `addMaterial(amount, type)`.
+- **Offener Pity:** `ArenaCards.getPityStatus()` → bei frischem Zähler `{epicIn: 26,
+  legendaryIn: 76}`, zählt mit jedem Pack ohne Treffer runter, springt beim Treffer zurück.
+- **Migration v2→v3:** alter Stand mit `material: 100` → `materials {34, 33, 33}`; Karten,
+  Level, Kopien, Boni und Pity-Zähler unverändert; zweiter Aufruf `{skipped: true}`.
 - **Cap-Gating:** Karte auf Gewöhnlich hochleveln → stoppt bei **Lv25**,
   `ArenaCards.canLevelUp(id).reason === 'cap'`; nach `merge(id,'common')` geht es bis **Lv40**.
 - **Merge-Pyramide:** `addDrop(id,'common',243)` + `mergeAll(id)` → 121 Merges, Endstufe
@@ -374,16 +484,40 @@ Trophäen und Packs vergibt.
   `goldCost` wird nur gemeldet.
 - **Suprem droppt nie** aus Packs; jedes Bronze-Pack enthält ≥1 Gut-Karte.
 
+**arena_fortress.js**
+- `node arena_patches/arena_fortress.js` → **ALLE TESTS OK** (Bonus-Kurve, Kostenreihe,
+  gemeinsamer Zähler, Gold-Schranke, Trophäen-Gates, Caps, Persistenz-Robustheit).
+- **Kostenreihe:** `ArenaFortress.costAt(0..35)` → **6 000 · 7 000 · 8 000 · … · 41 000**;
+  `totalCost() === 846000`. AAs beobachtete 17 000 liegen exakt auf Stufe 12.
+- **Gemeinsamer Zähler:** `buy('hp')` → 6 000, dann `buy('prismDmg')` → **7 000** (obwohl
+  anderer Track!), dann 8 000. Die Reihenfolge ist damit eine Entscheidung.
+- **Gate:** bei 0 🏆 sind genau **6** Stufen kaufbar, danach `trackInfo(k).locked === true` mit
+  `lockAt: 600` und `buy(...).reason === 'locked'`. Ab 600 🏆 geht es bis Stufe 12, dann 1200,
+  dann 1500.
+- **Diminishing:** `bonusAt('hp', 1..12)` fällt streng monoton 6.0 → 2.7 %, Quotient exakt
+  0.93. Voll ausgebaut: `hpMul 1.498` / `prismDmgMul 1.664` / `prismRateMul 1.415`, Power 6 120.
+- **Ohne Käufe sind alle Multiplikatoren exakt `1.0`** — das Modul darf die Balance nicht
+  stillschweigend verschieben, solange nichts gekauft ist.
+- Ohne geladenes `ArenaProfile`: keine Exception, `trophies === 0`.
+
 **ui_prototype.html**
 - Datei im Browser öffnen (kein Server nötig; `arena_cards.js` muss **daneben** liegen).
 - Beim ersten Start wird ein Demo-Zustand geseedet: EMBER Lv18/Gut **mergebar**, THORN Lv12
-  mergebar, STONE Lv25 **am Cap**, 64 Material, 248 500 Gold. Reset-Knopf unten in der Sammlung.
-- Durchklicken: Sammlung → Karte antippen → **Upgrade** (Level/Power/Gold ändern sich live) →
-  Schmiede → 3 identische Karten antippen → **VERSCHMELZEN** → Bonus wählen (Rahmenfarbe wechselt)
-  → Packs → **Bronze-Pack öffnen** → einzeln flippen → „Alle aufdecken" → Zusammenfassung →
-  zurück zur Sammlung (Red-Dot-Zähler hat sich aktualisiert).
-- **Konsole muss leer bleiben** — automatisiert geprüft mit einem Playwright-Skript (29 Schritte,
-  Screenshots je View, 0 JS-Fehler).
+  mergebar, STONE Lv25 **am Cap**, Material **26 ⚔️ / 21 ⚡ / 17 ✨**, **12 500 Gold**
+  (bewusst knapp: DAWN Lv44 kostet 18 000 und ist damit sichtbar unbezahlbar — der
+  dokumentierte Gold-Bottleneck). Top-Bar: 1136 🏆 / 245 💎 / 12 500 🪙.
+  Reset-Knopf unten in der Sammlung.
+- Durchklicken: Sammlung (drei Material-Bestände in der Leiste) → Karte antippen → Detail zeigt
+  die **Material-Sorte des Turms** („⚡ Tempo-Essenz 21 / 5") plus die fremden Sorten als
+  „nicht verwendbar" → **Upgrade** (Level/Power/Gold ändern sich live, es sinkt **nur** die
+  Sorte der Karte) → Sortierung auf **„Nach Rarität"** umstellen (Raster ordnet sich um) →
+  Schmiede → 3 identische Karten antippen → **VERSCHMELZEN** → Bonus wählen (Rahmenfarbe
+  wechselt) → Packs (**Pity-Zeile** „Episch garantiert in ≤N Packs · Legendär in ≤M" unter dem
+  Öffnen-Button) → **Bronze-Pack öffnen** → einzeln flippen (Material-Slots zeigen ihre Sorte)
+  → „Alle aufdecken" → Zusammenfassung mit Material nach Sorte → Pity-Zeile hat sich um 1
+  verringert → zurück zur Sammlung (Red-Dot-Zähler und Material-Leiste aktualisiert).
+- **Konsole muss leer bleiben** — automatisiert geprüft mit einem Playwright-Skript
+  (**37 Schritte**, Screenshots je View, **0 JS-Fehler**).
 
 ---
 

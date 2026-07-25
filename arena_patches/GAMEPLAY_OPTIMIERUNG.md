@@ -1,8 +1,12 @@
 # AA-Gameplay vs. Arcane Prism — verifizierte Abweichungen & Optimierungen
 
-**Stand:** 2026-07-24 · **Quelle:** `arena_patches/AA_UI_REFERENZ.md` §9 (Match-HUD, Matchmaking,
-Match-Ende), belegt aus den Screen-Recordings 1/2/3 des Users.
+**Stand:** 2026-07-25 · **Quelle:** `arena_patches/AA_UI_REFERENZ.md` §9 (Match-HUD, Matchmaking,
+Match-Ende, Trophy Road, Map Objectives), belegt aus den Screen-Recordings 1/2/3/6/11 des Users.
 **Gegenstand:** Abgleich der **verifizierten** AA-Match-Mechanik gegen unseren Spielstand.
+
+> **Ergänzt am 2026-07-25 aus Video 6:** neuer **Punkt 8** (arena-gebundene Map-Objectives
+> und Trick-Card-Freischaltung) und die **korrigierten Arena-Schwellen** in §4
+> (600 / 1200 / 1500 statt geschätzter 250 / 700 / 1200, siehe AA-Referenz §9.5 / §12.1).
 
 **Unser Stand (Referenz für alles Folgende):**
 
@@ -152,16 +156,46 @@ das *leichtere* Matchup, nicht das bessere Spiel.
 
 **Empfehlung: Hybrid.**
 
-* **Fixe Basis pro Arena** (planbar, wird vor dem Match im Matchmaking-Screen angezeigt):
+* **Fixe Basis pro Arena** (planbar, wird vor dem Match im Matchmaking-Screen angezeigt).
+  Die Schwellen sind seit Video 6 **belegt** und nicht mehr geschätzt (§9.5):
 
-  | Arena | Trophäen (Sieg) | Gold (Sieg) | Trophäen (Niederlage) |
-  |---|---|---|---|
-  | 1 | +30 | 250 | −8 |
-  | 2 (ab 250 🏆) | +32 | 400 | −9 |
-  | 3 (ab 700 🏆) | +35 | 610 | −10 |
-  | 4 (ab 1200 🏆) | +39 | 900 | −12 |
+  | Arena / Liga | Schwelle | Trophäen (Sieg) | Gold (Sieg) | Trophäen (Niederlage) |
+  |---|---|---|---|---|
+  | 1 | 0 🏆 | +30 | 250 | −8 |
+  | 2 | ~250 🏆 | +32 | 400 | −9 |
+  | 3 | **600 🏆** | +35 | **610** | −10 |
+  | 4 | ~900 🏆 | +37 | 750 | −11 |
+  | 5 | **1200 🏆** | +39 | 900 | −12 |
+  | 6 | **1500 🏆** | +42 | 1 100 | −13 |
+  | **Champions-Liga** | **~2900 🏆** | +45 | 1 400 | −15 |
 
   (Die Arena-3-Zeile übernimmt bewusst AAs belegte 610 Gold als Ankerwert.)
+
+> **⚠ KORRIGIERT nach Video 6 (§9.5 / §12.1).** Die frühere Fassung dieser Tabelle nannte
+> Arena-Aufstiege bei **250 / 700 / 1200** — geraten, weil die Top-Bar-Währungen vertauscht
+> gelesen worden waren. Belegt sind jetzt: **Arena 3 = 600**, **Arena 5 = 1200**,
+> **Arena 6 ≈ 1500**, danach die Liga **Champions Peak ab ≈ 2900** mit eigenen *Gates*
+> (Entrance / Stonegate 3400 / Ironpass 3900 / Bronzeward 4600 / Silverfield 5400 /
+> Flamegate 7800 / Stormcrest 8800 / Spitze ≈ 9800). Die Leaderboard-Spitze lag bei
+> **~6500** Trophäen — die Trophäenzahlen der Spielerschaft liegen also **etwa Faktor 7
+> niedriger** als bisher angenommen, und die frühere Annahme „Arena 4 ≈ 8218 Trophäen"
+> war falsch. **Dieselben Schwellen 600 / 1200 / 1500 gaten auch die Festungs-Upgrades**
+> (`arena_fortress.js`) und die Objective-/Curse-Freischaltung (Punkt 8) — eine Tabelle
+> für drei Systeme.
+>
+> **Schrittweite der Belohnungsknoten** (§9.5, für die Dichte-Kurve der Trophy Road):
+>
+> | Bereich | Schrittweite |
+> |---|---|
+> | 400 – 1 300 🏆 | **50** |
+> | 1 500 – 3 400 🏆 | **100** |
+> | 3 800 – 9 800 🏆 | **200** |
+>
+> Also **dichte kleine Belohnungen am Anfang, seltenere große später** — unsere geplanten
+> „alle 25 Trophäen ein Knoten" (`DESIGN_PROGRESSION.md` §D) sind damit im unteren Bereich
+> etwa doppelt so dicht wie im Vorbild. Empfehlung: auf **50 / 100 / 200** umstellen,
+> dafür pro Knoten mehr hineingeben — ein Knoten, der sich lohnt, schlägt zwei, die man
+> vergisst.
 * **Streak-Bonus bleibt** als einziger variabler Anteil: **+3 Trophäen pro Siegesserie-Stufe,
   gedeckelt bei +15**. Das belohnt Konstanz statt Glück und ist trotzdem vorhersagbar.
 * **Sterne-Bonus streichen** (`T_STAR`) — er ist der intransparenteste Teil und der einzige, den
@@ -254,6 +288,82 @@ Pfadfindungscode berührt und **jede** bestehende Map neu balanciert werden müs
 
 ---
 
+## 8. Arena-gebundene **Map-Objectives** & **Trick-Card-Freischaltung**
+
+**Beleg (§9.7, Video 6 t=105-125).** Jeder Arena-Banner der Trophy Road trägt ein Feld
+**„Unlocks:"**, und was dort steht, ist in zwei klar gelabelte Klassen sortiert:
+
+| Klasse | Wirkung | Belegte Namen |
+|---|---|---|
+| **Map Objective** | Regeländerung für die **ganze Map** | *Spell Frenzy*, *Bounty Bloom*, *Straight Combat*, *Endless Refresh*, *Doom Clock* |
+| **Trick Card** | einsetzbare **Störkarte gegen den Gegner** | *Chains of Binding*, *Curse of Weakness*, *Phantom Cart*, *Ghostly Distraction*, *Mystic Obstacles*, *Starfall Curse*, *Cursed Gust* |
+
+Beispiel: Arena 3 (*Sunken Atlantis*, 600 🏆) schaltet *Endless Refresh*, *Doom Clock*,
+*Ghostly Distraction* und *Mystic Obstacles* frei. Dazu der Schlüssel-Befund: Der Modifier
+**„Neutral"** auf dem Home-Screen (§9.4) bedeutet **kein Map Objective aktiv** — die
+Objectives rotieren also, sie sind kein Dauerzustand.
+
+**Bezug zu unseren offenen Punkten.** Zwei Dinge, die wir bisher getrennt geplant hatten,
+sind im Vorbild **dasselbe System**:
+
+1. **Unser Curse-System** (Punkt 3 oben, `DESIGN_PROGRESSION.md` §E und „Spätere
+   Ausbaustufen" Phase 2) war als Kartenpool-Erweiterung gedacht: Curse-Karten kommen
+   irgendwann in den Drop-Pool und laufen über dieselbe Level-Leiter. Offen blieb dabei
+   immer die Frage, **wann** ein Spieler sie bekommt — ein Drop-Slot ist kein Ereignis.
+   AA beantwortet das: **arena-gebunden freigeschaltet**, mit Namen, Banner und
+   „Unlocks:"-Feld.
+2. **Der Wochen-Mutator-Vorschlag** (rotierende Regeländerung pro Woche, bisher nur
+   mündlich, in keinem Dokument dieses Ordners festgehalten) wollte dasselbe erreichen:
+   dieselben Maps sollen sich neu anfühlen. Der Unterschied ist die **Bindung**: Ein
+   Wochen-Mutator ist an den **Kalender** gebunden, ein Map Objective an die **Arena**.
+
+**Warum die Arena-Bindung besser ist.** Ein Wochen-Mutator trifft alle Spieler gleichzeitig
+und ist damit reine Abwechslung — er belohnt nichts. Ein arenagebundenes Objective ist
+**Fortschritt**: „Ab Arena 3 kann *Doom Clock* laufen" macht den Aufstieg zu einem
+inhaltlichen Ereignis und nicht nur zu einer größeren Zahl. Genau das fehlt unserer Trophy
+Road bisher — sie vergibt Gold, Packs und Material, aber sie verändert **nichts am Spiel**.
+Und die Kosten sind lächerlich niedrig: Fünf Regelvarianten auf denselben Maps sind billiger
+als eine neue Map.
+
+**Empfehlung.**
+
+* **Objectives als Arena-Feature statt als Wochen-Mutator.** Pro Arena 1-2 neue Objectives,
+  freigeschaltet am Arena-Banner der Trophy Road. Im Matchmaking-Screen **vor** dem Match
+  anzeigen, welches Objective läuft (AA zeigt es auf dem Home-Screen). **„Neutral"
+  übernehmen** — nicht jedes Match braucht einen Modifier, sonst wird die Ausnahme zur
+  Regel und der Grundmodus verlernt.
+* **Fünf Objectives für den Start**, an unsere Mechanik angepasst:
+
+  | Name | Regel | schaltet frei ab |
+  |---|---|---|
+  | **Neutral** | kein Modifier (Grundmodus) | Start |
+  | **Zauberrausch** (AA: *Spell Frenzy*) | Held-Ult lädt doppelt so schnell | Arena 2 |
+  | **Beutesegen** (*Bounty Bloom*) | jeder 5. Gegner lässt eine Zusatz-Handkarte fallen | Arena 3 |
+  | **Endlos-Refresh** (*Endless Refresh*) | Hand-Refresh unbegrenzt statt 1×/Runde | Arena 4 |
+  | **Doom Clock** | Matchdauer 5 statt 7 Minuten, Wellen 30 % schneller | Arena 5 |
+  | **Direktkampf** (*Straight Combat*) | keine Straßenkarten — feste Strecke für beide | Arena 6 |
+
+  *Endlos-Refresh* ist dabei der interessanteste: Er nimmt genau die Schranke weg, über die
+  Punkt 2 dieses Dokuments diskutiert — und liefert damit **einen A/B-Test im laufenden
+  Betrieb**, ohne dass wir die Grundregel anfassen müssen.
+* **Curse-Karten arena-gebunden freischalten** statt sie einfach in den Drop-Pool zu
+  schütten. Das ist Content-Tröpfelung im besten Sinn: Jede Arena bringt **eine** neue
+  Störkarte, der Spieler lernt sie einzeln kennen statt sieben auf einmal, und die
+  Trophy Road hat einen Grund, der nicht „mehr Zahlen" heißt. Reihenfolge-Vorschlag:
+  **Sternenfall** (Arena 2, hängt an Punkt 3) → **Fluch der Schwäche** (Arena 3) →
+  **Geisterköder** (Arena 4) → **Ketten der Bindung** (Arena 5) → **Arkane Hindernisse**
+  (Arena 6).
+* **Technisch:** Ein Objective ist ein Datensatz mit einer Handvoll Flags
+  (`ultChargeMul`, `refreshLimit`, `matchSeconds`, `waveSpeedMul`, `pathCardsAllowed`) —
+  keine Sonderlogik pro Objective, sondern eine Konfiguration, die der Match-Start liest.
+  Die Freischaltung liest `ArenaProfile.get().trophies` gegen die Arena-Schwellen
+  (dieselbe Tabelle wie §4 und `arena_fortress.js`).
+
+**Aufwand: M** (Objective-Konfiguration + Matchmaking-Anzeige + Unlock-Banner) ·
+**Priorität: 2**
+
+---
+
 ## Übersicht
 
 | # | Thema | Beleg | Aufwand | Priorität |
@@ -265,8 +375,11 @@ Pfadfindungscode berührt und **jede** bestehende Map neu balanciert werden müs
 | 5 | Ladebildschirm-Tipps (10 Texte) | rotierende Tipps im Matchmaking | S | 3 |
 | 6 | Clan-Tag im Rivalen-Modul | „No clan" unter beiden Namen | S | 5 |
 | 7 | Turm-Grundflächen 1×2 + „Felder abgedeckt" | „1x2 TOWER PATH" / „Grids Covered" | L | 7 (Later) |
+| 8 | **Map-Objectives + Curse-Karten arena-gebunden** | „Unlocks:" pro Arena-Banner, Modifier „Neutral" | M | **2** |
 
 **Reihenfolge-Empfehlung:** 1 → 3 → 2 → 4 → 5 → 6 → (7 später).
+**Punkt 8 hängt an Punkt 3** (die erste Curse-Karte *Sternenfall* braucht die Sternstufen)
+und an der korrigierten Arena-Tabelle aus §4 — sinnvoll direkt nach 3 und 4 einzuplanen.
 Punkte 1 und 3 hängen zusammen (Gold ist die Währung der Sternstufen) und sollten in einem
 Arbeitspaket gebaut werden; Punkt 2 baut auf der wiederhergestellten Ökonomie auf und ist
 danach ein Zweizeiler pro Handkarte.

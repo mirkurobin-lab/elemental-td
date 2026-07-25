@@ -11,6 +11,13 @@
  * §2 (Turm-Detailkarte), §4.3 (Forge/Merge), §7 (Collection/Battle Deck)
  * mit UNSEREM Content (6 Elemente + 2 Helden, eigene Farbpalette).
  *
+ * Stand 2026-07-25 — eingearbeitete Video-6-Befunde:
+ *   - Top-Bar-Reihenfolge KORRIGIERT: 🏆 Trophäen | 💎 Gems | 🪙 Gold (§12.1)
+ *   - Material in DREI SORTEN statt generisch; die Detailkarte zeigt die
+ *     Sorte des Turms (Icon + Name), die Sammlung alle drei Bestände (§12.3)
+ *   - OFFENER Pity-Zähler auf dem Pack ("Episch garantiert in ≤N") (§8.2)
+ *   - Sortier-Dropdown mit "Nach Level" UND "Nach Rarität" (§7)
+ *
  * Kein Build, kein CDN. Lädt ./arena_cards.js relativ (window.ArenaCards).
  * Öffnen: einfach als file:// im Browser. Zustand liegt in localStorage
  * ("arenaCards" = Kartenbank v2, "arenaHubGold" = Hub-Wallet).
@@ -70,6 +77,14 @@ h2.title{font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(
 .tab.on{background:#2b3b47;color:#fff}
 .spacer{flex:1}
 .mini{font-size:11px;color:var(--dim);background:var(--panel);padding:6px 9px;border-radius:8px}
+select.sel{font-family:inherit;border:1px solid var(--line);appearance:none;
+  -webkit-appearance:none;padding-right:20px;cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,var(--dim) 50%),
+    linear-gradient(135deg,var(--dim) 50%,transparent 50%);
+  background-position:calc(100% - 12px) 12px,calc(100% - 8px) 12px;
+  background-size:4px 4px,4px 4px;background-repeat:no-repeat}
+select.sel option{background:var(--panel);color:var(--txt)}
+#matCount b{color:var(--txt);font-weight:800}
 .forgebtn{background:linear-gradient(180deg,#f2a13d,#c9762a);color:#231402;font-weight:900;
   font-size:12px;padding:7px 12px;border-radius:9px;letter-spacing:.05em}
 
@@ -151,6 +166,13 @@ nav.bottom .nb{display:inline-block;min-width:14px;height:14px;line-height:14px;
   border-radius:10px;padding:6px 14px;font-size:15px;font-weight:900}
 .matrow i{font-style:normal;font-size:18px}
 .matrow .bad{color:var(--danger)}
+.matrow .mname{font-size:12px;font-weight:800;letter-spacing:.02em}
+.matsub{margin-top:5px;font-size:10px;color:var(--dim);letter-spacing:.02em}
+/* Offener Pity-Zähler auf dem Pack (AA-Muster §8.2) */
+.pity{margin:0 0 10px;background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:8px 10px;font-size:11px;line-height:1.5;color:#c6d3dd;text-align:center}
+.pity b{color:var(--gold)}
+.pity .leg{color:#f2a13d}
 .dfoot{display:flex;gap:9px;padding:12px;position:sticky;bottom:0;background:linear-gradient(180deg,#0e141800,#0e1418 30%)}
 .btn{flex:1;border-radius:12px;padding:11px 0;text-align:center;font-weight:900;font-size:13px}
 .btn.ghost{background:var(--panel);color:#c2cfd9;border:1px solid var(--line);flex:0 0 38%}
@@ -230,11 +252,17 @@ footer{padding:6px 12px 14px;text-align:center}
 <body>
 <div id="app">
 
-  <!-- ===== Top-Bar (§1: Gems | Gold | Trophäen) ===== -->
+  <!-- ===== Top-Bar (§1) =====
+       ⚠ KORRIGIERT nach AA_UI_REFERENZ.md §12.1: Die Reihenfolge ist
+       🏆 Trophäen | 💎 Gems | 🪙 Gold — in der ersten Fassung waren
+       Trophäen und Gems/Gold vertauscht. Beleg: Video 6 zeigt wörtlich
+       "Your Trophies: 425" im ersten Feld, dazu die Icon-Farbmessung
+       (Feld 2 magenta #DC1DDB = Gem, Feld 3 goldgelb #F3B733 = Münze).
+       Demo-Werte entsprechen dem Video-11-Account (1136 🏆 → Arena 4). -->
   <div class="topbar">
-    <div class="cur"><i style="color:var(--gem)">💎</i><span id="curGems">1 136</span><span class="plus">+</span></div>
+    <div class="cur"><i>🏆</i><span id="curTrophies">0</span></div>
+    <div class="cur"><i style="color:var(--gem)">💎</i><span id="curGems">0</span><span class="plus">+</span></div>
     <div class="cur"><i style="color:var(--gold)">🪙</i><span id="curGold">0</span><span class="plus">+</span></div>
-    <div class="cur"><i>🏆</i><span id="curTrophies">8 218</span></div>
   </div>
 
   <!-- ===== VIEW 1: COLLECTION (§7) ===== -->
@@ -249,10 +277,14 @@ footer{padding:6px 12px 14px;text-align:center}
       <span class="spacer"></span>
       <button class="forgebtn" id="btnToForge">⚒ SCHMIEDE</button>
     </div>
+    <!-- Sortier-Dropdown (§7: AA hat "By Level" UND "By Rarity", Video 6) -->
     <div class="tabs">
-      <button class="mini" id="btnSort">Nach Level ▾</button>
+      <select class="mini sel" id="selSort" aria-label="Sortierung">
+        <option value="level">Nach Level</option>
+        <option value="tier">Nach Rarität</option>
+      </select>
       <span class="spacer"></span>
-      <span class="mini" id="matCount">⚗ 0</span>
+      <span class="mini" id="matCount">…</span>
     </div>
 
     <div class="grid" id="collGrid"></div>
@@ -272,7 +304,10 @@ footer{padding:6px 12px 14px;text-align:center}
       </div>
     </div>
     <div class="tabs">
-      <button class="mini" id="btnSortForge">Nach Level ▾</button>
+      <select class="mini sel" id="selSortForge" aria-label="Sortierung">
+        <option value="level">Nach Level</option>
+        <option value="tier">Nach Rarität</option>
+      </select>
       <span class="spacer"></span>
       <button class="forgebtn" id="btnMergeAll">ALLE VERSCHMELZEN</button>
     </div>
@@ -286,6 +321,9 @@ footer{padding:6px 12px 14px;text-align:center}
     <h2 class="title">Booster-Packs</h2>
     <button class="packbtn" id="btnOpenBronze">🎁 BRONZE-PACK ÖFFNEN
       <small id="bronzePromise">…</small></button>
+    <!-- AA zeigt den Pity-Stand OFFEN auf der Truhe ("Get Legendary in ~50
+         opens", §8.2) statt Prozent-Drop-Raten — wir machen es genauso. -->
+    <div class="pity" id="pityLine">…</div>
     <div class="tabs">
       <span class="mini" id="packStat">Geöffnet: 0</span>
       <span class="spacer"></span>
@@ -335,9 +373,12 @@ footer{padding:6px 12px 14px;text-align:center}
       <div class="power">⚡ Power: <span id="dPower">0</span></div>
       <div class="stats" id="dStats"></div>
       <div class="mergehint" id="dMerge"></div>
+      <!-- §5 + §12.3: Material ist SORTEN-gebunden — die Karte zeigt, WELCHE
+           Sorte sie frisst (Icon + Name), nicht einen generischen Vorrat. -->
       <div class="matblock">
         <div class="lbl">Upgrade-Material</div>
-        <div class="matrow"><i>⚗</i><span id="dMat">0 / 0</span></div>
+        <div class="matrow"><i id="dMatSym">⚗</i><span id="dMatName" class="mname">—</span><span id="dMat">0 / 0</span></div>
+        <div class="matsub" id="dMatSub"></div>
       </div>
     </div>
     <div class="dfoot">
@@ -425,10 +466,19 @@ footer{padding:6px 12px 14px;text-align:center}
   function gold() { return parseInt(localStorage.getItem(GOLD_KEY) || "0", 10) || 0; }
   function setGold(v) { localStorage.setItem(GOLD_KEY, String(Math.max(0, Math.round(v)))); }
 
+  /* Trophäen/Gems sind im Prototyp Deko (im Spiel: ArenaProfile bzw. Shop).
+     Werte aus dem Video-11-Account: 1136 🏆 = Arena 4, 245 💎, dazu ein
+     realistischer Gold-Stand von 12 500 — genug für die günstigen Karten,
+     NICHT genug für DAWN Lv44 (18 000). Das ist der dokumentierte
+     Gold-Bottleneck, im Prototyp bewusst sichtbar. */
+  var DEMO_TROPHIES = 1136, DEMO_GEMS = 245, DEMO_GOLD = 12500;
+
   /* ================= Demo-Seed ================= */
   var SEED_KEY = "arenaUiProtoSeed";
   function seed() {
-    var st = { v: AC.STATE_VERSION, cards: {}, material: 64, gold: null,
+    // State v3: Material liegt in DREI Sorten (AA-Befund §12.3).
+    var st = { v: AC.STATE_VERSION, cards: {},
+               materials: { attack: 26, speed: 21, special: 17 }, matRR: 0, gold: null,
                pityEpic: 6, pityLegendary: 21, packsOpened: 12 };
     function mk(tier, lvl, copies, boni) {
       var c = { tier: tier, lvl: lvl, copies: {}, mergeBoni: boni || [], pendingBoni: [] };
@@ -437,7 +487,7 @@ footer{padding:6px 12px 14px;text-align:center}
       return c;
     }
     // Gemischte Stände: EMBER + THORN sind sofort mergebar, STONE steht am Cap,
-    // überall genug Material für sofortige Level-Ups.
+    // bei den günstigen Karten reichen Material UND Gold für ein Level-Up.
     st.cards.fire     = mk("good", 18, { good: 3, common: 4 }, ["fire_good_rate"]);
     st.cards.water    = mk("rare", 31, { rare: 1, good: 2, common: 5 }, ["water_good_slow", "water_rare_shatter"]);
     st.cards.nature   = mk("common", 12, { common: 5 });
@@ -447,7 +497,7 @@ footer{padding:6px 12px 14px;text-align:center}
     st.cards.solara   = mk("good", 22, { good: 2, common: 3 }, ["solara_good_ult"]);
     st.cards.magmor   = mk("common", 4, { common: 1 });
     AC._write(st);
-    setGold(248500);
+    setGold(DEMO_GOLD);
     localStorage.setItem(SEED_KEY, "1");
   }
   if (!localStorage.getItem(SEED_KEY)) seed();
@@ -512,8 +562,14 @@ footer{padding:6px 12px 14px;text-align:center}
       '<div class="lvl">LvL ' + v.lvl + "</div></button>";
   }
   function renderTop() {
+    $("curTrophies").textContent = fmt(DEMO_TROPHIES);
+    $("curGems").textContent = fmt(DEMO_GEMS);
     $("curGold").textContent = fmt(gold());
-    $("matCount").textContent = "⚗ " + AC.get().material;
+    // Material-Vorrat je Sorte (§7.1: AA führt jede Sorte getrennt)
+    var bank = AC.getMaterials();
+    $("matCount").innerHTML = AC.MATERIALS.map(function (m) {
+      return m.sym + " <b>" + bank[m.key] + "</b>";
+    }).join(" ");
   }
   function renderCollection() {
     renderTop();
@@ -613,10 +669,17 @@ footer{padding:6px 12px 14px;text-align:center}
       mh.innerHTML = txt;
     }
 
-    // Upgrade-Material-Block (§5) + Buttons
-    var st = AC.get();
-    var need = v.needMaterial, have = st.material;
+    // Upgrade-Material-Block (§5 / §12.3) — SORTE der Karte + Buttons
+    var need = v.needMaterial, have = v.haveMaterial;
+    $("dMatSym").textContent = v.materialSym;
+    $("dMatName").textContent = v.materialName;
+    $("dMatName").style.color = v.materialColor;
     $("dMat").innerHTML = (have < need ? '<span class="bad">' + have + "</span>" : have) + " / " + need;
+    // Die anderen Sorten mit anzeigen — sonst wirkt ein leerer Vorrat wie ein Bug.
+    var bank = v.materials;
+    $("dMatSub").innerHTML = AC.MATERIALS.filter(function (m) { return m.key !== v.materialType; })
+      .map(function (m) { return m.sym + " " + m.name + " " + bank[m.key]; }).join(" · ") +
+      " — für diesen Turm nicht verwendbar";
     var chk = AC.canLevelUp(curId, gold());
     var up = $("btnUpgrade");
     $("dUpCost").textContent = v.atCap ? "Merge nötig" : "🪙 " + fmt(v.needGold);
@@ -628,14 +691,17 @@ footer{padding:6px 12px 14px;text-align:center}
     var chk = AC.canLevelUp(curId, gold());
     if (!chk.ok) {
       toast(chk.reason === "cap" ? "Level-Cap erreicht — verschmelze 3 Karten!"
-        : chk.reason === "material" ? "Zu wenig Upgrade-Material"
-        : chk.reason === "gold" ? "Zu wenig Gold" : "Upgrade nicht möglich");
+        : chk.reason === "material" ? "Zu wenig " + chk.materialName + " (" +
+            chk.haveMaterial + "/" + chk.needMaterial + ")"
+        : chk.reason === "gold" ? "Zu wenig Gold (" + fmt(chk.needGold) + " nötig)"
+        : "Upgrade nicht möglich");
       return;
     }
     var r = AC.levelUp(curId);
     if (!r) { toast("Upgrade nicht möglich"); return; }
     setGold(gold() - r.goldCost);           // Gold-Abzug macht der Hub, nicht ArenaCards
-    toast("⬆ " + BY_ID[curId].name + " ist jetzt Level " + r.newLvl);
+    toast("⬆ " + BY_ID[curId].name + " Level " + r.newLvl + "  (−" + r.materialSpent + " " +
+      r.materialSym + " " + r.materialName + ")");
     var el = $("dTower");
     el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
     renderDetail();
@@ -766,12 +832,22 @@ footer{padding:6px 12px 14px;text-align:center}
   function renderPackHeader() {
     $("bronzePromise").textContent = AC.PACKS.bronze.promise;
     $("packStat").textContent = "Geöffnet: " + AC.get().packsOpened;
+    renderPity();
+  }
+  /* Offener Pity-Zähler — AA schreibt ihn direkt auf die Truhe (§8.2) und
+     verzichtet dafür auf Prozent-Drop-Raten. Ein Versprechen liest sich
+     besser als eine Wahrscheinlichkeit. */
+  function renderPity() {
+    var p = AC.getPityStatus();
+    $("pityLine").innerHTML = "🛟 <b>Episch</b> garantiert in ≤" + p.epicIn +
+      " Packs · <span class=\"leg\">Legendär</span> in ≤" + p.legendaryIn;
   }
   function openBronze() {
     packResult = AC.openPack("bronze", POOL_IDS, HERO_IDS);
     packState = [];
     packResult.cards.forEach(function (c) { packState.push({ kind: "card", d: c, done: false }); });
-    packResult.materialSlots.forEach(function (n) { packState.push({ kind: "mat", n: n, done: false }); });
+    // Material-Slots tragen jetzt eine SORTE: {type, amount, name, sym, color}
+    packResult.materialSlots.forEach(function (s) { packState.push({ kind: "mat", m: s, done: false }); });
     packState.push({ kind: "gold", n: packResult.gold, done: false });
     $("packSummary").style.display = "none";
     renderPack();
@@ -781,14 +857,16 @@ footer{padding:6px 12px 14px;text-align:center}
   function renderPack() {
     $("packGrid").innerHTML = packState.map(function (s, i) {
       var color = s.kind === "card" ? tierOf(s.d.tier).color
-        : s.kind === "mat" ? "#7ad4c8" : "#f2c53d";
+        : s.kind === "mat" ? s.m.color : "#f2c53d";
       var face;
       if (s.kind === "card") {
         var m = BY_ID[s.d.cardId];
         face = '<div class="face"><div style="font-size:20px">' + m.art + '</div>' +
           '<div class="t" style="color:' + color + '">' + tierOf(s.d.tier).name + "</div></div>";
       } else if (s.kind === "mat") {
-        face = '<div class="face"><div style="font-size:20px">⚗</div><div class="t">+' + s.n + "</div></div>";
+        // Sorte ist Teil des Reveals — "welche Essenz?" ist eine eigene kleine Frage.
+        face = '<div class="face"><div style="font-size:20px">' + s.m.sym + '</div>' +
+          '<div class="t" style="color:' + color + '">+' + s.m.amount + "</div></div>";
       } else {
         face = '<div class="face"><div style="font-size:20px">🪙</div><div class="t">+' + fmt(s.n) + "</div></div>";
       }
@@ -814,7 +892,7 @@ footer{padding:6px 12px 14px;text-align:center}
       AC.addDrop(s.d.cardId, s.d.tier, 1);
       if (s.d.tierIndex >= 3 && el) el.classList.add("burst");
     } else if (s.kind === "mat") {
-      AC.addMaterial(s.n);
+      AC.addMaterial(s.m.amount, s.m.type);   // Sorte mitgeben!
     } else {
       setGold(gold() + s.n);
     }
@@ -842,10 +920,14 @@ footer{padding:6px 12px 14px;text-align:center}
     var byTier = {};
     packResult.cards.forEach(function (c) { byTier[c.tierName] = (byTier[c.tierName] || 0) + 1; });
     var parts = Object.keys(byTier).map(function (k) { return byTier[k] + "× " + k; });
+    // Material nach Sorte aufschlüsseln (nur die, die tatsächlich gedroppt sind)
+    var matParts = AC.MATERIALS.filter(function (m) { return packResult.materialByType[m.key] > 0; })
+      .map(function (m) { return "<b>+" + packResult.materialByType[m.key] + "</b> " + m.sym + " " + m.name; });
     $("packSummary").style.display = "";
     $("packSummary").innerHTML = "<b>+" + packResult.cards.length + " Karten</b> (" + parts.join(", ") +
-      ")<br><b>+" + packResult.material + "</b> Upgrade-Material<br><b>+" + fmt(packResult.gold) +
+      ")<br>" + matParts.join(" · ") + "<br><b>+" + fmt(packResult.gold) +
       "</b> Gold" + (packResult.pity ? "<br>🛟 Pity-Garantie ausgelöst (" + packResult.pity + ")" : "");
+    renderPity();
     updateNavBadge();
   }
   function updateNavBadge() {
@@ -885,15 +967,18 @@ footer{padding:6px 12px 14px;text-align:center}
   $("btnClearReq").addEventListener("click", function () { req = { id: null, tier: null, n: 0 }; renderForge(); });
   $("btnOpenBronze").addEventListener("click", openBronze);
   $("btnRevealAll").addEventListener("click", revealAll);
-  $("btnSort").addEventListener("click", function () {
-    sortMode = sortMode === "level" ? "tier" : "level";
-    $("btnSort").textContent = (sortMode === "level" ? "Nach Level" : "Nach Rarität") + " ▾";
-    renderCollection();
+  // Sortierung: beide Dropdowns teilen denselben Modus und bleiben synchron.
+  function setSort(mode) {
+    sortMode = mode === "tier" ? "tier" : "level";
+    $("selSort").value = sortMode;
+    $("selSortForge").value = sortMode;
+  }
+  $("selSort").addEventListener("change", function () {
+    setSort($("selSort").value); renderCollection();
+    toast(sortMode === "tier" ? "Sortiert nach Rarität" : "Sortiert nach Level");
   });
-  $("btnSortForge").addEventListener("click", function () {
-    sortMode = sortMode === "level" ? "tier" : "level";
-    $("btnSortForge").textContent = (sortMode === "level" ? "Nach Level" : "Nach Rarität") + " ▾";
-    renderForge();
+  $("selSortForge").addEventListener("change", function () {
+    setSort($("selSortForge").value); renderForge();
   });
   ["tabTowers", "tabSkills", "tabItems"].forEach(function (k) {
     $(k).addEventListener("click", function () {
@@ -912,9 +997,11 @@ footer{padding:6px 12px 14px;text-align:center}
   });
 
   /* ================= Start ================= */
+  setSort("level");
   renderCollection();
   renderPackHeader();
-  window.__proto = { AC: AC, openDetail: openDetail, show: show, seed: seed };
+  window.__proto = { AC: AC, openDetail: openDetail, show: show, seed: seed,
+                     setSort: setSort, sortedIds: sortedIds };
 })();
 </script>
 </body>

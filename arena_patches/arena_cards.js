@@ -1,20 +1,31 @@
 /* ==================================================================
- * ARENA CARDS v2 — Merge-Raritäten + Upgrade-Material (AA-verifiziert)
+ * ARENA CARDS v2.1 — Merge-Raritäten + Material-SORTEN (AA-verifiziert)
  * ------------------------------------------------------------------
  * Reines Logik-Modul, KEIN DOM. Modell nach der per Video-Analyse
  * verifizierten Mechanik von "Arcane Arena TD", siehe
- * arena_patches/AA_UI_REFERENZ.md §2 / §4 / §5.
+ * arena_patches/AA_UI_REFERENZ.md §2 / §4 / §5 / §7.1 / §12.3.
  *
  * ZWEI GETRENNTE ACHSEN pro Karte:
  *   A) RARITÄT via MERGE  — 3 IDENTISCHE Karten gleicher Stufe → 1 Karte
  *      der nächsten Stufe. Der Merge hebt das LEVEL-CAP und schaltet
  *      einen permanenten, kartenspezifischen BONUS frei.
- *   B) LEVEL via MATERIAL — Level-Ups kosten generisches Upgrade-Material
- *      (3-8 Stück) + Gold (Plateau-Kurve). Kartenkopien werden für
- *      Level-Ups NICHT verbraucht.
+ *   B) LEVEL via MATERIAL — Level-Ups kosten Upgrade-Material in DREI
+ *      SORTEN (3-8 Stück je nach Stufe) + Gold (Plateau-Kurve).
+ *      Kartenkopien werden für Level-Ups NICHT verbraucht.
  *
  * ⚠ ERSETZT das v1-Modell (Kopien+Gold pro Level, Rarität = Level-Band).
  *   Das war eine Fehlannahme vor der Videoanalyse; siehe DESIGN_PROGRESSION.md.
+ *
+ * ⚠ STATE v3 (2026-07-25, Video-6-Befunde §12.3 / §7.1):
+ *   Upgrade-Material ist in AA NICHT generisch, sondern ≥8 Sorten mit
+ *   Kategorie-Labels ("speed", "special"). Für unseren 8-Karten-Pool
+ *   passend dimensioniert: DREI Sorten (MATERIALS), je Karte über
+ *   materialTypeOf(cardId) fest zugeordnet. `state.material` (eine Zahl)
+ *   wird zu `state.materials = {attack, speed, special}`; die Migration
+ *   v2→v3 verteilt den Altbestand gleichmäßig.
+ *   Ebenfalls neu: getPityStatus() — AA zeigt den Pity-Counter OFFEN auf
+ *   der Truhe an ("Get Legendary in ~50 opens", §8.2), wir machen unseren
+ *   deshalb auch sichtbar.
  *
  * WIRING:
  *   1. arena_pan.html — metaMul ERSETZEN:
@@ -28,7 +39,9 @@
  *          const p = ArenaCards.openPack('bronze', POOL_IDS, HERO_IDS);
  *          // p.cards = [{cardId, tier, …}] → Pack-Screen flippt einzeln,
  *          // pro Flip: ArenaCards.addDrop(d.cardId, d.tier, 1);
- *          // danach: ArenaCards.addMaterial(p.material); hubGold += p.gold;
+ *          // p.materialSlots = [{type, amount, name, sym}] → pro Flip:
+ *          //   ArenaCards.addMaterial(slot.amount, slot.type);
+ *          // danach: hubGold += p.gold;
  *        }
  *      shardsBank / PACK_SHARDS / LOSS_SHARDS / applyShardsToHub()
  *      STILLLEGEN — Packs droppen Karten, Material und Gold.
@@ -36,9 +49,14 @@
  *        const c = ArenaCards.get().cards[id];
  *        const t = ArenaCards.tierOf(c.tier);        // {name,color,cap,index}
  *        const m = ArenaCards.progressToNextMerge(id);// {have,need,ready}
- *        const up = ArenaCards.canLevelUp(id, gold); // {ok,reason,needMaterial,needGold}
+ *        const up = ArenaCards.canLevelUp(id, gold); // {ok,reason,needMaterial,
+ *                                                    //  materialType,haveMaterial,needGold}
+ *        const mt = ArenaCards.materialTypeOf(id);   // 'attack'|'speed'|'special'
+ *        const bank = ArenaCards.getMaterials();     // {attack,speed,special,total}
+ *      Pack-Screen zeigt zusätzlich den OFFENEN Pity-Stand (AA-Muster §8.2):
+ *        const p = ArenaCards.getPityStatus();       // {epicIn, legendaryIn}
  *   4. Migration (EINMALIG, beim Hub-Start):
- *        ArenaCards.migrateV1();          // alter arenaCards-State (v1)
+ *        ArenaCards.migrateV1();   // v1 → v2 → v3, in einem Durchlauf
  *
  * GOLD wird NICHT von diesem Modul verwaltet (state.gold bleibt bewusst
  * null). Das Gold-Konto liegt hub-seitig in arenaHub; goldFor(lvl) liefert
@@ -49,7 +67,7 @@
   "use strict";
 
   var KEY = "arenaCards";
-  var STATE_VERSION = 2;
+  var STATE_VERSION = 3;
   var MAX_LEVEL = 100;
   var MERGE_COST = 3; // 3 identische Karten gleicher Stufe → 1 der nächsten
 
@@ -68,6 +86,45 @@
   var TIER_KEYS = TIERS.map(function (t) { return t.key; });
   var TIER_BY_KEY = {};
   TIERS.forEach(function (t) { TIER_BY_KEY[t.key] = t; });
+
+  /* ---------- Material-SORTEN (AA-Befund §7.1 / §12.3) ----------
+   * Video 6 zeigt im RESOURCES-Raster ≥8 unabhängige Materialsorten mit
+   * Kategorie-Labels ("speed", "special") — Upgrade-Material ist NICHT
+   * generisch. Für unseren Pool von 8 Karten wären 8 Sorten Overkill
+   * (jede Sorte hätte genau einen Abnehmer und der Vorrat wäre nie eine
+   * Entscheidung). DREI Sorten mit je 2-4 Abnehmern erzeugen dagegen
+   * echte Konkurrenz: "reicht meine Tempo-Essenz für FROST oder DAWN?".
+   * Skaliert mit dem Pool-Wachstum — bei 20+ Karten kommen Sorten dazu. */
+  var MATERIALS = [
+    { key: "attack",  name: "Angriffs-Essenz", sym: "⚔️", color: "#ff8a5c" },
+    { key: "speed",   name: "Tempo-Essenz",    sym: "⚡",  color: "#63d0ee" },
+    { key: "special", name: "Spezial-Essenz",  sym: "✨",  color: "#c39bff" },
+  ];
+  var MATERIAL_KEYS = MATERIALS.map(function (m) { return m.key; });
+  var MATERIAL_BY_KEY = {};
+  MATERIALS.forEach(function (m) { MATERIAL_BY_KEY[m.key] = m; });
+
+  /* Karte → Sorte. Zuordnung nach Element-Rolle, nicht nach Farbe:
+   *   fire/earth  → attack  (die beiden reinen Schadensbringer)
+   *   water/light → speed   (Slow/Support, beide über Tempo skaliert)
+   *   nature/darkness → special (Gift/Fluch = Status-Effekt-Türme)
+   *   Helden (solara/magmor) → special (Ults sind Spezialeffekte)
+   * Unbekannte IDs (Skills, Items, Trick-Karten später) → 'special'. */
+  var CARD_MATERIAL = {
+    fire: "attack", earth: "attack",
+    water: "speed", light: "speed",
+    nature: "special", darkness: "special",
+    solara: "special", magmor: "special",
+  };
+  function materialTypeOf(cardId) {
+    var k = CARD_MATERIAL[cardId];
+    return MATERIAL_BY_KEY[k] ? k : "special";
+  }
+  // materialInfoOf(cardId) → {key, name, sym, color}
+  function materialInfoOf(cardId) {
+    var d = MATERIAL_BY_KEY[materialTypeOf(cardId)];
+    return { key: d.key, name: d.name, sym: d.sym, color: d.color };
+  }
 
   /* ---------- Stat-Kurve ----------
    * statMul(lvl) = 1.022^(lvl-1), Lv100 ≈ 8.62×.
@@ -120,7 +177,7 @@
   var PITY_EPIC = 25;              // Packs ohne Episch+ → nächster erzwingt Episch
   var PITY_LEGENDARY = 75;         // Packs ohne Legendär → erzwingt Legendär
   var HERO_WEIGHT = 0.2;           // Helden-Karten droppen 5× seltener
-  var MATERIAL_NAME = "Arkan-Essenz";
+  var MATERIAL_NAME = "Arkan-Essenz"; // Sammelbegriff für alle Sorten (UI-Überschrift)
 
   /* ================= Level-Mathematik ================= */
 
@@ -335,12 +392,33 @@
     for (var i = 0; i < TIER_KEYS.length; i++) o[TIER_KEYS[i]] = 0;
     return o;
   }
+  function emptyMaterials() {
+    var o = {};
+    for (var i = 0; i < MATERIAL_KEYS.length; i++) o[MATERIAL_KEYS[i]] = 0;
+    return o;
+  }
+  // Fremde/fehlende Sorten aussortieren, negative Bestände abfangen.
+  function normMaterials(m) {
+    var o = emptyMaterials();
+    if (m && typeof m === "object") {
+      for (var i = 0; i < MATERIAL_KEYS.length; i++) {
+        o[MATERIAL_KEYS[i]] = Math.max(0, m[MATERIAL_KEYS[i]] | 0);
+      }
+    }
+    return o;
+  }
+  function materialsTotal(m) {
+    var n = 0;
+    for (var i = 0; i < MATERIAL_KEYS.length; i++) n += m[MATERIAL_KEYS[i]] | 0;
+    return n;
+  }
   function fresh() {
     return {
       v: STATE_VERSION,
-      cards: {},        // {id: {tier, lvl, copies:{tier:n}, mergeBoni:[], pendingBoni:[]}}
-      material: 0,      // generisches Upgrade-Material (Arkan-Essenz)
-      gold: null,       // BEWUSST null — Gold verwaltet der Hub (arenaHub)
+      cards: {},          // {id: {tier, lvl, copies:{tier:n}, mergeBoni:[], pendingBoni:[]}}
+      materials: emptyMaterials(), // Upgrade-Material JE SORTE (v3)
+      matRR: 0,           // Round-Robin-Zeiger für addMaterial() ohne Sorte
+      gold: null,         // BEWUSST null — Gold verwaltet der Hub (arenaHub)
       pityEpic: 0, pityLegendary: 0, packsOpened: 0,
     };
   }
@@ -348,12 +426,14 @@
     var s;
     try { s = JSON.parse(lsGet() || "{}"); } catch (e) { s = {}; }
     if (!s || typeof s !== "object") s = {};
-    if (s.v !== STATE_VERSION && s.cards) s = migrateState(s);
+    if (s.v !== STATE_VERSION && (s.cards || s.material !== undefined)) s = migrateState(s);
     var f = fresh();
     for (var k in f) if (s[k] === undefined) s[k] = f[k];
     if (!s.cards || typeof s.cards !== "object") s.cards = {};
-    s.material = Math.max(0, s.material | 0);
+    s.materials = normMaterials(s.materials);
+    s.matRR = ((s.matRR | 0) % MATERIAL_KEYS.length + MATERIAL_KEYS.length) % MATERIAL_KEYS.length;
     s.gold = null;
+    delete s.material;   // v2-Feld — existiert in v3 nicht mehr
     return s;
   }
   function save(s) { try { lsSet(JSON.stringify(s)); } catch (e) {} }
@@ -412,12 +492,39 @@
     return { tier: c.tier, copies: c.copies[tierKey], total: copiesTotal(c) };
   }
 
-  function addMaterial(n) {
-    var st = get();
-    st.material = Math.max(0, st.material + Math.floor(Number(n) || 0));
+  /* addMaterial(n, typeKey) → {attack, speed, special, total}
+   * MIT typeKey: bucht genau auf diese Sorte.
+   * OHNE typeKey (rückwärtskompatibel zur v2-Signatur): verteilt n
+   * ROUND-ROBIN gleichmäßig über alle Sorten. Der Rest-Zeiger `matRR`
+   * wandert mit, damit zehn Aufrufe à 1 Stück nicht alle auf 'attack'
+   * landen. Negative n ziehen ab (Bestand bleibt ≥ 0). */
+  function addMaterial(n, typeKey) {
+    n = Math.floor(Number(n) || 0);
+    var st = get(), i;
+    if (typeKey && MATERIAL_BY_KEY[typeKey]) {
+      st.materials[typeKey] = Math.max(0, st.materials[typeKey] + n);
+    } else if (n) {
+      var sign = n < 0 ? -1 : 1, mag = Math.abs(n), L = MATERIAL_KEYS.length;
+      var per = Math.floor(mag / L), rest = mag % L, cur = st.matRR | 0;
+      for (i = 0; i < L; i++) {
+        var add = per + (i < rest ? 1 : 0);
+        if (!add) continue;
+        var key = MATERIAL_KEYS[(cur + i) % L];
+        st.materials[key] = Math.max(0, st.materials[key] + sign * add);
+      }
+      st.matRR = (cur + rest) % L;
+    }
     save(st);
-    return st.material;
+    return getMaterialsFrom(st);
   }
+
+  function getMaterialsFrom(st) {
+    var o = { total: materialsTotal(st.materials) };
+    for (var i = 0; i < MATERIAL_KEYS.length; i++) o[MATERIAL_KEYS[i]] = st.materials[MATERIAL_KEYS[i]];
+    return o;
+  }
+  // getMaterials() → {attack, speed, special, total}
+  function getMaterials() { return getMaterialsFrom(get()); }
 
   /* ================= Merge ================= */
 
@@ -525,17 +632,23 @@
 
   /* ================= Level ================= */
 
-  // canLevelUp(id, goldAvailable) → {ok, reason, lvl, cap, needMaterial, needGold, haveMaterial}
+  /* canLevelUp(id, goldAvailable)
+   *   → {ok, reason, lvl, cap, needMaterial, needGold, haveMaterial,
+   *      materialType, materialName, materialSym}
+   * Geprüft (und später verbraucht) wird ausschließlich die SORTE der
+   * Karte (materialTypeOf) — ein Berg Tempo-Essenz hilft EMBER nicht. */
   function canLevelUp(id, goldAvailable) {
     var st = get(), c = st.cards[id] || cardOf(id);
     var ti = tierOf(c.tier).index, cap = capOf(c.tier);
+    var mi = materialInfoOf(id);
     var out = { ok: false, reason: "", lvl: c.lvl, cap: cap, tier: c.tier,
                 needMaterial: materialFor(c.lvl, ti), needGold: goldFor(c.lvl),
-                haveMaterial: st.material };
+                materialType: mi.key, materialName: mi.name, materialSym: mi.sym,
+                haveMaterial: st.materials[mi.key] };
     if (!owned(id)) { out.reason = "unowned"; return out; }
     if (c.lvl >= MAX_LEVEL) { out.reason = "max"; return out; }
     if (c.lvl >= cap) { out.reason = "cap"; return out; }   // Merge nötig!
-    if (st.material < out.needMaterial) { out.reason = "material"; return out; }
+    if (out.haveMaterial < out.needMaterial) { out.reason = "material"; return out; }
     if (goldAvailable !== undefined && goldAvailable !== null && goldAvailable < out.needGold) {
       out.reason = "gold"; return out;
     }
@@ -543,20 +656,24 @@
     return out;
   }
 
-  /* levelUp(id) → {newLvl, materialSpent, goldCost, atCap} | null
-   * Zieht NUR Material ab. Den Gold-Abzug macht der Aufrufer (Hub-Wallet). */
+  /* levelUp(id) → {newLvl, materialSpent, materialType, goldCost, atCap} | null
+   * Zieht NUR Material der Karten-Sorte ab. Den Gold-Abzug macht der
+   * Aufrufer (Hub-Wallet). */
   function levelUp(id) {
     var st = get(), c = cardIn(st, id);
     var cap = capOf(c.tier), ti = tierOf(c.tier).index;
     if (!owned(id) || c.lvl >= cap || c.lvl >= MAX_LEVEL) return null;
+    var mi = materialInfoOf(id);
     var need = materialFor(c.lvl, ti);
-    if (st.material < need) return null;
+    if (st.materials[mi.key] < need) return null;
     var gold = goldFor(c.lvl);
-    st.material -= need;
+    st.materials[mi.key] -= need;
     c.lvl += 1;
     save(st);
     return { newLvl: c.lvl, materialSpent: need, goldCost: gold, cap: cap,
-             atCap: c.lvl >= cap, material: st.material };
+             materialType: mi.key, materialName: mi.name, materialSym: mi.sym,
+             atCap: c.lvl >= cap, materials: getMaterialsFrom(st),
+             material: st.materials[mi.key] };
   }
 
   // Kompakte Karten-Sicht fürs UI
@@ -564,6 +681,7 @@
     var st = get(), c = st.cards[id] || cardOf(id);
     var t = tierOf(c.tier);
     var ti = t.index;
+    var mi = materialInfoOf(id);
     return {
       id: id, tier: c.tier, tierName: t.name, color: t.color, tierIndex: ti,
       lvl: c.lvl, cap: t.cap, atCap: c.lvl >= t.cap,
@@ -572,7 +690,9 @@
       statMul: statMul(c.lvl, c.mergeBoni),
       nextStatMul: statMul(Math.min(t.cap, c.lvl + 1), c.mergeBoni),
       needMaterial: materialFor(c.lvl, ti), needGold: goldFor(c.lvl),
-      haveMaterial: st.material,
+      materialType: mi.key, materialName: mi.name, materialSym: mi.sym,
+      materialColor: mi.color, haveMaterial: st.materials[mi.key],
+      materials: getMaterialsFrom(st),
       mergeProgress: progressToNextMerge(id),
     };
   }
@@ -608,12 +728,38 @@
   }
   function randInt(rng, a, b) { return a + Math.floor(rng() * (b - a + 1)); }
 
+  /* getPityStatus() → {epicIn, legendaryIn, pityEpic, pityLegendary, …}
+   * AA zeigt den Pity-Stand OFFEN auf der Truhe an ("Get <Legendary> in N
+   * opens", §8.2) statt Prozent-Drop-Raten. Wir machen unseren deshalb
+   * sichtbar — Lesart: "spätestens in ≤ epicIn Packs kommt ein Episches".
+   *
+   * ⚠ Zum +1: Der Zähler wird NACH dem Pack erhöht, geprüft wird davor
+   * (`pityEpic >= PITY_EPIC` → dieses Pack erzwingt). Bei pityEpic = 25
+   * greift also das NÄCHSTE Pack → epicIn = 1. Bei frischem Zähler (0)
+   * sind es 26 — deckungsgleich mit der gemessenen längsten Durststrecke
+   * von 25 Packs ohne Episch im Selbsttest. Ein reines PITY_EPIC−Zähler
+   * wäre um eins zu optimistisch. */
+  function getPityStatus() {
+    var st = get();
+    return {
+      epicIn: Math.max(1, PITY_EPIC - (st.pityEpic | 0) + 1),
+      legendaryIn: Math.max(1, PITY_LEGENDARY - (st.pityLegendary | 0) + 1),
+      pityEpic: st.pityEpic | 0, pityLegendary: st.pityLegendary | 0,
+      epicThreshold: PITY_EPIC, legendaryThreshold: PITY_LEGENDARY,
+      packsOpened: st.packsOpened | 0,
+    };
+  }
+
   /* openPack(type, poolIds, heroIds, rng)
-   *   → {packType, name, promise, cards:[{cardId, tier, …}], materialSlots:[n],
-   *      material, gold, pity, guarantee}
+   *   → {packType, name, promise, cards:[{cardId, tier, …}],
+   *      materialSlots:[{type, amount, name, sym}], materialByType, material,
+   *      gold, pity, guarantee}
    * Wendet die Drops NICHT an — die Pack-Zeremonie ruft pro Flip addDrop()
-   * bzw. addMaterial(); das Gold bucht der Hub. Pity-Zähler und packsOpened
-   * werden hier sofort persistiert. */
+   * bzw. addMaterial(amount, type); das Gold bucht der Hub. Pity-Zähler und
+   * packsOpened werden hier sofort persistiert.
+   * Material-Slots droppen eine ZUFÄLLIGE Sorte (gleichverteilt) — genau
+   * das erzeugt die AA-typische Situation, dass man für eine bestimmte
+   * Karte auf die passende Sorte wartet (§7.1 "TO BE FOUND"). */
   function openPack(type, poolIds, heroIds, rng) {
     rng = rng || Math.random;
     var def = PACKS[normType(type)];
@@ -647,18 +793,25 @@
       cards.push({ cardId: rollCard(poolIds, heroIds, rng), tier: t.key, tierName: t.name,
                    tierIndex: t.index, color: t.color, count: 1 });
     }
-    var matSlots = [], mat = 0;
+    var matSlots = [], mat = 0, byType = emptyMaterials();
     for (i = 0; i < def.materialSlots; i++) {
-      var m = randInt(rng, MATERIAL_PER_SLOT[0], MATERIAL_PER_SLOT[1]);
-      matSlots.push(m); mat += m;
+      var amount = randInt(rng, MATERIAL_PER_SLOT[0], MATERIAL_PER_SLOT[1]);
+      var md = MATERIALS[Math.min(MATERIALS.length - 1, Math.floor(rng() * MATERIALS.length))];
+      matSlots.push({ type: md.key, amount: amount, name: md.name, sym: md.sym, color: md.color });
+      byType[md.key] += amount;
+      mat += amount;
     }
     return { packType: def.key, name: def.name, promise: def.promise, color: def.color,
-             cards: cards, materialSlots: matSlots, material: mat,
+             cards: cards, materialSlots: matSlots, materialByType: byType, material: mat,
              gold: randInt(rng, def.gold[0], def.gold[1]),
-             pity: pityHit, guarantee: def.guarantee, packsOpened: st.packsOpened };
+             pity: pityHit, guarantee: def.guarantee, packsOpened: st.packsOpened,
+             pityStatus: getPityStatus() };
   }
 
-  /* ================= Migration v1 → v2 =================
+  /* ================= Migration v1 → v2 → v3 =================
+   * migrateState() ist der Dispatcher: ein v1-Stand läuft BEIDE Stufen
+   * durch (v1→v2→v3), ein v2-Stand nur die zweite.
+   *
    * v1-Modell: Rarität war ein LEVEL-BAND derselben Karte (Lv1-19 Gewöhnlich,
    * 20-39 Selten/grün, 40-59 Episch/blau, 60-79 Legendär/lila, 80-99
    * Relikt/orange, 100 Suprem) und `copies` war ein einzelner Zähler als
@@ -678,11 +831,17 @@
     return 0;
   }
   function migrateState(old) {
-    var out = fresh();
+    var s = old;
+    if ((s.v | 0) < 2) s = migrateV1toV2(s);
+    if ((s.v | 0) < 3) s = migrateV2toV3(s);
+    return s;
+  }
+
+  function migrateV1toV2(old) {
+    var out = { v: 2, cards: {}, material: 0, gold: null,
+                pityEpic: old.pityEpic | 0, pityLegendary: old.pityLegendary | 0,
+                packsOpened: old.packsOpened | 0 };
     out.material = Math.max(0, old.material | 0);
-    out.pityEpic = old.pityEpic | 0;
-    out.pityLegendary = old.pityLegendary | 0;
-    out.packsOpened = old.packsOpened | 0;
     var extraMaterial = Math.floor((old.dust | 0) / 10);
     for (var id in (old.cards || {})) {
       if (!Object.prototype.hasOwnProperty.call(old.cards, id)) continue;
@@ -703,15 +862,45 @@
     out._migratedFrom = old.v || 1;
     return out;
   }
+
+  /* v2 → v3: aus EINEM generischen Materialbestand werden DREI Sorten.
+   * Der Altbestand wird GLEICHMÄSSIG gedrittelt, der Rest (0-2 Stück)
+   * geht auf 'attack'. Begründung: Niemand verliert Material, und die
+   * Sorten starten ausbalanciert — welche Sorte der Spieler in v2
+   * "gemeint" hat, ist nicht rekonstruierbar, also ist jede Ungleich-
+   * verteilung willkürlich. Karten, Level, Kopien und Boni bleiben
+   * unangetastet; nur die Ressource wird aufgefächert. */
+  function migrateV2toV3(old) {
+    var out = { v: 3, cards: old.cards || {}, materials: emptyMaterials(), matRR: 0,
+                gold: null, pityEpic: old.pityEpic | 0,
+                pityLegendary: old.pityLegendary | 0, packsOpened: old.packsOpened | 0 };
+    if (old._migratedFrom !== undefined) out._migratedFrom = old._migratedFrom;
+    else out._migratedFrom = old.v || 2;
+    var total = Math.max(0, old.material | 0);
+    var L = MATERIAL_KEYS.length;
+    var per = Math.floor(total / L), rest = total - per * L;
+    for (var i = 0; i < L; i++) out.materials[MATERIAL_KEYS[i]] = per;
+    out.materials.attack += rest;
+    // Falls ein Stand (Testfixture, Teil-Migration) schon Sorten mitbringt: addieren.
+    if (old.materials && typeof old.materials === "object") {
+      var pre = normMaterials(old.materials);
+      for (var j = 0; j < L; j++) out.materials[MATERIAL_KEYS[j]] += pre[MATERIAL_KEYS[j]];
+    }
+    return out;
+  }
+
   // Explizit anstoßbar (get() migriert ohnehin lazy, speichert aber erst beim
   // nächsten Schreibzugriff — migrateV1() persistiert sofort).
+  // Heißt weiterhin migrateV1(), weil es der EINE Migrations-Einstiegspunkt
+  // für den Hub-Start ist; intern läuft v1→v2→v3 durch.
   function migrateV1() {
     var raw;
     try { raw = JSON.parse(lsGet() || "{}"); } catch (e) { raw = {}; }
     if (!raw || raw.v === STATE_VERSION) return { skipped: true, cards: 0 };
     var st = get();
     save(st);
-    return { skipped: false, cards: Object.keys(st.cards).length, material: st.material };
+    return { skipped: false, cards: Object.keys(st.cards).length,
+             from: st._migratedFrom || null, materials: getMaterialsFrom(st) };
   }
 
   /* ================= Export ================= */
@@ -720,12 +909,16 @@
     TIERS: TIERS, TIER_KEYS: TIER_KEYS, PACKS: PACKS, PERKS: PERKS,
     MERGE_TIER_KEYS: MERGE_TIER_KEYS, MERGE_COST: MERGE_COST, MAX_LEVEL: MAX_LEVEL,
     GOLD_BANDS: GOLD_BANDS, MATERIAL_NAME: MATERIAL_NAME,
+    MATERIALS: MATERIALS, MATERIAL_KEYS: MATERIAL_KEYS, CARD_MATERIAL: CARD_MATERIAL,
     PITY_EPIC: PITY_EPIC, PITY_LEGENDARY: PITY_LEGENDARY, HERO_WEIGHT: HERO_WEIGHT,
     STATE_VERSION: STATE_VERSION,
     // Mathe
     statMul: statMul, goldFor: goldFor, materialFor: materialFor, tierOf: tierOf,
     capOf: capOf, nextTierKey: nextTierKey, totalGoldTo: totalGoldTo,
     totalMaterialTo: totalMaterialTo,
+    // Material-Sorten
+    materialTypeOf: materialTypeOf, materialInfoOf: materialInfoOf,
+    getMaterials: getMaterials, getPityStatus: getPityStatus,
     // Bank
     get: get, addDrop: addDrop, addMaterial: addMaterial, owned: owned, view: view,
     canMerge: canMerge, merge: merge, mergeAll: mergeAll,
@@ -761,10 +954,34 @@
     var padL = function (s, n) { s = String(s); while (s.length < n) s = " " + s; return s; };
     var fmt = function (n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " "); };
 
-    console.log("\n=== ARENA CARDS v2 — Selbsttest ===\n");
+    console.log("\n=== ARENA CARDS v2.1 (State v3, Material-Sorten) — Selbsttest ===\n");
+
+    /* --- 0. Material-Sorten (Video-6-Befund §12.3) --- */
+    console.log("Material-Sorten:");
+    MATERIALS.forEach(function (m) {
+      var abn = Object.keys(CARD_MATERIAL).filter(function (k) { return CARD_MATERIAL[k] === m.key; });
+      console.log("  " + m.sym + " " + pad(m.name, 18) + pad(m.key, 9) +
+        "Abnehmer: " + abn.join(", "));
+    });
+    check("3 Sorten definiert", MATERIALS.length === 3, MATERIAL_KEYS.join("/"));
+    check("jede Sorte hat ≥2 Abnehmer", MATERIAL_KEYS.every(function (k) {
+      return Object.keys(CARD_MATERIAL).filter(function (c) { return CARD_MATERIAL[c] === k; }).length >= 2;
+    }));
+    check("materialTypeOf: fire/earth→attack", materialTypeOf("fire") === "attack" &&
+      materialTypeOf("earth") === "attack");
+    check("materialTypeOf: water/light→speed", materialTypeOf("water") === "speed" &&
+      materialTypeOf("light") === "speed");
+    check("materialTypeOf: nature/darkness→special", materialTypeOf("nature") === "special" &&
+      materialTypeOf("darkness") === "special");
+    check("materialTypeOf: Helden→special", materialTypeOf("solara") === "special" &&
+      materialTypeOf("magmor") === "special");
+    check("materialTypeOf: unbekannte ID → special", materialTypeOf("gibtsnicht") === "special" &&
+      materialTypeOf(undefined) === "special");
+    check("materialInfoOf liefert Name + Symbol", materialInfoOf("water").name === "Tempo-Essenz" &&
+      materialInfoOf("water").sym === "⚡");
 
     /* --- 1. Raritätsleiter & Kurven --- */
-    console.log("Raritätsleiter:");
+    console.log("\nRaritätsleiter:");
     TIERS.forEach(function (t) {
       console.log("  " + pad(t.name, 12) + pad(t.colorName, 8) + t.color +
         "   Cap " + padL(t.cap, 3) + "   Material/Level-Up " + materialFor(1, t.index));
@@ -823,11 +1040,23 @@
     var matTotal = 0, goldTotal = 0, pityEpicHits = 0, pityLegHits = 0;
     var streakNoEpic = 0, maxStreakNoEpic = 0, streakNoLeg = 0, maxStreakNoLeg = 0;
     var packsWithGoodPlus = 0;
+    var matBySort = { attack: 0, speed: 0, special: 0 }, matSlotsBySort = { attack: 0, speed: 0, special: 0 };
+    var matSlotsTotal = 0, matShapeOk = true;
     for (var p = 0; p < N; p++) {
       var res = openPack("bronze", POOL, HEROES, rng);
       if (res.pity === "epic") pityEpicHits++;
       if (res.pity === "legendary") pityLegHits++;
       matTotal += res.material; goldTotal += res.gold;
+      var sumSlots = 0;
+      for (var ms = 0; ms < res.materialSlots.length; ms++) {
+        var slot = res.materialSlots[ms];
+        if (!slot || typeof slot !== "object" || !MATERIAL_BY_KEY[slot.type] ||
+            !(slot.amount >= MATERIAL_PER_SLOT[0] && slot.amount <= MATERIAL_PER_SLOT[1])) matShapeOk = false;
+        matBySort[slot.type] += slot.amount;
+        matSlotsBySort[slot.type]++;
+        matSlotsTotal++; sumSlots += slot.amount;
+      }
+      if (sumSlots !== res.material) matShapeOk = false;
       var bi = -1, hasGood = false;
       for (var s = 0; s < res.cards.length; s++) {
         tc[res.cards[s].tierIndex]++; slotsTotal++;
@@ -850,6 +1079,13 @@
     }
     console.log("  Suprem: " + tc[5] + " Slots (muss 0 sein)");
     console.log("  Ø Material/Pack: " + r2(matTotal / N) + "   Ø Gold/Pack: " + r2(goldTotal / N));
+    console.log("  Material-Sorten-Verteilung (" + fmt(matSlotsTotal) + " Slots, Soll je 33.33 %):");
+    MATERIAL_KEYS.forEach(function (k) {
+      console.log("    " + MATERIAL_BY_KEY[k].sym + " " + pad(MATERIAL_BY_KEY[k].name, 18) +
+        padL((matSlotsBySort[k] / matSlotsTotal * 100).toFixed(2), 6) + " % der Slots   " +
+        padL(fmt(matBySort[k]), 8) + " Stück (" +
+        (matBySort[k] / matTotal * 100).toFixed(2) + " %)");
+    });
     console.log("  Helden-Slots: " + (heroSlots / slotsTotal * 100).toFixed(2) + " % (Soll 6.25 %)");
     console.log("  Pity ausgelöst: Episch " + pityEpicHits + "×, Legendär " + pityLegHits + "×");
     console.log("  längste Durststrecke: " + maxStreakNoEpic + " Packs ohne Episch+, " +
@@ -863,6 +1099,13 @@
     check("Helden-Quote ~6.25 % (±1 pp)", Math.abs(heroSlots / slotsTotal * 100 - 6.25) < 1,
       (heroSlots / slotsTotal * 100).toFixed(2) + " %");
     check("Ø Material/Pack ≈ 7 (2 Slots à 2-5)", matTotal / N > 6 && matTotal / N < 8, r2(matTotal / N));
+    check("Material-Slot-Form {type, amount} korrekt, Summe == material", matShapeOk);
+    check("Sorten gleichverteilt (je 33.3 % ±1.5 pp)", MATERIAL_KEYS.every(function (k) {
+      return Math.abs(matSlotsBySort[k] / matSlotsTotal * 100 - 100 / 3) < 1.5;
+    }), MATERIAL_KEYS.map(function (k) {
+      return (matSlotsBySort[k] / matSlotsTotal * 100).toFixed(2) + " %";
+    }).join(" / "));
+    check("jede Sorte droppt überhaupt", MATERIAL_KEYS.every(function (k) { return matBySort[k] > 0; }));
     check("Ø Gold/Pack ≈ 600", goldTotal / N > 550 && goldTotal / N < 650, r2(goldTotal / N));
     check("Pity Episch greift: nie >" + PITY_EPIC + " Packs ohne Episch+", maxStreakNoEpic <= PITY_EPIC, maxStreakNoEpic);
     check("Pity Legendär greift: nie >" + PITY_LEGENDARY + " Packs ohne Legendär", maxStreakNoLeg <= PITY_LEGENDARY, maxStreakNoLeg);
@@ -924,6 +1167,58 @@
       get().cards.water.copies.good === 2 && get().cards.water.tier === "good");
     check("Merge auf Suprem nicht möglich (Endstufe)", canMerge("water", "supreme") === false);
 
+    /* --- 4b. Material-Sorten: Buchung & Verbrauch --- */
+    API._reset();
+    var mm = addMaterial(30, "speed");
+    check("addMaterial(30,'speed') bucht nur auf 'speed'", mm.speed === 30 && mm.attack === 0 &&
+      mm.special === 0 && mm.total === 30, JSON.stringify(mm));
+    API._reset();
+    addMaterial(9);
+    check("addMaterial(9) ohne Sorte verteilt 3/3/3", (function () {
+      var g = getMaterials(); return g.attack === 3 && g.speed === 3 && g.special === 3;
+    })(), JSON.stringify(getMaterials()));
+    API._reset();
+    for (var rr = 0; rr < 3; rr++) addMaterial(1);
+    check("Round-Robin: 3× addMaterial(1) landet auf 3 verschiedenen Sorten", (function () {
+      var g = getMaterials(); return g.attack === 1 && g.speed === 1 && g.special === 1;
+    })(), JSON.stringify(getMaterials()));
+    API._reset();
+    addMaterial(10);
+    check("addMaterial(10) ohne Sorte: Rest wandert (4/3/3, Summe 10)", (function () {
+      var g = getMaterials();
+      return g.total === 10 && [g.attack, g.speed, g.special].sort().join(",") === "3,3,4";
+    })(), JSON.stringify(getMaterials()));
+    check("getMaterials().total == Summe der Sorten", getMaterials().total ===
+      getMaterials().attack + getMaterials().speed + getMaterials().special);
+    check("unbekannte Sorte wird wie 'ohne Sorte' verteilt", (function () {
+      API._reset(); addMaterial(3, "quatsch");
+      var g = getMaterials(); return g.attack === 1 && g.speed === 1 && g.special === 1;
+    })());
+
+    // levelUp verbraucht NUR die Sorte der Karte
+    API._reset();
+    addDrop("fire", "common", 1);          // fire → attack
+    addMaterial(50, "speed");
+    addMaterial(50, "special");
+    check("Level-Up scheitert bei falscher Sorte im Vorrat",
+      canLevelUp("fire").reason === "material", canLevelUp("fire").reason +
+      " (habe " + canLevelUp("fire").haveMaterial + " " + canLevelUp("fire").materialName + ")");
+    addMaterial(10, "attack");
+    var luS = levelUp("fire");
+    var gS = getMaterials();
+    console.log("\nSorten-Verbrauch: EMBER (" + materialInfoOf("fire").name + ") Lv1→Lv" +
+      (luS && luS.newLvl) + "  " + JSON.stringify(gS));
+    check("levelUp zieht genau 3 von 'attack' ab", luS && luS.materialSpent === 3 &&
+      gS.attack === 7, gS.attack);
+    check("levelUp lässt 'speed'/'special' unberührt", gS.speed === 50 && gS.special === 50);
+    check("levelUp meldet die Sorte mit", luS && luS.materialType === "attack" &&
+      luS.materialName === "Angriffs-Essenz");
+    check("view() nennt Sorte + Bestand dieser Sorte", (function () {
+      var v = view("water");
+      return v.materialType === "speed" && v.materialName === "Tempo-Essenz" &&
+             v.haveMaterial === 50;
+    })());
+
     /* --- 5. Level & Cap-Gating --- */
     API._reset();
     addDrop("earth", "common", 1);
@@ -943,12 +1238,13 @@
     check("canLevelUp wieder ok", canLevelUp("earth").ok === true);
     var lu = levelUp("earth");
     check("Level-Up kostet 4 Material auf Stufe Gut", lu && lu.materialSpent === 4 && lu.newLvl === 26,
-      lu && ("Lv" + lu.newLvl + " / " + lu.materialSpent + " Material / " + lu.goldCost + " Gold"));
+      lu && ("Lv" + lu.newLvl + " / " + lu.materialSpent + " " + lu.materialName + " / " +
+             lu.goldCost + " Gold"));
     check("Gold-Kosten werden nur gemeldet, nicht abgezogen", get().gold === null);
     API._reset();
-    addDrop("light", "common", 1); addMaterial(2);
+    addDrop("light", "common", 1); addMaterial(2, "speed");
     check("canLevelUp meldet Material-Mangel", canLevelUp("light").reason === "material");
-    addMaterial(10);
+    addMaterial(10, "speed");
     check("canLevelUp meldet Gold-Mangel", canLevelUp("light", 50).reason === "gold");
 
     /* --- 6. Material-/Gold-Gesamtbedarf einer Karte Lv1→100 --- */
@@ -964,7 +1260,35 @@
       check("Material-Gesamtbedarf 400-700", mat > 400 && mat < 700, mat);
     })();
 
-    /* --- 7. Migration v1 → v2 --- */
+    /* --- 6b. Sichtbarer Pity-Counter (AA-Muster §8.2) --- */
+    API._reset();
+    var ps0 = getPityStatus();
+    console.log("\nPity-Status (offen angezeigt, AA-Muster §8.2):");
+    console.log("  frischer Zähler:  Episch in ≤" + ps0.epicIn + " Packs, Legendär in ≤" +
+      ps0.legendaryIn + "   (Schwellen " + ps0.epicThreshold + "/" + ps0.legendaryThreshold + ")");
+    check("frischer Pity-Status: 26 / 76", ps0.epicIn === PITY_EPIC + 1 &&
+      ps0.legendaryIn === PITY_LEGENDARY + 1, ps0.epicIn + " / " + ps0.legendaryIn);
+    (function () {
+      // Zähler auf 24 setzen und den Countdown gegen die Realität prüfen.
+      var st = get(); st.pityEpic = 24; st.pityLegendary = 60; save(st);
+      var ps = getPityStatus();
+      console.log("  Zähler 24/60:     Episch in ≤" + ps.epicIn + " Packs, Legendär in ≤" + ps.legendaryIn);
+      check("Countdown zählt runter (24 → Episch in ≤2)", ps.epicIn === 2 && ps.legendaryIn === 16,
+        ps.epicIn + " / " + ps.legendaryIn);
+      // Genau epicIn Packs öffnen → spätestens im letzten MUSS Episch+ drin sein.
+      var r3 = mulberry32(777), sawEpic = false, need = ps.epicIn;
+      for (var q = 0; q < need; q++) {
+        var pr3 = openPack("bronze", POOL, HEROES, r3);
+        for (var s3 = 0; s3 < pr3.cards.length; s3++) if (pr3.cards[s3].tierIndex >= 3) sawEpic = true;
+      }
+      check("Zusage hält: nach " + need + " Packs war ein Episches dabei", sawEpic);
+      check("Pity-Status nach dem Treffer zurückgesetzt", getPityStatus().epicIn === PITY_EPIC + 1,
+        getPityStatus().epicIn);
+      check("openPack liefert pityStatus mit", typeof openPack("bronze", POOL, HEROES, r3)
+        .pityStatus.epicIn === "number");
+    })();
+
+    /* --- 7. Migration v1 → v2 → v3 --- */
     API._reset();
     var v1 = {
       v: 1, dust: 300, material: 0, pityEpic: 3, pityLegendary: 9, packsOpened: 44,
@@ -977,7 +1301,9 @@
     API._write(v1);
     var mg = migrateV1();
     var ms = get();
-    console.log("\nMigration v1→v2: " + mg.cards + " Karten, Material " + ms.material);
+    var mgMat = getMaterials();
+    console.log("\nMigration v1→v3 (zwei Stufen in einem Durchlauf): " + mg.cards +
+      " Karten, Material " + JSON.stringify(mgMat));
     Object.keys(ms.cards).forEach(function (k) {
       var c = ms.cards[k];
       console.log("  " + pad(k, 8) + tierOf(c.tier).name + " Lv" + c.lvl +
@@ -990,10 +1316,42 @@
     check("jede migrierte Karte besitzt 1 Kopie ihrer Stufe", Object.keys(ms.cards).every(function (k) {
       return ms.cards[k].copies[ms.cards[k].tier] === 1;
     }));
-    check("alte Kopien + Staub → Material (12+5+50 + 300/10 = 97)", ms.material === 97, ms.material);
+    check("alte Kopien + Staub → Material (12+5+50 + 300/10 = 97)", mgMat.total === 97, mgMat.total);
+    check("v1-Material auf 3 Sorten verteilt (33/32/32)", mgMat.attack === 33 &&
+      mgMat.speed === 32 && mgMat.special === 32, JSON.stringify(mgMat));
+    check("altes Zahlenfeld `material` ist weg", get().material === undefined);
     check("alte Perks überleben als mergeBoni", ms.cards.fire.mergeBoni.length === 1);
     check("Migration läuft nur einmal", migrateV1().skipped === true);
-    check("State-Version ist 2", get().v === 2);
+    check("State-Version ist 3", get().v === 3, get().v);
+    check("Pity-Zähler überleben die Migration", get().pityEpic === 3 && get().pityLegendary === 9);
+
+    /* --- 7b. Migration v2 → v3 (Material-Sorten) --- */
+    API._reset();
+    var v2 = {
+      v: 2, material: 100, gold: null, pityEpic: 7, pityLegendary: 31, packsOpened: 88,
+      cards: {
+        fire:  { tier: "good", lvl: 30, copies: { common: 2, good: 1, rare: 0, epic: 0, legendary: 0, supreme: 0 },
+                 mergeBoni: ["fire_good_rate"], pendingBoni: [] },
+        water: { tier: "common", lvl: 11, copies: { common: 4, good: 0, rare: 0, epic: 0, legendary: 0, supreme: 0 },
+                 mergeBoni: [], pendingBoni: [] },
+      },
+    };
+    API._write(v2);
+    var mg2 = migrateV1();
+    var m2 = getMaterials(), s2 = get();
+    console.log("\nMigration v2→v3: 100 generisches Material → " + JSON.stringify(m2));
+    check("v2→v3 lief (nicht übersprungen)", mg2.skipped === false);
+    check("100 Material → 34/33/33, Summe unverändert", m2.attack === 34 && m2.speed === 33 &&
+      m2.special === 33 && m2.total === 100, JSON.stringify(m2));
+    check("Karten/Level/Kopien/Boni bleiben unangetastet", s2.cards.fire.tier === "good" &&
+      s2.cards.fire.lvl === 30 && s2.cards.fire.copies.common === 2 &&
+      s2.cards.fire.mergeBoni[0] === "fire_good_rate" && s2.cards.water.copies.common === 4);
+    check("Pity/packsOpened bleiben erhalten", s2.pityEpic === 7 && s2.pityLegendary === 31 &&
+      s2.packsOpened === 88);
+    check("State-Version nach v2→v3 ist 3", s2.v === 3, s2.v);
+    check("zweiter Aufruf ist ein No-Op", migrateV1().skipped === true);
+    check("EMBER kann nach der Migration sofort leveln (34 Angriffs-Essenz)",
+      canLevelUp("fire", 1e9).ok === true, canLevelUp("fire", 1e9).reason || "ok");
 
     console.log("\n" + (fail === 0 ? "ALLE TESTS OK" : fail + " TEST(S) FEHLGESCHLAGEN") + "\n");
     if (fail) process.exitCode = 1;
