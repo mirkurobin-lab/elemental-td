@@ -52,6 +52,13 @@
   --banner-h:72px;      /* Standard-Reihe: Pass, Quests, Spenden, Post, Events */
   --banner-h-sm:56px;   /* kompakte Reihe: Rangliste, Handbuch-Kopf */
   --banner-h-lg:128px;  /* grosses Banner: Festung Variante 2, Kapitel-Kopf */
+  --keyart-h:172px;     /* Vollbild-Keyart-Kopf: Season-Pass, Event-Kopf.
+                           VIERTE und letzte Hoehe der Leiter. Begruendung
+                           in AA_UI_REFERENZ §19.4: ein 16:9-Keyart auf
+                           --banner-h-lg (128px) waere ein Letterbox-
+                           Streifen, in dem die Key-Art nicht mehr liest;
+                           bei 172px bleibt die Stufenleiste trotzdem
+                           ueber der Falz. KEINE weiteren Zwischenwerte. */
   --tile:84px;          /* quadratische Kachel: Shop, Login-Kalender */
   --gap:8px;            /* EINZIGER Standardabstand zwischen Reihen/Kacheln */
   --gap-lg:12px;        /* Abstand zwischen SEKTIONEN */
@@ -687,7 +694,7 @@ span.ico{mix-blend-mode:normal;text-align:center}
 .seasonline{margin-top:5px;font-size:10px;color:#9fb3c1;letter-spacing:.04em}
 
 /* ---------- SHOP (§8) ---------- */
-.shopsec{margin:14px 0 4px;display:flex;align-items:center;gap:8px}
+.shopsec{margin:var(--gap-lg) 0 var(--gap);display:flex;align-items:center;gap:var(--gap)}
 .shopsec .sh{font-size:12.5px;letter-spacing:.14em}
 .shopsec .timer{margin-left:auto;font-size:10px;color:var(--dim);background:var(--panel);
   border:1px solid var(--line);border-radius:8px;padding:4px 8px;font-weight:700}
@@ -709,6 +716,97 @@ span.ico{mix-blend-mode:normal;text-align:center}
 .packshop .promise{font-size:8.5px;color:#a9bccb;line-height:1.3}
 .freebadge{position:absolute;right:-4px;top:-6px;background:var(--up);color:#06280a;
   font-size:8.5px;font-weight:900;border-radius:8px;padding:1px 5px}
+/* ==================================================================
+ * SHOP — AA-SEKTIONSREIHENFOLGE (§8.1)
+ * ------------------------------------------------------------------
+ * 1 Promo-Banner · 2 Arena-/Starter-Pack · 3 Tagesangebote · 4 Packs ·
+ * 5 Kristalltresor (AAs Roulette-Platz) · 6 Gem-Pakete · 7 Gold-Tausch
+ * Alle Hoehen/Radien/Abstaende aus der Metrik (§19.2) — die Sektionen
+ * unterscheiden sich in der FARBE und im Inhalt, nie in der Geometrie.
+ * ================================================================== */
+/* 1) Promo-Banner — AAs "Buy any offer to remove forced ads". Wir haben
+      keine Werbung (§19.1), deshalb traegt der Platz bei uns den
+      Season-Pass als staerkstes Dauerangebot. */
+.promobanner{position:relative;display:flex;align-items:center;gap:10px;width:100%;
+  min-height:var(--banner-h);padding:0 var(--pad);border-radius:var(--radius);
+  overflow:hidden;text-align:left;
+  background-image:linear-gradient(110deg,#4a2a7a,#2a1b46 55%,#141d2b);
+  border:1px solid #a45ef255;box-shadow:0 8px 20px -12px #000}
+.promobanner .prs{flex:0 0 auto;font-size:24px}
+.promobanner .prt{flex:1;min-width:0}
+.promobanner .prn{display:block;font-size:14px;line-height:1.15}
+.promobanner .prd{display:block;font-size:9.5px;color:#c6b4ee;margin-top:3px;line-height:1.4}
+.promobanner .prb{flex:0 0 auto;border-radius:var(--radius-sm);padding:8px 12px;
+  font-size:11.5px;font-weight:900;
+  background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);box-shadow:0 3px 0 #6d551a;
+  -webkit-text-fill-color:#3a2b07;color:#3a2b07}
+/* 2) Arena-/Starter-Pack — Echtgeld, Preis in Fr. wie in AAs Store. */
+.iapgrid{display:grid;grid-template-columns:1fr;gap:var(--gap)}
+.iapcard{position:relative;display:flex;align-items:center;gap:10px;
+  min-height:var(--banner-h-lg);padding:var(--pad);border-radius:var(--radius);
+  border:1px solid var(--line);overflow:hidden}
+.iapcard .iart{flex:0 0 var(--tile);width:var(--tile);height:var(--tile);border-radius:var(--radius-sm);
+  display:flex;align-items:center;justify-content:center;font-size:34px;
+  background:#0b1116a6;border:1px solid #ffffff1f}
+.iapcard .itx{flex:1;min-width:0}
+.iapcard .inm{display:block;font-size:14px;line-height:1.15}
+.iapcard .isub{display:block;font-size:9px;color:#a9bccb;margin-top:3px}
+.iapicons{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.iapicons span{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:900;
+  color:#dbe6ef;background:#0b1116a6;border:1px solid #ffffff1f;border-radius:var(--radius-sm);
+  padding:3px 6px}
+.iapicons .ico{width:12px;height:12px}
+.iapcard .ibuy{flex:0 0 auto;border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;
+  font-weight:900;background:linear-gradient(180deg,#58fa1b,#3aad16);color:#0a2404;
+  box-shadow:0 3px 0 #1f6b09}
+/* "value"-Badge wie in AA. Helle Flaeche ⇒ IMMER dunkle Schrift. */
+.valbadge{position:absolute;right:-1px;top:-1px;border-radius:0 var(--radius) 0 var(--radius-sm);
+  padding:4px 9px;font-size:9.5px;font-weight:900;letter-spacing:.04em;
+  background:linear-gradient(180deg,#ffd9a0,#f2a13d 60%,#a8621a);
+  -webkit-text-fill-color:#3a2107;color:#3a2107}
+/* 6) Gem-Pakete + 7) Gold-Tausch — gleiche Geometrie, andere Farbe. */
+.gemgrid,.goldgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+.gemcard,.goldcard{position:relative;display:flex;flex-direction:column;align-items:center;
+  gap:3px;padding:var(--pad) 8px 8px;border-radius:var(--radius);border:1px solid var(--line);
+  text-align:center;overflow:hidden}
+/* Die volle Breite ist die TEUERSTE Staffel — sie liegt quer, damit sie
+   sich von den vier Kacheln darueber absetzt. Ohne die Overrides bricht
+   der Betrag um und der Knopf laeuft auf 100 % Breite. */
+.gemcard.wide,.goldcard.wide{grid-column:1/-1;flex-direction:row;align-items:center;
+  justify-content:flex-start;gap:var(--gap);text-align:left;padding:var(--pad)}
+.gemcard.wide.hasseal,.goldcard.wide.hasseal{padding-top:var(--pad)}
+.gemcard.wide .seal,.goldcard.wide .seal{left:auto;right:10px;transform:none}
+.gemcard.wide .gnm,.goldcard.wide .gnm{flex:0 0 auto;white-space:nowrap}
+.gemcard.wide .gamt,.goldcard.wide .gamt{flex:1;min-width:0;white-space:nowrap;font-size:18px}
+.gemcard.wide .gbuy,.goldcard.wide .gbuy{width:auto;min-width:118px;margin-top:0;
+  padding:9px 14px}
+.gemcard .gart,.goldcard .gart{font-size:29px;line-height:1}
+.gemcard .gnm,.goldcard .gnm{font-size:10.5px;font-weight:800;color:#dbe6ef}
+.gemcard .gamt,.goldcard .gamt{font-size:16px;font-weight:900;line-height:1.1}
+.gemcard .gamt{color:#e6a7f7}
+.goldcard .gamt{color:var(--gold)}
+.gemcard .gbuy,.goldcard .gbuy{margin-top:5px;width:100%;border-radius:var(--radius-sm);
+  padding:7px 0;font-size:12px;font-weight:900}
+.gemcard .gbuy{background:linear-gradient(180deg,#f5a7f7,#dc1ddb 55%,#8d1c78);color:#fff;
+  box-shadow:0 3px 0 #5d0f52}
+.goldcard .gbuy{background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);
+  box-shadow:0 3px 0 #6d551a;-webkit-text-fill-color:#3a2b07;color:#3a2b07}
+.goldcard .gbuy.free{background:linear-gradient(180deg,#58fa1b,#3aad16);box-shadow:0 3px 0 #1f6b09;
+  -webkit-text-fill-color:#0a2404;color:#0a2404}
+.goldcard .gbuy[disabled],.gemcard .gbuy[disabled]{
+  background:linear-gradient(180deg,#3a4a58,#222e39);box-shadow:0 3px 0 #16202a;
+  -webkit-text-fill-color:#8fa0ad;color:#8fa0ad}
+/* Siegel "Beliebt!" / "Bester Wert!" — helle Flaechen, dunkle Schrift. */
+.seal{position:absolute;left:50%;top:-1px;transform:translateX(-50%);
+  border-radius:0 0 var(--radius-sm) var(--radius-sm);padding:3px 10px;
+  font-size:8.5px;font-weight:900;letter-spacing:.08em;white-space:nowrap;z-index:2}
+.seal.pop{background:linear-gradient(180deg,#ffd9a0,#f2a13d 60%,#c9762a);
+  -webkit-text-fill-color:#3a2107;color:#3a2107}
+.seal.best{background:linear-gradient(180deg,#c8f7a0,#7ad14f 60%,#3aad16);
+  -webkit-text-fill-color:#0a2404;color:#0a2404}
+.gemcard.hasseal,.goldcard.hasseal{padding-top:20px}
+.iapnote{margin-top:var(--gap);font-size:10px;color:var(--dim);line-height:1.55;
+  border-left:2px solid #a45ef266;padding-left:8px}
 .decorow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--gap);margin-top:var(--gap-lg)}
 .decotile{border-radius:var(--radius-sm);border:1px dashed #35485a;background:#111a21;padding:9px 6px;
   text-align:center;font-size:9.5px;color:var(--dim);font-weight:700}
@@ -1069,7 +1167,7 @@ span.ico{mix-blend-mode:normal;text-align:center}
  * Grund / Assets als ERSTER Background-Layer ueber dem CSS-Fallback.
  * ================================================================== */
 /* ---------- Breitbanner-Kopf (Pass, Events) ---------- */
-.keyart{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:16/9;
+.keyart{position:relative;border-radius:var(--radius);overflow:hidden;height:var(--keyart-h);
   background-repeat:no-repeat;background-position:center;background-size:cover,cover;
   background-image:linear-gradient(120deg,#3a2b6b,#1a1230 55%,#0e1418);
   border:1px solid #e0b94a3d;box-shadow:0 12px 26px -14px #000e}
@@ -1085,7 +1183,7 @@ span.ico{mix-blend-mode:normal;text-align:center}
 .keyart .kend b{color:var(--gold)}
 
 /* ---------- Season-Pass ---------- */
-.passbar{display:flex;align-items:center;gap:8px;margin-top:10px;padding:9px 11px;
+.passbar{display:flex;align-items:center;gap:var(--gap);margin-top:var(--gap);padding:var(--pad);
   border-radius:12px;background:#0b1116;border:1px solid var(--line);font-size:10.5px;
   color:var(--dim)}
 .passbar b{color:var(--txt);font-size:13px}
@@ -1093,27 +1191,29 @@ span.ico{mix-blend-mode:normal;text-align:center}
   background:#16202a;border:1px solid #2b3b47}
 .passbar .pb i{position:absolute;left:0;top:0;bottom:0;
   background:linear-gradient(90deg,#a45ef2,#f2c53d)}
-.buypass{width:100%;margin-top:10px;border-radius:12px;padding:12px 0;font-size:14px;
+.buypass{width:100%;margin-top:var(--gap);border-radius:var(--radius);padding:12px 0;font-size:14px;
   font-weight:900;letter-spacing:.04em;
   background:linear-gradient(180deg,#f5a7f7,#dc1ddb 55%,#8d1c78);color:#fff;
   box-shadow:0 3px 0 #5d1250}
 .buypass[disabled]{background:linear-gradient(180deg,#3a4a58,#222e39);color:#8fa0ad;
   box-shadow:0 3px 0 #16202a}
-.passhead{display:grid;grid-template-columns:44px 1fr 1fr;gap:6px;margin-top:12px;
+.passhead{display:grid;grid-template-columns:44px 1fr 1fr;gap:var(--gap);margin-top:var(--gap-lg);
   font-size:9px;letter-spacing:.14em;font-weight:800;color:var(--dim);text-align:center}
 .passhead .prem{color:#e6c2ff}
 .passlist{margin-top:4px;max-height:430px;overflow-y:auto;padding-right:2px}
-.passrow{display:grid;grid-template-columns:44px 1fr 1fr;gap:6px;align-items:stretch;
-  margin-top:6px}
+.passrow{display:grid;grid-template-columns:44px 1fr 1fr;gap:var(--gap);align-items:stretch;
+  margin-top:var(--gap)}
 .passrow .pnum{display:flex;flex-direction:column;align-items:center;justify-content:center;
-  border-radius:10px;background:linear-gradient(180deg,#243342,#141d26);
+  border-radius:var(--radius-sm);background:linear-gradient(180deg,#243342,#141d26);
   border:1px solid var(--line);font-size:13px;font-weight:900;color:#c2cfd9}
 .passrow.done .pnum{border-color:#7ad14f66;color:#8fe08f}
 .passrow.now .pnum{border-color:#f2c53d;box-shadow:0 0 12px #f2c53d55;color:var(--gold)}
 .passrow .pnum small{font-size:7.5px;letter-spacing:.08em;color:var(--dim);font-weight:800}
-.rwcell{position:relative;display:flex;align-items:center;gap:7px;padding:8px 8px;
-  border-radius:10px;border:1px solid var(--line);
-  background:linear-gradient(180deg,#1b2732,#131c25);min-height:52px}
+/* Die FARB-Reihen des Farb-Passes uebernehmen die Metrik: Radius und
+   Hoehe kommen aus der Leiter, nur der Farbkoerper (.tinted) ist frei. */
+.rwcell{position:relative;display:flex;align-items:center;gap:7px;padding:8px;
+  border-radius:var(--radius-sm);border:1px solid var(--line);
+  background:linear-gradient(180deg,#1b2732,#131c25);min-height:var(--banner-h-sm)}
 .rwcell.prem{background:linear-gradient(180deg,#2a1c4a,#161028);border-color:#a45ef23d}
 .rwcell.claimable{border-color:#f2c53d;box-shadow:0 0 12px #f2c53d44}
 /* Nur die abholbare Zelle traegt den HOLEN-Knopf — nur dort muss der
@@ -1910,28 +2010,63 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
        UNSERE Systeme angepasst: kein Echtgeld, alles laeuft gegen die
        Demo-Wallet (Gold/Gems) bzw. ArenaCards. Der Pity-Stand steht OFFEN
        auf den Packs — AAs Muster (§8.2), statt Prozent-Drop-Raten. -->
+  <!-- ===== VIEW S: SHOP — AA-SEKTIONSREIHENFOLGE (§8.1) =====
+       AAs Store laeuft von oben nach unten:
+         1 Werbe-Entfernen-Banner · 2 ARENA PACK / Starter Pack ·
+         3 DAILY DEALS · 4 Truhen/Packs · 5 ENDLESS ROULETTE ·
+         6 Gem-Bundles · 7 Gold-Bundles
+       Wir uebernehmen die REIHENFOLGE 1:1 und ersetzen nur dort, wo wir
+       ein anderes System haben:
+         Platz 1 — wir haben KEINE Werbung (§19.1), der Platz traegt
+                   deshalb den Season-Pass als staerkstes Dauerangebot,
+                   darunter die personalisierte Angebotskette.
+         Platz 5 — statt Glücksrad der KRISTALLTRESOR (arena_vault.js):
+                   dieselbe Rolle (Sammel-Zufallsbelohnung), aber ohne
+                   Glücksspiel-Optik.
+       Alle Abstaende/Radien/Hoehen aus der Metrik (§19.2). -->
   <section id="viewShop" class="view">
     <h2 class="title">Shop</h2>
-    <!-- Zeit-Angebote der Kette (arena_vault.js). Erscheinen nur, wenn
-         ein Ereignis sie ausgelöst hat — nie „einfach so“. -->
+
+    <!-- (1) Promo-Banner — AAs Dauer-Banner an Position 1 -->
+    <button class="promobanner pressable" id="shopPromo" data-sec="1"></button>
+
+    <!-- (2) Echtgeld-Angebote: erst die personalisierte Kette
+             (arena_vault.js — erscheint nur nach einem Ereignis, nie
+             „einfach so“), dann Arena-Pack und Starter-Pack. -->
     <div class="shopsec" id="offerSec" style="display:none">
       <span class="sh goldtext">Nur für dich</span></div>
     <div id="offerSlot"></div>
 
-    <div class="shopsec"><span class="sh goldtext">Kristalltresor</span>
-      <span class="timer" id="vaultTier">—</span></div>
-    <div class="vaultbox" id="vaultShop"></div>
+    <div class="shopsec" data-sec="2"><span class="sh goldtext">Arena-Pack &amp; Starter</span>
+      <span class="timer">Echtgeld · Platzhalter</span></div>
+    <div class="iapgrid" id="arenaPackBox"></div>
 
-    <div class="shopsec"><span class="sh goldtext">Tagesangebote</span>
+    <!-- (3) Tagesangebote -->
+    <div class="shopsec" data-sec="3"><span class="sh goldtext">Tagesangebote</span>
       <span class="timer" id="dealTimer">Neue Angebote in 6h 58m</span></div>
     <div class="dealgrid" id="dealGrid"></div>
 
-    <div class="shopsec"><span class="sh goldtext">Booster-Packs</span>
+    <!-- (4) Booster-Packs -->
+    <div class="shopsec" data-sec="4"><span class="sh goldtext">Booster-Packs</span>
       <span class="timer" id="packPity">…</span></div>
     <div class="packshop" id="packShop"></div>
 
-    <div class="shopsec"><span class="sh goldtext">Währungen</span></div>
-    <div class="decorow" id="decoRow"></div>
+    <!-- (5) Kristalltresor — AAs Roulette-Platz -->
+    <div class="shopsec" data-sec="5"><span class="sh goldtext">Kristalltresor</span>
+      <span class="timer" id="vaultTier">—</span></div>
+    <div class="vaultbox" id="vaultShop"></div>
+
+    <!-- (6) Gem-Pakete -->
+    <div class="shopsec" data-sec="6"><span class="sh goldtext">Gem-Pakete</span>
+      <span class="timer">Echtgeld · Platzhalter</span></div>
+    <div class="gemgrid" id="gemShop"></div>
+
+    <!-- (7) Gold-Tausch -->
+    <div class="shopsec" data-sec="7"><span class="sh goldtext">Gold-Tausch</span>
+      <span class="timer">Gems → Gold</span></div>
+    <div class="goldgrid" id="goldShop"></div>
+
+    <p class="iapnote" id="iapNote">—</p>
     <p class="fortnote" id="shopNote">—</p>
   </section>
 
@@ -4060,6 +4195,48 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     { key:"arcane", cost:800,  cur:"gems" },
   ];
   var freeDailyTaken = false;
+
+  /* ---------- (2) Echtgeld-Bundles (AA §8.1 Pos. 2) ----------
+     Preise in Fr. wie in AAs Store (Store-Waehrung des Users). Im
+     Prototyp sind das PLATZHALTER: ein Klick oeffnet keinen Kauf,
+     sondern sagt genau das. Eine Demo-Wallet mit Echtgeld zu fuettern
+     waere die unehrlichere Variante. */
+  var IAP_PACKS = [
+    { id:"arena", name:"Arena-Pack", sub:"Einmal pro Saison", art:"pack_gold", emoji:"🎁",
+      price:"Fr. 3.–", value:"+180 % Wert",
+      items:[["cur_gold","🪙","5 000"],["cur_gem","💎","50"],["pack_silver","🎁","×3"],
+             ["ess_attack","⚗","×25"]] },
+    { id:"starter", name:"Starter-Pack", sub:"Nur für neue Beschwörer · einmalig",
+      art:"pack_arcane", emoji:"✨", price:"Fr. 9.–", value:"+320 % Wert",
+      items:[["cur_gold","🪙","20 000"],["cur_gem","💎","250"],["pack_gold","🎁","×2"],
+             ["frame_rare","🃏","1 Seltene"]] },
+  ];
+  /* ---------- (6) Gem-Pakete (AA §8.1 Pos. 6) ----------
+     Fuenf Staffeln. Die Siegel sitzen bewusst NICHT auf der teuersten
+     und der billigsten Stufe: „Beliebt!" auf der Einstiegsstufe darueber
+     (der Anker), „Bester Wert!" auf der zweitgroessten — genau das
+     Muster, das AAs Staffelung benutzt. */
+  var GEM_PACKS = [
+    { id:"g1", name:"Handvoll Gems",  amt:80,   price:"Fr. 3.–",  seal:null },
+    { id:"g2", name:"Beutel Gems",    amt:500,  price:"Fr. 9.–",  seal:"pop" },
+    { id:"g3", name:"Truhe Gems",     amt:1200, price:"Fr. 19.–", seal:null },
+    { id:"g4", name:"Hort der Gems",  amt:2500, price:"Fr. 39.–", seal:"best" },
+    { id:"g5", name:"Gem-Tresor",     amt:6500, price:"Fr. 89.–", seal:null, wide:true },
+  ];
+  /* ---------- (7) Gold-Tausch (AA §8.1 Pos. 7) ----------
+     Bei uns GEMS → GOLD statt Echtgeld → Gold: Gold ist die Waehrung,
+     die der Spieler ohnehin erspielt (DESIGN_PROGRESSION §B), und der
+     Tausch ist die Bruecke aus der Premium- in die Spielwaehrung.
+     AAs „ein Gold-Paket gratis per Werbevideo" wird bei uns zu einem
+     werbefreien Tages-Gratispaket (§19.1: keine Ads). */
+  var GOLD_PACKS = [
+    { id:"go1", name:"Beutel Gold",   amt:10500,  cost:80,  free:false },
+    { id:"go2", name:"Haufen Gold",   amt:31500,  cost:220, free:false, seal:"pop" },
+    { id:"go3", name:"Trophäe Gold",  amt:126000, cost:800, free:false, seal:"best", wide:true },
+    { id:"go0", name:"Tagesgold",     amt:2500,   cost:0,   free:true,  wide:true },
+  ];
+  var goldFreeTaken = false;
+
   function renderShop() {
     renderVault();
     renderOffers();
@@ -4100,13 +4277,17 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
         '<button class="sbuy" data-buypack="free"' + (freeDailyTaken ? " disabled" : "") + ">" +
           (freeDailyTaken ? "Wieder in 3h 41m" : "Abholen") + "</button></div>";
 
-    $("decoRow").innerHTML =
-      '<div class="decotile"><span class="dart">' + ico("cur_gem", "💎", "big") + "</span>Gems<br>im echten Spiel</div>" +
-      '<div class="decotile"><span class="dart">' + ico("cur_gold", "🪙", "big") + "</span>Gold<br>aus Siegen</div>" +
-      '<div class="decotile"><span class="dart">' + ico("hub_pass", "📖", "big") + "</span>Season-Pass<br>geplant</div>";
+    renderShopPromo();
+    renderIapPacks();
+    renderGemPacks();
+    renderGoldPacks();
 
-    $("shopNote").innerHTML = "Alle Preise und Stückzahlen skalieren im echten Spiel mit dem " +
-      "Fortschritt (AA-Befund §8.4). Käufe hier gehen gegen die Demo-Wallet.";
+    $("iapNote").innerHTML = "<b>Echtgeld ist im Prototyp ein Platzhalter.</b> Arena-Pack, " +
+      "Starter-Pack und die Gem-Pakete zeigen Preise in Fr. wie AAs Store, lösen aber " +
+      "keinen Kauf aus — der Gold-Tausch unten läuft dagegen echt gegen die Demo-Wallet.";
+    $("shopNote").innerHTML = "Sektionsreihenfolge 1:1 nach AA (§8.1): Promo · Arena-Pack · " +
+      "Tagesangebote · Packs · Kristalltresor · Gems · Gold. Alle Preise und Stückzahlen " +
+      "skalieren im echten Spiel mit dem Fortschritt (§8.4).";
 
     Array.prototype.forEach.call($("dealGrid").querySelectorAll("[data-buy]"), function (b) {
       b.addEventListener("click", function () { buyDeal(b.getAttribute("data-buy")); });
@@ -4117,6 +4298,105 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     markPressable($("viewShop"));
     UIBadge.set("shop", DEALS.filter(function (d) { return (d.avail - (dealUsed[d.id] | 0)) > 0; }).length);
   }
+  /* (1) Promo-Banner. Zeigt den Season-Pass, solange er nicht aktiv
+     ist — danach den naechsten erreichbaren Meilenstein. AAs Platz 1
+     ist immer belegt, deshalb faellt der Banner nie weg. */
+  function renderShopPromo() {
+    var el = $("shopPromo"), st = window.ArenaPass ? window.ArenaPass.state() : null;
+    var active = st && st.premium;
+    el.innerHTML = '<span class="prs">' + ico("hub_pass", "📖", "xl") + "</span>" +
+      '<span class="prt"><span class="prn goldtext">' +
+        (active ? "Premium-Pass aktiv" : "Goldene Fortuna") + "</span>" +
+      '<span class="prd">' + (active
+        ? "Stufe " + st.level + " von " + st.levels + " · alle Premium-Belohnungen offen."
+        : "Der Season-Pass ist das größte Angebot des Monats — " +
+          (st ? st.daysLeft + " Tage" : "30 Tage") + " Laufzeit, " +
+          (st ? st.levels : 50) + " Stufen.") + "</span></span>" +
+      '<span class="prb">' + (active ? "ANSEHEN" : "ZUM PASS") + "</span>";
+    tint(el, "pass");
+  }
+  /* (2) Arena-/Starter-Pack. */
+  function renderIapPacks() {
+    $("arenaPackBox").innerHTML = IAP_PACKS.map(function (p) {
+      var items = p.items.map(function (it) {
+        return "<span>" + ico(it[0], it[1]) + " " + it[2] + "</span>";
+      }).join("");
+      return '<div class="iapcard tinted" data-iap="' + p.id + '" style="' +
+        tintStyle(p.id === "arena" ? "pack_gold" : "pack_arcane") + '">' +
+        '<span class="valbadge">' + p.value + "</span>" +
+        '<span class="iart">' + ico(p.art, p.emoji, "xl") + "</span>" +
+        '<span class="itx"><span class="inm goldtext">' + p.name + "</span>" +
+          '<span class="isub">' + p.sub + "</span>" +
+          '<span class="iapicons">' + items + "</span></span>" +
+        '<button class="ibuy" data-iapbuy="' + p.id + '">' + p.price + "</button></div>";
+    }).join("");
+    Array.prototype.forEach.call($("arenaPackBox").querySelectorAll("[data-iapbuy]"), function (b) {
+      b.addEventListener("click", function () { buyIap(b.getAttribute("data-iapbuy")); });
+    });
+  }
+  /* (6) Gem-Pakete. */
+  function renderGemPacks() {
+    $("gemShop").innerHTML = GEM_PACKS.map(function (g) {
+      var seal = g.seal
+        ? '<span class="seal ' + g.seal + '">' +
+          (g.seal === "pop" ? "BELIEBT!" : "BESTER WERT!") + "</span>" : "";
+      return '<div class="gemcard tinted' + (g.seal ? " hasseal" : "") + (g.wide ? " wide" : "") +
+        '" data-gem="' + g.id + '" style="' + tintStyle("gems") + '">' + seal +
+        '<span class="gart">' + ico("cur_gem", "💎", "big") + "</span>" +
+        '<span class="gnm">' + g.name + "</span>" +
+        '<span class="gamt">' + fmt(g.amt) + "</span>" +
+        '<button class="gbuy" data-gembuy="' + g.id + '">' + g.price + "</button></div>";
+    }).join("");
+    Array.prototype.forEach.call($("gemShop").querySelectorAll("[data-gembuy]"), function (b) {
+      b.addEventListener("click", function () { buyIap(b.getAttribute("data-gembuy")); });
+    });
+  }
+  /* (7) Gold-Tausch — der EINZIGE Block hier, der echt bucht. */
+  function renderGoldPacks() {
+    $("goldShop").innerHTML = GOLD_PACKS.map(function (g) {
+      var seal = g.seal
+        ? '<span class="seal ' + g.seal + '">' +
+          (g.seal === "pop" ? "BELIEBT!" : "BESTER WERT!") + "</span>" : "";
+      var taken = g.free && goldFreeTaken;
+      var label = g.free
+        ? (taken ? "Wieder morgen" : "GRATIS · 1× täglich")
+        : ico("cur_gem", "💎") + " " + fmt(g.cost);
+      return '<div class="goldcard tinted' + (g.seal ? " hasseal" : "") + (g.wide ? " wide" : "") +
+        '" data-gold="' + g.id + '" style="' + tintStyle("gold") + '">' + seal +
+        '<span class="gart">' + ico("cur_gold", "🪙", "big") + "</span>" +
+        '<span class="gnm">' + g.name + "</span>" +
+        '<span class="gamt">' + fmt(g.amt) + "</span>" +
+        '<button class="gbuy' + (g.free ? " free" : "") + '" data-goldbuy="' + g.id + '"' +
+          (taken ? " disabled" : "") + ">" + label + "</button></div>";
+    }).join("");
+    Array.prototype.forEach.call($("goldShop").querySelectorAll("[data-goldbuy]"), function (b) {
+      b.addEventListener("click", function () { buyGold(b.getAttribute("data-goldbuy")); });
+    });
+  }
+  // Echtgeld: bewusst KEIN Wallet-Effekt, nur die ehrliche Ansage.
+  function buyIap(id) {
+    UISfx.deny();
+    toast("Echtgeld-Kauf ist im Prototyp ein Platzhalter (" + id + ")");
+    track("shop_iap_placeholder", { id: id });
+  }
+  function buyGold(id) {
+    var g = null;
+    GOLD_PACKS.forEach(function (x) { if (x.id === id) g = x; });
+    if (!g) return;
+    if (g.free) {
+      if (goldFreeTaken) { UISfx.deny(); toast("Heute schon abgeholt"); return; }
+      goldFreeTaken = true;
+    } else {
+      if (gems() < g.cost) { UISfx.deny(); toast("Nicht genug Gems (" + fmt(g.cost) + ")"); return; }
+      setGems(gems() - g.cost);
+    }
+    setGold(gold() + g.amt);
+    UISfx.reward();
+    toast("+" + fmt(g.amt) + " Gold");
+    track("shop_gold_exchange", { id: id, amount: g.amt });
+    renderShop();
+  }
+
   function buyDeal(id) {
     var d = null;
     DEALS.forEach(function (x) { if (x.id === id) d = x; });
@@ -5687,6 +5967,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     mail_reward: ["#6b4f14", "#2a1e08"],
     mail_clan:   ["#4a217a", "#1c0f31"],
     mail_system: ["#2b4152", "#101a22"],
+    // Season-Pass — dieselbe Amethyst-Signatur wie das Home-Banner
+    pass:        ["#4a2a7a", "#2a1b46"],
     neutral:     ["#2b3b47", "#131c25"],
   };
   function tint(el, key, extra) {
@@ -6461,6 +6743,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   // Icon-Leiste der Profilzeile + AA-Reihe EVENTS | BATTLE | CHALLENGES
   onNav("icoClan", "navClan"); onNav("icoBoard", "navBoard");
   onNav("passBanner", "navPass"); onNav("icoMail", "navMail");
+  // Promo-Banner an Shop-Position 1 fuehrt in den Season-Pass (§8.1).
+  onNav("shopPromo", "navPass");
   onNav("icoSettings", "navSettings"); onNav("tileGuide", "navGuide");
   $("icoDaily").addEventListener("click", openDaily);
   $("dailyClose").addEventListener("click", closeDaily);

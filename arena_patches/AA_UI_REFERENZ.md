@@ -1937,7 +1937,10 @@ sich sauber ist. Ab jetzt gilt **eine Leiter** als CSS-Variablen in `:root`:
 
 Angewendet in **39 CSS-Regeln** quer durch Shop, Sammlung, Schmiede, Clan (Quests/Spenden/
 Krieg), Rangliste, Festung, Guide, Handbuch und Login-Kalender. Neue Reihen wählen eine der
-drei Höhen und einen der beiden Radien — **keine Zwischenwerte mehr**.
+Höhen und einen der beiden Radien — **keine Zwischenwerte mehr**.
+
+> **Nachtrag:** Die Leiter hat inzwischen eine **vierte** Höhe `--keyart-h` für
+> Vollbild-Key-Art-Köpfe, siehe §19.4. Damit ist sie geschlossen.
 
 ### 19.3 Beim Sweep gefundene echte Fehler
 
@@ -1951,3 +1954,65 @@ Die v7-Suite prüft diese Klasse von Fehlern jetzt **für alle 15 Views automati
 Bottom-Nav sichtbar · keine helle Schrift auf goldener Fläche · kein Titel von einem
 positionierten Layer verdeckt · alle sichtbaren Knöpfe mit `.pressable` · kein horizontaler
 Scroll.
+
+### 19.4 Metrik-Erweiterung: `--keyart-h`
+
+Die Leiter aus §19.2 hat **eine vierte Höhe** bekommen:
+
+```
+--keyart-h:172px   /* Vollbild-Keyart-Kopf: Season-Pass, Event-Kopf */
+```
+
+**Begründung:** Der Season-Pass-Kopf ist ein Key-Art-Bild, keine Textreihe. Auf
+`--banner-h-lg` (128 px) wird daraus ein Letterbox-Streifen, in dem das Artwork nicht mehr
+liest; die vorherige Freihand-Lösung war `aspect-ratio:16/9` und damit **228 px** — dann
+rutscht die Stufen-/XP-Leiste unter die Falz und der Spieler sieht seinen Fortschritt beim
+Öffnen nicht. 172 px ist der Kompromiss, bei dem beides zutrifft. **Damit ist die Leiter
+geschlossen — weitere Zwischenwerte gibt es nicht.**
+
+### 19.5 Shop und Season-Pass auf AAs Anordnung (2026-07-25)
+
+**Shop** (`#viewShop`) folgt jetzt **exakt** der Reihenfolge aus §8.1. Jede Sektion trägt ein
+`data-sec`-Attribut, die v7-Suite prüft die DOM-Reihenfolge als Zahlenkette `1,2,3,4,5,6,7`:
+
+| # | AA (§8.1) | Bei uns | Container |
+|---|---|---|---|
+| 1 | Werbe-Entfernen-Banner | **Promo-Banner Season-Pass** | `#shopPromo` |
+| 2 | ARENA PACK / Starter Pack | Angebotskette + **Arena-Pack / Starter-Pack** | `#offerSlot`, `#arenaPackBox` |
+| 3 | DAILY DEALS | Tagesangebote | `#dealGrid` |
+| 4 | Truhen / Packs | Booster-Packs | `#packShop` |
+| 5 | ENDLESS ROULETTE | **Kristalltresor** | `#vaultShop` |
+| 6 | Gem-Bundles | **Gem-Pakete** (neu) | `#gemShop` |
+| 7 | Gold-Bundles | **Gold-Tausch** (neu) | `#goldShop` |
+
+**Season-Pass** (`#viewPass`) trug die §9.10-Reihenfolge bereits (Keyart-Header →
+Stufen-/XP-Leiste → Kauf-/Aktiv-Status → Spurenliste); geändert wurde die **Geometrie**:
+Keyart auf `--keyart-h`, Radien auf `--radius`, die Farb-Reihen des Farb-Passes
+(`.rwcell`, `.passrow`) auf `--banner-h-sm` / `--radius-sm` / `--gap`. Die v7-Suite prüft
+Reihenfolge **und** Metrikbindung.
+
+#### Annahmen — Referenzlücken
+
+Die folgenden Punkte gibt die Videoreferenz **nicht** her. Sie sind nach unserer eigenen
+Metrik entschieden und hier festgehalten, damit später nachvollziehbar ist, was Beleg war
+und was Entscheidung:
+
+| # | Referenzlücke | Unsere Annahme | Warum so |
+|---|---|---|---|
+| 1 | **Platz 1** — wir haben keine Werbung, AAs Banner „remove forced ads" ist gegenstandslos | Season-Pass als Dauerangebot auf Platz 1 | §19.1 lehnt AAs aggressive Monetarisierungs-Schienen ab; der Pass ist das stärkste Angebot, das wir **ohne** Werbedruck haben |
+| 2 | **Platz 5** — Glücksrad („Endless Roulette") | **Kristalltresor** (`arena_vault.js`) | gleiche Rolle (Sammel-Zufallsbelohnung an fester Stelle), ohne Glücksspiel-Optik |
+| 3 | **Kachelraster** der Gem-/Gold-Sektionen — Video zeigt keine Geometrie | 2 Spalten, oberste Staffel über die volle Breite; Radius `--radius`, Abstand `--gap`, Sektionsabstand `--gap-lg` | einheitliche Metrik §19.2; die Querkachel setzt die teuerste Staffel ab, ohne eine neue Größe einzuführen |
+| 4 | **Anzahl der Gem-Staffeln** | **5** (80 / 500 / 1 200 / 2 500 / 6 500) | AA zeigt fünf benannte Pakete (Heap · mittel · Bag · Trophy · Safe) — die Anzahl ist belegt, die Beträge sind unsere |
+| 5 | **Preise** — AAs Fr.-Werte sind nur teilweise lesbar (》Bag of Gems 2500 = „Fr. 40?"《) | eigene Staffel Fr. 3 / 9 / 19 / 39 / 89 | verankert an AAs **lesbaren** Enden (80 Gems ≈ Fr. 3, 14 000 Gems ≈ Fr. 90); dazwischen unsere eigene, monoton fallende Ct-pro-Gem-Kurve |
+| 6 | **Wo die Siegel sitzen** — AA zeigt keine „popular"/„best value"-Marken | „Beliebt!" auf Staffel 2, „Bester Wert!" auf Staffel 4 | der klassische Anker: nicht die billigste (wirkt geizig) und nicht die teuerste (wirkt unerreichbar) |
+| 7 | **Gold-Bundles** — AA verkauft sie für Echtgeld, eines gratis per Rewarded Ad | **Gems → Gold** plus ein werbefreies Tages-Gratispaket | Gold ist bei uns die erspielte Währung (DESIGN_PROGRESSION §B); der Tausch ist die Brücke aus der Premium- in die Spielwährung. Rewarded Ads sind nach §19.1 ausgeschlossen |
+| 8 | **Höhe des Pass-Keyarts** | `--keyart-h:172px` | siehe §19.4 |
+
+#### Offen
+
+* **AA hat DREI Pass-Stufen** (FREE / EPIC PASS / LEGENDARY PASS, §9.10), unsere
+  `window.ArenaPass` führt **zwei** Spuren (Gratis / Premium). Die dritte Spur ist eine
+  **Daten**-Erweiterung im Pass-Modul, kein Layout-Thema — sie wurde hier bewusst **nicht**
+  mitgemacht, weil ein dritter Knopf ohne dahinterliegende Belohnungsspur nur Attrappe wäre.
+* **Echtgeld** (Arena-Pack, Starter-Pack, Gem-Pakete) ist im Prototyp ein **Platzhalter**:
+  Der Klick sagt genau das und rührt keine Wallet an. Nur der Gold-Tausch bucht echt.

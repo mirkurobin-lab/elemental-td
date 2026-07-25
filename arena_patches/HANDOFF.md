@@ -785,6 +785,21 @@ Arkan für Gems) plus **1 Gratis-Tagespack** mit Badge, jedes mit Garantietext u
 **offenem Pity-Stand**. Käufe laufen gegen die Demo-Wallet und `ArenaCards`; ein
 Pack-Kauf öffnet direkt die Pack-Ansicht (`openPackKey`).
 
+**Shop** (`#viewShop`): Sektionsreihenfolge **1:1 nach AA §8.1** — Promo-Banner ·
+Arena-/Starter-Pack · Tagesangebote · Booster-Packs · Kristalltresor (AAs Roulette-Platz) ·
+Gem-Pakete · Gold-Tausch. Jede Sektion trägt `data-sec="1…7"`, die v7-Suite prüft die
+DOM-Reihenfolge als Zahlenkette. Neu sind `#arenaPackBox` (Echtgeld-Bundles mit Icon-Reihe
+und „value"-Badge), `#gemShop` (5 Staffeln, Siegel „Beliebt!" / „Bester Wert!") und
+`#goldShop` (Gems → Gold, plus ein werbefreies Tages-Gratispaket). **Echtgeld ist ein
+Platzhalter** — nur der Gold-Tausch bucht echt. Annahmen und Referenzlücken stehen in
+`AA_UI_REFERENZ.md` §19.5.
+
+**Season-Pass** (`#viewPass`): Reihenfolge nach §9.10 (Keyart-Header → Stufen-/XP-Leiste →
+Kauf-/Aktiv-Status → Spurenliste); Keyart auf der neuen Metrik-Höhe `--keyart-h` (172 px,
+§19.4), die Farb-Reihen des Farb-Passes auf `--banner-h-sm` / `--radius-sm` / `--gap`.
+Offen: AA hat drei Pass-Stufen, wir haben zwei Spuren — das ist eine Daten-Erweiterung im
+Pass-Modul, siehe §19.5.
+
 **Festung** (`#viewFortress`): **ZWEI umschaltbare Layouts** — siehe nächste zwei Abschnitte.
 
 ### Festung: zwei Layouts, ein Datensatz
