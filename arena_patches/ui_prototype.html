@@ -329,6 +329,15 @@ footer{padding:6px 12px 14px;text-align:center}
 }
 /* Auf farbigen Flächen (Rarität, Gefahr) soll der Verlauf neutral-hell sein. */
 .goldtext.pale{background-image:linear-gradient(180deg,#ffffff 0%,#e6eef5 55%,#9fb3c1 100%)}
+/* ⚠ GOLD AUF GOLD — dritter Fall desselben Bugs (nach .cerbtn und .okbtn).
+   Der KAMPF-Knopf ist SELBST golden (#f4e3a6 → #a8842a); ein goldener
+   Verlaufstext darauf verschwindet fast vollständig, es bleibt nur der
+   Schlagschatten als Umriss. Gleiche Lösung wie überall sonst: dunkle
+   Füllfarbe statt Verlauf. Die Regel lautet ausnahmslos:
+   .goldtext gehört auf DUNKLE Flächen — nie auf helle oder goldene. */
+.battlebtn .goldtext{background-image:none;filter:none;
+  -webkit-text-fill-color:#3a2b07;color:#3a2b07;
+  text-shadow:0 1px 0 #ffffff66}
 
 /* ==================================================================
  * ASSET-EBENE
@@ -795,6 +804,248 @@ span.ico{mix-blend-mode:normal;text-align:center}
 .skinbar{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:10.5px;
   color:var(--dim)}
 .skinbar select{flex:0 0 auto}
+
+/* ==================================================================
+ * CLAN + RANGLISTE (DESIGN_CLAN.md)
+ * ------------------------------------------------------------------
+ * Baut ausschliesslich auf den bereits vorhandenen Bausteinen auf:
+ * .view / .tabs / .tab / .pressable / .progbar / .mini / .hint.
+ * KEINE neuen Bilder — die Assets sind Recycling aus ui_assets.json
+ * (panel, tab, chest_bronze, hub_clan, hub_leaderboard, frame_*,
+ * progress_frame, btn_primary/secondary, icon_lock/check, arena_crest).
+ *
+ * ⚠ GOLDTEXT-REGEL (zweimal als Bug aufgetreten, siehe .cerbtn/.okbtn):
+ * .goldtext NIE auf hellen oder goldenen Flaechen. Alles, was hier auf
+ * Gold sitzt (.claimbtn, .attackbtn), setzt explizit dunkle Fuellfarbe
+ * mit -webkit-text-fill-color.
+ * ================================================================== */
+.viewhead{display:flex;align-items:center;gap:8px;margin:2px 0 8px}
+.viewhead h2.title{margin:0;flex:1}
+.backbtn{width:30px;height:30px;flex:0 0 30px;border-radius:9px;font-size:19px;line-height:1;
+  background:var(--panel);border:1px solid var(--line);color:#c2cfd9;font-weight:900}
+
+/* ---------- Clan-Kopf: Banner + Kennzahlen ---------- */
+.clanhead{position:relative;display:flex;gap:11px;align-items:center;padding:11px;
+  border-radius:14px;border:1px solid var(--line);overflow:hidden;
+  background-repeat:no-repeat;background-position:center;background-size:100% 100%,cover;
+  background-image:linear-gradient(180deg,#1b2732,#121a22)}
+.banner{position:relative;flex:0 0 60px;width:60px;height:70px;display:flex;
+  align-items:center;justify-content:center;font-size:29px;color:#fff;
+  filter:drop-shadow(0 2px 3px #000a);
+  clip-path:polygon(0 0,100% 0,100% 76%,50% 100%,0 76%)}
+.banner .bsym{position:relative;z-index:2;text-shadow:0 2px 4px #0009}
+.banner .bframe{position:absolute;inset:-3px;z-index:3;pointer-events:none;
+  clip-path:polygon(0 0,100% 0,100% 76%,50% 100%,0 76%);
+  border:2px solid transparent}
+.banner.f-bronze .bframe{border-color:#c98a52;box-shadow:0 0 10px #c98a5288}
+.banner.f-silver .bframe{border-color:#c9d2da;box-shadow:0 0 10px #c9d2da88}
+.banner.f-gold .bframe{border-color:#f2c53d;box-shadow:0 0 12px #f2c53d99}
+.banner.f-prisma .bframe{border-color:#a45ef2;
+  box-shadow:0 0 16px #a45ef2cc,inset 0 0 10px #63b1ee88}
+.clanhead .cmeta{flex:1;min-width:0}
+.clanhead .cnm{font-size:17px;font-weight:900;line-height:1.15}
+.clanhead .csub{font-size:10px;color:var(--dim);margin-top:3px;line-height:1.45}
+.clanhead .cstats{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.cchip{font-size:9.5px;font-weight:800;color:#cfe0ec;background:#0b1116b3;
+  border:1px solid #3a4c5c;border-radius:20px;padding:3px 8px;white-space:nowrap}
+.cchip b{color:#fff}
+.cchip.warn{border-color:#f2a13d55;color:#f2c53d}
+.clandesc{margin-top:9px;font-size:10.5px;color:#a9bccb;line-height:1.55}
+
+/* ---------- Quest-Karten ---------- */
+.qcard{margin-top:9px;border-radius:13px;border:1px solid var(--line);padding:10px 11px;
+  background:linear-gradient(180deg,#1b2732,#131c25);
+  background-repeat:no-repeat;background-position:center;background-size:100% 100%,cover}
+.qcard .qtop{display:flex;align-items:center;gap:8px}
+.qcard .qsym{font-size:19px;flex:0 0 auto}
+.qcard .qtx{flex:1;min-width:0}
+.qcard .qnm{display:block;font-size:12.5px;font-weight:900;color:#e8eef3;line-height:1.25}
+.qcard .qds{display:block;font-size:9.5px;color:var(--dim);margin-top:2px;line-height:1.4}
+.qcard .qval{font-size:11px;font-weight:900;color:var(--gold);white-space:nowrap}
+.qbar{position:relative;height:16px;border-radius:9px;margin-top:8px;overflow:hidden;
+  background:#0b1116;border:1px solid #2b3b47}
+.qbar .qfill{position:absolute;left:0;top:0;bottom:0;border-radius:9px;
+  background:linear-gradient(90deg,#3fa9e8,#7ad14f)}
+.qbar .qmine{position:absolute;top:0;bottom:0;border-radius:0 9px 9px 0;
+  background:linear-gradient(90deg,#f2c53d,#ffe89a)}
+.qbar .qlbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:9.5px;font-weight:900;color:#0b1116;text-shadow:0 1px 0 #ffffff55}
+.qcard .qsplit{margin-top:5px;font-size:9.5px;color:var(--dim)}
+.qcard .qsplit i{font-style:normal;display:inline-block;width:8px;height:8px;border-radius:2px;
+  margin-right:3px;vertical-align:-1px}
+.qcard.done{border-color:#7ad14f66}
+
+/* ---------- Truhen-Staffel ---------- */
+.chestrow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.chestcard{border-radius:12px;border:1px solid var(--line);padding:9px 6px;text-align:center;
+  background:linear-gradient(180deg,#1b2732,#131c25);
+  background-repeat:no-repeat;background-position:center 6px;background-size:38px auto,cover}
+.chestcard.reached{border-color:#f2c53d99;box-shadow:0 0 12px #f2c53d33}
+.chestcard.locked{opacity:.45}
+.chestcard .cart{font-size:24px;display:block}
+.chestcard .cnm2{font-size:9.5px;font-weight:900;margin-top:3px;color:#dbe6ef}
+.chestcard .cat{font-size:9px;color:var(--dim);margin-top:1px}
+.chestcard .cin{font-size:9px;color:#a9bccb;margin-top:3px;line-height:1.35}
+.claimbtn{width:100%;margin-top:11px;border-radius:12px;padding:11px 0;font-size:14px;
+  font-weight:900;letter-spacing:.05em;
+  background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);box-shadow:0 3px 0 #6d551a;
+  /* goldtext waere hier unsichtbar — dunkle Fuellfarbe (§Bug-Historie) */
+  -webkit-text-fill-color:#3a2b07;color:#3a2b07}
+.claimbtn[disabled]{background:linear-gradient(180deg,#3a4a58,#222e39);
+  -webkit-text-fill-color:#8fa0ad;color:#8fa0ad;box-shadow:0 3px 0 #16202a}
+
+/* ---------- Spenden ---------- */
+.quotabar{display:flex;align-items:center;gap:8px;margin-top:10px;padding:8px 10px;
+  border-radius:12px;background:#0b1116;border:1px solid var(--line);font-size:10.5px;
+  color:var(--dim)}
+.quotabar b{color:var(--txt);font-size:12px}
+.quotabar .qdots{display:flex;gap:2px;margin-left:auto}
+.quotabar .qd{width:7px;height:12px;border-radius:2px;background:#2b3b47}
+.quotabar .qd.on{background:linear-gradient(180deg,#f2c53d,#a8842a)}
+.reqrow{display:flex;align-items:center;gap:9px;margin-top:8px;padding:9px 10px;
+  border-radius:12px;border:1px solid var(--line);
+  background:linear-gradient(180deg,#1b2732,#131c25)}
+.reqrow.mine{border-color:#63b1ee66;box-shadow:0 0 10px #63b1ee22}
+.reqrow.full{opacity:.55}
+.reqcard{position:relative;flex:0 0 40px;width:40px;aspect-ratio:3/4;border-radius:7px;
+  border:2px solid #9aa3ad;background:var(--panel2);display:flex;align-items:center;
+  justify-content:center;font-size:18px;
+  background-repeat:no-repeat;background-position:center;background-size:100% 100%}
+.reqcard .rtier{position:absolute;left:0;right:0;bottom:0;background:#000b;font-size:6.5px;
+  text-align:center;font-weight:900;letter-spacing:.04em;padding:1px 0;color:#cfd6dd}
+.reqmeta{flex:1;min-width:0}
+.reqmeta .rown{font-size:11.5px;font-weight:800;color:#dbe6ef;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.reqmeta .rsub{font-size:9.5px;color:var(--dim);margin-top:2px}
+.reqmeta .rbar{position:relative;height:7px;border-radius:4px;margin-top:5px;overflow:hidden;
+  background:#0b1116;border:1px solid #2b3b47}
+.reqmeta .rbar i{position:absolute;left:0;top:0;bottom:0;
+  background:linear-gradient(90deg,#3fa9e8,#7ad14f)}
+.donbtn{flex:0 0 auto;border-radius:10px;padding:8px 12px;font-size:11.5px;font-weight:900;
+  background:linear-gradient(180deg,#58fa1b,#3aad16);color:#0a2404;box-shadow:0 3px 0 #1f6b09}
+.donbtn[disabled],.donbtn.is-disabled{background:linear-gradient(180deg,#3a4a58,#222e39);
+  color:#8fa0ad;box-shadow:0 3px 0 #16202a}
+.askbtn{width:100%;margin-top:10px;border-radius:12px;padding:10px 0;font-size:13px;
+  font-weight:900;background:linear-gradient(180deg,#3fa9e8,#1c6ea8);color:#fff;
+  box-shadow:0 3px 0 #12496f;letter-spacing:.04em}
+.sendnote{margin-top:10px;font-size:10px;color:var(--dim);line-height:1.55;
+  border-left:2px solid #f2a13d66;padding-left:8px}
+.sendnote b{color:var(--gold)}
+/* Karten-Wahl im Anfrage-Dialog */
+.pickgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.picktile{position:relative;border-radius:10px;border:2px solid #9aa3ad;padding:8px 4px;
+  text-align:center;background:var(--panel2)}
+.picktile .part{font-size:23px;display:block}
+.picktile .pnm{font-size:9.5px;font-weight:900;margin-top:3px}
+.picktile .pcnt{font-size:9px;color:var(--dim);margin-top:1px}
+.picktile.off{opacity:.35}
+
+/* ---------- Krieg ---------- */
+.warwait{margin-top:10px;padding:16px 12px;border-radius:14px;text-align:center;
+  border:1px solid var(--line);background:linear-gradient(180deg,#1b2732,#121a22)}
+.warwait .wk{font-size:10px;letter-spacing:.2em;font-weight:800;color:#b9c9d6}
+.warwait .wc{font-size:31px;font-weight:900;margin-top:6px;color:var(--gold);
+  text-shadow:0 0 14px #f2c53d55}
+.warwait .wd{font-size:10.5px;color:var(--dim);margin-top:6px;line-height:1.55}
+.warboard{margin-top:10px;border-radius:14px;border:1px solid var(--line);padding:11px;
+  background:linear-gradient(180deg,#1b2732,#121a22)}
+.warsides{display:flex;align-items:center;gap:8px}
+.warside{flex:1;min-width:0;text-align:center}
+.warside .wsn{font-size:11px;font-weight:900;color:#dbe6ef;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.warside .wsp{font-size:26px;font-weight:900;line-height:1.1;margin-top:2px}
+.warside.us .wsp{color:#7ad14f}
+.warside.them .wsp{color:#ff7b6b}
+.warside .wsb{font-size:9px;color:var(--dim);margin-top:1px}
+.warvs{flex:0 0 auto;font-size:12px;font-weight:900;color:var(--dim)}
+.warbar{position:relative;height:12px;border-radius:7px;margin-top:9px;overflow:hidden;
+  background:#ff7b6b33;border:1px solid #2b3b47}
+.warbar i{position:absolute;left:0;top:0;bottom:0;
+  background:linear-gradient(90deg,#3aad16,#7ad14f)}
+.warlead{margin-top:6px;font-size:10.5px;font-weight:800;text-align:center}
+.warlead.up{color:#7ad14f}
+.warlead.down{color:#ff7b6b}
+.atkhead{display:flex;align-items:center;gap:8px;margin-top:13px;font-size:11px;
+  color:var(--dim);font-weight:800}
+.atkhead .left{margin-left:auto;font-size:10px;color:var(--gold);font-weight:900}
+.ghostrow{display:flex;align-items:center;gap:9px;margin-top:7px;padding:8px 10px;
+  border-radius:11px;border:1px solid var(--line);
+  background:linear-gradient(180deg,#1b2732,#131c25)}
+.ghostrow.hit{opacity:.5}
+.ghostrow .gav{flex:0 0 34px;width:34px;height:34px;border-radius:9px;display:flex;
+  align-items:center;justify-content:center;font-size:16px;background:#0b1116;
+  border:1px solid #2b3b47}
+.ghostrow .gtx{flex:1;min-width:0}
+.ghostrow .gnm{font-size:11.5px;font-weight:800;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis}
+.ghostrow .gsub{font-size:9.5px;color:var(--dim);margin-top:2px}
+.ghostrow .gt1{color:#8fe08f}.ghostrow .gt2{color:#f2c53d}.ghostrow .gt3{color:#ff7b6b}
+.attackbtn{flex:0 0 auto;border-radius:10px;padding:8px 13px;font-size:11.5px;font-weight:900;
+  background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);box-shadow:0 3px 0 #6d551a;
+  /* dunkle Schrift auf Gold — NIE .goldtext hier */
+  -webkit-text-fill-color:#3a2b07;color:#3a2b07}
+.attackbtn.is-disabled,.attackbtn[disabled]{background:linear-gradient(180deg,#3a4a58,#222e39);
+  -webkit-text-fill-color:#8fa0ad;color:#8fa0ad;box-shadow:0 3px 0 #16202a}
+.gotpts{flex:0 0 auto;font-size:11px;font-weight:900;color:#7ad14f}
+
+/* ---------- Emote-Leiste + Aktivitaets-Feed ---------- */
+.emotebar{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:14px}
+.emobtn{border-radius:10px;padding:7px 5px;font-size:9.5px;font-weight:800;color:#cfe0ec;
+  background:linear-gradient(180deg,#243342,#16202a);border:1px solid var(--line);
+  line-height:1.3;text-align:center}
+.emobtn b{display:block;font-size:16px;margin-bottom:2px}
+.feed{margin-top:12px;border-radius:12px;border:1px solid var(--line);background:#0b1116;
+  padding:6px 10px;max-height:190px;overflow-y:auto}
+.feed .fe{display:flex;gap:7px;padding:6px 0;border-bottom:1px solid #16202a;font-size:10.5px;
+  line-height:1.45;color:#c2cfd9}
+.feed .fe:last-child{border-bottom:0}
+.feed .fe .fi{flex:0 0 auto;font-size:12px}
+.feed .fe .ft{flex:1;min-width:0}
+.feed .fe .fa{flex:0 0 auto;font-size:9px;color:#5d7284;white-space:nowrap}
+.feed .fe.me .ft{color:#ffe89a}
+.feed .fe.help .ft{color:#8fe08f;font-weight:700}
+
+/* ---------- Rangliste ---------- */
+.lblist{margin-top:8px}
+.lbrow{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:11px;
+  margin-top:5px;background:linear-gradient(180deg,#1b2732,#131c25);border:1px solid #1f2b35}
+.lbrow.me{border-color:#f2c53d;box-shadow:0 0 0 1px #f2c53d55,0 0 14px #f2c53d33;
+  background:linear-gradient(180deg,#2a3444,#1a2230)}
+.lbrow.top1{border-color:#f2c53d99}
+.lbrow.top2{border-color:#c9d2da77}
+.lbrow.top3{border-color:#c98a5277}
+.lbrow .lrk{flex:0 0 34px;text-align:center;font-size:12px;font-weight:900;color:#a9bccb}
+.lbrow.me .lrk{color:var(--gold)}
+.lbrow .lbg{flex:0 0 20px;width:20px;height:24px;display:flex;align-items:center;
+  justify-content:center;font-size:11px;color:#fff;
+  clip-path:polygon(0 0,100% 0,100% 74%,50% 100%,0 74%)}
+.lbrow .lnm{flex:1;min-width:0;font-size:11.5px;font-weight:800;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.lbrow .lnm small{display:block;font-size:9px;color:var(--dim);font-weight:700}
+.lbrow .ltr{flex:0 0 auto;font-size:11.5px;font-weight:900;color:var(--gold);
+  display:flex;align-items:center;gap:3px}
+.lbrow .ltr .ico{width:12px;height:12px}
+.lbjump{position:sticky;bottom:6px;margin:10px auto 0;display:block;width:70%;
+  border-radius:11px;padding:9px 0;font-size:12px;font-weight:900;color:#fff;
+  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);box-shadow:0 3px 0 #12496f}
+.lbnote{margin-top:10px;font-size:10px;color:var(--dim);line-height:1.55}
+
+/* ---------- Hub-Kacheln auf dem Home-Screen ---------- */
+.hubrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px 0}
+.hubtile{position:relative;display:flex;align-items:center;gap:9px;padding:10px;
+  border-radius:14px;border:1px solid #3a4c5c;
+  background-repeat:no-repeat;background-position:right -14px center;background-size:auto 128%,cover;
+  background-image:linear-gradient(160deg,#243342,#141d26);text-align:left}
+.hubtile .hi{flex:0 0 30px;height:30px;display:flex;align-items:center;justify-content:center;
+  font-size:21px}
+.hubtile .ht{flex:1;min-width:0}
+.hubtile .htn,.hubtile .hts{display:block}
+.hubtile .htn{font-size:12px;font-weight:900;color:#e8eef3}
+.hubtile .hts{font-size:9px;color:#a9bccb;margin-top:2px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.hubtile .nb2{position:absolute;right:-4px;top:-4px;min-width:16px;height:16px;line-height:16px;
+  border-radius:8px;background:var(--danger);color:#fff;font-size:9px;font-weight:900;
+  text-align:center;padding:0 4px}
 </style>
 </head>
 <body>
@@ -867,8 +1118,70 @@ span.ico{mix-blend-mode:normal;text-align:center}
       <button class="battlebtn" id="btnBattle"><span class="goldtext">Kampf</span></button>
     </div>
 
+    <!-- Hub-Kacheln: Einstieg in Clan + Rangliste. Die Bottom-Nav bleibt
+         bei AAs fuenf Plaetzen (Shop | Sammlung | START | Festung | Packs,
+         §15.5) — zwei weitere Knoepfe dort wuerden die Mitte zerquetschen.
+         AA haengt Clan/Leaderboard genauso ueber Hub-Kacheln ein und
+         nutzt dafuer die Icons hub_clan / hub_leaderboard. -->
+    <div class="hubrow">
+      <button class="hubtile" id="tileClan" data-hubico="hub_clan">
+        <span class="hi" data-ico="hub_clan" data-emoji="🛡"></span>
+        <span class="ht"><span class="htn">Clan</span>
+          <span class="hts" id="tileClanSub">—</span></span>
+        <i class="nb2" id="tileClanBadge" style="display:none">0</i></button>
+      <button class="hubtile" id="tileBoard" data-hubico="hub_leaderboard">
+        <span class="hi" data-ico="hub_leaderboard" data-emoji="🏅"></span>
+        <span class="ht"><span class="htn">Rangliste</span>
+          <span class="hts" id="tileBoardSub">—</span></span></button>
+    </div>
+
     <div class="ladder" id="arenaLadder"></div>
     <p class="homenote" id="homeNote">—</p>
+  </section>
+
+  <!-- ===== VIEW C: CLAN (DESIGN_CLAN.md) =====
+       Kopf (Banner + Kennzahlen) + drei Tabs:
+         Quests  — 3 Wochenquests mit Koop-Balken + Truhen-Staffel
+         Spenden — Anfragen, Spenden-Button, Sendekontingent X/10
+         Krieg   — Countdown ODER Kriegsboard mit Ghost-Zielen
+       Darunter Emote-Leiste (6 Presets, KEIN Freitext) + Aktivitaets-Feed.
+       Alle Zahlen kommen aus window.ArenaClan; dieser View ist reine
+       Praesentation und enthaelt KEINE eigene Clan-Logik. -->
+  <section id="viewClan" class="view">
+    <div class="viewhead"><button class="backbtn" id="clanBack">‹</button>
+      <h2 class="title">Clan</h2></div>
+    <div class="clanhead" id="clanHead"></div>
+    <p class="clandesc" id="clanDesc"></p>
+
+    <div class="tabs">
+      <button class="tab on" id="ctabQuests" data-clantab="quests">Quests</button>
+      <button class="tab" id="ctabDonate" data-clantab="donate">Spenden</button>
+      <button class="tab" id="ctabWar" data-clantab="war">Krieg</button>
+    </div>
+
+    <div class="clanpane" id="paneQuests"></div>
+    <div class="clanpane" id="paneDonate" style="display:none"></div>
+    <div class="clanpane" id="paneWar" style="display:none"></div>
+
+    <div class="emotebar" id="emoteBar"></div>
+    <div class="feed" id="clanFeed"></div>
+    <p class="fortnote" id="clanNote">—</p>
+  </section>
+
+  <!-- ===== VIEW L: RANGLISTE =====
+       Drei Ansichten ueber EINER Population (DESIGN_CLAN.md §6):
+       Global (Top 100) · Clan (30) · Umgebung (±25 Raenge). -->
+  <section id="viewBoard" class="view">
+    <div class="viewhead"><button class="backbtn" id="boardBack">‹</button>
+      <h2 class="title">Rangliste</h2></div>
+    <div class="tabs">
+      <button class="tab on" id="ltabGlobal" data-lbtab="global">Global</button>
+      <button class="tab" id="ltabClan" data-lbtab="clan">Clan</button>
+      <button class="tab" id="ltabAround" data-lbtab="around">Umgebung</button>
+    </div>
+    <div class="lblist" id="lbList"></div>
+    <button class="lbjump" id="lbJump">Zu meiner Position</button>
+    <p class="lbnote" id="lbNote">—</p>
   </section>
 
   <!-- ===== VIEW 1: COLLECTION (§7) ===== -->
@@ -1084,8 +1397,29 @@ span.ico{mix-blend-mode:normal;text-align:center}
 
 <div class="toast" id="toast"></div>
 
+<!-- ===== Karten-Wahl fuer die eigene Clan-Anfrage =====
+     Zeigt AUSSCHLIESSLICH die sechs Element-Tuerme und ausschliesslich
+     den grauen Basis-Bestand. Helden tauchen hier gar nicht erst auf —
+     die Regel steht im Modul (ArenaClan.assertSendable), das UI macht
+     sie nur sichtbar. -->
+<div class="modal" id="reqDlg">
+  <div class="sheet">
+    <div class="bonusbox">
+      <h3>Karten anfragen</h3>
+      <p id="reqDlgSub">Nur Turmkarten, nur graue Basis-Kopien. Deine Mitglieder
+        können dir bis zu 10 Kopien schicken.</p>
+      <div class="pickgrid" id="reqPick"></div>
+      <div class="forgeactions" style="margin-top:12px">
+        <button class="btn ghost" id="reqDlgClose" style="flex:1">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="./arena_cards.js"></script>
 <script src="./arena_fortress.js"></script>
+<script src="./arena_rivals.js"></script>
+<script src="./arena_clan.js"></script>
 <script>
 (function () {
   "use strict";
@@ -1360,7 +1694,8 @@ span.ico{mix-blend-mode:normal;text-align:center}
 
   /* UIBadge.set(navKey, n) — die roten Zaehler-Punkte der Bottom-Nav. */
   window.UIBadge = (function () {
-    var MAP = { collection: "navBadge", shop: "badgeShop", pack: "badgePack" };
+    var MAP = { collection: "navBadge", shop: "badgeShop", pack: "badgePack",
+                clan: "tileClanBadge" };
     return {
       set: function (navKey, n) {
         var id = MAP[navKey]; if (!id) return;
@@ -1577,6 +1912,13 @@ span.ico{mix-blend-mode:normal;text-align:center}
     st.cards.darkness = mk("common", 6, { common: 1 });
     st.cards.solara   = mk("good", 22, { good: 2, common: 3 }, ["solara_good_ult"]);
     st.cards.magmor   = mk("common", 4, { common: 1 });
+    /* SPENDEN-VORRAT (DESIGN_CLAN.md §4): Die Clan-Spende zieht
+       ausschliesslich GRAUE Basis-Kopien ab. Ohne Ueberschuss waere der
+       Spenden-Tab im Prototyp tot, deshalb bekommt jeder der sechs
+       Tuerme ein paar Kopien mehr. Helden bewusst NICHT — sie sind
+       nicht versendbar. */
+    var GIFT = { fire: 10, water: 7, nature: 8, earth: 7, light: 7, darkness: 7 };
+    for (var gk in GIFT) st.cards[gk].copies.common += GIFT[gk];
     AC._write(st);
     setGold(DEMO_GOLD);
     // Demo-Festung: passend zum 1 136-🏆-Account. Das Trophäen-Tor bei
@@ -2803,12 +3145,489 @@ span.ico{mix-blend-mode:normal;text-align:center}
     setTimeout(function () { if (ray.parentNode) ray.parentNode.removeChild(ray); }, 620);
   }
 
+  /* ==================================================================
+   * CLAN + RANGLISTE — Praesentation zu window.ArenaClan
+   * ------------------------------------------------------------------
+   * Wie bei Festung/Shop enthaelt dieser Block KEINE Spiellogik: jede
+   * Zahl, jede Regel und jede Fehlermeldung kommt aus arena_clan.js.
+   * Die Fehlermeldungen des Moduls sind bereits deutsche Klartexte und
+   * wandern unveraendert in toast().
+   * ================================================================== */
+  function CLof() { return window.ArenaClan || null; }
+
+  /* ArenaProfile existiert im Prototyp nicht (das echte Modul lebt im
+     Spiel). ArenaClan liest Trophaeen defensiv ueber window.ArenaProfile
+     — hier der Demo-Stub mit den Video-11-Werten. */
+  if (!window.ArenaProfile) {
+    window.ArenaProfile = { get: function () {
+      return { trophies: DEMO_TROPHIES, best: Math.max(DEMO_TROPHIES, 1400) };
+    } };
+  }
+
+  var clanTab = "quests", lbTab = "global";
+
+  /* Demo-Clan einmalig anlegen und mit etwas Wochenfortschritt fuellen,
+     damit die Balken nicht bei 0 stehen. */
+  var CLAN_SEED_KEY = "arenaClanProtoSeed";
+  function seedClan() {
+    var CL = CLof(); if (!CL) return;
+    if (!CL.info().joined) CL.seedDemoClan();
+    if (!localStorage.getItem(CLAN_SEED_KEY)) {
+      /* Der Demo-Fortschritt wird auf MITTWOCH derselben Woche gebucht.
+         Grund: reportEvent() zaehlt regelkonform NUR in der Sammelphase
+         Mo–Fr (DESIGN_CLAN.md §3.4). Wer den Prototyp an einem Wochenende
+         oeffnet, saehe sonst dauerhaft "ich 0" in allen drei Quests. */
+      var wed = CL.weekStart(Date.now()) + 2.5 * 86400000;
+      CL.reportEvent("win", 18, wed);
+      CL.reportEvent("pack", 6, wed);
+      CL.reportEvent("trophy", 260, wed);
+      localStorage.setItem(CLAN_SEED_KEY, "1");
+    }
+  }
+
+  function bannerHTML(badge, frameKey, cls) {
+    var f = frameKey ? " f-" + frameKey : "";
+    return '<div class="banner' + f + " " + (cls || "") + '" style="background:' +
+      "linear-gradient(160deg," + badge.c1 + "," + badge.c2 + ')">' +
+      '<span class="bsym">' + badge.symChar + "</span>" +
+      '<span class="bframe"></span></div>';
+  }
+
+  function renderClanHead() {
+    var CL = CLof(); if (!CL) return;
+    var inf = CL.info();
+    var ph = inf.phase;
+    $("clanHead").innerHTML =
+      bannerHTML(inf.badge, inf.warBadge) +
+      '<div class="cmeta">' +
+        '<div class="cnm">' + inf.name + "</div>" +
+        '<div class="csub">' + inf.joinModeName + " · ab " + fmt(inf.minTrophies) +
+          " 🏆 (Peak) · " + inf.myRoleName + "</div>" +
+        '<div class="cstats">' +
+          '<span class="cchip">' + ico("cur_trophy", "🏆") + " Ø <b>" + fmt(inf.avgTrophies) +
+            "</b></span>" +
+          '<span class="cchip">👥 <b>' + inf.members + "</b>/" + inf.maxMembers + "</span>" +
+          '<span class="cchip' + (inf.warStreak ? "" : " warn") + '">' +
+            (inf.warBadgeSym || "⚔") + " " + inf.warWins + " Siege · Serie " +
+            inf.warStreak + "</span>" +
+          '<span class="cchip">' + (ph.phase === "war" ? "⚔ Kriegsphase" : "🛠 Sammelphase") +
+            " · " + CL.hhmm(ph.msLeft).replace(":", " h ") + " m</span>" +
+        "</div></div>";
+    layer($("clanHead"), "panel");
+    $("clanDesc").textContent = inf.desc;
+  }
+
+  /* ---------- Tab 1: Quests ---------- */
+  function renderClanQuests() {
+    var CL = CLof(); if (!CL) return;
+    var qs = CL.quests(), ch = CL.chestTier();
+    var html = qs.map(function (q) {
+      var minePct = q.total ? Math.min(1, q.mine / q.goal) : 0;
+      var botPct = Math.max(0, q.pct - minePct);
+      return '<div class="qcard' + (q.done ? " done" : "") + '" data-quest="' + q.key + '">' +
+        '<div class="qtop"><span class="qsym">' + q.sym + "</span>" +
+          '<span class="qtx"><span class="qnm">' + q.title + "</span>" +
+          '<span class="qds">' + q.desc + "</span></span>" +
+          '<span class="qval">' + fmt(q.total) + " / " + fmt(q.goal) + "</span></div>" +
+        '<div class="qbar"><i class="qfill" style="width:' + (botPct * 100).toFixed(1) + '%"></i>' +
+          '<i class="qmine" style="left:' + (botPct * 100).toFixed(1) + "%;width:" +
+            (minePct * 100).toFixed(1) + '%"></i>' +
+          '<span class="qlbl">' + q.pctText + "</span></div>" +
+        '<div class="qsplit"><i style="background:#7ad14f"></i>Clan ' + fmt(q.bots) +
+          '  <i style="background:#f2c53d;margin-left:8px"></i>Du ' + fmt(q.mine) +
+          (q.done ? "  ✅ geschafft" : "  · noch " + fmt(q.missing)) + "</div></div>";
+    }).join("");
+
+    html += '<div class="chestrow">' + CL.CHEST_STEPS.map(function (s) {
+      var reached = ch.pct >= s.at - 1e-9;
+      return '<div class="chestcard ' + (reached ? "reached" : "locked") +
+        '" data-chest="' + s.tier + '">' +
+        '<span class="cart">' + s.sym + "</span>" +
+        '<div class="cnm2">' + s.name.replace("-Clantruhe", "") + "</div>" +
+        '<div class="cat">ab ' + Math.round(s.at * 100) + " %</div>" +
+        '<div class="cin">' + s.pack.toUpperCase() + "-Pack<br>" + fmt(s.gold) + " 🪙 · " +
+          s.material + " ⚗</div></div>";
+    }).join("") + "</div>";
+
+    var btnTxt, dis = "";
+    if (ch.claimed) { btnTxt = "Clantruhe bereits abgeholt"; dis = " disabled"; }
+    else if (ch.claimable) { btnTxt = ch.step.sym + " " + ch.step.name + " abholen"; }
+    else if (ch.step) { btnTxt = "Öffnet Samstag · " + CL.hhmm(ch.opensIn) + " h"; dis = " disabled"; }
+    else { btnTxt = "Noch keine Truhenstufe (ab 50 %)"; dis = " disabled"; }
+    html += '<button class="claimbtn pressable" id="btnClaimChest"' + dis + ">" + btnTxt + "</button>";
+    html += '<div class="hint">Gesamtfortschritt <b>' + ch.pctText +
+      "</b> — das Mittel der drei Balken. Alle 30 Mitglieder bekommen dieselbe Truhe. " +
+      "Am Wochenende zählen Matches für den <b>Krieg</b>, nicht mehr für die Quests.</div>";
+
+    $("paneQuests").innerHTML = html;
+    Array.prototype.forEach.call($("paneQuests").querySelectorAll(".chestcard"), function (el) {
+      layer(el, "chest_bronze");
+    });
+    Array.prototype.forEach.call($("paneQuests").querySelectorAll(".qcard"), function (el) {
+      layer(el, "panel");
+    });
+    var cb = $("btnClaimChest");
+    if (cb) cb.addEventListener("click", claimChest);
+    markPressable($("paneQuests"));
+  }
+  function claimChest() {
+    var CL = CLof();
+    try {
+      var r = CL.claimWeekChest();
+      setGold(gold() + r.gold);                    // Gold bucht der Hub (Modul meldet nur)
+      UISfx.reward();
+      toast(r.sym + " " + r.name + ": " + r.pack.toUpperCase() + "-Pack, " + fmt(r.gold) +
+        " Gold, " + r.material + " Material");
+      renderClan();
+    } catch (e) { UISfx.deny(); toast(e.message); }
+  }
+
+  /* ---------- Tab 2: Spenden ---------- */
+  function renderClanDonate() {
+    var CL = CLof(); if (!CL) return;
+    var q = CL.sendQuota(), reqs = CL.requests();
+    var dots = "";
+    for (var i = 0; i < CL.SEND_MAX; i++) {
+      dots += '<span class="qd' + (i < q.used ? " on" : "") + '"></span>';
+    }
+    var html = '<div class="quotabar"><span>Sendekontingent</span>' +
+      "<b>" + q.used + "/" + q.max + "</b>" +
+      "<span>· " + (q.used ? "Reset in " + q.resetText : "voll verfügbar") + "</span>" +
+      '<span class="qdots">' + dots + "</span></div>";
+
+    html += reqs.map(function (r) {
+      var m = BY_ID[r.cardId] || { art: "❔", color: "#9aa3ad", name: r.cardName };
+      var can = !r.mine && !r.closed && q.left > 0;
+      var btn = r.mine
+        ? '<span class="gotpts">' + (r.closed ? "erfüllt" : "deine Anfrage") + "</span>"
+        : '<button class="donbtn pressable' + (can ? "" : " is-disabled") +
+          '" data-donate="' + r.id + '">' + (r.closed ? "voll" : "SPENDEN") + "</button>";
+      return '<div class="reqrow' + (r.mine ? " mine" : "") + (r.closed ? " full" : "") +
+        '" data-req="' + r.id + '">' +
+        '<div class="reqcard" data-frame="frame_common" style="color:' + m.color + '">' + m.art +
+          '<span class="rtier">GRAU</span></div>' +
+        '<div class="reqmeta"><div class="rown">' +
+          (r.mine ? "Du brauchst " + r.cardName
+                  : r.ownerName + " braucht " + r.cardName) + "</div>" +
+          '<div class="rsub">' + r.got + "/" + r.need + " Kopien · " +
+            CL.ago(r.ageMs) + (r.myDonation ? " · du: " + r.myDonation : "") + "</div>" +
+          '<div class="rbar"><i style="width:' + (r.pct * 100).toFixed(0) + '%"></i></div></div>' +
+        btn + "</div>";
+    }).join("");
+
+    var hasMine = reqs.some(function (r) { return r.mine && !r.closed; });
+    html += '<button class="askbtn pressable" id="btnAskCards"' +
+      (hasMine ? " disabled" : "") + ">" +
+      (hasMine ? "Du hast bereits eine offene Anfrage" : "📥 Karten anfragen") + "</button>";
+    html += '<div class="sendnote">Es dürfen <b>nur Turmkarten</b> und <b>nur graue ' +
+      "Basis-Kopien</b> versendet werden — keine Helden, kein Material, kein Gold. " +
+      "<b>10 Karten pro 3 Stunden</b> (rollierendes Fenster). " +
+      "Fusionen (3 gleiche → nächste Stufe) macht jeder selbst.<br>" +
+      "Belohnung: <b>" + CL.DONATE_GOLD + " Gold</b> und <b>" + CL.DONATE_MATERIAL +
+      " Material</b> je gespendeter Karte.</div>";
+
+    $("paneDonate").innerHTML = html;
+    Array.prototype.forEach.call($("paneDonate").querySelectorAll("[data-frame]"), function (el) {
+      layer(el, el.getAttribute("data-frame"));
+    });
+    Array.prototype.forEach.call($("paneDonate").querySelectorAll("[data-donate]"), function (b) {
+      b.addEventListener("click", function () { doDonate(b.getAttribute("data-donate")); });
+    });
+    var ab = $("btnAskCards");
+    if (ab) ab.addEventListener("click", openReqDlg);
+    markPressable($("paneDonate"));
+  }
+  function doDonate(reqId) {
+    var CL = CLof();
+    var r = CL.requests().filter(function (x) { return x.id === reqId; })[0];
+    if (!r) { UISfx.deny(); toast("Anfrage nicht gefunden"); return; }
+    // So viel wie sinnvoll: Restbedarf, Restkontingent und eigener Bestand.
+    var have = 0;
+    CL.donatableCards().forEach(function (c) { if (c.cardId === r.cardId) have = c.copies; });
+    var n = Math.min(r.left, CL.sendQuota().left, have);
+    if (n <= 0) n = 1;                              // bewusst in den Fehler laufen lassen —
+    try {                                           // die Modul-Meldung erklaert das Warum
+      var res = CL.donateCards(reqId, n);
+      setGold(gold() + res.reward.gold);            // Gold bucht der Hub
+      UISfx.confirm();
+      toast(res.count + " × " + res.cardName + " gespendet · +" + res.reward.gold +
+        " Gold, +" + res.reward.material + " Material" +
+        (res.request.closed ? " · Anfrage erfüllt!" : ""));
+      renderClan(); renderTop();
+    } catch (e) { UISfx.deny(); toast(e.message); }
+  }
+  function openReqDlg() {
+    var CL = CLof();
+    $("reqPick").innerHTML = CL.donatableCards().map(function (c) {
+      var m = BY_ID[c.cardId] || { art: "❔", color: "#9aa3ad" };
+      return '<button class="picktile pressable" data-ask="' + c.cardId +
+        '" style="border-color:' + m.color + '">' +
+        '<span class="part">' + m.art + "</span>" +
+        '<span class="pnm">' + c.cardName + "</span>" +
+        '<span class="pcnt">' + c.copies + " grau</span></button>";
+    }).join("");
+    Array.prototype.forEach.call($("reqPick").querySelectorAll("[data-ask]"), function (b) {
+      b.addEventListener("click", function () { doAsk(b.getAttribute("data-ask")); });
+    });
+    markPressable($("reqPick"));
+    $("reqDlg").classList.add("open");
+  }
+  function doAsk(cardId) {
+    var CL = CLof();
+    try {
+      var r = CL.requestCards(cardId);
+      UISfx.confirm();
+      toast("Anfrage gestellt: " + r.need + " × " + r.cardName);
+      $("reqDlg").classList.remove("open");
+      renderClan();
+    } catch (e) { UISfx.deny(); toast(e.message); }
+  }
+
+  /* ---------- Tab 3: Krieg ---------- */
+  var EL_EMO = { fire: "🔥", water: "❄", nature: "🌿", earth: "🪨", light: "☀", darkness: "🌑" };
+  function renderClanWar() {
+    var CL = CLof(); if (!CL) return;
+    var wb = CL.warBoard();
+    if (wb.phase.phase !== "war") {
+      $("paneWar").innerHTML =
+        '<div class="warwait"><div class="wk">SAMMELPHASE — KRIEG STARTET IN</div>' +
+        '<div class="wc">' + CL.hhmm(wb.phase.msLeft) + "</div>" +
+        '<div class="wd">Samstag 00:00 tritt <b>' + wb.them.name + "</b> an " +
+          "(Ø " + fmt(wb.them.avgTrophies) + " 🏆). Bis dahin zählen Siege, Packs und " +
+          "Trophäen auf die Clan-Quests.</div></div>" +
+        '<div class="warboard"><div class="warsides">' +
+          '<div class="warside us"><div class="wsn">' + wb.us.name + "</div>" +
+            '<div class="wsb">Ø ' + fmt(wb.us.avgTrophies) + " 🏆</div></div>" +
+          '<div class="warvs">VS</div>' +
+          '<div class="warside them"><div class="wsn">' + wb.them.name + "</div>" +
+            '<div class="wsb">Ø ' + fmt(wb.them.avgTrophies) + " 🏆</div></div></div>" +
+        '<div class="warlead">Je Kriegstag ' + wb.attacksPerDay +
+          " Angriffe — 6 über das Wochenende.</div></div>" +
+        '<button class="claimbtn pressable" id="btnWarDemo">' + warDemoLabel() + "</button>" +
+        '<div class="hint">Die Phasen laufen nach der <b>Kalenderwoche</b> (Mo–Fr sammeln, ' +
+        "Sa–So Krieg, UTC). Der Demo-Knopf stellt die Uhr des Moduls auf Samstag, damit das " +
+        "Kriegsboard im Prototyp sichtbar ist.</div>";
+      $("btnWarDemo").addEventListener("click", toggleWarDemo);
+      markPressable($("paneWar"));
+      return;
+    }
+    var tot = Math.max(1, wb.us.points + wb.them.points);
+    var html = '<div class="warboard"><div class="warsides">' +
+      '<div class="warside us"><div class="wsn">' + wb.us.name + "</div>" +
+        '<div class="wsp">' + fmt(wb.us.points) + "</div>" +
+        '<div class="wsb">davon du: ' + fmt(wb.us.myPoints) + "</div></div>" +
+      '<div class="warvs">VS</div>' +
+      '<div class="warside them"><div class="wsn">' + wb.them.name + "</div>" +
+        '<div class="wsp">' + fmt(wb.them.points) + "</div>" +
+        '<div class="wsb">Ø ' + fmt(wb.them.avgTrophies) + " 🏆</div></div></div>" +
+      '<div class="warbar"><i style="width:' + (wb.us.points / tot * 100).toFixed(1) +
+        '%"></i></div>' +
+      '<div class="warlead ' + (wb.leading ? "up" : "down") + '">' +
+        (wb.leading ? "▲ " + fmt(wb.lead) + " Punkte Vorsprung" :
+                      "▼ " + fmt(-wb.lead) + " Punkte Rückstand") +
+        " · Kriegsende in " + CL.hhmm(wb.phase.msLeft) + "</div></div>";
+
+    html += '<div class="atkhead"><span>Ghost-Gegner (' + wb.targets.length + ")</span>" +
+      '<span class="left">Angriffe heute ' + wb.attacksLeftToday + "/" + wb.attacksPerDay +
+      "</span></div>";
+    html += wb.targets.map(function (g) {
+      return '<div class="ghostrow' + (g.attacked ? " hit" : "") + '" data-ghost="' + g.id + '">' +
+        '<div class="gav">' + (EL_EMO[g.el] || "👤") + "</div>" +
+        '<div class="gtx"><div class="gnm">' + g.name + "</div>" +
+          '<div class="gsub">' + g.elName + " · " + fmt(g.trophies) +
+          ' 🏆 · <span class="gt' + g.tier + '">' +
+          ["", "leicht", "mittel", "schwer"][g.tier] + "</span></div></div>" +
+        (g.attacked
+          ? '<span class="gotpts">+' + g.points + "</span>"
+          : '<button class="attackbtn pressable' + (wb.attacksLeftToday > 0 ? "" : " is-disabled") +
+            '" data-attack="' + g.id + '">ANGRIFF</button>') + "</div>";
+    }).join("");
+    html += '<button class="claimbtn pressable" id="btnWarDemo">' + warDemoLabel() + "</button>";
+    html += '<div class="hint">Ein Angriff liefert <b>100–160</b> Punkte bei Sieg und ' +
+      "<b>20–35</b> bei Niederlage — auch verlorene Angriffe zahlen ein. Jedes Ziel " +
+      "nur <b>einmal pro Krieg</b>. Ohne deine Punkte liegt der Clan hinten: die " +
+      "Bot-Lücke ist bewusst so gesetzt, dass <b>du</b> entscheidest.</div>";
+
+    $("paneWar").innerHTML = html;
+    Array.prototype.forEach.call($("paneWar").querySelectorAll("[data-attack]"), function (b) {
+      b.addEventListener("click", function () { doAttack(b.getAttribute("data-attack")); });
+    });
+    $("btnWarDemo").addEventListener("click", toggleWarDemo);
+    markPressable($("paneWar"));
+  }
+  /* Der Prototyp hat kein laufendes Match. Ein Angriff wird deshalb
+     sofort mit einem plausiblen Ergebnis aufgeloest — im Spiel liegt
+     zwischen startWarAttack() und resolveWarAttack() das echte Match. */
+  function doAttack(targetId) {
+    var CL = CLof();
+    try {
+      var lo = CL.startWarAttack(targetId);
+      var win = Math.random() < 0.62;
+      var res = CL.resolveWarAttack(targetId, {
+        win: win, stars: win ? 1 + Math.floor(Math.random() * 3) : Math.floor(Math.random() * 2),
+        hpFrac: win ? Math.random() : 0,
+      });
+      if (win) UISfx.reward(); else UISfx.deny();
+      toast((win ? "Sieg" : "Niederlage") + " gegen " + lo.name + " · +" + res.points +
+        " Kriegspunkte");
+      renderClan();
+    } catch (e) { UISfx.deny(); toast(e.message); }
+  }
+  /* Demo-Uhr: verschiebt die Modul-Zeit auf Samstag 10:00 UTC derselben
+     Woche (und zurueck). Nur Prototyp — im Spiel laeuft die echte Uhr. */
+  var warDemoOn = false;
+  function naturalPhase() {
+    var CL = CLof();
+    // warPhase() mit explizitem Zeitstempel umgeht die Demo-Uhr.
+    return CL ? CL.warPhase(Date.now()).phase : "collect";
+  }
+  function warDemoLabel() {
+    if (warDemoOn) return "🕒 Demo-Uhr aus — echte Zeit";
+    return naturalPhase() === "war"
+      ? "🕒 Sammelphase simulieren (Demo)"
+      : "🕒 Kriegsphase simulieren (Demo)";
+  }
+  function toggleWarDemo() {
+    var CL = CLof();
+    warDemoOn = !warDemoOn;
+    if (warDemoOn) {
+      var ws = CL.weekStart(Date.now());
+      var toWar = naturalPhase() !== "war";
+      var target = ws + (toWar ? 5 : 2) * 86400000 + 10 * 3600000;
+      var off = target - Date.now();
+      CL._clock(function () { return Date.now() + off; });
+      toast(toWar ? "Demo: Kriegsphase (Samstag 10:00 UTC)"
+                  : "Demo: Sammelphase (Mittwoch 10:00 UTC)");
+    } else {
+      CL._clock(null);
+      toast("Demo: zurück zur echten Uhr");
+    }
+    UISfx.confirm();
+    renderClan();
+  }
+
+  /* ---------- Emotes + Feed ---------- */
+  /* Kurzlabel fuer die Knopfbeschriftung — der VOLLE Spruch aus dem Modul
+     landet im Tooltip und im Feed. Ein abgeschnittener Satz auf dem Knopf
+     ("Brauche Karten —") liest sich wie ein Fehler. */
+  var EMOTE_SHORT = { gl: "Viel Glück", thx: "Danke!", need: "Karten?",
+                      war: "Angriff!", nice: "Stark!", hi: "Willkommen" };
+  function renderEmotes() {
+    var CL = CLof(); if (!CL) return;
+    $("emoteBar").innerHTML = CL.EMOTES.map(function (e) {
+      return '<button class="emobtn pressable" data-emote="' + e.key + '" title="' + e.text +
+        '"><b>' + e.emoji + "</b>" + (EMOTE_SHORT[e.key] || e.key) + "</button>";
+    }).join("");
+    Array.prototype.forEach.call($("emoteBar").querySelectorAll("[data-emote]"), function (b) {
+      b.addEventListener("click", function () {
+        try { CL.sendEmote(b.getAttribute("data-emote")); UISfx.confirm(); renderClanFeed(); }
+        catch (e) { UISfx.deny(); toast(e.message); }
+      });
+    });
+    markPressable($("emoteBar"));
+  }
+  var FEED_ICO = { donate: "📦", help: "💚", filled: "🎁", win: "⚔", emote: "💬",
+                   join: "👋", war: "⚔", warend: "🏆", chest: "🎁", request: "📥", clan: "🛡" };
+  function renderClanFeed() {
+    var CL = CLof(); if (!CL) return;
+    var fd = CL.feed(null, 18);
+    $("clanFeed").innerHTML = fd.map(function (f) {
+      return '<div class="fe' + (f.bot ? "" : " me") + (f.kind === "help" ? " help" : "") + '">' +
+        '<span class="fi">' + (FEED_ICO[f.kind] || "•") + "</span>" +
+        '<span class="ft">' + f.text + "</span>" +
+        '<span class="fa">' + f.agoText + "</span></div>";
+    }).join("") || '<div class="fe"><span class="ft">Noch keine Aktivität.</span></div>';
+  }
+
+  function setClanTab(k) {
+    clanTab = k;
+    ["quests", "donate", "war"].forEach(function (x) {
+      var t = $("ctab" + x.charAt(0).toUpperCase() + x.slice(1));
+      if (t) t.classList.toggle("on", x === k);
+      var p = $("pane" + x.charAt(0).toUpperCase() + x.slice(1));
+      if (p) p.style.display = x === k ? "" : "none";
+    });
+  }
+  function renderClan() {
+    var CL = CLof();
+    if (!CL) { $("clanNote").textContent = "arena_clan.js nicht geladen."; return; }
+    seedClan();
+    renderClanHead();
+    renderClanQuests();
+    renderClanDonate();
+    renderClanWar();
+    renderEmotes();
+    renderClanFeed();
+    setClanTab(clanTab);
+    var q = CL.sendQuota();
+    $("clanNote").textContent = "Logik: arena_clan.js (localStorage „arenaClan“). " +
+      "Bots, Gegnerclan und Rangliste sind berechnet, nicht gespeichert — ein Server " +
+      "ersetzt genau diese Schicht. Sendekontingent " + q.used + "/" + q.max + ".";
+    UIBadge.set("clan", CL.notifications().length);
+  }
+
+  /* ---------- Rangliste ---------- */
+  function renderBoard() {
+    var CL = CLof();
+    if (!CL) { $("lbNote").textContent = "arena_clan.js nicht geladen."; return; }
+    seedClan();
+    var lb = CL.leaderboard(lbTab);
+    $("lbList").innerHTML = lb.rows.map(function (r, i) {
+      var top = r.rank <= 3 ? " top" + r.rank : "";
+      return '<div class="lbrow' + (r.me ? " me" : "") + top + '" data-lbrank="' + r.rank + '"' +
+        (r.me ? ' id="lbMe"' : "") + ">" +
+        '<div class="lrk">' + (r.rank <= 3 ? ["🥇", "🥈", "🥉"][r.rank - 1] : "#" + r.rank) +
+          "</div>" +
+        '<div class="lbg" style="background:linear-gradient(160deg,' + r.badge.c1 + "," +
+          r.badge.c2 + ')">' + r.badge.symChar + "</div>" +
+        '<div class="lnm">' + r.name +
+          (r.roleName ? "<small>" + r.roleName + "</small>"
+            : r.title ? "<small>" + r.title + "</small>" : "") + "</div>" +
+        '<div class="ltr">' + ico("cur_trophy", "🏆") + " " + fmt(r.trophies) + "</div></div>";
+    }).join("");
+    var txt;
+    if (lbTab === "global") {
+      txt = "Top " + CL.LB_GLOBAL + " von " + lb.total + " Spielern. Dein Rang: #" + lb.myRank +
+        (lb.inTop ? "" : " — deine Zeile hängt unten an, damit sie nie fehlt.");
+    } else if (lbTab === "clan") {
+      txt = "Alle " + lb.rows.length + " Clan-Mitglieder nach Trophäen. Dein Rang im Clan: #" +
+        lb.myRank + ".";
+    } else {
+      txt = "Ränge " + lb.from + "–" + lb.to + " (±" + CL.LB_AROUND +
+        " um dich). Das ist die Ansicht, in der sich ein Sieg sofort ablesen lässt.";
+    }
+    $("lbNote").textContent = txt + " Die 12 benannten Rivalen aus arena_rivals.js sind " +
+      "in dieselbe Population einsortiert — keine zweite Bot-Welt.";
+    markPressable($("lbList"));
+  }
+  function setLbTab(k) {
+    lbTab = k;
+    ["global", "clan", "around"].forEach(function (x) {
+      var t = $("ltab" + x.charAt(0).toUpperCase() + x.slice(1));
+      if (t) t.classList.toggle("on", x === k);
+    });
+    renderBoard();
+    lbScrollToMe();
+  }
+  /* Smooth-Scroll auf die eigene Zeile.
+     ⚠ NICHT ueber #viewBoard.scrollTop: #app hat nur min-height:100vh und
+     waechst mit dem Inhalt — gescrollt wird also das DOKUMENT, nicht der
+     View-Container. scrollIntoView trifft in beiden Faellen das richtige
+     Element und braucht die Container-Frage gar nicht zu beantworten. */
+  function lbScrollToMe() {
+    var me = $("lbMe");
+    if (!me) return;
+    try { me.scrollIntoView({ behavior: "smooth", block: "center" }); }
+    catch (e) { me.scrollIntoView(); }
+  }
+
   /* ================= Navigation ================= */
   var NAVS = { navHome: "viewHome", navCollection: "viewCollection",
                navForge: "viewForge", navPack: "viewPack",
-               navShop: "viewShop", navFortress: "viewFortress" };
+               navShop: "viewShop", navFortress: "viewFortress",
+               navClan: "viewClan", navBoard: "viewBoard" };
   var NAV_IDS = ["navShop", "navCollection", "navHome", "navFortress", "navPack",
-                 "navTower", "navForge"];
+                 "navTower", "navForge", "navClan", "navBoard"];
   // navTower / navForge haben KEINEN eigenen Bottom-Nav-Knopf mehr (AA-
   // Ordnung, §15.5): die Detailkarte öffnet jede Karte, die Schmiede der
   // Forge-Button der Sammlung. Deshalb überall gegen null prüfen.
@@ -2830,6 +3649,8 @@ span.ico{mix-blend-mode:normal;text-align:center}
     if (navId === "navShop") renderShop();
     if (navId === "navFortress") renderFortress();
     if (navId === "navPack") { renderPackHeader(); renderTop(); }
+    if (navId === "navClan") renderClan();
+    if (navId === "navBoard") { renderBoard(); setTimeout(lbScrollToMe, 60); }
   }
 
   /* ================= Events ================= */
@@ -2859,6 +3680,24 @@ span.ico{mix-blend-mode:normal;text-align:center}
   }
   onNav("navCollection"); onNav("navTower"); onNav("navForge");
   onNav("navPack"); onNav("navShop"); onNav("navFortress");
+  // Clan + Rangliste haengen an den Home-Hub-Kacheln (siehe Kommentar
+  // im Markup) und haben deshalb keinen eigenen Bottom-Nav-Knopf.
+  onNav("tileClan", "navClan"); onNav("tileBoard", "navBoard");
+  $("clanBack").addEventListener("click", function () { show("navHome"); });
+  $("boardBack").addEventListener("click", function () { show("navHome"); });
+  $("lbJump").addEventListener("click", lbScrollToMe);
+  $("reqDlgClose").addEventListener("click", function () {
+    $("reqDlg").classList.remove("open");
+  });
+  $("reqDlg").addEventListener("click", function (e) {
+    if (e.target === $("reqDlg")) $("reqDlg").classList.remove("open");
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-clantab]"), function (b) {
+    b.addEventListener("click", function () { setClanTab(b.getAttribute("data-clantab")); });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-lbtab]"), function (b) {
+    b.addEventListener("click", function () { setLbTab(b.getAttribute("data-lbtab")); });
+  });
   $("btnToForge").addEventListener("click", function () { show("navForge"); });
   $("btnDetailBack").addEventListener("click", closeDetail);
   $("btnDetailClose").addEventListener("click", closeDetail);
@@ -2902,6 +3741,24 @@ span.ico{mix-blend-mode:normal;text-align:center}
     toast("Demo-Zustand zurückgesetzt");
   });
 
+  /* Hub-Kacheln auf Home mit Live-Zahlen fuellen. */
+  function renderHubTiles() {
+    var CL = CLof();
+    if (!CL) return;
+    seedClan();
+    var inf = CL.info(), ph = inf.phase, q = CL.sendQuota();
+    $("tileClanSub").textContent = inf.name + " · " +
+      (ph.phase === "war" ? "Krieg läuft" : "Spenden " + q.used + "/" + q.max);
+    var n = CL.notifications().length;
+    var tb = $("tileClanBadge");
+    tb.textContent = n > 9 ? "9+" : String(n);
+    tb.style.display = n > 0 ? "" : "none";
+    var lb = CL.leaderboard("around");
+    $("tileBoardSub").textContent = "Rang #" + lb.myRank + " von " + lb.total;
+    layer($("tileClan"), "hub_clan");
+    layer($("tileBoard"), "hub_leaderboard");
+  }
+
   /* ================= Start ================= */
   setSort("level");
   hydrateIcons();          // <i data-ico> -> Kristall-Icon (Emoji-Fallback)
@@ -2910,6 +3767,7 @@ span.ico{mix-blend-mode:normal;text-align:center}
   renderShop();
   renderPackHeader();
   renderHome();
+  renderHubTiles();
   setNav("navHome");
   markPressable();         // EINE Interaktions-Schicht fuer alles Klickbare
   UIBadge.set("pack", 1);  // Demo: ein Gratis-Tagespack wartet
@@ -2922,7 +3780,13 @@ span.ico{mix-blend-mode:normal;text-align:center}
                      markPressable: markPressable, ico: ico, CastleSkins: window.CastleSkins,
                      flip: flip, revealAll: revealAll, packState: function () { return packState; },
                      playCinematic: playCinematic, openPackKey: openPackKey,
-                     nextNodeTrophies: nextNodeTrophies };
+                     nextNodeTrophies: nextNodeTrophies,
+                     renderClan: renderClan, renderBoard: renderBoard,
+                     setClanTab: setClanTab, setLbTab: setLbTab,
+                     toggleWarDemo: toggleWarDemo, doDonate: doDonate, doAsk: doAsk,
+                     doAttack: doAttack, claimChest: claimChest,
+                     seedClan: seedClan, renderHubTiles: renderHubTiles,
+                     CL: function () { return window.ArenaClan; } };
 })();
 </script>
 </body>
