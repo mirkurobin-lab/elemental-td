@@ -5,7 +5,7 @@
   "styleSheetJob": "22646ce4-8685-46af-ad73-9ec32482c2c2",
   "modell": "nano_banana_pro (Higgsfield), resolution 1k, Style-Sheet als Bild-Referenz",
   "erzeugt": "2026-07-25",
-  "credits": "Batch 1: 25 Generationen x 2 = 50 Credits. Batch 2: 52 Generationen x 2 = 104 Credits. Batch 3 (Pack-Zeremonie): 1 Bild x 2 + 1 Video (kling3_0_turbo) x 7,5 = 9,5 Credits. Batch 3 (Festungs-Layout Variante 2 „Banner-Stapel\"): 4 Bilder x 2 = 8 Credits. Gesamt 83 Assets / 171,5 Credits, 0 Retakes.",
+  "credits": "Batch 1: 25 Generationen x 2 = 50 Credits. Batch 2: 52 Generationen x 2 = 104 Credits. Batch 3 (Pack-Zeremonie): 1 Bild x 2 + 1 Video (kling3_0_turbo) x 7,5 = 9,5 Credits. Batch 3 (Festungs-Layout Variante 2 „Banner-Stapel\"): 4 Bilder x 2 = 8 Credits. Batch 4 (Karten-Artworks, Breitbanner, Emote-Tokens): 17 Bilder x 2 = 34 Credits. Gesamt 100 Assets / 205,5 Credits, 0 Retakes.",
   "palette": {
    "gold": "#e0b94a",
    "violett": "#7a4fd6",
@@ -668,5 +668,141 @@
   "type": "image",
   "batch": 3,
   "beschreibung": "Meilenstein-Gem: prismatischer Sternkristall in goldener Hex-Fassung. Alle 10 Stufen."
+ },
+ "card_ember": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160628_0633b136-c9aa-409a-911e-63b1a496b1b6.png",
+  "job": "0633b136-c9aa-409a-911e-63b1a496b1b6",
+  "type": "image",
+  "subtype": "card_art",
+  "batch": 4,
+  "beschreibung": "Karten-Art EMBER: Obsidianturm mit loderndem Feuerkristall, Funkenflug."
+ },
+ "card_frost": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160630_0d477f21-6425-4849-aff7-8e545647fd90.png",
+  "job": "0d477f21-6425-4849-aff7-8e545647fd90",
+  "type": "image",
+  "subtype": "card_art",
+  "batch": 4,
+  "beschreibung": "Karten-Art FROST: Eiskristallturm, kaltes blaues Innenglühen, Schneestaub."
+ },
+ "card_stone": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160633_f987f0ee-26c9-4923-83f7-c99490d5c932.png",
+  "job": "f987f0ee-26c9-4923-83f7-c99490d5c932",
+  "type": "image",
+  "subtype": "card_art",
+  "batch": 4,
+  "beschreibung": "Karten-Art STONE: wuchtiger Steinturm mit Bernstein-Adern, schwebende Felsbrocken."
+ },
+ "card_thorn": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160635_8b90cad8-d641-4874-9aee-5e86fa6988cc.png",
+  "job": "8b90cad8-d641-4874-9aee-5e86fa6988cc",
+  "type": "image",
+  "subtype": "card_art",
+  "batch": 4,
+  "beschreibung": "Karten-Art THORN: Rankenturm um Giftkristalle, toxisch-grünes Glühen."
+ },
+ "card_dawn": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160638_c6833184-bb6f-494f-a32a-d31e61c0b17f.png",
+  "job": "c6833184-bb6f-494f-a32a-d31e61c0b17f",
+  "type": "image",
+  "subtype": "card_art",
+  "batch": 4,
+  "beschreibung": "Karten-Art DAWN: weißgoldene Kristallspitze mit Lichthalo und Goldmoten."
+ },
+ "card_hollow": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160640_ac3247ff-7eff-41e0-97b7-f3fc263d6948.png",
+  "job": "ac3247ff-7eff-41e0-97b7-f3fc263d6948",
+  "type": "image",
+  "subtype": "card_art",
+  "batch": 4,
+  "beschreibung": "Karten-Art HOLLOW: violetter Obsidianturm mit schwarzem Void-Orb, Schattenschlieren."
+ },
+ "card_solara": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160644_4be1e01f-8e65-4d2d-b42f-2b2ad3d579de.png",
+  "job": "4be1e01f-8e65-4d2d-b42f-2b2ad3d579de",
+  "type": "image",
+  "subtype": "card_art",
+  "batch": 4,
+  "beschreibung": "Helden-Art SOLARA: Lichtheldin in Weißgold-Rüstung, Sonnenstrahl aus erhobener Hand."
+ },
+ "card_magmor": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160645_a9f23226-f8fe-4d2c-9bc0-afad20ce6d7c.png",
+  "job": "a9f23226-f8fe-4d2c-9bc0-afad20ce6d7c",
+  "type": "image",
+  "subtype": "card_art",
+  "batch": 4,
+  "beschreibung": "Helden-Art MAGMOR: Magma-Titan mit Lavaadern reißt den Boden auf."
+ },
+ "pass_keyart": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160701_42a171b5-06f3-458d-a766-f4992e4210e5.png",
+  "job": "42a171b5-06f3-458d-a766-f4992e4210e5",
+  "type": "image",
+  "subtype": "banner",
+  "batch": 4,
+  "beschreibung": "Season-Pass-Keyart „Goldene Fortuna“: goldenes Fortuna-Rad, Schatzflut. Linkes Drittel ruhig für UI."
+ },
+ "event_tournament": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160704_9fb36583-0558-4407-a96c-83275fc4c95e.png",
+  "job": "9fb36583-0558-4407-a96c-83275fc4c95e",
+  "type": "image",
+  "subtype": "banner",
+  "batch": 4,
+  "beschreibung": "Event-Banner Turnier: Kristallarena mit zwei rivalisierenden Bannern über Schwebeinsel-Podium."
+ },
+ "event_essence": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160706_82a16544-3845-4947-8482-8104ab108bf6.png",
+  "job": "82a16544-3845-4947-8482-8104ab108bf6",
+  "type": "image",
+  "subtype": "banner",
+  "batch": 4,
+  "beschreibung": "Event-Banner Essenz-Regen: leuchtende Elementkristalle regnen in Schatzgefäße."
+ },
+ "emote_luck": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160713_d2da4068-32da-4d1a-950e-a554f7a3ec11.png",
+  "job": "d2da4068-32da-4d1a-950e-a554f7a3ec11",
+  "type": "image",
+  "subtype": "emote",
+  "batch": 4,
+  "beschreibung": "Emote Viel Glück: grünes Kristall-Kleeblatt im Goldring."
+ },
+ "emote_thanks": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160715_3b9758a1-6ccd-46fe-887b-c87ff28579f0.png",
+  "job": "3b9758a1-6ccd-46fe-887b-c87ff28579f0",
+  "type": "image",
+  "subtype": "emote",
+  "batch": 4,
+  "beschreibung": "Emote Danke: goldenes Kristallherz im Goldring."
+ },
+ "emote_cards": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160718_714b6f41-0b0f-4ebc-9284-e39af17401ea.png",
+  "job": "714b6f41-0b0f-4ebc-9284-e39af17401ea",
+  "type": "image",
+  "subtype": "emote",
+  "batch": 4,
+  "beschreibung": "Emote Karten?: leuchtende Karte mit Fragezeichen-Gem im Goldring."
+ },
+ "emote_attack": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160720_ca1c0844-21b8-40c1-b714-22bb44895f47.png",
+  "job": "ca1c0844-21b8-40c1-b714-22bb44895f47",
+  "type": "image",
+  "subtype": "emote",
+  "batch": 4,
+  "beschreibung": "Emote Angriff: gekreuzte Kristallschwerter im Goldring."
+ },
+ "emote_strong": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160722_700d087a-3ea5-4bb1-8178-7cf35e08d73f.png",
+  "job": "700d087a-3ea5-4bb1-8178-7cf35e08d73f",
+  "type": "image",
+  "subtype": "emote",
+  "batch": 4,
+  "beschreibung": "Emote Stark: Bernstein-Kristallarm mit Feuerglühen im Goldring."
+ },
+ "emote_welcome": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160724_83a735e4-f6f7-4853-86b5-23ebe574f386.png",
+  "job": "83a735e4-f6f7-4853-86b5-23ebe574f386",
+  "type": "image",
+  "subtype": "emote",
+  "batch": 4,
+  "beschreibung": "Emote Willkommen: winkende Kristallhand im Goldring."
  }
 }
