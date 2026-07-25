@@ -54,6 +54,8 @@ sind dagegen exakt, weil sie aus Pixelkoordinaten stammen.
 | 3 | `ScreenRecording_07-17 19-46` · `1p5cDo0-bWSW-d3c4RfV6gktynhCESwuy` | 6:06 | PvP-Match Arena 4, *Netherghost* vs. *DirtyDansen* — **mit Sieg + Belohnungsscreen**; enthält zusätzlich die Turm-Platzierungs-Hinweise („1x2 TOWER PATH") | 0-8 Matchmaking · Match-HUD · **358 VICTORY** (bei Restzeit 02:18) · **365 Belohnungsscreen (+39 Trophäen, 610 Gold, „TAP TO CLOSE")** |
 | 6 | `ScreenRecording_07-05 16-04` · `12-pNrsLpUwnnySckbYh8IOwbhRFc6RY2` (Kopie: `1CM1fn9aw7hjkA7FF3BSzHfl1fcxrbF5L`) | 4:25 | **Zweite große Menü-Tour — komplementär zu Video 11.** Anderer Account-Stand: *Netherghost*, **Level 4, Arena 2, 425 Trophäen**. Enthält alles, was Video 11 fehlte: Trophy Road komplett, Champions Peak, Season, Leaderboard, Clans, Golden-Fortune-Pass und das **Fortress-Upgrade-System** | 0-22 Shop (Daily Deals, Arcane Supplies Chest mit Pity-Counter, Truhen, Gem-Bundles) · 25-32 Battle Deck + Collection („By Rarity", RESOURCES, **TO BE FOUND**) · **34-98 Golden Fortune (Season-Pass, FREE/EPIC/LEGENDARY)** · 100 Home (Level 4, Arena 2) · 105-112 **Map Objectives + Trick Cards** · **115-190 Trophy Road / Arena-Liste mit allen Schwellen** · 150-215 Champions Peak + Season + Leaderboard · **220 CLANS** · **226-264 FORTRESS-UPGRADES mit Goldkosten** |
 | 7 | `ScreenRecording_07-25 09-16-41` · `1gQBeekSjfY4QNwTa5SOXBXZsb9v6tJl3` | 0:54 | **Die Aufnahme, die §10.1 und §10.4 schließt: MERGE-AUSFÜHRUNG + drei echte TURM-UPGRADES.** Kurz, aber die dichteste Aufnahme überhaupt. Account: 521 💎 / **19 918 🪙** | 4 Battle Deck · 5-6 „SELECT CARDS TO MERGE!" · **7-16 Merge-Auswahl CATAPULT + Vorschau (MAX LEVEL 20→30)** · **17-24 „PERFECT MERGE!"-Zeremonie** · 29-32 Deck (Gold unverändert!) · **33-37 Catapult-Detailkarte RARE + Upgrade Lv16→17** · **40-53 Boulder COMMON + zwei Upgrades Lv1→3** |
+| 8 | `ScreenRecording_07-25 15-59-29` · `1zInGsCyXefVkd58p9RIwf2wZ-azqbTMz` | 7:20 | **Die komplette Trophäenstraße in einem Zug — von 0 🏆 bis zur Spitze.** Schließt die Leiter endgültig: alle 8 Arenen, die 9 Liga-Tore von *Champions Peak*, Knotenkadenz, Season-Regel und die Weltrangliste. Account: *Netherghost*, 1 136 🏆, „Ice Season", „Season Ends In 9d 10h" | 8-88 Arenen 1-5 mit Unlock-Rastern · **104 Arena 6 *Inferno Pit* (1 500)** · **108-113 Arena 7 *Storm Shroom* (2 000)** · **115-120 Arena 8 *Ice Brawl* (2 500)** · **123-128 Liga-Start *Entrance Gate* (2 900)** · 133-192 Tore 2-9 (3 500/4 000/4 500/5 000/6 000/7 000/8 000/9 000) · **194-200 Spitze 9 800** · 202-212 Champions-Peak-Rangliste (Spitze **17 825**) · **213-217 Season-Reset-Tooltip im Wortlaut** → §15 |
+| 9 | `ScreenRecording_07-25 16-40-19` · `1NRDRmIM61flSodnDNuG2lZzjoFDAtFqC` | 2:56 | **Die Festungs-/Burg-Upgrades im Detail** — AAs „Upgrade"-Tab über ~40 Stufenkarten. Belegt: genau DREI Tracks, die Bonus- und Power-Kurven, das Account-Level-Gating. Account: *Netherghost*, **Level 14**, 1 918 🪙 (⚠ unverändert — keine Käufe, daher keine Kosten-Differenzen ableitbar) | 1 Home (Level 14, Arena 4) · 3-38 Tab-Wechsel + Kartenzyklus **Max Health · DPS · Attack Speed** · **39-63 Bonus-/Power-Werte lesbar (+1 % Speed, +8…11 % DPS, Power +418…+840)** · **64-77 „Level Too Low" — Account-Level-Gate** → §16 |
 | 4-5, 8-9 | weitere 07-05-Aufnahmen | — | nicht ausgewertet | — |
 | 10 | YouTube „ARROW PLAY" | — | nicht ausgewertet | — |
 
@@ -1376,3 +1378,295 @@ einzigen zusätzlichen Menüpunkt. Kostet nichts außer der Straße, die man ohn
 Alle Beschriftungen sind **deutsche HTML-Strings** mit `.goldtext`; es wurden **keine neuen
 Bilder generiert** — die Straße nutzt ausschließlich die 25 vorhandenen Assets plus
 CSS-Fallbacks.
+
+---
+
+## 15. Die komplette Leiter bis zur Spitze — Video 8
+
+**Quelle:** `ScreenRecording_07-25 15-59-29` · Drive-ID `1zInGsCyXefVkd58p9RIwf2wZ-azqbTMz`
+· 818 MB · Account *Netherghost*, **1 136 🏆**, Season „**Ice Season**", „Season Ends In 9d 10h".
+Der User hat die Trophäenstraße **in einem Zug von unten bis zum Ende durchgescrollt** —
+damit ist die Leiter erstmals vollständig belegt und muss nicht mehr extrapoliert werden.
+
+**Methode:** 218 Frames im 2-Sekunden-Raster, parallele Tesseract-OCR (`--psm 11`) plus
+zwei koordinatengeschnittene Durchläufe — einer nur auf den Ribbon-Streifen (Arena- und
+Tornamen), einer nur auf die linke Schiene (Skalenzahlen). Die Skalenzahlen sind der
+eigentliche Schlüssel: **AA setzt an jeder Torschwelle KEINE Skalenzahl.** Wo in der
+sonst lückenlosen Reihe eine Zahl fehlt, sitzt ein Tor. Damit lassen sich die
+Torschwellen exakt bestimmen, obwohl AA sie nirgends ausschreibt.
+
+### 15.1 Die Arenen — alle acht
+
+| Arena | AA-Name | Schwelle | Beleg |
+|---|---|---|---|
+| 1 | *Waterfall Vale* | **0 🏆** | Screenshot IMG_3294 |
+| 2 | *Dustfall Temple* | **300 🏆** | Screenshot IMG_3295 (Ribbon „Arena 2 · 🏆 300") |
+| 3 | *Sunken Atlantis* | **600 🏆** | Video 6 |
+| 4 | *Dock Drop* | **900 🏆** | Video 8, f_0071 ff.; konsistent mit „1 136 🏆 → Arena 4" |
+| 5 | *Aztec Grounds* | **1 200 🏆** | Video 6 |
+| 6 | *Inferno Pit* | **1 500 🏆** | Video 8, f_0104 (Ribbon neben Tick 1500) |
+| 7 | ***Storm Shroom*** | **2 000 🏆** | Video 8, f_0108-f_0113 — **NEU** |
+| 8 | ***Ice Brawl*** | **2 500 🏆** | Video 8, f_0115-f_0120 — **NEU** |
+
+Damit ist die Reihe **0 / 300 / 600 / 900 / 1 200 / 1 500 / 2 000 / 2 500**: unten ein
+starres 300er-Raster, ab Arena 6 auf 500er-Schritte gedehnt. Über Arena 8 folgt **keine
+neunte Arena**, sondern die Liga.
+
+Jede Arena-Sektion ist identisch aufgebaut (§14.2): Insel-Diorama, „Neutral"-Chip
+bzw. das aktive Map-Objective, magenta-violettes Ribbon „Arena N · 🏆 Schwelle",
+darunter das „Unlocks:"-Raster (4-6 Kacheln) und 2-4 Banner-Karten für Map Objectives
+(orange) und Trick Cards (violett), jede mit `(i)`-Knopf. Video 8 bestätigt für Arena 4
+zusätzlich die Karten *Fate Swap*, *Mirror Bound* und *Cursed Gust*.
+
+### 15.2 Die Liga „Champions Peak" — neun Tore plus Spitze
+
+Ab **2 900 🏆** wechselt die Straße die Sprache: keine Arenen mehr, sondern **Tore**.
+Der Kopf zeigt statt des Arena-Namens „**Champions Peak**" mit Season-Zeile.
+
+| Tor | AA-Name | Schwelle | wie belegt |
+|---|---|---|---|
+| 1 | *Entrance Gate* | **2 900** | Ribbon direkt gelesen (f_0123-f_0128) |
+| 2 | *Stonegate* | **3 500** | Ticks …3300, 3400, **—**, 3600… → 3500 fehlt |
+| 3 | *Ironpass* | **4 000** | Ticks …3800, 3900, **—**, 4100… |
+| 4 | *Bronzeward* | **4 500** | Ticks …4300, 4400, **—**, 4600… |
+| 5 | *Silverhold* | **5 000** | Ticks …4800, 4900, **—**, 5200… (Video 6 las „Silverfield") |
+| 6 | *Goldreach* | **6 000** | Ticks …5600, 5800, **—**, 6200… |
+| 7 | *Crystalpath* | **7 000** | Ticks …6600, 6800, **—**, 7200… |
+| 8 | *Flamegate* | **8 000** | Ticks …7600, 7800, **—**, 8200… |
+| 9 | *Stormcrest* | **9 000** | Ticks …8600, 8800, **—**, 9200… |
+| — | **Spitze / Straßenende** | **9 800** | letzter Tick, f_0194-f_0200 |
+
+> **⚠ Korrektur an §12/Video 6.** Die dort notierten Torschwellen (3400 / 3900 / 4600 /
+> 5400 / 7800 / 8800) waren aus dem Scroll-Fluss geschätzt. Video 8 zeigt sie über die
+> Tick-Lücken exakt: **3 500 / 4 000 / 4 500 / 5 000 / 6 000 / 7 000 / 8 000 / 9 000** —
+> AA legt die Tore auf **runde Zahlen**. Auch der Name lautet *Silverhold*, nicht
+> *Silverfield*.
+
+### 15.3 Wie die Liga optisch anders inszeniert wird
+
+Der Bruch ist deutlich und mit wenig Aufwand nachbaubar:
+
+| | Arena-Sektion | Liga-Tor |
+|---|---|---|
+| Ribbon | magenta/violett, breit | **dunkel**, schmaler, Steinoptik |
+| Bildmitte | Insel-**Diorama** einer Welt | **Tor-Emblem** (Steintor), kein Diorama |
+| Beschriftung | „Arena N" + Weltname | „Gate N" + Torname |
+| Kopfzeile | Weltname + Objective-Chip | „**Champions Peak**" + Season-Zeile |
+| „Unlocks" | ja, Raster mit Karten | **nein** — Tore schalten nichts frei |
+| Signatur | jede Arena eigenfarbig | einheitlich dunkel; **nur die Spitze** leuchtet |
+
+Die Liga ist damit **reiner Rang**, keine Content-Freischaltung mehr: ab hier klettert
+man um des Kletterns willen. Das ist auch die Stelle, an der AA die Season-Regel
+einblendet (§15.6).
+
+### 15.4 Knotenkadenz und Belohnungen
+
+Die Skalenzahlen belegen drei Zonen:
+
+| Bereich | Schrittweite | Beleg |
+|---|---|---|
+| 0 – ~1 500 🏆 | **50** | 50, 100, 150 … 1 150 lückenlos (f04-f43) |
+| ~1 500 – 5 000 🏆 | **100** | 1 600, 1 700 … 2 900, 3 100, 3 200 … 4 900 |
+| ab 5 000 🏆 | **200** | 5 200, 5 400, 5 600 … 9 600, 9 800 |
+
+Die Straße wird also nach oben **dünner**, nicht dichter — die Knoten bleiben ein
+Ereignis, statt zu verwässern. Das ergibt für den ganzen Aufstieg ≈ 30 + 35 + 24 ≈ **90
+Knoten** bis zur Spitze.
+
+Die Belohnungsmengen wachsen dabei sichtbar: auf den hohen Knoten stehen Multiplikatoren
+**×1 · ×3 · ×10 · ×20 · ×25 · ×30 · ×100 · ×250 · ×1.2K** neben den Symbolen. ×1 sind
+Truhen/Packs, die großen Zahlen Gold- und Materialmengen. Belohnungstypen selbst bleiben
+über die ganze Straße dieselben (Gold, Material, Truhen) — es skaliert nur die Menge.
+
+### 15.5 Leaderboard und Bottom-Nav
+
+Am Straßenende führt AA direkt in die **Champions-Peak-Rangliste**: Spitze
+**17 825 🏆** (*stone116*), dahinter 14 067, dann ein dichtes Feld 10 422 / 10 418 /
+10 311 / 10 265 / 10 246, ab Platz 8 unter 10 000 (9 905 / 9 845 / 9 427 / 9 386 …),
+Platz 24 noch bei 7 274.
+
+> **Wichtig für unsere Kalibrierung:** Die Straße endet bei 9 800, die Weltspitze steht
+> bei 17 825. **Über der Spitze geht es also weiter** — die Straße ist nicht das Ende des
+> Ratings, nur das Ende der Belohnungen. Wer 9 800 erreicht, sammelt ab da nur noch Rang.
+
+Die Bottom-Nav-Reihenfolge in dieser Aufnahme: **Shop · Collection · Battle (Mitte,
+größer) · Upgrade · Chests**. Wir haben sie 1:1 übernommen (Shop | Sammlung | START |
+Festung | Packs), die Schmiede hängt bei uns am Forge-Button der Sammlung.
+
+### 15.6 Die Season-Regel im Klartext
+
+Ein Tooltip auf der Liga-Seite (f_0213-f_0217), wörtlich:
+
+> „At the End of Each Season, Player's Trophies Will Be Reset Based on Their Current
+> Progress. They Can Climb Back Again and Collect Rewards."
+
+Also: **kein harter Reset auf 0**, sondern ein progressabhängiger Rückschnitt — und die
+Belohnungsknoten sind **erneut abholbar**. Das erklärt, warum AA so viel Aufwand in die
+Straße steckt: sie ist kein Einmal-Content, sondern der Season-Loop selbst.
+
+### 15.7 Umsetzung im Prototyp
+
+| Befund | Umsetzung in `ui_prototype.html` |
+|---|---|
+| 8 Arenen 0-2 500 | `ARENA_TIERS` — unsere Namen: Kristallhof 0 · Smaragdtal 300 · Saphirfeste 600 · Sturmspitze 900 · Obsidian-Thron 1200 · Prisma-Zitadelle 1500 · **Aschenmark 2000** · **Frostbastion 2500** |
+| 9 Tore + Spitze | `LEAGUE_NAME = "Prisma-Liga"`, `LEAGUE_GATES` — Eingangstor 2900 · Steintor 3500 · Eisenpfad 4000 · Bronzewacht 4500 · Silberhalt 5000 · Goldweite 6000 · Kristallpfad 7000 · Flammentor 8000 · Sturmkrone 9000 · **Prisma-Krone 9800** (`summit:true`) |
+| eigene Liga-Optik | `.gatesec` — dunkles Ribbon, `gate_emblem` statt Diorama, kein Unlock-Raster; nur `summit` trägt `summit_emblem` + Prisma-Akzent |
+| Kadenz 50→100→200 | `stepAt(t)`: `t < 1500 ? 50 : t < 5000 ? 100 : 200`, `ROAD_TOP = 9800` |
+| Mengen skalieren | `nodeReward(t)` — Gold `200 + 40 × ⌊t/50⌋`, Essenz `2 + ⌊t/300⌋`; Pack an jedem 250er, Silber an 500ern, Gold an 1000ern |
+| Namen der neuen Tiers | eigene deutsche Namen **im Geist von AAs Themen, nicht übersetzt** (Aschenmark ≈ *Storm Shroom*-Rolle, Frostbastion ≈ *Ice Brawl*) |
+| `(i)`-Teaser | `TEASERS` — je Arena 2-3 Karten mit **echtem deutschen Beschreibungssatz** und eigenem Teaser-Artwork |
+
+Die Straße rendert damit **18 Sektionen (8 Arenen + 10 Liga-Stufen) und ~72 Knoten** bis
+9 800 🏆 — von Playwright verifiziert.
+
+---
+
+## 16. Die Festungs-Upgrades im Detail — Video 9
+
+**Quelle:** `ScreenRecording_07-25 16-40-19` · Drive-ID `1NRDRmIM61flSodnDNuG2lZzjoFDAtFqC`
+· 524 MB · Account *Netherghost*, **Level 14**, 1 136 🏆 / 521 💎 / **1 918 🪙**, Arena 4
+*Dock Drop*. Die Aufnahme scrollt AAs „Upgrade"-Tab über **~40 Karten** hinweg durch und
+schließt damit §9.9, das bislang nur aus einem Video-6-Streifzug bestand.
+
+**Methode:** 88 Frames, OCR mit Koordinatenschnitt auf Kartenkopf / Bonuszeile /
+Power-Zeile / Kostenknopf.
+
+> **⚠ Wichtige Einschränkung, ehrlich notiert:** Der Goldstand blieb über die **ganze
+> Aufnahme konstant bei 1 918** — es wurde **nichts gekauft**. Die sonst zuverlässige
+> Methode (Kosten aus Kontostands-**Differenzen** ableiten, §13) war hier nicht möglich.
+> Die Kostenwerte stammen daher ausschließlich aus der OCR der stilisierten K-Schreibweise
+> („5&.51K", „6a.BIK", „PCS SIKG") und sind **unzuverlässig**. Belastbar sind nur:
+> Trackzahl, Bonuswerte, Power-Zuwächse und die Gating-Mechanik.
+
+### 16.1 Genau drei Tracks — nicht mehr
+
+Über alle 88 Frames erscheinen ausschließlich diese drei Kartentypen, im festen Zyklus
+**Max Health → DPS → Attack Speed → Max Health → …**:
+
+| AA-Track | Beschreibungstext (OCR) | Bonus je Stufe |
+|---|---|---|
+| **Max Health** | „Increases fortress health" | „+2.7 %" (fällt) |
+| **DPS** | „Increases fortress attack power" | „+11 %" → „+10 %" → „+8 %" |
+| **Attack Speed** | „Increases fortress attack speed" | konstant „+1 %" angezeigt |
+
+Es gibt **keine vierte Achse** (kein Range, kein Crit, keine Slots). Die Festung ist
+bewusst schmal gehalten — drei Zahlen, viele Stufen. Der feste Zyklus bedeutet außerdem:
+AA listet die Stufen **verschachtelt in einer einzigen langen Liste**, nicht in drei
+Spalten. Es gibt also keine „Stufe 40 von Track X" als eigene Ansicht — man scrollt eine
+gemeinsame Reihe.
+
+### 16.2 Die Kostengerade hält über den ganzen Bereich
+
+Video 6 zeigte die frühen Stufen sauber: **6 000 · 7 000 · 8 000 · 9 000 … 17 000** —
+also `6 000 + 1 000 × (Stufe − 1)` mit einem **gemeinsamen Zähler über alle drei Tracks**
+(Stufe 12 = 17 000 ✓). Video 9 zeigt auf den hohen Karten Werte im Bereich **20 K – 60 K**.
+Beides liegt auf derselben Gerade: Stufe 55 wäre 60 000. Die Reihe ist also **linear, ohne
+Knick** — kein exponentieller Sprung im Spätspiel.
+
+> Praktische Folge: Die Festung ist eine **planbare** Gold-Senke. Der Spieler kann
+> ausrechnen, was der nächste Block kostet — im Gegensatz zur Kartenaufwertung, deren
+> Kosten mit dem Level exponentiell steigen (§13).
+
+### 16.3 Power wächst mit, der Bonus schrumpft
+
+Der zweite große Befund: **„Power +N" ist keine Konstante.** Video 6 zeigte auf einer
+frühen Stufe „Power +170", Video 9 liest auf den hohen Karten:
+
+`+418 · +448 · +460 · +478 · +500 · +550 · +580 · +588 · +610 · +670 · +685 · +688 · +760 · +780 · +808 · +840`
+
+Das ist ein **linear wachsender** Zuwachs. Gleichzeitig **fällt** der prozentuale Bonus
+(DPS 17 % → 11 % → 10 % → 8 %). AA kombiniert also zwei Kurven:
+
+* **Power** (die angezeigte Gesamtstärke) wächst pro Stufe immer stärker → der Balken
+  fühlt sich nie flach an;
+* der **echte Effekt** pro Stufe sinkt → der abnehmende Grenznutzen bleibt erhalten.
+
+Das ist ein bemerkenswert sauberer Trick: die Zahl, die der Spieler feiert, wächst; die
+Zahl, die das Balancing tragen muss, flacht ab.
+
+### 16.4 Gating: AA gatet über das ACCOUNT-LEVEL
+
+Ab Frame f_0064 tragen alle weiteren Karten den Sperrtext „**Level Too Low**" — nicht
+„not enough trophies", nicht „reach Arena N". Der Account war **Level 14**. AA bindet die
+Festungsstufen also an das **Account-Level** (XP-Fortschritt), nicht an Trophäen.
+
+> **Bewusste Abweichung bei uns.** Der Prototyp hat **kein Account-Level** — eine
+> Kennzahl, die wir nicht führen, kann nichts gaten. Wir behalten daher **Trophäen-Gates**
+> und verteilen sie über die volle Leiter aus §15. Das ist funktional äquivalent (beides
+> ist „spiele weiter, dann darfst du mehr kaufen") und erspart uns ein zweites
+> Fortschrittssystem. Falls später ein Account-Level dazukommt, ist der Umbau eine Zeile
+> in `GATES`.
+
+### 16.5 UI-Struktur — und warum wir sie nicht kopieren
+
+AAs Upgrade-Screen ist funktional, aber der **schwächste Screen des Spiels**:
+
+* eine lange, gleichförmige Liste; **eine Karte pro Stufe**, drei Tracks verschachtelt
+* **winziges Icon** links (ca. 1/8 der Kartenbreite), viel leere Fläche rechts
+* Bonuszeile, Power-Zeile, Kostenknopf „Upgrade" — kein Bild, keine Bühne
+* der Kauf quittiert mit einem kleinen Zahlensprung; **nichts verändert sich visuell**
+
+Der User hat das ausdrücklich kritisiert („zu leer, kleine Icons, viel freier
+Hintergrund"). Wir übernehmen deshalb **nur die Mathematik**, nicht das Layout — siehe
+§16.7.
+
+### 16.6 Kalibrierung von `arena_fortress.js` auf Lv 100
+
+| Konstante | Wert | Begründung |
+|---|---|---|
+| `LEVELS_PER_TRACK` | **100** | User-Vorgabe: bis Stufe 100 je Track |
+| `TOTAL_CAP` | **300** | 3 × 100, gemeinsamer Zähler wie AA |
+| `COST_BASE` / `COST_STEP` | **6 000 / 1 000** | AA-Gerade, in beiden Videos bestätigt |
+| `DECAY` | **0.977** | AAs DPS 17 % → 8 % über ~30 Stufen; Stufe 100 = 0.977⁹⁹ ≈ 9.9 % des Startbonus |
+| `POWER_PER_STEP` / `POWER_GROW` | **170 / 6** | `powerAt(n) = 170 + 6 × (n−1)`: Stufe 1 = 170 (Video 6), Stufe 42 = 416, Stufe 100 = 764 — deckt AAs gelesene 418…840 ab |
+
+Daraus folgt für den Vollausbau: Gesamtkosten **46 650 000 Gold**, Gesamt-Power
+`powerSum(300)` = **320 100**, Multiplikatoren **HP ×3.354 · Prisma-Schaden ×4.139 ·
+Prisma-Tempo ×2.962**. Die 15 Trophäen-Tore staffeln je 20 Stufen über die Leiter aus §15:
+
+`0 · 300 · 600 · 900 · 1200 · 1500 · 2000 · 2500 · 2900 · 3500 · 4500 · 5000 · 6000 · 7000 · 9000 🏆`
+
+Alle Selbsttests in `arena_fortress.js` laufen grün (`node arena_patches/arena_fortress.js`),
+inklusive neuer AA-Anker-Assertions („DPS Stufe 1 ≈ 8 %, Stufe 30 ≈ 4 %").
+
+### 16.7 Unser Gegenentwurf: „Lebende Burg + Kristall-Konstellation"
+
+Statt AAs Liste (User-Entscheidung, Layout „1+3 kombiniert"):
+
+**A) LEBENDE BURG** — ein schwebendes Burg-Diorama oben, das sich **mit den Ausbaustufen
+sichtbar verändert**. Umgesetzt als **Ebenen-Stapel**: Basis-Artwork plus reine CSS/DOM-
+Overlays, eines je Track.
+
+| Track | Overlay | wächst mit |
+|---|---|---|
+| Burg-Stabilität | Schild-Schimmer (`#fxShield`) + Kristall-Anbauten an den Mauern (`.wallcrystal`) | Radius und Anzahl steigen mit dem HP-Level |
+| Prisma-Fokus | vertikaler Prisma-Strahl über dem Dach (`#fxBeam`) | Breite 5→27 %, Höhe 16→62 %, Glow 4→24 px |
+| Prisma-Taktung | **Puls-Tempo desselben Strahls** | `animation-duration` 1.60 s → 0.55 s |
+
+Beim Kauf: Lichtstrahl vom gekauften Knoten zur Burg (`.buyray`) plus Glow-Puls
+(`.justbought`).
+
+**B) KRISTALL-KONSTELLATION** — die drei Tracks als **Äste** mit einem Kristall-Knoten je
+Stufe, vertikal scrollbar (dasselbe Muster wie die Trophäenstraße): gekauft = golden
+glühend, nächste = pulsierend mit Kostenknopf, gesperrt = dunkel; Trophäen-Tore als
+Schloss-Symbol auf dem Ast; **alle 10 Stufen ein größerer Meilenstein-Kristall**. Die
+Knoten sind **Daten**, das Layout generisch — 100 Stufen je Track sind reine Fensterung
+(`WINDOW_BEFORE = 6`, `WINDOW_AFTER = 14`). Die drei großen Track-Embleme sitzen als
+Ast-Köpfe (~1/3 Kartenbreite).
+
+**C) SKIN-ARCHITEKTUR** — die Burg ist **nirgends hart verdrahtet**. `window.CastleSkins`
+liefert `{key, name, img, anchors}`; **alle** Overlays positionieren sich über
+**Prozent-Anker** der Bühne, nie über Pixel:
+
+```js
+anchors: {
+  prismTip: { x: 50, y: 30 },              // Ansatz des Prisma-Strahls
+  shield:   { x: 50, y: 62 },              // Zentrum des Schild-Schimmers
+  walls: [ {x:30,y:74}, {x:70,y:74}, … ]   // Ankerpunkte der Kristall-Anbauten
+}
+```
+
+Ein späterer Verkaufs-Skin besteht damit aus **1 Artwork + 1 Anker-Objekt** und
+funktioniert sofort mit allen 100 Ausbaustufen — die Upgrade-Optik ist nicht ins Artwork
+eingebacken, sonst müsste jeder Skin in n Stufen gemalt werden. Auswahl liegt in
+`localStorage "arenaSkins"`. Details im HANDOFF.

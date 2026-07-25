@@ -335,7 +335,7 @@ footer{padding:6px 12px 14px;text-align:center}
   background-image:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);
   box-shadow:0 4px 0 #6d551a;display:flex;align-items:center;justify-content:center}
 .battlebtn:active{transform:translateY(2px);box-shadow:0 2px 0 #6d551a}
-.ladder{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:16px 14px 0}
+.ladder{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:16px 14px 0}
 .rung{position:relative;border-radius:11px;overflow:hidden;aspect-ratio:16/10;border:1px solid #2b3b47;
   background-repeat:no-repeat;background-position:center;background-size:cover,cover;
   background-image:linear-gradient(150deg,#243342,#111a21);display:flex;flex-direction:column;
@@ -520,6 +520,219 @@ footer{padding:6px 12px 14px;text-align:center}
 .objcard .oart{flex:0 0 auto;font-size:26px;filter:drop-shadow(0 2px 3px #0009)}
 .roadmore{text-align:center;color:#7e93a4;font-size:20px;letter-spacing:.5em;
   padding:10px 0 18px}
+
+/* ==================================================================
+ * KRISTALL-ICONS (Asset-Batch 2)
+ * ------------------------------------------------------------------
+ * Alle Emojis der Meta-UI sind durch generierte Kristall-Icons ersetzt.
+ * Technik: <img> mit `alt` = Original-Emoji und `onerror` -> UIIcon.fail(),
+ * das das <img> gegen ein <span> mit dem Emoji tauscht. Laedt das CDN
+ * nicht, sieht man also weiterhin das Emoji.
+ * `mix-blend-mode:screen` loest den dunklen #0e1418-Grund der Icons auf
+ * dunklem UI-Grund praktisch auf — kein Freistellen noetig.
+ * ================================================================== */
+.ico{width:1.25em;height:1.25em;object-fit:contain;display:inline-block;
+  vertical-align:-.26em;mix-blend-mode:screen}
+.ico.big{width:1.9em;height:1.9em;vertical-align:-.5em}
+.ico.xl{width:2.6em;height:2.6em;vertical-align:-.7em}
+span.ico{mix-blend-mode:normal;text-align:center}
+
+/* ==================================================================
+ * INTERAKTIONS-EBENE (eine Schicht fuer alles Klickbare)
+ * ------------------------------------------------------------------
+ * .pressable  -> aktiv: scale(.96) + brightness(.85), 90 ms
+ * disabled    -> entsaettigt, keine Events
+ * Tap-Funken  -> reine CSS-Partikel (kein canvas), window.UIFx.spark()
+ * Klick-Sound -> window.UISfx.tap/confirm/deny/reward (WebAudio-Blips)
+ * Red-Dots    -> window.UIBadge.set(navKey, n)
+ * Beim Einbau ins Spiel nur window.UISfx auf die echte SFX-Engine
+ * umhaengen — die Funktionsnamen sind absichtlich dieselben.
+ * ================================================================== */
+.pressable{transition:transform 90ms ease,filter 90ms ease;
+  -webkit-user-select:none;user-select:none}
+.pressable.pressed{transform:scale(.96);filter:brightness(.85)}
+.pressable[disabled],.pressable.is-disabled{filter:grayscale(.8) brightness(.62);
+  pointer-events:none}
+#fxLayer{position:fixed;inset:0;pointer-events:none;z-index:200;overflow:hidden}
+.sparkdot{position:absolute;width:6px;height:6px;border-radius:50%;
+  background:radial-gradient(circle,#fff7d6,#e0b94a 55%,#e0b94a00 70%);
+  animation:sparkfly 460ms ease-out forwards;will-change:transform,opacity}
+@keyframes sparkfly{
+  0%{transform:translate(0,0) scale(1);opacity:1}
+  100%{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+
+/* ---------- Liga-Sektion (Champions, §15.3) ---------- */
+.arenasec.league{border-top-color:#e0b94a66}
+.arenasec.league .ribbon{
+  background-image:linear-gradient(180deg,#3a4358,#1d2333 55%,#0f1420);
+  box-shadow:0 5px 14px -4px #000c,inset 0 0 0 1px #e0b94a4d}
+.arenasec.league.summit .ribbon{
+  background-image:linear-gradient(90deg,#8d2f6e,#7a4fd6 30%,#3d9df2 55%,#58c26a 72%,#f2a13d 88%,#ff5e7e);
+  box-shadow:0 6px 18px -4px #000c,inset 0 0 0 1px #fff7d6aa,0 0 26px -4px #ffffff55}
+.gateemblem{width:96px;height:96px;background-repeat:no-repeat;background-position:center;
+  background-size:contain,contain;
+  background-image:radial-gradient(circle,#2c3a4b,#131c25 70%);
+  filter:drop-shadow(0 8px 14px #000a)}
+.leaguehead{margin-top:6px;font-size:12px;letter-spacing:.2em}
+.seasonline{margin-top:5px;font-size:10px;color:#9fb3c1;letter-spacing:.04em}
+
+/* ---------- SHOP (§8) ---------- */
+.shopsec{margin:14px 0 4px;display:flex;align-items:center;gap:8px}
+.shopsec .sh{font-size:12.5px;letter-spacing:.14em}
+.shopsec .timer{margin-left:auto;font-size:10px;color:var(--dim);background:var(--panel);
+  border:1px solid var(--line);border-radius:8px;padding:4px 8px;font-weight:700}
+.dealgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.shopcard{border-radius:12px;border:1px solid var(--line);background:linear-gradient(180deg,#1b2732,#131c25);
+  padding:9px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;
+  background-repeat:no-repeat;background-position:center;background-size:100% 100%,100% 100%}
+.shopcard .sart{font-size:26px;line-height:1.1}
+.shopcard .snm{font-size:10.5px;font-weight:800;color:#dbe6ef;line-height:1.25}
+.shopcard .savail{font-size:9px;color:var(--dim);font-weight:700}
+.shopcard .sbuy{margin-top:3px;width:100%;border-radius:9px;padding:6px 0;font-size:12px;
+  font-weight:900;background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);
+  color:#3a2b07;box-shadow:0 2px 0 #6d551a}
+.shopcard .sbuy.gems{background:linear-gradient(180deg,#f5a7f7,#dc1ddb 55%,#8d1c78);color:#fff;
+  box-shadow:0 2px 0 #5e1152;text-shadow:0 1px 2px #0008}
+.shopcard.sold{filter:grayscale(.7) brightness(.6)}
+.packshop{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.packshop .shopcard .sart{font-size:34px}
+.packshop .promise{font-size:8.5px;color:#a9bccb;line-height:1.3}
+.freebadge{position:absolute;right:-4px;top:-6px;background:var(--up);color:#06280a;
+  font-size:8.5px;font-weight:900;border-radius:8px;padding:1px 5px}
+.decorow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+.decotile{border-radius:11px;border:1px dashed #35485a;background:#111a21;padding:9px 6px;
+  text-align:center;font-size:9.5px;color:var(--dim);font-weight:700}
+.decotile .dart{display:block;font-size:22px;margin-bottom:3px}
+
+/* ---------- FESTUNG (§9.9) ---------- */
+.castlewrap{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:16/9;
+  background-repeat:no-repeat;background-position:center;background-size:cover,cover;
+  background-image:linear-gradient(165deg,#243342,#0e1418 75%);
+  border:1px solid #ffffff1a;box-shadow:0 14px 26px -12px #000c,0 0 30px -8px #e0b94a33}
+.castlewrap .pw{position:absolute;left:0;right:0;bottom:0;padding:8px 12px;
+  background:linear-gradient(180deg,#0e141800,#0e1418e8);display:flex;align-items:baseline;gap:8px}
+.castlewrap .pw b{font-size:19px}
+.castlewrap .pw span{font-size:10px;color:var(--dim);letter-spacing:.1em;font-weight:800;
+  text-transform:uppercase}
+.fortcard{margin-top:10px;border-radius:13px;border:1px solid var(--line);
+  background:linear-gradient(180deg,#1b2732,#131c25);padding:10px 11px;
+  background-repeat:no-repeat;background-position:center;background-size:100% 100%,100% 100%}
+.fortcard .fh{display:flex;align-items:center;gap:8px}
+.fortcard .fh .fn{font-size:14px;font-weight:900;flex:1;min-width:0}
+.fortcard .fh .flv{font-size:10.5px;font-weight:900;color:#0e1418;background:#e0b94a;
+  border-radius:7px;padding:2px 7px;letter-spacing:.03em}
+.fortcard .fd{font-size:10.5px;color:var(--dim);margin-top:3px;line-height:1.4}
+.fortcard .frow{display:flex;gap:8px;margin-top:8px}
+.fortcard .fstat{flex:1;background:#0e1418a6;border:1px solid #26343f;border-radius:9px;
+  padding:5px 8px}
+.fortcard .fstat .k{font-size:8.5px;color:var(--dim);letter-spacing:.09em;font-weight:800;
+  text-transform:uppercase}
+.fortcard .fstat .v{font-size:13px;font-weight:900;margin-top:1px}
+.fortcard .fstat .v em{font-style:normal;color:var(--up)}
+.fortcard .fbuy{margin-top:9px;width:100%;border-radius:10px;padding:9px 0;font-size:13px;
+  font-weight:900;background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);
+  color:#3a2b07;box-shadow:0 3px 0 #6d551a}
+.fortcard .fbuy.locked{background:linear-gradient(180deg,#3a4a58,#222e39);color:#8fa0ad;
+  box-shadow:0 3px 0 #16202a}
+.fortcard .fbuy.maxed{background:linear-gradient(180deg,#58c26a,#2f7a3c);color:#04210a;
+  box-shadow:0 3px 0 #1c4e26}
+.fortnote{margin-top:12px;font-size:10.5px;color:var(--dim);line-height:1.55}
+
+/* ==================================================================
+ * LEBENDE BURG — Ebenen-Stapel (Layout "1+3", Teil A)
+ * ------------------------------------------------------------------
+ * Basis ist EIN Burg-Artwork; darüber liegen reine CSS/DOM-Overlays,
+ * eines je Ausbau-Track. Sie wachsen mit dem Level:
+ *   Burg-HP      → Schild-Schimmer + Kristall-Anbauten an den Mauern
+ *   Prisma-Dmg   → vertikaler Prisma-Strahl über dem Dach (Breite+Glow)
+ *   Prisma-Tempo → Pulsgeschwindigkeit desselben Strahls
+ * ALLE Overlays positionieren sich über PROZENT-ANKER aus
+ * window.CastleSkins — nie über feste Pixel. Ein neuer Skin liefert
+ * daher nur {img + anchors} und funktioniert sofort mit allen Stufen.
+ * ================================================================== */
+.castlestage{position:relative;margin:2px auto 0;width:86%;max-width:320px;aspect-ratio:16/10;
+  border-radius:18px;overflow:visible;
+  background-repeat:no-repeat;background-position:center;background-size:cover,cover;
+  background-image:linear-gradient(160deg,#2c3a4b,#131c25);
+  border:1px solid #ffffff1f;
+  box-shadow:0 18px 30px -10px #000c,0 0 34px -6px #e0b94a3d;
+  transform:perspective(700px) rotateX(4deg)}
+.castlestage::after{content:"";position:absolute;left:12%;right:12%;bottom:-13px;height:14px;
+  border-radius:50%;background:radial-gradient(ellipse,#000000a6,#0000);pointer-events:none}
+/* Prisma-Strahl (Anker prismTip) */
+.prismbeam{position:absolute;transform:translate(-50%,-100%);transform-origin:50% 100%;
+  pointer-events:none;border-radius:50% 50% 6px 6px;
+  background:linear-gradient(180deg,#ffffff00,#fff7d6cc 35%,#e0b94aee 70%,#7a4fd6cc);
+  animation:beampulse 1.6s ease-in-out infinite;mix-blend-mode:screen}
+@keyframes beampulse{0%,100%{opacity:.55;filter:blur(.6px)}50%{opacity:1;filter:blur(0)}}
+/* Schild-Schimmer (Anker shield) */
+.shieldglow{position:absolute;transform:translate(-50%,-50%);border-radius:50%;
+  pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(circle,#8fd0ff55,#8fd0ff18 55%,#0000 72%);
+  animation:shieldbreathe 2.8s ease-in-out infinite}
+@keyframes shieldbreathe{0%,100%{opacity:.45}50%{opacity:.9}}
+/* Kristall-Anbauten (Anker walls[]) */
+.wallcrystal{position:absolute;transform:translate(-50%,-100%);pointer-events:none;
+  background:linear-gradient(180deg,#dff0ff,#7ab6e8 55%,#2d5f8f);
+  clip-path:polygon(50% 0,100% 42%,78% 100%,22% 100%,0 42%);
+  filter:drop-shadow(0 0 6px #8fd0ff88)}
+/* Kauf-Feedback: Lichtstrahl zur Burg + Glow-Puls */
+.castlestage.justbought{animation:castlepulse .9s ease-out}
+@keyframes castlepulse{0%{filter:brightness(1)}
+  30%{filter:brightness(1.5) drop-shadow(0 0 26px #e0b94a)}100%{filter:brightness(1)}}
+.buyray{position:fixed;z-index:150;pointer-events:none;width:3px;transform-origin:50% 100%;
+  background:linear-gradient(180deg,#fff7d600,#fff7d6ee 40%,#e0b94a);
+  animation:rayfly .55s ease-out forwards}
+@keyframes rayfly{0%{opacity:0;transform:scaleY(.2)}35%{opacity:1}100%{opacity:0;transform:scaleY(1)}}
+
+/* ==================================================================
+ * KRISTALL-KONSTELLATION (Layout "1+3", Teil B)
+ * ------------------------------------------------------------------
+ * Die drei Tracks als Äste mit einem Kristall-KNOTEN pro Stufe, die zur
+ * Burg hinaufführen. Vertikal scrollbar, gleiches Muster wie die
+ * Trophäenstraße. Skaliert auf 100 Stufen/Track: die Knoten sind Daten,
+ * das Layout ist generisch.
+ * ================================================================== */
+.constell{margin-top:14px}
+.branch{margin-top:12px;border-radius:14px;border:1px solid var(--line);
+  background:linear-gradient(180deg,#18222c,#111a21);overflow:hidden}
+.branchhead{display:flex;align-items:center;gap:10px;padding:10px 11px;
+  background:linear-gradient(180deg,#22303d,#18222c)}
+.branchhead .bico{flex:0 0 33%;max-width:96px;aspect-ratio:1/1;border-radius:12px;
+  background-repeat:no-repeat;background-position:center;background-size:contain,contain;
+  background-image:radial-gradient(circle,#2c3a4b,#131c25 72%);
+  display:flex;align-items:center;justify-content:center;font-size:30px;
+  box-shadow:inset 0 0 0 1px #e0b94a3d}
+.branchhead .btx{flex:1;min-width:0}
+.branchhead .bnm{font-size:14.5px;font-weight:900}
+.branchhead .bsub{font-size:10px;color:var(--dim);margin-top:2px;line-height:1.4}
+.branchhead .bstat{margin-top:4px;font-size:11px;font-weight:900}
+.branchhead .bstat em{font-style:normal;color:var(--up)}
+.branchrail{position:relative;padding:10px 10px 12px 30px;max-height:190px;overflow-y:auto}
+.branchrail::before{content:"";position:absolute;left:14px;top:0;bottom:0;width:4px;
+  border-radius:2px;background:linear-gradient(180deg,#8a6a1f,#e0b94a 45%,#3a4a58)}
+.knot{position:relative;display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.knot .kd{position:absolute;left:-20px;width:14px;height:14px;border-radius:50%;
+  background:radial-gradient(circle,#3a4a58,#1b2735);box-shadow:0 0 0 1px #ffffff1f}
+.knot.done .kd{background:radial-gradient(circle,#fff7d6,#e0b94a 60%,#8a6a1f);
+  box-shadow:0 0 10px #e0b94aaa}
+.knot.next .kd{background:radial-gradient(circle,#ffffff,#8fd0ff 60%,#2d5f8f);
+  animation:knotpulse 1.3s ease-in-out infinite}
+@keyframes knotpulse{0%,100%{box-shadow:0 0 0 0 #8fd0ff00}50%{box-shadow:0 0 0 7px #8fd0ff44}}
+.knot.milestone .kd{width:20px;height:20px;left:-23px;
+  clip-path:polygon(50% 0,100% 35%,82% 100%,18% 100%,0 35%);border-radius:0}
+.knot .kl{flex:1;min-width:0;font-size:10.5px;color:#9fb3c1;font-weight:700;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.knot.done .kl{color:#dbe6ef}
+.knot .kbuy{border-radius:8px;padding:5px 10px;font-size:11px;font-weight:900;
+  background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);color:#3a2b07;
+  box-shadow:0 2px 0 #6d551a}
+.knot .kgate{font-size:10px;font-weight:900;color:#e0b94a;background:#0e1418a6;
+  border:1px solid #e0b94a44;border-radius:8px;padding:3px 8px;white-space:nowrap}
+.knot.milestone .kl{color:#fff7d6;font-weight:900}
+.skinbar{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:10.5px;
+  color:var(--dim)}
+.skinbar select{flex:0 0 auto}
 </style>
 </head>
 <body>
@@ -533,10 +746,30 @@ footer{padding:6px 12px 14px;text-align:center}
        (Feld 2 magenta #DC1DDB = Gem, Feld 3 goldgelb #F3B733 = Münze).
        Demo-Werte entsprechen dem Video-11-Account (1136 🏆 → Arena 4). -->
   <div class="topbar">
-    <div class="cur"><i>🏆</i><span id="curTrophies">0</span></div>
-    <div class="cur"><i style="color:var(--gem)">💎</i><span id="curGems">0</span><span class="plus">+</span></div>
-    <div class="cur"><i style="color:var(--gold)">🪙</i><span id="curGold">0</span><span class="plus">+</span></div>
+    <div class="cur"><i data-ico="cur_trophy" data-emoji="🏆"></i><span id="curTrophies">0</span></div>
+    <div class="cur"><i data-ico="cur_gem" data-emoji="💎"></i><span id="curGems">0</span><span class="plus">+</span></div>
+    <div class="cur"><i data-ico="cur_gold" data-emoji="🪙"></i><span id="curGold">0</span><span class="plus">+</span></div>
   </div>
+
+  <!-- ===== VIEW S: SHOP (§8) =====
+       Nach AAs Aufbau (Daily Deals -> Truhen/Packs -> Bundles), aber an
+       UNSERE Systeme angepasst: kein Echtgeld, alles laeuft gegen die
+       Demo-Wallet (Gold/Gems) bzw. ArenaCards. Der Pity-Stand steht OFFEN
+       auf den Packs — AAs Muster (§8.2), statt Prozent-Drop-Raten. -->
+  <section id="viewShop" class="view">
+    <h2 class="title">Shop</h2>
+    <div class="shopsec"><span class="sh goldtext">Tagesangebote</span>
+      <span class="timer" id="dealTimer">Neue Angebote in 6h 58m</span></div>
+    <div class="dealgrid" id="dealGrid"></div>
+
+    <div class="shopsec"><span class="sh goldtext">Booster-Packs</span>
+      <span class="timer" id="packPity">…</span></div>
+    <div class="packshop" id="packShop"></div>
+
+    <div class="shopsec"><span class="sh goldtext">Währungen</span></div>
+    <div class="decorow" id="decoRow"></div>
+    <p class="fortnote" id="shopNote">—</p>
+  </section>
 
   <!-- ===== VIEW 0: HOME — Status-Arenen (§9.4 / §9.5b) =====
        WICHTIG: Die Match-Welten von Arcane Prism TD sind RANDOM pro Spiel.
@@ -554,7 +787,7 @@ footer{padding:6px 12px 14px;text-align:center}
            Key-Art nicht und legt sie NICHT vollflächig hinter den Screen. -->
       <button class="diorama" id="arenaDiorama" title="Arena-Rang"></button>
       <div class="progwrap">
-        <span style="font-size:15px">🏆</span>
+        <i data-ico="cur_trophy" data-emoji="🏆" style="font-size:15px"></i>
         <div class="progbar" id="arenaProg">
           <div class="progfill" id="arenaProgFill" style="width:0%"></div>
           <div class="proglabel" id="arenaProgLabel">—</div>
@@ -648,13 +881,44 @@ footer{padding:6px 12px 14px;text-align:center}
     <div class="summary" id="packSummary" style="display:none"></div>
   </section>
 
+  <!-- ===== VIEW F: FESTUNG (§9.9) =====
+       AAs eigener Bottom-Nav-Tab "Upgrade": die Burg des Spielers als
+       DRITTE Progressionsachse neben Kartenlevel und Kartenraritaet.
+       Die Logik liegt vollstaendig in arena_fortress.js (window.ArenaFortress);
+       dieser View ist reine Praesentation. Mehr Stufen sind spaeter NUR
+       Daten — die Karten rendern generisch aus allTracks(). -->
+  <section id="viewFortress" class="view">
+    <h2 class="title">Festung</h2>
+    <!-- A) LEBENDE BURG: Basis-Artwork + Overlay-Ebenen je Track.
+         Alle Overlays sitzen auf PROZENT-ANKERN aus window.CastleSkins —
+         ein neuer Skin liefert nur {img + anchors} und passt sofort. -->
+    <div class="castlestage" id="castleStage">
+      <div id="castleFx"></div>
+    </div>
+    <div class="castlewrap" id="castleArt" style="aspect-ratio:auto;background:none;border:0;box-shadow:none;margin-top:10px">
+      <div class="pw" style="position:static;background:none;padding:6px 2px">
+        <b class="goldtext" id="fortPower">0</b><span>Festungs-Power</span>
+        <span style="margin-left:auto" id="fortSteps">0/300 Stufen</span></div>
+    </div>
+    <!-- B) KRISTALL-KONSTELLATION: drei Äste mit einem Knoten je Stufe. -->
+    <div class="constell" id="fortTracks"></div>
+    <div class="skinbar"><span>Burg-Skin:</span>
+      <select class="mini sel" id="skinSel" aria-label="Burg-Skin"></select>
+      <span id="skinNote"></span></div>
+    <p class="fortnote" id="fortNote">—</p>
+  </section>
+
   <!-- ===== Bottom-Nav ===== -->
+  <!-- Bottom-Nav in AAs Ordnung (IMG_3292): Shop | Karten | START (mittig,
+       erhoeht, groesser) | Festung | Packs. Die Schmiede bleibt ueber den
+       Forge-Button in der Sammlung erreichbar, die Turm-Detailkarte ueber
+       jede Karte — genau wie AA es macht. -->
   <nav class="bottom" style="grid-template-columns:repeat(5,1fr)">
-    <button id="navHome" class="on"><i>🏛</i>Start</button>
-    <button id="navCollection"><i>🗂</i>Sammlung<span id="navBadge" class="nb" style="display:none">0</span></button>
-    <button id="navTower"><i>🗼</i>Turm</button>
-    <button id="navForge"><i>⚒</i>Schmiede</button>
-    <button id="navPack"><i>🎁</i>Packs</button>
+    <button id="navShop"><i data-ico="hub_shop" data-emoji="🛒"></i>Shop<span id="badgeShop" class="nb" style="display:none">0</span></button>
+    <button id="navCollection"><i data-ico="nav_collection" data-emoji="🗂"></i>Sammlung<span id="navBadge" class="nb" style="display:none">0</span></button>
+    <button id="navHome" class="on nav-center"><i data-ico="nav_home" data-emoji="🏛"></i>Start</button>
+    <button id="navFortress"><i data-ico="nav_tower" data-emoji="🗼"></i>Festung</button>
+    <button id="navPack"><i data-ico="nav_packs" data-emoji="🎁"></i>Packs<span id="badgePack" class="nb" style="display:none">0</span></button>
   </nav>
 </div>
 
@@ -745,9 +1009,12 @@ footer{padding:6px 12px 14px;text-align:center}
   </div>
 </div>
 
+<div id="fxLayer"></div>
+
 <div class="toast" id="toast"></div>
 
 <script src="./arena_cards.js"></script>
+<script src="./arena_fortress.js"></script>
 <script>
 (function () {
   "use strict";
@@ -859,7 +1126,203 @@ footer{padding:6px 12px 14px;text-align:center}
     arena4:         CDN + "hf_20260725_095808_72fb7754-d381-4be7-b741-6ff63150bcfb.png",
     arena5:         CDN + "hf_20260725_095811_7a6408ea-43bf-45d2-b9e3-e02d03d0f9c7.png",
     arena6:         CDN + "hf_20260725_095815_26d38ce0-2889-4351-8b4c-ac50183d32ea.png",
+    /* ---- Asset-Batch 2 (Icons, Strassen-Elemente, Teaser-Artworks,
+       Leiter-Ergaenzung, Kleinkram) — siehe ui_assets.json ---- */
+    cur_trophy:      CDN + "hf_20260725_132705_cc44c539-2646-40d1-b0ff-6b81510c0307.png",
+    cur_gem:         CDN + "hf_20260725_132708_f9dde68c-0307-479c-ad15-ca6f547df349.png",
+    cur_gold:        CDN + "hf_20260725_132711_78da253c-5269-46c7-9d6a-eb30eb27bb56.png",
+    ess_attack:      CDN + "hf_20260725_132812_0dd1e9db-ca2f-4d32-9132-8de9d1d1e9f6.png",
+    ess_speed:       CDN + "hf_20260725_132813_d75a56de-91cb-4f9a-a716-59ef4d75a649.png",
+    ess_special:     CDN + "hf_20260725_132814_976ad394-6e0a-4f76-943e-298eebf93410.png",
+    cur_xp:          CDN + "hf_20260725_132815_3b34ad3b-cdf3-4b5d-be12-9cb6b0237543.png",
+    nav_home:        CDN + "hf_20260725_132917_72f50976-9f2a-4278-891a-143342fda7c4.png",
+    nav_collection:  CDN + "hf_20260725_132918_511b5e7c-2c37-4f34-9d39-40b21155eac5.png",
+    nav_tower:       CDN + "hf_20260725_132919_6cb19273-0d12-4073-8231-d2e56424d692.png",
+    nav_forge:       CDN + "hf_20260725_132919_8a81e259-5be8-43e2-b797-bb957dccebda.png",
+    nav_packs:       CDN + "hf_20260725_132921_1a1ee40d-26a4-4e4f-bcad-53257fd22928.png",
+    hub_pass:        CDN + "hf_20260725_133025_671bafbb-8c27-4cff-8923-afab6d9f5c7b.png",
+    hub_mail:        CDN + "hf_20260725_133026_25da2335-2caa-4a3c-9107-ada8980bf4f6.png",
+    hub_clan:        CDN + "hf_20260725_133027_22a8d954-80b4-4d56-9043-6d90eb809856.png",
+    hub_events:      CDN + "hf_20260725_133029_f8199f4f-c610-4639-891e-3dfb69d8bbb7.png",
+    hub_challenges:  CDN + "hf_20260725_133030_a6c88f92-fb28-4d0e-84ef-c1a44034ef79.png",
+    hub_shop:        CDN + "hf_20260725_133134_c4dd57e8-7213-4769-b4c3-d2de067d6c26.png",
+    hub_leaderboard: CDN + "hf_20260725_133135_123fa2d4-5a7f-43d2-9fe4-2b9643a61a68.png",
+    hub_settings:    CDN + "hf_20260725_133135_db2d0a40-931f-439e-88d7-b6e5d7c7496d.png",
+    road_platform:   CDN + "hf_20260725_133136_11a05067-59c0-4049-a72a-9cdfc1afb81a.png",
+    prop_fire:       CDN + "hf_20260725_133137_7133f405-242a-4360-af65-7d0344f37d32.png",
+    prop_pouch:      CDN + "hf_20260725_133312_5c702ceb-1ca1-42d2-8753-bd3d6fc8bf4e.png",
+    prop_rune:       CDN + "hf_20260725_133312_cb122820-65dd-49b6-9047-c7f5ef253876.png",
+    prop_obelisk:    CDN + "hf_20260725_133313_0543d8f8-218d-44cd-a48f-51691e0aa3a6.png",
+    hex_slot:        CDN + "hf_20260725_133314_61df2470-d52e-46b7-8d39-adbc96da66bf.png",
+    arena_crest:     CDN + "hf_20260725_133315_995dd402-303e-4619-b57a-8ab08ab66483.png",
+    chest_bronze:    CDN + "hf_20260725_133419_c6ce951d-516e-44ba-b8cc-149219299e48.png",
+    tz_frenzy:       CDN + "hf_20260725_133422_9f9d2b66-9df7-4f29-8ae3-b0201f5a96d7.png",
+    tz_bounty:       CDN + "hf_20260725_133423_95e3a49d-8dd5-4ee5-b93f-3ad894e0c1eb.png",
+    tz_straight:     CDN + "hf_20260725_133424_8974903a-c02c-420f-b32a-d3fb048cfaff.png",
+    tz_blind:        CDN + "hf_20260725_133425_877bd158-0a80-49ef-9398-2cc2c38fce84.png",
+    tz_starborn:     CDN + "hf_20260725_133658_1b2c3d86-bbdb-4749-9d02-dd8322838d00.png",
+    tz_swift:        CDN + "hf_20260725_133702_949e2b93-321e-4d5f-b64f-c09d5ba099a5.png",
+    tk_chains:       CDN + "hf_20260725_133705_21ce5677-8a42-4d81-ad8d-061d76c788ed.png",
+    tk_weakness:     CDN + "hf_20260725_133709_18ac6ac6-cbd2-4591-849d-06509a3a88ce.png",
+    tk_cart:         CDN + "hf_20260725_133712_f9839e7a-e4da-430d-956f-4d07f3fd79d7.png",
+    tk_silence:      CDN + "hf_20260725_133718_0244095d-7454-4b78-84d7-2aadd4e2ec5c.png",
+    tk_starfall:     CDN + "hf_20260725_133726_de1c1e9d-c9f8-4b2e-8b4b-1089857f0828.png",
+    tk_wisp:         CDN + "hf_20260725_133730_f073465e-305a-4ea9-ae5d-6c3cf8383ac4.png",
+    arena7:          CDN + "hf_20260725_133735_eecfb0b0-d6ea-408d-8f43-f9337c9e35d6.png",
+    arena8:          CDN + "hf_20260725_133755_444e1bf7-6dce-4a24-b511-31cc50d0b247.png",
+    gate_emblem:     CDN + "hf_20260725_133759_5e7df04b-9d20-4c79-833f-e5e0f12d2173.png",
+    summit_emblem:   CDN + "hf_20260725_133802_c77dc4bd-420f-4d14-bc20-4da0a3dec1e2.png",
+    btn_info:        CDN + "hf_20260725_133805_e56cd8c3-9817-47b0-8fce-7a555d6b44f2.png",
+    icon_lock:       CDN + "hf_20260725_133808_d02b91b1-7af1-4214-a44e-116017f314e5.png",
+    icon_check:      CDN + "hf_20260725_133811_e6757de3-c63b-4dad-8f20-21b9b05baea7.png",
+    fx_spark:        CDN + "hf_20260725_133822_6d0be656-3486-496c-9c16-f6996e549dcf.png",
+    fort_castle:    CDN + "hf_20260725_134052_5d6b036a-d610-45d0-ad32-6956fdb5808a.png",
+    track_hp:        CDN + "hf_20260725_135828_29edbcf2-e256-4c35-b3a7-5fceb1ea7adc.png",
+    track_dmg:       CDN + "hf_20260725_135832_3232967e-3798-473d-81fd-cf24183c75e1.png",
+    track_rate:      CDN + "hf_20260725_135837_d4de036f-acc4-40f7-95e6-e667d2dec6fe.png",
   };
+  /* ==================================================================
+   * ico() — Kristall-Icon mit Emoji-Fallback
+   * ------------------------------------------------------------------
+   * Liefert ein <img> mit dem Emoji als `alt`. Schlaegt das Laden fehl
+   * (CDN offline, file://), tauscht UIIcon.fail() das Bild gegen ein
+   * <span> mit genau diesem Emoji — die UI bleibt vollstaendig lesbar.
+   * Deshalb steht in JEDEM Aufruf das Original-Emoji als zweites Argument.
+   * ================================================================== */
+  window.UIIcon = {
+    fail: function (img) {
+      var sp = document.createElement("span");
+      sp.className = img.className;
+      sp.textContent = img.getAttribute("alt") || "?";
+      if (img.parentNode) img.parentNode.replaceChild(sp, img);
+    }
+  };
+  function ico(key, emoji, cls) {
+    var u = ASSETS[key];
+    if (!u) return '<span class="ico ' + (cls || "") + '">' + emoji + "</span>";
+    return '<img class="ico ' + (cls || "") + '" src="' + u + '" alt="' + emoji +
+      '" onerror="UIIcon.fail(this)">';
+  }
+  // Platzhalter im Markup (<i data-ico="..." data-emoji="...">) aufloesen.
+  function hydrateIcons(root) {
+    Array.prototype.forEach.call((root || document).querySelectorAll("[data-ico]"), function (el) {
+      el.innerHTML = ico(el.getAttribute("data-ico"), el.getAttribute("data-emoji") || "•");
+      el.removeAttribute("data-ico");
+    });
+  }
+
+  /* ==================================================================
+   * UISfx — kleine WebAudio-Blips
+   * ------------------------------------------------------------------
+   * BEWUSST mit denselben Funktionsnamen wie die spaetere SFX-Engine des
+   * Spiels: tap / confirm / deny / reward. Beim Einbau auf dem Mac wird
+   * window.UISfx einfach auf die echte Engine umgehaengt, der Prototyp-
+   * Code bleibt unberuehrt. Kein Asset, keine Datei, kein Autoplay-
+   * Problem: der AudioContext entsteht erst beim ersten echten Tap.
+   * ================================================================== */
+  window.UISfx = (function () {
+    var ctx = null, muted = false;
+    function ac() {
+      if (muted) return null;
+      if (!ctx) {
+        try { ctx = new (window.AudioContext || window.webkitAudioContext)(); }
+        catch (e) { muted = true; return null; }
+      }
+      if (ctx.state === "suspended" && ctx.resume) { try { ctx.resume(); } catch (e) {} }
+      return ctx;
+    }
+    function blip(f0, f1, dur, type, vol) {
+      var c = ac(); if (!c) return;
+      try {
+        var o = c.createOscillator(), g = c.createGain(), t = c.currentTime;
+        o.type = type || "triangle";
+        o.frequency.setValueAtTime(f0, t);
+        o.frequency.exponentialRampToValueAtTime(Math.max(40, f1), t + dur);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(vol == null ? 0.06 : vol, t + 0.008);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        o.connect(g); g.connect(c.destination);
+        o.start(t); o.stop(t + dur + 0.02);
+      } catch (e) {}
+    }
+    return {
+      tap:     function () { blip(760, 520, 0.055, "triangle", 0.045); },
+      confirm: function () { blip(620, 980, 0.10, "triangle", 0.07);
+                             setTimeout(function () { blip(980, 1250, 0.09, "sine", 0.05); }, 80); },
+      deny:    function () { blip(220, 130, 0.16, "square", 0.05); },
+      reward:  function () { [0, 90, 180, 300].forEach(function (d, i) {
+                             setTimeout(function () { blip(640 + i * 190, 900 + i * 220, 0.12, "sine", 0.055); }, d); }); },
+      mute:    function (v) { muted = !!v; },
+      isMuted: function () { return muted; }
+    };
+  })();
+
+  /* UIFx.spark(x,y) — Tap-Funken aus reinen CSS-Partikeln (kein canvas). */
+  window.UIFx = {
+    spark: function (x, y, n) {
+      var layer = document.getElementById("fxLayer"); if (!layer) return;
+      n = n || 7;
+      for (var i = 0; i < n; i++) {
+        var d = document.createElement("span");
+        d.className = "sparkdot";
+        var a = (Math.PI * 2 * i) / n + Math.random() * 0.7, r = 16 + Math.random() * 26;
+        d.style.left = (x - 3) + "px"; d.style.top = (y - 3) + "px";
+        d.style.setProperty("--dx", (Math.cos(a) * r).toFixed(1) + "px");
+        d.style.setProperty("--dy", (Math.sin(a) * r - 6).toFixed(1) + "px");
+        layer.appendChild(d);
+        setTimeout(function (el) { return function () { if (el.parentNode) el.parentNode.removeChild(el); }; }(d), 520);
+      }
+    }
+  };
+
+  /* UIBadge.set(navKey, n) — die roten Zaehler-Punkte der Bottom-Nav. */
+  window.UIBadge = (function () {
+    var MAP = { collection: "navBadge", shop: "badgeShop", pack: "badgePack" };
+    return {
+      set: function (navKey, n) {
+        var id = MAP[navKey]; if (!id) return;
+        var el = document.getElementById(id); if (!el) return;
+        n = n | 0;
+        el.textContent = n > 99 ? "99+" : String(n);
+        el.style.display = n > 0 ? "" : "none";
+      },
+      keys: function () { return Object.keys(MAP); }
+    };
+  })();
+
+  /* EINE Interaktions-Schicht fuer alles Klickbare: .pressable + Funken +
+     Sound. Delegiert auf document, funktioniert daher auch fuer alles,
+     was spaeter nachgerendert wird. */
+  var PRESS_SEL = "button,.tile,.rung,.node,.slot,.deckslot,.utile,.objcard,.pcard," +
+                  ".shopcard .sbuy,.fortcard .fbuy,.diorama,.crestmini,.decotile";
+  function markPressable(root) {
+    Array.prototype.forEach.call((root || document).querySelectorAll(PRESS_SEL), function (el) {
+      el.classList.add("pressable");
+    });
+  }
+  (function installPress() {
+    function down(e) {
+      var el = e.target && e.target.closest ? e.target.closest(".pressable") : null;
+      if (!el || el.disabled || el.classList.contains("is-disabled")) return;
+      el.classList.add("pressed");
+      var x = e.clientX, y = e.clientY;
+      if (x == null && e.touches && e.touches[0]) { x = e.touches[0].clientX; y = e.touches[0].clientY; }
+      if (x != null) UIFx.spark(x, y);
+      UISfx.tap();
+    }
+    function up() {
+      Array.prototype.forEach.call(document.querySelectorAll(".pressed"), function (el) {
+        el.classList.remove("pressed");
+      });
+    }
+    document.addEventListener("pointerdown", down, true);
+    document.addEventListener("pointerup", up, true);
+    document.addEventListener("pointercancel", up, true);
+    // Fallback fuer Umgebungen ohne Pointer-Events.
+    document.addEventListener("touchstart", down, true);
+    document.addEventListener("touchend", up, true);
+  })();
+
   /* Setzt das Asset als ersten Hintergrund-Layer; die bereits im
      Stylesheet definierten Gradienten bleiben als Fallback dahinter. */
   function layer(el, key) {
@@ -887,12 +1350,40 @@ footer{padding:6px 12px 14px;text-align:center}
    * AAs Arena-3-Wert eine Stufe zu tief einsortiert.
    * ================================================================== */
   var ARENA_TIERS = [
-    { n:1, name:"Kristallhof",      at:0,    url:ASSETS.arena1, key:"arena1" },
-    { n:2, name:"Smaragdtal",       at:300,  url:ASSETS.arena2, key:"arena2" },
-    { n:3, name:"Saphirfeste",      at:600,  url:ASSETS.arena3, key:"arena3" },
-    { n:4, name:"Sturmspitze",      at:900,  url:ASSETS.arena4, key:"arena4" },
-    { n:5, name:"Obsidian-Thron",   at:1200, url:ASSETS.arena5, key:"arena5" },
-    { n:6, name:"Prisma-Zitadelle", at:1500, url:ASSETS.arena6, key:"arena6" },
+    { n:1, name:"Kristallhof",      at:0,    key:"arena1" },
+    { n:2, name:"Smaragdtal",       at:300,  key:"arena2" },
+    { n:3, name:"Saphirfeste",      at:600,  key:"arena3" },
+    { n:4, name:"Sturmspitze",      at:900,  key:"arena4" },
+    { n:5, name:"Obsidian-Thron",   at:1200, key:"arena5" },
+    { n:6, name:"Prisma-Zitadelle", at:1500, key:"arena6" },
+    { n:7, name:"Aschenmark",       at:2000, key:"arena7" },
+    { n:8, name:"Frostbastion",     at:2500, key:"arena8" },
+  ];
+
+  /* ==================================================================
+   * LEAGUE_GATES — die Liga oberhalb der Arenen (§15.2)
+   * ------------------------------------------------------------------
+   * AAs „Champions Peak" hat NEUN Tore und eine eigene Inszenierung:
+   * dunkles Ribbon statt Magenta, Season-Zeile im Kopf, Tor-Emblem
+   * statt Insel-Diorama. Belegte AA-Schwellen (Video 8, §15.2):
+   * 2900 / 3500 / 4000 / 4500 / 5000 / 6000 / 7000 / 8000 / 9000,
+   * Straßenende bei 9800.
+   * Unsere Tornamen sind EIGENE deutsche Namen im gleichen Material-
+   * Geist (Stein → Eisen → Bronze → Silber → Gold → Kristall → Flamme
+   * → Sturm); nur die Spitze trägt die Prisma-Signatur.
+   * ================================================================== */
+  var LEAGUE_NAME = "Prisma-Liga";
+  var LEAGUE_GATES = [
+    { n:1,  name:"Eingangstor",  at:2900 },
+    { n:2,  name:"Steintor",     at:3500 },
+    { n:3,  name:"Eisenpfad",    at:4000 },
+    { n:4,  name:"Bronzewacht",  at:4500 },
+    { n:5,  name:"Silberhalt",   at:5000 },
+    { n:6,  name:"Goldweite",    at:6000 },
+    { n:7,  name:"Kristallpfad", at:7000 },
+    { n:8,  name:"Flammentor",   at:8000 },
+    { n:9,  name:"Sturmkrone",   at:9000 },
+    { n:10, name:"Prisma-Krone", at:9800, summit:true },
   ];
   function arenaIndexFor(troph) {
     var i = 0;
@@ -901,16 +1392,19 @@ footer{padding:6px 12px 14px;text-align:center}
   }
 
   /* ==================================================================
-   * TROPHÄENSTRASSE — Daten (§14.4)
+   * TROPHÄENSTRASSE — Daten (§14.4 / §15.4)
    * ------------------------------------------------------------------
-   * NODE_STEP: AA setzt im unteren Bereich alle 50 🏆 einen Knoten
-   * (§9.5). Die Arena-Schwellen (Vielfache von 300) sind selbst KEINE
-   * Knoten, sondern tragen die Arena-Sektion.
+   * Knoten-Kadenz genau wie in AA gemessen (Video 8, §15.4):
+   *   50er-Schritte  bis  1 500 🏆
+   *   100er-Schritte bis  5 000 🏆
+   *   200er-Schritte bis  9 800 🏆 (Straßenende)
+   * Arena- und Tor-Schwellen sind selbst KEINE Knoten — dort steht die
+   * jeweilige Sektion.
    * Freischaltungen pro Arena: unser Content, deutsche Namen, im Geist
    * von GAMEPLAY_OPTIMIERUNG §8 (Map Objectives + Trick Cards).
    * ================================================================== */
-  var NODE_STEP = 50;
-  var ROAD_TOP = 1500;                       // Demo-Ende = letzte Arena
+  var ROAD_TOP = 9800;
+  function stepAt(t) { return t < 1500 ? 50 : (t < 5000 ? 100 : 200); }
   var UNLOCKS = {
     1: [["🔥", "#ff6b3d"], ["❄", "#3dc8ff"], ["🌿", "#46c46a"], ["🪨", "#e0a43c"],
         ["☀", "#ffe36b"], ["🌑", "#9b6bff"]],
@@ -918,36 +1412,55 @@ footer{padding:6px 12px 14px;text-align:center}
     3: [["🌋", "#ff4d2d"], ["🌀", "#3dc8ff"], ["🍃", "#46c46a"], ["💎", "#e0a43c"]],
     4: [["⚡", "#ffe36b"], ["🕸", "#9b6bff"], ["🔮", "#a45ef2"], ["🗡", "#ffd23d"]],
     5: [["☄", "#ff6b3d"], ["🌫", "#3dc8ff"], ["🕯", "#9b6bff"], ["⚔", "#e0a43c"]],
-    6: [["🌈", "#a45ef2"], ["👁", "#ff5e7e"], ["🜂", "#ffd23d"], ["🜄", "#3dc8ff"]],
+    6: [["🌈", "#a45ef2"], ["👁", "#ff5e7e"], ["🔥", "#ffd23d"], ["💧", "#3dc8ff"]],
+    7: [["🌪", "#e0a43c"], ["🪶", "#9b6bff"], ["🕳", "#ff6b3d"], ["🏵", "#46c46a"]],
+    8: [["☃", "#3dc8ff"], ["🗿", "#9aa3ad"], ["🧊", "#3d9df2"], ["🔱", "#a45ef2"]],
   };
+  /* (i)-Teaser: Kategorie · Name · Artwork-Asset · Emoji-Fallback ·
+     Beschreibungstext (ein Satz, deutsch — erscheint im (i)-Dialog). */
   var TEASERS = {
-    1: [["obj", "Zauber-Rausch", "🌀"], ["obj", "Kopfgeld-Blüte", "💰"],
-        ["trick", "Ketten der Bindung", "⛓"]],
-    2: [["obj", "Schnurgerade", "➡"], ["trick", "Fluch der Schwäche", "🩸"],
-        ["trick", "Phantomkarren", "🛒"]],
-    3: [["obj", "Endlos-Neuwahl", "🔄"], ["obj", "Untergangs-Uhr", "⏳"],
-        ["trick", "Geisterhafte Ablenkung", "👻"]],
-    4: [["obj", "Blindwahl", "❓"], ["trick", "Mystische Hindernisse", "🧱"],
-        ["trick", "Fluch der Stille", "🤫"]],
-    5: [["obj", "Sternengeboren", "⭐"], ["trick", "Sternenfall-Fluch", "💫"],
-        ["trick", "Verfluchte Bö", "🌬"]],
-    6: [["obj", "Prisma-Bruch", "🔺"], ["obj", "Doppelte Welle", "🌊"],
-        ["trick", "Spiegelfluch", "🪞"]],
+    1: [["obj", "Zauber-Rausch", "tz_frenzy", "🌀", "Zauberkarten laden doppelt so schnell nach — die ganze Runde wird zum Kartensturm."],
+        ["obj", "Kopfgeld-Blüte", "tz_bounty", "💰", "Jeder fünfte Gegner lässt eine Zusatz-Handkarte fallen."],
+        ["trick", "Ketten der Bindung", "tk_chains", "⛓", "Fesselt zwei gegnerische Türme für acht Sekunden."]],
+    2: [["obj", "Schnurgerade", "tz_straight", "➡", "Der Pfad verläuft ohne eine einzige Kurve — reine Feuerkraft entscheidet."],
+        ["trick", "Fluch der Schwäche", "tk_weakness", "🩸", "Senkt den Schaden aller Gegnertürme zehn Sekunden lang um ein Viertel."],
+        ["trick", "Phantomkarren", "tk_cart", "🛒", "Schickt einen Geisterkarren, der Treffer schluckt, bis er zerfällt."]],
+    3: [["obj", "Endlos-Neuwahl", "tz_blind", "🔄", "Das Turm-Angebot lässt sich unbegrenzt oft neu würfeln."],
+        ["obj", "Untergangs-Uhr", "tz_starborn", "⏳", "Die Rundenzeit halbiert sich — wer zögert, verliert."],
+        ["trick", "Geisterhafte Ablenkung", "tk_wisp", "👻", "Ein Irrlicht zieht das Feuer eines Turms für sechs Sekunden auf sich."]],
+    4: [["obj", "Blindwahl", "tz_blind", "❓", "Beide Seiten wählen ihre Türme verdeckt und sehen erst im Match, was kam."],
+        ["trick", "Mystische Hindernisse", "tk_chains", "🧱", "Kristallblöcke sperren zwei Bauplätze des Gegners."],
+        ["trick", "Fluch der Stille", "tk_silence", "🤫", "Verbietet dem Gegner zehn Sekunden lang jeden Zauber."]],
+    5: [["obj", "Sternengeburt", "tz_starborn", "⭐", "Ein zufälliger Turm startet mit einer zusätzlichen Sternstufe."],
+        ["trick", "Sternenfall", "tk_starfall", "💫", "Ein stürzender Stern nimmt einem Gegnerturm eine Sternstufe."],
+        ["trick", "Verfluchte Bö", "tk_wisp", "🌬", "Ein Windstoß schiebt die Gegnerwelle ein Stück nach vorn."]],
+    6: [["obj", "Prisma-Bruch", "tz_frenzy", "🔺", "Das Prisma spaltet seinen Strahl in drei schwächere Stränge."],
+        ["obj", "Doppelwelle", "tz_bounty", "🌊", "Zwei Wellen laufen gleichzeitig — doppelte Beute, doppelte Gefahr."],
+        ["trick", "Spiegelfluch", "tk_silence", "🪞", "Kopiert den letzten Zauber des Gegners und richtet ihn gegen ihn selbst."]],
+    7: [["obj", "Aschenregen", "tz_straight", "🌂", "Herabfallende Asche verlangsamt alle Projektile ein wenig."],
+        ["trick", "Gluthauch", "tk_weakness", "🔥", "Setzt drei Felder des Gegnerpfads für fünf Sekunden in Brand."]],
+    8: [["obj", "Frostgriff", "tz_blind", "❄", "Alle Türme feuern langsamer, aber jeder Treffer friert an."],
+        ["trick", "Eisbarriere", "tk_chains", "🧊", "Errichtet eine Eiswand, die genau eine Welle lang hält."]],
   };
-  // Belohnung eines Knotens: alle 250 🏆 ein Silber-Pack, sonst im
-  // Wechsel Gold / Material / Bronze-Pack.
+  // Belohnung eines Knotens: an runden Marken ein Pack, sonst Gold/Essenz.
   function nodeReward(t) {
-    if (t % 250 === 0) return { icon: "🥈", label: "Silber-Pack", q: "×1", asset: "pack_silver" };
-    var m = (t / NODE_STEP) % 3;
-    if (m === 1) return { icon: "🪙", label: "Gold", q: "×" + (200 + Math.floor(t / 50) * 40), asset: null };
-    if (m === 2) return { icon: "⚗", label: "Arkan-Essenz", q: "×" + (2 + Math.floor(t / 300)), asset: null };
-    return { icon: "🥉", label: "Bronze-Pack", q: "×1", asset: "pack_bronze" };
+    if (t % 1000 === 0) return { icon: "🥇", ico: "pack_gold",    label: "Gold-Pack",   q: "×1" };
+    if (t % 500 === 0)  return { icon: "🥈", ico: "pack_silver",  label: "Silber-Pack", q: "×1" };
+    if (t % 250 === 0)  return { icon: "🥉", ico: "chest_bronze", label: "Bronze-Pack", q: "×1" };
+    var m = (t / stepAt(t)) % 3;
+    if (m === 1) return { icon: "🪙", ico: "cur_gold", label: "Gold",
+                          q: "×" + fmt(200 + Math.floor(t / 50) * 40) };
+    if (m === 2) return { icon: "⚗", ico: "ess_special", label: "Arkan-Essenz",
+                          q: "×" + (2 + Math.floor(t / 300)) };
+    return { icon: "⚔", ico: "ess_attack", label: "Angriffs-Essenz", q: "×" + (2 + Math.floor(t / 400)) };
   }
   function nodeList() {
-    var out = [];
-    for (var t = NODE_STEP; t <= ROAD_TOP; t += NODE_STEP) {
-      if (ARENA_TIERS.some(function (a) { return a.at === t; })) continue;
-      out.push(t);
+    var out = [], t = 50, block = {};
+    ARENA_TIERS.forEach(function (a) { block[a.at] = 1; });
+    LEAGUE_GATES.forEach(function (g) { block[g.at] = 1; });
+    while (t <= ROAD_TOP) {
+      if (!block[t]) out.push(t);
+      t += stepAt(t);
     }
     return out;
   }
@@ -983,6 +1496,14 @@ footer{padding:6px 12px 14px;text-align:center}
     st.cards.magmor   = mk("common", 4, { common: 1 });
     AC._write(st);
     setGold(DEMO_GOLD);
+    // Demo-Festung: passend zum 1 136-🏆-Account. Das Trophäen-Tor bei
+    // 900 🏆 gibt 80 Gesamtstufen frei — 30/24/18 = 72 liegen bewusst
+    // darunter, damit alle drei Äste noch einen aktiven Kaufknopf haben
+    // und die LEBENDE BURG ihre Overlays sichtbar zeigt (statt Stufe 0).
+    try {
+      localStorage.setItem("arenaFortress", JSON.stringify(
+        { v: 1, lvl: { hp: 30, prismDmg: 24, prismRate: 18 }, steps: 72, goldSpent: 0 }));
+    } catch (e) {}
     localStorage.setItem(SEED_KEY, "1");
   }
   if (!localStorage.getItem(SEED_KEY)) seed();
@@ -1052,8 +1573,9 @@ footer{padding:6px 12px 14px;text-align:center}
     $("curGold").textContent = fmt(gold());
     // Material-Vorrat je Sorte (§7.1: AA führt jede Sorte getrennt)
     var bank = AC.getMaterials();
+    var MATICO = { attack: "ess_attack", speed: "ess_speed", special: "ess_special" };
     $("matCount").innerHTML = AC.MATERIALS.map(function (m) {
-      return m.sym + " <b>" + bank[m.key] + "</b>";
+      return ico(MATICO[m.key] || "ess_special", m.sym) + " <b>" + bank[m.key] + "</b>";
     }).join(" ");
   }
   function renderCollection() {
@@ -1073,6 +1595,7 @@ footer{padding:6px 12px 14px;text-align:center}
     if (n) { b.style.display = ""; b.textContent = n; } else { b.style.display = "none"; }
     bind($("collGrid"), openDetail);
     bind($("deckRow"), openDetail);
+    markPressable($("viewCollection"));
   }
   function bind(root, fn) {
     var els = root.querySelectorAll("[data-id]");
@@ -1164,7 +1687,8 @@ footer{padding:6px 12px 14px;text-align:center}
 
     // Upgrade-Material-Block (§5 / §12.3) — SORTE der Karte + Buttons
     var need = v.needMaterial, have = v.haveMaterial;
-    $("dMatSym").textContent = v.materialSym;
+    var MATICO2 = { attack: "ess_attack", speed: "ess_speed", special: "ess_special" };
+    $("dMatSym").innerHTML = ico(MATICO2[v.materialType] || "ess_special", v.materialSym, "big");
     $("dMatName").textContent = v.materialName;
     $("dMatName").style.color = v.materialColor;
     $("dMat").innerHTML = (have < need ? '<span class="bad">' + have + "</span>" : have) + " / " + need;
@@ -1235,6 +1759,7 @@ footer{padding:6px 12px 14px;text-align:center}
         '<div class="art">' + m.art + '</div><div class="cnt">×' + avail + "</div>" +
         '<div class="lvl">' + t.name + "</div></button>";
     }).join("");
+    markPressable($("viewForge"));
     var els = $("forgeGrid").querySelectorAll("[data-id]");
     for (var i = 0; i < els.length; i++) {
       (function (el) {
@@ -1402,6 +1927,7 @@ footer{padding:6px 12px 14px;text-align:center}
 
   /* ================= Pack-Öffnung ================= */
   var packResult = null, packState = [];
+  function markPressableLater() { setTimeout(function () { markPressable(); }, 0); }
   function renderPackHeader() {
     $("bronzePromise").textContent = AC.PACKS.bronze.promise;
     $("packStat").textContent = "Geöffnet: " + AC.get().packsOpened;
@@ -1412,11 +1938,12 @@ footer{padding:6px 12px 14px;text-align:center}
      besser als eine Wahrscheinlichkeit. */
   function renderPity() {
     var p = AC.getPityStatus();
-    $("pityLine").innerHTML = "🛟 <b>Episch</b> garantiert in ≤" + p.epicIn +
+    $("pityLine").innerHTML = ico("frame_epic", "🛟") + " <b>Episch</b> garantiert in ≤" + p.epicIn +
       " Packs · <span class=\"leg\">Legendär</span> in ≤" + p.legendaryIn;
   }
-  function openBronze() {
-    packResult = AC.openPack("bronze", POOL_IDS, HERO_IDS);
+  function openBronze() { openPackKey("bronze"); }
+  function openPackKey(key) {
+    packResult = AC.openPack(key, POOL_IDS, HERO_IDS);
     packState = [];
     packResult.cards.forEach(function (c) { packState.push({ kind: "card", d: c, done: false }); });
     // Material-Slots tragen jetzt eine SORTE: {type, amount, name, sym, color}
@@ -1425,9 +1952,11 @@ footer{padding:6px 12px 14px;text-align:center}
     $("packSummary").style.display = "none";
     renderPack();
     renderPackHeader();
-    toast("🎁 " + packResult.name + " geöffnet — tippe die Karten an");
+    UISfx.reward();
+    toast(packResult.name + " geöffnet — tippe die Karten an");
   }
   function renderPack() {
+    markPressableLater();
     $("packGrid").innerHTML = packState.map(function (s, i) {
       var color = s.kind === "card" ? tierOf(s.d.tier).color
         : s.kind === "mat" ? s.m.color : "#f2c53d";
@@ -1532,13 +2061,14 @@ footer{padding:6px 12px 14px;text-align:center}
     var SLOTS = [{ k: "bronze", i: "🥉" }, { k: "bronze", i: "🥉" }, null, null];
     $("packSlots").innerHTML = SLOTS.map(function (s, k) {
       return s
-        ? '<button class="slot full" data-slot="' + k + '" title="Bronze-Pack">' + s.i +
-          '<span class="cnt3">1</span></button>'
+        ? '<button class="slot full" data-slot="' + k + '" title="Bronze-Pack">' +
+          ico("chest_bronze", s.i, "big") + '<span class="cnt3">1</span></button>'
         : '<button class="slot empty" data-slot="' + k + '" title="Leerer Platz">＋</button>';
     }).join("");
     Array.prototype.forEach.call($("packSlots").querySelectorAll(".slot"), function (b) {
       var full = b.classList.contains("full");
-      if (full) layer(b, "pack_bronze");
+      layer(b, "hex_slot");
+      b.style.backgroundSize = "112% 112%, 100% 100%";
       b.addEventListener("click", function () {
         if (full) { toast("Bronze-Pack — zur Pack-Ansicht"); show("navPack"); }
         else toast("Leerer Platz — Packs gibt es für Siege");
@@ -1550,8 +2080,8 @@ footer{padding:6px 12px 14px;text-align:center}
     var pct = nxt ? Math.max(0, Math.min(100, (t - from) / (to - from) * 100)) : 100;
     $("arenaProgFill").style.width = pct.toFixed(1) + "%";
     $("arenaProgLabel").textContent = nxt
-      ? (fmt(t) + " / " + fmt(to) + " 🏆")
-      : (fmt(t) + " 🏆 — Höchste Arena");
+      ? (fmt(t) + " / " + fmt(to))
+      : (fmt(t) + " — Höchste Arena");
     // Belohnungs-Icon am rechten Balkenende = Belohnung des NÄCHSTEN
     // Straßen-Knotens (§14.3b). Klick öffnet die Trophäenstraße.
     var nn = nextNodeTrophies();
@@ -1566,11 +2096,12 @@ footer{padding:6px 12px 14px;text-align:center}
       return '<button class="rung' + (locked ? " locked" : "") + (here ? " here" : "") +
         '" data-arena="' + k + '">' +
         '<div class="shade"></div>' +
-        (locked ? '<span class="lk">🔒</span>' : "") +
+        (locked ? '<span class="lk">' + ico("icon_lock", "🔒") + "</span>" : "") +
         '<div class="rn ' + (locked ? "" : "goldtext") + '">' + a.name + "</div>" +
-        '<div class="rt">' + (a.at === 0 ? "Start" : fmt(a.at) + " 🏆") + "</div>" +
+        '<div class="rt">' + (a.at === 0 ? "Start" : fmt(a.at) + " " + ico("cur_trophy", "🏆")) + "</div>" +
         "</button>";
     }).join("");
+    markPressable($("viewHome"));
     Array.prototype.forEach.call($("arenaLadder").querySelectorAll(".rung"), function (b) {
       var a = ARENA_TIERS[b.getAttribute("data-arena") | 0];
       layer(b, a.key);
@@ -1594,56 +2125,74 @@ footer{padding:6px 12px 14px;text-align:center}
   var roadBuilt = false;
   function buildRoad() {
     var t = DEMO_TROPHIES, nextN = nextNodeTrophies();
-    // Marken von ROAD_TOP herunter bis 0 sammeln, dann als HTML ausgeben.
-    var marks = [];
-    for (var v = ROAD_TOP; v >= 0; v -= NODE_STEP) {
-      var arena = null;
-      for (var k = 0; k < ARENA_TIERS.length; k++) if (ARENA_TIERS[k].at === v) arena = ARENA_TIERS[k];
-      marks.push({ at: v, arena: arena });
-    }
+    // Marken von ROAD_TOP herunter bis 0 sammeln (die Straße wächst nach
+    // oben, also steht die höchste Trophäenzahl im DOM zuerst).
+    var byAt = {};
+    ARENA_TIERS.forEach(function (a) { byAt[a.at] = { arena: a }; });
+    LEAGUE_GATES.forEach(function (g) { byAt[g.at] = { gate: g }; });
+    var marks = [], v = 0;
+    while (v <= ROAD_TOP) { marks.push(v); v += stepAt(v); }
+    LEAGUE_GATES.forEach(function (g) { if (marks.indexOf(g.at) < 0) marks.push(g.at); });
+    marks.sort(function (a, b) { return b - a; });   // absteigend = von oben nach unten
+
+    var props = ["prop_fire", "prop_pouch", "prop_rune", "prop_obelisk"];
+    var propEmoji = ["🔥", "💰", "🪨", "🗿"];
     var html = ['<div class="roadmore">•••</div>'];
-    marks.forEach(function (mk) {
-      html.push('<div class="tick" data-at="' + mk.at + '"><b>' + fmt(mk.at) + '</b><i></i></div>');
-      if (mk.arena) { html.push(arenaSectionHtml(mk.arena, t)); return; }
-      var st = mk.at <= t ? "done" : (mk.at === nextN ? "next" : "lock");
-      var rw = nodeReward(mk.at);
-      var props = ["🔥", "🪵", "🪨", "🌿", "⛺", "🕳"];
+    marks.forEach(function (at, idx) {
+      var sec = byAt[at];
+      html.push('<div class="tick" data-at="' + at + '"><b>' + fmt(at) + '</b><i></i></div>');
+      if (sec && sec.gate)  { html.push(gateSectionHtml(sec.gate, t)); return; }
+      if (sec && sec.arena) { html.push(arenaSectionHtml(sec.arena, t)); return; }
+      var st = at <= t ? "done" : (at === nextN ? "next" : "lock");
+      var rw = nodeReward(at);
+      var p1 = idx % props.length, p2 = (idx + 2) % props.length;
       html.push(
-        '<div class="node ' + st + '" data-at="' + mk.at + '" data-state="' + st + '">' +
-          '<span class="prop">' + props[(mk.at / NODE_STEP) % props.length] + "</span>" +
-          '<div class="rw" data-asset="' + (rw.asset || "") + '" title="' + rw.label + '">' +
-            rw.icon + '<span class="q">' + rw.q + "</span>" +
-            (st === "done" ? '<span class="chk">✅</span>' : "") +
-            (st === "lock" ? '<span class="chk">🔒</span>' : "") +
+        '<div class="node ' + st + '" data-at="' + at + '" data-state="' + st + '">' +
+          '<span class="prop">' + ico(props[p1], propEmoji[p1]) + "</span>" +
+          '<div class="rw" data-asset="' + rw.ico + '" title="' + rw.label + '">' +
+            ico(rw.ico, rw.icon, "big") + '<span class="q">' + rw.q + "</span>" +
+            (st === "done" ? '<span class="chk">' + ico("icon_check", "✅") + "</span>" : "") +
+            (st === "lock" ? '<span class="chk">' + ico("icon_lock", "🔒") + "</span>" : "") +
           "</div>" +
-          '<span class="prop">' + props[(mk.at / NODE_STEP + 3) % props.length] + "</span>" +
+          '<span class="prop">' + ico(props[p2], propEmoji[p2]) + "</span>" +
         "</div>");
     });
     $("roadScroll").innerHTML = html.join("");
-    // Assets nachlegen (Diorama-Key-Art, Ribbon-Band, Pack-Kacheln).
+    // Assets nachlegen: Diorama-Key-Art, Tor-Embleme, Ribbon-Band,
+    // Knoten-Plattform (Kristallsockel statt grüner Wiese — unser Stil).
     Array.prototype.forEach.call($("roadScroll").querySelectorAll("[data-arenakey]"), function (el) {
       layer(el, el.getAttribute("data-arenakey"));
     });
     Array.prototype.forEach.call($("roadScroll").querySelectorAll(".ribbon"), function (el) {
       layer(el, "banner_rarity");
     });
-    Array.prototype.forEach.call($("roadScroll").querySelectorAll(".rw[data-asset]"), function (el) {
-      var a = el.getAttribute("data-asset"); if (a) layer(el, a);
+    Array.prototype.forEach.call($("roadScroll").querySelectorAll(".node"), function (el) {
+      layer(el, "road_platform");
+      el.style.backgroundSize = "104% 190%, 100% 100%";
+      el.style.backgroundPosition = "center 62%";
+      el.style.backgroundRepeat = "no-repeat";
+    });
+    Array.prototype.forEach.call($("roadScroll").querySelectorAll(".objcard"), function (el) {
+      var k = el.getAttribute("data-art"); if (k) layer(el, k);
+      el.style.backgroundSize = "cover, cover";
     });
     Array.prototype.forEach.call($("roadScroll").querySelectorAll(".objcard .ibtn"), function (b) {
       b.addEventListener("click", function (e) {
         e.stopPropagation();
+        UISfx.confirm();
         toast(b.getAttribute("data-info") || "Info");
       });
     });
     Array.prototype.forEach.call($("roadScroll").querySelectorAll(".node"), function (n) {
       n.addEventListener("click", function () {
         var at = n.getAttribute("data-at") | 0, s = n.getAttribute("data-state");
+        if (s === "next") UISfx.reward(); else if (s === "lock") UISfx.deny();
         toast(s === "done" ? "Bei " + fmt(at) + " 🏆 bereits abgeholt"
-          : s === "next" ? "Nächster Knoten: " + fmt(at) + " 🏆"
+          : s === "next" ? "Nächster Knoten: " + fmt(at) + " 🏆 — " + nodeReward(at).label
           : "Gesperrt — noch " + fmt(at - DEMO_TROPHIES) + " 🏆");
       });
     });
+    markPressable($("roadScroll"));
     roadBuilt = true;
   }
   function arenaSectionHtml(a, troph) {
@@ -1654,20 +2203,39 @@ footer{padding:6px 12px 14px;text-align:center}
     }).join("");
     var te = (TEASERS[a.n] || []).map(function (x) {
       var kind = x[0] === "trick" ? "Trick-Karte" : "Map-Ziel";
-      return '<div class="objcard' + (x[0] === "trick" ? " trick" : "") + '">' +
-        '<button class="ibtn" data-info="' + kind + ' „' + x[1] + '" — Details folgen">i</button>' +
+      return '<div class="objcard' + (x[0] === "trick" ? " trick" : "") +
+        '" data-art="' + x[2] + '">' +
+        '<button class="ibtn" data-info="' + kind + " „" + x[1] + '“: ' + x[4] + '">' +
+          ico("btn_info", "i") + "</button>" +
         '<div class="otx"><div class="okind">' + kind + '</div>' +
         '<div class="oname">' + x[1] + "</div></div>" +
-        '<span class="oart">' + x[2] + "</span></div>";
+        '<span class="oart">' + x[3] + "</span></div>";
     }).join("");
     return '<section class="arenasec' + (locked ? " lockedsec" : "") + '" data-arena="' + a.n + '">' +
       '<div class="diorama" data-arenakey="' + a.key + '"></div>' +
       '<div class="secchip">◎ Zufallswelt</div>' +
       '<div class="secname goldtext">' + a.name + "</div>" +
       '<div class="ribbon"><span class="rl goldtext pale">Arena ' + a.n + "</span>" +
-        '<span class="rr goldtext pale">🏆 ' + fmt(a.at) + "</span></div>" +
+        '<span class="rr goldtext pale">' + ico("cur_trophy", "🏆") + " " + fmt(a.at) + "</span></div>" +
       '<div class="unlockhead goldtext">Schaltet frei:</div>' +
       '<div class="unlockgrid">' + un + "</div>" + te +
+      "</section>";
+  }
+  /* Liga-Sektion (§15.3): bewusst ANDERS inszeniert als eine Arena —
+     dunkles Ribbon statt Magenta, Tor-Emblem statt Insel-Diorama,
+     Season-Zeile im Kopf. Nur die Spitze trägt die Prisma-Signatur. */
+  function gateSectionHtml(g, troph) {
+    var locked = troph < g.at, summit = !!g.summit;
+    return '<section class="arenasec league' + (summit ? " summit" : "") +
+      (locked ? " lockedsec" : "") + '" data-gate="' + g.n + '">' +
+      '<div class="leaguehead goldtext">' + LEAGUE_NAME + "</div>" +
+      '<div class="gateemblem" data-arenakey="' + (summit ? "summit_emblem" : "gate_emblem") + '"></div>' +
+      '<div class="secname goldtext" style="font-size:19px">' + g.name + "</div>" +
+      '<div class="ribbon"><span class="rl goldtext pale">' +
+        (summit ? "Spitze" : "Tor " + g.n) + "</span>" +
+        '<span class="rr goldtext pale">' + ico("cur_trophy", "🏆") + " " + fmt(g.at) + "</span></div>" +
+      '<div class="seasonline">Saison endet in 9 T 10 Std · Trophäen werden zum ' +
+        "Saisonende teilweise zurückgesetzt</div>" +
       "</section>";
   }
   function openRoad() {
@@ -1738,21 +2306,358 @@ footer{padding:6px 12px 14px;text-align:center}
     });
   }
 
+  /* ==================================================================
+   * SHOP (§8) — Tagesangebote, Packs, Währungs-Deko
+   * ------------------------------------------------------------------
+   * AAs Aufbau, unsere Systeme: kein Echtgeld, alle Käufe laufen gegen
+   * die Demo-Wallet (Gold/Gems) und ArenaCards. Der Pity-Stand steht
+   * OFFEN auf den Packs — AAs Muster statt Prozent-Drop-Raten (§8.2).
+   * ================================================================== */
+  var DEALS = [
+    { id:"d1", art:"ess_attack",  emoji:"⚔", name:"Angriffs-Essenz ×20", cost:3000,  cur:"gold",
+      avail:3, give:function(){ AC.addMaterial(20, "attack"); } },
+    { id:"d2", art:"ess_speed",   emoji:"⚡", name:"Tempo-Essenz ×20",    cost:3000,  cur:"gold",
+      avail:3, give:function(){ AC.addMaterial(20, "speed"); } },
+    { id:"d3", art:"ess_special", emoji:"✨", name:"Spezial-Essenz ×15",  cost:4200,  cur:"gold",
+      avail:2, give:function(){ AC.addMaterial(15, "special"); } },
+    { id:"d4", art:"frame_common", emoji:"🃏", name:"3 gewöhnliche Karten", cost:5400, cur:"gold",
+      avail:2, give:function(){ for (var i=0;i<3;i++) AC.addDrop(POOL_IDS[(Math.random()*6)|0], "common", 1); } },
+    { id:"d5", art:"frame_good",  emoji:"🂡", name:"1 gute Karte",        cost:9000,  cur:"gold",
+      avail:1, give:function(){ AC.addDrop(POOL_IDS[(Math.random()*6)|0], "good", 1); } },
+    { id:"d6", art:"cur_gem",     emoji:"💎", name:"Gem-Bündel ×25",      cost:0,     cur:"free",
+      avail:1, give:function(){ DEMO_GEMS += 25; } },
+  ];
+  var dealUsed = {};
+  var SHOP_PACKS = [
+    { key:"bronze", cost:2000, cur:"gold" },
+    { key:"silver", cost:80,   cur:"gems" },
+    { key:"gold",   cost:300,  cur:"gems" },
+    { key:"arcane", cost:800,  cur:"gems" },
+  ];
+  var freeDailyTaken = false;
+  function renderShop() {
+    renderTop();
+    var p = AC.getPityStatus();
+    $("packPity").innerHTML = "Episch ≤" + p.epicIn + " · Legendär ≤" + p.legendaryIn;
+
+    $("dealGrid").innerHTML = DEALS.map(function (d) {
+      var left = d.avail - (dealUsed[d.id] | 0), sold = left <= 0;
+      var price = d.cur === "free" ? "Gratis"
+        : (d.cur === "gold" ? ico("cur_gold", "🪙") : ico("cur_gem", "💎")) + " " + fmt(d.cost);
+      return '<div class="shopcard' + (sold ? " sold" : "") + '" data-deal="' + d.id + '">' +
+        '<span class="sart">' + ico(d.art, d.emoji, "xl") + "</span>" +
+        '<span class="snm">' + d.name + "</span>" +
+        '<span class="savail">Verfügbar: ' + Math.max(0, left) + "</span>" +
+        '<button class="sbuy' + (d.cur === "gems" ? " gems" : "") + '" data-buy="' + d.id + '"' +
+          (sold ? " disabled" : "") + ">" + (sold ? "Ausverkauft" : price) + "</button></div>";
+    }).join("");
+
+    $("packShop").innerHTML = SHOP_PACKS.map(function (sp) {
+      var pk = AC.PACKS[sp.key];
+      var price = (sp.cur === "gold" ? ico("cur_gold", "🪙") : ico("cur_gem", "💎")) + " " + fmt(sp.cost);
+      return '<div class="shopcard" data-pack="' + sp.key + '" style="position:relative">' +
+        '<span class="sart">' + ico("pack_" + sp.key, "🎁", "xl") + "</span>" +
+        '<span class="snm">' + pk.name + "</span>" +
+        '<span class="promise">' + pk.promise + "</span>" +
+        '<button class="sbuy' + (sp.cur === "gems" ? " gems" : "") + '" data-buypack="' + sp.key +
+          '">' + price + "</button></div>";
+    }).join("") +
+      '<div class="shopcard" style="position:relative;grid-column:1/-1">' +
+        (freeDailyTaken ? "" : '<span class="freebadge">GRATIS</span>') +
+        '<span class="sart">' + ico("chest_bronze", "🥉", "xl") + "</span>" +
+        '<span class="snm">Tages-Bronze-Pack</span>' +
+        '<span class="promise">' + AC.PACKS.bronze.promise + "</span>" +
+        '<button class="sbuy" data-buypack="free"' + (freeDailyTaken ? " disabled" : "") + ">" +
+          (freeDailyTaken ? "Wieder in 3h 41m" : "Abholen") + "</button></div>";
+
+    $("decoRow").innerHTML =
+      '<div class="decotile"><span class="dart">' + ico("cur_gem", "💎", "big") + "</span>Gems<br>im echten Spiel</div>" +
+      '<div class="decotile"><span class="dart">' + ico("cur_gold", "🪙", "big") + "</span>Gold<br>aus Siegen</div>" +
+      '<div class="decotile"><span class="dart">' + ico("hub_pass", "📖", "big") + "</span>Season-Pass<br>geplant</div>";
+
+    $("shopNote").innerHTML = "Alle Preise und Stückzahlen skalieren im echten Spiel mit dem " +
+      "Fortschritt (AA-Befund §8.4). Käufe hier gehen gegen die Demo-Wallet.";
+
+    Array.prototype.forEach.call($("dealGrid").querySelectorAll("[data-buy]"), function (b) {
+      b.addEventListener("click", function () { buyDeal(b.getAttribute("data-buy")); });
+    });
+    Array.prototype.forEach.call($("packShop").querySelectorAll("[data-buypack]"), function (b) {
+      b.addEventListener("click", function () { buyPack(b.getAttribute("data-buypack")); });
+    });
+    markPressable($("viewShop"));
+    UIBadge.set("shop", DEALS.filter(function (d) { return (d.avail - (dealUsed[d.id] | 0)) > 0; }).length);
+  }
+  function buyDeal(id) {
+    var d = null;
+    DEALS.forEach(function (x) { if (x.id === id) d = x; });
+    if (!d) return;
+    if ((d.avail - (dealUsed[d.id] | 0)) <= 0) { UISfx.deny(); toast("Ausverkauft"); return; }
+    if (d.cur === "gold" && gold() < d.cost) { UISfx.deny(); toast("Nicht genug Gold"); return; }
+    if (d.cur === "gems" && DEMO_GEMS < d.cost) { UISfx.deny(); toast("Nicht genug Gems"); return; }
+    if (d.cur === "gold") setGold(gold() - d.cost);
+    if (d.cur === "gems") DEMO_GEMS -= d.cost;
+    d.give();
+    dealUsed[d.id] = (dealUsed[d.id] | 0) + 1;
+    UISfx.confirm();
+    toast("Gekauft: " + d.name);
+    renderShop();
+  }
+  function buyPack(key) {
+    if (key === "free") {
+      if (freeDailyTaken) { UISfx.deny(); toast("Heute schon abgeholt"); return; }
+      freeDailyTaken = true; UISfx.reward();
+      openPackKey("bronze"); show("navPack"); return;
+    }
+    var sp = null;
+    SHOP_PACKS.forEach(function (x) { if (x.key === key) sp = x; });
+    if (!sp) return;
+    if (sp.cur === "gold" && gold() < sp.cost) { UISfx.deny(); toast("Nicht genug Gold"); return; }
+    if (sp.cur === "gems" && DEMO_GEMS < sp.cost) { UISfx.deny(); toast("Nicht genug Gems"); return; }
+    if (sp.cur === "gold") setGold(gold() - sp.cost); else DEMO_GEMS -= sp.cost;
+    UISfx.reward();
+    openPackKey(key);
+    show("navPack");
+  }
+
+  /* ==================================================================
+   * FESTUNG (§9.9) — dritte Progressionsachse
+   * ------------------------------------------------------------------
+   * Reine Präsentation: die ganze Mathematik liegt in arena_fortress.js
+   * (window.ArenaFortress). Die Karten rendern generisch aus allTracks(),
+   * mehr Stufen sind daher später NUR Daten — am UI ändert sich nichts.
+   * ================================================================== */
+  /* ==================================================================
+   * window.CastleSkins — SKIN-ARCHITEKTUR (verkaufsfertig)
+   * ------------------------------------------------------------------
+   * Die Burg ist NIRGENDS hart verdrahtet. Ein Skin ist:
+   *     { key, name, img, anchors: { prismTip:{x,y}, shield:{x,y},
+   *                                  walls:[{x,y}, …] } }
+   * Alle Anker sind PROZENTWERTE der Bühne (0-100), nie Pixel. Deshalb
+   * genügt für einen neuen Skin EIN Artwork plus EIN Anker-Objekt — alle
+   * Ausbaustufen-Overlays sitzen automatisch richtig.
+   * Auswahl liegt in localStorage "arenaSkins".
+   * Für MATCH-Skins (Burg im Spielfeld) braucht es später zusätzlich das
+   * 24-Winkel-Sheet-Format wie castle_v3 — siehe HANDOFF.
+   * ================================================================== */
+  window.CastleSkins = (function () {
+    var KEY = "arenaSkins";
+    var SKINS = [
+      { key: "prisma", name: "Prisma-Feste (Standard)",
+        img: ASSETS.fort_castle,
+        anchors: {
+          prismTip: { x: 50, y: 30 },
+          shield:   { x: 50, y: 62 },
+          walls: [ { x: 30, y: 74 }, { x: 70, y: 74 }, { x: 21, y: 80 }, { x: 79, y: 80 },
+                   { x: 39, y: 70 }, { x: 61, y: 70 } ]
+        } },
+    ];
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { return {}; }
+    }
+    function write(o) { try { localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) {} }
+    function byKey(k) {
+      for (var i = 0; i < SKINS.length; i++) if (SKINS[i].key === k) return SKINS[i];
+      return SKINS[0];
+    }
+    return {
+      list:    function () { return SKINS.map(function (s) { return { key: s.key, name: s.name }; }); },
+      current: function () { return byKey(read().castle); },
+      set:     function (k) { var o = read(); o.castle = byKey(k).key; write(o); },
+      register: function (skin) { if (skin && skin.key && skin.img && skin.anchors) SKINS.push(skin); }
+    };
+  })();
+
+  function AFof() { return window.ArenaFortress || null; }
+  function renderFortress() {
+    renderTop();
+    var AF = AFof();
+    if (!AF) {
+      $("fortTracks").innerHTML = '<p class="fortnote">arena_fortress.js nicht geladen.</p>';
+      return;
+    }
+    var tracks = AF.allTracks(DEMO_TROPHIES);
+    var st = AF.get();
+    $("fortPower").textContent = fmt(AF.powerSum ? AF.powerSum(st.steps) : st.steps * 170);
+    $("fortSteps").textContent = st.steps + "/" + AF.TOTAL_CAP + " Stufen";
+    renderCastle(tracks);
+    renderConstellation(tracks);
+    renderSkinBar();
+
+    var g = AF.nextGate();
+    $("fortNote").innerHTML = "Der Bonus pro Stufe SINKT, die Kosten steigen — AAs " +
+      "abnehmender Grenznutzen (§9.9 / §16.3). " + (g
+        ? "Nächstes Tor: ab <b>" + fmt(g.trophies) + " 🏆</b> (" + g.label + ")."
+        : "Alle Trophäen-Tore offen.") +
+      " Jeder Track läuft bis Stufe " + AF.LEVELS_PER_TRACK + ".";
+    markPressable($("viewFortress"));
+  }
+
+  /* A) LEBENDE BURG — Overlays wachsen mit den Ausbaustufen. */
+  var TRACK_VIS = { hp: "track_hp", prismDmg: "track_dmg", prismRate: "track_rate" };
+  var TRACK_EMO = { hp: "🛡", prismDmg: "🔺", prismRate: "⚡" };
+  function renderCastle(tracks) {
+    var skin = window.CastleSkins.current();
+    var stage = $("castleStage");
+    stage.style.backgroundImage = 'url("' + skin.img + '"), linear-gradient(160deg,#2c3a4b,#131c25)';
+    var lv = {};
+    tracks.forEach(function (t) { lv[t.key] = t.lvl; });
+    var max = (AFof() || { LEVELS_PER_TRACK: 100 }).LEVELS_PER_TRACK;
+    var fHp = Math.min(1, lv.hp / max), fDmg = Math.min(1, lv.prismDmg / max),
+        fRate = Math.min(1, lv.prismRate / max);
+    var a = skin.anchors, html = "";
+
+    // Prisma-Strahl: Breite/Höhe/Glow aus prismDmg, Puls-Tempo aus prismRate.
+    var bw = 5 + fDmg * 22, bh = 16 + fDmg * 46;
+    var pulse = (1.6 - fRate * 1.05).toFixed(2);
+    html += '<div class="prismbeam" id="fxBeam" data-lvl="' + lv.prismDmg + '" style="' +
+      "left:" + a.prismTip.x + "%;top:" + a.prismTip.y + "%;" +
+      "width:" + bw.toFixed(1) + "%;height:" + bh.toFixed(1) + "%;" +
+      "animation-duration:" + pulse + "s;" +
+      "filter:drop-shadow(0 0 " + (4 + fDmg * 20).toFixed(0) + "px #e0b94a)\"></div>";
+
+    // Schild-Schimmer: Radius/Deckkraft aus hp.
+    var sr = 30 + fHp * 62;
+    html += '<div class="shieldglow" id="fxShield" data-lvl="' + lv.hp + '" style="' +
+      "left:" + a.shield.x + "%;top:" + a.shield.y + "%;" +
+      "width:" + sr.toFixed(1) + "%;height:" + (sr * 0.72).toFixed(1) + "%;" +
+      "opacity:" + (0.15 + fHp * 0.75).toFixed(2) + "\"></div>";
+
+    // Kristall-Anbauten: Anzahl UND Größe wachsen mit hp.
+    var nWalls = Math.min(a.walls.length, Math.round(fHp * a.walls.length));
+    for (var i = 0; i < nWalls; i++) {
+      var w = a.walls[i], sz = 4 + fHp * 6;
+      html += '<div class="wallcrystal" style="left:' + w.x + "%;top:" + w.y + "%;" +
+        "width:" + sz.toFixed(1) + "%;height:" + (sz * 1.7).toFixed(1) + '%"></div>';
+    }
+    $("castleFx").innerHTML = html;
+    $("castleFx").setAttribute("data-walls", nWalls);
+  }
+
+  /* B) KRISTALL-KONSTELLATION — ein Knoten je Stufe, generisch aus Daten. */
+  var WINDOW_BEFORE = 6, WINDOW_AFTER = 14;   // sichtbarer Ausschnitt je Ast
+  function renderConstellation(tracks) {
+    var AF = AFof();
+    $("fortTracks").innerHTML = tracks.map(function (t) {
+      var from = Math.max(1, t.lvl - WINDOW_BEFORE);
+      var to = Math.min(t.maxLvl, t.lvl + WINDOW_AFTER);
+      var knots = "";
+      for (var n = from; n <= to; n++) {
+        var done = n <= t.lvl, isNext = n === t.lvl + 1;
+        var ms = n % 10 === 0;
+        var bonus = AF ? AF.bonusAt(t.key, n) : 0;
+        var cls = "knot" + (done ? " done" : "") + (isNext && !t.locked ? " next" : "") +
+                  (ms ? " milestone" : "");
+        var right = "";
+        if (isNext && t.locked) {
+          right = '<span class="kgate">' + ico("icon_lock", "🔒") + " " + fmt(t.lockAt) + " " +
+                  ico("cur_trophy", "🏆") + "</span>";
+        } else if (isNext && !t.maxed) {
+          right = '<button class="kbuy" data-buyfort="' + t.key + '">' +
+                  ico("cur_gold", "🪙") + " " + fmt(t.nextCost) + "</button>";
+        }
+        knots += '<div class="' + cls + '" data-knot="' + t.key + ":" + n + '">' +
+          '<span class="kd"></span>' +
+          '<span class="kl">Stufe ' + n + (ms ? " · Meilenstein" : "") +
+            "  ·  +" + (bonus * 100).toFixed(2) + " %</span>" + right + "</div>";
+      }
+      var head = '<div class="branchhead">' +
+        '<div class="bico" data-bico="' + TRACK_VIS[t.key] + '">' + TRACK_EMO[t.key] + "</div>" +
+        '<div class="btx"><div class="bnm goldtext">' + t.name + "</div>" +
+        '<div class="bsub">' + t.desc + "</div>" +
+        '<div class="bstat">' + t.stat + ": +" + t.totalPct.toFixed(1) + " %" +
+          (t.maxed ? "" : '  →  <em>+' + t.nextPct.toFixed(2) + " %</em>") +
+          '  ·  Lv ' + t.lvl + "/" + t.maxLvl + "</div></div></div>";
+      return '<div class="branch" data-track="' + t.key + '">' + head +
+        '<div class="branchrail">' + knots + "</div></div>";
+    }).join("");
+    // Ast-Köpfe: die drei großen Track-Embleme.
+    Array.prototype.forEach.call($("fortTracks").querySelectorAll("[data-bico]"), function (el) {
+      layer(el, el.getAttribute("data-bico"));
+    });
+    // Sichtfenster auf den nächsten Knoten schieben.
+    Array.prototype.forEach.call($("fortTracks").querySelectorAll(".branchrail"), function (r) {
+      var nx = r.querySelector(".knot.next") || r.querySelector(".knot.done:last-child");
+      if (nx) r.scrollTop = Math.max(0, nx.offsetTop - r.clientHeight * 0.45);
+    });
+    Array.prototype.forEach.call($("fortTracks").querySelectorAll("[data-buyfort]"), function (b) {
+      b.addEventListener("click", function (e) {
+        buyFort(b.getAttribute("data-buyfort"), e);
+      });
+    });
+  }
+  function renderSkinBar() {
+    var sel = $("skinSel"), cur = window.CastleSkins.current();
+    sel.innerHTML = window.CastleSkins.list().map(function (s) {
+      return '<option value="' + s.key + '"' + (s.key === cur.key ? " selected" : "") + ">" +
+        s.name + "</option>";
+    }).join("");
+    $("skinNote").textContent = "Skin = 1 Artwork + 1 Anker-Objekt.";
+  }
+  function buyFort(key, ev) {
+    var AF = AFof();
+    if (!AF) return;
+    var r = AF.buy(key, gold(), DEMO_TROPHIES);
+    if (!r.ok) {
+      UISfx.deny();
+      toast(r.reason === "gold" ? "Nicht genug Gold (" + fmt(r.cost) + ")"
+        : r.reason === "locked" ? "Gesperrt bis " + fmt(r.lockAt) + " 🏆"
+        : r.reason === "maxed" ? "Bereits voll ausgebaut"
+        : r.reason === "cap" ? "Gesamt-Obergrenze erreicht" : "Kauf nicht möglich");
+      return;
+    }
+    setGold(gold() - r.cost);
+    UISfx.confirm();
+    // Kauf-Feedback: Lichtstrahl vom Knopf zur Burg + Glow-Puls (Teil A).
+    fireBuyRay(ev);
+    toast("Stufe " + r.lvl + " gekauft — " + fmt(r.cost) + " Gold · Power +" + fmt(r.power));
+    renderFortress();
+    var stage = $("castleStage");
+    stage.classList.remove("justbought"); void stage.offsetWidth;
+    stage.classList.add("justbought");
+  }
+  function fireBuyRay(ev) {
+    var stage = $("castleStage"); if (!stage) return;
+    var sb = stage.getBoundingClientRect();
+    var x = ev && ev.clientX != null ? ev.clientX : sb.left + sb.width / 2;
+    var y = ev && ev.clientY != null ? ev.clientY : sb.bottom + 60;
+    var tx = sb.left + sb.width / 2, ty = sb.top + sb.height * 0.35;
+    var ray = document.createElement("div");
+    ray.className = "buyray";
+    var dx = tx - x, dy = ty - y, len = Math.sqrt(dx * dx + dy * dy);
+    ray.style.left = x + "px";
+    ray.style.top = (y - len) + "px";
+    ray.style.height = len + "px";
+    ray.style.transform = "rotate(" + (Math.atan2(dx, -dy) * 180 / Math.PI).toFixed(1) + "deg)";
+    document.body.appendChild(ray);
+    setTimeout(function () { if (ray.parentNode) ray.parentNode.removeChild(ray); }, 620);
+  }
+
   /* ================= Navigation ================= */
   var NAVS = { navHome: "viewHome", navCollection: "viewCollection",
-               navForge: "viewForge", navPack: "viewPack" };
-  var NAV_IDS = ["navHome", "navCollection", "navTower", "navForge", "navPack"];
+               navForge: "viewForge", navPack: "viewPack",
+               navShop: "viewShop", navFortress: "viewFortress" };
+  var NAV_IDS = ["navShop", "navCollection", "navHome", "navFortress", "navPack",
+                 "navTower", "navForge"];
+  // navTower / navForge haben KEINEN eigenen Bottom-Nav-Knopf mehr (AA-
+  // Ordnung, §15.5): die Detailkarte öffnet jede Karte, die Schmiede der
+  // Forge-Button der Sammlung. Deshalb überall gegen null prüfen.
   function setNav(which) {
-    NAV_IDS.forEach(function (k) { $(k).classList.toggle("on", k === which); });
+    NAV_IDS.forEach(function (k) {
+      var el = $(k); if (el) el.classList.toggle("on", k === which);
+    });
   }
   function show(navId) {
     if (navId === "navTower") { openDetail(curId); return; }
     $("detailModal").classList.remove("open");
-    for (var k in NAVS) $(NAVS[k]).classList.toggle("active", k === navId);
+    for (var k in NAVS) {
+      var vw = $(NAVS[k]); if (vw) vw.classList.toggle("active", k === navId);
+    }
     setNav(navId);
     if (navId === "navHome") renderHome();
     if (navId === "navCollection") renderCollection();
     if (navId === "navForge") renderForge();
+    if (navId === "navShop") renderShop();
+    if (navId === "navFortress") renderFortress();
     if (navId === "navPack") { renderPackHeader(); renderTop(); }
   }
 
@@ -1768,16 +2673,21 @@ footer{padding:6px 12px 14px;text-align:center}
     toast("Arena " + a.n + " von " + ARENA_TIERS.length + ": " + a.name);
   });
   $("arenaProgIcon").addEventListener("click", function (e) { e.stopPropagation(); openRoad(); });
+  $("skinSel").addEventListener("change", function () {
+    window.CastleSkins.set($("skinSel").value);
+    UISfx.confirm(); renderFortress(); toast("Burg-Skin gewechselt");
+  });
   $("roadOk").addEventListener("click", closeRoad);
   $("roadTop").addEventListener("click", roadScrollTop);
   $("roadUp").addEventListener("click", function () {
     var sc = $("roadScroll");
     sc.scrollTop = Math.max(0, sc.scrollTop - sc.clientHeight * 0.85);
   });
-  $("navCollection").addEventListener("click", function () { show("navCollection"); });
-  $("navTower").addEventListener("click", function () { show("navTower"); });
-  $("navForge").addEventListener("click", function () { show("navForge"); });
-  $("navPack").addEventListener("click", function () { show("navPack"); });
+  function onNav(id, target) {
+    var el = $(id); if (el) el.addEventListener("click", function () { show(target || id); });
+  }
+  onNav("navCollection"); onNav("navTower"); onNav("navForge");
+  onNav("navPack"); onNav("navShop"); onNav("navFortress");
   $("btnToForge").addEventListener("click", function () { show("navForge"); });
   $("btnDetailBack").addEventListener("click", closeDetail);
   $("btnDetailClose").addEventListener("click", closeDetail);
@@ -1823,15 +2733,22 @@ footer{padding:6px 12px 14px;text-align:center}
 
   /* ================= Start ================= */
   setSort("level");
+  hydrateIcons();          // <i data-ico> -> Kristall-Icon (Emoji-Fallback)
   applyAssets();
   renderCollection();
+  renderShop();
   renderPackHeader();
   renderHome();
   setNav("navHome");
+  markPressable();         // EINE Interaktions-Schicht fuer alles Klickbare
+  UIBadge.set("pack", 1);  // Demo: ein Gratis-Tagespack wartet
   window.__proto = { AC: AC, openDetail: openDetail, show: show, seed: seed,
                      setSort: setSort, sortedIds: sortedIds,
                      ASSETS: ASSETS, ARENA_TIERS: ARENA_TIERS, renderHome: renderHome,
                      openRoad: openRoad, closeRoad: closeRoad, nodeList: nodeList,
+                     LEAGUE_GATES: LEAGUE_GATES, renderShop: renderShop,
+                     renderFortress: renderFortress, buyDeal: buyDeal, buyFort: buyFort,
+                     markPressable: markPressable, ico: ico, CastleSkins: window.CastleSkins,
                      nextNodeTrophies: nextNodeTrophies };
 })();
 </script>

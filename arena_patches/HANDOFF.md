@@ -315,12 +315,23 @@ Der WIRING-Block oben in `arena_cards.js` listet alle vier Einbaustellen mit Cod
 eigenes Bottom-Nav-Tab **„Upgrade"**, das die Festung des Spielers dauerhaft aufwertet —
 getrennt von den Turmkarten (`AA_UI_REFERENZ.md` §9.9 / §12.6).
 
-**Was es tut:** Drei Gold-Tracks à 12 Stufen — `hp` (Burg-HP), `prismDmg` (Prisma-Schaden),
-`prismRate` (Prisma-Tempo). **Ein gemeinsamer Kostenzähler über alle Tracks**
-(`6000 + 1000 × gekaufte Gesamtstufen` → 6 000 · 7 000 · … · 41 000, Summe **846 000 Gold**
-für alle 36 Stufen), abnehmender Grenznutzen (Bonus × 0.93 je Stufe), Gates über **Trophäen**
-(1-6 frei · 7-12 ab 600 🏆 · 13-24 ab 1200 · 25-36 ab 1500 — AAs belegte Arena-Schwellen).
-Voll ausgebaut: `hpMul 1.498` / `prismDmgMul 1.664` / `prismRateMul 1.415`, Power +6 120.
+**Was es tut:** Drei Gold-Tracks à **100 Stufen** — `hp` (Burg-HP), `prismDmg`
+(Prisma-Schaden), `prismRate` (Prisma-Tempo). **Ein gemeinsamer Kostenzähler über alle
+Tracks** (`6000 + 1000 × gekaufte Gesamtstufen` → 6 000 · 7 000 · … · 305 000, Summe
+**46 650 000 Gold** für alle 300 Stufen), abnehmender Grenznutzen (Bonus × 0.977 je Stufe),
+Gates über **Trophäen** — 15 Tore à 20 Stufen, verteilt über die volle Leiter aus
+`AA_UI_REFERENZ.md` §15: 0 · 300 · 600 · 900 · 1200 · 1500 · 2000 · 2500 · 2900 · 3500 ·
+4500 · 5000 · 6000 · 7000 · 9000 🏆.
+Voll ausgebaut: `hpMul 3.354` / `prismDmgMul 4.139` / `prismRateMul 2.962`,
+Gesamt-Power **320 100** (`powerSum(300)`).
+
+> **⚠ KALIBRIERT NACH VIDEO 9** (`AA_UI_REFERENZ.md` §16). Die frühere Fassung lief bis
+> Stufe 12 je Track (36 gesamt, 846 000 Gold) — das war der Stand vor dem Burg-Video. Neu
+> belegt: AA hat **genau drei** Tracks, die Kostengerade `6000 + 1000 × Stufe` hält über den
+> ganzen Bereich, und **„Power +N" wächst** mit der Stufe (`powerAt(n) = 170 + 6 × (n−1)`,
+> AA-gelesen +418 … +840) während der prozentuale Bonus fällt. AA gatet über das
+> **Account-Level** („Level Too Low"); wir bleiben bei Trophäen, weil der Prototyp kein
+> Account-Level führt (§16.4).
 
 **Einbau (arena_pan.html):**
 1. Script einbinden.
@@ -343,7 +354,7 @@ ArenaFortress.TRACKS.forEach(tr => {
   const i = ArenaFortress.trackInfo(tr.key);
   // i.locked  → Button "Ab " + i.lockAt + " 🏆"   (AAs "Level Too Low"-Äquivalent)
   // sonst     → "🪙 " + i.nextCost  und  i.stat + " +" + i.nextPct + " %"
-  //             plus "Power +" + ArenaFortress.POWER_PER_STEP
+  //             plus "Power +" + ArenaFortress.powerAt(totalStepNo)
 });
 const r = ArenaFortress.buy('hp', hubGold);   // Gold zieht der HUB ab:
 if (r.ok) setHubGold(hubGold - r.cost);
@@ -355,13 +366,14 @@ Red Dot auf dem Tab: `ArenaFortress.anyAffordable(hubGold)`.
 Persistiert werden ausschließlich die Stufen (`localStorage.arenaFortress`).
 
 **Trophäen-Anbindung:** liest defensiv `ArenaProfile.get().trophies`. Fehlt das Modul, gilt 0
-— dann sind genau die sechs freien Stufen kaufbar und nichts wirft eine Exception. Für Tests
+— dann sind genau die ersten 20 freien Stufen kaufbar und nichts wirft eine Exception. Für Tests
 und Sonderfälle nehmen `trackInfo(key, trophies)` und `buy(key, gold, trophies)` einen
 expliziten Wert, der Vorrang hat.
 
-**Tuning:** `LEVELS_PER_TRACK` (12), `TOTAL_CAP` (36), `COST_BASE` (6000), `COST_STEP` (1000),
-`DECAY` (0.93), `POWER_PER_STEP` (170), die `base`-Werte der drei Tracks (0.06 / 0.08 / 0.05)
-und die `GATES`-Schwellen.
+**Tuning:** `LEVELS_PER_TRACK` (100), `TOTAL_CAP` (300), `COST_BASE` (6000), `COST_STEP`
+(1000), `DECAY` (0.977), `POWER_PER_STEP` (170) + `POWER_GROW` (6), die `base`-Werte der drei
+Tracks (0.06 / 0.08 / 0.05) und die `GATES`-Schwellen. Zusätzliche API für die UI:
+`allTracks(trophiesOverride)`, `bonusAt(key, n)`, `powerAt(n)`, `powerSum(n)`, `nextGate()`.
 
 **Warum es wichtig ist:** `DESIGN_PROGRESSION.md` dokumentiert Gold als Endgame-Bottleneck
 (eine Karte Lv1→100 = 3.4 Mio Gold ≈ 600 Tage). Die Festung ist die **zweite sinnvolle
@@ -671,3 +683,165 @@ Hex-Rahmen (Demo 2 Bronze + 2 leer, Klick → Pack-Ansicht; im Spiel an `ArenaPr
 **Und eine Korrektur der Optik** (§14.2): Arenen sind **schwebende Insel-Dioramen** auf
 dunklem Grund, **kein** vollflächiger Hintergrund. Unsere Querformat-Key-Art wird deshalb
 als gerundete, schwebende Karte mit Glow und Schlagschatten gezeigt (`.diorama`).
+
+---
+
+## Asset-Batch 2, Interaktions-Schicht, Shop, Festung (Stand 2026-07-25, Runde 3-6)
+
+### Asset-Batch 2 — 52 weitere Assets
+
+`ui_assets.json` enthält jetzt **77 Assets** (Batch 1 = 25, Batch 2 = 52), jedes mit
+`{url, job, type, batch, beschreibung}`. Neu in Batch 2:
+
+| Gruppe | Anzahl | Inhalt |
+|---|---|---|
+| A — Währungen/Ressourcen | 7 | Trophäe, Gem, Goldmünze, Angriffs-/Tempo-/Spezial-Essenz, XP-Stern |
+| B — Nav/Hub-Icons | 13 | Start, Sammlung, Turm, Schmiede, Packs + Pass, Post, Klan, Events, Herausforderungen, Shop, Rangliste, Einstellungen |
+| C — Straßen-Elemente | 8 | Knoten-Podest (Kristallsockel), 4 Deko-Props, Hex-Slot-Rahmen, Arena-Wappen, Bronzetruhe |
+| D — Teaser-Artworks | 12 | 6 Map-Ziele + 6 Trick-Karten |
+| E — Leiter/Liga | 4 | Arena 7 + 8 Dioramen, Liga-Tor-Emblem, Spitzen-Emblem |
+| F — Kleinteile | 4 | Info-„i", Schloss, Häkchen-Siegel, Funken-Burst |
+| Festung | 4 | Burg-Basis-Artwork + 3 **große** Track-Embleme (Ast-Köpfe) |
+
+**Credits:** Batch 1 = 50, Batch 2 = 104 → **154 Credits, 0 Retakes**. Der Deckel von 200
+Credits für Batch 2 wurde nicht ausgeschöpft. Alle Assets sind per Tesseract-OCR als
+**textfrei** verifiziert. Download-Anleitung: dieselbe `curl`-Schleife wie bei Batch 1
+(Abschnitt „Assets vom CDN nach `public/assets/` holen") — sie liest `ui_assets.json`
+und zieht daher Batch 2 automatisch mit.
+
+### Icons statt Emojis — mit Emoji als Fallback
+
+Emojis sind **nur noch Notnagel**. Jedes Icon im Markup ist:
+
+```html
+<img class="ico" src="<CDN-URL>" alt="🏆" onerror="UIIcon.fail(this)">
+```
+
+`UIIcon.fail()` ersetzt das `<img>` durch ein `<span>` mit dem Emoji aus `alt` — schlägt
+das CDN fehl, bleibt die UI vollständig lesbar. Im Markup steht dafür die Kurzform
+`<i data-ico="cur_gold" data-emoji="🪙"></i>`, die `hydrateIcons(root)` nach jedem Render
+auflöst. `.ico` trägt `mix-blend-mode: screen`, damit sich der dunkle #0e1418-Grund der
+Assets auf dunkler UI von selbst auflöst — **kein Freistellen nötig**.
+
+### Interaktions-Schicht — EINE Stelle für alles Klickbare
+
+Vier zusammenhängende Bausteine, absichtlich mit den Namen, die die Spiel-Engine schon
+verwendet, damit der Einbau am Mac **nur Umhängen** ist:
+
+| Baustein | API | Aufgabe |
+|---|---|---|
+| `.pressable` | `markPressable(root)` | setzt die Klasse auf alles Klickbare (`PRESS_SEL`); `:active` → `scale(.96)` + `brightness(.85)`, 90 ms; `[disabled]` → entsättigt, `pointer-events:none` |
+| Tap-Funken | `window.UIFx.spark(x, y, n)` | CSS-Partikel-Burst am Klickpunkt in `#fxLayer` — **kein Canvas** |
+| Klick-Sounds | `window.UISfx.tap() / confirm() / deny() / reward() / mute() / isMuted()` | kleine WebAudio-Blips, Kontext wird erst beim ersten echten Tap erzeugt (Autoplay-Policy) |
+| Rote Punkte | `window.UIBadge.set(navKey, n)` | `navKey` ∈ `collection` \| `shop` \| `pack`; `n = 0` versteckt das Badge |
+
+> **⚠ SFX UMHÄNGEN, NICHT ERSETZEN.** `window.UISfx` hat **absichtlich dieselben
+> Funktionsnamen** wie die SFX-Engine des Spiels. Beim Einbau **nicht** die Aufrufe im
+> Prototyp umschreiben, sondern `window.UISfx` einmal auf die echte Engine zeigen lassen:
+>
+> ```js
+> window.UISfx = { tap: Sfx.uiTap, confirm: Sfx.uiConfirm,
+>                  deny: Sfx.uiDeny, reward: Sfx.uiReward,
+>                  mute: Sfx.toggleMute, isMuted: Sfx.isMuted };
+> ```
+>
+> Danach klingt der ganze Meta-UI-Layer wie das restliche Spiel, ohne eine einzige
+> Aufrufstelle anzufassen. Dasselbe gilt für `UIFx.spark` (auf die Partikel-Engine) und
+> `UIBadge.set` (auf das echte Badge-System).
+
+Ein Pointer-Handler auf `document` erledigt Pressed-Klasse, Funken und Tap-Sound
+**delegiert** — neue Buttons brauchen nur `.pressable` bzw. einen Lauf durch
+`markPressable()`, keine eigenen Listener.
+
+### Neue Views: Shop und Festung, neue Nav-Reihenfolge
+
+**Bottom-Nav in AAs Reihenfolge** (§15.5): **Shop | Sammlung | START | Festung | Packs**
+— START mittig und größer. Die **Schmiede hat keinen eigenen Nav-Knopf mehr**, sie hängt
+am Forge-Button der Sammlung (`#btnToForge`). Konsequenz für den Code: `NAV_IDS` enthält
+weiterhin `navTower`/`navForge`, deren `$()`-Lookups sind aber **überall null-geprüft**.
+
+**Shop** (`#viewShop`, nach AA §8, aber ohne Echtgeld): 6 Tagesangebote mit
+Stückzahl-Countdown und statischem Refresh-Timer, 4 Packs (Bronze für Gold, Silber/Gold/
+Arkan für Gems) plus **1 Gratis-Tagespack** mit Badge, jedes mit Garantietext und
+**offenem Pity-Stand**. Käufe laufen gegen die Demo-Wallet und `ArenaCards`; ein
+Pack-Kauf öffnet direkt die Pack-Ansicht (`openPackKey`).
+
+**Festung** (`#viewFortress`): Layout „1+3 kombiniert" — siehe nächster Abschnitt.
+
+### Festung: lebende Burg + Kristall-Konstellation
+
+Die Mathematik liegt komplett in `arena_fortress.js` (auf **Lv 100 je Track**
+kalibriert, AA-Referenz §16.6); die View ist reine Präsentation und liest ausschließlich
+`allTracks()`. Drei Bausteine:
+
+* `renderCastle(tracks)` — Overlay-Ebenen über dem Burg-Artwork. Aus `lvl/maxLvl` je Track
+  werden Strahlbreite/-höhe/-glow (`#fxBeam`), Schild-Radius (`#fxShield`) und Anzahl der
+  Mauer-Kristalle (`#castleFx[data-walls]`) berechnet; `prismRate` steuert die
+  `animation-duration` des Strahlpulses.
+* `renderConstellation(tracks)` — drei Äste, ein Knoten je Stufe, Fenster um die aktuelle
+  Stufe (`WINDOW_BEFORE = 6`, `WINDOW_AFTER = 14`). **Die Knoten sind Daten** — mehr Stufen
+  ändern am Layout nichts.
+* `buyFort(key, ev)` → `fireBuyRay(ev)` (Lichtstrahl vom Knopf zur Burg) + `.justbought`
+  (Glow-Puls) + `renderFortress()`.
+
+> **Layout bewusst noch nicht final.** Der User wählt die endgültige Optik separat. Die
+> Trackdaten sind deshalb **sauber vom Markup getrennt**: alles, was die View braucht,
+> kommt aus `ArenaFortress.allTracks()`. Ein Layoutwechsel betrifft nur `renderCastle` /
+> `renderConstellation`, keine Datenstruktur.
+
+### 🔑 `window.CastleSkins` — die Skin-Architektur (für den späteren Verkauf)
+
+**Die Burg ist nirgends hart verdrahtet.** Jede Stelle, die eine Burg zeigt, fragt die
+Registry:
+
+```js
+window.CastleSkins.current();   // → { key, name, img, anchors }
+window.CastleSkins.list();      // → [{ key, name }, …]
+window.CastleSkins.set(key);    // persistiert in localStorage "arenaSkins"
+window.CastleSkins.register(s); // neuen Skin anmelden
+```
+
+Ein Skin ist **1 Artwork + 1 Anker-Objekt**:
+
+```js
+{ key: "prisma", name: "Prisma-Feste (Standard)", img: "<URL>",
+  anchors: {
+    prismTip: { x: 50, y: 30 },               // Ansatzpunkt des Prisma-Strahls
+    shield:   { x: 50, y: 62 },               // Zentrum des Schild-Schimmers
+    walls: [ {x:30,y:74}, {x:70,y:74}, … ]    // Ankerpunkte der Kristall-Anbauten
+  } }
+```
+
+**Alle Anker sind PROZENTWERTE der Bühne (0-100), niemals Pixel.** Genau das macht Skins
+billig: Die Upgrade-Optik ist **nicht ins Artwork eingebacken**, sondern liegt als
+Overlay-Ebene darüber. Ein neuer Verkaufs-Skin muss deshalb **nicht** in n Ausbaustufen
+gemalt werden — er liefert ein Bild plus sechs bis acht Zahlenpaare und funktioniert
+sofort mit allen 100 Stufen.
+
+**Regeln für den Einbau:**
+
+1. **Nie** `ASSETS.fort_castle` direkt referenzieren — immer `CastleSkins.current().img`.
+   Das gilt auch für Home, Sieg-Screen und jede künftige Burg-Darstellung.
+2. Neue Overlay-Effekte **ausschließlich** über Anker positionieren. Braucht ein Effekt
+   einen Punkt, den es noch nicht gibt, kommt ein **neuer Anker** ins Schema (und in jeden
+   Skin) — kein Pixel-Offset.
+3. `set(key)` schreibt nur eine ID; im echten Spiel gehört diese ID ins **Spielerprofil**,
+   nicht in den `localStorage`, damit der Skin geräteübergreifend gilt.
+4. **MATCH-Skins sind ein anderes Format.** Die Burg im Spielfeld wird gedreht dargestellt
+   und braucht daher zusätzlich das **24-Winkel-Sheet** wie `castle_v3`. Meta-Skin
+   (1 Artwork + Anker) und Match-Skin (24-Winkel-Sheet) sind getrennte Assets desselben
+   Produkts — beim Bepreisen zusammen denken, beim Produzieren getrennt beauftragen.
+
+### Wo `.goldtext` NICHT hin darf
+
+Stehende Regel nach zwei Bugs: `.goldtext` arbeitet mit `background-clip:text` und
+`-webkit-text-fill-color: transparent`. **Auf hellen oder goldenen Flächen ist die
+Schrift dadurch unsichtbar.** Für Beschriftungen auf Gold-Buttons stattdessen:
+
+```css
+-webkit-text-fill-color: #3a2b07; color: #3a2b07; filter: none;
+```
+
+Betroffen waren der „Weiter"-Knopf der Merge-Zeremonie und das „Nach oben"-Label der
+Trophäenstraße — beide gefixt. Bei **jeder neuen Beschriftung** vorher prüfen, worauf sie
+liegt.

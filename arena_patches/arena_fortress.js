@@ -36,7 +36,7 @@
  * WARUM DAS WICHTIG IST: DESIGN_PROGRESSION.md dokumentiert, dass Gold der
  * Endgame-Bottleneck ist (eine Karte Lv1→100 kostet 3.4 Mio Gold ≈ 600
  * Tage). Ein Festungsbaum ist die ZWEITE sinnvolle Gold-Senke — planbar,
- * abgeschlossen (846 000 Gold für alle 36 Stufen) und für JEDES Match
+ * abgeschlossen (46,65 Mio Gold für alle 300 Stufen) und für JEDES Match
  * wirksam, nicht nur für eine Karte. Er nimmt der Karten-Goldkurve den
  * Druck, ohne die Sammlung zu entwerten.
  *
@@ -77,19 +77,36 @@
   var KEY = "arenaFortress";
   var STATE_VERSION = 1;
 
-  var LEVELS_PER_TRACK = 12;   // Stufen je Track
-  var TOTAL_CAP = 36;          // 3 Tracks × 12 — der gemeinsame Kostenzähler-Deckel
+  /* ==================================================================
+   * KALIBRIERT NACH VIDEO 9 (Burg-Upgrades im Detail, §16)
+   * ------------------------------------------------------------------
+   * Video 9 zeigt AAs Festungs-Screen über ~40 Karten hinweg. Belegt:
+   *   · EXAKT DREI Tracks: Max Health · DPS · Attack Speed
+   *   · die Kostenreihe 6 000 + 1 000 × Stufe hält über den ganzen
+   *     Bereich: Stufe 12 = 17 000 (Video 6) und die hohen Karten liegen
+   *     im Bereich 20-60 K — beides passt auf dieselbe Gerade.
+   *   · "Power +N" WÄCHST mit der Stufe: gelesen +418 … +840. AAs
+   *     konstantes "+170" aus Video 6 war der Wert einer FRÜHEN Stufe.
+   *   · Attack Speed bleibt bei +1 % pro Stufe (gerundete Anzeige),
+   *     DPS sinkt 17 % → 11 % → 10 % → 8 % ⇒ Decay ≈ 0.975-0.977.
+   *   · Gesperrte Stufen zeigen "Level Too Low" — AA gatet über das
+   *     ACCOUNT-LEVEL, nicht über Trophäen (siehe §16.4).
+   * Wir bleiben bei Trophäen-Gates (der Prototyp hat kein Account-Level)
+   * und verteilen sie über die volle Leiter aus Video 8.
+   * ================================================================== */
+  var LEVELS_PER_TRACK = 100;  // Stufen je Track (war 12 — auf Lv 100 erweitert)
+  var TOTAL_CAP = 300;         // 3 Tracks × 100 — gemeinsamer Kostenzähler-Deckel
   var COST_BASE = 6000;        // AA-Beleg: erste Stufe 6 000 Gold (§9.9)
-  var COST_STEP = 1000;        // AA-Beleg: grob +1 000 pro Stufe
-  var DECAY = 0.93;            // Bonus × 0.93 je gekaufter Stufe DIESES Tracks
-  var POWER_PER_STEP = 170;    // AA-Beleg: "Power +170" pro Stufe (§9.9)
+  var COST_STEP = 1000;        // AA-Beleg: +1 000 pro Stufe, über den ganzen Bereich
+  var DECAY = 0.977;           // AA-Beleg §16.3: DPS 17 % → 8 % über ~30 Stufen
+  var POWER_PER_STEP = 170;    // Basiswert; growPower() staffelt ihn (§16.3)
 
   /* ---------- Tracks ----------
    * base = Bonus der ERSTEN Stufe. Stufe n gibt base × 0.93^(n-1).
-   * Bei 12 Stufen landet die letzte auf 0.93^11 = 45.0 % des Startwerts:
-   *   hp        6.00 %  →  2.70 %   (Summe +49.8 %)
-   *   prismDmg  8.00 %  →  3.60 %   (Summe +66.4 %)
-   *   prismRate 5.00 %  →  2.25 %   (Summe +41.5 %)
+   * Bei 100 Stufen landet die letzte auf 0.977^99 = 9.9 % des Startwerts:
+   *   hp        6.00 %  →  0.59 %   (Summe +235 %)
+   *   prismDmg  8.00 %  →  0.79 %   (Summe +314 %)
+   *   prismRate 5.00 %  →  0.49 %   (Summe +196 %)
    * Die Design-Vorgabe lautete "abnehmend bis etwa die Hälfte" (3 / 4 /
    * 2.5 %); maßgeblich ist der Decay-Faktor, weil er die KURVE definiert —
    * die Endpunkte sind sein Ergebnis, nicht umgekehrt. */
@@ -113,12 +130,44 @@
    * Schwelle. Die Werte sind AAs belegte Arena-Aufstiege (§9.5):
    * Arena 3 = 600, Arena 5 = 1200, Arena 6 ≈ 1500. Stufen 1-6 sind frei,
    * damit die Festung schon im Tutorial-Umfeld anfassbar ist. */
+  /* Trophäen-Gates über die VOLLE Leiter aus Video 8 (§15.2) verteilt:
+     je 20 gekaufte Gesamtstufen ein neues Tor, die Schwellen sind exakt
+     die belegten Arena- bzw. Liga-Tor-Werte. Die ersten 20 Stufen sind
+     frei, damit die Festung schon im Tutorial anfassbar ist. */
   var GATES = [
-    { upTo: 6,  trophies: 0,    label: "frei" },
-    { upTo: 12, trophies: 600,  label: "Arena 3" },
-    { upTo: 24, trophies: 1200, label: "Arena 5" },
-    { upTo: 36, trophies: 1500, label: "Arena 6" },
+    { upTo: 20,  trophies: 0,    label: "frei" },
+    { upTo: 40,  trophies: 300,  label: "Arena 2" },
+    { upTo: 60,  trophies: 600,  label: "Arena 3" },
+    { upTo: 80,  trophies: 900,  label: "Arena 4" },
+    { upTo: 100, trophies: 1200, label: "Arena 5" },
+    { upTo: 120, trophies: 1500, label: "Arena 6" },
+    { upTo: 140, trophies: 2000, label: "Arena 7" },
+    { upTo: 160, trophies: 2500, label: "Arena 8" },
+    { upTo: 180, trophies: 2900, label: "Liga-Tor 1" },
+    { upTo: 200, trophies: 3500, label: "Liga-Tor 2" },
+    { upTo: 220, trophies: 4500, label: "Liga-Tor 4" },
+    { upTo: 240, trophies: 5000, label: "Liga-Tor 5" },
+    { upTo: 260, trophies: 6000, label: "Liga-Tor 6" },
+    { upTo: 280, trophies: 7000, label: "Liga-Tor 7" },
+    { upTo: 300, trophies: 9000, label: "Liga-Tor 9" },
   ];
+
+  /* ---------- Power-Zuwachs (AA-Beleg §16.3) ----------
+   * Video 6 zeigte "Power +170" auf einer FRÜHEN Stufe, Video 9 auf
+   * höheren Karten +418 … +840. Der Zuwachs wächst also linear mit der
+   * Gesamtstufe. powerAt(n) = 170 + 6 × (n−1):
+   *   Stufe 1 = 170 · Stufe 42 = 416 · Stufe 100 = 764 · Stufe 300 = 1 964
+   * Damit liegen AAs gelesene Werte genau im Band der mittleren Stufen. */
+  var POWER_GROW = 6;
+  function powerAt(stepNo) {
+    stepNo = Math.max(1, stepNo | 0);
+    return POWER_PER_STEP + POWER_GROW * (stepNo - 1);
+  }
+  // Summe der Power über die ersten n Gesamtstufen.
+  function powerSum(n) {
+    n = Math.max(0, n | 0);
+    return n * POWER_PER_STEP + POWER_GROW * (n * (n - 1) / 2);
+  }
 
   /* ================= Persistenz ================= */
 
@@ -249,6 +298,7 @@
       locked: locked, lockAt: locked ? gate.trophies : null,
       lockLabel: locked ? gate.label : null,
       trophies: troph, power: lvl * POWER_PER_STEP,
+      nextPower: maxed || capReached ? null : powerAt(stepNo),
     };
   }
 
@@ -289,8 +339,8 @@
     out.bonus = bonus;
     out.pct = Math.round(bonus * 1000) / 10;
     out.mul = 1 + bonusTotal(key, lvl + 1);
-    out.power = POWER_PER_STEP;
-    out.totalPower = st.steps * POWER_PER_STEP;
+    out.power = powerAt(st.steps);
+    out.totalPower = powerSum(st.steps);
     return out;
   }
 
@@ -298,7 +348,7 @@
    * Das ist die EINE Funktion, die das Match braucht. */
   function totalMultipliers() {
     var st = get();
-    var out = { steps: st.steps, power: st.steps * POWER_PER_STEP, goldSpent: st.goldSpent };
+    var out = { steps: st.steps, power: powerSum(st.steps), goldSpent: st.goldSpent };
     for (var i = 0; i < TRACKS.length; i++) {
       out[TRACKS[i].mulKey] = 1 + bonusTotal(TRACKS[i].key, st.lvl[TRACKS[i].key]);
     }
@@ -329,7 +379,8 @@
     TRACKS: TRACKS, TRACK_KEYS: TRACK_KEYS, GATES: GATES,
     LEVELS_PER_TRACK: LEVELS_PER_TRACK, TOTAL_CAP: TOTAL_CAP,
     COST_BASE: COST_BASE, COST_STEP: COST_STEP, DECAY: DECAY,
-    POWER_PER_STEP: POWER_PER_STEP,
+    POWER_PER_STEP: POWER_PER_STEP, POWER_GROW: POWER_GROW,
+    powerAt: powerAt, powerSum: powerSum,
     get: get, trackInfo: trackInfo, allTracks: allTracks, buy: buy,
     totalMultipliers: totalMultipliers, anyAffordable: anyAffordable,
     nextGate: nextGate, costAt: costAt, totalCost: totalCost,
@@ -381,12 +432,23 @@
       }
       return true;
     }));
-    check("letzte Stufe ≈ halber Startbonus (0.93^11 = 45.0 %)",
-      Math.abs(bonusAt("hp", 12) / bonusAt("hp", 1) - Math.pow(DECAY, 11)) < 1e-12 &&
-      Math.abs(bonusAt("hp", 12) / bonusAt("hp", 1) - 0.45) < 0.01,
-      r1(bonusAt("hp", 12) * 100) + " % / " + r1(bonusAt("prismDmg", 12) * 100) + " % / " +
-      r1(bonusAt("prismRate", 12) * 100) + " %");
-    check("Bonus jenseits des Track-Caps ist 0", bonusAt("hp", 13) === 0 && bonusAt("hp", 0) === 0);
+    // AA-kalibriert (§16.3): Decay 0.977 — Stufe 100 liegt bei 0.977^99 ≈ 9.9 %
+    // des Startbonus. AAs DPS lief 17 % → 8 % über ~30 Stufen, das ist genau
+    // diese Kurve. Die Anzeige rundet auf 0,1 %; Attack Speed steht deshalb
+    // in AA lange auf "+1 %".
+    check("letzte Stufe ≈ 9.9 % des Startbonus (0.977^99)",
+      Math.abs(bonusAt("hp", LEVELS_PER_TRACK) / bonusAt("hp", 1) -
+               Math.pow(DECAY, LEVELS_PER_TRACK - 1)) < 1e-12 &&
+      Math.abs(bonusAt("hp", LEVELS_PER_TRACK) / bonusAt("hp", 1) - 0.099) < 0.005,
+      r1(bonusAt("hp", LEVELS_PER_TRACK) * 100) + " % / " +
+      r1(bonusAt("prismDmg", LEVELS_PER_TRACK) * 100) + " % / " +
+      r1(bonusAt("prismRate", LEVELS_PER_TRACK) * 100) + " %");
+    check("AA-Anker: DPS Stufe 1 ≈ 8 %, Stufe 30 ≈ 4 % (Video 9)",
+      Math.round(bonusAt("prismDmg", 1) * 100) === 8 &&
+      Math.abs(bonusAt("prismDmg", 30) * 100 - 4.0) < 0.4,
+      r1(bonusAt("prismDmg", 1) * 100) + " % → " + r1(bonusAt("prismDmg", 30) * 100) + " %");
+    check("Bonus jenseits des Track-Caps ist 0",
+      bonusAt("hp", LEVELS_PER_TRACK + 1) === 0 && bonusAt("hp", 0) === 0);
     check("unbekannter Track → kein Bonus, kein Crash", bonusAt("quatsch", 1) === 0 &&
       trackInfo("quatsch") === null);
 
@@ -402,10 +464,15 @@
       series.slice(0, 4).join(",") === "6000,7000,8000,9000", series.slice(0, 4).join(" · "));
     check("AAs beobachtete 17 000 liegen auf der Reihe", series.indexOf(17000) === 11,
       "Stufe " + (series.indexOf(17000) + 1));
-    check("Reihe streng steigend, letzte Stufe 41 000",
+    check("Reihe streng steigend, letzte Stufe 305 000",
       series.every(function (c, j) { return j === 0 || c > series[j - 1]; }) &&
-      series[TOTAL_CAP - 1] === 41000, fmt(series[TOTAL_CAP - 1]));
-    check("Gesamtkosten 846 000 Gold (planbare Gold-Senke)", totalCost() === 846000, fmt(totalCost()));
+      series[TOTAL_CAP - 1] === 305000, fmt(series[TOTAL_CAP - 1]));
+    // Video 9 zeigt auf hohen Karten Kosten im Bereich 20-60 K — die
+    // Gerade 6000 + 1000 × Stufe trifft das (Stufe 20 = 25 K, Stufe 55 = 60 K).
+    check("AA-Anker: Stufe 20 = 25 000, Stufe 55 = 60 000",
+      series[19] === 25000 && series[54] === 60000, series[19] + " / " + series[54]);
+    check("Gesamtkosten 46,65 Mio Gold (Endgame-Gold-Senke)",
+      totalCost() === 46650000, fmt(totalCost()));
 
     /* --- 3. Gemeinsamer Zähler: Reihenfolge ist eine Entscheidung --- */
     reset();
@@ -422,8 +489,12 @@
     check("goldSpent mitgeführt (6000+7000+8000)", get().goldSpent === 21000, get().goldSpent);
     check("trackInfo.nextCost == costAt(steps)", trackInfo("prismRate").nextCost === 9000,
       trackInfo("prismRate").nextCost);
-    check("Power +170 je Stufe", totalMultipliers().power === 3 * POWER_PER_STEP,
+    // AA §16.3: der Power-Zuwachs WÄCHST mit der Stufe (+170 früh, +418…+840 später).
+    check("Power wächst mit der Stufe (powerSum(3) = 528)",
+      totalMultipliers().power === powerSum(3) && powerSum(3) === 528,
       totalMultipliers().power);
+    check("AA-Anker: powerAt(42) ≈ 416, powerAt(100) = 764",
+      powerAt(42) === 416 && powerAt(100) === 764, powerAt(42) + " / " + powerAt(100));
 
     /* --- 4. Gold-Schranke (Abzug macht der Hub) --- */
     reset();
@@ -447,41 +518,46 @@
       if (!done) break;
     }
     console.log("\nGate-Sperre bei 0 Trophäen: " + bought + " Stufen kaufbar, dann blockiert");
-    check("bei 0 🏆 sind genau 6 Stufen kaufbar", bought === 6, bought);
+    check("bei 0 🏆 sind genau 20 Stufen kaufbar", bought === 20, bought);
     var lockInfo = trackInfo("hp");
     console.log("  trackInfo.locked = " + lockInfo.locked + ", lockAt = " + lockInfo.lockAt +
       " 🏆 (" + lockInfo.lockLabel + ")");
-    check("7. Stufe gesperrt, lockAt 600 (AA-Arena-3-Schwelle)", lockInfo.locked === true &&
-      lockInfo.lockAt === 600, lockInfo.lockAt);
+    check("21. Stufe gesperrt, lockAt 300 (Arena-2-Schwelle)", lockInfo.locked === true &&
+      lockInfo.lockAt === 300, lockInfo.lockAt);
     check("buy() verweigert mit reason 'locked'", buy("hp", 1e9).reason === "locked");
     check("nextGate() nennt die Lücke", (function () {
-      var g = nextGate(); return g && g.trophies === 600 && g.missing === 600;
+      var g = nextGate(); return g && g.trophies === 300 && g.missing === 300;
     })(), JSON.stringify(nextGate()));
     check("anyAffordable false bei Gate-Sperre", anyAffordable(1e9) === false);
-    TROPH = 600;
-    check("ab 600 🏆 wieder kaufbar", trackInfo("hp").locked === false && buy("hp", 1e9).ok === true);
+    TROPH = 300;
+    check("ab 300 🏆 wieder kaufbar", trackInfo("hp").locked === false && buy("hp", 1e9).ok === true);
     check("anyAffordable true nach dem Gate", anyAffordable(1e9) === true);
-    // Bis Stufe 12 durchkaufen, dann muss 1200 greifen
-    TROPH = 600; guard = 0;
-    while (get().steps < 12 && guard++ < 40) {
+    // Bis Stufe 40 durchkaufen, dann muss das 600er-Tor greifen
+    TROPH = 300; guard = 0;
+    while (get().steps < 40 && guard++ < 200) {
       for (var t2 = 0; t2 < TRACK_KEYS.length; t2++) if (buy(TRACK_KEYS[t2], 1e9).ok) break;
     }
-    check("Stufe 13 verlangt 1200 🏆 (Arena 5)", get().steps === 12 &&
-      trackInfo("prismRate").lockAt === 1200, get().steps + " Stufen, lockAt " +
+    check("Stufe 41 verlangt 600 🏆 (Arena 3)", get().steps === 40 &&
+      trackInfo("prismRate").lockAt === 600, get().steps + " Stufen, lockAt " +
       trackInfo("prismRate").lockAt);
-    TROPH = 1200;
-    check("ab 1200 🏆 geht es weiter", buy("prismRate", 1e9).ok === true);
-    check("Gate-Stufen 25-36 verlangen 1500 🏆", gateFor(25).trophies === 1500 &&
-      gateFor(36).trophies === 1500);
-    check("Gates decken alle 36 Stufen ab", GATES[GATES.length - 1].upTo === TOTAL_CAP);
+    TROPH = 600;
+    check("ab 600 🏆 geht es weiter", buy("prismRate", 1e9).ok === true);
+    // Gates liegen auf der vollen Video-8-Leiter (§15.2).
+    check("Gate-Stufen 281-300 verlangen 9000 🏆 (Liga-Tor 9)",
+      gateFor(281).trophies === 9000 && gateFor(300).trophies === 9000);
+    check("Gates decken alle 300 Stufen ab", GATES[GATES.length - 1].upTo === TOTAL_CAP);
+    check("Gate-Schwellen sind echte Leiter-Werte (Video 8)", GATES.every(function (g) {
+      return [0, 300, 600, 900, 1200, 1500, 2000, 2500, 2900, 3500, 4000, 4500,
+              5000, 6000, 7000, 8000, 9000].indexOf(g.trophies) >= 0;
+    }));
 
     /* --- 6. Caps: 12 je Track, 36 gesamt --- */
     reset();
     TROPH = 99999;
     var n1 = 0;
-    while (buy("hp", 1e9).ok && n1++ < 50) {}
+    while (buy("hp", 1e9).ok && n1++ < 400) {}
     console.log("\nTrack-Cap: " + n1 + " Käufe auf 'hp', dann reason '" + buy("hp", 1e9).reason + "'");
-    check("Track-Cap 12", get().lvl.hp === 12 && n1 === 12, get().lvl.hp);
+    check("Track-Cap 100", get().lvl.hp === 100 && n1 === 100, get().lvl.hp);
     check("über dem Track-Cap: reason 'maxed', nextCost null", buy("hp", 1e9).reason === "maxed" &&
       trackInfo("hp").nextCost === null && trackInfo("hp").maxed === true);
     check("gemaxter Track blockiert die anderen NICHT", buy("prismDmg", 1e9).ok === true);
@@ -500,12 +576,14 @@
     console.log("  Wirkung: Burg 15 000 → " + fmt(Math.round(15000 * tm.hpMul)) +
       " HP · Prisma-CD ×" + (1 / tm.prismRateMul).toFixed(3));
     check("Gesamt-Cap 36 erreicht", st9.steps === TOTAL_CAP, st9.steps);
-    check("alle Tracks auf 12", TRACK_KEYS.every(function (k) { return st9.lvl[k] === 12; }));
+    check("alle Tracks auf 100", TRACK_KEYS.every(function (k) { return st9.lvl[k] === 100; }));
     check("Gold-Summe == totalCost()", st9.goldSpent === totalCost(), fmt(st9.goldSpent));
-    check("hpMul ≈ 1.498 (+49.8 % Burg-HP)", Math.abs(tm.hpMul - 1.498) < 0.002, tm.hpMul.toFixed(4));
-    check("prismDmgMul ≈ 1.664", Math.abs(tm.prismDmgMul - 1.664) < 0.002, tm.prismDmgMul.toFixed(4));
-    check("prismRateMul ≈ 1.415", Math.abs(tm.prismRateMul - 1.415) < 0.002, tm.prismRateMul.toFixed(4));
-    check("Voll-Power 36 × 170 = 6120", tm.power === 6120, tm.power);
+    check("hpMul ≈ 3.354 (+235 % Burg-HP bei Lv 100)",
+      Math.abs(tm.hpMul - 3.354) < 0.01, tm.hpMul.toFixed(4));
+    check("prismDmgMul ≈ 4.139", Math.abs(tm.prismDmgMul - 4.139) < 0.01, tm.prismDmgMul.toFixed(4));
+    check("prismRateMul ≈ 2.962", Math.abs(tm.prismRateMul - 2.962) < 0.01, tm.prismRateMul.toFixed(4));
+    check("Voll-Power = powerSum(300) = 320 100", tm.power === 320100 && tm.power === powerSum(300),
+      fmt(tm.power));
     check("anyAffordable false am Cap", anyAffordable(1e9) === false);
     check("nextGate null am Cap", nextGate() === null);
 
@@ -520,8 +598,8 @@
     check("kaputter State wird geheilt", (function () {
       API._write({ v: 1, lvl: { hp: 999, prismDmg: -5, quatsch: 7 }, steps: 4242, goldSpent: -9 });
       var s = get();
-      return s.lvl.hp === 12 && s.lvl.prismDmg === 0 && s.lvl.prismRate === 0 &&
-             s.steps === 12 && s.goldSpent === 0 && s.lvl.quatsch === undefined;
+      return s.lvl.hp === 100 && s.lvl.prismDmg === 0 && s.lvl.prismRate === 0 &&
+             s.steps === 100 && s.goldSpent === 0 && s.lvl.quatsch === undefined;
     })(), JSON.stringify(get().lvl));
     check("fehlendes ArenaProfile → 0 Trophäen, keine Exception", (function () {
       reset();
@@ -534,7 +612,7 @@
     check("trophiesOverride hat Vorrang vor ArenaProfile", (function () {
       reset(); TROPH = 0;
       var a = trackInfo("hp", 5000);
-      for (var q = 0; q < 6; q++) buy("hp", 1e9, 5000);
+      for (var q = 0; q < 20; q++) buy("hp", 1e9, 5000);
       return a.trophies === 5000 && buy("prismDmg", 1e9, 5000).ok === true &&
              buy("prismDmg", 1e9, 0).reason === "locked";
     })());
