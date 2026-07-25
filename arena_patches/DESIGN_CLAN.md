@@ -180,21 +180,28 @@ validierbar ist.
 
 ### 3.2 Warum genau diese Zahlen
 
-Die Ziele sind so kalibriert, dass die **29 Bots ~90 % erreichen** und der Spieler den Rest
-liefert. Erwarteter Bot-Beitrag pro Woche und Bot: **12 Siege · 4 Packs · 180 🏆** (Jitter
-0.5–1.5×, Mittel 1.0) → 29 Bots ≈ **348 / 116 / 5 220**.
+Die Ziele sind so kalibriert, dass die **29 Bots ~89 % erreichen** und der Spieler den Rest
+liefert. Erwarteter Bot-Beitrag pro Woche und Bot: **11 Siege · 3,7 Packs · 168 🏆**
+(Jitter-Faktor 0,7–1,3×, Mittel 1,0) → 29 Bots ≈ **319 / 107 / 4 872**.
 
-| Quest | Bot-Erwartung | Ziel | Spieler-Anteil bis Gold |
-|---|---|---|---|
-| Siege | 348 | 360 | **12 Siege** |
-| Packs | 116 | 120 | **4 Packs** |
-| Trophäen | 5 220 | 5 400 | **180 🏆** |
+| Quest | Bot-Erwartung (σ) | Ziel | Bots allein | Spieler-Anteil bis Gold |
+|---|---|---|---|---|
+| Siege | 319 (± 10) | 360 | ~89 % | **41 Siege** ≈ 6/Tag |
+| Packs | 107 (± 3) | 120 | ~89 % | **13 Packs** ≈ 2/Tag |
+| Trophäen | 4 872 (± 157) | 5 400 | ~90 % | **528 🏆** ≈ 75/Tag |
 
 Das ist der Kern des Designs: **Der Clan schafft es ohne dich fast — und mit dir sicher.** Eine
-Wochenleistung, die ein engagierter Spieler in 3–4 Sitzungen erbringt, entscheidet die
+Wochenleistung, die ein engagierter Spieler in täglichen Sitzungen erbringt, entscheidet die
 Truhenstufe für **30 Leute**. Genau diese Hebelwirkung ist der Grund, warum Clan-Quests binden.
 Ziele deutlich über der Bot-Erwartung („der Clan schafft es nie") oder deutlich darunter („der
 Clan schafft es sowieso") töten den Effekt in beide Richtungen.
+
+> **Warum die Jitter-Spanne eng ist (0,7–1,3 statt 0,5–1,5).** Die Streuung der *Summe* über 29
+> Bots wächst mit der Spanne. Bei 0,5–1,5 liegt σ der Siege-Summe bei ±19 — dann reißt in etwa
+> jeder sechsten Woche ein Quest die 100 % **ohne** den Spieler, und die Quest ist in dieser
+> Woche Deko. Bei 0,7–1,3 sinkt σ auf ±10; die Bots landen verlässlich bei 84–96 %, und der
+> Spieler ist **immer** der Unterschied. Der erste Testlauf hat genau diesen Fehler
+> aufgedeckt (gemessen: 103 % / 88 % / 95 %).
 
 ### 3.3 Truhen-Staffel
 
@@ -235,15 +242,22 @@ Matches. Bewusst: Der Clan darf die Solo-Progression beschleunigen, nicht ablös
 Kein Timer, keine gespeicherten Zwischenstände. Der Bot-Beitrag ist eine **reine Funktion**:
 
 ```
-botProgress(quest, now) = Σ_bots floor( base[quest] · rate(bot, week, quest) · frac(now) )
-rate(...)  = 0.5 + 1.0 · hash01(seed, botId, weekKey, questKey)     // 0.5 .. 1.5, fix pro Woche
+botProgress(quest, now) = Σ_bots round( base[quest] · rate(bot, week, quest) · frac(now) )
+rate(...)  = 0.7 + 0.6 · hash01(seed, botId, weekKey, questKey)     // 0.7 .. 1.3, fix pro Woche
 frac(now)  = clamp( (now − Wochenstart) / 5 Tage , 0 , 1 )          // Sammelphase
 ```
 
 Eigenschaften, die daraus folgen und im Selbsttest geprüft werden: **monoton** (der Balken
-springt nie zurück), **reproduzierbar** (zweimal derselbe Zeitpunkt = dasselbe Ergebnis),
-**wochenstabil** (`rate` ändert sich nur beim Wochenwechsel) und **serverersetzbar** (eine echte
-Summe über 29 Datensätze hat genau dieselbe Signatur).
+springt nie zurück — `round` ist monoton in seinem Argument), **reproduzierbar** (zweimal
+derselbe Zeitpunkt = dasselbe Ergebnis), **wochenstabil** (`rate` ändert sich nur beim
+Wochenwechsel) und **serverersetzbar** (eine echte Summe über 29 Datensätze hat genau dieselbe
+Signatur).
+
+> **Implementierungsfalle, teuer bezahlt:** `hash01()` ist FNV-1a **mit murmur3-Finalisierung**.
+> Reines FNV-1a mischt die *zuletzt* eingespeisten Bytes kaum — und genau die variieren hier
+> (`…|k` mit k = 0…28). Ohne Finalisierung sind die 29 „Zufallswerte" korreliert und die
+> Summe verfehlt ihren Erwartungswert systematisch (gemessen: Packs bei 54 % statt 89 %).
+> Wer die Bot-Schicht erweitert, muss diesen Mischschritt beibehalten.
 
 ---
 
@@ -298,6 +312,11 @@ Ein Level-Up im Bereich Lv 8–12 kostet 4 500 🪙 (`GOLD_BANDS`); die Spenden-
 Materials ist dabei der elegantere Teil: Wer `fire`/`earth` spendet, bekommt Angriffs-Essenz —
 also genau das Material für die Karten, die er offensichtlich im Überfluss hat. Die Belohnung
 verstärkt die vorhandene Schwerpunktsetzung statt sie zu verwässern.
+
+**Wer bucht was:** Kartenkopien und Material bucht das Modul selbst über `ArenaCards` (dessen
+Domäne). **Gold wird nur gemeldet** (`reward.gold`) und vom Hub ausgezahlt — exakt dieselbe
+Arbeitsteilung wie in `arena_cards.js` (`goldFor()`) und `arena_fortress.js` (`buy()`). Es gibt
+im Projekt genau eine Gold-Wallet, und sie liegt nicht in einem Logik-Modul.
 
 **Bewusst NICHT belohnt:** der Empfänger. Er bekommt die Karten — das ist die Belohnung. Ein
 zusätzlicher Bonus fürs Anfragen würde Anfrage-Spam erzeugen.
@@ -519,8 +538,9 @@ MAX_MEMBERS          = 30          Spieler + 29 Bots
 MAX_ELDERS           = 5
 EMOTE_COOLDOWN_MS    = 60 s
 
-QUEST_GOALS          = { wins: 360, packs: 120, trophies: 5400 }
-BOT_WEEK_BASE        = { wins: 12,  packs: 4,   trophies: 180  }   je Bot
+QUEST_GOALS          = { wins: 360, packs: 120,  trophies: 5400 }
+BOT_WEEK_BASE        = { wins: 11,  packs: 3.7, trophies: 168  }   je Bot
+QUEST_RATE           = 0.7 … 1.3   Jitter je (Woche, Quest, Bot), Mittel 1.0
 CHEST_STEPS          = [ 0.50 Bronze, 0.80 Silber, 1.00 Gold ]
 
 WAR_ATTACKS_PER_DAY  = 3           → 6 pro Wochenende
