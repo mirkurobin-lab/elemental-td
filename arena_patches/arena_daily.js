@@ -13,6 +13,13 @@
  *   3. GRATIS-PACK-TIMER: alle 4 h ein Bronze-Pack, maximal 2 gestapelt.
  *      Der Stapel ist der eigentliche Trick — er verzeiht einen
  *      verpassten Blick, ohne zum Dauer-Vorrat zu werden.
+ *   4. LOGIN-KALENDER (7 Tage, v3). Beim ersten Öffnen des Tages ein
+ *      Popup mit sieben Kacheln; nach Tag 7 beginnt ein neuer Zyklus.
+ *      ANKER SIND BOOSTER-PACKS, keine Truhen — User-Vorgabe wörtlich:
+ *      „Daily Login Belohnungen mit Truhen wir brauchen aber mit
+ *      boosterpacks". Tag 3 Bronze, Tag 5 Silber, Tag 7 GOLD-Pack.
+ *      Der Kalender rückt NUR beim Abholen vor: ein verpasster Tag
+ *      kostet keinen Fortschritt (siehe LOGIN_REWARDS).
  *
  * WARUM DIESE DREI ZUSAMMEN: Quests geben ein TAGESZIEL, die Serie einen
  * Grund WEITERZUSPIELEN, wenn es läuft, und der Pack-Timer einen Grund
@@ -34,7 +41,7 @@
   "use strict";
 
   var KEY = "arenaDaily";
-  var STATE_VERSION = 2;
+  var STATE_VERSION = 3;
 
   var MINUTE = 60000, HOUR = 3600000, DAY = 86400000;
 
@@ -91,6 +98,38 @@
    * gibt es etwas — sonst wäre der Bonus ein Grundeinkommen und kein Bonus. */
   var STREAK_MUL = [1.00, 1.00, 1.10, 1.20, 1.30, 1.40, 1.50];
   var STREAK_CAP = STREAK_MUL.length - 1;
+
+  /* ---------- Login-Kalender (7 Tage) ----------
+   * User-Vorgabe wörtlich: „Daily Login Belohnungen mit Truhen wir
+   * brauchen aber mit boosterpacks". Deshalb sind die drei Anker des
+   * Zyklus BOOSTER-PACKS (Tag 3 / 5 / 7) und keine Truhen — Truhen
+   * gehören bei uns zum Clan (ArenaClan) und zur Tagesquest-Belohnung.
+   *
+   * ⚠ KEIN STREAK. Der Kalender rückt ausschließlich beim ABHOLEN vor,
+   * nie durch Zeitablauf. Wer drei Tage fehlt, macht danach bei
+   * derselben Kachel weiter. Begründung: Die Härte des täglichen Loops
+   * sitzt bereits im SIEGESSERIEN-Bonus (STREAK_MUL) — dort ist sie
+   * verdient, weil sie an Leistung hängt. Ein Login-Kalender, der
+   * Abwesenheit bestraft, erzeugt nur schlechtes Gewissen und ist
+   * nachweislich der schwächere Rückkehrgrund. Er ist ein GESCHENK.
+   * Werte und Herleitung: DESIGN_MONETARISIERUNG.md §Daily-Login. */
+  var LOGIN_REWARDS = [
+    { day: 1, sym: "🪙", kind: "gold",     gold: 1200, material: 0,  gems: 0,  pack: null,
+      name: "1 200 Gold" },
+    { day: 2, sym: "⚗",  kind: "material", gold: 0,    material: 12, gems: 0,  pack: null,
+      name: "12 Material" },
+    { day: 3, sym: "🎁", kind: "pack",     gold: 0,    material: 0,  gems: 0,  pack: "bronze",
+      name: "Bronze-Pack" },
+    { day: 4, sym: "🪙", kind: "gold",     gold: 2500, material: 0,  gems: 0,  pack: null,
+      name: "2 500 Gold" },
+    { day: 5, sym: "🎁", kind: "pack",     gold: 0,    material: 0,  gems: 0,  pack: "silver",
+      name: "Silber-Pack" },
+    { day: 6, sym: "💎", kind: "gems",     gold: 0,    material: 0,  gems: 60, pack: null,
+      name: "60 Gems" },
+    { day: 7, sym: "🏆", kind: "finale",   gold: 5000, material: 0,  gems: 0,  pack: "gold",
+      name: "GOLD-Pack + 5 000 Gold", finale: true },
+  ];
+  var LOGIN_CYCLE = LOGIN_REWARDS.length;      // 7
 
   /* ---------- Gratis-Pack-Timer ---------- */
   var PACK_MS = 4 * HOUR;     // ein Pack alle 4 Stunden
@@ -178,6 +217,9 @@
       streak: 0, bestStreak: 0,
       packBase: now,               // Anker der Pack-Ansammlung (v2)
       packsTaken: 0,
+      // Login-Kalender (v3). `step` = wie viele Kacheln im laufenden
+      // Zyklus schon abgeholt sind (0..6 → die nächste ist step+1).
+      login: { step: 0, cycle: 0, lastDay: null, claims: 0 },
       stats: { daysCompleted: 0, questsClaimed: 0, packsTaken: 0 },
     };
   }
@@ -215,7 +257,27 @@
     }
     return s;
   }
-  function migrateState(old, now) { return migrateV1toV2(old || {}, now); }
+  /* ---- Migration v2 → v3 -------------------------------------------
+   * v3 ergänzt ausschließlich den Login-Kalender. Bestandsspieler
+   * starten bei Kachel 1 mit `lastDay: null` — sie dürfen also SOFORT
+   * abholen und verlieren nichts. Das ist die spielerfreundliche
+   * Richtung und die einzige, die man bei einem Geschenk-System
+   * verantworten kann. ------------------------------------------------ */
+  function migrateV2toV3(old, now) {
+    var s = old;
+    if (!s.login || typeof s.login !== "object") {
+      s.login = { step: 0, cycle: 0, lastDay: null, claims: 0 };
+    }
+    s.v = STATE_VERSION;
+    return s;
+  }
+  function migrateState(old, now) {
+    old = old || {};
+    // v1 kannte weder `progress` noch `packBase` — daran erkennt man es.
+    var isV1 = (old.v | 0) < 2 || old.packStack !== undefined;
+    var s = isV1 ? migrateV1toV2(old, now) : old;
+    return migrateV2toV3(s, now);
+  }
 
   /* get(now) — normalisiert, migriert und macht den LAZY TAGES-ROLLOVER. */
   function get(now) {
@@ -237,6 +299,14 @@
     s.bestStreak = Math.max(s.streak, s.bestStreak | 0);
     if (!s.stats || typeof s.stats !== "object") s.stats = f.stats;
 
+    /* Login-Kalender heilen. `step` wird modulo gerechnet statt geklemmt,
+     * damit ein manipulierter Wert nicht dauerhaft auf Tag 7 stehen bleibt. */
+    if (!s.login || typeof s.login !== "object") s.login = { step: 0, cycle: 0, lastDay: null, claims: 0 };
+    s.login.step = ((s.login.step | 0) % LOGIN_CYCLE + LOGIN_CYCLE) % LOGIN_CYCLE;
+    s.login.cycle = Math.max(0, s.login.cycle | 0);
+    s.login.claims = Math.max(0, s.login.claims | 0);
+    if (typeof s.login.lastDay !== "string") s.login.lastDay = null;
+
     /* Pack-Anker normalisieren. DAS ist der Deckel: Alles, was weiter als
      * PACK_MAX × 4 h zurückliegt, wird nach vorne gezogen — angesammelt
      * werden nie mehr als zwei Packs, egal wie lange man weg war. */
@@ -250,10 +320,13 @@
      * nicht bei null anfangen. */
     if (s.day !== dayKey(now)) {
       var streak = s.streak, best = s.bestStreak, packBase = s.packBase;
-      var stats = s.stats, taken = s.packsTaken;
+      var stats = s.stats, taken = s.packsTaken, login = s.login;
       s = fresh(now);
       s.streak = streak; s.bestStreak = best; s.packBase = packBase;
       s.stats = stats; s.packsTaken = taken;
+      // Der Login-Kalender ist BEWUSST tagesübergreifend — er ist das
+      // einzige System hier, das den Rollover unverändert übersteht.
+      s.login = login;
     }
     return s;
   }
@@ -391,6 +464,76 @@
              gold: BONUS_CHEST.gold, material: BONUS_CHEST.material };
   }
 
+  /* ================= Login-Kalender (7 Tage) ================= */
+
+  /* loginCalendar(now) → alles, was das Popup braucht.
+   *   days[]   sieben Kacheln mit state "done" | "today" | "locked"
+   *   canClaim heute noch nicht abgeholt?
+   *   step     Index der NÄCHSTEN Kachel (0-basiert)
+   * "today" markiert die Kachel, die JETZT dran ist — sie ist nicht an
+   * den Wochentag gekoppelt, sondern an den Fortschritt im Zyklus. */
+  function loginCalendar(now) {
+    now = nowMs(now);
+    var s = get(now);
+    var todayK = dayKey(now);
+    var can = s.login.lastDay !== todayK;
+    var step = s.login.step | 0;
+    var days = LOGIN_REWARDS.map(function (r, i) {
+      var state = i < step ? "done" : (i === step ? (can ? "today" : "taken") : "locked");
+      return {
+        day: r.day, sym: r.sym, kind: r.kind, name: r.name, finale: !!r.finale,
+        gold: r.gold, material: r.material, gems: r.gems, pack: r.pack,
+        state: state,
+        done: i < step,
+        current: i === step,
+        claimable: i === step && can,
+        locked: i > step,
+      };
+    });
+    var nextIn = dayStart(now) + DAY - now;
+    return {
+      days: days, step: step, cycle: s.login.cycle | 0, claims: s.login.claims | 0,
+      canClaim: can, today: days[step],
+      lastDay: s.login.lastDay,
+      nextIn: nextIn, nextText: hhmm(nextIn),
+      cycleLength: LOGIN_CYCLE,
+    };
+  }
+
+  /* claimLogin(now) → Belohnung der aktuellen Kachel.
+   * Material wird gebucht, GOLD und GEMS werden nur gemeldet (Wallet
+   * liegt im Hub) — dieselbe Arbeitsteilung wie überall im Projekt. */
+  function claimLogin(now) {
+    now = nowMs(now);
+    var s = get(now), todayK = dayKey(now);
+    if (s.login.lastDay === todayK) {
+      throw new Error("Die Login-Belohnung von heute ist schon abgeholt. " +
+        "Die nächste Kachel öffnet in " + hhmm(dayStart(now) + DAY - now) + ".");
+    }
+    var idx = s.login.step | 0;
+    var r = LOGIN_REWARDS[idx];
+    s.login.lastDay = todayK;
+    s.login.claims = (s.login.claims | 0) + 1;
+    var wrapped = false;
+    if (idx + 1 >= LOGIN_CYCLE) {
+      s.login.step = 0;
+      s.login.cycle = (s.login.cycle | 0) + 1;
+      wrapped = true;                              // Tag 7 abgeholt → neuer Zyklus
+    } else {
+      s.login.step = idx + 1;
+    }
+    save(s);
+    if (r.material) bankMaterial(r.material);
+    var t = telemetry();
+    if (t) t.track("daily_complete", { day: todayK, login: r.day, cycle: s.login.cycle });
+    return {
+      day: r.day, sym: r.sym, kind: r.kind, name: r.name, finale: !!r.finale,
+      gold: r.gold, material: r.material, gems: r.gems, pack: r.pack,
+      cycleDone: wrapped, cycle: s.login.cycle, nextDay: LOGIN_REWARDS[s.login.step].day,
+      nextName: LOGIN_REWARDS[s.login.step].name,
+    };
+  }
+
   /* ================= Siegesserie ================= */
 
   function goldMultiplierFrom(streak) { return STREAK_MUL[clamp(streak | 0, 0, STREAK_CAP)]; }
@@ -455,14 +598,16 @@
   function state(now) {
     now = nowMs(now);
     var s = get(now), qs = quests(now), b = bonus(now), t = packTimer(now);
+    var lg = loginCalendar(now);
     var claimable = qs.filter(function (q) { return q.claimable; }).length;
     return {
       day: s.day, dayKey: dayKey(now),
       resetIn: dayStart(now) + DAY - now, resetText: hhmm(dayStart(now) + DAY - now),
-      quests: qs, bonus: b, pack: t, streak: streakInfo(now),
+      quests: qs, bonus: b, pack: t, streak: streakInfo(now), login: lg,
       done: b.done, need: b.need,
-      // EINE Zahl für den roten Punkt: offene Abholungen + fertige Packs.
-      badge: claimable + (b.ready ? 1 : 0) + t.ready,
+      // EINE Zahl für den roten Punkt: offene Abholungen + fertige Packs
+      // + die heutige Login-Kachel.
+      badge: claimable + (b.ready ? 1 : 0) + t.ready + (lg.canClaim ? 1 : 0),
       stats: s.stats,
     };
   }
@@ -470,6 +615,7 @@
 
   var API = {
     QUEST_POOL: QUEST_POOL, QUESTS_PER_DAY: QUESTS_PER_DAY, BONUS_CHEST: BONUS_CHEST,
+    LOGIN_REWARDS: LOGIN_REWARDS, LOGIN_CYCLE: LOGIN_CYCLE,
     STREAK_MUL: STREAK_MUL, STREAK_CAP: STREAK_CAP,
     PACK_MS: PACK_MS, PACK_MAX: PACK_MAX, PACK_TYPE: PACK_TYPE,
     STATE_VERSION: STATE_VERSION,
@@ -477,6 +623,7 @@
     reportEvent: reportEvent, claim: claim, bonus: bonus, claimBonus: claimBonus,
     goldMultiplier: goldMultiplier, streakInfo: streakInfo, applyStreak: applyStreak,
     packTimer: packTimer, claimPack: claimPack,
+    loginCalendar: loginCalendar, claimLogin: claimLogin,
     dayKey: dayKey, dayStart: dayStart, hhmm: hhmm, reset: reset,
     _key: KEY, _write: function (s) { save(s); },
     _clock: function (fn) { CLOCK = fn || null; },
@@ -749,12 +896,126 @@
       setT(D0 + 2 * PACK_MS);              // zwei Packs angesammelt
       var k0 = todayKeys()[0], q0 = POOL_BY_KEY[k0];
       reportEvent(q0.ev, q0.goal);         // eine Quest abholbar
-      return state().badge === 3 && state().pack.ready === 2;
-    })(), state().badge + " (Packs " + state().pack.ready + ")");
+      // 1 Quest + 2 Packs + 1 offene Login-Kachel (v3)
+      return state().badge === 4 && state().pack.ready === 2 && state().login.canClaim === true;
+    })(), state().badge + " (Packs " + state().pack.ready + ", Login offen " +
+      state().login.canClaim + ")");
+
+    /* ================= 8b. LOGIN-KALENDER (7 Tage) ================= */
+    console.log("\n" + "=".repeat(64));
+    console.log("LOGIN-KALENDER — Anker sind BOOSTER-PACKS, keine Truhen");
+    console.log("=".repeat(64));
+    setT(D0 + 9 * HOUR); reset();
+    console.log("Zyklus:");
+    LOGIN_REWARDS.forEach(function (r) {
+      console.log("  Tag " + r.day + "  " + r.sym + " " + pad(r.name, 26) +
+        (r.pack ? "Pack: " + r.pack : "") + (r.finale ? "   ← FINALE" : ""));
+    });
+    check("7-Tage-Zyklus", LOGIN_CYCLE === 7 && LOGIN_REWARDS.length === 7);
+    check("User-Vorgabe: Anker sind BOOSTER-PACKS, keine Truhen", (function () {
+      var packs = LOGIN_REWARDS.filter(function (r) { return !!r.pack; });
+      var chests = LOGIN_REWARDS.filter(function (r) {
+        return /truhe|chest/i.test(r.name) || r.kind === "chest";
+      });
+      return packs.length === 3 && chests.length === 0;
+    })(), LOGIN_REWARDS.filter(function (r) { return r.pack; })
+      .map(function (r) { return "T" + r.day + " " + r.pack; }).join(" · "));
+    check("Tag 3 Bronze, Tag 5 Silber, Tag 7 GOLD-Pack",
+      LOGIN_REWARDS[2].pack === "bronze" && LOGIN_REWARDS[4].pack === "silver" &&
+      LOGIN_REWARDS[6].pack === "gold");
+    check("Tag 7 ist das Finale (groesste Belohnung)",
+      LOGIN_REWARDS[6].finale === true && LOGIN_REWARDS[6].gold === 5000);
+    check("jede Kachel gibt genau eine Sorte Anker",
+      LOGIN_REWARDS.every(function (r) {
+        return (r.gold > 0) || (r.material > 0) || (r.gems > 0) || !!r.pack;
+      }));
+
+    var cal = loginCalendar();
+    console.log("\nStart: Kachel " + cal.today.day + " ist dran, canClaim = " + cal.canClaim);
+    check("Frischer Spieler: Kachel 1 ist heute abholbar",
+      cal.step === 0 && cal.canClaim === true && cal.days[0].state === "today");
+    check("Kacheln 2-7 sind gesperrt (mit Vorschau)",
+      cal.days.slice(1).every(function (d) { return d.state === "locked" && !!d.name; }));
+    check("keine Kachel ist abgehakt", cal.days.every(function (d) { return !d.done; }));
+
+    var c1 = claimLogin();
+    console.log("  Abgeholt Tag " + c1.day + ": " + c1.name + " → naechste " + c1.nextName);
+    check("claimLogin() liefert die Belohnung von Tag 1",
+      c1.day === 1 && c1.gold === 1200 && c1.pack === null);
+    check("Kachel 1 abgehakt, Kachel 2 ist die naechste", (function () {
+      var c = loginCalendar();
+      return c.days[0].state === "done" && c.step === 1 && c.days[1].current === true;
+    })());
+    check("DOPPEL-ABHOLUNG am selben Tag wird blockiert", (function () {
+      try { claimLogin(); return false; } catch (e) {
+        return /schon abgeholt/.test(e.message) && /naechste|nächste/.test(e.message);
+      }
+    })(), (function () { try { claimLogin(); return ""; } catch (e) { return e.message; } })());
+    check("Kachel 2 zeigt heute den Zustand 'taken', nicht 'today'",
+      loginCalendar().days[1].state === "taken" && loginCalendar().canClaim === false);
+    check("Fortschritt steht still, solange nicht abgeholt wird",
+      loginCalendar().step === 1);
+
+    // --- Tageswechsel ---
+    setT(D0 + DAY + 9 * HOUR);
+    check("Naechster Tag: Kachel 2 wird abholbar",
+      loginCalendar().canClaim === true && loginCalendar().today.day === 2);
+    var c2 = claimLogin();
+    check("Tag 2 gibt Material (und bucht es in der Kartenbank)",
+      c2.day === 2 && c2.material === 12 && c2.gold === 0);
+    // --- VERPASSTE TAGE kosten nichts ---
+    setT(D0 + 5 * DAY + 9 * HOUR);         // drei Tage nicht eingeloggt
+    var cSkip = loginCalendar();
+    console.log("\n  Drei Tage verpasst → Kachel " + cSkip.today.day + " (kein Rueckfall)");
+    check("verpasste Tage setzen den Kalender NICHT zurueck",
+      cSkip.step === 2 && cSkip.today.day === 3 && cSkip.canClaim === true, "Kachel " +
+      cSkip.today.day);
+    var c3 = claimLogin();
+    check("Tag 3 liefert das Bronze-Pack", c3.pack === "bronze" && c3.kind === "pack");
+
+    // --- durchspielen bis Tag 7 + Rollover ---
+    var got = [c1, c2, c3];
+    for (var d2 = 4; d2 <= 7; d2++) {
+      setT(D0 + (2 + d2) * DAY + 9 * HOUR);
+      got.push(claimLogin());
+    }
+    var last = got[got.length - 1];
+    console.log("  Tag 7 abgeholt: " + last.name + " · Zyklus " + last.cycle +
+      " abgeschlossen: " + last.cycleDone);
+    check("Tag 7 liefert GOLD-Pack + 5 000 Gold",
+      last.day === 7 && last.pack === "gold" && last.gold === 5000);
+    check("7er-ROLLOVER: neuer Zyklus, wieder bei Kachel 1",
+      last.cycleDone === true && last.cycle === 1 && last.nextDay === 1);
+    check("Kalender steht nach dem Rollover wieder auf Kachel 1", (function () {
+      setT(D0 + 10 * DAY + 9 * HOUR);
+      var c = loginCalendar();
+      return c.step === 0 && c.cycle === 1 && c.days[0].state === "today" &&
+             c.days.every(function (x) { return !x.done; });
+    })());
+    check("alle sieben Kacheln wurden genau einmal vergeben",
+      got.map(function (g) { return g.day; }).join(",") === "1,2,3,4,5,6,7",
+      got.map(function (g) { return g.day; }).join(","));
+    check("Zaehler claims = 7", get().login.claims === 7, get().login.claims);
+    check("zweiter Zyklus vergibt dieselben Belohnungen", (function () {
+      var again = claimLogin();
+      return again.day === 1 && again.gold === 1200;
+    })());
+    check("Login-Kalender ueberlebt den Tages-Rollover der Quests", (function () {
+      setT(D0 + 11 * DAY + 9 * HOUR);
+      var before = loginCalendar().step;
+      reportEvent("win", 1);                 // erzwingt einen get()/Rollover
+      return loginCalendar().step === before && before === 1;
+    })());
+    check("manipulierter step wird modulo geheilt", (function () {
+      var st2 = get(); st2.login.step = 99; save(st2);
+      return loginCalendar().step === 99 % LOGIN_CYCLE;
+    })(), loginCalendar().step);
+    check("state() enthaelt den Login-Kalender",
+      !!state().login && state().login.days.length === 7);
 
     /* ================= 9. Migration v1 → v2 ================= */
     console.log("\n" + "=".repeat(64));
-    console.log("MIGRATION v1 → v2 (Pack-Zähler → Ansammlungs-Anker)");
+    console.log("MIGRATION v1 → v2 → v3 (Pack-Anker, dann Login-Kalender)");
     console.log("=".repeat(64));
     (function () {
       setT(D0 + 12 * HOUR);
@@ -769,7 +1030,7 @@
       lsSet(JSON.stringify(v1));
       var s = get();
       console.log("  v1 { packStack: 2, packLast: t } → v2 packBase = t − 2 × 4 h");
-      check("State-Version auf 2 gehoben", s.v === 2);
+      check("State-Version auf " + STATE_VERSION + " gehoben", s.v === STATE_VERSION, s.v);
       check("flache Quest-Zähler → progress{}",
         s.progress.wins === 2 && s.progress.donate === 4 && s.progress.trophies === 35);
       check("fremde Quest-Keys fallen aus claimed heraus",
@@ -784,14 +1045,27 @@
       check("Migration ist idempotent", (function () {
         save(get());
         var s2 = get();
-        return s2.v === 2 && s2.progress.wins === 2 && packTimer().ready === 2;
+        return s2.v === STATE_VERSION && s2.progress.wins === 2 && packTimer().ready === 2;
       })());
       // State ohne v-Feld
       lsSet(JSON.stringify({ day: dayKey(D0 + 12 * HOUR), wins: 1, packStack: 1,
                              packLast: D0 + 12 * HOUR }));
       var s3 = get();
       check("State OHNE v-Feld wird wie v1 behandelt",
-        s3.v === 2 && s3.progress.wins === 1 && packTimer().ready === 1);
+        s3.v === STATE_VERSION && s3.progress.wins === 1 && packTimer().ready === 1);
+      // v2 → v3: der Login-Block wird ERGÄNZT, alles andere bleibt stehen.
+      check("v2 → v3 ergänzt nur den Login-Kalender", (function () {
+        lsSet(JSON.stringify({ v: 2, day: dayKey(nowMs()), progress: { wins: 3 },
+                               claimed: ["wins"], streak: 4, bestStreak: 6,
+                               packBase: nowMs() - PACK_MS, packsTaken: 5,
+                               stats: { daysCompleted: 2, questsClaimed: 5, packsTaken: 5 } }));
+        var s4 = get();
+        return s4.v === 3 && s4.progress.wins === 3 && s4.streak === 4 &&
+               s4.stats.daysCompleted === 2 && packTimer().ready === 1 &&
+               s4.login.step === 0 && s4.login.lastDay === null;
+      })());
+      check("Bestandsspieler dürfen nach der Migration SOFORT abholen",
+        loginCalendar().canClaim === true && loginCalendar().today.day === 1);
       check("v1-Stapel über dem Deckel wird gekappt", (function () {
         lsSet(JSON.stringify({ v: 1, day: dayKey(nowMs()), packStack: 99,
                                packLast: nowMs() }));
@@ -804,7 +1078,7 @@
     check("Müll im Speicher → frischer Tag, kein Crash", (function () {
       lsSet("{kaputt,,,");
       var s = get();
-      return s.v === 2 && s.day === dayKey(nowMs()) && s.claimed.length === 0;
+      return s.v === STATE_VERSION && s.day === dayKey(nowMs()) && s.claimed.length === 0;
     })());
     check("kaputter State wird geheilt", (function () {
       lsSet(JSON.stringify({
