@@ -159,6 +159,63 @@ verfügbar ist `floor((now − packBase) / 4 h)`, gekappt bei 2. Der Deckel ist 
 Eigenschaft der Formel und keine Prüfung, die man vergessen kann. Beim Abholen wandert der Anker
 um genau ein Intervall — angefangener Fortschritt geht nie verloren.
 
+### D.1 Daily-Login — der 7-Tage-Kalender
+
+> **User-Vorgabe, wörtlich:** *„Daily Login Belohnungen mit Truhen wir brauchen aber mit
+> boosterpacks"*
+
+Das Referenzspiel hängt **Truhen** in den Login-Kalender. Bei uns sind die Anker **Booster-Packs**
+— Truhen gehören im Projekt zum Clan (`ArenaClan`, Wochen- und Kriegstruhe) und zur
+Tagesquest-Belohnung. Ein dritter Truhentyp im Login würde die Belohnungssprache verwässern:
+*Truhe = Gruppenleistung, Pack = individueller Ziehmoment.* Der Login ist ein individueller
+Moment, also ein Pack.
+
+| Tag | Belohnung | Kachel |
+|---|---|---|
+| 1 | **1 200 🪙** | Gold |
+| 2 | **12 ⚗** | Material |
+| 3 | **Bronze-Pack** | 🎁 Anker 1 |
+| 4 | **2 500 🪙** | Gold |
+| 5 | **Silber-Pack** | 🎁 Anker 2 |
+| 6 | **60 💎** | Gems |
+| 7 | **GOLD-PACK + 5 000 🪙** | 🏆 **Finale**, festliche Kachel |
+
+**Wochensumme:** 8 700 🪙 · 12 ⚗ · 60 💎 · Bronze + Silber + **Gold-Pack**.
+
+**Warum die Kurve so aussieht.** Die drei Packs stehen auf 3 / 5 / 7 — nicht auf 1 / 4 / 7.
+Der erste Tag muss *sofort* etwas geben (Gold, sichtbar in der Top-Bar), aber der erste
+*Ziehmoment* darf ruhig zwei Tage kosten: Ein Pack an Tag 1 verschenkt den einzigen Hebel, den
+ein Kalender hat — die Vorfreude auf die nächste Kachel. Tag 6 (Gems) ist bewusst die
+Vorstufe zum Finale: Gems sind die Premium-Währung, und wer sie an Tag 6 bekommt, sieht am
+Tag 7 hin.
+
+**Der Gold-Pack an Tag 7** ist die größte kostenlose Ziehung der Woche (9 Karten, mindestens
+eine Epische). Das ist Absicht und der Grund, warum der Kalender überhaupt trägt. Im Verhältnis
+zur restlichen Ökonomie bleibt er maßvoll: Die drei Tagesquests liefern zusammen ~3 400 🪙 pro
+Tag, also ~23 800 🪙 pro Woche — der Login-Kalender legt mit 8 700 🪙 rund **37 %** obendrauf,
+nicht ein Vielfaches.
+
+#### Kein Streak — und warum das die härtere Entscheidung ist
+
+Der Kalender rückt **ausschließlich beim Abholen** vor. Wer drei Tage fehlt, macht danach bei
+derselben Kachel weiter; es gibt **keinen Rückfall auf Tag 1**.
+
+Das ist bewusst gegen das Genre-Muster entschieden:
+
+* Die **Härte des täglichen Loops sitzt bereits im Siegesserien-Bonus** (`STREAK_MUL`, 1,00 →
+  1,50). Dort ist sie *verdient*, weil sie an Leistung hängt und nicht an Anwesenheit.
+* Ein Login-Kalender, der Abwesenheit bestraft, erzeugt **schlechtes Gewissen statt Vorfreude**.
+  Der Spieler, den man damit erreicht, ist der, der ohnehin täglich spielt; der, den man
+  verliert, ist der Rückkehrer nach einer Woche Pause — also genau der, den man will.
+* Ein Geschenk mit Strafmechanik ist **kein Geschenk mehr**. Der Kalender ist die einzige
+  Stelle im ganzen Spiel, an der es etwas für nichts gibt. Diese Rolle soll er behalten.
+
+Technisch: `login: { step, cycle, lastDay, claims }` in `arenaDaily` (State **v3**). `step` ist
+der Index der nächsten Kachel, `lastDay` der Tagesschlüssel der letzten Abholung — daraus folgen
+sowohl die Doppelabhol-Sperre als auch der fehlende Streak, ohne einen einzigen zusätzlichen
+Zähler. Nach Tag 7 wird `step` auf 0 gesetzt und `cycle` erhöht; die Belohnungen wiederholen
+sich (eskalierende Zyklen: siehe §F).
+
 ---
 
 ## E) Analytics (`arena_telemetry.js`)
@@ -250,3 +307,9 @@ Schema — auch nicht optionale.
    eine Einwilligung samt Opt-out in den Einstellungen.
 7. **Angebots-Ermüdung.** Es gibt keine Obergrenze für Angebote pro Woche. Sobald echte Zahlen
    vorliegen (`offer_shown` vs. `offer_clicked`), gehört eine Deckelung dazu.
+8. **Eskalierende Login-Zyklen.** Zyklus 2 vergibt heute dieselben sieben Belohnungen wie
+   Zyklus 1. Üblich wäre eine leichte Steigerung ab Zyklus 3 (z. B. Arkan-Pack an Tag 7).
+   Bewusst offen gelassen, bis echte Retentionszahlen zeigen, wie viele Spieler den zweiten
+   Zyklus überhaupt erreichen — vorher ist jede Steigerung geraten.
+9. **Offline-Earnings** (Beobachtung aus dem Referenzvideo). Als Vorschlag dokumentiert in
+   `GAMEPLAY_OPTIMIERUNG.md` §10, bewusst **nicht gebaut**.

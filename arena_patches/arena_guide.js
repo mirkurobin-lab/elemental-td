@@ -332,6 +332,14 @@
     } catch (e) {}
     memStore = v;
   }
+  /* ts0(v) — Zeitstempel normalisieren. NIEMALS `v | 0`: ein
+   * Millisekunden-Zeitstempel ist > 2³¹ und wird von einer 32-Bit-
+   * Bit-Operation in eine negative Zahl verwandelt. Genau dieser Fehler
+   * hat beim ersten Testlauf jedes gesetzte mark() sofort wieder
+   * unsichtbar gemacht (Math.max(0, negativ) === 0 === falsy). */
+  function ts0(v) {
+    return (typeof v === "number" && isFinite(v) && v > 0) ? Math.floor(v) : 0;
+  }
   function fresh() {
     return {
       v: STATE_VERSION,
@@ -361,10 +369,10 @@
     s.chapters = s.chapters.filter(function (k2) { return !!CHAPTER_BY_KEY[k2]; });
     s.read = s.read.filter(function (k2) { return !!MANUAL_BY_KEY[k2]; });
     var cleanDone = {};
-    for (var d in s.done) if (TASK_BY_KEY[d]) cleanDone[d] = Math.max(0, s.done[d] | 0);
+    for (var d in s.done) if (TASK_BY_KEY[d]) cleanDone[d] = ts0(s.done[d]);
     s.done = cleanDone;
     var cleanMarks = {};
-    for (var m in s.marks) if (MARK_KEYS.indexOf(m) >= 0) cleanMarks[m] = Math.max(0, s.marks[m] | 0);
+    for (var m in s.marks) if (MARK_KEYS.indexOf(m) >= 0) cleanMarks[m] = ts0(s.marks[m]);
     s.marks = cleanMarks;
     if (!s.stats || typeof s.stats !== "object") s.stats = f.stats;
     return s;
@@ -689,7 +697,8 @@
       throws(function () { claimTask("merge1"); }, "Noch nicht erledigt").ok,
       throws(function () { claimTask("merge1"); }).msg);
     check("unbekannte Aufgabe wirft", throws(function () { claimTask("nix"); }, "Unbekannte").ok);
-    check("badge() sinkt nach dem Abholen", badge() === 3, badge());
+    // 3 offene Aufgaben-Belohnungen + 1 offenes Kapitel-Pack
+    check("badge() sinkt nach dem Abholen", badge() === 4, badge());
 
     /* --- Kapitel-Belohnung --- */
     check("Kapitel-Pack erst nach ALLEN Aufgaben", (function () {

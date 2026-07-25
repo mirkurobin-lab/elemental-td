@@ -503,6 +503,48 @@ größten Teil des Effekts.
 
 ---
 
+## 10. „Offline Earnings" — Beobachtung aus dem Referenzvideo (VORSCHLAG, nicht gebaut)
+
+> **Quelle:** User-Referenzvideo eines anderen Mobile-TD (dasselbe Video, aus dem der
+> Login-Kalender und das Guide-System stammen). **Status: bewusst NICHT umgesetzt** — hier nur
+> festgehalten, damit die Entscheidung nachvollziehbar bleibt.
+
+**Was das Referenzspiel macht:** Beim Start erscheint ein Panel „Offline Earnings" mit einer
+Abrechnung der Zeit seit dem letzten Login:
+
+| Element | Beobachtung |
+|---|---|
+| Ertragsrate | Gold **und** XP pro Stunde, abhängig vom Spielerfortschritt |
+| Deckel | maximal **8 Stunden** Ansammlung |
+| Boost | „Quick Earnings" — sofortige Zusatzstunden gegen **Werbevideo oder Gems** |
+| Platzierung | eigenes Popup direkt nach dem Login-Kalender |
+
+**Warum das mechanisch funktioniert:** Es macht *Abwesenheit* zur Ressource und liefert damit
+einen Rückkehrgrund, der ohne Spielzeit auskommt. Der 8-h-Deckel erzeugt zusätzlich ein
+weiches Sitzungsraster („zweimal am Tag reinschauen lohnt, dreimal nicht").
+
+**Warum wir es (noch) nicht bauen — drei Gründe:**
+
+1. **Es steht quer zu unserer Ökonomie.** Gold ist bei uns der Endgame-Bottleneck und
+   ausdrücklich *an Leistung* gekoppelt (Match-Gold, Siegesserie, Festungs-Senke,
+   `DESIGN_PROGRESSION.md`). Eine Quelle, die Gold für Nichtstun ausschüttet, entwertet die
+   Siegesserie und die Tagesquests gleichzeitig — also genau die beiden Systeme, die wir
+   gerade erst als täglichen Loop etabliert haben.
+2. **Wir hätten drei Start-Popups.** Login-Kalender, Angebotskette (`arena_vault.js`) und
+   Offline-Earnings würden sich beim ersten Öffnen des Tages stapeln. Drei Popups vor dem
+   ersten Tap sind der zuverlässigste Weg, einen Rückkehrer sofort wieder zu verlieren.
+3. **„Quick Earnings" braucht Werbung.** Erzwungene oder belohnte Videowerbung ist im Projekt
+   bisher bewusst ausgeschlossen (siehe „Was AA macht, das wir bewusst nicht übernehmen").
+   Ohne Werbung bleibt nur der Gem-Kauf — und damit wäre das Panel eine reine Verkaufsfläche.
+
+**Wenn wir es später doch bauen, dann so:** nicht als Gold-Quelle, sondern als **Material- und
+XP-Quelle** (Ressourcen, die keine Endgame-Senke bedienen), Deckel bei 8 h, **kein** Boost gegen
+Gems, und **eingefaltet in den Login-Kalender** statt als eigenes Popup — eine zusätzliche Zeile
+„Während deiner Abwesenheit gesammelt" unter den sieben Kacheln. Dann kostet es kein
+zusätzliches Popup und keine Glaubwürdigkeit.
+
+---
+
 ## Übersicht
 
 | # | Thema | Beleg | Aufwand | Priorität |

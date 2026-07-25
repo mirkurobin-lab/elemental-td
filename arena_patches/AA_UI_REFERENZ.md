@@ -1801,3 +1801,77 @@ Drei Dinge daran sind bewusst so gebaut:
 * Der Ton läuft noch über die WebAudio-Blips von `window.UISfx`. Im Spiel werden
   `UISfx.flip()` und `UISfx.legend()` **mit umgehängt** — sie sind Teil derselben
   Namensschnittstelle (siehe HANDOFF).
+
+---
+
+## 18. Referenz-Befunde: Login-Kalender, Guide-System, Offline-Earnings
+
+> **Quelle: zwei User-Referenzvideos, ANDERES Spiel** (nicht Arcane Arena) — dasselbe Genre
+> (Mobile-TD), vom Koordinator analysiert und die Frames gesichtet. Übernommen wird die
+> **Mechanik**, nicht die Optik: Anordnung und Farben bleiben unser Brand-Stil.
+> Umgesetzt in `arena_daily.js` (§18.1) und `arena_guide.js` (§18.2); §18.3 ist bewusst
+> **nur dokumentiert**.
+
+### 18.1 Daily-Login-Kalender
+
+**Aufbau im Referenzspiel:**
+
+| Element | Beobachtung |
+|---|---|
+| Auslöser | Popup **beim ersten Öffnen des Tages**, vor allem anderen |
+| Raster | **7 Kacheln** (Tag 1–7), meist 4 + 3 oder 7 in einer Reihe |
+| Zustände | vergangene Tage **abgehakt**, heutiger Tag **hervorgehoben** mit Abhol-Button, kommende **gesperrt mit sichtbarer Vorschau** |
+| Anker | **Truhen** an mehreren Tagen, Tag 7 die größte |
+| Tag 7 | eigene, **festlichere Kachel** (größer, andere Rahmenfarbe) |
+| Zyklus | nach Tag 7 beginnt der Kalender von vorn |
+
+**Unsere Umsetzung — und die eine bewusste Abweichung:**
+
+> **User-Vorgabe, wörtlich:** *„Daily Login Belohnungen mit Truhen wir brauchen aber mit
+> boosterpacks"*
+
+Truhen sind bei uns bereits belegt (Clan-Wochentruhe, Kriegstruhe, Tagestruhe) und stehen
+für **Gruppenleistung**. Der Login ist ein **individueller** Moment, also ein **Booster-Pack**:
+Tag 3 Bronze, Tag 5 Silber, **Tag 7 Gold-Pack + 5 000 Gold** als Finale. Werte und Herleitung:
+`DESIGN_MONETARISIERUNG.md` §D.1.
+
+**Zweite Abweichung — kein Streak.** Das Referenzspiel setzt bei einem verpassten Tag zurück.
+Wir nicht: Der Kalender rückt ausschließlich beim **Abholen** vor. Begründung ausführlich in
+§D.1 — kurz: Die Härte des täglichen Loops sitzt bei uns schon im Siegesserien-Bonus, wo sie an
+*Leistung* hängt statt an Anwesenheit.
+
+### 18.2 Guide-System (zwei Teile)
+
+Das Referenzspiel trennt sauber zwischen *„was soll ich als Nächstes tun"* und *„wie
+funktioniert das"* — genau diese Zweiteilung haben wir übernommen:
+
+**Teil 1 — Einsteiger-Guide** (eigener View):
+
+| Element | Beobachtung | Unsere Umsetzung |
+|---|---|---|
+| Struktur | gestaffelte **Kapitel** | 4 Kapitel: Erste Schritte · Karten & Fusion · Clan & Krieg · Festung & Pass |
+| Kapitel-Inhalt | **Aufgabenliste mit Häkchen** | 4 Aufgaben je Kapitel, 16 gesamt |
+| Häkchen-Quelle | echte Spielzustände | **`ArenaTelemetry`-Trichter** + ArenaCards/Clan/Fortress/Daily — kein zweiter Zähler |
+| Belohnung | pro Aufgabe | 500–1 500 🪙 + 4–10 ⚗ |
+| Kapitel-Abschluss | größere Belohnung | **Booster-Pack**, steigend Bronze → Silber → Silber → Gold |
+| Fortschritt | Leiste über alle Kapitel | `ArenaGuide.progress()` → 0–100 % über 16 Aufgaben |
+| Staffelung | Kapitel n+1 erst nach n | umgesetzt: `locked`, gekoppelt an *erledigt*, nicht an *abgeholt* |
+
+Zwei Aufgabensorten: **auto** (aus fremden Modulen abgeleitet) und **mark** (das UI meldet
+eine tatsächlich gesehene Ansicht — `ArenaGuide.mark("vault_seen")`). Damit lassen sich auch
+Aufgaben wie *„Sieh dir den Kristalltresor an"* ehrlich abhaken, ohne dafür Telemetrie-Ereignisse
+zu erfinden.
+
+**Teil 2 — Spiel-Handbuch:** bebilderte Erklärseiten pro System, aufklappbar, erreichbar aus dem
+Einsteiger-Guide **und** aus den Einstellungen. Acht Seiten (`ArenaGuide.MANUAL`): Elemente ·
+Fusion · Raritäten-Leiter · Packs & Pity · Festung · Clan & Krieg · Pass & Tresor · Täglicher
+Loop. Jede Seite trägt Asset-Schlüssel zur Illustration (die `card_*`-Artworks, `frame_*`,
+`pack_*`, `fort_castle`, `hub_clan`, `pass_keyart`) — das UI rendert generisch aus den Daten.
+
+### 18.3 „Offline Earnings" — beobachtet, bewusst nicht gebaut
+
+Gold **und** XP pro Stunde Abwesenheit, Deckel 8 h, „Quick Earnings" gegen Werbung oder Gems,
+eigenes Popup direkt nach dem Login-Kalender. Vollständige Bewertung samt der drei Gründe gegen
+eine Übernahme (Gold ist unser Endgame-Bottleneck · drei gestapelte Start-Popups · Werbung ist
+im Projekt ausgeschlossen) und der Skizze einer verträglichen Variante:
+`GAMEPLAY_OPTIMIERUNG.md` §10.
