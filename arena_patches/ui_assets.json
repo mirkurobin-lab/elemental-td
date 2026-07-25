@@ -135,31 +135,31 @@
   "arena2": {
     "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095757_8ddd3202-0a7c-4f43-82a7-1d9d6a06d038.png",
     "job": "8ddd3202-0a7c-4f43-82a7-1d9d6a06d038", "type": "arena", "size": "1376x768",
-    "name": "Smaragdtal", "at": 600,
+    "name": "Smaragdtal", "at": 300,
     "beschreibung": "Arena 2 — grüne Kristallgärten in Terrassen, Nachmittagslicht."
   },
   "arena3": {
     "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095801_d277827e-8704-485f-b0bb-b0f4498a2eba.png",
     "job": "d277827e-8704-485f-b0bb-b0f4498a2eba", "type": "arena", "size": "1376x768",
-    "name": "Saphirfeste", "at": 1200,
+    "name": "Saphirfeste", "at": 600,
     "beschreibung": "Arena 3 — blaue Kristallfestung, abendlich, wehrhaft."
   },
   "arena4": {
     "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095808_72fb7754-d381-4be7-b741-6ff63150bcfb.png",
     "job": "72fb7754-d381-4be7-b741-6ff63150bcfb", "type": "arena", "size": "1376x768",
-    "name": "Sturmspitze", "at": 1500,
+    "name": "Sturmspitze", "at": 900,
     "beschreibung": "Arena 4 — schwebende Felsen um eine Zackenspitze, Blitze, Gewitterwolken."
   },
   "arena5": {
     "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095811_7a6408ea-43bf-45d2-b9e3-e02d03d0f9c7.png",
     "job": "7a6408ea-43bf-45d2-b9e3-e02d03d0f9c7", "type": "arena", "size": "1376x768",
-    "name": "Obsidian-Thron", "at": 2200,
+    "name": "Obsidian-Thron", "at": 1200,
     "beschreibung": "Arena 5 — schwarze Glas-Thronhalle, violette Runen, bedrohlich."
   },
   "arena6": {
     "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095815_26d38ce0-2889-4351-8b4c-ac50183d32ea.png",
     "job": "26d38ce0-2889-4351-8b4c-ac50183d32ea", "type": "arena", "size": "1376x768",
-    "name": "Prisma-Zitadelle", "at": 2900,
+    "name": "Prisma-Zitadelle", "at": 1500,
     "beschreibung": "Arena 6 — strahlende Kristall-Zitadelle mit Regenbogen-Lichtsaum. Einziges Asset mit Prisma-Signatur."
   }
 }

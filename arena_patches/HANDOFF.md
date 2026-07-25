@@ -118,6 +118,10 @@ die Intensitätsschwelle `0.6` (= Eingriff beginnt im letzten 40% der Matchzeit)
 `|margin| < 0.06`, sowie `bandOf()`-Schwellen (250 / 700 Trophäen).
 
 > **⚠ `bandOf()`-Schwellen nachziehen.** Die 250/700 stammen aus der geschätzten Arena-Tabelle.
+> **Stand jetzt (AA-Referenz §14.1): die vollständige Leiter ist 0 / 300 / 600 / 900 / 1200 /
+> 1500.** Für `bandOf()` also am besten `Math.min(5, Math.floor(trophies / 300))` — dann
+> stimmen Bänder und Arenen per Konstruktion überein, ohne dass eine zweite Tabelle
+> gepflegt werden muss.
 > Belegt sind seit Video 6 **600 / 1200 / 1500** (`AA_UI_REFERENZ.md` §9.5). Damit die
 > Rivalen-Bänder mit den Arenen zusammenfallen — sonst wechselt der Gegnertyp mitten in einer
 > Arena —, beim Einbau auf **600 / 1200** umstellen (bzw. ein viertes Band ab 1500 ergänzen).
@@ -625,14 +629,45 @@ ersten Release passieren, damit das Spiel nicht von fremder Infrastruktur abhän
 | # | Name | ab 🏆 |
 |---|---|---|
 | 1 | Kristallhof | 0 |
-| 2 | Smaragdtal | 600 |
-| 3 | Saphirfeste | 1 200 |
-| 4 | Sturmspitze | 1 500 |
-| 5 | Obsidian-Thron | 2 200 |
-| 6 | Prisma-Zitadelle | 2 900 |
+| 2 | Smaragdtal | 300 |
+| 3 | Saphirfeste | 600 |
+| 4 | Sturmspitze | 900 |
+| 5 | Obsidian-Thron | 1 200 |
+| 6 | Prisma-Zitadelle | 1 500 |
 
-Die Schwellen sind an AAs eigene Kurve angelehnt (§9.5). **Die Arenen sind reine
-Status-Optik** — die Match-Welt wird in Arcane Prism TD pro Spiel zufällig gewählt.
+Die Schwellen sind jetzt **AAs echte Leiter** — belegt über das Arena-Ribbon der
+Trophäenstraße („Arena 2 · 🏆 300", AA-Referenz §14.1) plus die aus Video 6 bekannten
+600 / 1200 / 1500. Glatte 300er-Schrittweite. **Die Arenen sind reine Status-Optik** — die Match-Welt wird in Arcane Prism TD pro Spiel zufällig gewählt.
 Deshalb steht auf dem Home-Screen „Zufallswelt" statt AAs „Neutral". Wer die Schwellen
 verschiebt, muss nur `ARENA_TIERS` anfassen; Fortschrittsbalken, Leiter und der
 „noch N 🏆 bis …"-Text rechnen sich daraus.
+
+### Trophäenstraße (neu, `#roadLayer` in `ui_prototype.html`)
+
+AAs BATTLE-Button öffnet **nicht** direkt das Matchmaking, sondern zuerst die
+**Trophäenstraße** — einen Vollbild-Layer, der von unten nach oben durch alle Arenen
+führt (AA-Referenz **§14.4**, Quelle: vier User-Screenshots). Im Prototyp nachgebaut:
+
+* **Öffnen:** KAMPF-Button oder das Belohnungs-Icon am Trophäen-Balken.
+  **Schließen:** unten fixierter `Okay`-Button.
+* **Scroll:** startet am unteren Ende (Arena 1, 0 🏆) und springt dann automatisch auf den
+  ersten noch nicht abgeholten Knoten — der Spieler landet immer bei sich selbst.
+* **Knoten** alle 50 🏆 in drei Zuständen: abgeholt (✅, gedimmt) · nächster (Glow-Puls) ·
+  gesperrt (🔒, dunkel). Belohnungen: alle 250 🏆 ein Silber-Pack, sonst im Wechsel
+  Gold / Arkan-Essenz / Bronze-Pack.
+* **Arena-Sektionen** an den Schwellen: Diorama-Karte, „Zufallswelt"-Chip, Name,
+  magenta Ribbon `Arena N · 🏆 Schwelle`, „Schaltet frei:"-Raster mit Element-Gems und
+  Map-Ziel-/Trick-Karten-Banner mit `(i)`-Button.
+
+**Beim Einbau ins Spiel:** `DEMO_TROPHIES` durch `ArenaProfile.trophies()` ersetzen und die
+Knoten-Abholung persistieren (ein `Set` abgeholter Schwellen genügt) — die Zustandslogik
+hängt an genau einer Funktion, `nextNodeTrophies()`. Die Straße braucht **keine neuen
+Bilder**: sie nutzt die 25 Assets aus `ui_assets.json` plus CSS-Fallbacks.
+
+**Ebenfalls neu auf dem Home-Screen** (AA-Referenz §14.3): die **4 Truhen-/Pack-Slots** in
+Hex-Rahmen (Demo 2 Bronze + 2 leer, Klick → Pack-Ansicht; im Spiel an `ArenaProfile` /
+`packAwarded` andocken) und das **Belohnungs-Icon** am rechten Ende des Trophäen-Balkens.
+
+**Und eine Korrektur der Optik** (§14.2): Arenen sind **schwebende Insel-Dioramen** auf
+dunklem Grund, **kein** vollflächiger Hintergrund. Unsere Querformat-Key-Art wird deshalb
+als gerundete, schwebende Karte mit Glow und Schlagschatten gezeigt (`.diorama`).

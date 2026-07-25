@@ -298,7 +298,7 @@ footer{padding:6px 12px 14px;text-align:center}
  * daher REINE STATUS-OPTIK (Aufstiegs-Genugtuung), genau wie in AA.
  * ================================================================== */
 #viewHome{padding:0 0 88px;position:relative}
-.arenahero{position:relative;min-height:330px;display:flex;flex-direction:column;
+.arenahero{position:relative;min-height:300px;display:flex;flex-direction:column;
   align-items:center;padding:26px 14px 16px;
   background-repeat:no-repeat;background-position:center center;
   background-size:cover,cover;
@@ -311,9 +311,9 @@ footer{padding:6px 12px 14px;text-align:center}
 .arenaname{font-size:31px;line-height:1.05;text-align:center;margin:4px 0 0}
 .arenachip{margin-top:9px;background:#0b1116b3;border:1px solid #3a4c5c;border-radius:20px;
   padding:4px 13px;font-size:10.5px;font-weight:800;letter-spacing:.1em;color:#cfe0ec}
-.crest{margin-top:14px;width:70px;height:78px;display:flex;align-items:center;justify-content:center;
-  font-size:30px;clip-path:polygon(50% 0,100% 22%,100% 68%,50% 100%,0 68%,0 22%);
-  background:linear-gradient(180deg,#4a5f78,#1b2735);border:0;box-shadow:0 0 0 2px #e0b94a55}
+.crestmini{flex:0 0 30px;height:30px;border-radius:8px;font-size:15px;
+  background:linear-gradient(180deg,#4a5f78,#1b2735);box-shadow:0 0 0 2px #e0b94a55;
+  display:flex;align-items:center;justify-content:center}
 .progwrap{width:100%;margin-top:16px;display:flex;align-items:center;gap:8px}
 .progbar{flex:1;height:22px;border-radius:12px;position:relative;overflow:hidden;
   background-repeat:no-repeat;background-position:center;background-size:100% 240%,100% 100%;
@@ -381,6 +381,145 @@ footer{padding:6px 12px 14px;text-align:center}
   background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);box-shadow:0 3px 0 #6d551a;
   /* goldtext on gold ground would be invisible — dark text instead */
   -webkit-text-fill-color:#3a2b07;color:#3a2b07;filter:none}
+
+/* ==================================================================
+ * ARENA-DIORAMA (Korrektur nach User-Screenshots, §14.2)
+ * ------------------------------------------------------------------
+ * AA zeigt die Arena NICHT als vollflaechigen Hintergrund, sondern als
+ * freischwebendes INSEL-DIORAMA mittig auf schlichtem Dunkelblau.
+ * Unsere Querformat-Key-Art wird deshalb als abgerundete, schwebende
+ * Karte mit Glow und Schlagschatten inszeniert.
+ * ================================================================== */
+.diorama{margin-top:14px;width:74%;max-width:280px;aspect-ratio:16/10;border-radius:18px;
+  background-repeat:no-repeat;background-position:center;background-size:cover,cover;
+  background-image:linear-gradient(160deg,#2c3a4b,#131c25);
+  border:1px solid #ffffff1f;
+  box-shadow:0 18px 30px -10px #000000cc, 0 0 34px -6px #e0b94a3d,
+             inset 0 0 0 1px #0e141866;
+  transform:perspective(700px) rotateX(4deg);position:relative}
+.diorama::after{content:"";position:absolute;left:12%;right:12%;bottom:-13px;height:14px;
+  border-radius:50%;background:radial-gradient(ellipse,#000000a6,#0000);pointer-events:none}
+
+/* ---------- Truhen-/Pack-Slots auf dem Home-Screen (§14.3) ---------- */
+.slotrow{margin:16px auto 0;width:100%;max-width:320px;display:grid;
+  grid-template-columns:repeat(4,1fr);gap:7px;padding:7px 8px;border-radius:14px;
+  background:#0b111699;border:1px solid #2b3b47}
+.slot{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;font-size:23px;
+  clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
+  background:linear-gradient(180deg,#2b3b47,#141d26);position:relative;
+  background-repeat:no-repeat;background-position:center;border:0}
+.slot.full{background-image:linear-gradient(180deg,#4a5f78,#20303f);
+  box-shadow:0 0 0 2px #e0b94a66}
+.slot.empty{opacity:.45;font-size:16px;color:#5d7284}
+.slot .cnt3{position:absolute;bottom:14%;font-size:8px;font-weight:900;color:#0e1418;
+  background:#e0b94a;border-radius:5px;padding:0 3px}
+
+/* ==================================================================
+ * TROPHAEENSTRASSE — Vollbild-Layer (§14.4)
+ * ------------------------------------------------------------------
+ * Nachbau nach den User-Screenshots IMG_3293/3294/3295:
+ *   - links eine durchgehende GOLDENE SCHIENE mit Trophaeen-Skala,
+ *     Zahl alle 50 Trophaeen
+ *   - Belohnungs-KNOTEN als gruene Plattform-Karten mit Deko-Props
+ *     links/rechts und mittiger Belohnungs-Kachel; gruener Haken,
+ *     sobald abgeholt
+ *   - Arena-Sektionen an den Schwellen: Diorama + Chip + Name +
+ *     MAGENTA RIBBON "Arena N / Schwelle" + Unlocks-Raster +
+ *     Objective-/Trick-Card-Banner mit (i)
+ *   - "Top"-Sprungbutton oben mittig, schwebender Hoch-Pfeil links
+ *   - unten fixiert "Okay"
+ * Die Strasse waechst NACH OBEN: hoechste Trophaeen im DOM zuerst, der
+ * Scroll-Container startet am unteren Ende.
+ * ================================================================== */
+#roadLayer{position:fixed;inset:0;display:none;z-index:70;justify-content:center}
+#roadLayer.open{display:flex}
+.roadwrap{width:100%;max-width:430px;position:relative;
+  background:linear-gradient(180deg,#0a1420,#122238 45%,#0a1420)}
+.roadscroll{position:absolute;inset:0 0 66px 0;overflow-y:auto;
+  padding:56px 12px 20px 54px;-webkit-overflow-scrolling:touch}
+.rail{position:absolute;left:22px;top:0;bottom:66px;width:12px;
+  background:linear-gradient(90deg,#8a6a1f,#e0b94a 40%,#fff7d6 55%,#a8842a);
+  box-shadow:0 0 12px #e0b94a4d;z-index:2;pointer-events:none}
+.roadfoot{position:absolute;left:0;right:0;bottom:0;height:66px;z-index:6;
+  background:linear-gradient(180deg,#0e1418cc,#0a1420);border-top:1px solid #26343f;
+  display:flex;align-items:center;justify-content:center}
+.okbtn{font-size:16px;padding:10px 44px;border-radius:12px;
+  background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);box-shadow:0 3px 0 #6d551a;
+  -webkit-text-fill-color:#3a2b07;color:#3a2b07;filter:none}
+.topjump{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:8;
+  font-size:13px;padding:7px 22px;border-radius:10px;
+  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);color:#fff;font-weight:900;
+  box-shadow:0 3px 0 #12496f;letter-spacing:.06em}
+.upfloat{position:absolute;left:10px;top:56px;z-index:8;width:38px;height:38px;
+  border-radius:10px;font-size:15px;color:#fff;
+  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);box-shadow:0 3px 0 #12496f}
+.scrollhint{position:absolute;right:6px;top:50%;transform:translateY(-50%);z-index:8;
+  width:20px;height:44px;border-radius:6px;font-size:10px;line-height:1.1;color:#0e1418;
+  background:linear-gradient(180deg,#f4e3a6,#e0b94a);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;font-weight:900;pointer-events:none}
+.tick{position:relative;height:0;margin:0 0 0 -30px;z-index:3}
+.tick b{position:absolute;left:0;top:-9px;font-size:11px;font-weight:900;color:#fff;
+  text-shadow:0 1px 3px #000,0 0 8px #000}
+.tick i{position:absolute;left:34px;top:-1px;width:12px;height:2px;background:#fff7d68c}
+.node{position:relative;margin:0 0 16px 0;border-radius:14px;padding:12px 10px 16px;
+  display:flex;align-items:center;justify-content:space-around;
+  background:linear-gradient(180deg,#5fbe3a,#3f8f26 68%,#2b6a1a);
+  box-shadow:0 7px 0 #24344a,0 12px 16px -6px #000a;border:1px solid #7ad14f66}
+.node .prop{font-size:20px;opacity:.9;filter:drop-shadow(0 2px 2px #0006)}
+.node .rw{width:60px;height:60px;border-radius:11px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;font-size:25px;position:relative;
+  background-repeat:no-repeat;background-position:center;background-size:100% 100%,100% 100%;
+  background-image:linear-gradient(180deg,#e9eef3,#a8b6c2);
+  box-shadow:inset 0 0 0 2px #ffffff8c,0 3px 6px #0007}
+.node .rw .q{position:absolute;right:2px;bottom:1px;font-size:9px;font-weight:900;color:#20303f}
+.node .chk{position:absolute;right:-7px;top:-9px;font-size:17px;
+  filter:drop-shadow(0 1px 2px #000)}
+.node.done{filter:saturate(.5) brightness(.72)}
+.node.next{animation:nodeglow 1.5s ease-in-out infinite}
+@keyframes nodeglow{0%,100%{box-shadow:0 7px 0 #24344a,0 0 0 0 #e0b94a00}
+  50%{box-shadow:0 7px 0 #24344a,0 0 22px 5px #e0b94a99}}
+.node.lock{background:linear-gradient(180deg,#3a4a58,#222e39 70%,#18222b);
+  border-color:#ffffff14;box-shadow:0 7px 0 #16202a,0 10px 14px -6px #000a}
+.node.lock .rw{background-image:linear-gradient(180deg,#4a5967,#2b3743);filter:grayscale(.7)}
+.arenasec{position:relative;margin:6px 0 22px;padding:16px 6px 14px;
+  display:flex;flex-direction:column;align-items:center;
+  border-top:2px solid #ffffff26}
+.arenasec.lockedsec{opacity:.52}
+.secchip{margin-top:11px;background:#0b1116b3;border:1px solid #3a4c5c;border-radius:20px;
+  padding:3px 12px;font-size:10px;font-weight:800;letter-spacing:.09em;color:#cfe0ec}
+.secname{margin-top:7px;font-size:22px;text-align:center;line-height:1.1}
+.ribbon{position:relative;margin-top:11px;width:100%;max-width:330px;min-height:46px;
+  display:flex;align-items:center;justify-content:space-between;padding:8px 26px;
+  background-repeat:no-repeat;background-position:center;background-size:100% 260%,100% 100%;
+  background-image:linear-gradient(180deg,#f06ad2,#c72fa8 55%,#8d1c78);
+  clip-path:polygon(0 8%,7% 0,93% 0,100% 8%,100% 78%,93% 100%,7% 100%,0 78%);
+  box-shadow:0 5px 12px -4px #000a}
+.ribbon .rl{font-size:15px}
+.ribbon .rr{font-size:15px}
+.unlockhead{margin:16px 0 9px;font-size:13px;letter-spacing:.1em}
+.unlockgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%;
+  max-width:330px}
+.utile{aspect-ratio:1/1;border-radius:10px;position:relative;display:flex;
+  align-items:center;justify-content:center;font-size:23px;
+  background:linear-gradient(180deg,#dfe6ec,#9fadb9);
+  box-shadow:inset 0 0 0 2px #ffffff9e,0 3px 5px #0007}
+.utile .gem{position:absolute;left:-3px;top:-3px;width:15px;height:15px;
+  transform:rotate(45deg);border-radius:3px;box-shadow:0 0 0 1.5px #fffc,0 1px 3px #000a}
+.objcard{width:100%;max-width:330px;margin-top:9px;border-radius:11px;
+  display:flex;align-items:center;gap:9px;padding:9px 11px;position:relative;overflow:hidden;
+  border:2px solid #f2a13d;background:linear-gradient(100deg,#3a2a56,#6b4a2a 60%,#2c3b22)}
+.objcard.trick{border-color:#a45ef2;background:linear-gradient(100deg,#141c33,#2a1a4a 60%,#101a2e)}
+.objcard .ibtn{flex:0 0 26px;height:26px;border-radius:7px;font-size:13px;font-weight:900;
+  background:linear-gradient(180deg,#4fb6f0,#1c6ea8);color:#fff;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 #12496f}
+.objcard .otx{flex:1;min-width:0}
+.objcard .okind{font-size:9.5px;font-weight:900;letter-spacing:.09em;color:#5ad2ff;
+  text-transform:uppercase}
+.objcard .oname{font-size:14px;font-weight:900;color:#fff;text-shadow:0 1px 3px #000;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.objcard .oart{flex:0 0 auto;font-size:26px;filter:drop-shadow(0 2px 3px #0009)}
+.roadmore{text-align:center;color:#7e93a4;font-size:20px;letter-spacing:.5em;
+  padding:10px 0 18px}
 </style>
 </head>
 <body>
@@ -411,15 +550,21 @@ footer{padding:6px 12px 14px;text-align:center}
       <div class="arenakicker" id="arenaKicker">Arena 1</div>
       <div class="arenaname goldtext" id="arenaName">Kristallhof</div>
       <div class="arenachip" id="arenaChip">◎ Neutral</div>
-      <button class="crest" id="arenaCrest" title="Arena-Rang">👑</button>
+      <!-- Arena als freischwebendes INSEL-DIORAMA (§14.2) — AA rahmt die
+           Key-Art nicht und legt sie NICHT vollflächig hinter den Screen. -->
+      <button class="diorama" id="arenaDiorama" title="Arena-Rang"></button>
       <div class="progwrap">
         <span style="font-size:15px">🏆</span>
         <div class="progbar" id="arenaProg">
           <div class="progfill" id="arenaProgFill" style="width:0%"></div>
           <div class="proglabel" id="arenaProgLabel">—</div>
         </div>
-        <span style="font-size:15px" id="arenaProgIcon">🎁</span>
+        <!-- Belohnungs-Icon für den nächsten Straßen-Knoten (§14.3b) -->
+        <button class="crestmini" id="arenaProgIcon" title="Nächster Straßen-Knoten">🎁</button>
       </div>
+      <!-- Truhen-/Pack-Slots (§14.3): 4 Hex-Plätze, gefüllte führen in die
+           Packs-Ansicht. Bestand kommt aus ArenaProfile (hier Demo). -->
+      <div class="slotrow" id="packSlots"></div>
     </div>
 
     <div class="homerow">
@@ -585,6 +730,21 @@ footer{padding:6px 12px 14px;text-align:center}
   </div>
 </div>
 
+<!-- ===== TROPHAEENSTRASSE (§14.4) — Vollbild-Layer =====
+     In AA oeffnet der BATTLE-Button zuerst diesen Layer: eine von UNTEN
+     nach OBEN wachsende Strasse mit allen Arenen. Aufbau nach den
+     User-Screenshots IMG_3293/3294/3295. Unten fixiert "Okay". -->
+<div class="modal" id="roadLayer">
+  <div class="roadwrap">
+    <div class="rail"></div>
+    <button class="topjump goldtext pale" id="roadTop">Nach oben</button>
+    <button class="upfloat" id="roadUp">▲</button>
+    <div class="scrollhint">▲<br>▼</div>
+    <div class="roadscroll" id="roadScroll"></div>
+    <div class="roadfoot"><button class="okbtn" id="roadOk">Okay</button></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="./arena_cards.js"></script>
@@ -715,20 +875,87 @@ footer{padding:6px 12px 14px;text-align:center}
    * Reine Optik an der Trophäenzahl. Die Match-Welt wird pro Spiel
    * ZUFÄLLIG gewählt und hat mit diesen Orten nichts zu tun; sie sind
    * Aufstiegs-Belohnung fürs Auge — genauso wie in AA.
-   * Schwellen an AAs Kurve angelehnt (§9.5: 600 / 1200 / ~1500 / …).
+   *
+   * ⚠ SCHWELLEN KORRIGIERT (User-Screenshot IMG_3295, §14.1): Das
+   * magenta Ribbon der AA-Trophäenstraße liest wörtlich
+   * „Arena 2 · 🏆 300". Zusammen mit den aus Video 6 belegten Werten
+   * (Arena 3 = 600, Arena 5 = 1200, Arena 6 = 1500) ergibt sich AAs
+   * echte Leiter als glatte 300er-Schrittweite:
+   *   0 / 300 / 600 / 900 / 1200 / 1500
+   * Arena 4 = 900 passt dazu widerspruchsfrei („1136 🏆 → Arena 4
+   * Dock Drop", §12.1). Unsere frühere Annahme Arena 2 = 600 hatte
+   * AAs Arena-3-Wert eine Stufe zu tief einsortiert.
    * ================================================================== */
   var ARENA_TIERS = [
     { n:1, name:"Kristallhof",      at:0,    url:ASSETS.arena1, key:"arena1" },
-    { n:2, name:"Smaragdtal",       at:600,  url:ASSETS.arena2, key:"arena2" },
-    { n:3, name:"Saphirfeste",      at:1200, url:ASSETS.arena3, key:"arena3" },
-    { n:4, name:"Sturmspitze",      at:1500, url:ASSETS.arena4, key:"arena4" },
-    { n:5, name:"Obsidian-Thron",   at:2200, url:ASSETS.arena5, key:"arena5" },
-    { n:6, name:"Prisma-Zitadelle", at:2900, url:ASSETS.arena6, key:"arena6" },
+    { n:2, name:"Smaragdtal",       at:300,  url:ASSETS.arena2, key:"arena2" },
+    { n:3, name:"Saphirfeste",      at:600,  url:ASSETS.arena3, key:"arena3" },
+    { n:4, name:"Sturmspitze",      at:900,  url:ASSETS.arena4, key:"arena4" },
+    { n:5, name:"Obsidian-Thron",   at:1200, url:ASSETS.arena5, key:"arena5" },
+    { n:6, name:"Prisma-Zitadelle", at:1500, url:ASSETS.arena6, key:"arena6" },
   ];
   function arenaIndexFor(troph) {
     var i = 0;
     for (var k = 0; k < ARENA_TIERS.length; k++) if (troph >= ARENA_TIERS[k].at) i = k;
     return i;
+  }
+
+  /* ==================================================================
+   * TROPHÄENSTRASSE — Daten (§14.4)
+   * ------------------------------------------------------------------
+   * NODE_STEP: AA setzt im unteren Bereich alle 50 🏆 einen Knoten
+   * (§9.5). Die Arena-Schwellen (Vielfache von 300) sind selbst KEINE
+   * Knoten, sondern tragen die Arena-Sektion.
+   * Freischaltungen pro Arena: unser Content, deutsche Namen, im Geist
+   * von GAMEPLAY_OPTIMIERUNG §8 (Map Objectives + Trick Cards).
+   * ================================================================== */
+  var NODE_STEP = 50;
+  var ROAD_TOP = 1500;                       // Demo-Ende = letzte Arena
+  var UNLOCKS = {
+    1: [["🔥", "#ff6b3d"], ["❄", "#3dc8ff"], ["🌿", "#46c46a"], ["🪨", "#e0a43c"],
+        ["☀", "#ffe36b"], ["🌑", "#9b6bff"]],
+    2: [["💥", "#ff6b3d"], ["🧊", "#3dc8ff"], ["🌾", "#46c46a"], ["⛰", "#e0a43c"], ["✨", "#ffd23d"]],
+    3: [["🌋", "#ff4d2d"], ["🌀", "#3dc8ff"], ["🍃", "#46c46a"], ["💎", "#e0a43c"]],
+    4: [["⚡", "#ffe36b"], ["🕸", "#9b6bff"], ["🔮", "#a45ef2"], ["🗡", "#ffd23d"]],
+    5: [["☄", "#ff6b3d"], ["🌫", "#3dc8ff"], ["🕯", "#9b6bff"], ["⚔", "#e0a43c"]],
+    6: [["🌈", "#a45ef2"], ["👁", "#ff5e7e"], ["🜂", "#ffd23d"], ["🜄", "#3dc8ff"]],
+  };
+  var TEASERS = {
+    1: [["obj", "Zauber-Rausch", "🌀"], ["obj", "Kopfgeld-Blüte", "💰"],
+        ["trick", "Ketten der Bindung", "⛓"]],
+    2: [["obj", "Schnurgerade", "➡"], ["trick", "Fluch der Schwäche", "🩸"],
+        ["trick", "Phantomkarren", "🛒"]],
+    3: [["obj", "Endlos-Neuwahl", "🔄"], ["obj", "Untergangs-Uhr", "⏳"],
+        ["trick", "Geisterhafte Ablenkung", "👻"]],
+    4: [["obj", "Blindwahl", "❓"], ["trick", "Mystische Hindernisse", "🧱"],
+        ["trick", "Fluch der Stille", "🤫"]],
+    5: [["obj", "Sternengeboren", "⭐"], ["trick", "Sternenfall-Fluch", "💫"],
+        ["trick", "Verfluchte Bö", "🌬"]],
+    6: [["obj", "Prisma-Bruch", "🔺"], ["obj", "Doppelte Welle", "🌊"],
+        ["trick", "Spiegelfluch", "🪞"]],
+  };
+  // Belohnung eines Knotens: alle 250 🏆 ein Silber-Pack, sonst im
+  // Wechsel Gold / Material / Bronze-Pack.
+  function nodeReward(t) {
+    if (t % 250 === 0) return { icon: "🥈", label: "Silber-Pack", q: "×1", asset: "pack_silver" };
+    var m = (t / NODE_STEP) % 3;
+    if (m === 1) return { icon: "🪙", label: "Gold", q: "×" + (200 + Math.floor(t / 50) * 40), asset: null };
+    if (m === 2) return { icon: "⚗", label: "Arkan-Essenz", q: "×" + (2 + Math.floor(t / 300)), asset: null };
+    return { icon: "🥉", label: "Bronze-Pack", q: "×1", asset: "pack_bronze" };
+  }
+  function nodeList() {
+    var out = [];
+    for (var t = NODE_STEP; t <= ROAD_TOP; t += NODE_STEP) {
+      if (ARENA_TIERS.some(function (a) { return a.at === t; })) continue;
+      out.push(t);
+    }
+    return out;
+  }
+  // Erster noch nicht abgeholter Knoten = Spielerposition auf der Straße.
+  function nextNodeTrophies() {
+    var ns = nodeList();
+    for (var i = 0; i < ns.length; i++) if (ns[i] > DEMO_TROPHIES) return ns[i];
+    return null;
   }
 
   /* ================= Demo-Seed ================= */
@@ -1293,10 +1520,30 @@ footer{padding:6px 12px 14px;text-align:center}
     // wörtlich "Neutral". Bei uns immer neutral — die Welt ist random.
     $("arenaChip").textContent = "◎ Zufallswelt";
 
-    // Key-Art vollflächig hinter dem Hero (AA rahmt sie NICHT ein).
-    layer($("arenaHero"), cur.key);
+    // §14.2: Die Key-Art ist ein freischwebendes DIORAMA, nicht der
+    // Screen-Hintergrund. Der Hero bleibt schlicht dunkelblau.
+    layer($("arenaDiorama"), cur.key);
     layer($("arenaProg"), "progress_frame");
     layer($("btnBattle"), "btn_primary");
+
+    // Truhen-/Pack-Slots (§14.3). Demo: 2 Bronze-Packs + 2 leere Plätze.
+    // Im Spiel kommt der Bestand aus ArenaProfile (packAwarded jeden
+    // 3. Sieg, siehe arena_cards.js PACKS.bronze.source).
+    var SLOTS = [{ k: "bronze", i: "🥉" }, { k: "bronze", i: "🥉" }, null, null];
+    $("packSlots").innerHTML = SLOTS.map(function (s, k) {
+      return s
+        ? '<button class="slot full" data-slot="' + k + '" title="Bronze-Pack">' + s.i +
+          '<span class="cnt3">1</span></button>'
+        : '<button class="slot empty" data-slot="' + k + '" title="Leerer Platz">＋</button>';
+    }).join("");
+    Array.prototype.forEach.call($("packSlots").querySelectorAll(".slot"), function (b) {
+      var full = b.classList.contains("full");
+      if (full) layer(b, "pack_bronze");
+      b.addEventListener("click", function () {
+        if (full) { toast("Bronze-Pack — zur Pack-Ansicht"); show("navPack"); }
+        else toast("Leerer Platz — Packs gibt es für Siege");
+      });
+    });
 
     // Fortschritt bis zur nächsten Arena.
     var from = cur.at, to = nxt ? nxt.at : cur.at;
@@ -1305,7 +1552,13 @@ footer{padding:6px 12px 14px;text-align:center}
     $("arenaProgLabel").textContent = nxt
       ? (fmt(t) + " / " + fmt(to) + " 🏆")
       : (fmt(t) + " 🏆 — Höchste Arena");
-    $("arenaProgIcon").textContent = nxt ? "🎁" : "👑";
+    // Belohnungs-Icon am rechten Balkenende = Belohnung des NÄCHSTEN
+    // Straßen-Knotens (§14.3b). Klick öffnet die Trophäenstraße.
+    var nn = nextNodeTrophies();
+    $("arenaProgIcon").textContent = nn ? nodeReward(nn).icon : "👑";
+    $("arenaProgIcon").title = nn
+      ? "Nächster Knoten bei " + fmt(nn) + " 🏆: " + nodeReward(nn).label
+      : "Straße abgeschlossen";
 
     // Arena-Leiter: erreichte farbig, kommende abgedunkelt mit 🔒 + Schwelle.
     $("arenaLadder").innerHTML = ARENA_TIERS.map(function (a, k) {
@@ -1334,6 +1587,107 @@ footer{padding:6px 12px 14px;text-align:center}
       : "Höchste Arena erreicht. Arenen sind reine Status-Optik — die Match-Welt wird pro Spiel zufällig gewählt.";
     renderTop();
   }
+
+  /* ================= TROPHÄENSTRASSE (§14.4) ================= */
+  /* Die Straße wächst NACH OBEN: im DOM steht die höchste Trophäenzahl
+     oben, der Scroll-Container startet am unteren Ende. */
+  var roadBuilt = false;
+  function buildRoad() {
+    var t = DEMO_TROPHIES, nextN = nextNodeTrophies();
+    // Marken von ROAD_TOP herunter bis 0 sammeln, dann als HTML ausgeben.
+    var marks = [];
+    for (var v = ROAD_TOP; v >= 0; v -= NODE_STEP) {
+      var arena = null;
+      for (var k = 0; k < ARENA_TIERS.length; k++) if (ARENA_TIERS[k].at === v) arena = ARENA_TIERS[k];
+      marks.push({ at: v, arena: arena });
+    }
+    var html = ['<div class="roadmore">•••</div>'];
+    marks.forEach(function (mk) {
+      html.push('<div class="tick" data-at="' + mk.at + '"><b>' + fmt(mk.at) + '</b><i></i></div>');
+      if (mk.arena) { html.push(arenaSectionHtml(mk.arena, t)); return; }
+      var st = mk.at <= t ? "done" : (mk.at === nextN ? "next" : "lock");
+      var rw = nodeReward(mk.at);
+      var props = ["🔥", "🪵", "🪨", "🌿", "⛺", "🕳"];
+      html.push(
+        '<div class="node ' + st + '" data-at="' + mk.at + '" data-state="' + st + '">' +
+          '<span class="prop">' + props[(mk.at / NODE_STEP) % props.length] + "</span>" +
+          '<div class="rw" data-asset="' + (rw.asset || "") + '" title="' + rw.label + '">' +
+            rw.icon + '<span class="q">' + rw.q + "</span>" +
+            (st === "done" ? '<span class="chk">✅</span>' : "") +
+            (st === "lock" ? '<span class="chk">🔒</span>' : "") +
+          "</div>" +
+          '<span class="prop">' + props[(mk.at / NODE_STEP + 3) % props.length] + "</span>" +
+        "</div>");
+    });
+    $("roadScroll").innerHTML = html.join("");
+    // Assets nachlegen (Diorama-Key-Art, Ribbon-Band, Pack-Kacheln).
+    Array.prototype.forEach.call($("roadScroll").querySelectorAll("[data-arenakey]"), function (el) {
+      layer(el, el.getAttribute("data-arenakey"));
+    });
+    Array.prototype.forEach.call($("roadScroll").querySelectorAll(".ribbon"), function (el) {
+      layer(el, "banner_rarity");
+    });
+    Array.prototype.forEach.call($("roadScroll").querySelectorAll(".rw[data-asset]"), function (el) {
+      var a = el.getAttribute("data-asset"); if (a) layer(el, a);
+    });
+    Array.prototype.forEach.call($("roadScroll").querySelectorAll(".objcard .ibtn"), function (b) {
+      b.addEventListener("click", function (e) {
+        e.stopPropagation();
+        toast(b.getAttribute("data-info") || "Info");
+      });
+    });
+    Array.prototype.forEach.call($("roadScroll").querySelectorAll(".node"), function (n) {
+      n.addEventListener("click", function () {
+        var at = n.getAttribute("data-at") | 0, s = n.getAttribute("data-state");
+        toast(s === "done" ? "Bei " + fmt(at) + " 🏆 bereits abgeholt"
+          : s === "next" ? "Nächster Knoten: " + fmt(at) + " 🏆"
+          : "Gesperrt — noch " + fmt(at - DEMO_TROPHIES) + " 🏆");
+      });
+    });
+    roadBuilt = true;
+  }
+  function arenaSectionHtml(a, troph) {
+    var locked = troph < a.at;
+    var un = (UNLOCKS[a.n] || []).map(function (u) {
+      return '<div class="utile">' + u[0] +
+        '<span class="gem" style="background:' + u[1] + '"></span></div>';
+    }).join("");
+    var te = (TEASERS[a.n] || []).map(function (x) {
+      var kind = x[0] === "trick" ? "Trick-Karte" : "Map-Ziel";
+      return '<div class="objcard' + (x[0] === "trick" ? " trick" : "") + '">' +
+        '<button class="ibtn" data-info="' + kind + ' „' + x[1] + '" — Details folgen">i</button>' +
+        '<div class="otx"><div class="okind">' + kind + '</div>' +
+        '<div class="oname">' + x[1] + "</div></div>" +
+        '<span class="oart">' + x[2] + "</span></div>";
+    }).join("");
+    return '<section class="arenasec' + (locked ? " lockedsec" : "") + '" data-arena="' + a.n + '">' +
+      '<div class="diorama" data-arenakey="' + a.key + '"></div>' +
+      '<div class="secchip">◎ Zufallswelt</div>' +
+      '<div class="secname goldtext">' + a.name + "</div>" +
+      '<div class="ribbon"><span class="rl goldtext pale">Arena ' + a.n + "</span>" +
+        '<span class="rr goldtext pale">🏆 ' + fmt(a.at) + "</span></div>" +
+      '<div class="unlockhead goldtext">Schaltet frei:</div>' +
+      '<div class="unlockgrid">' + un + "</div>" + te +
+      "</section>";
+  }
+  function openRoad() {
+    if (!roadBuilt) buildRoad();
+    $("roadLayer").classList.add("open");
+    var sc = $("roadScroll");
+    // Straße wächst nach oben → erst ans UNTERE Ende (Arena 1, 0 🏆).
+    sc.scrollTop = sc.scrollHeight;
+    // …dann sanft zur Spielerposition (erster nicht abgeholter Knoten).
+    var nextN = nextNodeTrophies();
+    var target = sc.querySelector('.node[data-state="next"]') ||
+                 sc.querySelector('.tick[data-at="' + nextN + '"]');
+    if (target) {
+      setTimeout(function () {
+        sc.scrollTop = Math.max(0, target.offsetTop - sc.clientHeight * 0.55);
+      }, 30);
+    }
+  }
+  function closeRoad() { $("roadLayer").classList.remove("open"); }
+  function roadScrollTop() { $("roadScroll").scrollTop = 0; }
 
   /* Assets, die außerhalb des Home-Views liegen, einmalig auflegen.
      Fällt das CDN aus, greifen überall die vorhandenen Gradienten. */
@@ -1404,16 +1758,21 @@ footer{padding:6px 12px 14px;text-align:center}
 
   /* ================= Events ================= */
   $("navHome").addEventListener("click", function () { show("navHome"); });
-  // Home → Kampf: im Prototyp gibt es kein Match, also führt der Button in
-  // die Sammlung (dort wird das Deck fürs nächste Match zusammengestellt).
-  $("btnBattle").addEventListener("click", function () {
-    toast("Match startet — im Prototyp geht es zum Deck");
-    show("navCollection");
-  });
+  // Home → KAMPF: In AA öffnet der Battle-Button ZUERST die
+  // Trophäenstraße (User-Screenshots, §14.4). Genau das macht der
+  // Prototyp jetzt auch; „Okay" schließt den Layer wieder.
+  $("btnBattle").addEventListener("click", function () { openRoad(); });
   $("tileEvents").addEventListener("click", function () { toast("Events sind im Prototyp Deko"); });
-  $("arenaCrest").addEventListener("click", function () {
+  $("arenaDiorama").addEventListener("click", function () {
     var a = ARENA_TIERS[arenaIndexFor(DEMO_TROPHIES)];
     toast("Arena " + a.n + " von " + ARENA_TIERS.length + ": " + a.name);
+  });
+  $("arenaProgIcon").addEventListener("click", function (e) { e.stopPropagation(); openRoad(); });
+  $("roadOk").addEventListener("click", closeRoad);
+  $("roadTop").addEventListener("click", roadScrollTop);
+  $("roadUp").addEventListener("click", function () {
+    var sc = $("roadScroll");
+    sc.scrollTop = Math.max(0, sc.scrollTop - sc.clientHeight * 0.85);
   });
   $("navCollection").addEventListener("click", function () { show("navCollection"); });
   $("navTower").addEventListener("click", function () { show("navTower"); });
@@ -1471,7 +1830,9 @@ footer{padding:6px 12px 14px;text-align:center}
   setNav("navHome");
   window.__proto = { AC: AC, openDetail: openDetail, show: show, seed: seed,
                      setSort: setSort, sortedIds: sortedIds,
-                     ASSETS: ASSETS, ARENA_TIERS: ARENA_TIERS, renderHome: renderHome };
+                     ASSETS: ASSETS, ARENA_TIERS: ARENA_TIERS, renderHome: renderHome,
+                     openRoad: openRoad, closeRoad: closeRoad, nodeList: nodeList,
+                     nextNodeTrophies: nextNodeTrophies };
 })();
 </script>
 </body>

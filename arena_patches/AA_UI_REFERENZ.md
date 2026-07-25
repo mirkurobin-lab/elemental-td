@@ -2,6 +2,12 @@
 
 Referenzdokumentation für den Nachbau in **Arcane Prism TD**.
 
+> **Stand: 4. Durchgang (User-Screenshots der Trophäenstraße eingearbeitet, §14).**
+> Neu: AAs **Trophäenstraße** als eigener Vollbild-Layer hinter dem BATTLE-Button, die
+> **komplette Arena-Leiter 0/300/600/900/1200/1500** (Arena 2 = 300 ist wörtlich belegt),
+> und die Korrektur, dass Arenen als **schwebendes Insel-Diorama** inszeniert werden,
+> nicht als Vollflächen-Hintergrund. **Bitte §14 zuerst lesen.**
+>
 > **Stand: 3. Durchgang (Video 7 eingearbeitet).** Video 7 schließt die beiden größten
 > Lücken — die **Merge-Ausführung samt Zeremonie** (§4.4) und die **Level→Gold-Kurve**
 > (§13.2) — und verwirft dabei den bisherigen Wert „8000 Gold". Neu ist außerdem §9.5b:
@@ -692,11 +698,19 @@ Die Trophy Road ist ein **vertikaler Scroll** mit den Trophäenschwellen linksb�
 (x ≈ 100) und den Belohnungen rechts daneben. An den Arena-Grenzen ist jeweils ein
 **Arena-Banner** eingeschoben, der Name, Nummer, Schwelle und ein **„Unlocks:"**-Feld zeigt.
 
+> ⚠ **SCHWELLEN KOMPLETTIERT (User-Screenshots, §14.1).** Das magenta Arena-Ribbon der
+> Trophäenstraße liest wörtlich **„Arena 1 · 🏆 0"** (IMG_3294) und **„Arena 2 · 🏆 300"**
+> (IMG_3295). Zusammen mit den hier belegten 600 / 1200 / 1500 ergibt sich AAs echte Leiter
+> als **glatte 300er-Schrittweite: 0 / 300 / 600 / 900 / 1200 / 1500**. Arena 4 = **900**
+> folgt daraus und ist widerspruchsfrei mit „1136 🏆 → Arena 4 Dock Drop" (§12.1).
+> Der Name von Arena 1 ist ebenfalls jetzt bekannt: **Waterfall Vale**.
+
 | Arena / Liga | Name | Trophäen-Schwelle |
 |---|---|---|
-| Arena 2 | **Dustfall Temple** | < 600 (Account mit 425 war hier) |
+| Arena 1 | **Waterfall Vale** | **0** (IMG_3294) |
+| Arena 2 | **Dustfall Temple** | **300** (IMG_3295) |
 | Arena 3 | **Sunken Atlantis** | **600** |
-| Arena 4 | *(Name in Videos nicht sichtbar)* | zwischen 600 und 1136 (Account mit 1136 war hier) |
+| Arena 4 | **Dock Drop** | **900** (abgeleitet: 300er-Raster + Account mit 1136 stand hier) |
 | Arena 5 | **Aztec Grounds** | **1200** |
 | Arena 6 | **Inferno Pit** | ≈ **1500** |
 | Liga | **Champions Peak** — Entrance Gate | ≈ **2900** |
@@ -756,8 +770,11 @@ y ~2590-2860  Bottom-Nav, 5 Tabs; der mittlere („Battle") ist ERHÖHT,
 ```
 
 **Entscheidend für den Nachbau:**
-* Die **Key-Art ist VOLLFLÄCHIGER HINTERGRUND**, kein gerahmtes Banner. Der obere
-  Bildschirmteil *ist* die Arena (blauer Himmel, Tempelbauwerk); die UI liegt darüber.
+* ⚠ **KORRIGIERT (§14.2):** Die Key-Art ist **KEIN vollflächiger Hintergrund**, sondern ein
+  **freischwebendes INSEL-DIORAMA** — eine kleine, aus dem Boden gestanzte Insel (Hütte,
+  Felsen, Wasserrand) die mittig auf **schlichtem Dunkelblau** schwebt, mit Schlagschatten
+  darunter. Die frühere Lesung „Vollflächen-Hintergrund" entstand aus den stark
+  komprimierten Frame-Transfers; die User-Screenshots zeigen es eindeutig anders.
 * Der **Arenaname steht zweizeilig zentriert auf ~28-33 % Bildhöhe**, direkt über der Mitte —
   also im „Himmel" der Key-Art, wo garantiert ruhige Fläche ist.
 * Der Name ist **Text auf Bild**, nicht ins Bild gebrannt. Das ist genau unsere
@@ -1201,3 +1218,161 @@ nur bis etwa Level 20.
 5. 🟡 **„Max Level"-Button** — existiert sicher, Wirkung nur erschlossen (§13.4).
 6. 🟡 **Epic/Legendary-Caps (40/50)** — weiterhin Extrapolation, jetzt aber auf einer
    dreifach gemessenen Schrittweite von +10 aufsetzend.
+
+---
+
+## 14. Die Trophäenstraße — Nachtrag aus vier User-Screenshots
+
+> Quelle: vier vom User nachgelieferte AA-Screenshots (IMG_3292 Home, IMG_3293 Arena-1-
+> Freischaltungen, IMG_3294 Straßenanfang, IMG_3295 Arena-2-Sektion). Anders als die
+> Videoframes sind das **unkomprimierte Vollauflösungs-Bilder** — sie korrigieren daher
+> zwei Aussagen, die aus stark komprimierten Frame-Transfers abgeleitet waren.
+>
+> **Der zentrale Befund:** Der **BATTLE-Button öffnet nicht direkt das Matchmaking**,
+> sondern zuerst die **Trophäenstraße** als eigenen Vollbild-Layer.
+
+### 14.1 ✅ Die komplette Arena-Leiter: 0 / 300 / 600 / 900 / 1200 / 1500
+
+Das magenta Arena-Ribbon nennt die Schwelle wörtlich:
+
+| Beleg | Ribbon-Text |
+|---|---|
+| IMG_3294 | **`Arena 1   🏆 0`** |
+| IMG_3295 | **`Arena 2   🏆 300`** |
+
+Damit fügt sich alles zu einer **glatten 300er-Schrittweite**:
+
+| Arena | Name | Schwelle | Status |
+|---|---|---|---|
+| 1 | Waterfall Vale | **0** | Screenshot |
+| 2 | Dustfall Temple | **300** | Screenshot |
+| 3 | Sunken Atlantis | **600** | Video 6 |
+| 4 | Dock Drop | **900** | abgeleitet (Raster + „1136 🏆 → Arena 4") |
+| 5 | Aztec Grounds | **1200** | Video 6 |
+| 6 | Inferno Pit | **1500** | Video 6 |
+
+⚠ **Korrektur an unserem Modell:** Wir hatten Smaragdtal auf 600 gelegt — das ist AAs
+**Arena-3**-Wert, unsere Leiter war also um eine Stufe gestreckt. Nachgezogen in
+`ui_prototype.html` (`ARENA_TIERS`), `ui_assets.json`, `GAMEPLAY_OPTIMIERUNG.md` §4
+und `HANDOFF.md`. Die Festungs-Gates in `arena_fortress.js` (600 / 1200 / 1500, gelabelt
+„Arena 3 / 5 / 6") bleiben **unverändert richtig** — sie hingen immer an den AA-Werten,
+nicht an unserer Nummerierung.
+
+### 14.2 ⚠ Arenen sind schwebende Insel-DIORAMEN, kein Vollflächen-Hintergrund
+
+Die Aussage in §9.5b („Key-Art ist vollflächiger Hintergrund") war **falsch** und stammte
+aus einem auf 430 px komprimierten Frame. In Vollauflösung ist klar:
+
+* Der Bildschirmhintergrund ist ein **schlichter dunkelblauer Verlauf**, ohne Motiv.
+* Die Arena ist ein **kleines, aus dem Boden gestanztes Insel-Diorama** — Hütte, Felsen,
+  Grasrand, Wasserkante, bei „Dock Drop" zusätzlich Tentakel und ein Kieferknochen.
+  Es **schwebt** mittig, mit weichem Schlagschatten darunter, leicht von oben gesehen.
+* Es nimmt nur etwa **35 % der Bildschirmbreite und 12 % der Höhe** ein.
+
+**Konsequenz für den Nachbau:** Unsere Querformat-Key-Art wird als **abgerundete,
+schwebende Karte** inszeniert (Glow + Schlagschatten + minimale `rotateX`-Neigung),
+Hintergrund bleibt dunkel. Umgesetzt als CSS-Klasse `.diorama`.
+
+### 14.3 Home-Screen — zwei fehlende Elemente (IMG_3292)
+
+Der Home-Screen hat unter dem Diorama **zwei Reihen**, die bisher fehlten:
+
+```
+y ~1650   Trophäen-Balken: 🏆 links · leere Goldrinne · REWARD-ICON am rechten Ende,
+          halb aus der Kapsel herausragend (= Belohnung des nächsten Straßen-Knotens)
+y ~1830   TRUHEN-/PACK-SLOTS: 4 Plätze in HEX-Rahmen in einem gerundeten Container
+          (im Screenshot 3 silberne + 1 goldene Truhe)
+y ~2110   EVENTS  |  BATTLE  |  CHALLENGES     ← DREI Elemente, nicht zwei
+```
+
+Ergänzt: die **4 Hex-Slots** (Demo: 2 Bronze-Packs + 2 leere Plätze, Klick führt in die
+Pack-Ansicht; im Spiel hängt der Bestand an `ArenaProfile` / `packAwarded`) und das
+**Belohnungs-Icon am rechten Balkenende**, das die Belohnung des nächsten Knotens zeigt
+und die Trophäenstraße öffnet.
+
+Weitere Home-Details aus dem Screenshot (nicht nachgebaut, aber dokumentiert):
+Avatar-Portrait links oben, **XP-Ring mit „Level 14"**, Postfach-Icon, Freundesliste- und
+Menü-Button, sowie **zwei senkrechte Schienen mit Shop-/Angebots-Icons** am linken und
+rechten Bildrand (je 3-4 Kacheln, alle mit rotem „!"-Badge) — ein sehr aggressives
+Monetarisierungs-Layout, das wir bewusst nicht übernehmen.
+
+### 14.4 ✅ Aufbau der Trophäenstraße
+
+**Trigger:** BATTLE-Button. **Abschluss:** unten fixierter **`Okay`**-Button.
+**Scroll-Richtung:** Die Straße wächst **von unten nach oben** — Arena 1 (0 🏆) liegt
+ganz unten, höhere Trophäen weiter oben.
+
+**Feste Bedienelemente (bleiben beim Scrollen stehen):**
+
+| Element | Position | Funktion |
+|---|---|---|
+| **`Top`**-Button | oben mittig | Sprung an die Spitze der Straße |
+| Hoch-Pfeil (blau) | links oben, schwebend | eine Bildschirmhöhe nach oben |
+| Scroll-Indikator (gelb, ▲▼) | rechter Rand, mittig | reine Anzeige |
+| **`Okay`** | unten mittig, eigene Leiste | Layer schließen |
+
+**Linke Schiene:** eine durchgehende, **kräftig goldene Vertikalleiste** am linken Rand.
+Rechts daneben stehen die Trophäenzahlen in weißer Fettschrift **alle 50 🏆**
+(`0 · 50 · 100 · 150 …`) mit kurzem Tick.
+
+**Belohnungs-Knoten** (alle 50 🏆) sind **grüne Plattform-Karten**: eine Rasenfläche mit
+dunklem, abgeschrägtem Sockel darunter (3D-Plattform-Look), darin
+
+* **mittig** die Belohnungs-Kachel (gerahmtes Quadrat mit Icon + `x1`),
+* **links und rechts Deko-Props** (Lagerfeuer, Baumstumpf mit Pilzen, Brunnen, Axt im
+  Holzblock …) — reine Ausstattung, keine Funktion,
+* bei abgeholten Knoten ein **grüner Haken** oben rechts an der Kachel.
+
+**Arena-Sektionen** sitzen an ihren Schwellen und unterbrechen die Knotenkette. Aufbau
+strikt in dieser Reihenfolge (IMG_3295):
+
+```
+1  [schwebendes Insel-Diorama]
+2  ◈ Neutral                       ← Modifier-Chip
+3  Dustfall Temple                 ← Arenaname, groß, weiß fett
+4  ╔═ MAGENTA RIBBON ═╗            ← Band mit gefalteten Enden:
+   ║ Arena 2    🏆 300 ║              Nummer links, Schwelle rechts
+   ╚══════════════════╝
+5  Unlocks:                        ← gold/gelb, zentriert
+6  [Raster silbergerahmter Kacheln] ← Türme + Spells; jede Kachel trägt oben links
+                                      ein kleines ELEMENT-GEM (rot/blau/violett/gelb).
+                                      Arena 1: 10 Kacheln, Arena 2: 6.
+7  [breite Banner-Karten mit (i)]   ← je ein (i)-Button links, darüber eine cyanfarbene
+                                      Kategoriezeile, darunter der Name fett weiß,
+                                      rechts Artwork
+```
+
+**Farbcode der Banner-Karten** (klare visuelle Trennung):
+
+| Kategorie | Rahmenfarbe | Beispiele aus den Screenshots |
+|---|---|---|
+| **Map Objective** | **orange/gold** | Spell Frenzy · Bounty Bloom · Straight Combat · Swift Trick · Starborn · Blind Pick |
+| **Trick Card** | **violett** | Chains of Binding · Curse of Weakness · Phantom Cart · Curse of Silence |
+
+Damit erweitert sich die Liste aus §9.7 um vier bisher unbekannte Namen:
+**Swift Trick**, **Starborn**, **Blind Pick** (Objectives) und **Curse of Silence**
+(Trick Card).
+
+### 14.5 Warum das Muster so gut funktioniert
+
+Der BATTLE-Button führt nicht ins Match, sondern **zuerst durch die eigene Erfolgsbilanz**.
+Der Spieler scrollt an abgeholten Haken vorbei nach oben, sieht den nächsten Knoten
+glühen und dahinter die noch gesperrte Arena mit allem, was sie freischaltet — und tippt
+dann erst „Okay". Das ist **Motivation genau im Moment der Kampfbereitschaft**, ohne einen
+einzigen zusätzlichen Menüpunkt. Kostet nichts außer der Straße, die man ohnehin baut.
+
+### 14.6 Umsetzung im Prototyp
+
+| Element | Umsetzung in `ui_prototype.html` |
+|---|---|
+| Vollbild-Layer | `#roadLayer`, geöffnet vom KAMPF-Button und vom Belohnungs-Icon |
+| Scroll-Start | `scrollTop = scrollHeight` (unteres Ende), dann Auto-Scroll auf den ersten nicht abgeholten Knoten |
+| Goldene Schiene | `.rail`, feste Position, plus `.tick`-Marken alle 50 🏆 bis 1500 + „•••" |
+| Knoten | `.node` in drei Zuständen: `.done` (✅, gedimmt) · `.next` (Glow-Puls) · `.lock` (🔒, dunkel) |
+| Belohnungen | alle 250 🏆 ein Silber-Pack, sonst im Wechsel Gold / Arkan-Essenz / Bronze-Pack; Pack-Kacheln nutzen die generierten Pack-Assets |
+| Arena-Sektion | `.arenasec` mit `.diorama`, Chip, Name (`goldtext`), `.ribbon` (Banner-Asset magenta getönt), `.unlockgrid` mit Element-Gems, `.objcard` in orange/violett mit `(i)` |
+| Bedienung | `Nach oben` (fix oben), schwebender Hoch-Pfeil, Scroll-Indikator, `Okay` (fix unten) |
+
+Alle Beschriftungen sind **deutsche HTML-Strings** mit `.goldtext`; es wurden **keine neuen
+Bilder generiert** — die Straße nutzt ausschließlich die 25 vorhandenen Assets plus
+CSS-Fallbacks.

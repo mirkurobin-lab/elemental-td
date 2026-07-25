@@ -161,16 +161,23 @@ das *leichtere* Matchup, nicht das bessere Spiel.
 
   | Arena / Liga | Schwelle | Trophäen (Sieg) | Gold (Sieg) | Trophäen (Niederlage) |
   |---|---|---|---|---|
-  | 1 | 0 🏆 | +30 | 250 | −8 |
-  | 2 | ~250 🏆 | +32 | 400 | −9 |
+  | 1 | **0 🏆** | +30 | 250 | −8 |
+  | 2 | **300 🏆** | +32 | 400 | −9 |
   | 3 | **600 🏆** | +35 | **610** | −10 |
-  | 4 | ~900 🏆 | +37 | 750 | −11 |
+  | 4 | **900 🏆** | +37 | 750 | −11 |
   | 5 | **1200 🏆** | +39 | 900 | −12 |
   | 6 | **1500 🏆** | +42 | 1 100 | −13 |
   | **Champions-Liga** | **~2900 🏆** | +45 | 1 400 | −15 |
 
   (Die Arena-3-Zeile übernimmt bewusst AAs belegte 610 Gold als Ankerwert.)
 
+> **⚠ KOMPLETT nach den User-Screenshots der Trophäenstraße (AA-Referenz §14.1).**
+> AAs Arena-Ribbon liest wörtlich „Arena 2 · 🏆 300" — damit ist die Leiter eine **glatte
+> 300er-Schrittweite: 0 / 300 / 600 / 900 / 1200 / 1500**. Alle sechs Schwellen sind jetzt
+> belegt bzw. lückenlos abgeleitet, nichts mehr geschätzt. Unsere sechs Arenen
+> (Kristallhof / Smaragdtal / Saphirfeste / Sturmspitze / Obsidian-Thron / Prisma-Zitadelle)
+> liegen auf genau diesen Schwellen.
+>
 > **⚠ KORRIGIERT nach Video 6 (§9.5 / §12.1).** Die frühere Fassung dieser Tabelle nannte
 > Arena-Aufstiege bei **250 / 700 / 1200** — geraten, weil die Top-Bar-Währungen vertauscht
 > gelesen worden waren. Belegt sind jetzt: **Arena 3 = 600**, **Arena 5 = 1200**,
