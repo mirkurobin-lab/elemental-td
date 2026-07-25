@@ -68,7 +68,14 @@ der Spieler kontrolliert.
 > Entfernung am 19.07. — im HUD heißen sie gleich, sind aber zwei getrennte Systeme, exakt wie
 > in AA (dort: Match-HUD-Gold vs. Top-Bar-Gold 491).
 
-**Aufwand: M** (Ökonomie + HUD-Zeile + Kaufpfade) · **Priorität: 1 (höchste)**
+**Aufwand: M** (Ökonomie + HUD-Zeile + Kaufpfade) · ~~Priorität: 1~~ → **ENTSCHIEDEN (User, 2026-07-25): NICHT übernehmen.**
+
+> **⛔ User-Entscheidung:** In der Arena wird **kein Gold** für Türme oder Upgrades gebraucht —
+> das Match bleibt ökonomie-frei (freie Builds, Bau-Taktung über Runden/Cooldowns, Power-Kurve
+> über Fusionen). Übernommen wird nur die **Meta-Seite**: feste **Gold-Siegprämie** nach dem
+> Match (AA: +610), die ins Hub-Wallet fließt und dort die Karten-Level-Ups
+> (`goldFor(lvl)` + Material) bezahlt — siehe Punkt 4. Der Zahlenvorschlag oben bleibt als
+> Referenz stehen, falls die Entscheidung nach Playtests revidiert wird.
 
 ---
 

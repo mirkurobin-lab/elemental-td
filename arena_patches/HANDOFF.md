@@ -295,6 +295,18 @@ Der WIRING-Block oben in `arena_cards.js` listet alle vier Einbaustellen mit Cod
 
 ## Reihenfolge & Aufwand
 
+> **✅ Bestätigte Ausbaustufe (User, 2026-07-25) — diese 3 Systeme werden eingebaut:**
+> 1. **Gold als Siegprämie (Meta-Gold):** Nach dem Match fließt eine **fixe, arenagebundene**
+>    Gold-Prämie ins Hub-Wallet (Tabelle in `GAMEPLAY_OPTIMIERUNG.md` §4; AA-Anker: 610 Gold).
+>    In `resolveEnd()` zusammen mit den Trophäen gutschreiben. Das Gold bezahlt im Hub die
+>    Karten-Level-Ups (`goldFor(lvl)` + Material).
+> 2. **Kartensystem v2 + Booster-Packs** (`arena_cards.js` + UI aus `ui_prototype.html`).
+> 3. **Trophäen/Rang/Streak + Rivalen** (`arena_profile.js` + `arena_rivals.js`).
+>
+> **⛔ Ausdrücklich NICHT gewünscht:** In-Match-Gold. In der Arena kosten Türme, Upgrades und
+> Refresh **kein Gold** — `GAMEPLAY_OPTIMIERUNG.md` §1 ist entschieden abgelehnt (Referenz
+> bleibt dokumentiert). Das Match bleibt ökonomie-frei; Gold existiert nur als Belohnung/Meta.
+
 Empfohlen, weil jedes Modul auf dem Verständnis des vorherigen aufbaut und `arena_profile.js`
 die Datenbasis für `arena_rivals.js` liefert:
 
