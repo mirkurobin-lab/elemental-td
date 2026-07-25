@@ -1875,3 +1875,79 @@ eigenes Popup direkt nach dem Login-Kalender. Vollständige Bewertung samt der d
 eine Übernahme (Gold ist unser Endgame-Bottleneck · drei gestapelte Start-Popups · Werbung ist
 im Projekt ausgeschlossen) und der Skizze einer verträglichen Variante:
 `GAMEPLAY_OPTIMIERUNG.md` §10.
+
+---
+
+## 19. AA-Layout-Rebuild der Meta-UI (2026-07-25)
+
+> **User-Feedback, wörtlich:** *„AA wirkt viel aufgeräumter und cleaner bei uns ist alles
+> cluttert das wollen wir so nicht … Unsere UI muss genau die gleiche Anordnung der Buttons
+> haben. Das selbe beim Shop battlepass usw. Wir wollen nur unsere Brand Farben und unsere
+> individuellen Designs … Auch die Banner Grösse muss auf das AA Design angepasst werden
+> durchgehend durch die komplette Ui."*
+
+### 19.1 Home — AAs Achse, 1:1 übernommen
+
+| AA-Position (§9.5b / §14.3) | Unser Element | gemessen im Prototyp |
+|---|---|---|
+| 7 % Top-Bar 🏆 \| 💎 \| 🪙 | unverändert | 7 % |
+| 12 % Profilzeile (Avatar, Name, Level) | `.profrow` mit XP-Ring | 7 % |
+| **21 % Season-Pass als breites Banner** | `.passbanner` | **13 %** |
+| ~25 % schwebendes Diorama, 35 % Breite | `.diorama`, 46 % Breite | 25 % |
+| 28-33 % Arenaname zweizeilig | `.arenakicker` + `.arenaname` | 39 % |
+| 34 % Modifier-Chip | `.arenachip` | 43 % |
+| 58 % Trophäenbalken + Reward-Icon rechts | `.progwrap` | 65 % |
+| **64 % vier Hex-Slots** | `.slotrow` | 70 % |
+| 74-83 % EVENTS \| **BATTLE (55 %)** \| CHALLENGES | `.homerow3` | 82 %, Knopf 55 % |
+| 90 % Bottom-Nav, 5 Tabs, Mitte erhöht | unverändert | 90 % |
+
+**Was vom Startbildschirm verschwunden ist** — begründet mit AAs zentraler Aussage §9.5b
+*„Ein Bildschirm = ein Ziel. Zwischen Wappen und Battle-Taste steht nichts Ablenkendes."*:
+
+| Entfernt | Wohin | AA-Beleg |
+|---|---|---|
+| **8er-Arena-Leiter** (die „300-Trophäen-Ziffernflut") | Trophäenstraße hinter dem KAMPF-Knopf | §14.4 — AA hat die Leiter **nur** dort |
+| Erklärender Fließtext unter der Leiter | gestrichen | §9.5b — Home zeigt nur eine Fortschrittsleiste |
+| **Tresor-Widget** | Shop | §8.1 — dort liegt AAs Angebotsfläche |
+| **Tagesziel-Panel** | hinter das Kalender-Icon der Profilzeile | §14.3 — AA hält den Kopf für Icons frei |
+| Zwei Hub-Kachelreihen (6 Text-Kacheln) | 5 Icons in der Profilzeile | §14.3 — Postfach-/Freundes-/Menü-Icon |
+
+**Bewusste Abweichungen von AA, jeweils begründet:**
+
+1. **Diorama 46 % statt 35 % Breite.** AAs Key-Art ist 4:3, unsere ist 16:10 — bei exakt 35 %
+   wäre die Insel 150 px breit und nicht mehr lesbar. 46 % trifft AAs Wirkung („kleines
+   schwebendes Objekt auf ruhigem Grund"), vorher waren es 74 %.
+2. **Keine seitlichen Angebots-Schienen.** §14.3 bewertet AAs zwei senkrechte Shop-Schienen mit
+   je 3-4 rot gebadgten Kacheln selbst als „sehr aggressives Monetarisierungs-Layout, das wir
+   bewusst nicht übernehmen". Diese Bewertung steht.
+3. **„CHALLENGES" ist bei uns der Einsteiger-Guide.** Gleiche Rolle (offene Aufgaben mit
+   Belohnung), gleiche Position rechts neben dem KAMPF-Knopf.
+
+### 19.2 Einheitliche Banner-Metrik
+
+Vorher trug jede View Freihand-Größen (Reihenhöhen 76/82/90/128 px, Abstände 6/7/8/10 px,
+Radien 8/11/12/14/16 px). Genau das liest das Auge als „cluttert", auch wenn jede Reihe für
+sich sauber ist. Ab jetzt gilt **eine Leiter** als CSS-Variablen in `:root`:
+
+```
+--banner-h:72px    --banner-h-sm:56px   --banner-h-lg:128px
+--tile:84px        --gap:8px            --gap-lg:12px
+--radius:14px      --radius-sm:10px     --pad:12px
+```
+
+Angewendet in **39 CSS-Regeln** quer durch Shop, Sammlung, Schmiede, Clan (Quests/Spenden/
+Krieg), Rangliste, Festung, Guide, Handbuch und Login-Kalender. Neue Reihen wählen eine der
+drei Höhen und einen der beiden Radien — **keine Zwischenwerte mehr**.
+
+### 19.3 Beim Sweep gefundene echte Fehler
+
+| Fehler | Wirkung | Fix |
+|---|---|---|
+| **`nav.bottom{position:absolute}`** hing an `#app`, das mit dem Inhalt wächst | In langen Views (Einstellungen, Rangliste, Festung) rutschte die Bottom-Nav unter den sichtbaren Bereich und war **nicht mehr erreichbar** | `position:fixed` mit derselben Breite/Zentrierung; AA hält sie konstant bei 90-100 % (§9.5b) |
+| Profil- und Pass-Banner-Textblöcke ohne `display:block` | Zeilen liefen ineinander („Stufe 4 · 620/1000 XP" umgebrochen, „TAG 7 · FINALEGOLD-Pack") | `display:block` auf den Textspans |
+| `#fortBg` überdeckte Titel und Layout-Umschalter | Umschalter unsichtbar, aber klickbar | `position:relative; z-index:2` auf Titel und `.laybar` (bereits in §16.8) |
+
+Die v7-Suite prüft diese Klasse von Fehlern jetzt **für alle 15 Views automatisch**:
+Bottom-Nav sichtbar · keine helle Schrift auf goldener Fläche · kein Titel von einem
+positionierten Layer verdeckt · alle sichtbaren Knöpfe mit `.pressable` · kein horizontaler
+Scroll.

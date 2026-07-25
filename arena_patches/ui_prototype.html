@@ -37,6 +37,27 @@
   --bg:#0e1418; --panel:#16202a; --panel2:#1c2833; --line:#26343f;
   --txt:#e8eef3; --dim:#8fa0ad; --top:#01090b;
   --up:#48e222; --gold:#f2c53d; --gem:#63b1ee; --danger:#ff5e7e;
+  /* ================================================================
+   * EINHEITLICHE BANNER-METRIK
+   * ----------------------------------------------------------------
+   * Vorher hatte jede View ihre eigenen Freihand-Groessen (76 / 82 /
+   * 90 / 128 px Reihenhoehen, 6 / 7 / 8 / 10 px Abstaende, 8 / 11 /
+   * 12 / 14 / 16 px Radien). Genau das laesst eine UI „cluttert"
+   * wirken, auch wenn jede Reihe fuer sich sauber ist: Das Auge liest
+   * die Unregelmaessigkeit, nicht den Inhalt.
+   *
+   * Ab hier gilt EINE Leiter. Jede neue Reihe waehlt eine der drei
+   * Hoehen und eine der beiden Radien — keine Zwischenwerte.
+   * ================================================================ */
+  --banner-h:72px;      /* Standard-Reihe: Pass, Quests, Spenden, Post, Events */
+  --banner-h-sm:56px;   /* kompakte Reihe: Rangliste, Handbuch-Kopf */
+  --banner-h-lg:128px;  /* grosses Banner: Festung Variante 2, Kapitel-Kopf */
+  --tile:84px;          /* quadratische Kachel: Shop, Login-Kalender */
+  --gap:8px;            /* EINZIGER Standardabstand zwischen Reihen/Kacheln */
+  --gap-lg:12px;        /* Abstand zwischen SEKTIONEN */
+  --radius:14px;        /* Panels, Banner, Kacheln */
+  --radius-sm:10px;     /* Buttons, Chips, kleine Kacheln */
+  --pad:12px;           /* Innenabstand einer Reihe */
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;background:#05090c;color:var(--txt);
@@ -64,7 +85,7 @@ h2.title{font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(
   margin:2px 0 10px;font-weight:800}
 
 /* ---------- Deck-Zeile (§7) ---------- */
-.deckrow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.deckrow{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gap);margin-bottom:var(--gap-lg)}
 .deckslot{position:relative;aspect-ratio:3/4;border-radius:10px;border:2px solid var(--line);
   background:var(--panel);display:flex;align-items:center;justify-content:center;font-size:30px}
 .deckslot .lvl{position:absolute;left:0;right:0;bottom:0;background:#0009;font-size:10px;
@@ -89,7 +110,7 @@ select.sel option{background:var(--panel);color:var(--txt)}
   font-size:12px;padding:7px 12px;border-radius:9px;letter-spacing:.05em}
 
 /* ---------- Kartenraster (5 Spalten, §7) ---------- */
-.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:var(--gap)}
 .tile{position:relative;aspect-ratio:3/4;border-radius:8px;border:2px solid #444;
   background:var(--panel2);overflow:hidden;display:flex;align-items:center;justify-content:center}
 .tile .art{font-size:22px;filter:drop-shadow(0 1px 2px #000)}
@@ -106,7 +127,15 @@ select.sel option{background:var(--panel);color:var(--txt)}
 .hint{font-size:11px;color:var(--dim);margin:10px 2px;line-height:1.5}
 
 /* ---------- Bottom-Nav ---------- */
-nav.bottom{position:absolute;left:0;right:0;bottom:0;background:var(--top);
+/* ⚠ WAR EIN ECHTER FEHLER: `position:absolute` haengt die Nav an das
+   UNTERE ENDE VON #app — und #app waechst mit dem Inhalt. In langen
+   Views (Einstellungen, Rangliste, Festung) rutschte die Bottom-Nav
+   damit unter den sichtbaren Bereich und war nicht mehr erreichbar.
+   AA haelt sie konstant bei 90-100 % Bildhoehe (§9.5b). `fixed` mit
+   derselben Breite/Zentrierung wie #app stellt genau das her; die
+   Views haben mit `padding-bottom:88px` bereits Platz dafuer. */
+nav.bottom{position:fixed;left:50%;transform:translateX(-50%);width:100%;max-width:430px;
+  bottom:0;background:var(--top);
   border-top:1px solid #1b262e;display:grid;grid-template-columns:repeat(4,1fr);
   padding:6px 0 10px;z-index:40}
 nav.bottom button{padding:5px 0;font-size:9.5px;color:#6d7f8c;font-weight:700;text-align:center}
@@ -369,7 +398,12 @@ footer{padding:6px 12px 14px;text-align:center}
  * daher REINE STATUS-OPTIK (Aufstiegs-Genugtuung), genau wie in AA.
  * ================================================================== */
 #viewHome{padding:0 0 88px;position:relative}
-.arenahero{position:relative;min-height:300px;display:flex;flex-direction:column;
+#viewHome.view{display:none}
+#viewHome.view.active{display:flex;flex-direction:column}
+#viewHome .arenahero{flex:1 1 auto}
+#viewHome .arenahero .progwrap{margin-top:auto}
+#viewHome .homerow3{padding-bottom:10px}
+.arenahero{position:relative;min-height:250px;display:flex;flex-direction:column;
   align-items:center;padding:26px 14px 16px;
   background-repeat:no-repeat;background-position:center center;
   background-size:cover,cover;
@@ -461,7 +495,12 @@ footer{padding:6px 12px 14px;text-align:center}
  * Unsere Querformat-Key-Art wird deshalb als abgerundete, schwebende
  * Karte mit Glow und Schlagschatten inszeniert.
  * ================================================================== */
-.diorama{margin-top:14px;width:74%;max-width:280px;aspect-ratio:16/10;border-radius:18px;
+/* §14.2 misst AAs Diorama auf 35 % Breite x 12 % Hoehe. Unsere Key-Art
+   ist querformatig 16:10 statt 4:3; bei exakt 35 % waere sie 150 px
+   breit und die Insel nicht mehr lesbar. 46 % ist der Kompromiss, der
+   AAs „kleines schwebendes Objekt auf ruhigem Grund" trifft, ohne das
+   Artwork zu verschenken — vorher waren es 74 %. */
+.diorama{margin-top:12px;width:46%;max-width:190px;aspect-ratio:16/10;border-radius:18px;
   background-repeat:no-repeat;background-position:center;background-size:cover,cover;
   background-image:linear-gradient(160deg,#2c3a4b,#131c25);
   border:1px solid #ffffff1f;
@@ -652,8 +691,8 @@ span.ico{mix-blend-mode:normal;text-align:center}
 .shopsec .sh{font-size:12.5px;letter-spacing:.14em}
 .shopsec .timer{margin-left:auto;font-size:10px;color:var(--dim);background:var(--panel);
   border:1px solid var(--line);border-radius:8px;padding:4px 8px;font-weight:700}
-.dealgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.shopcard{border-radius:12px;border:1px solid var(--line);background:linear-gradient(180deg,#1b2732,#131c25);
+.dealgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+.shopcard{border-radius:var(--radius);border:1px solid var(--line);background:linear-gradient(180deg,#1b2732,#131c25);
   padding:9px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;
   background-repeat:no-repeat;background-position:center;background-size:100% 100%,100% 100%}
 .shopcard .sart{font-size:26px;line-height:1.1}
@@ -665,13 +704,13 @@ span.ico{mix-blend-mode:normal;text-align:center}
 .shopcard .sbuy.gems{background:linear-gradient(180deg,#f5a7f7,#dc1ddb 55%,#8d1c78);color:#fff;
   box-shadow:0 2px 0 #5e1152;text-shadow:0 1px 2px #0008}
 .shopcard.sold{filter:grayscale(.7) brightness(.6)}
-.packshop{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.packshop{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
 .packshop .shopcard .sart{font-size:34px}
 .packshop .promise{font-size:8.5px;color:#a9bccb;line-height:1.3}
 .freebadge{position:absolute;right:-4px;top:-6px;background:var(--up);color:#06280a;
   font-size:8.5px;font-weight:900;border-radius:8px;padding:1px 5px}
-.decorow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
-.decotile{border-radius:11px;border:1px dashed #35485a;background:#111a21;padding:9px 6px;
+.decorow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--gap);margin-top:var(--gap-lg)}
+.decotile{border-radius:var(--radius-sm);border:1px dashed #35485a;background:#111a21;padding:9px 6px;
   text-align:center;font-size:9.5px;color:var(--dim);font-weight:700}
 .decotile .dart{display:block;font-size:22px;margin-bottom:3px}
 
@@ -765,7 +804,7 @@ span.ico{mix-blend-mode:normal;text-align:center}
  * das Layout ist generisch.
  * ================================================================== */
 .constell{margin-top:14px}
-.branch{margin-top:12px;border-radius:14px;border:1px solid var(--line);
+.branch{margin-top:var(--gap-lg);border-radius:var(--radius);border:1px solid var(--line);
   background:linear-gradient(180deg,#18222c,#111a21);overflow:hidden}
 .branchhead{display:flex;align-items:center;gap:10px;padding:10px 11px;
   background:linear-gradient(180deg,#22303d,#18222c)}
@@ -1306,13 +1345,13 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 #viewFortress.lay-banner .skinbar{display:none}
 #viewFortress.lay-banner .bannerstack{display:block}
 .bannerstack{display:none;position:relative;z-index:1;margin-top:2px}
-.powerstrip{position:relative;z-index:1;display:flex;align-items:center;gap:8px;
-  padding:8px 12px;border-radius:12px;border:1px solid var(--line);background:#0b1116cc;
+.powerstrip{position:relative;z-index:1;display:flex;align-items:center;gap:var(--gap);
+  padding:var(--pad);border-radius:var(--radius);border:1px solid var(--line);background:#0b1116cc;
   font-size:10px;color:var(--dim);letter-spacing:.1em;font-weight:800}
 .powerstrip b{font-size:19px;letter-spacing:0}
 
-.trackbanner{position:relative;display:flex;align-items:center;gap:10px;margin-top:10px;
-  min-height:128px;padding:12px 12px 12px 10px;border-radius:16px;
+.trackbanner{position:relative;display:flex;align-items:center;gap:10px;margin-top:var(--gap);
+  min-height:var(--banner-h-lg);padding:var(--pad);border-radius:var(--radius);
   background-repeat:no-repeat;background-position:center;background-size:100% 100%,cover;
   background-image:linear-gradient(150deg,#2a1c4a 0%,#1b1230 42%,#120c22 100%);
   border:1px solid #a45ef23d;
@@ -1444,7 +1483,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .clandesc{margin-top:9px;font-size:10.5px;color:#a9bccb;line-height:1.55}
 
 /* ---------- Quest-Karten ---------- */
-.qcard{margin-top:9px;border-radius:13px;border:1px solid var(--line);padding:10px 11px;
+.qcard{margin-top:var(--gap);border-radius:var(--radius);border:1px solid var(--line);padding:var(--pad);
   background:linear-gradient(180deg,#1b2732,#131c25);
   background-repeat:no-repeat;background-position:center;background-size:100% 100%,cover}
 .qcard .qtop{display:flex;align-items:center;gap:8px}
@@ -1467,8 +1506,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .qcard.done{border-color:#7ad14f66}
 
 /* ---------- Truhen-Staffel ---------- */
-.chestrow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
-.chestcard{border-radius:12px;border:1px solid var(--line);padding:9px 6px;text-align:center;
+.chestrow{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);margin-top:var(--gap-lg)}
+.chestcard{border-radius:var(--radius);border:1px solid var(--line);padding:9px 6px;text-align:center;
   background:linear-gradient(180deg,#1b2732,#131c25);
   background-repeat:no-repeat;background-position:center 6px;background-size:38px auto,cover}
 .chestcard.reached{border-color:#f2c53d99;box-shadow:0 0 12px #f2c53d33}
@@ -1493,8 +1532,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .quotabar .qdots{display:flex;gap:2px;margin-left:auto}
 .quotabar .qd{width:7px;height:12px;border-radius:2px;background:#2b3b47}
 .quotabar .qd.on{background:linear-gradient(180deg,#f2c53d,#a8842a)}
-.reqrow{display:flex;align-items:center;gap:9px;margin-top:8px;padding:9px 10px;
-  border-radius:12px;border:1px solid var(--line);
+.reqrow{display:flex;align-items:center;gap:9px;margin-top:var(--gap);padding:var(--pad);
+  min-height:var(--banner-h);border-radius:var(--radius);border:1px solid var(--line);
   background:linear-gradient(180deg,#1b2732,#131c25)}
 .reqrow.mine{border-color:#63b1ee66;box-shadow:0 0 10px #63b1ee22}
 .reqrow.full{opacity:.55}
@@ -1532,13 +1571,13 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .picktile.off{opacity:.35}
 
 /* ---------- Krieg ---------- */
-.warwait{margin-top:10px;padding:16px 12px;border-radius:14px;text-align:center;
+.warwait{margin-top:var(--gap);padding:16px var(--pad);border-radius:var(--radius);text-align:center;
   border:1px solid var(--line);background:linear-gradient(180deg,#1b2732,#121a22)}
 .warwait .wk{font-size:10px;letter-spacing:.2em;font-weight:800;color:#b9c9d6}
 .warwait .wc{font-size:31px;font-weight:900;margin-top:6px;color:var(--gold);
   text-shadow:0 0 14px #f2c53d55}
 .warwait .wd{font-size:10.5px;color:var(--dim);margin-top:6px;line-height:1.55}
-.warboard{margin-top:10px;border-radius:14px;border:1px solid var(--line);padding:11px;
+.warboard{margin-top:var(--gap);border-radius:var(--radius);border:1px solid var(--line);padding:var(--pad);
   background:linear-gradient(180deg,#1b2732,#121a22)}
 .warsides{display:flex;align-items:center;gap:8px}
 .warside{flex:1;min-width:0;text-align:center}
@@ -1559,8 +1598,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .atkhead{display:flex;align-items:center;gap:8px;margin-top:13px;font-size:11px;
   color:var(--dim);font-weight:800}
 .atkhead .left{margin-left:auto;font-size:10px;color:var(--gold);font-weight:900}
-.ghostrow{display:flex;align-items:center;gap:9px;margin-top:7px;padding:8px 10px;
-  border-radius:11px;border:1px solid var(--line);
+.ghostrow{display:flex;align-items:center;gap:9px;margin-top:var(--gap);padding:var(--pad);
+  border-radius:var(--radius-sm);border:1px solid var(--line);
   background:linear-gradient(180deg,#1b2732,#131c25)}
 .ghostrow.hit{opacity:.5}
 .ghostrow .gav{flex:0 0 34px;width:34px;height:34px;border-radius:9px;display:flex;
@@ -1580,12 +1619,12 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .gotpts{flex:0 0 auto;font-size:11px;font-weight:900;color:#7ad14f}
 
 /* ---------- Emote-Leiste + Aktivitaets-Feed ---------- */
-.emotebar{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:14px}
-.emobtn{border-radius:10px;padding:7px 5px;font-size:9.5px;font-weight:800;color:#cfe0ec;
+.emotebar{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);margin-top:var(--gap-lg)}
+.emobtn{border-radius:var(--radius-sm);padding:7px 5px;font-size:9.5px;font-weight:800;color:#cfe0ec;
   background:linear-gradient(180deg,#243342,#16202a);border:1px solid var(--line);
   line-height:1.3;text-align:center}
 .emobtn b{display:block;font-size:16px;margin-bottom:2px}
-.feed{margin-top:12px;border-radius:12px;border:1px solid var(--line);background:#0b1116;
+.feed{margin-top:var(--gap-lg);border-radius:var(--radius);border:1px solid var(--line);background:#0b1116;
   padding:6px 10px;max-height:190px;overflow-y:auto}
 .feed .fe{display:flex;gap:7px;padding:6px 0;border-bottom:1px solid #16202a;font-size:10.5px;
   line-height:1.45;color:#c2cfd9}
@@ -1598,8 +1637,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 
 /* ---------- Rangliste ---------- */
 .lblist{margin-top:8px}
-.lbrow{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:11px;
-  margin-top:5px;background:linear-gradient(180deg,#1b2732,#131c25);border:1px solid #1f2b35}
+.lbrow{display:flex;align-items:center;gap:9px;padding:9px var(--pad);min-height:var(--banner-h-sm);
+  border-radius:var(--radius-sm);margin-top:var(--gap);background:linear-gradient(180deg,#1b2732,#131c25);border:1px solid #1f2b35}
 .lbrow.me{border-color:#f2c53d;box-shadow:0 0 0 1px #f2c53d55,0 0 14px #f2c53d33;
   background:linear-gradient(180deg,#2a3444,#1a2230)}
 .lbrow.top1{border-color:#f2c53d99}
@@ -1637,6 +1676,217 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .hubtile .nb2{position:absolute;right:-4px;top:-4px;min-width:16px;height:16px;line-height:16px;
   border-radius:8px;background:var(--danger);color:#fff;font-size:9px;font-weight:900;
   text-align:center;padding:0 4px}
+/* ==================================================================
+ * HOME NACH AAs ACHSE (AA_UI_REFERENZ §9.5b + §14.2 + §14.3)
+ * ------------------------------------------------------------------
+ * Gemessene AA-Reihenfolge auf 1320 x 2868 (Prozent = y / Screenhoehe):
+ *    7 %  Top-Bar          Trophaeen | Gems | Gold      (§9.5b, §12.1)
+ *   12 %  Profilzeile      Avatar + Name + Level        (§9.5b)
+ *   21 %  SEASON-PASS      breites zentriertes Banner   (§9.5b, §9.4)
+ *   ~25 % Diorama          35 % Breite, schwebend       (§14.2)
+ *   28-33 % Arenaname      zweizeilig zentriert         (§9.5b)
+ *   34 %  Modifier-Chip                                 (§9.5b)
+ *   58 %  Trophaeenbalken  Reward-Icon am rechten Ende  (§14.3)
+ *   64 %  4 HEX-SLOTS      Truhen/Packs                 (§14.3)
+ *   74-83 % EVENTS | BATTLE (55 % Breite) | CHALLENGES  (§14.3)
+ *   90 %  Bottom-Nav       5 Tabs, Mitte erhoeht        (§9.5b, §15.5)
+ *
+ * DIE ZENTRALE AA-AUSSAGE (§9.5b): „Ein Bildschirm = ein Ziel. Zwischen
+ * Wappen und Battle-Taste steht nichts Ablenkendes."
+ * Deshalb sind vom alten Home ENTFERNT worden:
+ *   · die 8er-Arena-Leiter — AA hat sie NUR in der Trophaeenstrasse
+ *     hinter dem BATTLE-Knopf (§14.4). Das war unsere „Ziffernflut".
+ *   · das Tresor-Widget      → Shop (dort hat AA seine Angebote, §8.1)
+ *   · das Tagesziel-Panel    → hinter das Kalender-Badge der Kopfzeile
+ *   · die zwei Hub-Kachelreihen → als kompakte Icon-Leiste in die
+ *     Profilzeile, wo AA Postfach-, Freundes- und Menue-Icon hat (§14.3)
+ *   · der erklaerende Fliesstext unter der Leiter
+ * ================================================================== */
+.profrow{display:flex;align-items:center;gap:9px;padding:16px 14px 0}
+.avatar{position:relative;flex:0 0 40px;width:40px;height:40px;border-radius:50%;
+  background:conic-gradient(#63b1ee var(--xp,62%),#26343f 0);
+  display:flex;align-items:center;justify-content:center}
+.avatar i{width:32px;height:32px;border-radius:50%;font-style:normal;font-size:17px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(160deg,#3a4c5c,#141d26);border:1px solid #0b1116}
+.avatar b{position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);
+  font-size:8px;font-weight:900;color:#0b1116;background:var(--gold);
+  border-radius:6px;padding:0 4px;line-height:11px}
+.profname{flex:1;min-width:0}
+.profname .pn{display:block;font-size:12.5px;font-weight:900;line-height:1.2;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.profname .px{display:block;font-size:9px;color:var(--dim);font-weight:700;margin-top:1px}
+.hubicons{display:flex;gap:5px}
+.hubicon{position:relative;width:32px;height:32px;border-radius:var(--radius-sm);
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+  border:1px solid #2b3b47;background:linear-gradient(180deg,#1b2732,#111a21)}
+.hubicon .ico{width:18px;height:18px}
+.hubicon .nb2{position:absolute;right:-4px;top:-4px;min-width:15px;height:15px;line-height:15px;
+  border-radius:8px;background:var(--danger);color:#fff;font-size:8.5px;font-weight:900;
+  text-align:center;padding:0 3px}
+/* Season-Pass-Banner — AAs „GOLDEN FORTUNE" bei 21 % Hoehe (§9.5b). */
+.passbanner{position:relative;display:flex;align-items:center;gap:10px;margin:16px 14px 0;
+  min-height:var(--banner-h);padding:0 12px;border-radius:var(--radius);overflow:hidden;
+  background-repeat:no-repeat;background-position:center;background-size:cover,cover;
+  background-image:linear-gradient(110deg,#4a2a7a,#2a1b46 55%,#141d2b);
+  border:1px solid #a45ef255;box-shadow:0 8px 20px -12px #000,inset 0 0 30px -10px #a45ef255}
+.passbanner .pbs{flex:0 0 auto;font-size:23px}
+.passbanner .pbt{flex:1;min-width:0;position:relative;z-index:2}
+.passbanner .pbk{display:block;font-size:8.5px;letter-spacing:.18em;font-weight:900;
+  color:#c6b4ee}
+.passbanner .pbn{display:block;font-size:15px;line-height:1.15}
+.passbanner .pbd{display:block;font-size:9px;color:#a9bccb;margin-top:2px}
+.passbanner .pbb{flex:0 0 auto;position:relative;z-index:2;border-radius:var(--radius-sm);
+  padding:7px 11px;font-size:11px;font-weight:900;
+  background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);box-shadow:0 3px 0 #6d551a;
+  -webkit-text-fill-color:#3a2b07;color:#3a2b07}
+/* AA-Reihe: EVENTS | BATTLE (55 % Breite) | CHALLENGES (§14.3) */
+.homerow3{display:flex;gap:var(--gap);align-items:stretch;padding:14px 14px 0}
+.homerow3 .sidetile{position:relative;flex:0 0 20%;border-radius:var(--radius);
+  border:1px solid #3a4c5c;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px;padding:8px 4px;
+  background-repeat:no-repeat;background-position:center -6px;background-size:auto 140%,cover;
+  background-image:linear-gradient(160deg,#243342,#141d26)}
+.homerow3 .sidetile .sti{font-size:19px;line-height:1}
+.homerow3 .sidetile .sti .ico{width:22px;height:22px}
+.homerow3 .sidetile span.stn{font-size:8px;font-weight:900;letter-spacing:.07em;color:#a9bccb}
+.homerow3 .sidetile .nb2{position:absolute;right:-4px;top:-4px;min-width:16px;height:16px;
+  line-height:16px;border-radius:8px;background:var(--danger);color:#fff;font-size:9px;
+  font-weight:900;text-align:center;padding:0 4px}
+.homerow3 .battlebtn{flex:1 1 55%}
+
+/* ==================================================================
+ * DAILY-LOGIN-KALENDER, EINSTEIGER-GUIDE, HANDBUCH
+ * ------------------------------------------------------------------
+ * Alle Groessen kommen aus der Banner-Metrik (--tile, --banner-h,
+ * --gap, --radius) — keine Freihand-Werte mehr.
+ * GOLDTEXT-REGEL: goldtext nur auf dunklem Grund. Die Abhol-Knoepfe
+ * sind golden und setzen deshalb dunkle Fuellfarbe.
+ * ================================================================== */
+#dailyLayer{position:fixed;inset:0;display:none;z-index:84;align-items:center;
+  justify-content:center;background:#05090cd6;padding:16px}
+#dailyLayer.open{display:flex}
+.dailypop{width:100%;max-width:360px;max-height:86vh;overflow-y:auto;
+  animation:offerpop .4s cubic-bezier(.2,1.4,.4,1)}
+.dailypop .dailypanel{margin:0}
+.dailypop .dailyhead{cursor:default}
+#loginLayer{position:fixed;inset:0;display:none;z-index:85;align-items:center;
+  justify-content:center;background:#05090ce0;padding:16px}
+#loginLayer.open{display:flex}
+.loginpop{width:100%;max-width:360px;border-radius:20px;overflow:hidden;
+  border:1px solid #e0b94a55;box-shadow:0 24px 60px -20px #000,0 0 40px -12px #e0b94a55;
+  background:linear-gradient(165deg,#26324a,#141d2b 55%,#0e1418);
+  animation:offerpop .45s cubic-bezier(.2,1.4,.4,1)}
+.loginhead{padding:14px 16px 10px;text-align:center}
+.loginhead .lgt{font-size:20px;line-height:1.1}
+.loginhead .lgs{font-size:10.5px;color:#a9bccb;margin-top:4px;line-height:1.45}
+.logingrid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gap);padding:0 14px}
+.logincell{position:relative;min-height:var(--tile);border-radius:var(--radius-sm);
+  border:1px solid var(--line);padding:7px 4px 6px;text-align:center;
+  background:linear-gradient(180deg,#1b2732,#131c25);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.logincell .lgd{font-size:8.5px;font-weight:900;letter-spacing:.08em;color:#8fa0ad}
+.logincell .lgi{font-size:23px;line-height:1}
+.logincell .lgi .ico{width:26px;height:26px}
+.logincell .lgn{font-size:8.5px;font-weight:800;color:#cfe0ec;line-height:1.25}
+.logincell.done{opacity:.5}
+.logincell.done::after{content:"✓";position:absolute;right:5px;top:4px;font-size:12px;
+  color:#7ad14f;font-weight:900;text-shadow:0 0 6px #7ad14f88}
+.logincell.today{border-color:var(--gold);box-shadow:0 0 0 1px #f2c53d66,0 0 18px #f2c53d44;
+  background:linear-gradient(180deg,#33405a,#1a2333)}
+.logincell.today .lgd{color:var(--gold)}
+.logincell.locked{opacity:.62}
+.logincell.locked .lgi{filter:grayscale(.7)}
+/* Tag 7 ist das Finale: volle Breite, festlicher Rahmen. */
+.logincell.finale{grid-column:span 4;min-height:74px;flex-direction:row;gap:10px;
+  justify-content:flex-start;padding:9px 12px;text-align:left;
+  border-color:#a45ef2aa;background:linear-gradient(120deg,#3a1c66,#221436 55%,#141d2b);
+  box-shadow:inset 0 0 26px -6px #a45ef255}
+.logincell.finale .lgi{font-size:31px}
+.logincell.finale .lgi .ico{width:34px;height:34px}
+.logincell.finale .lgn{font-size:12px;color:#fff}
+.logincell.finale .lgd{font-size:9px}
+.logincell.finale .lgtx{flex:1;min-width:0;text-align:left}
+.logincell.finale .lgtx .lgd,.logincell.finale .lgtx .lgn{display:block}
+.loginfoot{padding:12px 14px 14px}
+.loginbtn{width:100%;border-radius:var(--radius);padding:12px 0;font-size:15px;font-weight:900;
+  letter-spacing:.04em;
+  background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);box-shadow:0 3px 0 #6d551a;
+  -webkit-text-fill-color:#3a2b07;color:#3a2b07}
+.loginbtn[disabled]{background:linear-gradient(180deg,#3a4a58,#222e39);
+  -webkit-text-fill-color:#8fa0ad;color:#8fa0ad;box-shadow:0 3px 0 #16202a}
+.loginlater{width:100%;margin-top:7px;font-size:11px;color:#8fa0ad;padding:6px 0;font-weight:700}
+
+/* ---------- Einsteiger-Guide ---------- */
+.gprog{display:flex;align-items:center;gap:10px;padding:var(--pad);margin-top:2px;
+  border-radius:var(--radius);border:1px solid var(--line);
+  background:linear-gradient(180deg,#1b2732,#131c25)}
+.gprog .gpn{font-size:23px;font-weight:900;color:var(--gold);line-height:1}
+.gprog .gpt{flex:1;min-width:0}
+.gprog .gpl{font-size:10px;color:var(--dim);font-weight:800;letter-spacing:.08em}
+.gprog .gpbar{position:relative;height:12px;border-radius:7px;margin-top:5px;overflow:hidden;
+  background:#0b1116;border:1px solid #2b3b47}
+.gprog .gpbar i{position:absolute;left:0;top:0;bottom:0;border-radius:7px;
+  background:linear-gradient(90deg,#3fa9e8,#7ad14f)}
+.gchap{margin-top:var(--gap);border-radius:var(--radius);border:1px solid var(--line);
+  overflow:hidden;background:linear-gradient(180deg,#1b2732,#131c25)}
+.gchap.locked{opacity:.55}
+.gchap.done{border-color:#7ad14f55}
+.gchead{display:flex;align-items:center;gap:10px;width:100%;padding:10px var(--pad);
+  min-height:var(--banner-h-sm);text-align:left;
+  background-repeat:no-repeat;background-position:right -10px center;background-size:auto 150%,cover}
+.gchead .gcs{font-size:22px;flex:0 0 auto}
+.gchead .gct{flex:1;min-width:0}
+.gchead .gcn{font-size:13.5px;font-weight:900;line-height:1.2}
+.gchead .gcd{font-size:9.5px;color:var(--dim);margin-top:2px;line-height:1.4}
+.gchead .gcc{flex:0 0 auto;font-size:11px;font-weight:900;color:var(--gold)}
+.gchead .gcar{flex:0 0 auto;font-size:11px;color:var(--dim);transition:transform .2s}
+.gchap.open .gchead .gcar{transform:rotate(180deg)}
+.gcbody{display:none;padding:0 var(--pad) var(--pad)}
+.gchap.open .gcbody{display:block}
+.gtask{display:flex;align-items:center;gap:9px;padding:8px 9px;margin-top:6px;
+  border-radius:var(--radius-sm);border:1px solid #1f2b35;background:#0e1720}
+.gtask.done{border-color:#7ad14f44}
+.gtask .gtb{flex:0 0 20px;width:20px;height:20px;border-radius:6px;border:1px solid #3a4c5c;
+  display:flex;align-items:center;justify-content:center;font-size:12px;color:#5d7284;
+  background:#0b1116}
+.gtask.done .gtb{background:linear-gradient(180deg,#7ad14f,#3aad16);border-color:#7ad14f;
+  color:#0a2404;font-weight:900}
+.gtask .gtt{flex:1;min-width:0}
+.gtask .gtn{font-size:11.5px;font-weight:800;line-height:1.25}
+.gtask .gtd{font-size:9px;color:var(--dim);margin-top:2px;line-height:1.4}
+.gtask .gtr{font-size:9px;color:var(--gold);font-weight:800;margin-top:2px}
+.gclaim{flex:0 0 auto;border-radius:var(--radius-sm);padding:7px 11px;font-size:11px;
+  font-weight:900;background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);
+  box-shadow:0 3px 0 #6d551a;-webkit-text-fill-color:#3a2b07;color:#3a2b07}
+.gclaim.is-disabled,.gclaim[disabled]{background:linear-gradient(180deg,#3a4a58,#222e39);
+  -webkit-text-fill-color:#8fa0ad;color:#8fa0ad;box-shadow:0 3px 0 #16202a}
+.gcpack{display:flex;align-items:center;gap:9px;margin-top:9px;padding:9px 10px;
+  border-radius:var(--radius-sm);border:1px dashed #e0b94a55;background:#0e1720}
+.gcpack .gpi{font-size:22px}
+.gcpack .gpt2{flex:1;min-width:0;font-size:10.5px;color:#cfe0ec;line-height:1.4}
+.gcpack .gpt2 b{color:var(--gold)}
+
+/* ---------- Handbuch ---------- */
+.manpage{margin-top:var(--gap);border-radius:var(--radius);border:1px solid var(--line);
+  overflow:hidden;background:linear-gradient(180deg,#1b2732,#131c25)}
+.manhead{display:flex;align-items:center;gap:10px;width:100%;padding:10px var(--pad);
+  min-height:var(--banner-h-sm);text-align:left}
+.manhead .mhs{font-size:21px}
+.manhead .mhn{flex:1;min-width:0;font-size:13px;font-weight:900}
+.manhead .mhr{font-size:9px;color:#7ad14f;font-weight:800}
+.manhead .mhar{font-size:11px;color:var(--dim);transition:transform .2s}
+.manpage.open .manhead .mhar{transform:rotate(180deg)}
+.manbody{display:none;padding:0 var(--pad) var(--pad)}
+.manpage.open .manbody{display:block}
+.manart{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px}
+.manart .ma{width:46px;height:56px;border-radius:8px;border:1px solid var(--line);
+  background-repeat:no-repeat;background-position:center;background-size:cover,cover;
+  background-image:linear-gradient(180deg,#243342,#141d26)}
+.manbody .mintro{font-size:11px;color:#c2cfd9;line-height:1.6}
+.manbody ul{margin:8px 0 0;padding-left:16px}
+.manbody li{font-size:10.5px;color:#a9bccb;line-height:1.6;margin-bottom:3px}
+.manbody li b{color:#dbe6ef}
 </style>
 </head>
 <body>
@@ -1693,77 +1943,80 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
        wenn kein Map Objective aktiv ist).
        Reihenfolge der Elemente 1:1 nach den §9.5b-Messungen aus Video 6. -->
   <section id="viewHome" class="view active">
+    <!-- AAs Achse, von oben nach unten (§9.5b / §14.2 / §14.3):
+         Profilzeile → Season-Pass-Banner → Diorama → Arenaname →
+         Modifier-Chip → Trophaeenbalken → 4 Hex-Slots →
+         EVENTS | BATTLE | CHALLENGES. Nichts dazwischen. -->
+
+    <!-- 12 %: Profilzeile. Rechts die Icon-Leiste an der Stelle, an der
+         AA Postfach-, Freundes- und Menue-Icon hat (§14.3). Alles, was
+         frueher als zwei Kachelreihen den Screen fuellte, sitzt hier. -->
+    <div class="profrow">
+      <span class="avatar" id="profAvatar"><i>🜂</i><b id="profLvl">4</b></span>
+      <span class="profname"><span class="pn" id="profName">Prisma-Magier</span>
+        <span class="px" id="profXp">Stufe 4 · 620/1000 XP</span></span>
+      <span class="hubicons">
+        <button class="hubicon pressable" id="icoDaily" title="Tagesziele &amp; Login">
+          <span data-ico="hub_challenges" data-emoji="🗓"></span>
+          <i class="nb2" id="tileDailyBadge" style="display:none">0</i></button>
+        <button class="hubicon pressable" id="icoClan" title="Clan">
+          <span data-ico="hub_clan" data-emoji="🛡"></span>
+          <i class="nb2" id="tileClanBadge" style="display:none">0</i></button>
+        <button class="hubicon pressable" id="icoBoard" title="Rangliste">
+          <span data-ico="hub_leaderboard" data-emoji="🏅"></span></button>
+        <button class="hubicon pressable" id="icoMail" title="Post">
+          <span data-ico="hub_mail" data-emoji="✉"></span>
+          <i class="nb2" id="tileMailBadge" style="display:none">0</i></button>
+        <button class="hubicon pressable" id="icoSettings" title="Einstellungen">
+          <span data-ico="hub_settings" data-emoji="⚙"></span></button>
+      </span>
+    </div>
+
+    <!-- 21 %: SEASON-PASS. AA setzt ihn als breites zentriertes Banner
+         GENAU hier — nicht in die Nav, nicht zu den Hub-Kacheln
+         (§9.5b y 592, §9.4 mit Countdown). -->
+    <button class="passbanner pressable" id="passBanner">
+      <span class="pbs" data-ico="hub_pass" data-emoji="🎟"></span>
+      <span class="pbt"><span class="pbk">SAISON</span>
+        <span class="pbn goldtext" id="pbName">Goldene Fortuna</span>
+        <span class="pbd" id="pbSub">—</span></span>
+      <span class="pbb" id="pbBtn">ÖFFNEN</span>
+    </button>
+
     <div class="arenahero" id="arenaHero">
+      <!-- 25 %: freischwebendes Insel-Diorama auf ruhigem Grund (§14.2) -->
+      <button class="diorama" id="arenaDiorama" title="Arena-Rang"></button>
+      <!-- 28-33 %: Arenaname zweizeilig zentriert (§9.5b) -->
       <div class="arenakicker" id="arenaKicker">Arena 1</div>
       <div class="arenaname goldtext" id="arenaName">Kristallhof</div>
+      <!-- 34 %: Modifier-Chip -->
       <div class="arenachip" id="arenaChip">◎ Neutral</div>
-      <!-- Arena als freischwebendes INSEL-DIORAMA (§14.2) — AA rahmt die
-           Key-Art nicht und legt sie NICHT vollflächig hinter den Screen. -->
-      <button class="diorama" id="arenaDiorama" title="Arena-Rang"></button>
+      <!-- 58 %: Trophaeenbalken, Reward-Icon am rechten Ende (§14.3) -->
       <div class="progwrap">
         <i data-ico="cur_trophy" data-emoji="🏆" style="font-size:15px"></i>
         <div class="progbar" id="arenaProg">
           <div class="progfill" id="arenaProgFill" style="width:0%"></div>
           <div class="proglabel" id="arenaProgLabel">—</div>
         </div>
-        <!-- Belohnungs-Icon für den nächsten Straßen-Knoten (§14.3b) -->
         <button class="crestmini" id="arenaProgIcon" title="Nächster Straßen-Knoten">🎁</button>
       </div>
-      <!-- Truhen-/Pack-Slots (§14.3): 4 Hex-Plätze, gefüllte führen in die
-           Packs-Ansicht. Bestand kommt aus ArenaProfile (hier Demo). -->
+      <!-- 64 %: vier Hex-Slots fuer Truhen/Packs (§14.3) -->
       <div class="slotrow" id="packSlots"></div>
     </div>
 
-    <!-- Kristalltresor: fuellt sich bei jedem Sieg, wird nur GANZ geoeffnet.
-         Logik + Preise in arena_vault.js / DESIGN_MONETARISIERUNG.md §B. -->
-    <div style="padding:12px 14px 0"><div class="vaultbox" id="vaultBox"></div></div>
-
-    <!-- Taeglicher Loop: 3 Quests, Bonus-Truhe, Siegesserie, Gratis-Pack. -->
-    <div class="dailypanel" id="dailyPanel">
-      <button class="dailyhead pressable" id="dailyHead">
-        <span class="dqs">🗓</span>
-        <span class="dh1"><span class="dnm">Tagesziele</span>
-          <span class="dsub" id="dailySub">—</span></span>
-        <span class="dcnt" id="dailyCnt">0/3</span>
-        <span class="darr">▾</span>
-      </button>
-      <div class="dailybody" id="dailyBody"></div>
-    </div>
-
-    <div class="homerow">
-      <button class="eventtile" id="tileEvents">🎪<span>EVENTS</span><i class="nb2">3</i></button>
+    <!-- 74-83 %: EVENTS | BATTLE (55 % Breite) | CHALLENGES (§14.3).
+         „CHALLENGES" ist bei uns der Einsteiger-Guide — dieselbe Rolle
+         (offene Aufgaben mit Belohnung) an derselben Stelle. -->
+    <div class="homerow3">
+      <button class="sidetile" id="tileEvents">
+        <span class="sti" data-ico="hub_events" data-emoji="🎪"></span>
+        <span class="stn">EVENTS</span><i class="nb2" id="tileEventBadge">3</i></button>
       <button class="battlebtn" id="btnBattle"><span class="goldtext">Kampf</span></button>
+      <button class="sidetile" id="tileGuide">
+        <span class="sti" data-ico="hub_challenges" data-emoji="🎯"></span>
+        <span class="stn">GUIDE</span>
+        <i class="nb2" id="tileGuideBadge" style="display:none">0</i></button>
     </div>
-
-    <!-- Hub-Kacheln: Einstieg in Clan + Rangliste. Die Bottom-Nav bleibt
-         bei AAs fuenf Plaetzen (Shop | Sammlung | START | Festung | Packs,
-         §15.5) — zwei weitere Knoepfe dort wuerden die Mitte zerquetschen.
-         AA haengt Clan/Leaderboard genauso ueber Hub-Kacheln ein und
-         nutzt dafuer die Icons hub_clan / hub_leaderboard. -->
-    <div class="hubrow">
-      <button class="hubtile" id="tileClan" data-hubico="hub_clan">
-        <span class="hi" data-ico="hub_clan" data-emoji="🛡"></span>
-        <span class="ht"><span class="htn">Clan</span>
-          <span class="hts" id="tileClanSub">—</span></span>
-        <i class="nb2" id="tileClanBadge" style="display:none">0</i></button>
-      <button class="hubtile" id="tileBoard" data-hubico="hub_leaderboard">
-        <span class="hi" data-ico="hub_leaderboard" data-emoji="🏅"></span>
-        <span class="ht"><span class="htn">Rangliste</span>
-          <span class="hts" id="tileBoardSub">—</span></span></button>
-    </div>
-    <!-- Zweite Hub-Reihe: Pass, Post, Einstellungen. Die Bottom-Nav
-         bleibt bei AAs fuenf Plaetzen (§15.5). -->
-    <div class="hubrow2">
-      <button class="hubmini" id="tilePass"><span class="hmi" data-ico="hub_pass" data-emoji="🎟"></span>
-        <span class="hmn">Season-Pass</span><i class="nb2" id="tilePassBadge" style="display:none">0</i></button>
-      <button class="hubmini" id="tileMail"><span class="hmi" data-ico="hub_mail" data-emoji="✉"></span>
-        <span class="hmn">Post</span><i class="nb2" id="tileMailBadge" style="display:none">0</i></button>
-      <button class="hubmini" id="tileSettings"><span class="hmi" data-ico="hub_settings" data-emoji="⚙"></span>
-        <span class="hmn">Einstellungen</span></button>
-    </div>
-
-    <div class="ladder" id="arenaLadder"></div>
-    <p class="homenote" id="homeNote">—</p>
   </section>
 
   <!-- ===== VIEW C: CLAN (DESIGN_CLAN.md) =====
@@ -1883,6 +2136,15 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
         <span class="sbadge">BALD</span></div>
     </div>
 
+    <div class="setgrp"><div class="sghd">HILFE &amp; GUIDES</div>
+      <div class="setrow"><span class="stx">Einsteiger-Guide<small>Kapitel mit Aufgaben und Belohnungen</small></span>
+        <button class="setbtn pressable" id="btnSetGuide">Öffnen</button></div>
+      <div class="setrow"><span class="stx">Spiel-Handbuch<small>Alle Systeme kurz erklärt</small></span>
+        <button class="setbtn pressable" id="btnSetManual">Öffnen</button></div>
+      <div class="setrow"><span class="stx">Login-Kalender<small>7 Tage, Anker sind Booster-Packs</small></span>
+        <button class="setbtn pressable" id="btnSetLogin">Anzeigen</button></div>
+    </div>
+
     <div class="setgrp"><div class="sghd">SPIELSTAND</div>
       <div class="setrow" style="display:block">
         <textarea class="savearea" id="saveArea" spellcheck="false"
@@ -1896,6 +2158,29 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       </div>
     </div>
     <p class="credits" id="credits">—</p>
+  </section>
+
+  <!-- ===== VIEW G: EINSTEIGER-GUIDE =====
+       Gestaffelte Kapitel mit Aufgabenliste. Die Haekchen kommen aus
+       window.ArenaGuide, das sie wiederum aus den bestehenden Zustaenden
+       ableitet (Telemetrie-Trichter, Karten, Clan, Festung, Daily).
+       Dieser View enthaelt KEINE eigene Fortschrittslogik. -->
+  <section id="viewGuide" class="view">
+    <div class="viewhead"><button class="backbtn" id="guideBack">‹</button>
+      <h2 class="title">Guide</h2>
+      <button class="mini pressable" id="btnToManual">📖 Handbuch</button></div>
+    <div class="gprog" id="guideProg"></div>
+    <div id="guideChapters"></div>
+    <p class="fortnote" id="guideNote">—</p>
+  </section>
+
+  <!-- ===== VIEW MB: SPIEL-HANDBUCH =====
+       Aufklappbare Erklaerseiten, Daten aus ArenaGuide.MANUAL. -->
+  <section id="viewManual" class="view">
+    <div class="viewhead"><button class="backbtn" id="manBack">‹</button>
+      <h2 class="title">Handbuch</h2></div>
+    <div id="manList"></div>
+    <p class="fortnote" id="manNote">—</p>
   </section>
 
   <!-- Bestaetigungsdialog (Zuruecksetzen) -->
@@ -2148,6 +2433,34 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   <div class="offerpop" id="offerPop"></div>
 </div>
 
+<!-- ===== DAILY-LOGIN-KALENDER =====
+     Oeffnet beim ERSTEN Start des Tages, vor allem anderen. Sieben
+     Kacheln, Tag 7 als volle Breite (Finale). Anker sind BOOSTER-PACKS,
+     keine Truhen — User-Vorgabe, siehe DESIGN_MONETARISIERUNG.md §D.1. -->
+<div id="loginLayer">
+  <div class="loginpop" id="loginPop"></div>
+</div>
+
+<!-- ===== TAGESZIELE =====
+     Lag frueher als Panel auf Home und war einer der Haupt-Gruende fuer
+     den ueberladenen Startbildschirm. AA haelt den Start frei („Ein
+     Bildschirm = ein Ziel", §9.5b); die Tagesziele sitzen jetzt hinter
+     dem Kalender-Icon der Profilzeile, inklusive Badge. -->
+<div id="dailyLayer">
+  <div class="dailypop">
+    <div class="dailypanel open" id="dailyPanel">
+      <div class="dailyhead" id="dailyHead">
+        <span class="dqs">🗓</span>
+        <span class="dh1"><span class="dnm">Tagesziele</span>
+          <span class="dsub" id="dailySub">—</span></span>
+        <span class="dcnt" id="dailyCnt">0/3</span>
+      </div>
+      <div class="dailybody" id="dailyBody"></div>
+    </div>
+    <button class="loginlater pressable" id="dailyClose">Schließen</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- ===== Karten-Wahl fuer die eigene Clan-Anfrage =====
@@ -2176,6 +2489,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 <script src="./arena_clan.js"></script>
 <script src="./arena_vault.js"></script>
 <script src="./arena_daily.js"></script>
+<script src="./arena_guide.js"></script>
 <script>
 (function () {
   "use strict";
@@ -2568,8 +2882,9 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   /* UIBadge.set(navKey, n) — die roten Zaehler-Punkte der Bottom-Nav. */
   window.UIBadge = (function () {
     var MAP = { collection: "navBadge", shop: "badgeShop", pack: "badgePack",
-                clan: "tileClanBadge", pass: "tilePassBadge", mail: "tileMailBadge",
-                daily: "dailyCnt2" };
+                clan: "tileClanBadge", mail: "tileMailBadge",
+                daily: "tileDailyBadge", guide: "tileGuideBadge",
+                events: "tileEventBadge" };
     return {
       set: function (navKey, n) {
         var id = MAP[navKey]; if (!id) return;
@@ -3506,8 +3821,9 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
         if (pt0.ready) firstEmpty.classList.add("full");
       }
     }
-    renderVault();
+    // Tresor lebt jetzt im Shop, die Tagesziele hinter dem Kalender-Icon.
     renderDaily();
+    renderProfile();
 
     // Fortschritt bis zur nächsten Arena.
     var from = cur.at, to = nxt ? nxt.at : cur.at;
@@ -3524,32 +3840,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       ? "Nächster Knoten bei " + fmt(nn) + " 🏆: " + nodeReward(nn).label
       : "Straße abgeschlossen";
 
-    // Arena-Leiter: erreichte farbig, kommende abgedunkelt mit 🔒 + Schwelle.
-    $("arenaLadder").innerHTML = ARENA_TIERS.map(function (a, k) {
-      var locked = t < a.at, here = k === i;
-      return '<button class="rung' + (locked ? " locked" : "") + (here ? " here" : "") +
-        '" data-arena="' + k + '">' +
-        '<div class="shade"></div>' +
-        (locked ? '<span class="lk">' + ico("icon_lock", "🔒") + "</span>" : "") +
-        '<div class="rn ' + (locked ? "" : "goldtext") + '">' + a.name + "</div>" +
-        '<div class="rt">' + (a.at === 0 ? "Start" : fmt(a.at) + " " + ico("cur_trophy", "🏆")) + "</div>" +
-        "</button>";
-    }).join("");
     markPressable($("viewHome"));
-    Array.prototype.forEach.call($("arenaLadder").querySelectorAll(".rung"), function (b) {
-      var a = ARENA_TIERS[b.getAttribute("data-arena") | 0];
-      layer(b, a.key);
-      b.addEventListener("click", function () {
-        toast(DEMO_TROPHIES >= a.at
-          ? "Arena " + a.n + ": " + a.name + " — erreicht"
-          : "Arena " + a.n + ": " + a.name + " — noch " + fmt(a.at - DEMO_TROPHIES) + " 🏆");
-      });
-    });
-
-    $("homeNote").innerHTML = nxt
-      ? ("Noch <b>" + fmt(to - t) + " 🏆</b> bis <b>" + nxt.name + "</b>. " +
-         "Arenen sind reine Status-Optik — die Match-Welt wird pro Spiel zufällig gewählt.")
-      : "Höchste Arena erreicht. Arenen sind reine Status-Optik — die Match-Welt wird pro Spiel zufällig gewählt.";
     renderTop();
   }
 
@@ -5684,13 +5975,17 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       renderDaily(); renderTop(); renderHubTiles();
     } catch (e) { UISfx.deny(); toast(e.message); }
   }
-  function toggleDaily() {
-    var p = $("dailyPanel");
-    var open = !p.classList.contains("open");
-    p.classList.toggle("open", open);
-    try { localStorage.setItem(DAILY_OPEN_KEY, open ? "1" : "0"); } catch (e) {}
+  function openDaily() {
+    renderDaily();
+    $("dailyLayer").classList.add("open");
     UISfx.tap();
   }
+  function closeDaily() {
+    $("dailyLayer").classList.remove("open");
+    UISfx.tap();
+    renderHubTiles();
+  }
+  var toggleDaily = openDaily;   // alter Name bleibt fuer __proto gueltig
 
   /* ==================================================================
    * demoMatchResult(win) — die EINE Naht, die das Spiel spaeter aufruft
@@ -5845,13 +6140,251 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     $("confirmDlg").classList.add("open");
   }
 
+  /* ==================================================================
+   * DAILY-LOGIN-KALENDER  (arena_daily.js §Login)
+   * ------------------------------------------------------------------
+   * Oeffnet beim ersten Start des Tages. Der Merker liegt in
+   * localStorage "arenaLoginSeen" und traegt den TAGESSCHLUESSEL —
+   * damit oeffnet das Popup je Tag genau einmal, auch nach Reload.
+   * ================================================================== */
+  var LOGIN_SEEN_KEY = "arenaLoginSeen";
+  function DYof2() { return window.ArenaDaily || null; }
+  var LOGIN_ICO = { gold: "cur_gold", material: "ess_special", gems: "cur_gem",
+                    pack: null, finale: null };
+  function loginTileIco(d) {
+    if (d.pack) return ico("pack_" + d.pack, d.sym, "big");
+    var k = LOGIN_ICO[d.kind];
+    return k ? ico(k, d.sym, "big") : '<span class="ico">' + d.sym + "</span>";
+  }
+  function renderLoginPopup() {
+    var D = DYof2(); if (!D) return;
+    var cal = D.loginCalendar();
+    var cells = cal.days.map(function (d) {
+      var cls = "logincell " + (d.done ? "done" : d.state === "today" ? "today"
+                : d.state === "taken" ? "locked" : "locked") +
+                (d.finale ? " finale" : "");
+      if (d.finale) {
+        return '<div class="' + cls + '" data-lgd="' + d.day + '">' +
+          '<span class="lgi">' + loginTileIco(d) + "</span>" +
+          '<span class="lgtx"><span class="lgd">TAG ' + d.day + " · FINALE</span>" +
+          '<span class="lgn">' + d.name + "</span></span></div>";
+      }
+      return '<div class="' + cls + '" data-lgd="' + d.day + '">' +
+        '<span class="lgd">TAG ' + d.day + "</span>" +
+        '<span class="lgi">' + loginTileIco(d) + "</span>" +
+        '<span class="lgn">' + d.name + "</span></div>";
+    }).join("");
+    var btn = cal.canClaim
+      ? '<button class="loginbtn pressable" id="loginClaim">' + cal.today.sym +
+        " " + cal.today.name + " abholen</button>"
+      : '<button class="loginbtn" id="loginClaim" disabled>Heute schon abgeholt · ' +
+        "nächste Kachel in " + cal.nextText + "</button>";
+    $("loginPop").innerHTML =
+      '<div class="loginhead"><div class="lgt goldtext">Täglich einloggen</div>' +
+        '<div class="lgs">Sieben Tage, drei Booster-Packs. <b>Verpasste Tage kosten nichts</b> — ' +
+        "der Kalender rückt nur beim Abholen vor." +
+        (cal.cycle ? "<br>Zyklus " + (cal.cycle + 1) + " · " + cal.claims +
+          " Belohnungen insgesamt" : "") + "</div></div>" +
+      '<div class="logingrid">' + cells + "</div>" +
+      '<div class="loginfoot">' + btn +
+        '<button class="loginlater pressable" id="loginLater">Später</button></div>';
+    $("loginClaim").addEventListener("click", doLoginClaim);
+    $("loginLater").addEventListener("click", closeLogin);
+    markPressable($("loginPop"));
+  }
+  function openLogin() {
+    if (!DYof2()) return false;
+    renderLoginPopup();
+    $("loginLayer").classList.add("open");
+    UISfx.confirm();
+    return true;
+  }
+  function closeLogin() {
+    $("loginLayer").classList.remove("open");
+    UISfx.tap();
+    try { localStorage.setItem(LOGIN_SEEN_KEY, DYof2().dayKey(Date.now())); } catch (e) {}
+    renderHubTiles();
+  }
+  function doLoginClaim() {
+    var D = DYof2();
+    try {
+      var r = D.claimLogin();
+      if (r.gold) setGold(gold() + r.gold);          // Gold bucht der Hub
+      if (r.gems) setGems(gems() + r.gems);
+      UISfx.reward();
+      var parts = [];
+      if (r.gold) parts.push(fmt(r.gold) + " Gold");
+      if (r.material) parts.push(r.material + " Material");
+      if (r.gems) parts.push(r.gems + " Gems");
+      if (r.pack) parts.push(r.pack.toUpperCase() + "-Pack");
+      toast("Tag " + r.day + " abgeholt: " + parts.join(" · ") +
+        (r.cycleDone ? " — Zyklus geschafft!" : ""));
+      track("daily_complete", { login: r.day });
+      renderLoginPopup();
+      renderHome();
+      renderHubTiles();
+    } catch (e) { UISfx.deny(); toast(e.message); }
+  }
+  /* Beim Start genau EINMAL pro Tag zeigen. */
+  function maybeShowLogin() {
+    var D = DYof2(); if (!D) return false;
+    var today = D.dayKey(Date.now()), seen = null;
+    try { seen = localStorage.getItem(LOGIN_SEEN_KEY); } catch (e) {}
+    if (seen === today) return false;
+    return openLogin();
+  }
+
+  /* ==================================================================
+   * EINSTEIGER-GUIDE + HANDBUCH  (arena_guide.js)
+   * ================================================================== */
+  function GDof() { return window.ArenaGuide || null; }
+  function guideMark(key) {
+    var G = GDof();
+    if (G) G.mark(key);
+  }
+  var guideOpen = {};        // welche Kapitel sind aufgeklappt
+  function renderGuide() {
+    var G = GDof();
+    if (!G) { $("guideNote").textContent = "arena_guide.js nicht geladen."; return; }
+    var pr = G.progress(), cs = G.chapters();
+    $("guideProg").innerHTML =
+      '<div class="gpn">' + pr.pctText + "</div>" +
+      '<div class="gpt"><div class="gpl">' + pr.tasksDone + " von " + pr.tasksTotal +
+        " Aufgaben · " + pr.chaptersDone + "/" + pr.chaptersTotal + " Kapitel</div>" +
+        '<div class="gpbar"><i style="width:' + (pr.pct * 100).toFixed(1) + '%"></i></div></div>';
+
+    $("guideChapters").innerHTML = cs.map(function (c) {
+      var open = guideOpen[c.key] || (!c.locked && !c.complete && !guideOpen._any);
+      var tasks = c.tasks.map(function (t) {
+        var btn = t.claimed
+          ? '<span class="gtr">✓ abgeholt</span>'
+          : '<button class="gclaim pressable' + (t.claimable ? "" : " is-disabled") +
+            '" data-gtask="' + t.key + '">' + (t.claimable ? "ABHOLEN" : t.have + "/" + t.need) +
+            "</button>";
+        return '<div class="gtask' + (t.done ? " done" : "") + '" data-task="' + t.key + '">' +
+          '<span class="gtb">' + (t.done ? "✓" : "") + "</span>" +
+          '<span class="gtt"><span class="gtn">' + t.title + "</span>" +
+          '<span class="gtd">' + t.desc + "</span>" +
+          '<span class="gtr">' + ico("cur_gold", "🪙") + " " + fmt(t.gold) + " · " +
+            ico("ess_special", "⚗") + " " + t.material + "</span></span>" + btn + "</div>";
+      }).join("");
+      var packBtn = c.chapterClaimed
+        ? '<span class="gtr">✓ abgeholt</span>'
+        : '<button class="gclaim pressable' + (c.chapterClaimable ? "" : " is-disabled") +
+          '" data-gchap="' + c.key + '">ABHOLEN</button>';
+      return '<div class="gchap' + (open ? " open" : "") + (c.locked ? " locked" : "") +
+        (c.complete ? " done" : "") + '" data-chap="' + c.key + '">' +
+        '<button class="gchead pressable" data-gtoggle="' + c.key + '" data-bg="' + c.art + '">' +
+          '<span class="gcs">' + c.sym + "</span>" +
+          '<span class="gct"><span class="gcn">' + c.name +
+            (c.locked ? " " + ico("icon_lock", "🔒") : "") + "</span>" +
+            '<span class="gcd">' + c.desc + "</span></span>" +
+          '<span class="gcc">' + c.doneCount + "/" + c.total + "</span>" +
+          '<span class="gcar">▾</span></button>' +
+        '<div class="gcbody">' + tasks +
+          '<div class="gcpack"><span class="gpi">' + ico("pack_" + c.pack, "🎁") + "</span>" +
+          '<span class="gpt2">Kapitel-Abschluss: <b>' + c.pack.toUpperCase() +
+            "-Pack</b><br>Alle " + c.total + " Aufgaben erledigen.</span>" + packBtn +
+        "</div></div></div>";
+    }).join("");
+
+    Array.prototype.forEach.call($("guideChapters").querySelectorAll("[data-bg]"), function (el) {
+      layer(el, el.getAttribute("data-bg"));
+    });
+    Array.prototype.forEach.call($("guideChapters").querySelectorAll("[data-gtoggle]"), function (b) {
+      b.addEventListener("click", function () {
+        var k = b.getAttribute("data-gtoggle");
+        guideOpen._any = true;
+        guideOpen[k] = !guideOpen[k];
+        renderGuide();
+      });
+    });
+    Array.prototype.forEach.call($("guideChapters").querySelectorAll("[data-gtask]"), function (b) {
+      b.addEventListener("click", function (e) {
+        e.stopPropagation();
+        claimGuideTask(b.getAttribute("data-gtask"));
+      });
+    });
+    Array.prototype.forEach.call($("guideChapters").querySelectorAll("[data-gchap]"), function (b) {
+      b.addEventListener("click", function (e) {
+        e.stopPropagation();
+        claimGuideChapter(b.getAttribute("data-gchap"));
+      });
+    });
+    $("guideNote").textContent = "Die Häkchen lesen deinen echten Spielstand — " +
+      "es gibt keinen zweiten Zähler. Logik: arena_guide.js (localStorage „arenaGuide“).";
+    markPressable($("viewGuide"));
+    UIBadge.set("guide", G.badge());
+  }
+  function claimGuideTask(key) {
+    var G = GDof();
+    try {
+      var r = G.claimTask(key);
+      setGold(gold() + r.gold);
+      UISfx.reward();
+      toast(r.title + ": +" + fmt(r.gold) + " Gold, +" + r.material + " Material");
+      renderGuide(); renderTop(); renderHubTiles();
+    } catch (e) { UISfx.deny(); toast(e.message); }
+  }
+  function claimGuideChapter(key) {
+    var G = GDof();
+    try {
+      var r = G.claimChapter(key);
+      UISfx.reward();
+      toast("Kapitel „" + r.name + "“ abgeschlossen — " + r.pack.toUpperCase() + "-Pack!");
+      renderGuide(); renderHubTiles();
+    } catch (e) { UISfx.deny(); toast(e.message); }
+  }
+
+  var manOpen = {};
+  function renderManual() {
+    var G = GDof();
+    if (!G) { $("manNote").textContent = "arena_guide.js nicht geladen."; return; }
+    var pages = G.manual();
+    $("manList").innerHTML = pages.map(function (m, i) {
+      var open = manOpen[m.key] || (!manOpen._any && i === 0);
+      var arts = (m.arts.length ? m.arts : [m.art]).map(function (a) {
+        return '<span class="ma" data-bg="' + a + '"></span>';
+      }).join("");
+      return '<div class="manpage' + (open ? " open" : "") + '" data-man="' + m.key + '">' +
+        '<button class="manhead pressable" data-mtoggle="' + m.key + '">' +
+          '<span class="mhs">' + m.sym + "</span>" +
+          '<span class="mhn">' + m.title + "</span>" +
+          (m.read ? '<span class="mhr">gelesen</span>' : "") +
+          '<span class="mhar">▾</span></button>' +
+        '<div class="manbody"><div class="manart">' + arts + "</div>" +
+          '<div class="mintro">' + m.intro + "</div><ul>" +
+          m.bullets.map(function (b) { return "<li>" + b + "</li>"; }).join("") +
+        "</ul></div></div>";
+    }).join("");
+    Array.prototype.forEach.call($("manList").querySelectorAll("[data-bg]"), function (el) {
+      layer(el, el.getAttribute("data-bg"));
+    });
+    Array.prototype.forEach.call($("manList").querySelectorAll("[data-mtoggle]"), function (b) {
+      b.addEventListener("click", function () {
+        var k = b.getAttribute("data-mtoggle");
+        manOpen._any = true;
+        manOpen[k] = !manOpen[k];
+        G.readPage(k);
+        renderManual();
+      });
+    });
+    // Die zuerst offene Seite zaehlt als gelesen — sonst bliebe die
+    // Guide-Aufgabe „Lies eine Seite" haengen, obwohl man sie sieht.
+    G.readPage(pages[0].key);
+    $("manNote").textContent = "Alle Systeme kurz erklärt. Erreichbar aus dem Guide " +
+      "und aus den Einstellungen.";
+    markPressable($("viewManual"));
+  }
+
   /* ================= Navigation ================= */
   var NAVS = { navHome: "viewHome", navCollection: "viewCollection",
                navForge: "viewForge", navPack: "viewPack",
                navShop: "viewShop", navFortress: "viewFortress",
                navClan: "viewClan", navBoard: "viewBoard",
                navPass: "viewPass", navHeroes: "viewHeroes", navEvents: "viewEvents",
-               navMail: "viewMail", navSettings: "viewSettings" };
+               navMail: "viewMail", navSettings: "viewSettings",
+               navGuide: "viewGuide", navManual: "viewManual" };
   var NAV_IDS = ["navShop", "navCollection", "navHome", "navFortress", "navPack",
                  "navTower", "navForge", "navClan", "navBoard",
                  "navPass", "navHeroes", "navEvents", "navMail", "navSettings"];
@@ -5889,6 +6422,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     if (navId === "navEvents") renderEvents();
     if (navId === "navMail") renderMail();
     if (navId === "navSettings") renderSettings();
+    if (navId === "navGuide") renderGuide();
+    if (navId === "navManual") renderManual();
   }
 
   /* ================= Events ================= */
@@ -5923,9 +6458,15 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   onNav("navPack"); onNav("navShop"); onNav("navFortress");
   // Clan + Rangliste haengen an den Home-Hub-Kacheln (siehe Kommentar
   // im Markup) und haben deshalb keinen eigenen Bottom-Nav-Knopf.
-  onNav("tileClan", "navClan"); onNav("tileBoard", "navBoard");
-  onNav("tilePass", "navPass"); onNav("tileMail", "navMail");
-  onNav("tileSettings", "navSettings");
+  // Icon-Leiste der Profilzeile + AA-Reihe EVENTS | BATTLE | CHALLENGES
+  onNav("icoClan", "navClan"); onNav("icoBoard", "navBoard");
+  onNav("passBanner", "navPass"); onNav("icoMail", "navMail");
+  onNav("icoSettings", "navSettings"); onNav("tileGuide", "navGuide");
+  $("icoDaily").addEventListener("click", openDaily);
+  $("dailyClose").addEventListener("click", closeDaily);
+  $("dailyLayer").addEventListener("click", function (e) {
+    if (e.target === $("dailyLayer")) closeDaily();
+  });
   ["passBack", "heroBack", "evBack", "mailBack", "setBack"].forEach(function (k) {
     var el = $(k); if (el) el.addEventListener("click", function () { show("navHome"); });
   });
@@ -5953,11 +6494,25 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   $("confirmDlg").addEventListener("click", function (e) {
     if (e.target === $("confirmDlg")) { $("confirmDlg").classList.remove("open"); confirmFn = null; }
   });
-  $("dailyHead").addEventListener("click", toggleDaily);
+
   $("offerLayer").addEventListener("click", function (e) {
     if (e.target === $("offerLayer")) closeOfferPopup();
   });
   $("clanBack").addEventListener("click", function () { show("navHome"); });
+  $("guideBack").addEventListener("click", function () { show("navHome"); });
+  $("manBack").addEventListener("click", function () { show("navGuide"); });
+  $("btnToManual").addEventListener("click", function () { show("navManual"); });
+  $("btnSetGuide").addEventListener("click", function () { show("navGuide"); });
+  $("btnSetManual").addEventListener("click", function () { show("navManual"); });
+  $("btnSetLogin").addEventListener("click", openLogin);
+  $("icoDaily").addEventListener("click", openDaily);
+  $("dailyClose").addEventListener("click", closeDaily);
+  $("loginLayer").addEventListener("click", function (e) {
+    if (e.target === $("loginLayer")) closeLogin();
+  });
+  $("dailyLayer").addEventListener("click", function (e) {
+    if (e.target === $("dailyLayer")) closeDaily();
+  });
   $("boardBack").addEventListener("click", function () { show("navHome"); });
   $("lbJump").addEventListener("click", lbScrollToMe);
   $("reqDlgClose").addEventListener("click", function () {
@@ -6021,32 +6576,52 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   });
 
   /* Hub-Kacheln auf Home mit Live-Zahlen fuellen. */
+  /* Profilzeile + Season-Pass-Banner (AAs Positionen 12 % und 21 %). */
+  function renderProfile() {
+    var xpPct = 62;                            // Demo-XP-Ring
+    $("profAvatar").style.setProperty("--xp", xpPct + "%");
+    $("profName").textContent = "Prisma-Magier";
+    $("profXp").textContent = "Stufe 4 · 620/1000 XP";
+    var P = window.ArenaPass;
+    if (P) {
+      seedPass();
+      var st = P.state();
+      $("pbName").textContent = "Goldene Fortuna";
+      $("pbSub").textContent = "Stufe " + st.level + "/" + st.levels +
+        " · endet in " + st.daysLeft + " Tag" + (st.daysLeft === 1 ? "" : "en");
+      $("pbBtn").textContent = st.pending ? st.pending + " BEREIT" : "ÖFFNEN";
+      UIBadge.set("pass", st.pending);
+    }
+    layer($("passBanner"), "pass_keyart");
+  }
+
   function renderHubTiles() {
     var CL = CLof();
-    if (!CL) return;
-    seedClan();
-    var inf = CL.info(), ph = inf.phase, q = CL.sendQuota();
-    $("tileClanSub").textContent = inf.name + " · " +
-      (ph.phase === "war" ? "Krieg läuft" : "Spenden " + q.used + "/" + q.max);
-    var n = CL.notifications().length;
-    var tb = $("tileClanBadge");
-    tb.textContent = n > 9 ? "9+" : String(n);
-    tb.style.display = n > 0 ? "" : "none";
-    var lb = CL.leaderboard("around");
-    $("tileBoardSub").textContent = "Rang #" + lb.myRank + " von " + lb.total;
-    layer($("tileClan"), "hub_clan");
-    layer($("tileBoard"), "hub_leaderboard");
-    // Farbige Koerper statt grau — jede Kachel bekommt ihre Familie.
-    tint($("tileClan"), "special");
-    tint($("tileBoard"), "gold");
-    tint($("tilePass"), "pack_gold");
-    tint($("tileMail"), "speed");
-    tint($("tileSettings"), "neutral");
-    tint($("tileEvents"), "nature");
-    seedPass();
-    UIBadge.set("pass", ArenaPass.state().pending);
+    // Icon-Leiste der Profilzeile: nur noch Badges, keine Textkacheln.
+    var D = DYof2();
+    if (D) UIBadge.set("daily", D.state().badge);
+    var G = GDof();
+    if (G) UIBadge.set("guide", G.badge());
+    if (CL) {
+      seedClan();
+      UIBadge.set("clan", CL.notifications().length);
+    }
     UIBadge.set("mail", mailBadgeCount());
+    /* Farbkoerper statt grauer Flaechen — jede Kachel und jedes Icon der
+       Profilzeile bekommt seine Farbfamilie (Konsistenz-Sweep). */
+    tint($("tileEvents"), "nature");
+    tint($("tileGuide"), "gold");
+    tint($("icoDaily"), "pack_gold");
+    tint($("icoClan"), "special");
+    tint($("icoBoard"), "gold");
+    tint($("icoMail"), "speed");
+    tint($("icoSettings"), "neutral");
+    tint($("passBanner"), "special");
+    layer($("tileEvents"), "hub_events");
+    layer($("tileGuide"), "hub_challenges");
+    renderProfile();
   }
+
 
   /* ================= Start ================= */
   setSort("level");
@@ -6059,12 +6634,14 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   renderHubTiles();
   applySettings();          // Sound-Schalter wirkt ab dem ersten Frame
   if (window.ArenaAudio) ArenaAudio.music("audio_theme");   // startet beim 1. Tap
-  try {
-    if (localStorage.getItem(DAILY_OPEN_KEY) !== "0") $("dailyPanel").classList.add("open");
-  } catch (e) { $("dailyPanel").classList.add("open"); }
+  renderDaily();
   setNav("navHome");
   markPressable();         // EINE Interaktions-Schicht fuer alles Klickbare
   UIBadge.set("pack", 1);  // Demo: ein Gratis-Tagespack wartet
+  /* Der Login-Kalender ist das ERSTE, was ein Spieler am Tag sieht —
+     danach ist der Startbildschirm frei (AAs „ein Bildschirm = ein
+     Ziel"). Erst wenn er geschlossen ist, darf die Angebotskette. */
+  setTimeout(function () { maybeShowLogin(); }, 260);
   window.__proto = { AC: AC, openDetail: openDetail, show: show, seed: seed,
                      setSort: setSort, sortedIds: sortedIds,
                      ASSETS: ASSETS, ARENA_TIERS: ARENA_TIERS, renderHome: renderHome,
@@ -6105,7 +6682,15 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
                      demoMatchResult: demoMatchResult,
                      tint: tint, tintStyle: tintStyle, TINTS: TINTS, ambient: ambient,
                      attachLoop: attachLoop, CARD_LOOP: CARD_LOOP,
-                     AU: function () { return window.ArenaAudio; } };
+                     AU: function () { return window.ArenaAudio; },
+                     renderGuide: renderGuide, renderManual: renderManual,
+                     renderLoginPopup: renderLoginPopup, openLogin: openLogin,
+                     closeLogin: closeLogin, doLoginClaim: doLoginClaim,
+                     maybeShowLogin: maybeShowLogin, guideMark: guideMark,
+                     claimGuideTask: claimGuideTask, claimGuideChapter: claimGuideChapter,
+                     openDaily: openDaily, closeDaily: closeDaily,
+                     renderProfile: renderProfile, renderHubTiles2: renderHubTiles,
+                     GD: function () { return window.ArenaGuide; } };
 })();
 </script>
 </body>
