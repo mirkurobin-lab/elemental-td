@@ -371,6 +371,138 @@ als eine neue Map.
 
 ---
 
+## 9. Kampf-Juice (Freitag-Wiring)
+
+> **Was das ist:** Fünf kleine Effekte, die zusammen den Unterschied zwischen „funktioniert"
+> und „fühlt sich gut an" ausmachen. Alle fünf sind **rein visuell** — kein Balancing, keine
+> Zahl im Spiel ändert sich. Genau deshalb sind sie ein Freitagnachmittag: Sie können nichts
+> kaputtmachen, was ein Test abfangen müsste.
+>
+> **Warum das der beste Ertrag pro Stunde im ganzen Projekt ist:** Ein Spieler bewertet ein
+> Match nicht nach seiner Mathematik, sondern nach dem Feedback im Moment des Treffers. AA hat
+> hier deutlich mehr Substanz als unser Prototyp, und keiner der fünf Punkte braucht neue
+> Assets.
+
+**Vorhandene Anknüpfungspunkte in `arena_pan.html`:** `drawMergeFx()`, `drawMuzFx()`, die
+Wellen-Schleife und `resolveEnd()`. Alles Folgende hängt an diesen Stellen — es kommt **keine**
+neue Rendering-Ebene dazu.
+
+### 9.1 Hit-Stop bei Kills (60–80 ms)
+
+Der wirkungsvollste der fünf. Beim Tod eines Gegners wird die **Simulation** für 60–80 ms
+angehalten, das Rendering läuft weiter. Der Treffer bekommt dadurch Gewicht — dieselbe Technik,
+die jedes Beat-em-up benutzt.
+
+```js
+// oben, neben den übrigen Match-Variablen
+var hitStopUntil = 0;
+function hitStop(ms) { hitStopUntil = Math.max(hitStopUntil, performance.now() + ms); }
+
+// im Update-Schritt, VOR jeder Bewegung/Timer-Logik:
+var nowP = performance.now();
+if (nowP < hitStopUntil) { draw(); requestAnimationFrame(loop); return; }   // nur zeichnen
+```
+
+Aufruf dort, wo ein Gegner stirbt (dieselbe Stelle, die schon `drawMuzFx()` auslöst):
+
+```js
+if (mob.hp <= 0) { hitStop(bossFlag ? 80 : 60); /* … bestehender Kill-Code … */ }
+```
+
+**Regeln:** nur bei **Kills**, nie bei normalen Treffern (sonst ruckelt das Spiel dauerhaft);
+**nicht kumulieren** (`Math.max`, nicht `+=`); bei mehr als ~8 gleichzeitigen Kills überspringen,
+sonst steht das Bild bei einer Bosswelle.
+
+### 9.2 Screen-Shake bei Burg-Treffern
+
+Nur, wenn die **eigene** Burg Schaden nimmt — Shake bei jedem Ereignis wird sofort zur Belästigung.
+
+```js
+var shake = 0;                       // Restdauer in ms
+function addShake(ms, mag) { shake = Math.max(shake, ms); shakeMag = Math.max(shakeMag || 0, mag); }
+
+// in draw(), vor dem Zeichnen der Welt:
+if (shake > 0) {
+  var k = shake / 220, a = Math.random() * Math.PI * 2, r = shakeMag * k;
+  ctx.save();
+  ctx.translate(Math.cos(a) * r, Math.sin(a) * r);
+  shake -= dtMs;
+}
+// … Welt zeichnen … dann:
+if (shakeWasApplied) ctx.restore();
+```
+
+Stärke nach Schadenshöhe staffeln: normaler Durchbruch `addShake(160, 3)`, Boss-Treffer
+`addShake(260, 7)`. **HUD außerhalb der Transformation zeichnen** — ein wackelnder Lebensbalken
+sieht nach Bug aus, nicht nach Wucht.
+
+### 9.3 Wellen-Abschluss-Feier
+
+Der Moment, in dem eine Welle geräumt ist, ist aktuell stumm. Er ist der natürliche Taktgeber
+des Matches und sollte ihn auch hörbar/sichtbar machen:
+
+- kurzer **Lichtblitz** über die Bahn (dieselbe Mechanik wie `drawMergeFx()`, nur breiter und
+  mit 200 ms Abklingzeit),
+- **Wellennummer** groß und kurz eingeblendet („WELLE 7 GERÄUMT"), 700 ms, dann ausblenden,
+- `UISfx.reward()` (existiert bereits im Hub, im Match auf die echte SFX-Engine mappen),
+- bei **perfekter** Welle (kein Durchbruch) zusätzlich ein goldener Rahmenpuls.
+
+Einbau in der Wellen-Schleife an der Stelle, an der `waveIndex++` passiert.
+
+### 9.4 Kill-Streak-Popups
+
+Zählt Kills **innerhalb eines 2-Sekunden-Fensters**. Ab 5 erscheint ein Text am oberen Rand,
+der mit der Streak wächst:
+
+| Kills im Fenster | Text | Farbe |
+|---|---|---|
+| 5 | **GUT!** | Weiß |
+| 8 | **STARK!** | Gold |
+| 12 | **VERHEEREND!** | Orange |
+| 18 | **PRISMA-STURM!** | Violett + Partikel |
+
+```js
+var streakN = 0, streakUntil = 0;
+function onKill() {
+  var t = performance.now();
+  if (t > streakUntil) streakN = 0;
+  streakN++; streakUntil = t + 2000;
+  var s = STREAK_TIERS.filter(function (x) { return streakN >= x.at; }).pop();
+  if (s && s.at !== lastShownAt) { showStreakPopup(s); lastShownAt = s.at; }
+}
+```
+
+**Wichtig:** Die Schwelle darf pro Streak nur **einmal** feuern (`lastShownAt`), sonst blinkt bei
+18 Kills viermal derselbe Text.
+
+### 9.5 Merge-Blitz im Match
+
+`drawMergeFx()` existiert bereits für die Schmiede — im Match fehlt der Effekt komplett. Wenn ein
+Turm im Spielfeld eine Stufe aufsteigt (Sternstufe aus §3), gehört derselbe Blitz auf das Feld:
+kurzer radialer Ausbruch in der Raritätsfarbe der neuen Stufe, 300 ms, plus ein einzelner
+Ring, der auf die Reichweite des Turms aufläuft. Das erklärt nebenbei die Reichweiten-Änderung,
+ohne einen Tooltip zu brauchen.
+
+### 9.6 Reihenfolge und Aufwand
+
+| # | Effekt | Aufwand | Wirkung | Risiko |
+|---|---|---|---|---|
+| 1 | Hit-Stop | **S** (20 Zeilen) | sehr hoch | Frame-Loop anfassen |
+| 2 | Screen-Shake | **S** | hoch | HUD-Transformation |
+| 3 | Wellen-Feier | **S** | hoch | keins |
+| 4 | Kill-Streak-Popups | **M** | mittel | keins |
+| 5 | Merge-Blitz im Match | **S** | mittel | hängt an §3 |
+
+**Empfehlung:** 1 → 3 → 2 → 4 → 5. Punkte 1–3 sind zusammen ein Nachmittag und liefern den
+größten Teil des Effekts.
+
+> **Ein Schalter für alles.** Alle fünf Effekte gehören hinter **eine** Einstellung
+> („Bildschirmeffekte", Standard an) in den Einstellungen-View des Hubs. Hit-Stop und Shake sind
+> für einen kleinen Teil der Spieler ein Barriere-Thema, und ein Sammelschalter ist billiger als
+> fünf einzelne.
+
+---
+
 ## Übersicht
 
 | # | Thema | Beleg | Aufwand | Priorität |
@@ -383,6 +515,7 @@ als eine neue Map.
 | 6 | Clan-Tag im Rivalen-Modul | „No clan" unter beiden Namen | S | 5 |
 | 7 | Turm-Grundflächen 1×2 + „Felder abgedeckt" | „1x2 TOWER PATH" / „Grids Covered" | L | 7 (Later) |
 | 8 | **Map-Objectives + Curse-Karten arena-gebunden** | „Unlocks:" pro Arena-Banner, Modifier „Neutral" | M | **2** |
+| 9 | **Kampf-Juice** (Hit-Stop, Shake, Wellen-Feier, Kill-Streaks, Merge-Blitz) | rein visuell, kein Balancing | S–M | **2** |
 
 **Reihenfolge-Empfehlung:** 1 → 3 → 2 → 4 → 5 → 6 → (7 später).
 **Punkt 8 hängt an Punkt 3** (die erste Curse-Karte *Sternenfall* braucht die Sternstufen)

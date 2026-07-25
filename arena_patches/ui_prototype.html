@@ -806,6 +806,137 @@ span.ico{mix-blend-mode:normal;text-align:center}
 .skinbar select{flex:0 0 auto}
 
 /* ==================================================================
+ * KRISTALLTRESOR · ANGEBOTSKETTE · TAeGLICHER LOOP
+ * ------------------------------------------------------------------
+ * Logik: arena_vault.js / arena_daily.js / arena_telemetry.js.
+ * Diese Views sind reine Praesentation — kein Preis, keine Schwelle und
+ * keine Zeitspanne steht hier im Markup.
+ * ⚠ GOLDTEXT-REGEL: Der Tresor-Knopf und die Angebots-Knoepfe sind
+ * golden bzw. magenta — dort ausnahmslos dunkle bzw. weisse
+ * Fuellfarbe, nie .goldtext.
+ * ================================================================== */
+/* ---------- Kristalltresor ---------- */
+.vaultbox{position:relative;display:flex;align-items:center;gap:11px;padding:11px;
+  border-radius:15px;border:1px solid #a45ef23d;overflow:hidden;
+  background:linear-gradient(150deg,#2a1c4a,#161028 60%,#0e1418)}
+.vaultbox.full{border-color:#f2c53d;box-shadow:0 0 0 1px #f2c53d55,0 0 22px #f2c53d3d;
+  animation:vaultglow 2s ease-in-out infinite}
+@keyframes vaultglow{50%{box-shadow:0 0 0 1px #f2c53d99,0 0 34px #f2c53d66}}
+.vaultjar{position:relative;flex:0 0 58px;width:58px;height:70px;display:flex;
+  align-items:flex-end;justify-content:center;overflow:hidden;
+  clip-path:polygon(22% 0,78% 0,100% 26%,100% 88%,80% 100%,20% 100%,0 88%,0 26%);
+  background:linear-gradient(180deg,#1b2436,#0b1116);border:0}
+.vaultjar .fill{position:absolute;left:0;right:0;bottom:0;
+  background:linear-gradient(180deg,#7fd8ff,#3fa9e8 45%,#1c6ea8);
+  box-shadow:0 0 16px #63b1eeaa;transition:height .4s ease}
+.vaultjar .gem{position:relative;z-index:2;font-size:23px;margin-bottom:16px;
+  filter:drop-shadow(0 2px 4px #000a)}
+.vaultbox.full .vaultjar .fill{background:linear-gradient(180deg,#fff7d6,#f2c53d 45%,#a8842a);
+  box-shadow:0 0 22px #f2c53dcc}
+.vaultmeta{flex:1;min-width:0}
+.vaultmeta .vnm{font-size:13px;font-weight:900;color:#e8eef3}
+.vaultmeta .vnum{font-size:19px;font-weight:900;color:#7fd8ff;line-height:1.15;margin-top:1px}
+.vaultbox.full .vaultmeta .vnum{color:var(--gold)}
+.vaultmeta .vsub{font-size:9.5px;color:var(--dim);margin-top:3px;line-height:1.4}
+.vaultbtn{flex:0 0 auto;border-radius:11px;padding:10px 12px;font-size:12px;font-weight:900;
+  text-align:center;line-height:1.2;
+  background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);box-shadow:0 3px 0 #6d551a;
+  -webkit-text-fill-color:#3a2b07;color:#3a2b07}
+.vaultbtn small{display:block;font-size:8.5px;font-weight:800;opacity:.75;margin-top:1px;
+  -webkit-text-fill-color:#3a2b07}
+.vaultbtn.dim{background:linear-gradient(180deg,#3a4a58,#222e39);box-shadow:0 3px 0 #16202a;
+  -webkit-text-fill-color:#8fa0ad;color:#8fa0ad}
+
+/* ---------- Angebote ---------- */
+.offercard{position:relative;display:flex;align-items:center;gap:10px;margin-top:9px;
+  padding:10px;border-radius:14px;overflow:hidden;border:1px solid #dc1ddb4d;
+  background:linear-gradient(150deg,#3a1440,#1c1030 58%,#0e1418)}
+.offercard .osym{flex:0 0 40px;width:40px;height:40px;border-radius:11px;display:flex;
+  align-items:center;justify-content:center;font-size:21px;background:#0b1116a6;
+  border:1px solid #dc1ddb55}
+.offercard .otx{flex:1;min-width:0}
+.offercard .onm{font-size:13px;font-weight:900;color:#f5d7ff}
+.offercard .oct{font-size:9.5px;color:#c6b4ee;margin-top:2px;line-height:1.4}
+.offercard .otime{font-size:9px;font-weight:900;color:#ff9ad2;margin-top:3px}
+.offerbuy{flex:0 0 auto;border-radius:11px;padding:10px 13px;font-size:12.5px;font-weight:900;
+  text-align:center;line-height:1.2;
+  background:linear-gradient(180deg,#f5a7f7,#dc1ddb 55%,#8d1c78);color:#fff;
+  box-shadow:0 3px 0 #5d1250}
+.offerbuy small{display:block;font-size:8.5px;font-weight:800;opacity:.85;margin-top:1px}
+.offerx{position:absolute;right:5px;top:4px;width:20px;height:20px;border-radius:50%;
+  font-size:13px;line-height:20px;text-align:center;color:#c6b4ee;background:#0b1116a6}
+/* Angebots-Popup */
+#offerLayer{position:fixed;inset:0;display:none;z-index:80;align-items:center;
+  justify-content:center;background:#05090cd6;padding:18px}
+#offerLayer.open{display:flex}
+.offerpop{width:100%;max-width:340px;border-radius:20px;overflow:hidden;
+  border:1px solid #dc1ddb66;box-shadow:0 24px 60px -20px #000,0 0 40px -10px #dc1ddb55;
+  background:linear-gradient(160deg,#3a1440,#1c1030 58%,#0e1418);
+  animation:offerpop .45s cubic-bezier(.2,1.4,.4,1)}
+@keyframes offerpop{0%{transform:scale(.7) translateY(30px);opacity:0}
+  100%{transform:scale(1) translateY(0);opacity:1}}
+.offerpop .ohead{position:relative;padding:16px 16px 12px;text-align:center}
+.offerpop .obig{font-size:40px;line-height:1}
+.offerpop .otitle{font-size:22px;line-height:1.15;margin-top:5px}
+.offerpop .owhy{font-size:10.5px;color:#c6b4ee;line-height:1.5;margin-top:7px}
+.offerpop .ogrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:0 16px}
+.offerpop .oitem{display:flex;align-items:center;gap:6px;padding:8px;border-radius:10px;
+  background:#0b111699;border:1px solid #ffffff14;font-size:11px;font-weight:800;color:#e8eef3}
+.offerpop .ofoot{padding:12px 16px 16px}
+.offerpop .otimer{text-align:center;font-size:10px;font-weight:900;color:#ff9ad2;
+  margin-bottom:8px}
+.offerpop .obtn{width:100%;border-radius:13px;padding:13px 0;font-size:15px;font-weight:900;
+  background:linear-gradient(180deg,#f5a7f7,#dc1ddb 55%,#8d1c78);color:#fff;
+  box-shadow:0 4px 0 #5d1250}
+.offerpop .olater{width:100%;margin-top:7px;font-size:11px;font-weight:800;color:#a9bccb;
+  padding:8px 0}
+.iapnote{margin-top:9px;font-size:9px;color:#8fa0ad;text-align:center;line-height:1.5}
+
+/* ---------- Taeglicher Loop (Home) ---------- */
+.dailypanel{margin:12px 14px 0;border-radius:15px;border:1px solid var(--line);overflow:hidden;
+  background:linear-gradient(180deg,#1b2732,#131c25)}
+.dailyhead{display:flex;align-items:center;gap:9px;padding:11px 12px;width:100%;text-align:left}
+.dailyhead .dh1{flex:1;min-width:0}
+.dailyhead .dnm{display:block;font-size:13px;font-weight:900;color:#e8eef3}
+.dailyhead .dsub{display:block;font-size:9.5px;color:var(--dim);margin-top:3px}
+.dailyhead .dcnt{font-size:11px;font-weight:900;color:var(--gold);background:#0b1116;
+  border:1px solid #2b3b47;border-radius:8px;padding:4px 9px}
+.dailyhead .darr{font-size:12px;color:var(--dim);transition:transform .2s}
+.dailypanel.open .dailyhead .darr{transform:rotate(180deg)}
+.dailybody{display:none;padding:0 12px 12px}
+.dailypanel.open .dailybody{display:block}
+.dqrow{display:flex;align-items:center;gap:9px;padding:9px;border-radius:11px;margin-top:7px;
+  background:#0b1116;border:1px solid #1f2b35}
+.dqrow.done{border-color:#7ad14f4d}
+.dqrow .dqs{flex:0 0 auto;font-size:17px}
+.dqrow .dqt{flex:1;min-width:0}
+.dqrow .dqt{display:flex;flex-direction:column}
+.dqrow .dqn{display:block;font-size:11.5px;font-weight:800;color:#dbe6ef;line-height:1.25}
+.dqrow .dqb{display:block;position:relative;height:6px;border-radius:4px;margin-top:5px;overflow:hidden;
+  background:#16202a;border:1px solid #2b3b47}
+.dqrow .dqb i{position:absolute;left:0;top:0;bottom:0;
+  background:linear-gradient(90deg,#3fa9e8,#7ad14f)}
+.dqrow .dqv{display:block;font-size:9px;color:var(--dim);font-weight:700;margin-top:3px}
+.dqget{flex:0 0 auto;border-radius:9px;padding:7px 11px;font-size:10.5px;font-weight:900;
+  background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);box-shadow:0 2px 0 #6d551a;
+  -webkit-text-fill-color:#3a2b07;color:#3a2b07}
+.dqget.dim{background:linear-gradient(180deg,#3a4a58,#222e39);box-shadow:0 2px 0 #16202a;
+  -webkit-text-fill-color:#8fa0ad;color:#8fa0ad}
+.dqchk{flex:0 0 auto;font-size:14px;color:#8fe08f}
+.dbonus{display:flex;align-items:center;gap:9px;margin-top:9px;padding:10px;border-radius:11px;
+  border:1px solid #2b3b47;background:linear-gradient(180deg,#243342,#141d26)}
+.dbonus.ready{border-color:#f2c53d;box-shadow:0 0 12px #f2c53d3d}
+.dbonus .dbs{font-size:20px}
+.dbonus .dbt{flex:1;min-width:0;font-size:11px;font-weight:800;color:#dbe6ef}
+.dbonus .dbt small{display:block;font-size:9px;color:var(--dim);font-weight:700;margin-top:2px}
+.streakchip{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:900;
+  border-radius:20px;padding:4px 10px;background:#0b1116;border:1px solid #3a4c5c;color:#a9bccb}
+.streakchip.hot{border-color:#ff7b6b;color:#ffb0a4;
+  background:linear-gradient(90deg,#3a1a16,#0b1116)}
+.slot .tmr{position:absolute;bottom:9%;font-size:7.5px;font-weight:900;color:#cfe0ec;
+  background:#0b1116cc;border-radius:5px;padding:0 3px}
+
+/* ==================================================================
  * SEASON-PASS · HELDEN · EVENTS · POST · EINSTELLUNGEN
  * ------------------------------------------------------------------
  * Die fuenf restlichen Views. Gleiche Bausteine wie ueberall:
@@ -1428,6 +1559,16 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
        auf den Packs — AAs Muster (§8.2), statt Prozent-Drop-Raten. -->
   <section id="viewShop" class="view">
     <h2 class="title">Shop</h2>
+    <!-- Zeit-Angebote der Kette (arena_vault.js). Erscheinen nur, wenn
+         ein Ereignis sie ausgelöst hat — nie „einfach so“. -->
+    <div class="shopsec" id="offerSec" style="display:none">
+      <span class="sh goldtext">Nur für dich</span></div>
+    <div id="offerSlot"></div>
+
+    <div class="shopsec"><span class="sh goldtext">Kristalltresor</span>
+      <span class="timer" id="vaultTier">—</span></div>
+    <div class="vaultbox" id="vaultShop"></div>
+
     <div class="shopsec"><span class="sh goldtext">Tagesangebote</span>
       <span class="timer" id="dealTimer">Neue Angebote in 6h 58m</span></div>
     <div class="dealgrid" id="dealGrid"></div>
@@ -1468,6 +1609,22 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
       <!-- Truhen-/Pack-Slots (§14.3): 4 Hex-Plätze, gefüllte führen in die
            Packs-Ansicht. Bestand kommt aus ArenaProfile (hier Demo). -->
       <div class="slotrow" id="packSlots"></div>
+    </div>
+
+    <!-- Kristalltresor: fuellt sich bei jedem Sieg, wird nur GANZ geoeffnet.
+         Logik + Preise in arena_vault.js / DESIGN_MONETARISIERUNG.md §B. -->
+    <div style="padding:12px 14px 0"><div class="vaultbox" id="vaultBox"></div></div>
+
+    <!-- Taeglicher Loop: 3 Quests, Bonus-Truhe, Siegesserie, Gratis-Pack. -->
+    <div class="dailypanel" id="dailyPanel">
+      <button class="dailyhead pressable" id="dailyHead">
+        <span class="dqs">🗓</span>
+        <span class="dh1"><span class="dnm">Tagesziele</span>
+          <span class="dsub" id="dailySub">—</span></span>
+        <span class="dcnt" id="dailyCnt">0/3</span>
+        <span class="darr">▾</span>
+      </button>
+      <div class="dailybody" id="dailyBody"></div>
     </div>
 
     <div class="homerow">
@@ -1877,6 +2034,13 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
 </div>
 <div id="fxLayer"></div>
 
+<!-- ===== Angebots-Popup =====
+     Zeigt hoechstens EIN Angebot (ArenaVault.best()) und nur im Hub,
+     nie im Match. „Spaeter" blendet es dauerhaft aus. -->
+<div id="offerLayer">
+  <div class="offerpop" id="offerPop"></div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- ===== Karten-Wahl fuer die eigene Clan-Anfrage =====
@@ -1898,10 +2062,13 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
   </div>
 </div>
 
+<script src="./arena_telemetry.js"></script>
 <script src="./arena_cards.js"></script>
 <script src="./arena_fortress.js"></script>
 <script src="./arena_rivals.js"></script>
 <script src="./arena_clan.js"></script>
+<script src="./arena_vault.js"></script>
+<script src="./arena_daily.js"></script>
 <script>
 (function () {
   "use strict";
@@ -2245,7 +2412,8 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
   /* UIBadge.set(navKey, n) — die roten Zaehler-Punkte der Bottom-Nav. */
   window.UIBadge = (function () {
     var MAP = { collection: "navBadge", shop: "badgeShop", pack: "badgePack",
-                clan: "tileClanBadge", pass: "tilePassBadge", mail: "tileMailBadge" };
+                clan: "tileClanBadge", pass: "tilePassBadge", mail: "tileMailBadge",
+                daily: "dailyCnt2" };
     return {
       set: function (navKey, n) {
         var id = MAP[navKey]; if (!id) return;
@@ -2850,6 +3018,8 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
     // auch wenn dabei "nur" eine Kopie der nächsten Stufe entsteht (in
     // Video 7 war genau das der Fall und AA zeigte trotzdem die volle
     // "PERFECT MERGE!"-Sequenz). Die Bonus-Wahl kommt erst danach.
+    track("first_merge", { card: id, from: tier });
+    var DYm = DYof(); if (DYm) DYm.reportEvent("merge", 1);
     window.__cerId = id;
     playCeremony(id, tier, r.tierUp ? r.newTier : AC.nextTierKey(tier),
                  AC.view(id).lvl, !r.tierUp);
@@ -2926,6 +3096,12 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
   function openBronze() { openPackKey("bronze"); }
   function openPackKey(key) {
     packResult = AC.openPack(key, POOL_IDS, HERO_IDS);
+    /* EIN Ereignis, alle Systeme haengen dran — dieselbe Naht wie im
+       Spiel (reportEvent-Signatur in Clan, Pass, Daily, Vault gleich). */
+    track("pack_opened", { type: key, cards: packResult.cards.length });
+    var CLp = CLof(); if (CLp) CLp.reportEvent("pack", 1);
+    if (window.ArenaPass) window.ArenaPass.reportEvent("pack", 1);
+    var DYp = DYof(); if (DYp) DYp.reportEvent("pack", 1);
     packState = [];
     packResult.cards.forEach(function (c) { packState.push({ kind: "card", d: c, done: false }); });
     // Material-Slots tragen jetzt eine SORTE: {type, amount, name, sym, color}
@@ -3147,6 +3323,20 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
         else toast("Leerer Platz — Packs gibt es für Siege");
       });
     });
+    /* Der ERSTE leere Platz zeigt den Gratis-Pack-Countdown — genau dort
+       schaut man hin, wenn man wissen will, wann es wieder etwas gibt. */
+    var D0 = DYof();
+    if (D0) {
+      var pt0 = D0.packTimer();
+      var firstEmpty = $("packSlots").querySelector(".slot.empty");
+      if (firstEmpty) {
+        firstEmpty.innerHTML = (pt0.ready ? ico("chest_bronze", "🥉", "big") : "＋") +
+          '<span class="tmr">' + (pt0.ready ? pt0.ready + "x frei" : pt0.text) + "</span>";
+        if (pt0.ready) firstEmpty.classList.add("full");
+      }
+    }
+    renderVault();
+    renderDaily();
 
     // Fortschritt bis zur nächsten Arena.
     var from = cur.at, to = nxt ? nxt.at : cur.at;
@@ -3409,6 +3599,8 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
   ];
   var freeDailyTaken = false;
   function renderShop() {
+    renderVault();
+    renderOffers();
     renderTop();
     var p = AC.getPityStatus();
     $("packPity").innerHTML = "Episch ≤" + p.epicIn + " · Legendär ≤" + p.legendaryIn;
@@ -3890,7 +4082,10 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
   var CLAN_SEED_KEY = "arenaClanProtoSeed";
   function seedClan() {
     var CL = CLof(); if (!CL) return;
-    if (!CL.info().joined) CL.seedDemoClan();
+    if (!CL.info().joined) {
+      CL.seedDemoClan();
+      track("clan_joined", { members: CL.MAX_MEMBERS });
+    }
     if (!localStorage.getItem(CLAN_SEED_KEY)) {
       /* Der Demo-Fortschritt wird auf MITTWOCH derselben Woche gebucht.
          Grund: reportEvent() zaehlt regelkonform NUR in der Sammelphase
@@ -4065,6 +4260,8 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
     if (n <= 0) n = 1;                              // bewusst in den Fehler laufen lassen —
     try {                                           // die Modul-Meldung erklaert das Warum
       var res = CL.donateCards(reqId, n);
+      track("donation_sent", { card: res.cardId, n: res.count });
+      var DYd = DYof(); if (DYd) DYd.reportEvent("donate", res.count);
       setGold(gold() + res.reward.gold);            // Gold bucht der Hub
       UISfx.confirm();
       toast(res.count + " × " + res.cardName + " gespendet · +" + res.reward.gold +
@@ -4184,6 +4381,7 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
         win: win, stars: win ? 1 + Math.floor(Math.random() * 3) : Math.floor(Math.random() * 2),
         hpFrac: win ? Math.random() : 0,
       });
+      var DYw = DYof(); if (DYw) DYw.reportEvent("warAttack", 1);
       if (win) UISfx.reward(); else UISfx.deny();
       toast((win ? "Sieg" : "Niederlage") + " gegen " + lo.name + " · +" + res.points +
         " Kriegspunkte");
@@ -4895,7 +5093,8 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
   // arbeiten alle ueber diese Liste.
   var SAVE_KEYS = ["arenaCards", "arenaHubGold", "arenaHubGems", "arenaFortress", "arenaSkins",
     "arenaFortLayout", "arenaClan", "arenaPass", "arenaMail", "arenaSettings",
-    "arenaProtoSeed", "arenaClanProtoSeed", "arenaPassProtoSeed"];
+    "arenaVault", "arenaDaily", "arenaTelemetry", "arenaDailyOpen",
+    "arenaProtoSeed", "arenaClanProtoSeed", "arenaPassProtoSeed", "arenaLoopProtoSeed"];
   function exportSave() {
     var out = { _app: "arcane-prism-td", _v: 1, _ts: Date.now(), data: {} };
     SAVE_KEYS.forEach(function (k) {
@@ -4941,6 +5140,312 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
     $("saveNote").textContent = "Der Export enthält ausschließlich die " + SAVE_KEYS.length +
       " Prototyp-Schlüssel aus dem localStorage — keine Konto- oder Gerätedaten.";
     markPressable($("viewSettings"));
+  }
+
+
+  /* ==================================================================
+   * KRISTALLTRESOR · ANGEBOTSKETTE · TAeGLICHER LOOP — Praesentation
+   * ------------------------------------------------------------------
+   * Alle Zahlen kommen aus arena_vault.js / arena_daily.js. Dieser Block
+   * enthaelt KEINE Preise, keine Schwellen und keine Zeitspannen.
+   * Begruendung aller Werte: DESIGN_MONETARISIERUNG.md
+   * ================================================================== */
+  function VLof() { return window.ArenaVault || null; }
+  function DYof() { return window.ArenaDaily || null; }
+  function TMof() { return window.ArenaTelemetry || null; }
+  function track(ev, props) {
+    var t = TMof();
+    if (t) t.track(ev, props);
+  }
+
+  /* Demo-Anschub: ein paar Siege, damit Tresor und Tagesziele nicht bei
+     null stehen. Einmalig, wie die uebrigen Prototyp-Seeds. */
+  var LOOP_SEED_KEY = "arenaLoopProtoSeed";
+  function seedLoop() {
+    var V = VLof(), D = DYof();
+    if (!V || !D) return;
+    if (localStorage.getItem(LOOP_SEED_KEY)) return;
+    // Arena-Stand bekannt machen, ohne ein Aufstiegs-Angebot auszuloesen.
+    V.reportEvent("arena", V.arenaIndexFor(DEMO_TROPHIES), { trophies: DEMO_TROPHIES });
+    V.reportEvent("win", 34, { trophies: DEMO_TROPHIES });
+    D.reportEvent("win", 2);
+    D.reportEvent("pack", 1);
+    localStorage.setItem(LOOP_SEED_KEY, "1");
+  }
+
+  /* ---------- Kristalltresor ---------- */
+  function vaultHTML(v, forShop) {
+    var btn = v.gems > 0
+      ? '<button class="vaultbtn pressable" data-openvault="1">' + v.priceText +
+        "<small>" + fmt(v.gems) + " Gems holen</small></button>"
+      : '<div class="vaultbtn dim">leer<small>gewinne Matches</small></div>';
+    return '<div class="vaultjar">' +
+        '<span class="fill" style="height:' + (v.pct * 100).toFixed(1) + '%"></span>' +
+        '<span class="gem">' + ico("cur_gem", "💎") + "</span></div>" +
+      '<div class="vaultmeta"><div class="vnm">Kristalltresor</div>' +
+        '<div class="vnum">' + fmt(v.gems) + " / " + fmt(v.cap) + "</div>" +
+        '<div class="vsub">' + (v.full
+          ? "VOLL — jeder weitere Sieg verpufft."
+          : "+" + v.perWin + " Gems je Sieg · noch " + v.winsLeft + " Siege") +
+        (forShop ? "<br>Stufe " + (v.tier + 1) + " von " + (v.tierMax + 1) + " · " +
+          v.perGemCt.toFixed(2).replace(".", ",") + " ct je Gem" : "") +
+        "</div></div>" + btn;
+  }
+  function renderVault() {
+    var V = VLof(); if (!V) return;
+    seedLoop();
+    var v = V.vault(null, DEMO_TROPHIES);
+    ["vaultBox", "vaultShop"].forEach(function (id) {
+      var el = $(id); if (!el) return;
+      el.className = "vaultbox" + (v.full ? " full" : "");
+      el.innerHTML = vaultHTML(v, id === "vaultShop");
+      Array.prototype.forEach.call(el.querySelectorAll("[data-openvault]"), function (b) {
+        b.addEventListener("click", openVault);
+      });
+      markPressable(el);
+    });
+    var vt = $("vaultTier");
+    if (vt) vt.textContent = "Stufe " + (v.tier + 1) + "/" + (v.tierMax + 1) +
+      " · " + v.opened + "× geöffnet";
+  }
+  /* ⚠ IAP-PLATZHALTER: bestaetigt, bucht Spielwaehrung, loest KEINE
+     Zahlung aus. Die Store-Anbindung gehoert in die App-Huelle. */
+  function openVault() {
+    var V = VLof();
+    var v = V.vault(null, DEMO_TROPHIES);
+    askConfirm("Kristalltresor öffnen?",
+      "Du erhältst <b>" + fmt(v.gems) + " Gems</b> für <b>" + v.priceText +
+      "</b>. Danach startet der Tresor neu mit der naechsten Kapazitaet (" +
+      fmt(v.nextCap || v.cap) + " Gems).<br><br>" +
+      "<i>Demo: Es wird keine Zahlung ausgelöst.</i>",
+      "Öffnen · " + v.priceText, function () {
+        try {
+          var r = V.open();
+          setGems(gems() + r.gems);
+          UISfx.reward();
+          toast(r.gems + " Gems erhalten (Demo — kein echter Kauf)");
+          renderVault(); renderTop(); renderHubTiles();
+        } catch (e) { UISfx.deny(); toast(e.message); }
+      });
+  }
+
+  /* ---------- Angebotskette ---------- */
+  var OFFER_ICO = { gems: "cur_gem", gold: "cur_gold", material: "ess_special" };
+  function offerRowHTML(o) {
+    return '<div class="offercard" data-offer="' + o.key + '">' +
+      '<button class="offerx pressable" data-offerx="' + o.key + '" title="Ausblenden">×</button>' +
+      '<div class="osym">' + o.sym + "</div>" +
+      '<div class="otx"><div class="onm">' + o.name + "</div>" +
+        '<div class="oct">' + fmt(o.content.gems) + " Gems · " + fmt(o.content.gold) +
+          " Gold · " + o.content.material + " Material · " +
+          o.content.packs.length + "x Pack</div>" +
+        '<div class="otime">⏳ noch ' + o.leftText + "</div></div>" +
+      '<button class="offerbuy pressable" data-buyoffer="' + o.key + '">' + o.priceText +
+        "<small>ansehen</small></button></div>";
+  }
+  function renderOffers() {
+    var V = VLof(); if (!V) return;
+    var act = V.active();
+    var sec = $("offerSec"), slot = $("offerSlot");
+    if (sec) sec.style.display = act.length ? "" : "none";
+    if (!slot) return;
+    slot.innerHTML = act.map(offerRowHTML).join("");
+    Array.prototype.forEach.call(slot.querySelectorAll("[data-buyoffer]"), function (b) {
+      b.addEventListener("click", function () { showOfferPopup(b.getAttribute("data-buyoffer")); });
+    });
+    Array.prototype.forEach.call(slot.querySelectorAll("[data-offerx]"), function (b) {
+      b.addEventListener("click", function () {
+        V.dismiss(b.getAttribute("data-offerx"));
+        UISfx.tap(); renderOffers();
+      });
+    });
+    markPressable(slot);
+  }
+  function showOfferPopup(key) {
+    var V = VLof(); if (!V) return;
+    var o = V.active().filter(function (x) { return x.key === key; })[0];
+    if (!o) { UISfx.deny(); toast("Dieses Angebot ist nicht mehr verfuegbar"); return; }
+    V.markShown(key);                       // meldet offer_shown an die Telemetrie
+    var items = [
+      { ico: "cur_gem", emo: "💎", t: fmt(o.content.gems) + " Gems" },
+      { ico: "cur_gold", emo: "🪙", t: fmt(o.content.gold) + " Gold" },
+      { ico: "ess_special", emo: "⚗", t: o.content.material + " Material" },
+      { ico: "pack_" + o.content.packs[0], emo: "🎁",
+        t: o.content.packs[0].toUpperCase() + "-Pack" },
+    ];
+    $("offerPop").innerHTML =
+      '<div class="ohead"><div class="obig">' + o.sym + "</div>" +
+        '<div class="otitle goldtext">' + o.name + "</div>" +
+        '<div class="owhy">' + o.why + "</div></div>" +
+      '<div class="ogrid">' + items.map(function (i) {
+        return '<div class="oitem">' + ico(i.ico, i.emo) + " " + i.t + "</div>";
+      }).join("") + "</div>" +
+      '<div class="ofoot"><div class="otimer">⏳ Nur noch ' + o.leftText + "</div>" +
+        '<button class="obtn pressable" id="offerBuy">' + o.priceText + " · jetzt sichern</button>" +
+        '<button class="olater pressable" id="offerLater">Später</button>' +
+        '<div class="iapnote">Demo-Platzhalter — es wird keine Zahlung ausgelöst.</div>' +
+      "</div>";
+    $("offerBuy").addEventListener("click", function () { buyOffer(key); });
+    $("offerLater").addEventListener("click", closeOfferPopup);
+    markPressable($("offerPop"));
+    $("offerLayer").classList.add("open");
+    UISfx.confirm();
+  }
+  function closeOfferPopup() { $("offerLayer").classList.remove("open"); UISfx.tap(); }
+  function buyOffer(key) {
+    var V = VLof();
+    try {
+      var r = V.claimOffer(key);              // meldet offer_clicked
+      setGold(gold() + r.content.gold);
+      setGems(gems() + r.content.gems);
+      UISfx.reward();
+      closeOfferPopup();
+      toast(r.name + " erhalten (Demo — kein echter Kauf)");
+      renderOffers(); renderTop(); renderShop && renderShop();
+    } catch (e) { UISfx.deny(); toast(e.message); }
+  }
+  /* Popup-Automatik: hoechstens EIN Angebot, nur im Hub, nur wenn es
+     noch nicht gezeigt wurde. */
+  function maybeShowOffer() {
+    var V = VLof(); if (!V) return false;
+    var b = V.best();
+    if (!b) return false;
+    showOfferPopup(b.key);
+    return true;
+  }
+
+  /* ---------- Taeglicher Loop ---------- */
+  var DAILY_OPEN_KEY = "arenaDailyOpen";
+  function renderDaily() {
+    var D = DYof(); if (!D) return;
+    seedLoop();
+    var st = D.state();
+    $("dailyCnt").textContent = st.done + "/" + st.need;
+    var sk = st.streak;
+    $("dailySub").innerHTML = "Reset in " + st.resetText + " h  ·  " +
+      '<span class="streakchip' + (sk.streak >= 2 ? " hot" : "") + '">🔥 Serie ' + sk.streak +
+      " · Gold x" + sk.mul.toFixed(2) + "</span>";
+
+    var html = st.quests.map(function (q) {
+      var right = q.claimed
+        ? '<span class="dqchk">✔</span>'
+        : '<button class="dqget pressable' + (q.claimable ? "" : " dim") + '" data-dq="' +
+          q.key + '">HOLEN</button>';
+      return '<div class="dqrow' + (q.done ? " done" : "") + '" data-dqrow="' + q.key + '">' +
+        '<span class="dqs">' + q.sym + "</span>" +
+        '<span class="dqt"><span class="dqn">' + q.title + "</span>" +
+          '<span class="dqb"><i style="width:' + (q.pct * 100).toFixed(0) + '%"></i></span>' +
+          '<span class="dqv">' + q.have + "/" + q.goal + "  ·  " + fmt(q.gold) +
+            " Gold + " + q.material + " Material</span></span>" + right + "</div>";
+    }).join("");
+
+    var b = st.bonus;
+    html += '<div class="dbonus' + (b.ready ? " ready" : "") + '">' +
+      '<span class="dbs">' + b.chest.sym + "</span>" +
+      '<span class="dbt">' + b.chest.name + "<small>" + b.done + "/" + b.need +
+        " Quests · " + fmt(b.chest.gold) + " Gold + " + b.chest.material + " Material + " +
+        b.chest.pack.toUpperCase() + "-Pack</small></span>" +
+      (b.claimed ? '<span class="dqchk">✔</span>'
+        : '<button class="dqget pressable' + (b.ready ? "" : " dim") +
+          '" id="dqBonus">HOLEN</button>') + "</div>";
+
+    var pt = st.pack;
+    html += '<div class="dbonus" style="margin-top:7px">' +
+      '<span class="dbs">' + ico("chest_bronze", "🥉") + "</span>" +
+      '<span class="dbt">Gratis-Pack<small>' +
+        (pt.ready ? pt.ready + " von " + pt.max + " bereit" : "nächstes in " + pt.text + " h") +
+        " · alle " + pt.everyText + ", max " + pt.max + "</small></span>" +
+      '<button class="dqget pressable' + (pt.ready ? "" : " dim") + '" id="dqPack">' +
+        (pt.ready ? "ÖFFNEN" : pt.text) + "</button></div>";
+
+    $("dailyBody").innerHTML = html;
+    Array.prototype.forEach.call($("dailyBody").querySelectorAll("[data-dq]"), function (btn) {
+      btn.addEventListener("click", function (e) { claimDaily(btn.getAttribute("data-dq"), e); });
+    });
+    var bb = $("dqBonus");
+    if (bb) bb.addEventListener("click", function (e) {
+      try {
+        var r = D.claimBonus();
+        setGold(gold() + r.gold);
+        UISfx.reward(); fireSparkBurst(e);
+        toast(r.sym + " " + r.name + ": " + fmt(r.gold) + " Gold + " + r.material + " Material");
+        renderDaily(); renderTop(); renderHubTiles();
+      } catch (err) { UISfx.deny(); toast(err.message); }
+    });
+    var pb = $("dqPack");
+    if (pb) pb.addEventListener("click", function () {
+      try {
+        var r = D.claimPack();
+        D.reportEvent("pack", 1);
+        track("pack_opened", { type: r.type, source: "free_timer" });
+        UISfx.confirm();
+        toast("Gratis-Pack abgeholt — viel Erfolg!");
+        renderDaily(); renderHome();
+        openPackKey(r.type); show("navPack");
+      } catch (err) { UISfx.deny(); toast(err.message); }
+    });
+    markPressable($("dailyBody"));
+    UIBadge.set("daily", st.badge);
+  }
+  function claimDaily(key, ev) {
+    var D = DYof();
+    try {
+      var r = D.claim(key);
+      setGold(gold() + r.gold);
+      UISfx.reward();
+      fireSparkBurst(ev);
+      toast(fmt(r.gold) + " Gold + " + r.material + " Material erhalten" +
+        (r.allDone ? " · Tagestruhe frei!" : ""));
+      renderDaily(); renderTop(); renderHubTiles();
+    } catch (e) { UISfx.deny(); toast(e.message); }
+  }
+  function toggleDaily() {
+    var p = $("dailyPanel");
+    var open = !p.classList.contains("open");
+    p.classList.toggle("open", open);
+    try { localStorage.setItem(DAILY_OPEN_KEY, open ? "1" : "0"); } catch (e) {}
+    UISfx.tap();
+  }
+
+  /* ==================================================================
+   * demoMatchResult(win) — die EINE Naht, die das Spiel spaeter aufruft
+   * ------------------------------------------------------------------
+   * Im echten Spiel steht dieser Block in resolveEnd() von arena_pan.html.
+   * Hier liegt er im Prototyp, damit sich Tresor, Angebotskette, Tagesziele
+   * und Season-Pass ohne Match bedienen und testen lassen.
+   * ================================================================== */
+  function demoMatchResult(win, opts) {
+    opts = opts || {};
+    var CLm = CLof(), DYm2 = DYof(), VLm = VLof();
+    if (win) {
+      if (CLm) CLm.reportEvent("win", 1);
+      if (window.ArenaPass) window.ArenaPass.reportEvent("win", 1);
+      if (DYm2) DYm2.reportEvent("win", 1);
+      if (VLm) VLm.reportEvent("win", 1, { trophies: DEMO_TROPHIES });
+      if (!localStorage.getItem("arenaFirstWin")) {
+        localStorage.setItem("arenaFirstWin", "1");
+        track("first_win", { arena: arenaIndexFor(DEMO_TROPHIES) + 1 });
+      }
+    } else {
+      if (DYm2) DYm2.reportEvent("loss", 1);
+      if (VLm) VLm.reportEvent("loss", 1);
+    }
+    if (opts.arenaTier != null && VLm) VLm.reportEvent("arena", opts.arenaTier);
+    renderHome(); renderTop(); renderHubTiles();
+    // Ein neu ausgeloestes Angebot darf sich sofort zeigen — aber nur im Hub.
+    if (!opts.silent) maybeShowOffer();
+    return true;
+  }
+
+  /* ---------- Bestaetigungs-Dialog (generisch) ---------- */
+  var confirmFn = null;
+  function askConfirm(title, html, okText, fn) {
+    $("cfTitle").textContent = title;
+    $("cfText").innerHTML = html;
+    $("cfYes").textContent = okText || "Ja";
+    $("cfYes").className = "setbtn pressable";
+    confirmFn = fn;
+    $("confirmDlg").classList.add("open");
   }
 
   /* ================= Navigation ================= */
@@ -5027,15 +5532,27 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
   });
   $("btnExport").addEventListener("click", exportSave);
   $("btnImport").addEventListener("click", importSave);
-  $("btnWipe").addEventListener("click", function () { $("confirmDlg").classList.add("open"); });
+  $("btnWipe").addEventListener("click", function () {
+    askConfirm("Wirklich zurücksetzen?",
+      "Alle Karten, Festungsstufen, Clan-Daten, der Pass-Fortschritt, der " +
+      "Kristalltresor und die Tagesziele werden gelöscht. Das lässt sich nicht " +
+      "rückgängig machen.", "Ja, löschen", wipeSave);
+    $("cfYes").className = "setbtn danger pressable";
+  });
   $("cfNo").addEventListener("click", function () {
-    $("confirmDlg").classList.remove("open"); UISfx.tap();
+    $("confirmDlg").classList.remove("open"); confirmFn = null; UISfx.tap();
   });
   $("cfYes").addEventListener("click", function () {
-    $("confirmDlg").classList.remove("open"); wipeSave();
+    $("confirmDlg").classList.remove("open");
+    var fn = confirmFn; confirmFn = null;
+    if (typeof fn === "function") fn();
   });
   $("confirmDlg").addEventListener("click", function (e) {
-    if (e.target === $("confirmDlg")) $("confirmDlg").classList.remove("open");
+    if (e.target === $("confirmDlg")) { $("confirmDlg").classList.remove("open"); confirmFn = null; }
+  });
+  $("dailyHead").addEventListener("click", toggleDaily);
+  $("offerLayer").addEventListener("click", function (e) {
+    if (e.target === $("offerLayer")) closeOfferPopup();
   });
   $("clanBack").addEventListener("click", function () { show("navHome"); });
   $("boardBack").addEventListener("click", function () { show("navHome"); });
@@ -5131,6 +5648,9 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
   renderHome();
   renderHubTiles();
   applySettings();          // Sound-Schalter wirkt ab dem ersten Frame
+  try {
+    if (localStorage.getItem(DAILY_OPEN_KEY) !== "0") $("dailyPanel").classList.add("open");
+  } catch (e) { $("dailyPanel").classList.add("open"); }
   setNav("navHome");
   markPressable();         // EINE Interaktions-Schicht fuer alles Klickbare
   UIBadge.set("pack", 1);  // Demo: ein Gratis-Tagespack wartet
@@ -5161,7 +5681,17 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
                      importSave: importSave, settings: settings,
                      gems: gems, setGems: setGems, mailBadgeCount: mailBadgeCount,
                      cardArtHTML: cardArtHTML, CARD_ART: CARD_ART,
-                     EVENTS: EVENTS, eventState: eventState, MAILS: MAILS };
+                     EVENTS: EVENTS, eventState: eventState, MAILS: MAILS,
+                     renderVault: renderVault, renderOffers: renderOffers,
+                     renderDaily: renderDaily, openVault: openVault,
+                     showOfferPopup: showOfferPopup, closeOfferPopup: closeOfferPopup,
+                     buyOffer: buyOffer, maybeShowOffer: maybeShowOffer,
+                     claimDaily: claimDaily, toggleDaily: toggleDaily,
+                     seedLoop: seedLoop, track: track, askConfirm: askConfirm,
+                     VL: function () { return window.ArenaVault; },
+                     DY: function () { return window.ArenaDaily; },
+                     TM: function () { return window.ArenaTelemetry; },
+                     demoMatchResult: demoMatchResult };
 })();
 </script>
 </body>
