@@ -638,18 +638,32 @@ ersten Release passieren, damit das Spiel nicht von fremder Infrastruktur abhän
 `ARENA_TIERS` steht als `const` in `ui_prototype.html` (und gespiegelt in
 `ui_assets.json`):
 
-| # | Name | ab 🏆 |
-|---|---|---|
-| 1 | Kristallhof | 0 |
-| 2 | Smaragdtal | 300 |
-| 3 | Saphirfeste | 600 |
-| 4 | Sturmspitze | 900 |
-| 5 | Obsidian-Thron | 1 200 |
-| 6 | Prisma-Zitadelle | 1 500 |
+| # | Name | ab 🏆 | AA-Vorbild |
+|---|---|---|---|
+| 1 | Kristallhof | 0 | *Waterfall Vale* |
+| 2 | Smaragdtal | 300 | *Dustfall Temple* |
+| 3 | Saphirfeste | 600 | *Sunken Atlantis* |
+| 4 | Sturmspitze | 900 | *Dock Drop* |
+| 5 | Obsidian-Thron | 1 200 | *Aztec Grounds* |
+| 6 | Prisma-Zitadelle | 1 500 | *Inferno Pit* |
+| 7 | Aschenmark | 2 000 | *Storm Shroom* |
+| 8 | Frostbastion | 2 500 | *Ice Brawl* |
 
-Die Schwellen sind jetzt **AAs echte Leiter** — belegt über das Arena-Ribbon der
-Trophäenstraße („Arena 2 · 🏆 300", AA-Referenz §14.1) plus die aus Video 6 bekannten
-600 / 1200 / 1500. Glatte 300er-Schrittweite. **Die Arenen sind reine Status-Optik** — die Match-Welt wird in Arcane Prism TD pro Spiel zufällig gewählt.
+Darüber liegt die **`LEAGUE_GATES`-Liga** („Prisma-Liga", AAs *Champions Peak*) mit zehn
+Stufen — Tore statt Arenen, eigene dunkle Ribbon-Optik, **keine** Freischaltungen:
+
+| Tor | Name | ab 🏆 | | Tor | Name | ab 🏆 |
+|---|---|---|---|---|---|---|
+| 1 | Eingangstor | 2 900 | | 6 | Goldweite | 6 000 |
+| 2 | Steintor | 3 500 | | 7 | Kristallpfad | 7 000 |
+| 3 | Eisenpfad | 4 000 | | 8 | Flammentor | 8 000 |
+| 4 | Bronzewacht | 4 500 | | 9 | Sturmkrone | 9 000 |
+| 5 | Silberhalt | 5 000 | | — | **Prisma-Krone** (`summit`) | **9 800** |
+
+Die Schwellen sind **AAs echte Leiter**, seit Video 8 vollständig belegt (AA-Referenz
+§15.1/§15.2): unten glatte 300er-Schritte, ab Arena 6 auf 500 gedehnt, die Liga auf runden
+Tausendern. Die Knotenkadenz folgt `stepAt(t)` — **50 🏆 bis 1 500, dann 100, ab 5 000 dann
+200** (§15.4). **Die Arenen sind reine Status-Optik** — die Match-Welt wird in Arcane Prism TD pro Spiel zufällig gewählt.
 Deshalb steht auf dem Home-Screen „Zufallswelt" statt AAs „Neutral". Wer die Schwellen
 verschiebt, muss nur `ARENA_TIERS` anfassen; Fortschrittsbalken, Leiter und der
 „noch N 🏆 bis …"-Text rechnen sich daraus.

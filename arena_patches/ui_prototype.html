@@ -210,23 +210,85 @@ nav.bottom .nb{display:inline-block;min-width:14px;height:14px;line-height:14px;
   box-shadow:0 4px 0 #6b4119}
 .packbtn small{display:block;font-size:10.5px;font-weight:700;opacity:.85;margin-top:3px}
 .packgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
-.pcard{position:relative;aspect-ratio:3/4;border-radius:9px;border:2px solid #2b3b47;
-  background:linear-gradient(150deg,#1b2732,#111a21);display:flex;align-items:center;
-  justify-content:center;font-size:20px;transition:transform .25s}
-.pcard .back{font-size:19px;opacity:.5}
-.pcard.res{background:var(--panel2)}
-.pcard.flipped{transform:rotateY(0);border-width:2px}
-.pcard .face{display:none;flex-direction:column;align-items:center;gap:2px}
-.pcard.flipped .face{display:flex}
-.pcard.flipped .back{display:none}
-.pcard .face .t{font-size:7.5px;font-weight:900;letter-spacing:.03em}
-.pcard.flip-anim{animation:flip .45s ease-out}
-@keyframes flip{0%{transform:rotateY(0) scale(1)}50%{transform:rotateY(90deg) scale(1.12)}
-  100%{transform:rotateY(0) scale(1)}}
+
+/* ==================================================================
+ * KARTEN-DREHUNG (§17) — ECHTER 3D-Flip, kein Fake-Keyframe
+ * ------------------------------------------------------------------
+ * Aufbau je Karte:  .pcard (Bühne, perspective)
+ *                     └ .pc3d (dreht sich, preserve-3d)
+ *                         ├ .pcside.pcback   → Kartenrücken-Artwork
+ *                         └ .pcside.pcfront  → das Ergebnis (rotateY 180°)
+ * Beide Seiten tragen backface-visibility:hidden, deshalb ist immer
+ * genau EINE sichtbar. Die Drehung ist eine echte Y-Achsen-Rotation um
+ * 180°, mit leichtem ÜBERSCHWINGEN aus der cubic-bezier-Kurve
+ * (Referenzvideo: die Karte kippt kurz über die Endlage hinaus und
+ * federt zurück). Dauer 600 ms.
+ * WICHTIG: kein Auto-Reveal — jede Karte will ihren eigenen Klick.
+ * ================================================================== */
+.pcard{position:relative;aspect-ratio:3/4;border-radius:9px;background:none;border:0;padding:0;
+  perspective:620px;-webkit-perspective:620px}
+.pc3d{position:absolute;inset:0;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;
+  transition:transform 600ms cubic-bezier(.34,1.42,.5,1);will-change:transform}
+.pcard.flipped .pc3d{transform:rotateY(180deg)}
+.pcside{position:absolute;inset:0;border-radius:9px;border:2px solid #2b3b47;overflow:hidden;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+  background:linear-gradient(150deg,#1b2732,#111a21)}
+/* Rückseite: unser Kartenrücken-Asset, Gradient als Fallback (CDN offline) */
+.pcback{background-repeat:no-repeat;background-position:center;background-size:cover,cover;
+  background-image:radial-gradient(circle at 50% 42%,#3b2a5e,#141b26 68%);
+  box-shadow:inset 0 0 0 1px #e0b94a3d}
+.pcback .bk{font-size:20px;color:#e0b94a;opacity:.75;text-shadow:0 0 10px #e0b94a88}
+.pcfront{transform:rotateY(180deg)}
+.pcard.res .pcfront{background:var(--panel2)}
+.pcside .face{display:flex;flex-direction:column;align-items:center;gap:2px}
+.pcside .face .t{font-size:7.5px;font-weight:900;letter-spacing:.03em}
+/* Glühen WÄHREND der Drehung, in der Drop-Raritätsfarbe */
+.pcglow{position:absolute;inset:-6px;border-radius:13px;pointer-events:none;opacity:0;
+  transition:opacity 140ms ease}
+.pcard.turning .pcglow{opacity:1;animation:turnglow 600ms ease-out}
+@keyframes turnglow{
+  0%{box-shadow:0 0 8px 1px currentColor;filter:brightness(1)}
+  45%{box-shadow:0 0 30px 10px currentColor,0 0 60px 22px currentColor;filter:brightness(1.5)}
+  100%{box-shadow:0 0 10px 2px currentColor;filter:brightness(1)}}
 .pcard.burst::after{content:"";position:absolute;inset:-8px;border-radius:12px;pointer-events:none;
   animation:burst .8s ease-out forwards}
 @keyframes burst{0%{box-shadow:0 0 0 0 #fff,0 0 26px 10px currentColor;opacity:1}
   100%{box-shadow:0 0 0 26px #fff0;opacity:0}}
+.packhint{margin-top:8px;font-size:10.5px;color:var(--dim);text-align:center;line-height:1.5}
+
+/* ==================================================================
+ * LEGENDÄR-CINEMATIC (§17.3)
+ * ------------------------------------------------------------------
+ * Vollbild-Video, deshalb OHNE Transparenz — das umgeht das aus den
+ * Lessons Learned bekannte Mobile-Safari-Problem mit Alpha-Videos.
+ * Faellt das Video aus (kein Netz, Codec, Autoplay verweigert), greift
+ * .fallback: ein reiner CSS-Lichtausbruch. Der Reveal laeuft in BEIDEN
+ * Faellen identisch weiter — die Zeremonie darf nie haengen bleiben.
+ * ================================================================== */
+#cineLayer{position:fixed;inset:0;z-index:260;display:none;background:#000;
+  align-items:center;justify-content:center;overflow:hidden}
+#cineLayer.on{display:flex;animation:cinefade 260ms ease-out}
+@keyframes cinefade{0%{opacity:0}100%{opacity:1}}
+#cineVid{width:100%;height:100%;object-fit:cover;background:#000}
+#cineLayer .cinefall{position:absolute;inset:0;display:none;
+  background:radial-gradient(circle at 50% 52%,#fff7d6,#e0a13d 18%,#7a4fd6 42%,#0e1418 72%)}
+#cineLayer.fallback #cineVid{display:none}
+#cineLayer.fallback .cinefall{display:block;animation:cinepop 1250ms ease-out forwards}
+@keyframes cinepop{
+  0%{transform:scale(.2);opacity:0;filter:blur(14px)}
+  30%{transform:scale(1.05);opacity:1;filter:blur(0)}
+  70%{transform:scale(1.12);opacity:1}
+  100%{transform:scale(1.5);opacity:0;filter:blur(10px)}}
+#cineLayer .cineskip{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);
+  border-radius:11px;padding:9px 20px;font-size:12px;font-weight:900;
+  background:#0e1418c4;border:1px solid #e0b94a66;color:#f4e3a6}
+/* Nachglühen der aufgedeckten Legendär-Karte */
+.pcard.legend .pcfront{box-shadow:inset 0 0 0 2px #fff7d6,0 0 22px 4px currentColor}
+.pcard.legend{animation:legendafter 1.6s ease-out}
+@keyframes legendafter{
+  0%{filter:brightness(2.2) drop-shadow(0 0 26px #fff7d6)}
+  100%{filter:brightness(1)}}
 .summary{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;
   padding:11px;font-size:12.5px;line-height:1.7}
 .summary b{color:var(--up)}
@@ -878,6 +940,8 @@ span.ico{mix-blend-mode:normal;text-align:center}
       <button class="mini" id="btnRevealAll">Alle aufdecken</button>
     </div>
     <div class="packgrid" id="packGrid"></div>
+    <p class="packhint">Jede Karte einzeln antippen — sie dreht sich und deckt auf.
+      „Alle aufdecken" spielt die Drehungen schnell hintereinander.</p>
     <div class="summary" id="packSummary" style="display:none"></div>
   </section>
 
@@ -1009,6 +1073,13 @@ span.ico{mix-blend-mode:normal;text-align:center}
   </div>
 </div>
 
+<!-- Vollbild-Cinematic fuer Legendaer-Pulls (§17.3). Das Video traegt
+     KEINE Transparenz — deshalb kein Mobile-Safari-Alpha-Problem. -->
+<div id="cineLayer" aria-hidden="true">
+  <video id="cineVid" playsinline muted preload="none"></video>
+  <div class="cinefall"></div>
+  <button class="cineskip pressable" id="cineSkip">Weiter</button>
+</div>
 <div id="fxLayer"></div>
 
 <div class="toast" id="toast"></div>
@@ -1180,6 +1251,10 @@ span.ico{mix-blend-mode:normal;text-align:center}
     track_hp:        CDN + "hf_20260725_135828_29edbcf2-e256-4c35-b3a7-5fceb1ea7adc.png",
     track_dmg:       CDN + "hf_20260725_135832_3232967e-3798-473d-81fd-cf24183c75e1.png",
     track_rate:      CDN + "hf_20260725_135837_d4de036f-acc4-40f7-95e6-e667d2dec6fe.png",
+    /* ---- Pack-Zeremonie (Referenzvideo, §17) ---- */
+    card_back:       CDN + "hf_20260725_144624_82b4b51d-f9d3-416d-8212-52e2f3c0c0a1.png",
+    cinematic_legendary:
+                     CDN + "hf_20260725_141315_94331286-780b-4b74-8ee1-c8a3e15b9dac.mp4",
   };
   /* ==================================================================
    * ico() — Kristall-Icon mit Emoji-Fallback
@@ -1252,6 +1327,14 @@ span.ico{mix-blend-mode:normal;text-align:center}
       deny:    function () { blip(220, 130, 0.16, "square", 0.05); },
       reward:  function () { [0, 90, 180, 300].forEach(function (d, i) {
                              setTimeout(function () { blip(640 + i * 190, 900 + i * 220, 0.12, "sine", 0.055); }, d); }); },
+      // Karten-Swish + Ding beim Aufdecken (Referenzvideo, §17.1)
+      flip:    function () { blip(300, 1500, 0.13, "sawtooth", 0.028);
+                             setTimeout(function () { blip(1650, 2100, 0.07, "sine", 0.045); }, 300); },
+      // Legendaer: Crescendo unter dem Cinematic
+      legend:  function () { [0, 140, 280, 420, 620, 900].forEach(function (d, i) {
+                             setTimeout(function () {
+                               blip(300 + i * 150, 520 + i * 210, 0.22, "sine", 0.05);
+                             }, d); }); },
       mute:    function (v) { muted = !!v; },
       isMuted: function () { return muted; }
     };
@@ -1957,6 +2040,7 @@ span.ico{mix-blend-mode:normal;text-align:center}
   }
   function renderPack() {
     markPressableLater();
+    var back = ASSETS.card_back;
     $("packGrid").innerHTML = packState.map(function (s, i) {
       var color = s.kind === "card" ? tierOf(s.d.tier).color
         : s.kind === "mat" ? s.m.color : "#f2c53d";
@@ -1970,54 +2054,140 @@ span.ico{mix-blend-mode:normal;text-align:center}
         face = '<div class="face"><div style="font-size:20px">' + s.m.sym + '</div>' +
           '<div class="t" style="color:' + color + '">+' + s.m.amount + "</div></div>";
       } else {
-        face = '<div class="face"><div style="font-size:20px">🪙</div><div class="t">+' + fmt(s.n) + "</div></div>";
+        face = '<div class="face"><div style="font-size:20px">' + ico("cur_gold", "🪙") +
+          '</div><div class="t">+' + fmt(s.n) + "</div></div>";
       }
-      // Kartenkante glüht VOR dem Flip in der Drop-Raritätsfarbe (Antizipation!)
+      // Zwei echte 3D-Seiten. Die Rückseite traegt das Kartenrücken-Asset,
+      // der Gradient darunter bleibt als Fallback stehen (CDN offline).
       return '<button class="pcard' + (s.done ? " flipped" : "") + (s.kind !== "card" ? " res" : "") +
-        '" data-i="' + i + '" style="border-color:' + color + ";color:" + color +
-        ";box-shadow:0 0 " + (s.done ? 4 : 12) + "px " + color + '88">' +
-        '<div class="back">' + (s.kind === "card" ? "✦" : s.kind === "mat" ? "⚗" : "🪙") + "</div>" +
-        face + "</button>";
+        '" data-i="' + i + '" data-tier="' + (s.kind === "card" ? s.d.tierIndex : -1) +
+        '" style="color:' + color + '">' +
+        '<span class="pcglow"></span>' +
+        '<span class="pc3d">' +
+          '<span class="pcside pcback" style="background-image:url(&quot;' + back +
+            '&quot;),radial-gradient(circle at 50% 42%,#3b2a5e,#141b26 68%)">' +
+            '<span class="bk">' + (s.kind === "card" ? "✦" : s.kind === "mat" ? "⚗" : "🪙") + "</span></span>" +
+          '<span class="pcside pcfront" style="border-color:' + color +
+            ";box-shadow:inset 0 0 14px -4px " + color + '88">' + face + "</span>" +
+        "</span></button>";
     }).join("");
+    hydrateIcons($("packGrid"));
     var els = $("packGrid").querySelectorAll("[data-i]");
     for (var i = 0; i < els.length; i++) {
       (function (el) {
-        el.addEventListener("click", function () { flip(parseInt(el.getAttribute("data-i"), 10), el); });
+        el.addEventListener("click", function () {
+          flip(parseInt(el.getAttribute("data-i"), 10), el);
+        });
       })(els[i]);
     }
   }
-  function flip(i, el) {
+
+  /* ==================================================================
+   * flip() — EIN Klick, EINE Karte (§17.2)
+   * ------------------------------------------------------------------
+   * Ablauf: Legendaer+ schaltet zuerst das Vollbild-Cinematic davor,
+   * danach laeuft in beiden Faellen dieselbe Dreh-Choreografie:
+   *   .turning setzen (Glow in Raritaetsfarbe) → .flipped (3D-Rotation
+   *   600 ms mit Ueberschwingen) → Partikel-Burst in der Bildmitte der
+   *   Karte → .turning nach der Drehung wieder abnehmen.
+   * ================================================================== */
+  var LEGEND_FROM = 4;            // Tier-Index ab dem das Cinematic laeuft
+  function flip(i, el, cb) {
     var s = packState[i];
-    if (!s || s.done) return;
+    if (!s || s.done || s.busy) { if (cb) cb(); return; }
+    var legendary = s.kind === "card" && s.d.tierIndex >= LEGEND_FROM;
+    if (legendary && el) {
+      s.busy = true;
+      playCinematic(function () { s.busy = false; doFlip(i, el, cb, true); });
+      return;
+    }
+    doFlip(i, el, cb, false);
+  }
+  function doFlip(i, el, cb, legendary) {
+    var s = packState[i];
+    if (!s || s.done) { if (cb) cb(); return; }
     s.done = true;
     if (s.kind === "card") {
       AC.addDrop(s.d.cardId, s.d.tier, 1);
-      if (s.d.tierIndex >= 3 && el) el.classList.add("burst");
     } else if (s.kind === "mat") {
       AC.addMaterial(s.m.amount, s.m.type);   // Sorte mitgeben!
     } else {
       setGold(gold() + s.n);
     }
     if (el) {
-      el.classList.add("flipped", "flip-anim");
-      el.style.boxShadow = "0 0 4px " + el.style.color;
-      var inner = el.querySelector(".face");
-      if (inner) inner.style.display = "flex";
-      var back = el.querySelector(".back");
-      if (back) back.style.display = "none";
+      el.classList.add("turning");
+      void el.offsetWidth;
+      el.classList.add("flipped");
+      if (legendary) el.classList.add("legend");
+      UISfx.flip();
+      // Partikel genau in der Kartenmitte, wenn die Vorderseite erscheint.
+      setTimeout(function () {
+        var r = el.getBoundingClientRect();
+        UIFx.spark(r.left + r.width / 2, r.top + r.height / 2,
+                   legendary ? 20 : (s.kind === "card" && s.d.tierIndex >= 3 ? 14 : 8));
+        if (s.kind === "card" && s.d.tierIndex >= 3) el.classList.add("burst");
+      }, 300);
+      setTimeout(function () { el.classList.remove("turning"); }, 640);
     }
     renderTop();
     updateNavBadge();
-    if (packState.every(function (x) { return x.done; })) showSummary();
+    var allDone = packState.every(function (x) { return x.done; });
+    setTimeout(function () {
+      if (allDone) showSummary();
+      if (cb) cb();
+    }, el ? 660 : 0);
   }
+
+  /* Vollbild-Cinematic mit garantiertem Ausweg (§17.3). */
+  function playCinematic(done) {
+    var lay = $("cineLayer"), v = $("cineVid");
+    if (!lay || !v) { done(); return; }
+    var closed = false;
+    function finish() {
+      if (closed) return;
+      closed = true;
+      clearTimeout(guard);
+      lay.classList.remove("on", "fallback");
+      lay.setAttribute("aria-hidden", "true");
+      try { v.pause(); } catch (e) {}
+      done();
+    }
+    function fallback() {
+      if (closed) return;
+      lay.classList.add("fallback");     // reiner CSS-Lichtausbruch
+      setTimeout(finish, 1250);
+    }
+    lay.classList.remove("fallback");
+    lay.classList.add("on");
+    lay.setAttribute("aria-hidden", "false");
+    UISfx.legend();
+    $("cineSkip").onclick = finish;
+    v.onended = finish;
+    v.onerror = fallback;
+    if (!v.getAttribute("src")) v.setAttribute("src", ASSETS.cinematic_legendary);
+    var guard = setTimeout(finish, 7000);   // Sicherheitsnetz: haengt nie
+    var pr = null;
+    try { v.currentTime = 0; pr = v.play(); } catch (e) { fallback(); return; }
+    if (pr && pr.catch) pr.catch(fallback);
+  }
+
+  /* "Alle aufdecken": dieselben Flips, nur schnell hintereinander —
+     sequenziell, damit ein Legendaer-Cinematic nicht ueberfahren wird. */
   function revealAll() {
     if (!packState.length) { toast("Erst ein Pack öffnen"); return; }
     var els = $("packGrid").querySelectorAll("[data-i]");
-    for (var i = 0; i < packState.length; i++) flip(i, els[i]);
-    renderPack();
-    showSummary();
+    var i = 0;
+    (function step() {
+      while (i < packState.length && packState[i].done) i++;
+      if (i >= packState.length) { showSummary(); return; }
+      var k = i++;
+      var legendary = packState[k].kind === "card" &&
+                      packState[k].d.tierIndex >= LEGEND_FROM;
+      flip(k, els[k], function () { setTimeout(step, legendary ? 120 : 30); });
+    })();
   }
   function showSummary() {
+
     if (!packResult) return;
     var byTier = {};
     packResult.cards.forEach(function (c) { byTier[c.tierName] = (byTier[c.tierName] || 0) + 1; });
@@ -2749,6 +2919,8 @@ span.ico{mix-blend-mode:normal;text-align:center}
                      LEAGUE_GATES: LEAGUE_GATES, renderShop: renderShop,
                      renderFortress: renderFortress, buyDeal: buyDeal, buyFort: buyFort,
                      markPressable: markPressable, ico: ico, CastleSkins: window.CastleSkins,
+                     flip: flip, revealAll: revealAll, packState: function () { return packState; },
+                     playCinematic: playCinematic, openPackKey: openPackKey,
                      nextNodeTrophies: nextNodeTrophies };
 })();
 </script>

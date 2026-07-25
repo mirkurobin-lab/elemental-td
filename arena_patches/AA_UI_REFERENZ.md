@@ -56,6 +56,7 @@ sind dagegen exakt, weil sie aus Pixelkoordinaten stammen.
 | 7 | `ScreenRecording_07-25 09-16-41` · `1gQBeekSjfY4QNwTa5SOXBXZsb9v6tJl3` | 0:54 | **Die Aufnahme, die §10.1 und §10.4 schließt: MERGE-AUSFÜHRUNG + drei echte TURM-UPGRADES.** Kurz, aber die dichteste Aufnahme überhaupt. Account: 521 💎 / **19 918 🪙** | 4 Battle Deck · 5-6 „SELECT CARDS TO MERGE!" · **7-16 Merge-Auswahl CATAPULT + Vorschau (MAX LEVEL 20→30)** · **17-24 „PERFECT MERGE!"-Zeremonie** · 29-32 Deck (Gold unverändert!) · **33-37 Catapult-Detailkarte RARE + Upgrade Lv16→17** · **40-53 Boulder COMMON + zwei Upgrades Lv1→3** |
 | 8 | `ScreenRecording_07-25 15-59-29` · `1zInGsCyXefVkd58p9RIwf2wZ-azqbTMz` | 7:20 | **Die komplette Trophäenstraße in einem Zug — von 0 🏆 bis zur Spitze.** Schließt die Leiter endgültig: alle 8 Arenen, die 9 Liga-Tore von *Champions Peak*, Knotenkadenz, Season-Regel und die Weltrangliste. Account: *Netherghost*, 1 136 🏆, „Ice Season", „Season Ends In 9d 10h" | 8-88 Arenen 1-5 mit Unlock-Rastern · **104 Arena 6 *Inferno Pit* (1 500)** · **108-113 Arena 7 *Storm Shroom* (2 000)** · **115-120 Arena 8 *Ice Brawl* (2 500)** · **123-128 Liga-Start *Entrance Gate* (2 900)** · 133-192 Tore 2-9 (3 500/4 000/4 500/5 000/6 000/7 000/8 000/9 000) · **194-200 Spitze 9 800** · 202-212 Champions-Peak-Rangliste (Spitze **17 825**) · **213-217 Season-Reset-Tooltip im Wortlaut** → §15 |
 | 9 | `ScreenRecording_07-25 16-40-19` · `1NRDRmIM61flSodnDNuG2lZzjoFDAtFqC` | 2:56 | **Die Festungs-/Burg-Upgrades im Detail** — AAs „Upgrade"-Tab über ~40 Stufenkarten. Belegt: genau DREI Tracks, die Bonus- und Power-Kurven, das Account-Level-Gating. Account: *Netherghost*, **Level 14**, 1 918 🪙 (⚠ unverändert — keine Käufe, daher keine Kosten-Differenzen ableitbar) | 1 Home (Level 14, Arena 4) · 3-38 Tab-Wechsel + Kartenzyklus **Max Health · DPS · Attack Speed** · **39-63 Bonus-/Power-Werte lesbar (+1 % Speed, +8…11 % DPS, Power +418…+840)** · **64-77 „Level Too Low" — Account-Level-Gate** → §16 |
+| R | *Referenzvideo, anderes Spiel* · `ScreenRecording_07-07-2026 16-30-56_1.MP4` · `1PKtYhm_9drym_Osr7p1TOriq53nEeBcv` | 0:14 | **Vom User als Vorbild markiert: Pack-Öffnung mit Karten-DREHUNG.** Kein AA-Material — Wunsch-Referenz für unsere Pack-Zeremonie | 0-3 Karten drehen sich einzeln um, Swish + Ding, Raritäts-Glühen · **3-13 Vollbild-Cinematic (Marsch → Runen-Podest → Enthüllung von unten)** → §17 |
 | 4-5, 8-9 | weitere 07-05-Aufnahmen | — | nicht ausgewertet | — |
 | 10 | YouTube „ARROW PLAY" | — | nicht ausgewertet | — |
 
@@ -1670,3 +1671,100 @@ Ein späterer Verkaufs-Skin besteht damit aus **1 Artwork + 1 Anker-Objekt** und
 funktioniert sofort mit allen 100 Ausbaustufen — die Upgrade-Optik ist nicht ins Artwork
 eingebacken, sonst müsste jeder Skin in n Stufen gemalt werden. Auswahl liegt in
 `localStorage "arenaSkins"`. Details im HANDOFF.
+
+---
+
+## 17. Referenz-Choreografie: Pack-Öffnung mit Karten-Drehung
+
+> **Quelle: User-Referenzvideo, ANDERES Spiel** (nicht Arcane Arena) —
+> `ScreenRecording_07-07-2026 16-30-56_1.MP4`, Drive-ID
+> `1PKtYhm_9drym_Osr7p1TOriq53nEeBcv`, 14 s, 1320×2868, 60 fps.
+> Der User hat es als Vorbild markiert: *„so wäre es brutal geil, wenn die Karten sich so
+> drehen usw."* Es ist eine Social-Aufnahme (Creator-Inset unten rechts) eines
+> Pack-Openings. **Alles in diesem Kapitel gilt daher als WUNSCH-Referenz, nicht als
+> AA-Befund** — AAs eigene Truhen-Zeremonie ist bis heute unbelegt (§10, der Account hatte
+> nie genug Gems).
+
+### 17.1 Was das Referenzvideo zeigt
+
+Zwei klar getrennte Phasen:
+
+**Phase 1 — die Karten (0:00-0:03).** Mehrere Karten liegen verdeckt nebeneinander. Sie
+**drehen sich eine nach der anderen um** und zeigen je eine Figur. Tonspur: helle
+digitale **Dings** plus ein **Karten-Swish** je Drehung. Der Spieler spricht dazu
+(„What's it going to be?") — die Spannung entsteht also **vor** dem Reveal, nicht danach.
+Aus den Einzelframes: um die sich drehende Karte liegt ein **farbiges Glühen** (im
+aufgenommenen Fall kräftiges Rot/Karmesin), das mit der Drehung heller wird; die Karte
+kippt kurz **über die Endlage hinaus** und federt zurück.
+
+**Phase 2 — das Cinematic (0:03-0:13, zehn von vierzehn Sekunden!).** Für den besonderen
+Zug übernimmt ein **Vollbild-Film** den ganzen Screen:
+
+| Zeit | Bild | Ton |
+|---|---|---|
+| 0:03-0:08 | drei Krieger in dunkler Plattenrüstung marschieren mit Fackeln durch eine Höhle, langsame Vorwärtsfahrt | schwere metallische Schritte, tiefer Kino-Drone |
+| 0:08-0:10 | Nah auf die Füße: Eisenstiefel treten auf ein rundes Runen-Podest, Funken stieben | hallender Metall-Klang |
+| 0:10-0:13 | Kamera **kippt nach oben** und enthüllt den Charakter: glühend rote Augen, dunkle Energie | Monster-Brüllen + Orchester-Aufschwung |
+
+**Die Lehre daraus:** Der teure Teil ist nicht die Karte, sondern die **Verzögerung**.
+Zehn der vierzehn Sekunden gehören der Vorfreude. Und die Dramaturgie ist bewusst
+**generisch** gebaut — Rüstung, Podest, Enthüllung von unten — der eigentliche Charakter
+kommt erst in der Schlusssekunde. **Ein Film trägt beliebig viele Karten.**
+
+### 17.2 Umsetzung: echter 3D-Flip, ein Klick pro Karte
+
+Der bisherige Prototyp „flippte" mit einem Keyframe-Trick (`rotateY 0→90°→0` auf
+derselben Fläche). Ersetzt durch eine **echte** Zwei-Seiten-Rotation:
+
+```
+.pcard            Bühne, perspective: 620px
+  .pcglow         Glühring, currentColor = Drop-Raritätsfarbe
+  .pc3d           transform-style: preserve-3d, dreht auf rotateY(180deg)
+    .pcside.pcback    Kartenrücken-Artwork (Asset card_back)
+    .pcside.pcfront   das Ergebnis, vorgedreht um 180°
+```
+
+Beide Seiten tragen `backface-visibility: hidden` — es ist immer genau eine sichtbar.
+
+| Referenz-Detail | Umsetzung |
+|---|---|
+| Achse | **Y-Achse**, 0 → 180° (echte Drehung, keine Skalierung) |
+| Tempo | **600 ms** |
+| Überschwingen | `cubic-bezier(.34, 1.42, .5, 1)` — kippt über 180° hinaus und federt zurück |
+| Glühen während der Drehung | `.turning` → `@keyframes turnglow`, Helligkeit bei 45 % am Maximum, Farbe = Raritätsfarbe |
+| Partikel beim Aufdecken | `UIFx.spark()` in der Kartenmitte bei t = 300 ms (genau wenn die Vorderseite kippt) — 8 Funken normal, 14 ab Episch, 20 bei Legendär |
+| Ton | `UISfx.flip()` — Swish (Sägezahn 300→1500 Hz) plus Ding (Sinus 1650→2100 Hz) nach 300 ms |
+| **kein Auto-Reveal** | jede Karte braucht ihren eigenen Klick; „Alle aufdecken" bleibt als Option und spielt die Drehungen **sequenziell schnell** hintereinander (30 ms Versatz) |
+
+### 17.3 Umsetzung: das Legendär-Cinematic
+
+Ab Drop-Stufe **Legendär** (`tierIndex ≥ 4`) schiebt sich vor die Drehung ein
+Vollbild-Video (`#cineLayer` → `<video id="cineVid" playsinline muted>`), Asset
+`cinematic_legendary` (5 s, 720×1280, kling3_0_turbo). Danach läuft dieselbe
+Dreh-Choreografie wie sonst, plus `.legend`-Nachglühen und 20 Funken.
+
+Drei Dinge daran sind bewusst so gebaut:
+
+1. **Kein Alpha-Kanal.** Ein Vollbild-Film braucht keine Transparenz — genau damit umgeht
+   er das aus den eigenen Lessons Learned bekannte Problem, dass Overlay-Videos mit
+   Alpha auf Mobile-Safari als schwarzer Kasten erscheinen.
+2. **Der Film ist generisch, die Karte dynamisch.** Wie im Referenzvideo endet er in einer
+   Lichtexplosion; die **echte gezogene Karte** blendet danach als HTML-Ebene ein. Ein
+   Video pro Rarität reicht für beliebig viele Karten.
+3. **Es kann nie hängen bleiben.** Drei Auswege: `onended` → weiter · `onerror` bzw. ein
+   abgelehntes `play()` → `.fallback` mit reinem CSS-Lichtausbruch (1 250 ms) → weiter ·
+   und ein `setTimeout`-Sicherheitsnetz nach 7 s. Dazu ein „Weiter"-Knopf. Der Reveal
+   läuft in **allen** Fällen identisch zu Ende — auch offline, wo das CDN blockiert ist
+   (genau dieser Fallback-Pfad wird im Playwright-Test durchlaufen).
+
+### 17.4 Was für das echte Spiel noch offen ist
+
+* **Antizipation vor dem Öffnen** (Referenz-Muster, noch nicht gebaut): Pack wackelt beim
+  Antippen, glühende Risse wachsen, erst der dritte Tap sprengt es — die Vorfreude gehört
+  dem Spieler, nicht der Animation.
+* **Vibration** am Höhepunkt (`navigator.vibrate`), im Prototyp absichtlich nicht verdrahtet.
+* **Suprem** könnte ein eigenes Cinematic in Rot-Prismatisch bekommen; derzeit teilt es
+  sich das Legendär-Video (`LEGEND_FROM = 4`).
+* Der Ton läuft noch über die WebAudio-Blips von `window.UISfx`. Im Spiel werden
+  `UISfx.flip()` und `UISfx.legend()` **mit umgehängt** — sie sind Teil derselben
+  Namensschnittstelle (siehe HANDOFF).

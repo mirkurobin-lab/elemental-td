@@ -5,7 +5,7 @@
     "styleSheetJob": "22646ce4-8685-46af-ad73-9ec32482c2c2",
     "modell": "nano_banana_pro (Higgsfield), resolution 1k, Style-Sheet als Bild-Referenz",
     "erzeugt": "2026-07-25",
-    "credits": "Batch 1: 25 Generationen x 2 = 50 Credits. Batch 2: 52 Generationen x 2 = 104 Credits. Gesamt 77 Assets / 154 Credits, 0 Retakes. Batch-2-Deckel (200 Credits) nicht ausgeschoepft.",
+    "credits": "Batch 1: 25 Generationen x 2 = 50 Credits. Batch 2: 52 Generationen x 2 = 104 Credits. Batch 3 (Pack-Zeremonie): 1 Bild x 2 + 1 Video (kling3_0_turbo) x 7,5 = 9,5 Credits. Gesamt 79 Assets / 163,5 Credits, 0 Retakes.",
     "palette": {
       "gold": "#e0b94a",
       "violett": "#7a4fd6",
@@ -26,12 +26,14 @@
       "Die UI-Elemente sind mittig auf einer größeren Leinwand platziert. Im CSS deshalb mit background-size 100% 200% + background-position center arbeiten (zeigt das mittlere Drittel/Hälfte), oder `contain` und die dunklen Ränder mitlaufen lassen.",
       "CDN-URLs sind aus der Agent-Umgebung NICHT erreichbar (Proxy), im Browser des Users schon. Der Prototyp hat für jedes Asset einen CSS-Gradient-Fallback.",
       "Icons liegen auf #0e1418. Im Prototyp traegt .ico `mix-blend-mode:screen` — damit loest sich der dunkle Grund auf dunkler UI von selbst auf, ohne Freistellen.",
-      "Jedes Icon im Markup ist <img class=\"ico\" alt=\"<Emoji>\" onerror=\"UIIcon.fail(this)\"> — schlaegt das Laden fehl, ersetzt UIIcon.fail das Bild durch das Emoji aus alt. Emojis sind also NUR noch Fallback, nie primaere Darstellung."
+      "Jedes Icon im Markup ist <img class=\"ico\" alt=\"<Emoji>\" onerror=\"UIIcon.fail(this)\"> — schlaegt das Laden fehl, ersetzt UIIcon.fail das Bild durch das Emoji aus alt. Emojis sind also NUR noch Fallback, nie primaere Darstellung.",
+      "cinematic_legendary ist ein MP4, kein Bild — beim Kopieren nach public/assets/ die curl-Schleife nicht auf *.png filtern."
     ],
     "cdnBase": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/",
     "batches": {
       "1": "25 Assets: Buttons, Rahmen, Raritaets-Frames, Packs, Panels, Arena-Dioramen 1-6.",
-      "2": "52 Assets: (A) 7 Waehrungs-/Ressourcen-Icons, (B) 13 Nav-/Hub-Icons, (C) 8 Strassen-Elemente, (D) 12 Teaser-Artworks, (E) 4 Leiter-/Liga-Embleme, (F) 4 Kleinteile, dazu 1 Burg-Basis-Artwork und 3 grosse Festungs-Track-Embleme."
+      "2": "52 Assets: (A) 7 Waehrungs-/Ressourcen-Icons, (B) 13 Nav-/Hub-Icons, (C) 8 Strassen-Elemente, (D) 12 Teaser-Artworks, (E) 4 Leiter-/Liga-Embleme, (F) 4 Kleinteile, dazu 1 Burg-Basis-Artwork und 3 grosse Festungs-Track-Embleme.",
+      "3": "2 Assets für die Pack-Öffnung: Kartenrücken (Prisma-Emblem) und das Legendär-Vollbild-Cinematic (5 s, 720x1280)."
     }
   },
   "btn_primary": {
@@ -621,5 +623,22 @@
     "type": "fortress",
     "batch": 2,
     "beschreibung": "Track-Emblem „Prisma-Taktung“: Doppelblitz im Kristall. Groß, Ast-Kopf."
+  },
+  "card_back": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_144624_82b4b51d-f9d3-416d-8212-52e2f3c0c0a1.png",
+    "job": "82b4b51d-f9d3-416d-8212-52e2f3c0c0a1",
+    "type": "cardframe",
+    "batch": 3,
+    "size": "896x1200",
+    "beschreibung": "KARTENRÜCKEN: Prisma-Emblem in goldenem Filigran-Ring, Facetten-Kristall, violette Akzente. Liegt als .pcback auf jeder verdeckten Pack-Karte; die Karte dreht sich beim Antippen um 180° und zeigt die Vorderseite (§17.2)."
+  },
+  "cinematic_legendary": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_141315_94331286-780b-4b74-8ee1-c8a3e15b9dac.mp4",
+    "job": "94331286-780b-4b74-8ee1-c8a3e15b9dac",
+    "type": "video",
+    "batch": 3,
+    "size": "720x1280, 5,04 s",
+    "modell": "kling3_0_turbo (7,5 Credits)",
+    "beschreibung": "VOLLBILD-CINEMATIC für Legendär+-Pulls: Kristall-Pack zerspringt in Goldlicht, Splitter fliegen zur Kamera, eine leuchtende Karten-Silhouette steigt auf. OHNE Alpha-Kanal (Vollbild braucht keine Transparenz — umgeht das Mobile-Safari-Problem mit Overlay-Videos). Generisch pro Rarität, die echte Karte blendet danach als HTML-Ebene ein (§17.3)."
   }
 }
