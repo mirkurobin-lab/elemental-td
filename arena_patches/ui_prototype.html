@@ -805,6 +805,92 @@ span.ico{mix-blend-mode:normal;text-align:center}
   color:var(--dim)}
 .skinbar select{flex:0 0 auto}
 
+
+/* ==================================================================
+ * FARB-PASS — Farbflächen statt Akzente auf Anthrazit
+ * ------------------------------------------------------------------
+ * User-Befund: „nicht so farbenfroh wie AA … sieht alles so leer/tot aus."
+ * Die Ursache war strukturell, nicht dekorativ: Bis hierher hatte JEDE
+ * Reihe denselben dunkelgrauen Körper (#1b2732 → #131c25) und nur der
+ * TEXT war farbig. AA macht es umgekehrt — der Körper trägt die Farbe,
+ * der Text ist weiß.
+ *
+ * LÖSUNG: EIN System für alle Views. Jede Reihe bekommt zwei
+ * CSS-Variablen (--t1/--t2) und die Klasse .tinted; JS setzt nur die
+ * beiden Farben, das Layout bleibt unangetastet. Damit ist der Farbpass
+ * an jeder Stelle derselbe Zweizeiler und nicht fünfzehn Sonderfälle.
+ *
+ * ⚠ LESBARKEIT: Alle Tints sind DUNKLE Sättigungen (Luminanz < 70), damit
+ * weißer Text darauf lesbar bleibt. Die Playwright-Suite prüft das auf
+ * allen getönten Flächen nach.
+ * ================================================================== */
+/* ⚠ Klasse DOPPELT im Selektor (.tinted.tinted). Die getoenten Bausteine
+   (.dqrow, .rwcell, .mailrow …) bringen alle ein eigenes `background:`
+   mit und stehen im Stylesheet WEITER UNTEN — bei gleicher Spezifitaet
+   gewinnt der spaetere. Das Verdoppeln hebt die Spezifitaet auf 0,2,0
+   und macht den Farbkoerper unabhaengig von der Reihenfolge. */
+.tinted.tinted{
+  background-image:linear-gradient(135deg,var(--t1,#243342) 0%,var(--t2,#131c25) 62%,#0e1418 100%);
+  border-color:color-mix(in srgb,var(--t1,#243342) 55%,#ffffff 12%)}
+.tinted.glow{box-shadow:0 0 0 1px color-mix(in srgb,var(--t1,#243342) 70%,#fff 10%),
+  0 0 18px -4px var(--t1,#243342)}
+/* Seitliche Farbkante — der billigste Weg, eine Reihe „zugehörig" wirken
+   zu lassen, ohne den Text zu bedrängen. */
+.tinted.edge{position:relative;overflow:hidden}
+.tinted.edge::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(180deg,var(--t1),var(--t2));z-index:1}
+
+/* ---------- Season-Pass: farbige Belohnungskörper ---------- */
+.rwcell{border-color:#ffffff1f}
+.rwcell.tinted::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(120% 90% at 82% 50%,var(--t1) 0%,transparent 62%);
+  opacity:.55;z-index:0}
+.rwcell>*{position:relative;z-index:1}
+.rwcell.prem{border-color:#a45ef25c}
+.rwcell.prem.tinted::after{opacity:.7}
+/* Meilenstein-Reihen (10/20/…) sind festlich: goldener Rahmen + Schimmer. */
+.passrow.milestone .rwcell{border-color:#e0b94a8a;
+  box-shadow:inset 0 0 22px -8px #f2c53d99}
+.passrow.milestone .pnum{background:linear-gradient(180deg,#6b5314,#2a2108);
+  border-color:#e0b94a;color:#ffe89a}
+.passrow.milestone .rwcell::before{content:"";position:absolute;inset:0;z-index:0;
+  pointer-events:none;background:linear-gradient(115deg,#fff0 42%,#fff7d63d 50%,#fff0 58%);
+  background-size:260% 100%;animation:msshine 4.5s linear infinite}
+@keyframes msshine{0%{background-position:170% 0}100%{background-position:-70% 0}}
+.rwcell .rico{border:1px solid #ffffff26}
+
+/* ---------- Ambient-Leben ----------
+   Sehr langsame Glow-Pulse und schwebende Partikel. Nur transform und
+   opacity — beides läuft auf dem Compositor und kostet keine Layouts. */
+.ambient{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.ambient i{position:absolute;display:block;width:5px;height:5px;border-radius:50%;
+  background:radial-gradient(circle,#fff7d6,#e0b94a00 70%);opacity:0;
+  animation:drift linear infinite}
+@keyframes drift{
+  0%{transform:translate3d(0,20px,0) scale(.6);opacity:0}
+  15%{opacity:.75}
+  85%{opacity:.5}
+  100%{transform:translate3d(14px,-120px,0) scale(1.1);opacity:0}}
+.pulseglow{position:relative}
+.pulseglow::after{content:"";position:absolute;inset:-1px;border-radius:inherit;
+  pointer-events:none;z-index:0;
+  background:radial-gradient(70% 120% at 50% 0%,var(--t1,#3fa9e8)33,transparent 70%);
+  animation:softpulse 5.5s ease-in-out infinite}
+@keyframes softpulse{0%,100%{opacity:.35}50%{opacity:.85}}
+@media (prefers-reduced-motion:reduce){
+  .ambient,.pulseglow::after,.passrow.milestone .rwcell::before{animation:none;display:none}
+}
+
+/* ---------- Getoente Varianten der bestehenden Bausteine ---------- */
+.qcard.tinted,.dqrow.tinted,.reqrow.tinted,.mailrow.tinted,.shopcard.tinted,
+.hubtile.tinted,.hubmini.tinted,.evcard.tinted,.ghostrow.tinted,.dbonus.tinted{
+  border-color:color-mix(in srgb,var(--t1) 62%,#ffffff 14%)}
+.dqrow.tinted .dqn,.qcard.tinted .qnm,.mailrow.tinted .msub{color:#fff}
+.warside.us{--t1:#1f7a3a;--t2:#0c2a15}
+.warside.them{--t1:#8d2320;--t2:#2c0e0c}
+.warboard.tinted.tinted{background-image:linear-gradient(120deg,#12331f 0%,#0e1418 46%,#331215 100%)}
+.warbar{background:linear-gradient(90deg,#8d232066,#8d2320aa)}
+
 /* ==================================================================
  * KRISTALLTRESOR · ANGEBOTSKETTE · TAeGLICHER LOOP
  * ------------------------------------------------------------------
@@ -948,9 +1034,12 @@ span.ico{mix-blend-mode:normal;text-align:center}
   background-repeat:no-repeat;background-position:center;background-size:cover,cover;
   background-image:linear-gradient(120deg,#3a2b6b,#1a1230 55%,#0e1418);
   border:1px solid #e0b94a3d;box-shadow:0 12px 26px -14px #000e}
-.keyart .kshade{position:absolute;inset:0;
+.keyart .kvid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  z-index:1;display:block;background:transparent;border:0;pointer-events:none}
+@media (prefers-reduced-motion:reduce){.keyart .kvid{display:none}}
+.keyart .kshade{z-index:2;position:absolute;inset:0;
   background:linear-gradient(90deg,#0b1116e8 0%,#0b111699 42%,#0b111600 78%)}
-.keyart .ktx{position:absolute;left:14px;right:14px;bottom:12px}
+.keyart .ktx{position:absolute;left:14px;right:14px;bottom:12px;z-index:3}
 .keyart .kkick{font-size:9.5px;letter-spacing:.22em;font-weight:800;color:#c6b4ee}
 .keyart .ktitle{font-size:23px;line-height:1.1;margin-top:2px}
 .keyart .kend{font-size:10.5px;color:#dbe6ef;margin-top:5px;font-weight:700}
@@ -988,6 +1077,10 @@ span.ico{mix-blend-mode:normal;text-align:center}
   background:linear-gradient(180deg,#1b2732,#131c25);min-height:52px}
 .rwcell.prem{background:linear-gradient(180deg,#2a1c4a,#161028);border-color:#a45ef23d}
 .rwcell.claimable{border-color:#f2c53d;box-shadow:0 0 12px #f2c53d44}
+/* Nur die abholbare Zelle traegt den HOLEN-Knopf — nur dort muss der
+   Text Platz lassen, sonst laeuft er unter den Knopf. */
+.rwcell.claimable .rtx{padding-right:54px}
+.rwcell.blocked .rtx,.rwcell.taken .rtx{padding-right:20px}
 .rwcell.taken{opacity:.42}
 .rwcell.blocked{opacity:.6}
 .rwcell .rico{flex:0 0 26px;width:26px;height:26px;display:flex;align-items:center;
@@ -1131,6 +1224,12 @@ span.ico{mix-blend-mode:normal;text-align:center}
    Netzwerk-Timeout zuschlaegt — bei blockiertem CDN sind das Sekunden. */
 img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100%;
   object-fit:cover;border:0}
+/* Bewegter Karten-Loop. Liegt UEBER dem Standbild — laedt er nicht, bleibt
+   das Artwork stehen, und darunter immer noch das Emoji. Drei Ebenen,
+   damit die Karte in jedem Netz-Zustand etwas zeigt. */
+video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:100%;
+  object-fit:cover;border:0;background:transparent;pointer-events:none}
+@media (prefers-reduced-motion:reduce){video.cvid{display:none}}
 .cartemo{position:absolute;inset:0;z-index:0;display:flex;align-items:center;
   justify-content:center;font-size:inherit;filter:drop-shadow(0 2px 4px #000a)}
 /* Bildflaeche einer Karte: fuellt die Kachel, der Rahmen liegt darueber. */
@@ -1317,18 +1416,22 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
   border-radius:14px;border:1px solid var(--line);overflow:hidden;
   background-repeat:no-repeat;background-position:center;background-size:100% 100%,cover;
   background-image:linear-gradient(180deg,#1b2732,#121a22)}
-.banner{position:relative;flex:0 0 60px;width:60px;height:70px;display:flex;
+/* ⚠ NICHT .banner nennen — so hiess schon das Raritaets-Band der
+   Turm-Detailkarte (#dBanner). Die Kollision hat dort den Text
+   abgeschnitten ("EPISCH" → "PISC"), weil das Clan-Wappen eine feste
+   Breite und einen Wappen-Zuschnitt mitbringt. */
+.cbanner{position:relative;flex:0 0 60px;width:60px;height:70px;display:flex;
   align-items:center;justify-content:center;font-size:29px;color:#fff;
   filter:drop-shadow(0 2px 3px #000a);
   clip-path:polygon(0 0,100% 0,100% 76%,50% 100%,0 76%)}
-.banner .bsym{position:relative;z-index:2;text-shadow:0 2px 4px #0009}
-.banner .bframe{position:absolute;inset:-3px;z-index:3;pointer-events:none;
+.cbanner .bsym{position:relative;z-index:2;text-shadow:0 2px 4px #0009}
+.cbanner .bframe{position:absolute;inset:-3px;z-index:3;pointer-events:none;
   clip-path:polygon(0 0,100% 0,100% 76%,50% 100%,0 76%);
   border:2px solid transparent}
-.banner.f-bronze .bframe{border-color:#c98a52;box-shadow:0 0 10px #c98a5288}
-.banner.f-silver .bframe{border-color:#c9d2da;box-shadow:0 0 10px #c9d2da88}
-.banner.f-gold .bframe{border-color:#f2c53d;box-shadow:0 0 12px #f2c53d99}
-.banner.f-prisma .bframe{border-color:#a45ef2;
+.cbanner.f-bronze .bframe{border-color:#c98a52;box-shadow:0 0 10px #c98a5288}
+.cbanner.f-silver .bframe{border-color:#c9d2da;box-shadow:0 0 10px #c9d2da88}
+.cbanner.f-gold .bframe{border-color:#f2c53d;box-shadow:0 0 12px #f2c53d99}
+.cbanner.f-prisma .bframe{border-color:#a45ef2;
   box-shadow:0 0 16px #a45ef2cc,inset 0 0 10px #63b1ee88}
 .clanhead .cmeta{flex:1;min-width:0}
 .clanhead .cnm{font-size:17px;font-weight:900;line-height:1.15}
@@ -1717,6 +1820,10 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
     <div class="viewhead"><button class="backbtn" id="passBack">‹</button>
       <h2 class="title">Season-Pass</h2></div>
     <div class="keyart" id="passArt">
+      <!-- Bewegtes Keyart. Das Standbild pass_keyart bleibt als poster
+           UND als CSS-Hintergrund darunter — faellt das Video aus, sieht
+           man weiterhin das Bild, faellt auch das aus, den Verlauf. -->
+      <video class="kvid" id="passVid" muted loop autoplay playsinline preload="auto"></video>
       <div class="kshade"></div>
       <div class="ktx"><div class="kkick">SAISON · <span id="passSeason">—</span></div>
         <div class="ktitle goldtext">Goldene Fortuna</div>
@@ -2159,6 +2266,8 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
    * man den Gradient — der Prototyp bleibt voll funktionsfähig.
    * ================================================================== */
   var CDN = "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/";
+  // Audio liegt auf einem eigenen CDN-Pfad (CC0-Material, LIZENZEN.md).
+  var CDNA = "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/";
   var ASSETS = {
     btn_primary:    CDN + "hf_20260725_094652_c3235d59-6aa8-4e7b-bf6e-8a86ae45e738.png",
     btn_secondary:  CDN + "hf_20260725_094715_3b933e5e-6d2f-488b-8093-f545aa5af6c5.png",
@@ -2239,6 +2348,23 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
     track_hp:        CDN + "hf_20260725_135828_29edbcf2-e256-4c35-b3a7-5fceb1ea7adc.png",
     track_dmg:       CDN + "hf_20260725_135832_3232967e-3798-473d-81fd-cf24183c75e1.png",
     track_rate:      CDN + "hf_20260725_135837_d4de036f-acc4-40f7-95e6-e667d2dec6fe.png",
+    /* ---- Batch 5: Video-Loops (Pass-Keyart + 8 Karten-Loops) ---- */
+    pass_keyart_anim:  CDN + "hf_20260725_200210_b61d062e-a080-4471-8bcf-b60155348539.mp4",
+    loop_ember:        CDN + "hf_20260725_195220_4f55efc0-8b30-48ea-8d4d-ef2a05b60dc6.mp4",
+    loop_frost:        CDN + "hf_20260725_195223_61b525c2-44b8-4034-b9a8-724b3b078fd0.mp4",
+    loop_thorn:        CDN + "hf_20260725_195228_6520b371-5cad-4054-8686-e548a33b3656.mp4",
+    loop_stone:        CDN + "hf_20260725_195238_0d2ac0d2-dbcd-4590-8edc-4cfb75dcd9a5.mp4",
+    loop_dawn:         CDN + "hf_20260725_195242_95858f9b-afc7-4802-baac-f65ebe9321ef.mp4",
+    loop_hollow:       CDN + "hf_20260725_195245_08274840-1ace-4097-8b73-e46fd3c93cb5.mp4",
+    loop_solara:       CDN + "hf_20260725_195248_f3a50c1a-b483-4c2c-8ac4-81dc14fc19fc.mp4",
+    loop_magmor:       CDN + "hf_20260725_195257_05b3dbd0-8f5a-4790-88ed-4b3170bd0df6.mp4",
+    /* ---- Batch 5: Audio (alle CC0, OpenGameArt — siehe LIZENZEN.md) ---- */
+    audio_theme:       CDNA + "a36fc476-2c77-4def-a786-ee6129650cb7.mp3",
+    audio_battle:      CDNA + "19b60a4b-d371-4164-99c2-954b88ce7287.mp3",
+    audio_war:         CDNA + "724a9347-ebd1-4d3f-978f-1aa7a2517f63.mp3",
+    audio_pack_fanfare: CDNA + "fd1322fe-841d-4a37-aba7-8e51ea2a1be8.mp3",
+    audio_victory:     CDNA + "1aecb507-371c-4fa6-9415-255e9a68f422.mp3",
+    audio_defeat:      CDNA + "980ce9bc-9de9-4cc6-99aa-13754c1ad4c8.mp3",
     /* ---- Batch 4: Karten-Artworks (3:4, randlos, liegen UNTER dem Raritaetsrahmen) ---- */
     card_ember:       CDN + "hf_20260725_163302_2030f3d4-06f9-481f-b9ff-68596f587fb9.png",
     card_frost:       CDN + "hf_20260725_163306_f5f7b63e-a4ae-4473-bb89-2b7421051f16.png",
@@ -2307,6 +2433,36 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
     // onerror blendet das Bild aus; darunter liegt bereits das Emoji.
     return emo + '<img class="cart ' + (cls || "") + '" src="' + u + '" alt="' + emoji +
       '" onerror="UIIcon.hide(this)">';
+  }
+  /* CARD_LOOP — bewegte Fassung jeder Karte (Batch 5, 720x1280).
+     attachLoop() haengt sie NACHTRAeGLICH an eine bereits gerenderte
+     .artbox. Bewusst als Progressive Enhancement: Das Standbild ist
+     immer schon da, das Video kommt oben drauf. Faellt es aus, aendert
+     sich nichts — deshalb steht der Loop auch nur dort, wo die Karte
+     GROSS zu sehen ist (Detail, Pack-Reveal, Heldenbuehne) und nicht in
+     jeder 60-px-Kachel. */
+  var CARD_LOOP = {
+    fire: "loop_ember", water: "loop_frost", nature: "loop_thorn", earth: "loop_stone",
+    light: "loop_dawn", darkness: "loop_hollow", solara: "loop_solara", magmor: "loop_magmor",
+  };
+  function attachLoop(box, id) {
+    if (!box || !ASSETS[CARD_LOOP[id]]) return null;
+    var old = box.querySelector("video.cvid");
+    if (old) { if (old.getAttribute("data-card") === id) return old; old.remove(); }
+    var v = document.createElement("video");
+    v.className = "cvid";
+    v.setAttribute("data-card", id);
+    v.muted = true; v.loop = true; v.autoplay = true;
+    v.setAttribute("muted", ""); v.setAttribute("loop", "");
+    v.setAttribute("autoplay", ""); v.setAttribute("playsinline", "");
+    v.playsInline = true; v.preload = "auto";
+    if (ASSETS[CARD_ART[id]]) v.poster = ASSETS[CARD_ART[id]];
+    v.addEventListener("error", function () { UIIcon.hide(v); });
+    v.src = ASSETS[CARD_LOOP[id]];
+    box.appendChild(v);
+    var pr = v.play();
+    if (pr && pr.catch) pr.catch(function () {});   // Autoplay-Policy: still scheitern
+    return v;
   }
   // Karten-Bildflaeche inklusive Rahmen-Overlay, fertig fuer jede Kachel.
   function artBox(id, tierKey, cls) {
@@ -2451,6 +2607,10 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
         el.classList.remove("pressed");
       });
     }
+    // Autoplay-Policy: Musik darf erst nach der ERSTEN echten Geste laufen.
+    document.addEventListener("pointerdown", function () {
+      if (window.ArenaAudio) ArenaAudio.unlock();
+    }, { once: true, capture: true });
     document.addEventListener("pointerdown", down, true);
     document.addEventListener("pointerup", up, true);
     document.addEventListener("pointercancel", up, true);
@@ -2783,6 +2943,7 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
     bn.style.boxShadow = "inset 0 0 0 999px " + t.color + "38";
     $("dArt").innerHTML = cardArtHTML(curId);
     $("dArt").classList.add("artbox");
+    attachLoop($("dArt"), curId);          // bewegte Fassung oben drauf
     $("dTower").style.background = "linear-gradient(180deg," + m.color + "cc,#1b2b3d)";
     $("dTarget").innerHTML = m.target;
     $("dDesc").textContent = m.desc;
@@ -3176,6 +3337,7 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
     var legendary = s.kind === "card" && s.d.tierIndex >= LEGEND_FROM;
     if (legendary && el) {
       s.busy = true;
+      if (window.ArenaAudio) ArenaAudio.sfx("audio_pack_fanfare");
       playCinematic(function () { s.busy = false; doFlip(i, el, cb, true, fast); });
       return;
     }
@@ -3209,6 +3371,14 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
         if (s.kind === "card" && s.d.tierIndex >= 3) el.classList.add("burst");
       }, 300);
       setTimeout(function () { el.classList.remove("turning"); }, 640);
+      /* NACH der Drehung geht die Karte in ihren Loop ueber — der
+         Moment, in dem der Spieler sie zum ersten Mal sieht, ist der,
+         der bewegt sein muss. Das Standbild bleibt darunter liegen. */
+      if (s.kind === "card") {
+        setTimeout(function () {
+          attachLoop(el.querySelector(".pcfront .artbox"), s.d.cardId);
+        }, 620);
+      }
     }
     renderTop();
     updateNavBadge();
@@ -3300,6 +3470,7 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
 
     // §14.2: Die Key-Art ist ein freischwebendes DIORAMA, nicht der
     // Screen-Hintergrund. Der Hero bleibt schlicht dunkelblau.
+    ambient($("arenaHero"), 12);          // langsam schwebende Lichtpunkte
     layer($("arenaDiorama"), cur.key);
     layer($("arenaProg"), "progress_frame");
     layer($("btnBattle"), "btn_primary");
@@ -3609,7 +3780,9 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
       var left = d.avail - (dealUsed[d.id] | 0), sold = left <= 0;
       var price = d.cur === "free" ? "Gratis"
         : (d.cur === "gold" ? ico("cur_gold", "🪙") : ico("cur_gem", "💎")) + " " + fmt(d.cost);
-      return '<div class="shopcard' + (sold ? " sold" : "") + '" data-deal="' + d.id + '">' +
+      return '<div class="shopcard tinted' + (sold ? " sold" : "") + '" data-deal="' + d.id +
+        '" style="' + tintStyle(d.cur === "gems" ? "gems" : d.cur === "free" ? "free" : "gold") +
+        '">' +
         '<span class="sart">' + ico(d.art, d.emoji, "xl") + "</span>" +
         '<span class="snm">' + d.name + "</span>" +
         '<span class="savail">Verfügbar: ' + Math.max(0, left) + "</span>" +
@@ -3620,7 +3793,8 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
     $("packShop").innerHTML = SHOP_PACKS.map(function (sp) {
       var pk = AC.PACKS[sp.key];
       var price = (sp.cur === "gold" ? ico("cur_gold", "🪙") : ico("cur_gem", "💎")) + " " + fmt(sp.cost);
-      return '<div class="shopcard" data-pack="' + sp.key + '" style="position:relative">' +
+      return '<div class="shopcard tinted" data-pack="' + sp.key +
+        '" style="position:relative;' + tintStyle("pack_" + sp.key) + '">' +
         '<span class="sart">' + ico("pack_" + sp.key, "🎁", "xl") + "</span>" +
         '<span class="snm">' + pk.name + "</span>" +
         '<span class="promise">' + pk.promise + "</span>" +
@@ -4101,7 +4275,7 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
 
   function bannerHTML(badge, frameKey, cls) {
     var f = frameKey ? " f-" + frameKey : "";
-    return '<div class="banner' + f + " " + (cls || "") + '" style="background:' +
+    return '<div class="cbanner' + f + " " + (cls || "") + '" style="background:' +
       "linear-gradient(160deg," + badge.c1 + "," + badge.c2 + ')">' +
       '<span class="bsym">' + badge.symChar + "</span>" +
       '<span class="bframe"></span></div>';
@@ -4128,6 +4302,8 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
             " · " + CL.hhmm(ph.msLeft).replace(":", " h ") + " m</span>" +
         "</div></div>";
     layer($("clanHead"), "panel");
+    tint($("clanHead"), "special", "pulseglow");
+    ambient($("clanHead"), 7);
     $("clanDesc").textContent = inf.desc;
   }
 
@@ -4138,7 +4314,8 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
     var html = qs.map(function (q) {
       var minePct = q.total ? Math.min(1, q.mine / q.goal) : 0;
       var botPct = Math.max(0, q.pct - minePct);
-      return '<div class="qcard' + (q.done ? " done" : "") + '" data-quest="' + q.key + '">' +
+      return '<div class="qcard tinted' + (q.done ? " done" : "") + '" data-quest="' + q.key +
+        '" style="' + tintStyle("q_" + q.key) + '">' +
         '<div class="qtop"><span class="qsym">' + q.sym + "</span>" +
           '<span class="qtx"><span class="qnm">' + q.title + "</span>" +
           '<span class="qds">' + q.desc + "</span></span>" +
@@ -4216,8 +4393,9 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
         ? '<span class="gotpts">' + (r.closed ? "erfüllt" : "deine Anfrage") + "</span>"
         : '<button class="donbtn pressable' + (can ? "" : " is-disabled") +
           '" data-donate="' + r.id + '">' + (r.closed ? "voll" : "SPENDEN") + "</button>";
-      return '<div class="reqrow' + (r.mine ? " mine" : "") + (r.closed ? " full" : "") +
-        '" data-req="' + r.id + '">' +
+      return '<div class="reqrow tinted edge' + (r.mine ? " mine" : "") +
+        (r.closed ? " full" : "") + '" data-req="' + r.id +
+        '" style="' + tintStyle(r.cardId) + '">' +
         '<div class="reqcard" style="color:' + m.color + '">' +
           artBox(r.cardId, "common") + '<span class="rtier">GRAU</span></div>' +
         '<div class="reqmeta"><div class="rown">' +
@@ -4326,7 +4504,7 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
       return;
     }
     var tot = Math.max(1, wb.us.points + wb.them.points);
-    var html = '<div class="warboard"><div class="warsides">' +
+    var html = '<div class="warboard tinted"><div class="warsides">' +
       '<div class="warside us"><div class="wsn">' + wb.us.name + "</div>" +
         '<div class="wsp">' + fmt(wb.us.points) + "</div>" +
         '<div class="wsb">davon du: ' + fmt(wb.us.myPoints) + "</div></div>" +
@@ -4345,7 +4523,8 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
       '<span class="left">Angriffe heute ' + wb.attacksLeftToday + "/" + wb.attacksPerDay +
       "</span></div>";
     html += wb.targets.map(function (g) {
-      return '<div class="ghostrow' + (g.attacked ? " hit" : "") + '" data-ghost="' + g.id + '">' +
+      return '<div class="ghostrow tinted edge' + (g.attacked ? " hit" : "") +
+        '" data-ghost="' + g.id + '" style="' + tintStyle(g.el) + '">' +
         '<div class="gav">' + (EL_EMO[g.el] || "👤") + "</div>" +
         '<div class="gtx"><div class="gnm">' + g.name + "</div>" +
           '<div class="gsub">' + g.elName + " · " + fmt(g.trophies) +
@@ -4483,6 +4662,7 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
 
   function setClanTab(k) {
     clanTab = k;
+    if (window.ArenaAudio) ArenaAudio.music(k === "war" ? "audio_war" : "audio_theme");
     ["quests", "donate", "war"].forEach(function (x) {
       var t = $("ctab" + x.charAt(0).toUpperCase() + x.slice(1));
       if (t) t.classList.toggle("on", x === k);
@@ -4760,20 +4940,31 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
     ArenaPass.reportEvent("trophy", 460);
     localStorage.setItem(PASS_SEED_KEY, "1");
   }
+  /* Farbfamilie je Belohnungstyp — das ist die Stelle, an der der Pass
+     aufhoert, eine graue Liste zu sein. */
+  function rewardTint(rw, prem) {
+    if (rw.kind === "gold") return "gold";
+    if (rw.kind === "mat") return rw.key;                 // attack/speed/special
+    if (rw.kind === "pack") return "pack_" + rw.key;
+    if (rw.kind === "emote") return "emote";
+    if (rw.kind === "skin") return "skin";
+    return prem ? "special" : "neutral";
+  }
   function rewardCellHTML(level, track, st) {
     var rw = ArenaPass.reward(level, track);
     var prem = track === "prem";
     var claimed = (prem ? st.claimedPrem : st.claimedFree).indexOf(level) >= 0;
     var reached = level <= st.level;
     var blocked = prem && !st.premium;
-    var cls = "rwcell" + (prem ? " prem" : "") + (claimed ? " taken" : "") +
+    var cls = "rwcell tinted" + (prem ? " prem" : "") + (claimed ? " taken" : "") +
       (blocked ? " blocked" : "") + (!claimed && reached && !blocked ? " claimable" : "");
     var right = claimed ? '<span class="rchk">✔</span>'
       : blocked ? '<span class="rlock">' + ico("icon_lock", "🔒") + "</span>"
       : reached ? '<button class="rget pressable" data-claim="' + level + ":" + track +
           '">HOLEN</button>'
       : "";
-    return '<div class="' + cls + '" data-cell="' + level + ":" + track + '">' +
+    return '<div class="' + cls + '" data-cell="' + level + ":" + track +
+      '" style="' + tintStyle(rewardTint(rw, prem)) + '">' +
       '<span class="rico" data-rico="' + (rw.ico || "") + '">' + rw.emoji + "</span>" +
       '<span class="rtx">' + rw.label + "<small>" + rw.sub + "</small></span>" + right + "</div>";
   }
@@ -4781,6 +4972,14 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
     seedPass();
     var st = ArenaPass.state();
     layer($("passArt"), "pass_keyart");
+    ambient($("passArt"), 10);
+    var pv = $("passVid");
+    if (pv && ASSETS.pass_keyart_anim && !pv.src) {
+      pv.poster = ASSETS.pass_keyart || "";
+      pv.addEventListener("error", function () { UIIcon.hide(pv); });
+      pv.src = ASSETS.pass_keyart_anim;
+      var prp = pv.play(); if (prp && prp.catch) prp.catch(function () {});
+    }
     $("passSeason").textContent = st.seasonName;
     $("passEnd").innerHTML = "Endet in <b>" + st.daysLeft + " Tag" +
       (st.daysLeft === 1 ? "" : "en") + "</b> · 50 Stufen · 100 XP je Stufe";
@@ -4795,6 +4994,7 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
     var rows = "";
     for (var L = 1; L <= st.levels; L++) {
       var cls = L <= st.level ? "done" : (L === st.level + 1 ? "now" : "");
+      if (L % 10 === 0) cls += " milestone";
       rows += '<div class="passrow ' + cls + '" data-passlvl="' + L + '">' +
         '<div class="pnum">' + L + (L % 10 === 0 ? "<small>MEILE</small>" : "") + "</div>" +
         rewardCellHTML(L, "free", st) + rewardCellHTML(L, "prem", st) + "</div>";
@@ -4863,7 +5063,8 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
       var lock = owned ? "" :
         '<div class="hlock">' + ico("icon_lock", "🔒") + " In Packs zu finden — Helden droppen " +
         "5× seltener als Türme.</div>";
-      return '<div class="herocard' + (owned ? "" : " locked") + '" data-hero="' + id + '">' +
+      return '<div class="herocard tinted' + (owned ? "" : " locked") + '" data-hero="' + id +
+        '" style="' + tintStyle(m.elem) + '">' +
         '<div class="herostage" style="border-color:' + (owned ? t.color : "#35485a") +
           '"><span class="artbox">' + cardArtHTML(id) + "</span></div>" +
         '<div class="hmeta">' +
@@ -4875,6 +5076,7 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
         "</div></div>";
     }).join("");
     Array.prototype.forEach.call($("heroList").querySelectorAll("[data-hero]"), function (el) {
+      attachLoop(el.querySelector(".artbox"), el.getAttribute("data-hero"));
       el.addEventListener("click", function () {
         var id = el.getAttribute("data-hero");
         if (AC.view(id).owned) openDetail(id);
@@ -4926,7 +5128,8 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
       var d = new Date(st.from);
       var start = ("0" + d.getUTCDate()).slice(-2) + "." + ("0" + (d.getUTCMonth() + 1)).slice(-2) +
         ". um " + ("0" + d.getUTCHours()).slice(-2) + ":00 UTC";
-      return '<div class="evcard" data-event="' + ev.key + '">' +
+      return '<div class="evcard tinted" data-event="' + ev.key + '" style="' +
+        tintStyle(ev.key === "tournament" ? "fire" : "nature") + '">' +
         '<div class="evart" data-evart="' + ev.art + '"><div class="evshade"></div>' +
           '<span class="evchip ' + (st.live ? "live" : "soon") + '">' +
             (st.live ? "AKTIV" : "KOMMEND") + "</span>" +
@@ -5017,7 +5220,9 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
             m.id + '"' + (taken ? " disabled" : "") + ">" +
             (taken ? "ABGEHOLT" : "ABHOLEN") + "</button></div>";
       }
-      return '<div class="mailrow' + (unread ? " unread" : "") + '" data-mailrow="' + m.id + '">' +
+      var mt = m.reward ? "mail_reward" : (m.from === "Prisma-Orden" ? "mail_clan" : "mail_system");
+      return '<div class="mailrow tinted edge' + (unread ? " unread" : "") + '" data-mailrow="' +
+        m.id + '" style="' + tintStyle(mt) + '">' +
         '<div class="mico">' + m.ico + (unread ? '<span class="dot"></span>' : "") + "</div>" +
         '<div class="mtx"><div class="msub">' + m.subject + "</div>" +
           '<div class="mfrom">von ' + m.from + "</div>" +
@@ -5074,6 +5279,7 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
   function applySettings() {
     var s2 = settings();
     UISfx.mute(!s2.sound);
+    if (window.ArenaAudio) ArenaAudio.apply();
     ["sound", "music", "haptic"].forEach(function (k) {
       var el = document.querySelector('[data-sw="' + k + '"]');
       if (el) { el.classList.toggle("on", !!s2[k]); el.classList.toggle("off", !s2[k]); }
@@ -5136,7 +5342,8 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
     applySettings();
     $("credits").innerHTML = "Arcane Prism TD · " + APP_VERSION + "<br>" +
       "Logik: arena_cards.js · arena_fortress.js · arena_clan.js · arena_rivals.js<br>" +
-      "100 Assets im Stil „Edel &amp; Kristallin“ · alle Texte Deutsch";
+      "115 Assets im Stil „Edel &amp; Kristallin“ · alle Texte Deutsch<br>" +
+      "Musik &amp; Klaenge: CC0 von OpenGameArt.org — siehe LIZENZEN.md";
     $("saveNote").textContent = "Der Export enthält ausschließlich die " + SAVE_KEYS.length +
       " Prototyp-Schlüssel aus dem localStorage — keine Konto- oder Gerätedaten.";
     markPressable($("viewSettings"));
@@ -5150,6 +5357,78 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
    * enthaelt KEINE Preise, keine Schwellen und keine Zeitspannen.
    * Begruendung aller Werte: DESIGN_MONETARISIERUNG.md
    * ================================================================== */
+
+  /* ==================================================================
+   * FARB-SYSTEM — eine Palette, alle Views
+   * ------------------------------------------------------------------
+   * tint(el, key) setzt nur zwei CSS-Variablen; die Optik macht .tinted.
+   * Alle Werte sind DUNKLE Saettigungen — weisser Text bleibt darauf
+   * lesbar, und genau das prueft die Playwright-Suite nach.
+   * ================================================================== */
+  var TINTS = {
+    gold:        ["#6b4f14", "#2a1e08"],
+    gems:        ["#2f4f8f", "#111c33"],
+    free:        ["#1f6b4a", "#0c2a1e"],
+    attack:      ["#7a2a20", "#2a1210"],
+    speed:       ["#12556e", "#0a2231"],
+    special:     ["#4a217a", "#1c0f31"],
+    pack_bronze: ["#6b4326", "#2a1a0f"],
+    pack_silver: ["#4a5764", "#1c2228"],
+    pack_gold:   ["#6e5714", "#2b2208"],
+    pack_arcane: ["#54217a", "#1e0c2c"],
+    emote:       ["#1f6b2c", "#0c2413"],
+    skin:        ["#7a2a5f", "#2c1024"],
+    // Elementfarben fuer Karten-bezogene Reihen
+    fire:        ["#7a3418", "#2a1208"],
+    water:       ["#14567a", "#08222f"],
+    nature:      ["#22662f", "#0b2412"],
+    earth:       ["#6e5220", "#291d0b"],
+    light:       ["#6e6220", "#2a2508"],
+    darkness:    ["#4a2a7a", "#1a0f2c"],
+    // Quest-/Aufgabenfarben
+    q_wins:      ["#7a2a20", "#2a1210"],
+    q_donate:    ["#14567a", "#08222f"],
+    q_packs:     ["#6e5714", "#2b2208"],
+    q_merge:     ["#54217a", "#1e0c2c"],
+    q_war:       ["#7a3418", "#2a1208"],
+    q_trophies:  ["#6b4f14", "#2a1e08"],
+    // Post
+    mail_reward: ["#6b4f14", "#2a1e08"],
+    mail_clan:   ["#4a217a", "#1c0f31"],
+    mail_system: ["#2b4152", "#101a22"],
+    neutral:     ["#2b3b47", "#131c25"],
+  };
+  function tint(el, key, extra) {
+    if (!el) return el;
+    var t = TINTS[key] || TINTS.neutral;
+    el.style.setProperty("--t1", t[0]);
+    el.style.setProperty("--t2", t[1]);
+    el.classList.add("tinted");
+    if (extra) el.classList.add(extra);
+    return el;
+  }
+  // Inline-Variante fuer Markup, das als String gebaut wird.
+  function tintStyle(key) {
+    var t = TINTS[key] || TINTS.neutral;
+    return "--t1:" + t[0] + ";--t2:" + t[1] + ";";
+  }
+  /* Ambient-Partikel. Rein dekorativ, nur transform/opacity, und komplett
+     abgeschaltet bei prefers-reduced-motion (CSS). */
+  function ambient(el, n) {
+    if (!el || el.querySelector(".ambient")) return;
+    var box = document.createElement("div");
+    box.className = "ambient";
+    var html = "";
+    for (var i = 0; i < (n || 9); i++) {
+      var dur = 9 + Math.random() * 11, delay = -Math.random() * dur;
+      html += '<i style="left:' + (4 + Math.random() * 92).toFixed(1) + "%;bottom:" +
+        (-8 + Math.random() * 30).toFixed(1) + "%;animation-duration:" + dur.toFixed(1) +
+        "s;animation-delay:" + delay.toFixed(1) + 's"></i>';
+    }
+    box.innerHTML = html;
+    el.insertBefore(box, el.firstChild);
+  }
+
   function VLof() { return window.ArenaVault || null; }
   function DYof() { return window.ArenaDaily || null; }
   function TMof() { return window.ArenaTelemetry || null; }
@@ -5197,8 +5476,11 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
     var v = V.vault(null, DEMO_TROPHIES);
     ["vaultBox", "vaultShop"].forEach(function (id) {
       var el = $(id); if (!el) return;
-      el.className = "vaultbox" + (v.full ? " full" : "");
+      el.className = "vaultbox tinted" + (v.full ? " full" : "");
+      el.style.setProperty("--t1", v.full ? "#6b4f14" : "#2f4f8f");
+      el.style.setProperty("--t2", v.full ? "#2a1e08" : "#111c33");
       el.innerHTML = vaultHTML(v, id === "vaultShop");
+      ambient(el, v.full ? 8 : 4);
       Array.prototype.forEach.call(el.querySelectorAll("[data-openvault]"), function (b) {
         b.addEventListener("click", openVault);
       });
@@ -5331,7 +5613,8 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
         ? '<span class="dqchk">✔</span>'
         : '<button class="dqget pressable' + (q.claimable ? "" : " dim") + '" data-dq="' +
           q.key + '">HOLEN</button>';
-      return '<div class="dqrow' + (q.done ? " done" : "") + '" data-dqrow="' + q.key + '">' +
+      return '<div class="dqrow tinted edge' + (q.done ? " done" : "") + '" data-dqrow="' +
+        q.key + '" style="' + tintStyle("q_" + (q.key === "war" ? "war" : q.key)) + '">' +
         '<span class="dqs">' + q.sym + "</span>" +
         '<span class="dqt"><span class="dqn">' + q.title + "</span>" +
           '<span class="dqb"><i style="width:' + (q.pct * 100).toFixed(0) + '%"></i></span>' +
@@ -5340,7 +5623,8 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
     }).join("");
 
     var b = st.bonus;
-    html += '<div class="dbonus' + (b.ready ? " ready" : "") + '">' +
+    html += '<div class="dbonus tinted' + (b.ready ? " ready" : "") +
+      '" style="' + tintStyle("pack_silver") + '">' +
       '<span class="dbs">' + b.chest.sym + "</span>" +
       '<span class="dbt">' + b.chest.name + "<small>" + b.done + "/" + b.need +
         " Quests · " + fmt(b.chest.gold) + " Gold + " + b.chest.material + " Material + " +
@@ -5350,7 +5634,8 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
           '" id="dqBonus">HOLEN</button>') + "</div>";
 
     var pt = st.pack;
-    html += '<div class="dbonus" style="margin-top:7px">' +
+    html += '<div class="dbonus tinted" style="margin-top:7px;' +
+      tintStyle("pack_bronze") + '">' +
       '<span class="dbs">' + ico("chest_bronze", "🥉") + "</span>" +
       '<span class="dbt">Gratis-Pack<small>' +
         (pt.ready ? pt.ready + " von " + pt.max + " bereit" : "nächstes in " + pt.text + " h") +
@@ -5416,6 +5701,9 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
    * ================================================================== */
   function demoMatchResult(win, opts) {
     opts = opts || {};
+    /* Die beiden Stinger sind hier die NAHT fuer arena_pan.html: dort
+       stehen sie in resolveEnd(), sobald win/lose feststeht. */
+    if (window.ArenaAudio && !opts.silent) ArenaAudio.sfx(win ? "audio_victory" : "audio_defeat");
     var CLm = CLof(), DYm2 = DYof(), VLm = VLof();
     if (win) {
       if (CLm) CLm.reportEvent("win", 1);
@@ -5436,6 +5724,115 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
     if (!opts.silent) maybeShowOffer();
     return true;
   }
+
+
+  /* ==================================================================
+   * window.ArenaAudio — Musik- und SFX-Kanal
+   * ------------------------------------------------------------------
+   * Zwei getrennte Kanaele mit je eigener Lautstaerke, damit die beiden
+   * Schalter aus den Einstellungen (Sound / Musik) unabhaengig wirken:
+   *   · MUSIK   — genau EIN <audio> mit loop, weiche Ueberblendung beim
+   *               Wechsel (Hub-Theme ↔ Kriegs-Board ↔ Match).
+   *   · SFX     — kurze Einzelklaenge (Pack-Fanfare, Sieg, Niederlage).
+   *               Jeder Aufruf bekommt sein eigenes Element, damit sich
+   *               zwei Stinger nicht gegenseitig abschneiden.
+   *
+   * ⚠ AUTOPLAY-POLICY: Browser verbieten Ton vor der ersten echten
+   * Nutzerinteraktion. Deshalb wird die Musik NICHT beim Laden gestartet,
+   * sondern beim ersten pointerdown (einmaliger Listener). play() liefert
+   * ein Promise, dessen Ablehnung bewusst verschluckt wird — ein
+   * blockierter Autoplay ist kein Fehler, sondern der Normalfall.
+   *
+   * Alle Dateien sind CC0 von OpenGameArt (siehe LIZENZEN.md).
+   * Faellt das CDN aus, passiert schlicht nichts: kein Ton, keine Fehler.
+   * ================================================================== */
+  window.ArenaAudio = (function () {
+    var MUSIC_VOL = 0.30;          // Musik bewusst leise unter der UI
+    var SFX_VOL = 0.55;
+    var FADE_MS = 700;
+    var musicEl = null, musicKey = null, fadeTimer = null;
+    var unlocked = false, wanted = null;
+
+    function on(kind) {
+      var st = settings();
+      return kind === "music" ? (st.music && st.sound) : st.sound;
+    }
+    function make(key, loop) {
+      var url = ASSETS[key];
+      if (!url) return null;
+      var a = document.createElement("audio");
+      a.src = url;
+      a.loop = !!loop;
+      a.preload = "auto";
+      a.addEventListener("error", function () { /* CDN weg → stumm bleiben */ });
+      return a;
+    }
+    function fadeTo(el, target, done) {
+      if (fadeTimer) clearInterval(fadeTimer);
+      var steps = 14, i = 0, from = el.volume;
+      fadeTimer = setInterval(function () {
+        i++;
+        el.volume = Math.max(0, Math.min(1, from + (target - from) * (i / steps)));
+        if (i >= steps) { clearInterval(fadeTimer); fadeTimer = null; if (done) done(); }
+      }, FADE_MS / steps);
+    }
+    /* music(key) — Loop wechseln. Gleicher Key = nichts tun (sonst
+       springt die Musik bei jedem Render-Durchlauf an den Anfang). */
+    function music(key) {
+      wanted = key;
+      if (!unlocked) return false;
+      if (!on("music")) { stopMusic(); return false; }
+      if (musicKey === key && musicEl && !musicEl.paused) return true;
+      var next = make(key, true);
+      if (!next) return false;
+      var old = musicEl;
+      musicEl = next; musicKey = key;
+      next.volume = 0;
+      var pr = next.play();
+      if (pr && pr.catch) pr.catch(function () {});
+      fadeTo(next, MUSIC_VOL);
+      if (old) {
+        try {
+          var o = old;
+          setTimeout(function () { try { o.pause(); o.src = ""; } catch (e) {} }, FADE_MS + 50);
+        } catch (e) {}
+      }
+      return true;
+    }
+    function stopMusic() {
+      if (!musicEl) return;
+      try { musicEl.pause(); } catch (e) {}
+      musicEl = null; musicKey = null;
+    }
+    function sfx(key) {
+      if (!unlocked || !on("sfx")) return false;
+      var a = make(key, false);
+      if (!a) return false;
+      a.volume = SFX_VOL;
+      var pr = a.play();
+      if (pr && pr.catch) pr.catch(function () {});
+      a.addEventListener("ended", function () { try { a.src = ""; } catch (e) {} });
+      return true;
+    }
+    /* applySettings() — von den Schaltern in den Einstellungen gerufen. */
+    function apply() {
+      if (!on("music")) stopMusic();
+      else if (wanted) music(wanted);
+    }
+    /* unlock() — beim ERSTEN echten Tap. Danach darf Ton laufen. */
+    function unlock() {
+      if (unlocked) return;
+      unlocked = true;
+      if (wanted) music(wanted);
+    }
+    return {
+      music: music, sfx: sfx, stopMusic: stopMusic, apply: apply, unlock: unlock,
+      isUnlocked: function () { return unlocked; },
+      current: function () { return musicKey; },
+      wanted: function () { return wanted; },
+      _vol: function () { return { music: MUSIC_VOL, sfx: SFX_VOL }; },
+    };
+  })();
 
   /* ---------- Bestaetigungs-Dialog (generisch) ---------- */
   var confirmFn = null;
@@ -5479,6 +5876,12 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
     if (navId === "navShop") renderShop();
     if (navId === "navFortress") renderFortress();
     if (navId === "navPack") { renderPackHeader(); renderTop(); }
+    /* Musik folgt dem View: Hub-Theme ueberall, Kriegs-Loop auf dem
+       Clan-Kriegsboard. Der Match-Loop (audio_battle) haengt spaeter in
+       arena_pan.html — die Naht ist dieselbe. */
+    if (window.ArenaAudio) {
+      ArenaAudio.music(navId === "navClan" && clanTab === "war" ? "audio_war" : "audio_theme");
+    }
     if (navId === "navClan") renderClan();
     if (navId === "navBoard") { renderBoard(); setTimeout(lbScrollToMe, 60); }
     if (navId === "navPass") renderPass();
@@ -5633,6 +6036,13 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
     $("tileBoardSub").textContent = "Rang #" + lb.myRank + " von " + lb.total;
     layer($("tileClan"), "hub_clan");
     layer($("tileBoard"), "hub_leaderboard");
+    // Farbige Koerper statt grau — jede Kachel bekommt ihre Familie.
+    tint($("tileClan"), "special");
+    tint($("tileBoard"), "gold");
+    tint($("tilePass"), "pack_gold");
+    tint($("tileMail"), "speed");
+    tint($("tileSettings"), "neutral");
+    tint($("tileEvents"), "nature");
     seedPass();
     UIBadge.set("pass", ArenaPass.state().pending);
     UIBadge.set("mail", mailBadgeCount());
@@ -5648,6 +6058,7 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
   renderHome();
   renderHubTiles();
   applySettings();          // Sound-Schalter wirkt ab dem ersten Frame
+  if (window.ArenaAudio) ArenaAudio.music("audio_theme");   // startet beim 1. Tap
   try {
     if (localStorage.getItem(DAILY_OPEN_KEY) !== "0") $("dailyPanel").classList.add("open");
   } catch (e) { $("dailyPanel").classList.add("open"); }
@@ -5691,7 +6102,10 @@ img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100
                      VL: function () { return window.ArenaVault; },
                      DY: function () { return window.ArenaDaily; },
                      TM: function () { return window.ArenaTelemetry; },
-                     demoMatchResult: demoMatchResult };
+                     demoMatchResult: demoMatchResult,
+                     tint: tint, tintStyle: tintStyle, TINTS: TINTS, ambient: ambient,
+                     attachLoop: attachLoop, CARD_LOOP: CARD_LOOP,
+                     AU: function () { return window.ArenaAudio; } };
 })();
 </script>
 </body>

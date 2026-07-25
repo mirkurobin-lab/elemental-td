@@ -16,6 +16,7 @@ untereinander, defensiv gegen fehlende Callbacks).
 | `arena_vault.js` | **Kristalltresor + Angebotskette** — IAP-Platzhalter (`DESIGN_MONETARISIERUNG.md`) |
 | `arena_daily.js` | **Täglicher Loop** — 3 Tagesquests, Siegesserie, Gratis-Pack-Timer |
 | `arena_telemetry.js` | **Analytics** — Ringpuffer im localStorage, 11 Trichter-Ereignisse, PII-frei |
+| `LIZENZEN.md` | **Fremdmaterial** — die 6 CC0-Audiodateien (OpenGameArt), Schriften, Code |
 | `ui_prototype.html` | **lauffähiger UI-Nachbau** der vier Meta-Screens (§6) |
 | `AA_UI_REFERENZ.md` | verifizierte Referenz zum Vorbild (Video-Analyse) — **Wahrheitsquelle** |
 | `DESIGN_PROGRESSION.md` | Design-Spezifikation der Karten-Progression (v2, inkl. v1-Anhang) |
@@ -945,3 +946,107 @@ Schrift dadurch unsichtbar.** Für Beschriftungen auf Gold-Buttons stattdessen:
 Betroffen waren der „Weiter"-Knopf der Merge-Zeremonie und das „Nach oben"-Label der
 Trophäenstraße — beide gefixt. Bei **jeder neuen Beschriftung** vorher prüfen, worauf sie
 liegt.
+
+---
+
+## Farb-Pass, Karten-Loops und Audio (Batch 5)
+
+### Farb-Pass — ein System für alle Views
+
+**Befund des Users:** *„nicht so farbenfroh wie AA … sieht alles so leer/tot aus."* Die Ursache
+war strukturell, nicht dekorativ: Bis Batch 4 hatte **jede** Reihe denselben dunkelgrauen Körper
+(`#1b2732 → #131c25`), farbig war nur der Text. AA macht es umgekehrt — **der Körper trägt die
+Farbe, der Text ist weiß.**
+
+Umgesetzt als **eine** Mechanik statt fünfzehn Sonderfällen:
+
+```js
+tint(el, "pack_gold");          // setzt --t1/--t2 + Klasse .tinted
+tintStyle("fire")               // dieselbe Palette als Inline-String fürs Markup
+```
+
+```css
+.tinted.tinted{ background-image:linear-gradient(135deg,var(--t1),var(--t2) 62%,#0e1418) }
+```
+
+> ⚠ **Die Klasse steht doppelt im Selektor (`.tinted.tinted`) — das ist Absicht.** Alle
+> getönten Bausteine (`.dqrow`, `.rwcell`, `.mailrow`, `.shopcard` …) bringen ein eigenes
+> `background:` mit und stehen im Stylesheet **weiter unten**; bei gleicher Spezifität gewinnt
+> der spätere. Verdoppeln hebt die Spezifität auf 0,2,0 und macht den Farbkörper unabhängig von
+> der Reihenfolge. Ohne diesen Kniff blieben genau die Reihen grau, um die es ging.
+
+**Palette (`TINTS`):** Belohnungstypen (gold / attack / speed / special / pack_bronze…arcane /
+emote / skin), Elementfarben (fire…darkness), Questfarben (`q_*`), Mail-Typen, Währungen. **Alle
+Tints haben Luminanz < 90** — die Playwright-Suite rechnet das nach und prüft zusätzlich, dass
+der Text darauf über 170 bleibt.
+
+**Wo es greift:** Season-Pass (Farbfamilie je Belohnungstyp, Premium-Spalte violett,
+Meilenstein-Reihen mit Goldrahmen + Schimmer), Clan-Quests, Spenden-Reihen (Elementfarbe der
+angefragten Karte), Kriegsboard (grün/rot Teamseiten), Tagesziele, Post, Shop, Events, Helden,
+Home-Hub-Kacheln.
+
+**Ambient-Leben:** `ambient(el, n)` streut langsam schwebende Lichtpunkte (nur `transform` und
+`opacity`, laufen auf dem Compositor). Dazu `.pulseglow` für Header. **Beides plus die
+Video-Loops sind unter `prefers-reduced-motion: reduce` komplett abgeschaltet.**
+
+### Karten-Loops (`attachLoop`)
+
+Acht 720×1280-Videos, eines je Karte. Bewusst **Progressive Enhancement**: `artBox()` rendert
+weiterhin zuerst Emoji + Standbild, `attachLoop(box, id)` hängt das Video **nachträglich**
+darüber. Drei Fallback-Stufen: Video → `poster` (= Karten-Artwork) → `<img>` → Emoji.
+
+Eingebaut nur dort, wo die Karte **groß** zu sehen ist: Detailkarte, Pack-Reveal (620 ms nach der
+Drehung — der Moment, in dem man die Karte zum ersten Mal sieht) und Heldenbühne. **Nicht** in
+60-px-Kacheln; acht gleichzeitige Videos in einem Grid sind Batterieverbrauch ohne Nutzen.
+
+Der Season-Pass-Header ist ebenfalls ein Video (`pass_keyart_anim`) mit dem Standbild als
+`poster` **und** als CSS-Hintergrund darunter.
+
+### `window.ArenaAudio`
+
+```js
+ArenaAudio.music("audio_theme");   // Loop wechseln, weiche Überblendung
+ArenaAudio.sfx("audio_victory");   // Stinger, eigenes Element je Aufruf
+ArenaAudio.apply();                // von applySettings() gerufen
+ArenaAudio.unlock();               // beim ERSTEN pointerdown
+```
+
+* **Zwei Kanäle**, damit die Schalter *Sound* und *Musik* unabhängig wirken. *Sound aus* schaltet
+  beides ab, *Musik aus* nur den Loop.
+* **Autoplay-Policy**: Musik startet **nicht** beim Laden, sondern beim ersten `pointerdown`
+  (einmaliger Listener). Abgelehnte `play()`-Promises werden bewusst verschluckt — ein
+  blockierter Autoplay ist der Normalfall, kein Fehler.
+* **Musik folgt dem View**: Hub-Theme überall, `audio_war` auf dem Kriegsboard. Der Match-Loop
+  (`audio_battle`) und die Stinger `audio_victory` / `audio_defeat` hängen später in
+  `arena_pan.html` — die Naht ist `demoMatchResult()` im Prototyp.
+* Fällt das CDN aus, passiert schlicht **nichts**: kein Ton, keine Fehler.
+
+Alle sechs Dateien sind **CC0 von OpenGameArt** — Titel, Bearbeitung und offene Punkte in
+**`LIZENZEN.md`**.
+
+### Asset-Download (Batch 5 ergänzt)
+
+Die Download-Schleife aus dem Abschnitt oben deckt Batch 5 mit ab — `ui_assets.json` enthält
+jetzt **115** Einträge mit `type` (`image` / `video` / `audio`). Für den echten Build:
+
+```bash
+python3 - <<'EOF'
+import json, os, urllib.request
+d = json.load(open("arena_patches/ui_assets.json"))
+for k, v in d.items():
+    if k == "_meta": continue
+    sub = {"image": "img", "video": "vid", "audio": "audio"}.get(v.get("type"), "img")
+    os.makedirs("public/assets/%s" % sub, exist_ok=True)
+    ext = v["url"].rsplit(".", 1)[-1]
+    urllib.request.urlretrieve(v["url"], "public/assets/%s/%s.%s" % (sub, k, ext))
+    print(k)
+EOF
+```
+
+Danach im Prototyp `CDN` und `CDNA` auf `./assets/img/` bzw. `./assets/audio/` umstellen.
+
+> **Klassen-Kollision, teuer bezahlt:** Das Clan-Wappen hieß zuerst `.banner` — genauso wie das
+> Raritäts-Band der Turm-Detailkarte (`#dBanner`). Die Wappen-Regeln (feste Breite 60 px,
+> Wappen-`clip-path`) haben dort den Text abgeschnitten („EPISCH" → „PISC"). Das Wappen heißt
+> jetzt `.cbanner`; die Playwright-Suite prüft **beide** Elemente auf ihre eigene Größe. Wer neue
+> Bausteine benennt: **im ganzen Dokument nach dem Klassennamen greppen**, bevor er vergeben wird.
