@@ -13,6 +13,9 @@ untereinander, defensiv gegen fehlende Callbacks).
 | `arena_cards.js` | **Karten-Progression v2** — Merge + Material-**Sorten** (§6) |
 | `arena_fortress.js` | **Festungs-Upgrades** — die dritte Progressions-Achse (§7) |
 | `arena_clan.js` | **Clan-System Stufe 1** — Quests, Spenden, Ghost-Clankrieg, Leaderboard (`DESIGN_CLAN.md`) |
+| `arena_vault.js` | **Kristalltresor + Angebotskette** — IAP-Platzhalter (`DESIGN_MONETARISIERUNG.md`) |
+| `arena_daily.js` | **Täglicher Loop** — 3 Tagesquests, Siegesserie, Gratis-Pack-Timer |
+| `arena_telemetry.js` | **Analytics** — Ringpuffer im localStorage, 11 Trichter-Ereignisse, PII-frei |
 | `ui_prototype.html` | **lauffähiger UI-Nachbau** der vier Meta-Screens (§6) |
 | `AA_UI_REFERENZ.md` | verifizierte Referenz zum Vorbild (Video-Analyse) — **Wahrheitsquelle** |
 | `DESIGN_PROGRESSION.md` | Design-Spezifikation der Karten-Progression (v2, inkl. v1-Anhang) |
