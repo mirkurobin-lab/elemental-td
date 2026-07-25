@@ -1672,6 +1672,39 @@ funktioniert sofort mit allen 100 Ausbaustufen — die Upgrade-Optik ist nicht i
 eingebacken, sonst müsste jeder Skin in n Stufen gemalt werden. Auswahl liegt in
 `localStorage "arenaSkins"`. Details im HANDOFF.
 
+### 16.8 Zweites Layout: „Banner-Stapel" (Variante 2, umschaltbar)
+
+Auf User-Wunsch steht die Festung ab 2026-07-25 in **zwei gleichwertigen Darstellungen**
+zur Verfügung, umschaltbar über einen Segment-Umschalter oben rechts im View. Die Wahl
+liegt in **`localStorage "arenaFortLayout"`** (`"constell"` \| `"banner"`).
+
+| | Variante 1 „Konstellation" (Standard) | Variante 2 „Banner-Stapel" |
+|---|---|---|
+| Burg | lebendes Diorama oben, Overlays je Track | abgedunkelter **Parallax-Hintergrund** (`brightness .45`) hinter den Bannern |
+| Tracks | drei Äste mit **einem Knoten je Stufe** | drei **Banner über die volle Breite** (~130 px) |
+| Fortschrittsanzeige | Knotenkette mit Fensterung (6 zurück / 14 vor) | **Pip-Reihe der aktuellen Zehner-Dekade**: 9 Pips + Meilenstein-Gem an Position 10 |
+| Kauf | Kostenknopf am nächsten Knoten | großer Kosten-Button rechts im Banner |
+| Kauf-Feedback | Lichtstrahl zur Burg (`.buyray`) | `fx_spark`-Burst am Knopf + Glow-Puls auf dem Banner |
+| Stärke | zeigt den **ganzen Weg** — man sieht, wie weit es noch ist | zeigt den **nächsten Meilenstein** — kompakt, ohne 100 Knoten zu rendern |
+
+**Warum beides sinnvoll nebeneinander steht:** Die Konstellation beantwortet „wie weit bin
+ich auf dieser Leiter?", der Banner-Stapel beantwortet „was kostet der nächste Schritt und
+was bringt er?". Das sind zwei verschiedene Fragen, und AA beantwortet mit seiner
+Listenansicht (§16.1) nur die zweite. Welche Variante final wird, entscheidet der User am
+Gerät — technisch kostet das Nebeneinander nichts, weil beide Layouts denselben
+`allTracks()`-Datensatz lesen und über dieselbe `buyFort()` kaufen. **`arena_fortress.js`
+wurde für Variante 2 nicht angefasst.**
+
+**Assets Batch 3** (4 Bilder, `ui_assets.json`, `type: "image"`, `batch: 3`):
+`fort_banner_track` (Plakette aus dunklem Amethyst-Glas mit Goldfiligran-Rahmen, Gem-Sockel
+links, Button-Zone rechts), `fort_pip_full`, `fort_pip_empty`, `fort_milestone`.
+
+> **Goldtext-Regel, dritte Anwendung.** Auf der Banner-Plakette (dunkles Glas) ist
+> `.goldtext` für den Track-Namen **erlaubt**; der goldene Kosten-Button `.tb-buy` setzt
+> ausnahmslos **dunkle** Schriftfüllung. Bei dieser Gelegenheit fiel der dritte Altfall
+> auf: der **KAMPF-Knopf auf Home** ist selbst golden und trug `.goldtext` — die
+> Beschriftung war praktisch unsichtbar. Ebenfalls behoben.
+
 ---
 
 ## 17. Referenz-Choreografie: Pack-Öffnung mit Karten-Drehung

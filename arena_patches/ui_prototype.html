@@ -806,6 +806,139 @@ span.ico{mix-blend-mode:normal;text-align:center}
 .skinbar select{flex:0 0 auto}
 
 /* ==================================================================
+ * FESTUNG — LAYOUT-VARIANTE 2: „BANNER-STAPEL"
+ * ------------------------------------------------------------------
+ * Zweites, umschaltbares Layout NEBEN der Konstellation (Variante 1).
+ * Reiner Darstellungs-Tausch: dieselben allTracks()-Daten, dieselbe
+ * buyFort()-Logik, arena_fortress.js bleibt unberuehrt.
+ *
+ * Aufbau je Track ein Banner ueber die volle Breite (~130px):
+ *   links   Track-Emblem in Hex-Fassung (hex_slot / CSS-Hexagon)
+ *   mitte   Name + „Stufe X / 100" + Pip-Reihe der aktuellen Dekade
+ *           (9 Pips + Meilenstein-Gem an Position 10) + naechster
+ *           Meilenstein-Bonus
+ *   rechts  grosser Kosten-Button (Gold) bzw. Trophaeen-Tor mit Schloss
+ * Dahinter die Burg als abgedunkelter Parallax-Layer.
+ *
+ * ⚠ GOLDTEXT-REGEL: .tb-name DARF goldtext tragen — die Plakette ist
+ * dunkles Amethyst-Glas. Der Kosten-Button .tb-buy ist GOLD und setzt
+ * deshalb ausnahmslos dunkle Fuellfarbe (dritter Bug-Fall war der
+ * KAMPF-Knopf, siehe .battlebtn .goldtext).
+ * ================================================================== */
+.laybar{display:flex;align-items:center;gap:6px;margin:-4px 0 10px}
+.laybar .lbl2{font-size:10px;color:var(--dim);font-weight:800;letter-spacing:.08em;
+  text-transform:uppercase}
+.seg{margin-left:auto;display:flex;border-radius:9px;overflow:hidden;border:1px solid var(--line);
+  background:var(--panel)}
+.segbtn{padding:6px 12px;font-size:11px;font-weight:800;color:var(--dim);background:none}
+.segbtn.on{background:#2b3b47;color:#fff}
+/* Parallax-Hintergrund: nur im Banner-Layout sichtbar. */
+#viewFortress{position:relative}
+/* #fortBg ist positioniert und wuerde sonst ueber dem nicht-positionierten
+   Titel und dem Umschalter liegen (gleiche Stapelebene, spaeter im DOM). */
+#viewFortress>h2.title,#viewFortress .laybar{position:relative;z-index:2}
+#fortBg{position:absolute;left:0;right:0;top:-30px;height:min(640px,86%);z-index:0;
+  display:none;pointer-events:none;
+  background-repeat:no-repeat;background-position:center 18%;background-size:cover,cover;
+  background-image:radial-gradient(ellipse 70% 55% at 50% 32%,#4a6a8f,#1d2a38 62%,#0e1418 100%);
+  filter:brightness(.45) saturate(.85) blur(.4px);
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 55%,#0000 100%);
+  mask-image:linear-gradient(180deg,#000 0%,#000 55%,#0000 100%);
+  will-change:transform}
+#viewFortress.lay-banner #fortBg{display:block}
+#viewFortress.lay-banner .castlestage,
+#viewFortress.lay-banner #castleArt,
+#viewFortress.lay-banner .constell,
+#viewFortress.lay-banner .skinbar{display:none}
+#viewFortress.lay-banner .bannerstack{display:block}
+.bannerstack{display:none;position:relative;z-index:1;margin-top:2px}
+.powerstrip{position:relative;z-index:1;display:flex;align-items:center;gap:8px;
+  padding:8px 12px;border-radius:12px;border:1px solid var(--line);background:#0b1116cc;
+  font-size:10px;color:var(--dim);letter-spacing:.1em;font-weight:800}
+.powerstrip b{font-size:19px;letter-spacing:0}
+
+.trackbanner{position:relative;display:flex;align-items:center;gap:10px;margin-top:10px;
+  min-height:128px;padding:12px 12px 12px 10px;border-radius:16px;
+  background-repeat:no-repeat;background-position:center;background-size:100% 100%,cover;
+  background-image:linear-gradient(150deg,#2a1c4a 0%,#1b1230 42%,#120c22 100%);
+  border:1px solid #a45ef23d;
+  box-shadow:0 10px 22px -12px #000e,inset 0 0 34px -8px #7a4fd63d}
+.trackbanner::after{content:"";position:absolute;inset:4px;border-radius:12px;pointer-events:none;
+  border:1px solid #e0b94a3d;
+  box-shadow:inset 0 0 0 1px #e0b94a14}
+.trackbanner.locked{filter:saturate(.55) brightness(.86)}
+.trackbanner>*{position:relative;z-index:2}
+/* Kauf-Feedback: kurzer Glow-Puls auf dem Banner. */
+.trackbanner.justbought{animation:bannerpulse .85s ease-out}
+@keyframes bannerpulse{0%{filter:brightness(1)}
+  28%{filter:brightness(1.55) drop-shadow(0 0 22px #e0b94acc)}100%{filter:brightness(1)}}
+
+/* --- links: Emblem in Hex-Fassung --- */
+.tb-emblem{flex:0 0 66px;width:66px;height:76px;position:relative;display:flex;
+  align-items:center;justify-content:center;
+  clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
+  background-repeat:no-repeat;background-position:center;background-size:100% 100%,cover;
+  background-image:linear-gradient(180deg,#3a4c5c,#141d26);
+  filter:drop-shadow(0 3px 6px #000a)}
+.tb-emblem .tb-art{width:76%;height:76%;display:flex;align-items:center;justify-content:center;
+  font-size:26px;
+  clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
+  background-repeat:no-repeat;background-position:center;background-size:cover,cover;
+  background-image:radial-gradient(circle at 50% 35%,#7a4fd6aa,#0e1418)}
+
+/* --- mitte: Name, Stufe, Pips, Meilenstein --- */
+.tb-mid{flex:1;min-width:0}
+.tb-name{font-size:15px;line-height:1.15}
+.tb-lvl{font-size:10px;color:#c6b4ee;font-weight:800;letter-spacing:.06em;margin-top:2px}
+.tb-lvl em{font-style:normal;color:#fff}
+.pips{display:flex;align-items:center;gap:3px;margin-top:7px}
+.pip{flex:0 0 auto;width:19px;height:19px;border-radius:50%;overflow:hidden;
+  background-repeat:no-repeat;background-position:center;background-size:cover,cover;
+  background-image:radial-gradient(circle at 40% 32%,#3a4756,#141d26 70%);
+  box-shadow:inset 0 0 0 1px #ffffff1f}
+.pip.full{background-image:radial-gradient(circle at 40% 32%,#fff7d6,#e0b94a 45%,#8a6a1f 100%);
+  box-shadow:inset 0 0 0 1px #fff7d666,0 0 7px #e0b94a99}
+.pip.ms{width:30px;height:30px;border-radius:0;margin-left:3px;
+  clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
+  background-image:radial-gradient(circle at 50% 38%,#ffffff,#a45ef2 42%,#4b1c8d 100%);
+  box-shadow:none;filter:drop-shadow(0 0 8px #a45ef2aa)}
+/* Auch der noch nicht erreichte Meilenstein bleibt als HEXAGON und in
+   Amethyst erkennbar — er ist das Ziel der Dekade, kein Fuellmaterial.
+   Der goldene Aussenring bleibt (die HEX-FASSUNG ist gebaut, nur der
+   Gem darin ist noch unbeleuchtet) — sonst verschwindet der Meilenstein
+   optisch zwischen den leeren Pips. */
+.pip.ms.dim{background-image:radial-gradient(circle at 50% 38%,#9d8cc4,#54407e 38%,
+  #2a1c4a 68%,#a8842a 100%);filter:drop-shadow(0 0 5px #e0b94a55);opacity:.85}
+.tb-ms{font-size:9.5px;color:#a9bccb;margin-top:6px;line-height:1.4}
+.tb-ms b{color:var(--gold)}
+
+/* --- rechts: Kosten-Button (GOLD ⇒ dunkle Schrift) --- */
+.tb-buy{flex:0 0 auto;min-width:96px;border-radius:12px;padding:11px 10px;text-align:center;
+  font-size:13px;font-weight:900;line-height:1.2;
+  background-repeat:no-repeat;background-position:center;background-size:100% 100%,100% 100%;
+  background-image:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);
+  box-shadow:0 3px 0 #6d551a;
+  -webkit-text-fill-color:#3a2b07;color:#3a2b07}
+.tb-buy small{display:block;font-size:9px;font-weight:800;opacity:.8;margin-top:2px;
+  -webkit-text-fill-color:#3a2b07}
+.tb-buy .ico{width:13px;height:13px;vertical-align:-2px}
+.tb-buy.gate{background-image:linear-gradient(180deg,#3a4a58,#222e39);box-shadow:0 3px 0 #16202a;
+  -webkit-text-fill-color:#e0b94a;color:#e0b94a;font-size:12px}
+.tb-buy.gate small{-webkit-text-fill-color:#9fb3c1}
+.tb-buy.maxed{background-image:linear-gradient(180deg,#7ad14f,#3aad16);box-shadow:0 3px 0 #1f6b09;
+  -webkit-text-fill-color:#0a2404;color:#0a2404}
+.tb-buy.poor{filter:grayscale(.35) brightness(.88)}
+/* fx_spark-Burst am Button (Bild-Layer, CSS-Ring als Fallback) */
+.sparkburst{position:fixed;z-index:150;width:120px;height:120px;margin:-60px 0 0 -60px;
+  pointer-events:none;background-repeat:no-repeat;background-position:center;
+  background-size:contain,contain;
+  background-image:radial-gradient(circle,#fff7d6cc 0%,#e0b94a66 32%,#e0b94a00 68%);
+  animation:sparkpop .6s ease-out forwards}
+@keyframes sparkpop{0%{opacity:0;transform:scale(.25) rotate(0)}
+  35%{opacity:1;transform:scale(1) rotate(24deg)}
+  100%{opacity:0;transform:scale(1.5) rotate(46deg)}}
+
+/* ==================================================================
  * CLAN + RANGLISTE (DESIGN_CLAN.md)
  * ------------------------------------------------------------------
  * Baut ausschliesslich auf den bereits vorhandenen Bausteinen auf:
@@ -1266,6 +1399,20 @@ span.ico{mix-blend-mode:normal;text-align:center}
        Daten — die Karten rendern generisch aus allTracks(). -->
   <section id="viewFortress" class="view">
     <h2 class="title">Festung</h2>
+    <!-- Layout-Umschalter. ZWEI gleichwertige Darstellungen derselben
+         Daten (arena_fortress.js bleibt unberuehrt):
+           Konstellation — lebende Burg + drei Knoten-Aeste (Variante 1)
+           Banner        — drei Banner ueber die volle Breite, Burg als
+                           abgedunkelter Parallax dahinter (Variante 2)
+         Die Wahl liegt in localStorage "arenaFortLayout". -->
+    <div class="laybar"><span class="lbl2">Darstellung</span>
+      <div class="seg">
+        <button class="segbtn on" id="segConstell" data-fortlay="constell">Konstellation</button>
+        <button class="segbtn" id="segBanner" data-fortlay="banner">Banner</button>
+      </div>
+    </div>
+    <!-- Variante 2: abgedunkelte Burg als Parallax-Ebene hinter den Banners -->
+    <div id="fortBg"></div>
     <!-- A) LEBENDE BURG: Basis-Artwork + Overlay-Ebenen je Track.
          Alle Overlays sitzen auf PROZENT-ANKERN aus window.CastleSkins —
          ein neuer Skin liefert nur {img + anchors} und passt sofort. -->
@@ -1279,6 +1426,8 @@ span.ico{mix-blend-mode:normal;text-align:center}
     </div>
     <!-- B) KRISTALL-KONSTELLATION: drei Äste mit einem Knoten je Stufe. -->
     <div class="constell" id="fortTracks"></div>
+    <!-- B2) BANNER-STAPEL (Variante 2) — dieselben Daten, andere Optik. -->
+    <div class="bannerstack" id="fortBanners"></div>
     <div class="skinbar"><span>Burg-Skin:</span>
       <select class="mini sel" id="skinSel" aria-label="Burg-Skin"></select>
       <span id="skinNote"></span></div>
@@ -1585,6 +1734,11 @@ span.ico{mix-blend-mode:normal;text-align:center}
     track_hp:        CDN + "hf_20260725_135828_29edbcf2-e256-4c35-b3a7-5fceb1ea7adc.png",
     track_dmg:       CDN + "hf_20260725_135832_3232967e-3798-473d-81fd-cf24183c75e1.png",
     track_rate:      CDN + "hf_20260725_135837_d4de036f-acc4-40f7-95e6-e667d2dec6fe.png",
+    /* ---- Festungs-Layout Variante 2 „Banner-Stapel" (Batch 3) ---- */
+    fort_banner_track: CDN + "hf_20260725_150531_224eab67-a74f-40dd-a293-3caf809eb8b9.png",
+    fort_pip_full:     CDN + "hf_20260725_150534_85413c44-d6fc-41ea-a6ee-2b0589f1d5f7.png",
+    fort_pip_empty:    CDN + "hf_20260725_150536_445edf7f-152a-42cd-81f2-b18060e68ced.png",
+    fort_milestone:    CDN + "hf_20260725_150538_2ac9dd11-83f1-435b-8f5c-793e503b448b.png",
     /* ---- Pack-Zeremonie (Referenzvideo, §17) ---- */
     card_back:       CDN + "hf_20260725_144624_82b4b51d-f9d3-416d-8212-52e2f3c0c0a1.png",
     cinematic_legendary:
@@ -2981,6 +3135,30 @@ span.ico{mix-blend-mode:normal;text-align:center}
   })();
 
   function AFof() { return window.ArenaFortress || null; }
+
+  /* ---------- Layout-Umschalter (Variante 1 / Variante 2) ----------
+     Reine Darstellungsfrage: BEIDE Layouts lesen dieselben allTracks()-
+     Daten und kaufen ueber dieselbe buyFort(). arena_fortress.js weiss
+     von der Umschaltung nichts. */
+  var FORT_LAY_KEY = "arenaFortLayout";
+  var fortLayout = (function () {
+    try { return localStorage.getItem(FORT_LAY_KEY) === "banner" ? "banner" : "constell"; }
+    catch (e) { return "constell"; }
+  })();
+  function setFortLayout(k, quiet) {
+    fortLayout = k === "banner" ? "banner" : "constell";
+    try { localStorage.setItem(FORT_LAY_KEY, fortLayout); } catch (e) {}
+    $("viewFortress").classList.toggle("lay-banner", fortLayout === "banner");
+    $("segConstell").classList.toggle("on", fortLayout === "constell");
+    $("segBanner").classList.toggle("on", fortLayout === "banner");
+    if (!quiet) {
+      UISfx.tap();
+      toast(fortLayout === "banner" ? "Darstellung: Banner-Stapel"
+                                    : "Darstellung: Kristall-Konstellation");
+      renderFortress();
+    }
+  }
+
   function renderFortress() {
     renderTop();
     var AF = AFof();
@@ -2992,8 +3170,13 @@ span.ico{mix-blend-mode:normal;text-align:center}
     var st = AF.get();
     $("fortPower").textContent = fmt(AF.powerSum ? AF.powerSum(st.steps) : st.steps * 170);
     $("fortSteps").textContent = st.steps + "/" + AF.TOTAL_CAP + " Stufen";
+    setFortLayout(fortLayout, true);
+    // Beide Layouts werden gerendert; CSS blendet das inaktive aus. Das
+    // haelt den Umschalter sofort reaktionsfaehig und kostet bei drei
+    // Tracks nichts.
     renderCastle(tracks);
     renderConstellation(tracks);
+    renderBanners(tracks);
     renderSkinBar();
 
     var g = AF.nextGate();
@@ -3098,6 +3281,118 @@ span.ico{mix-blend-mode:normal;text-align:center}
       });
     });
   }
+  /* ==================================================================
+   * B2) BANNER-STAPEL — Layout-Variante 2
+   * ------------------------------------------------------------------
+   * Drei Banner ueber die volle Breite. Die Pip-Reihe zeigt IMMER die
+   * AKTUELLE ZEHNER-DEKADE: neun normale Pips plus den Meilenstein-Gem
+   * an Position 10. Damit ist der naechste greifbare Belohnungspunkt
+   * jederzeit sichtbar, ohne 100 Knoten zu rendern — genau die Staerke,
+   * die dieses Layout gegenueber der Konstellation hat.
+   * ================================================================== */
+  var PIPS_PER_DECADE = 10;
+  function decadeOf(lvl, maxLvl) {
+    // Bei Lv 100 (Cap) bleibt die letzte Dekade 91-100 stehen, statt eine
+    // nicht existierende Dekade 101-110 anzuzeigen.
+    var d = Math.floor(lvl / PIPS_PER_DECADE);
+    if (lvl >= maxLvl) d = Math.max(0, Math.ceil(maxLvl / PIPS_PER_DECADE) - 1);
+    return { index: d, from: d * PIPS_PER_DECADE + 1, to: (d + 1) * PIPS_PER_DECADE,
+             filled: Math.max(0, Math.min(PIPS_PER_DECADE, lvl - d * PIPS_PER_DECADE)) };
+  }
+  function renderBanners(tracks) {
+    var AF = AFof(), st = AF.get();
+    var html = '<div class="powerstrip"><b class="goldtext">' +
+      fmt(AF.powerSum ? AF.powerSum(st.steps) : st.steps * 170) + "</b>" +
+      "<span>Festungs-Power</span>" +
+      '<span style="margin-left:auto">' + st.steps + "/" + AF.TOTAL_CAP + " Stufen</span></div>";
+
+    html += tracks.map(function (t) {
+      var dec = decadeOf(t.lvl, t.maxLvl);
+      var pips = "";
+      for (var i = 1; i <= PIPS_PER_DECADE; i++) {
+        var on = i <= dec.filled;
+        if (i === PIPS_PER_DECADE) {
+          pips += '<i class="pip ms' + (on ? "" : " dim") + '" data-pip="' +
+            (on ? "fort_milestone" : "fort_milestone") + '" title="Meilenstein Stufe ' +
+            dec.to + '"></i>';
+        } else {
+          pips += '<i class="pip' + (on ? " full" : "") + '" data-pip="' +
+            (on ? "fort_pip_full" : "fort_pip_empty") + '"></i>';
+        }
+      }
+      // Naechster Meilenstein = das Ende der aktuellen Dekade.
+      var msLvl = dec.to;
+      var msBonus = AF.bonusAt(t.key, msLvl);
+      var msLeft = Math.max(0, msLvl - t.lvl);
+      var ms = msLeft === 0
+        ? "Meilenstein <b>Stufe " + msLvl + "</b> erreicht — Dekade voll."
+        : "Meilenstein <b>Stufe " + msLvl + "</b>: +" + (msBonus * 100).toFixed(2) + " % " +
+          t.stat + " · noch " + msLeft + " Stufe" + (msLeft === 1 ? "" : "n");
+
+      var btn;
+      if (t.maxed || t.capReached) {
+        btn = '<div class="tb-buy maxed">MAX<small>Stufe ' + t.maxLvl + "</small></div>";
+      } else if (t.locked) {
+        btn = '<div class="tb-buy gate">' + ico("icon_lock", "🔒") + " " + fmt(t.lockAt) + " " +
+          ico("cur_trophy", "🏆") + "<small>" + t.lockLabel + "</small></div>";
+      } else {
+        var poor = gold() < t.nextCost ? " poor" : "";
+        btn = '<button class="tb-buy pressable' + poor + '" data-buyfort2="' + t.key + '">' +
+          ico("cur_gold", "🪙") + " " + fmt(t.nextCost) +
+          "<small>+" + t.nextPct.toFixed(2) + " % · Power +" + fmt(t.nextPower) +
+          "</small></button>";
+      }
+
+      return '<div class="trackbanner' + (t.locked ? " locked" : "") + '" data-banner="' +
+        t.key + '" data-bg="fort_banner_track">' +
+        '<div class="tb-emblem" data-hex>' +
+          '<span class="tb-art" data-emb="' + TRACK_VIS[t.key] + '">' + TRACK_EMO[t.key] +
+          "</span></div>" +
+        '<div class="tb-mid">' +
+          '<div class="tb-name goldtext">' + t.name + "</div>" +
+          '<div class="tb-lvl">Stufe <em>' + t.lvl + "</em> / " + t.maxLvl +
+            "  ·  " + t.stat + " +" + t.totalPct.toFixed(1) + " %</div>" +
+          '<div class="pips">' + pips + "</div>" +
+          '<div class="tb-ms">' + ms + "</div>" +
+        "</div>" + btn + "</div>";
+    }).join("");
+
+    $("fortBanners").innerHTML = html;
+    // Asset-Layer: ueberall zuerst das Bild, der CSS-Gradient bleibt als
+    // Fallback dahinter (CDN laedt im Prototyp nicht).
+    var stack = $("fortBanners");
+    Array.prototype.forEach.call(stack.querySelectorAll("[data-bg]"), function (el) {
+      layer(el, el.getAttribute("data-bg"));
+    });
+    Array.prototype.forEach.call(stack.querySelectorAll("[data-hex]"), function (el) {
+      layer(el, "hex_slot");
+    });
+    Array.prototype.forEach.call(stack.querySelectorAll("[data-emb]"), function (el) {
+      layer(el, el.getAttribute("data-emb"));
+    });
+    Array.prototype.forEach.call(stack.querySelectorAll("[data-pip]"), function (el) {
+      layer(el, el.getAttribute("data-pip"));
+    });
+    Array.prototype.forEach.call(stack.querySelectorAll("[data-buyfort2]"), function (b) {
+      b.addEventListener("click", function (e) {
+        buyFort(b.getAttribute("data-buyfort2"), e);
+      });
+    });
+    layer($("fortBg"), "fort_castle");
+    markPressable(stack);
+  }
+
+  /* Parallax: der abgedunkelte Burg-Layer laeuft langsamer als der
+     Inhalt. Gescrollt wird das DOKUMENT (#app hat nur min-height:100vh),
+     deshalb haengt der Listener am window. */
+  function fortParallax() {
+    if (fortLayout !== "banner") return;
+    var bg = $("fortBg");
+    if (!bg || !$("viewFortress").classList.contains("active")) return;
+    bg.style.transform = "translateY(" + (window.scrollY * -0.28).toFixed(1) + "px)";
+  }
+  window.addEventListener("scroll", fortParallax, { passive: true });
+
   function renderSkinBar() {
     var sel = $("skinSel"), cur = window.CastleSkins.current();
     sel.innerHTML = window.CastleSkins.list().map(function (s) {
@@ -3120,13 +3415,31 @@ span.ico{mix-blend-mode:normal;text-align:center}
     }
     setGold(gold() - r.cost);
     UISfx.confirm();
-    // Kauf-Feedback: Lichtstrahl vom Knopf zur Burg + Glow-Puls (Teil A).
-    fireBuyRay(ev);
+    /* Kauf-Feedback je Layout:
+       Konstellation → Lichtstrahl vom Knopf zur Burg + Burg-Glow
+       Banner        → fx_spark-Burst am Knopf + Glow-Puls auf dem Banner */
+    if (fortLayout === "banner") fireSparkBurst(ev); else fireBuyRay(ev);
     toast("Stufe " + r.lvl + " gekauft — " + fmt(r.cost) + " Gold · Power +" + fmt(r.power));
     renderFortress();
     var stage = $("castleStage");
     stage.classList.remove("justbought"); void stage.offsetWidth;
     stage.classList.add("justbought");
+    var bn = $("fortBanners").querySelector('[data-banner="' + key + '"]');
+    if (bn) { bn.classList.remove("justbought"); void bn.offsetWidth; bn.classList.add("justbought"); }
+  }
+  /* fx_spark-Burst am Kauf-Knopf. Das Asset liegt als erster
+     Background-Layer, der radiale CSS-Verlauf traegt den Fallback. */
+  function fireSparkBurst(ev) {
+    var x = ev && ev.clientX != null ? ev.clientX : window.innerWidth / 2;
+    var y = ev && ev.clientY != null ? ev.clientY : window.innerHeight / 2;
+    var el = document.createElement("div");
+    el.className = "sparkburst";
+    el.style.left = x + "px";
+    el.style.top = y + "px";
+    layer(el, "fx_spark");
+    document.body.appendChild(el);
+    UIFx.spark(x, y, 12);
+    setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 640);
   }
   function fireBuyRay(ev) {
     var stage = $("castleStage"); if (!stage) return;
@@ -3665,6 +3978,9 @@ span.ico{mix-blend-mode:normal;text-align:center}
     toast("Arena " + a.n + " von " + ARENA_TIERS.length + ": " + a.name);
   });
   $("arenaProgIcon").addEventListener("click", function (e) { e.stopPropagation(); openRoad(); });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-fortlay]"), function (b) {
+    b.addEventListener("click", function () { setFortLayout(b.getAttribute("data-fortlay")); });
+  });
   $("skinSel").addEventListener("change", function () {
     window.CastleSkins.set($("skinSel").value);
     UISfx.confirm(); renderFortress(); toast("Burg-Skin gewechselt");
@@ -3777,6 +4093,9 @@ span.ico{mix-blend-mode:normal;text-align:center}
                      openRoad: openRoad, closeRoad: closeRoad, nodeList: nodeList,
                      LEAGUE_GATES: LEAGUE_GATES, renderShop: renderShop,
                      renderFortress: renderFortress, buyDeal: buyDeal, buyFort: buyFort,
+                     setFortLayout: setFortLayout, renderBanners: renderBanners,
+                     fortLayout: function () { return fortLayout; },
+                     decadeOf: decadeOf, setGold: setGold, gold: gold,
                      markPressable: markPressable, ico: ico, CastleSkins: window.CastleSkins,
                      flip: flip, revealAll: revealAll, packState: function () { return packState; },
                      playCinematic: playCinematic, openPackKey: openPackKey,

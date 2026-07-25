@@ -12,6 +12,7 @@ untereinander, defensiv gegen fehlende Callbacks).
 | `arena_profile.js` · `arena_rivals.js` · `arena_pity.js` · `arena_surrender.js` · `arena_tutorial.js` | die fünf Match-Module (§1–§5) |
 | `arena_cards.js` | **Karten-Progression v2** — Merge + Material-**Sorten** (§6) |
 | `arena_fortress.js` | **Festungs-Upgrades** — die dritte Progressions-Achse (§7) |
+| `arena_clan.js` | **Clan-System Stufe 1** — Quests, Spenden, Ghost-Clankrieg, Leaderboard (`DESIGN_CLAN.md`) |
 | `ui_prototype.html` | **lauffähiger UI-Nachbau** der vier Meta-Screens (§6) |
 | `AA_UI_REFERENZ.md` | verifizierte Referenz zum Vorbild (Video-Analyse) — **Wahrheitsquelle** |
 | `DESIGN_PROGRESSION.md` | Design-Spezifikation der Karten-Progression (v2, inkl. v1-Anhang) |
@@ -780,9 +781,55 @@ Arkan für Gems) plus **1 Gratis-Tagespack** mit Badge, jedes mit Garantietext u
 **offenem Pity-Stand**. Käufe laufen gegen die Demo-Wallet und `ArenaCards`; ein
 Pack-Kauf öffnet direkt die Pack-Ansicht (`openPackKey`).
 
-**Festung** (`#viewFortress`): Layout „1+3 kombiniert" — siehe nächster Abschnitt.
+**Festung** (`#viewFortress`): **ZWEI umschaltbare Layouts** — siehe nächste zwei Abschnitte.
 
-### Festung: lebende Burg + Kristall-Konstellation
+### Festung: zwei Layouts, ein Datensatz
+
+Der View trägt oben rechts einen Segment-Umschalter (`[data-fortlay]`):
+
+| Segment | Layout | Aufbau |
+|---|---|---|
+| **Konstellation** (Standard) | Variante 1, „1+3 kombiniert" | lebende Burg + drei Knoten-Äste |
+| **Banner** | Variante 2, „Banner-Stapel" | drei Banner über die volle Breite, Burg als abgedunkelter Parallax dahinter |
+
+* Die Wahl liegt in **`localStorage["arenaFortLayout"]`** (`"constell"` \| `"banner"`),
+  gesetzt über `setFortLayout(key)`. Sie überlebt den Reload.
+* Umgeschaltet wird **rein über eine CSS-Klasse** am View (`.lay-banner`); `renderFortress()`
+  rendert **beide** Layouts (bei drei Tracks kostenlos) und CSS blendet das inaktive aus —
+  deshalb reagiert der Umschalter ohne Nachladen.
+* **`arena_fortress.js` ist unberührt.** Beide Layouts lesen dasselbe `allTracks()` und
+  kaufen über dieselbe `buyFort()`. Ein drittes Layout wäre wieder nur eine Render-Funktion
+  plus ein Segment.
+
+**Variante 2 im Detail** (`renderBanners(tracks)`):
+
+* **links** Track-Emblem (`track_hp`/`track_dmg`/`track_rate`) in einer Hex-Fassung
+  (`hex_slot`, CSS-Hexagon als Fallback).
+* **mitte** Track-Name (`.tb-name.goldtext` — die Plakette ist dunkles Amethyst-Glas, dort
+  ist `goldtext` erlaubt), „Stufe X / 100", eine **Pip-Reihe der aktuellen Zehner-Dekade**
+  (9 Pips + Meilenstein-Gem an Position 10, `decadeOf(lvl, maxLvl)`) und darunter der
+  nächste Meilenstein-Bonus. Das ist die eigentliche Stärke dieses Layouts: Der nächste
+  greifbare Belohnungspunkt ist sichtbar, **ohne 100 Knoten zu rendern**.
+* **rechts** Kosten-Button `.tb-buy` (Gold ⇒ **dunkle Schriftfüllung**), bei Trophäen-Tor
+  `.tb-buy.gate` mit `icon_lock` + Anforderung.
+* **Kauf-Feedback** je Layout: Konstellation → `fireBuyRay()` (Lichtstrahl zur Burg),
+  Banner → `fireSparkBurst()` (`fx_spark`-Burst am Knopf) + `.justbought`-Glow auf dem Banner.
+* **Parallax**: `#fortBg` (abgedunkelt, `brightness(.45)`) wird von `fortParallax()` beim
+  Scrollen um `scrollY × −0.28` verschoben. Gescrollt wird das **Dokument** (`#app` hat nur
+  `min-height:100vh`), der Listener hängt deshalb am `window`.
+
+> ⚠ `#fortBg` ist positioniert und lag anfangs **über** dem nicht positionierten Titel und
+> dem Umschalter (gleiche Stapelebene, später im DOM). `#viewFortress > h2.title` und
+> `.laybar` brauchen deshalb `position:relative; z-index:2`.
+
+**Assets Batch 3** (in `ui_assets.json`, `type: "image"`, `batch: 3`):
+`fort_banner_track` (Plakette), `fort_pip_full`, `fort_pip_empty`, `fort_milestone`.
+Die Pip-/Meilenstein-Bilder haben dunkle Hintergründe und werden deshalb als runde
+(`border-radius:50%`) bzw. hexagonale (`clip-path`) Elemente beschnitten — Pips 19 px,
+Meilenstein 30 px. Wie überall liegt das Asset als **erster** Background-Layer, der
+CSS-Verlauf dahinter trägt den Offline-Fallback.
+
+### Festung: lebende Burg + Kristall-Konstellation (Variante 1)
 
 Die Mathematik liegt komplett in `arena_fortress.js` (auf **Lv 100 je Track**
 kalibriert, AA-Referenz §16.6); die View ist reine Präsentation und liest ausschließlich
@@ -798,10 +845,11 @@ kalibriert, AA-Referenz §16.6); die View ist reine Präsentation und liest auss
 * `buyFort(key, ev)` → `fireBuyRay(ev)` (Lichtstrahl vom Knopf zur Burg) + `.justbought`
   (Glow-Puls) + `renderFortress()`.
 
-> **Layout bewusst noch nicht final.** Der User wählt die endgültige Optik separat. Die
-> Trackdaten sind deshalb **sauber vom Markup getrennt**: alles, was die View braucht,
-> kommt aus `ArenaFortress.allTracks()`. Ein Layoutwechsel betrifft nur `renderCastle` /
-> `renderConstellation`, keine Datenstruktur.
+> **Layout weiterhin nicht final — jetzt aber vergleichbar.** Beide Varianten sind live
+> umschaltbar, der User kann sie am Gerät gegeneinander halten. Dass das ohne
+> Datenänderung ging, ist der Beweis für die Trennung: alles, was eine View braucht, kommt
+> aus `ArenaFortress.allTracks()`. Ein Layoutwechsel betrifft nur `renderCastle` /
+> `renderConstellation` / `renderBanners`, keine Datenstruktur.
 
 ### 🔑 `window.CastleSkins` — die Skin-Architektur (für den späteren Verkauf)
 
