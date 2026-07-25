@@ -806,6 +806,230 @@ span.ico{mix-blend-mode:normal;text-align:center}
 .skinbar select{flex:0 0 auto}
 
 /* ==================================================================
+ * SEASON-PASS · HELDEN · EVENTS · POST · EINSTELLUNGEN
+ * ------------------------------------------------------------------
+ * Die fuenf restlichen Views. Gleiche Bausteine wie ueberall:
+ * .view / .viewhead / .tabs / .pressable / goldtext nur auf DUNKLEM
+ * Grund / Assets als ERSTER Background-Layer ueber dem CSS-Fallback.
+ * ================================================================== */
+/* ---------- Breitbanner-Kopf (Pass, Events) ---------- */
+.keyart{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:16/9;
+  background-repeat:no-repeat;background-position:center;background-size:cover,cover;
+  background-image:linear-gradient(120deg,#3a2b6b,#1a1230 55%,#0e1418);
+  border:1px solid #e0b94a3d;box-shadow:0 12px 26px -14px #000e}
+.keyart .kshade{position:absolute;inset:0;
+  background:linear-gradient(90deg,#0b1116e8 0%,#0b111699 42%,#0b111600 78%)}
+.keyart .ktx{position:absolute;left:14px;right:14px;bottom:12px}
+.keyart .kkick{font-size:9.5px;letter-spacing:.22em;font-weight:800;color:#c6b4ee}
+.keyart .ktitle{font-size:23px;line-height:1.1;margin-top:2px}
+.keyart .kend{font-size:10.5px;color:#dbe6ef;margin-top:5px;font-weight:700}
+.keyart .kend b{color:var(--gold)}
+
+/* ---------- Season-Pass ---------- */
+.passbar{display:flex;align-items:center;gap:8px;margin-top:10px;padding:9px 11px;
+  border-radius:12px;background:#0b1116;border:1px solid var(--line);font-size:10.5px;
+  color:var(--dim)}
+.passbar b{color:var(--txt);font-size:13px}
+.passbar .pb{flex:1;position:relative;height:12px;border-radius:7px;overflow:hidden;
+  background:#16202a;border:1px solid #2b3b47}
+.passbar .pb i{position:absolute;left:0;top:0;bottom:0;
+  background:linear-gradient(90deg,#a45ef2,#f2c53d)}
+.buypass{width:100%;margin-top:10px;border-radius:12px;padding:12px 0;font-size:14px;
+  font-weight:900;letter-spacing:.04em;
+  background:linear-gradient(180deg,#f5a7f7,#dc1ddb 55%,#8d1c78);color:#fff;
+  box-shadow:0 3px 0 #5d1250}
+.buypass[disabled]{background:linear-gradient(180deg,#3a4a58,#222e39);color:#8fa0ad;
+  box-shadow:0 3px 0 #16202a}
+.passhead{display:grid;grid-template-columns:44px 1fr 1fr;gap:6px;margin-top:12px;
+  font-size:9px;letter-spacing:.14em;font-weight:800;color:var(--dim);text-align:center}
+.passhead .prem{color:#e6c2ff}
+.passlist{margin-top:4px;max-height:430px;overflow-y:auto;padding-right:2px}
+.passrow{display:grid;grid-template-columns:44px 1fr 1fr;gap:6px;align-items:stretch;
+  margin-top:6px}
+.passrow .pnum{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  border-radius:10px;background:linear-gradient(180deg,#243342,#141d26);
+  border:1px solid var(--line);font-size:13px;font-weight:900;color:#c2cfd9}
+.passrow.done .pnum{border-color:#7ad14f66;color:#8fe08f}
+.passrow.now .pnum{border-color:#f2c53d;box-shadow:0 0 12px #f2c53d55;color:var(--gold)}
+.passrow .pnum small{font-size:7.5px;letter-spacing:.08em;color:var(--dim);font-weight:800}
+.rwcell{position:relative;display:flex;align-items:center;gap:7px;padding:8px 8px;
+  border-radius:10px;border:1px solid var(--line);
+  background:linear-gradient(180deg,#1b2732,#131c25);min-height:52px}
+.rwcell.prem{background:linear-gradient(180deg,#2a1c4a,#161028);border-color:#a45ef23d}
+.rwcell.claimable{border-color:#f2c53d;box-shadow:0 0 12px #f2c53d44}
+.rwcell.taken{opacity:.42}
+.rwcell.blocked{opacity:.6}
+.rwcell .rico{flex:0 0 26px;width:26px;height:26px;display:flex;align-items:center;
+  justify-content:center;font-size:16px;border-radius:7px;
+  background-repeat:no-repeat;background-position:center;background-size:cover,cover;
+  background-image:radial-gradient(circle at 45% 35%,#3a4c5c,#141d26 72%)}
+.rwcell .rtx{flex:1;min-width:0;font-size:10px;font-weight:800;color:#dbe6ef;line-height:1.3}
+.rwcell .rtx small{display:block;font-size:8.5px;color:var(--dim);font-weight:700}
+.rwcell .rget{position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  border-radius:8px;padding:5px 9px;font-size:10px;font-weight:900;
+  background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);box-shadow:0 2px 0 #6d551a;
+  -webkit-text-fill-color:#3a2b07;color:#3a2b07}
+.rwcell .rlock{position:absolute;right:7px;top:50%;transform:translateY(-50%);font-size:13px}
+.rwcell .rchk{position:absolute;right:7px;top:50%;transform:translateY(-50%);font-size:13px;
+  color:#8fe08f}
+
+/* ---------- Helden ---------- */
+.herocard{position:relative;display:flex;gap:11px;margin-top:11px;padding:11px;
+  border-radius:16px;border:1px solid var(--line);
+  background:linear-gradient(160deg,#1e2a36,#111a21)}
+.herocard.locked{filter:grayscale(.6) brightness(.78)}
+.herostage{position:relative;flex:0 0 116px;width:116px;aspect-ratio:3/4;border-radius:12px;
+  overflow:hidden;font-size:44px;
+  background:linear-gradient(180deg,#2c3a4b,#131c25);border:2px solid var(--line)}
+.herostage .artbox{inset:0;border-radius:10px;font-size:44px}
+.herocard .hmeta{flex:1;min-width:0;display:flex;flex-direction:column}
+.herocard .hnm{font-size:19px;line-height:1.1}
+.herocard .hel{font-size:9.5px;letter-spacing:.12em;font-weight:800;margin-top:3px}
+.herocard .hds{font-size:10.5px;color:#c6d3dd;line-height:1.45;margin-top:6px;flex:1}
+.herocard .hstat{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.herocard .hlock{font-size:10px;color:var(--gold);font-weight:800;margin-top:6px}
+
+/* ---------- Events ---------- */
+.evcard{position:relative;margin-top:11px;border-radius:16px;overflow:hidden;
+  border:1px solid var(--line);background:#111a21}
+.evart{position:relative;aspect-ratio:16/9;
+  background-repeat:no-repeat;background-position:center;background-size:cover,cover;
+  background-image:linear-gradient(120deg,#2c3a4b,#131c25)}
+.evart .evshade{position:absolute;inset:0;
+  background:linear-gradient(180deg,#0b111600 40%,#0b1116e6)}
+.evart .evchip{position:absolute;left:10px;top:10px;border-radius:20px;padding:3px 10px;
+  font-size:9px;font-weight:900;letter-spacing:.1em}
+.evchip.live{background:linear-gradient(180deg,#7ad14f,#3aad16);color:#0a2404}
+.evchip.soon{background:#0b1116cc;border:1px solid #3a4c5c;color:#a9bccb}
+.evart .evtitle{position:absolute;left:12px;right:12px;bottom:9px;font-size:19px;line-height:1.1}
+.evbody{padding:10px 12px 12px}
+.evbody .evds{font-size:10.5px;color:#c6d3dd;line-height:1.5}
+.evbody .evfoot{display:flex;align-items:center;gap:8px;margin-top:9px}
+.evbody .evtime{font-size:10px;font-weight:800;color:var(--gold)}
+.evjoin{margin-left:auto;border-radius:10px;padding:8px 15px;font-size:11.5px;font-weight:900;
+  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);color:#fff;box-shadow:0 3px 0 #12496f}
+.evjoin.soon{background:linear-gradient(180deg,#3a4a58,#222e39);color:#8fa0ad;
+  box-shadow:0 3px 0 #16202a}
+
+/* ---------- Post ---------- */
+.mailrow{display:flex;gap:10px;margin-top:9px;padding:11px;border-radius:13px;
+  border:1px solid var(--line);background:linear-gradient(180deg,#1b2732,#131c25)}
+.mailrow.unread{border-color:#63b1ee66;box-shadow:0 0 10px #63b1ee1f}
+.mailrow.unread .msub{color:#fff}
+.mailrow .mico{flex:0 0 32px;width:32px;height:32px;border-radius:9px;display:flex;
+  align-items:center;justify-content:center;font-size:17px;background:#0b1116;
+  border:1px solid #2b3b47;position:relative}
+.mailrow .mico .dot{position:absolute;right:-3px;top:-3px;width:9px;height:9px;border-radius:50%;
+  background:var(--danger);box-shadow:0 0 6px var(--danger)}
+.mailrow .mtx{flex:1;min-width:0}
+.mailrow .msub{font-size:12px;font-weight:900;color:#dbe6ef;line-height:1.25}
+.mailrow .mfrom{font-size:9px;color:var(--dim);font-weight:700;margin-top:2px}
+.mailrow .mbody{font-size:10.5px;color:#c6d3dd;line-height:1.5;margin-top:5px}
+.mailrow .mrew{display:flex;align-items:center;gap:7px;margin-top:8px;flex-wrap:wrap}
+.mailrow .mrew .rchip{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:800;
+  background:#0b1116;border:1px solid #2b3b47;border-radius:8px;padding:4px 8px}
+.mailtake{margin-left:auto;border-radius:9px;padding:7px 13px;font-size:11px;font-weight:900;
+  background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);box-shadow:0 2px 0 #6d551a;
+  -webkit-text-fill-color:#3a2b07;color:#3a2b07}
+.mailtake.done{background:linear-gradient(180deg,#3a4a58,#222e39);box-shadow:0 2px 0 #16202a;
+  -webkit-text-fill-color:#8fa0ad;color:#8fa0ad}
+
+/* ---------- Einstellungen ---------- */
+.setgrp{margin-top:12px;border-radius:13px;border:1px solid var(--line);overflow:hidden;
+  background:linear-gradient(180deg,#1b2732,#131c25)}
+.setgrp .sghd{padding:8px 11px;font-size:9.5px;letter-spacing:.14em;font-weight:800;
+  color:var(--dim);background:#0b1116;border-bottom:1px solid var(--line)}
+.setrow{display:flex;align-items:center;gap:10px;padding:11px}
+.setrow+.setrow{border-top:1px solid #1f2b35}
+.setrow .stx{flex:1;min-width:0;font-size:12px;font-weight:800;color:#dbe6ef}
+.setrow .stx small{display:block;font-size:9.5px;color:var(--dim);font-weight:700;margin-top:2px}
+.swch{flex:0 0 46px;width:46px;height:26px;border-radius:14px;position:relative;
+  background:#2b3b47;border:1px solid #35485a;transition:background .18s}
+.swch i{position:absolute;left:2px;top:2px;width:20px;height:20px;border-radius:50%;
+  background:linear-gradient(180deg,#dbe6ef,#8fa0ad);transition:left .18s}
+.swch.on{background:linear-gradient(90deg,#3aad16,#7ad14f);border-color:#7ad14f}
+.swch.on i{left:22px;background:linear-gradient(180deg,#fff,#dff2e0)}
+.swch.off i{left:2px}
+.setrow .sbadge{font-size:9px;font-weight:900;color:#a9bccb;background:#0b1116;
+  border:1px solid #2b3b47;border-radius:8px;padding:4px 8px}
+.savearea{width:100%;min-height:74px;border-radius:10px;border:1px solid var(--line);
+  background:#0b1116;color:#c2cfd9;font-family:ui-monospace,Menlo,Consolas,monospace;
+  font-size:9.5px;padding:8px;resize:vertical}
+.setbtns{display:flex;gap:8px;margin-top:8px}
+.setbtn{flex:1;border-radius:10px;padding:9px 0;font-size:11.5px;font-weight:900;
+  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);color:#fff;box-shadow:0 3px 0 #12496f}
+.setbtn.danger{background:linear-gradient(180deg,#ff7b6b,#b52b1d);box-shadow:0 3px 0 #6d1710}
+.setbtn.ghost{background:var(--panel);color:#c2cfd9;border:1px solid var(--line);
+  box-shadow:none}
+.credits{margin-top:14px;font-size:9.5px;color:var(--dim);line-height:1.6;text-align:center}
+.confirmbox{text-align:center;padding:18px 16px}
+.confirmbox h3{margin:0 0 8px;font-size:17px}
+.confirmbox p{margin:0 0 14px;font-size:11.5px;color:#c6d3dd;line-height:1.5}
+
+/* ---------- Home: zweite Hub-Reihe (3 kompakte Kacheln) ---------- */
+.hubrow2{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:8px 14px 0}
+.hubmini{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:9px 4px;border-radius:12px;border:1px solid #3a4c5c;
+  background-repeat:no-repeat;background-position:center -8px;background-size:auto 150%,cover;
+  background-image:linear-gradient(160deg,#243342,#141d26)}
+.hubmini .hmi{font-size:19px;line-height:1}
+.hubmini .hmn{font-size:9px;font-weight:900;color:#cfe0ec;letter-spacing:.04em}
+.hubmini .nb2{position:absolute;right:-4px;top:-4px;min-width:16px;height:16px;line-height:16px;
+  border-radius:8px;background:var(--danger);color:#fff;font-size:9px;font-weight:900;
+  text-align:center;padding:0 4px}
+
+/* ==================================================================
+ * KARTEN-ARTWORK-EBENE (Batch 4) — der AAA-Sweep
+ * ------------------------------------------------------------------
+ * Bis Batch 3 stand auf jeder Karte ein EMOJI (🔥❄🪨…). Das war die
+ * sichtbarste Indie-Schwaeche der ganzen UI: ein Emoji ist auf jedem
+ * Geraet ein anderes Bild, traegt keine Stilrichtung und skaliert nicht.
+ * Jede Karte hat jetzt ein echtes 3:4-Artwork, das UNTER dem
+ * Raritaetsrahmen liegt.
+ *
+ * Technik: cardArtHTML() liefert ein <img> mit dem Emoji als `alt` und
+ * onerror="UIIcon.fail(this)" — exakt das ico()-Muster. Faellt das CDN
+ * aus, ersetzt UIIcon.fail() das <img> durch ein <span> mit demselben
+ * Klassennamen und dem Emoji als Text. Deshalb sind unten BEIDE
+ * Selektoren gestylt: img.cart (Bildfall) und span.cart (Fallback).
+ * ================================================================== */
+/* Das Emoji liegt als UNTERE Ebene IMMER da, das Artwork deckt es zu.
+   Damit ist die Karte in allen drei Zustaenden lesbar: waehrend das Bild
+   laedt, nach dem Laden und wenn das CDN gar nicht antwortet. Ein reiner
+   onerror-Tausch (wie bei ico()) laesst die Kachel so lange LEER, bis der
+   Netzwerk-Timeout zuschlaegt — bei blockiertem CDN sind das Sekunden. */
+img.cart{position:absolute;inset:0;z-index:1;display:block;width:100%;height:100%;
+  object-fit:cover;border:0}
+.cartemo{position:absolute;inset:0;z-index:0;display:flex;align-items:center;
+  justify-content:center;font-size:inherit;filter:drop-shadow(0 2px 4px #000a)}
+/* Bildflaeche einer Karte: fuellt die Kachel, der Rahmen liegt darueber. */
+.artbox{position:absolute;inset:2px;border-radius:6px;overflow:hidden;z-index:0;
+  background:linear-gradient(160deg,#243342,#0e1418)}
+/* Rahmen-Overlay. BEWUSST ohne Gradient-Fallback: laedt das Rahmenbild
+   nicht, darf hier NICHTS gezeichnet werden — sonst deckt der Fallback
+   das Artwork zu. Die farbige Kachelkante traegt die Raritaet dann allein. */
+.frm{position:absolute;inset:0;z-index:3;pointer-events:none;
+  background-repeat:no-repeat;background-position:center;background-size:100% 100%}
+.tile .artbox{font-size:22px}
+.deckslot .artbox{font-size:30px;inset:3px}
+.reqslot .artbox{font-size:24px;inset:3px}
+.tower .artbox,.tower .big.artbox{inset:0;margin:0;border-radius:12px;font-size:54px}
+.cercard .artbox{inset:3px;border-radius:9px;font-size:52px}
+.pcfront .artbox{inset:0;border-radius:0;font-size:22px}
+/* Kartenvorderseite im Pack: Artwork randlos, Beschriftung als Bauchbinde. */
+.pcfront .facewrap{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;
+  justify-content:flex-end;pointer-events:none}
+.pcfront .facewrap .t{background:linear-gradient(180deg,#0e141800,#0e1418e8 55%);
+  font-size:8.5px;font-weight:900;letter-spacing:.05em;text-align:center;padding:8px 2px 3px}
+/* Emote-Tokens (rund, Batch 4) */
+.emotok{position:relative;flex:0 0 auto;width:34px;height:34px;border-radius:50%;
+  overflow:hidden;display:block;margin:0 auto 3px;font-size:17px;
+  background:radial-gradient(circle at 45% 35%,#3a4c5c,#141d26 72%);
+  box-shadow:0 0 0 1px #e0b94a4d,0 2px 5px #0008}
+.feed .fe .fi .emotok{width:20px;height:20px;margin:0;font-size:11px;
+  box-shadow:0 0 0 1px #e0b94a3d}
+
+/* ==================================================================
  * FESTUNG — LAYOUT-VARIANTE 2: „BANNER-STAPEL"
  * ------------------------------------------------------------------
  * Zweites, umschaltbares Layout NEBEN der Konstellation (Variante 1).
@@ -1267,6 +1491,16 @@ span.ico{mix-blend-mode:normal;text-align:center}
         <span class="ht"><span class="htn">Rangliste</span>
           <span class="hts" id="tileBoardSub">—</span></span></button>
     </div>
+    <!-- Zweite Hub-Reihe: Pass, Post, Einstellungen. Die Bottom-Nav
+         bleibt bei AAs fuenf Plaetzen (§15.5). -->
+    <div class="hubrow2">
+      <button class="hubmini" id="tilePass"><span class="hmi" data-ico="hub_pass" data-emoji="🎟"></span>
+        <span class="hmn">Season-Pass</span><i class="nb2" id="tilePassBadge" style="display:none">0</i></button>
+      <button class="hubmini" id="tileMail"><span class="hmi" data-ico="hub_mail" data-emoji="✉"></span>
+        <span class="hmn">Post</span><i class="nb2" id="tileMailBadge" style="display:none">0</i></button>
+      <button class="hubmini" id="tileSettings"><span class="hmi" data-ico="hub_settings" data-emoji="⚙"></span>
+        <span class="hmn">Einstellungen</span></button>
+    </div>
 
     <div class="ladder" id="arenaLadder"></div>
     <p class="homenote" id="homeNote">—</p>
@@ -1317,6 +1551,104 @@ span.ico{mix-blend-mode:normal;text-align:center}
     <p class="lbnote" id="lbNote">—</p>
   </section>
 
+  <!-- ===== VIEW P: SEASON-PASS „GOLDENE FORTUNA" =====
+       50 Stufen, ZWEI Spuren (Gratis | Premium). Saison = Kalendermonat,
+       deterministisch. Logik gekapselt in window.ArenaPass (localStorage
+       "arenaPass"), Schnittstelle ArenaPass.reportEvent(type, amount) —
+       bewusst DIESELBE Signatur wie ArenaClan.reportEvent(). -->
+  <section id="viewPass" class="view">
+    <div class="viewhead"><button class="backbtn" id="passBack">‹</button>
+      <h2 class="title">Season-Pass</h2></div>
+    <div class="keyart" id="passArt">
+      <div class="kshade"></div>
+      <div class="ktx"><div class="kkick">SAISON · <span id="passSeason">—</span></div>
+        <div class="ktitle goldtext">Goldene Fortuna</div>
+        <div class="kend" id="passEnd">—</div></div>
+    </div>
+    <div class="passbar"><span>Stufe <b id="passLvl">0</b></span>
+      <span class="pb"><i id="passFill" style="width:0%"></i></span>
+      <span id="passXp">0/100 XP</span></div>
+    <button class="buypass pressable" id="btnBuyPass">Pass aktivieren · 950 💎</button>
+    <div class="passhead"><span>STUFE</span><span>GRATIS</span><span class="prem">PREMIUM</span></div>
+    <div class="passlist" id="passList"></div>
+    <p class="fortnote" id="passNote">—</p>
+  </section>
+
+  <!-- ===== VIEW H: HELDEN ===== -->
+  <section id="viewHeroes" class="view">
+    <div class="viewhead"><button class="backbtn" id="heroBack">‹</button>
+      <h2 class="title">Helden</h2></div>
+    <div id="heroList"></div>
+    <p class="fortnote" id="heroNote">—</p>
+  </section>
+
+  <!-- ===== VIEW E: EVENTS ===== -->
+  <section id="viewEvents" class="view">
+    <div class="viewhead"><button class="backbtn" id="evBack">‹</button>
+      <h2 class="title">Events</h2></div>
+    <div id="evList"></div>
+    <p class="fortnote" id="evNote">—</p>
+  </section>
+
+  <!-- ===== VIEW M: POST ===== -->
+  <section id="viewMail" class="view">
+    <div class="viewhead"><button class="backbtn" id="mailBack">‹</button>
+      <h2 class="title">Post</h2></div>
+    <div id="mailList"></div>
+    <p class="fortnote" id="mailNote">—</p>
+  </section>
+
+  <!-- ===== VIEW S2: EINSTELLUNGEN ===== -->
+  <section id="viewSettings" class="view">
+    <div class="viewhead"><button class="backbtn" id="setBack">‹</button>
+      <h2 class="title">Einstellungen</h2></div>
+
+    <div class="setgrp"><div class="sghd">TON &amp; HAPTIK</div>
+      <div class="setrow"><span class="stx">Sound-Effekte<small>Klicks, Belohnungen, Kartendrehung</small></span>
+        <button class="swch on" id="swSound" data-sw="sound"><i></i></button></div>
+      <div class="setrow"><span class="stx">Musik<small>Hintergrundmusik im Hub</small></span>
+        <button class="swch on" id="swMusic" data-sw="music"><i></i></button></div>
+      <div class="setrow"><span class="stx">Haptik<small>Vibration bei Treffern und Käufen</small></span>
+        <button class="swch on" id="swHaptic" data-sw="haptic"><i></i></button></div>
+    </div>
+
+    <div class="setgrp"><div class="sghd">SPRACHE</div>
+      <div class="setrow"><span class="stx">Deutsch<small>Aktuell aktiv</small></span>
+        <span class="sbadge" id="langDe">AKTIV</span></div>
+      <div class="setrow"><span class="stx">English<small>Translation in progress</small></span>
+        <span class="sbadge">BALD</span></div>
+    </div>
+
+    <div class="setgrp"><div class="sghd">SPIELSTAND</div>
+      <div class="setrow" style="display:block">
+        <textarea class="savearea" id="saveArea" spellcheck="false"
+          placeholder="Spielstand-JSON — Exportieren füllt das Feld, Importieren liest es ein."></textarea>
+        <div class="setbtns">
+          <button class="setbtn pressable" id="btnExport">Exportieren</button>
+          <button class="setbtn ghost pressable" id="btnImport">Importieren</button>
+        </div>
+        <div class="setbtns"><button class="setbtn danger pressable" id="btnWipe">Alles zurücksetzen</button></div>
+        <p class="lbnote" id="saveNote">—</p>
+      </div>
+    </div>
+    <p class="credits" id="credits">—</p>
+  </section>
+
+  <!-- Bestaetigungsdialog (Zuruecksetzen) -->
+  <div class="modal" id="confirmDlg">
+    <div class="sheet">
+      <div class="confirmbox">
+        <h3 class="goldtext" id="cfTitle">Wirklich zurücksetzen?</h3>
+        <p id="cfText">Alle Karten, Festungsstufen, Clan-Daten und der Pass-Fortschritt
+          werden gelöscht. Das lässt sich nicht rückgängig machen.</p>
+        <div class="setbtns">
+          <button class="setbtn ghost pressable" id="cfNo">Abbrechen</button>
+          <button class="setbtn danger pressable" id="cfYes">Ja, löschen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== VIEW 1: COLLECTION (§7) ===== -->
   <section id="viewCollection" class="view">
     <h2 class="title">Battle Deck</h2>
@@ -1326,6 +1658,7 @@ span.ico{mix-blend-mode:normal;text-align:center}
       <button class="tab on" id="tabTowers">Türme</button>
       <button class="tab" id="tabSkills">Skills</button>
       <button class="tab" id="tabItems">Items</button>
+      <button class="tab" id="tabHeroes">Helden</button>
       <span class="spacer"></span>
       <button class="forgebtn" id="btnToForge">⚒ SCHMIEDE</button>
     </div>
@@ -1629,16 +1962,21 @@ span.ico{mix-blend-mode:normal;text-align:center}
   var DECK = ["fire", "water", "nature", "light"];
 
   /* ================= Hub-Wallet (Gold liegt NICHT in ArenaCards) ======== */
-  var GOLD_KEY = "arenaHubGold";
+  var GOLD_KEY = "arenaHubGold", GEM_KEY = "arenaHubGems";
   function gold() { return parseInt(localStorage.getItem(GOLD_KEY) || "0", 10) || 0; }
   function setGold(v) { localStorage.setItem(GOLD_KEY, String(Math.max(0, Math.round(v)))); }
+  /* Gems waren bis Batch 3 eine reine Anzeige-Konstante. Der Season-Pass
+     kostet echte 950 Gems — damit der Kauf im Prototyp ueberhaupt
+     stattfinden kann, liegen sie jetzt wie Gold in der Hub-Wallet. */
+  function gems() { return parseInt(localStorage.getItem(GEM_KEY) || "0", 10) || 0; }
+  function setGems(v) { localStorage.setItem(GEM_KEY, String(Math.max(0, Math.round(v)))); }
 
   /* Trophäen/Gems sind im Prototyp Deko (im Spiel: ArenaProfile bzw. Shop).
      Werte aus dem Video-11-Account: 1136 🏆 = Arena 4, 245 💎, dazu ein
      realistischer Gold-Stand von 12 500 — genug für die günstigen Karten,
      NICHT genug für DAWN Lv44 (18 000). Das ist der dokumentierte
      Gold-Bottleneck, im Prototyp bewusst sichtbar. */
-  var DEMO_TROPHIES = 1136, DEMO_GEMS = 245, DEMO_GOLD = 12500;
+  var DEMO_TROPHIES = 1136, DEMO_GEMS = 1250, DEMO_GOLD = 12500;
 
   /* ==================================================================
    * ASSET-MANIFEST (Spiegel von arena_patches/ui_assets.json)
@@ -1734,6 +2072,26 @@ span.ico{mix-blend-mode:normal;text-align:center}
     track_hp:        CDN + "hf_20260725_135828_29edbcf2-e256-4c35-b3a7-5fceb1ea7adc.png",
     track_dmg:       CDN + "hf_20260725_135832_3232967e-3798-473d-81fd-cf24183c75e1.png",
     track_rate:      CDN + "hf_20260725_135837_d4de036f-acc4-40f7-95e6-e667d2dec6fe.png",
+    /* ---- Batch 4: Karten-Artworks (3:4, randlos, liegen UNTER dem Raritaetsrahmen) ---- */
+    card_ember:       CDN + "hf_20260725_160628_0633b136-c9aa-409a-911e-63b1a496b1b6.png",
+    card_frost:       CDN + "hf_20260725_160630_0d477f21-6425-4849-aff7-8e545647fd90.png",
+    card_stone:       CDN + "hf_20260725_160633_f987f0ee-26c9-4923-83f7-c99490d5c932.png",
+    card_thorn:       CDN + "hf_20260725_160635_8b90cad8-d641-4874-9aee-5e86fa6988cc.png",
+    card_dawn:        CDN + "hf_20260725_160638_c6833184-bb6f-494f-a32a-d31e61c0b17f.png",
+    card_hollow:      CDN + "hf_20260725_160640_ac3247ff-7eff-41e0-97b7-f3fc263d6948.png",
+    card_solara:      CDN + "hf_20260725_160644_4be1e01f-8e65-4d2d-b42f-2b2ad3d579de.png",
+    card_magmor:      CDN + "hf_20260725_160645_a9f23226-f8fe-4d2c-9bc0-afad20ce6d7c.png",
+    /* ---- Batch 4: Breitbanner 16:9 (Pass, Events) ---- */
+    pass_keyart:      CDN + "hf_20260725_160701_42a171b5-06f3-458d-a766-f4992e4210e5.png",
+    event_tournament: CDN + "hf_20260725_160704_9fb36583-0558-4407-a96c-83275fc4c95e.png",
+    event_essence:    CDN + "hf_20260725_160706_82a16544-3845-4947-8482-8104ab108bf6.png",
+    /* ---- Batch 4: Emote-Tokens 1:1 (rund beschnitten) ---- */
+    emote_luck:       CDN + "hf_20260725_160713_d2da4068-32da-4d1a-950e-a554f7a3ec11.png",
+    emote_thanks:     CDN + "hf_20260725_160715_3b9758a1-6ccd-46fe-887b-c87ff28579f0.png",
+    emote_cards:      CDN + "hf_20260725_160718_714b6f41-0b0f-4ebc-9284-e39af17401ea.png",
+    emote_attack:     CDN + "hf_20260725_160720_ca1c0844-21b8-40c1-b714-22bb44895f47.png",
+    emote_strong:     CDN + "hf_20260725_160722_700d087a-3ea5-4bb1-8178-7cf35e08d73f.png",
+    emote_welcome:    CDN + "hf_20260725_160724_83a735e4-f6f7-4853-86b5-23ebe574f386.png",
     /* ---- Festungs-Layout Variante 2 „Banner-Stapel" (Batch 3) ---- */
     fort_banner_track: CDN + "hf_20260725_150531_224eab67-a74f-40dd-a293-3caf809eb8b9.png",
     fort_pip_full:     CDN + "hf_20260725_150534_85413c44-d6fc-41ea-a6ee-2b0589f1d5f7.png",
@@ -1753,6 +2111,8 @@ span.ico{mix-blend-mode:normal;text-align:center}
    * Deshalb steht in JEDEM Aufruf das Original-Emoji als zweites Argument.
    * ================================================================== */
   window.UIIcon = {
+    // Bild ausblenden — fuer Ebenen, unter denen bereits ein Fallback liegt.
+    hide: function (img) { img.style.display = "none"; },
     fail: function (img) {
       var sp = document.createElement("span");
       sp.className = img.className;
@@ -1760,6 +2120,42 @@ span.ico{mix-blend-mode:normal;text-align:center}
       if (img.parentNode) img.parentNode.replaceChild(sp, img);
     }
   };
+  /* ==================================================================
+   * cardArtHTML(id, cls) — die eine Stelle, an der Karten-Artwork entsteht
+   * ------------------------------------------------------------------
+   * Liefert <img src=Artwork alt=Emoji onerror=UIIcon.fail>. Faellt das
+   * CDN aus, bleibt das Emoji als Text stehen — dieselbe Absicherung wie
+   * bei ico(). Wer eine neue Karte anlegt, traegt sie in CARD_ART ein;
+   * fehlt der Eintrag, greift automatisch der Emoji-Pfad.
+   * ================================================================== */
+  var CARD_ART = {
+    fire: "card_ember", water: "card_frost", nature: "card_thorn", earth: "card_stone",
+    light: "card_dawn", darkness: "card_hollow", solara: "card_solara", magmor: "card_magmor",
+  };
+  function cardArtHTML(id, cls) {
+    var m = BY_ID[id] || {}, emoji = m.art || "❔";
+    var u = ASSETS[CARD_ART[id]];
+    var emo = '<span class="cartemo">' + emoji + "</span>";
+    if (!u) return emo;
+    // onerror blendet das Bild aus; darunter liegt bereits das Emoji.
+    return emo + '<img class="cart ' + (cls || "") + '" src="' + u + '" alt="' + emoji +
+      '" onerror="UIIcon.hide(this)">';
+  }
+  // Karten-Bildflaeche inklusive Rahmen-Overlay, fertig fuer jede Kachel.
+  function artBox(id, tierKey, cls) {
+    return '<span class="artbox ' + (cls || "") + '">' + cardArtHTML(id) + "</span>" +
+      (tierKey ? '<span class="frm" data-frame="frame_' + tierKey + '"></span>' : "");
+  }
+  /* Rahmen-Overlays aufloesen. Anders als layer() OHNE Gradient-Fallback:
+     ein Overlay, das bei fehlendem Bild einen Verlauf malt, wuerde das
+     Artwork darunter zudecken. */
+  function hydrateFrames(root) {
+    Array.prototype.forEach.call((root || document).querySelectorAll("[data-frame]"), function (el) {
+      var k = el.getAttribute("data-frame");
+      if (ASSETS[k]) el.style.backgroundImage = 'url("' + ASSETS[k] + '")';
+      el.removeAttribute("data-frame");
+    });
+  }
   function ico(key, emoji, cls) {
     var u = ASSETS[key];
     if (!u) return '<span class="ico ' + (cls || "") + '">' + emoji + "</span>";
@@ -1849,7 +2245,7 @@ span.ico{mix-blend-mode:normal;text-align:center}
   /* UIBadge.set(navKey, n) — die roten Zaehler-Punkte der Bottom-Nav. */
   window.UIBadge = (function () {
     var MAP = { collection: "navBadge", shop: "badgeShop", pack: "badgePack",
-                clan: "tileClanBadge" };
+                clan: "tileClanBadge", pass: "tilePassBadge", mail: "tileMailBadge" };
     return {
       set: function (navKey, n) {
         var id = MAP[navKey]; if (!id) return;
@@ -2075,6 +2471,7 @@ span.ico{mix-blend-mode:normal;text-align:center}
     for (var gk in GIFT) st.cards[gk].copies.common += GIFT[gk];
     AC._write(st);
     setGold(DEMO_GOLD);
+    setGems(DEMO_GEMS);
     // Demo-Festung: passend zum 1 136-🏆-Account. Das Trophäen-Tor bei
     // 900 🏆 gibt 80 Gesamtstufen frei — 30/24/18 = 72 liegen bewusst
     // darunter, damit alle drei Äste noch einen aktiven Kaufknopf haben
@@ -2141,14 +2538,13 @@ span.ico{mix-blend-mode:normal;text-align:center}
     return '<button class="tile' + (opts.cls ? " " + opts.cls : "") + '" data-id="' + id + '"' +
       (opts.tier ? ' data-tier="' + opts.tier + '"' : "") +
       ' style="border-color:' + t.color + ';background:linear-gradient(160deg,' + m.color +
-      '33,#16202a 70%)">' + eq + red +
-      '<div class="art">' + m.art + "</div>" + cnt +
+      '33,#16202a 70%)">' + artBox(id, t.key) + eq + red + cnt +
       '<div class="dots">' + dots + "</div>" +
       '<div class="lvl">LvL ' + v.lvl + "</div></button>";
   }
   function renderTop() {
     $("curTrophies").textContent = fmt(DEMO_TROPHIES);
-    $("curGems").textContent = fmt(DEMO_GEMS);
+    $("curGems").textContent = fmt(gems());
     $("curGold").textContent = fmt(gold());
     // Material-Vorrat je Sorte (§7.1: AA führt jede Sorte getrennt)
     var bank = AC.getMaterials();
@@ -2162,10 +2558,12 @@ span.ico{mix-blend-mode:normal;text-align:center}
     $("deckRow").innerHTML = DECK.map(function (id) {
       var m = BY_ID[id], v = AC.view(id), t = tierOf(v.tier);
       return '<button class="deckslot" data-id="' + id + '" style="border-color:' + t.color +
-        ';background:linear-gradient(160deg,' + m.color + '33,#16202a 70%)">' + m.art +
+        ';background:linear-gradient(160deg,' + m.color + '33,#16202a 70%)">' +
+        artBox(id, t.key) +
         '<div class="lvl">LvL ' + v.lvl + "</div></button>";
     }).join("");
     $("collGrid").innerHTML = sortedIds().map(function (id) { return tileHTML(id); }).join("");
+    hydrateFrames($("viewCollection"));
     var n = mergeableCount();
     $("collHint").innerHTML = n
       ? "🔴 <b>" + n + " Karte(n) bereit zum Verschmelzen</b> — ab in die Schmiede."
@@ -2215,7 +2613,8 @@ span.ico{mix-blend-mode:normal;text-align:center}
     bn.style.backgroundPosition = "center";
     bn.style.backgroundRepeat = "no-repeat";
     bn.style.boxShadow = "inset 0 0 0 999px " + t.color + "38";
-    $("dArt").textContent = m.art;
+    $("dArt").innerHTML = cardArtHTML(curId);
+    $("dArt").classList.add("artbox");
     $("dTower").style.background = "linear-gradient(180deg," + m.color + "cc,#1b2b3d)";
     $("dTarget").innerHTML = m.target;
     $("dDesc").textContent = m.desc;
@@ -2322,7 +2721,8 @@ span.ico{mix-blend-mode:normal;text-align:center}
       if (i < req.n) {
         var t = tierOf(req.tier), m = BY_ID[req.id];
         return '<div class="reqslot filled" style="border-color:' + t.color +
-          ";background:linear-gradient(160deg," + m.color + '33,#111a21 70%)">' + m.art + "</div>";
+          ";background:linear-gradient(160deg," + m.color + '33,#111a21 70%)">' +
+          artBox(req.id, t.key) + "</div>";
       }
       return '<div class="reqslot">＋</div>';
     }).join("");
@@ -2335,9 +2735,10 @@ span.ico{mix-blend-mode:normal;text-align:center}
       return '<button class="tile ' + sel + (avail <= 0 ? " dim" : "") +
         '" data-id="' + e.id + '" data-tier="' + e.tier + '" style="border-color:' + t.color +
         ";background:linear-gradient(160deg," + m.color + '33,#16202a 70%)">' +
-        '<div class="art">' + m.art + '</div><div class="cnt">×' + avail + "</div>" +
+        artBox(e.id, t.key) + '<div class="cnt">×' + avail + "</div>" +
         '<div class="lvl">' + t.name + "</div></button>";
     }).join("");
+    hydrateFrames($("viewForge"));
     markPressable($("viewForge"));
     var els = $("forgeGrid").querySelectorAll("[data-id]");
     for (var i = 0; i < els.length; i++) {
@@ -2394,9 +2795,11 @@ span.ico{mix-blend-mode:normal;text-align:center}
     var box = $("mergeCeremony");
     $("cerTitle").textContent = copyOnly
       ? "Verschmolzen!" : "Perfekte Verschmelzung!";
-    $("cerArt").textContent = m.art;
+    $("cerArt").className = "artbox";
+    $("cerArt").innerHTML = cardArtHTML(id);
     $("cerCard").style.borderColor = to.color;
     layer($("cerCard"), "frame_" + to.key);
+    hydrateFrames($("cerCard"));
     $("cerTable").innerHTML =
       '<div class="row2"><span class="k2">Max. Level</span><span class="v2"><s>' + from.cap +
         "</s> → <em>" + to.cap + "</em></span></div>" +
@@ -2542,9 +2945,11 @@ span.ico{mix-blend-mode:normal;text-align:center}
         : s.kind === "mat" ? s.m.color : "#f2c53d";
       var face;
       if (s.kind === "card") {
-        var m = BY_ID[s.d.cardId];
-        face = '<div class="face"><div style="font-size:20px">' + m.art + '</div>' +
-          '<div class="t" style="color:' + color + '">' + tierOf(s.d.tier).name + "</div></div>";
+        // DER wichtigste Moment der ganzen App: Hier faellt die Karte auf.
+        // Deshalb randloses Artwork mit Bauchbinde statt eines Emojis.
+        face = artBox(s.d.cardId, s.d.tier) +
+          '<div class="facewrap"><div class="t" style="color:' + color + '">' +
+          tierOf(s.d.tier).name + "</div></div>";
       } else if (s.kind === "mat") {
         // Sorte ist Teil des Reveals — "welche Essenz?" ist eine eigene kleine Frage.
         face = '<div class="face"><div style="font-size:20px">' + s.m.sym + '</div>' +
@@ -2568,6 +2973,7 @@ span.ico{mix-blend-mode:normal;text-align:center}
         "</span></button>";
     }).join("");
     hydrateIcons($("packGrid"));
+    hydrateFrames($("packGrid"));
     var els = $("packGrid").querySelectorAll("[data-i]");
     for (var i = 0; i < els.length; i++) {
       (function (el) {
@@ -2992,7 +3398,7 @@ span.ico{mix-blend-mode:normal;text-align:center}
     { id:"d5", art:"frame_good",  emoji:"🂡", name:"1 gute Karte",        cost:9000,  cur:"gold",
       avail:1, give:function(){ AC.addDrop(POOL_IDS[(Math.random()*6)|0], "good", 1); } },
     { id:"d6", art:"cur_gem",     emoji:"💎", name:"Gem-Bündel ×25",      cost:0,     cur:"free",
-      avail:1, give:function(){ DEMO_GEMS += 25; } },
+      avail:1, give:function(){ setGems(gems() + 25); } },
   ];
   var dealUsed = {};
   var SHOP_PACKS = [
@@ -3060,9 +3466,9 @@ span.ico{mix-blend-mode:normal;text-align:center}
     if (!d) return;
     if ((d.avail - (dealUsed[d.id] | 0)) <= 0) { UISfx.deny(); toast("Ausverkauft"); return; }
     if (d.cur === "gold" && gold() < d.cost) { UISfx.deny(); toast("Nicht genug Gold"); return; }
-    if (d.cur === "gems" && DEMO_GEMS < d.cost) { UISfx.deny(); toast("Nicht genug Gems"); return; }
+    if (d.cur === "gems" && gems() < d.cost) { UISfx.deny(); toast("Nicht genug Gems"); return; }
     if (d.cur === "gold") setGold(gold() - d.cost);
-    if (d.cur === "gems") DEMO_GEMS -= d.cost;
+    if (d.cur === "gems") setGems(gems() - d.cost);
     d.give();
     dealUsed[d.id] = (dealUsed[d.id] | 0) + 1;
     UISfx.confirm();
@@ -3079,8 +3485,8 @@ span.ico{mix-blend-mode:normal;text-align:center}
     SHOP_PACKS.forEach(function (x) { if (x.key === key) sp = x; });
     if (!sp) return;
     if (sp.cur === "gold" && gold() < sp.cost) { UISfx.deny(); toast("Nicht genug Gold"); return; }
-    if (sp.cur === "gems" && DEMO_GEMS < sp.cost) { UISfx.deny(); toast("Nicht genug Gems"); return; }
-    if (sp.cur === "gold") setGold(gold() - sp.cost); else DEMO_GEMS -= sp.cost;
+    if (sp.cur === "gems" && gems() < sp.cost) { UISfx.deny(); toast("Nicht genug Gems"); return; }
+    if (sp.cur === "gold") setGold(gold() - sp.cost); else setGems(gems() - sp.cost);
     UISfx.reward();
     openPackKey(key);
     show("navPack");
@@ -3617,8 +4023,8 @@ span.ico{mix-blend-mode:normal;text-align:center}
           '" data-donate="' + r.id + '">' + (r.closed ? "voll" : "SPENDEN") + "</button>";
       return '<div class="reqrow' + (r.mine ? " mine" : "") + (r.closed ? " full" : "") +
         '" data-req="' + r.id + '">' +
-        '<div class="reqcard" data-frame="frame_common" style="color:' + m.color + '">' + m.art +
-          '<span class="rtier">GRAU</span></div>' +
+        '<div class="reqcard" style="color:' + m.color + '">' +
+          artBox(r.cardId, "common") + '<span class="rtier">GRAU</span></div>' +
         '<div class="reqmeta"><div class="rown">' +
           (r.mine ? "Du brauchst " + r.cardName
                   : r.ownerName + " braucht " + r.cardName) + "</div>" +
@@ -3640,9 +4046,7 @@ span.ico{mix-blend-mode:normal;text-align:center}
       " Material</b> je gespendeter Karte.</div>";
 
     $("paneDonate").innerHTML = html;
-    Array.prototype.forEach.call($("paneDonate").querySelectorAll("[data-frame]"), function (el) {
-      layer(el, el.getAttribute("data-frame"));
-    });
+    hydrateFrames($("paneDonate"));
     Array.prototype.forEach.call($("paneDonate").querySelectorAll("[data-donate]"), function (b) {
       b.addEventListener("click", function () { doDonate(b.getAttribute("data-donate")); });
     });
@@ -3675,7 +4079,7 @@ span.ico{mix-blend-mode:normal;text-align:center}
       var m = BY_ID[c.cardId] || { art: "❔", color: "#9aa3ad" };
       return '<button class="picktile pressable" data-ask="' + c.cardId +
         '" style="border-color:' + m.color + '">' +
-        '<span class="part">' + m.art + "</span>" +
+        '<span class="part">' + cardArtHTML(c.cardId) + "</span>" +
         '<span class="pnm">' + c.cardName + "</span>" +
         '<span class="pcnt">' + c.copies + " grau</span></button>";
     }).join("");
@@ -3825,11 +4229,21 @@ span.ico{mix-blend-mode:normal;text-align:center}
      ("Brauche Karten —") liest sich wie ein Fehler. */
   var EMOTE_SHORT = { gl: "Viel Glück", thx: "Danke!", need: "Karten?",
                       war: "Angriff!", nice: "Stark!", hi: "Willkommen" };
+  // Batch 4: echte Token-Artworks statt der Emoji aus arena_clan.js.
+  var EMOTE_ICO = { gl: "emote_luck", thx: "emote_thanks", need: "emote_cards",
+                    war: "emote_attack", nice: "emote_strong", hi: "emote_welcome" };
+  function emoteTok(key, emoji) {
+    var u = ASSETS[EMOTE_ICO[key]];
+    var inner = '<span class="cartemo">' + emoji + "</span>" +
+      (u ? '<img class="cart" src="' + u + '" alt="' + emoji +
+           '" onerror="UIIcon.hide(this)">' : "");
+    return '<span class="emotok">' + inner + "</span>";
+  }
   function renderEmotes() {
     var CL = CLof(); if (!CL) return;
     $("emoteBar").innerHTML = CL.EMOTES.map(function (e) {
       return '<button class="emobtn pressable" data-emote="' + e.key + '" title="' + e.text +
-        '"><b>' + e.emoji + "</b>" + (EMOTE_SHORT[e.key] || e.key) + "</button>";
+        '">' + emoteTok(e.key, e.emoji) + (EMOTE_SHORT[e.key] || e.key) + "</button>";
     }).join("");
     Array.prototype.forEach.call($("emoteBar").querySelectorAll("[data-emote]"), function (b) {
       b.addEventListener("click", function () {
@@ -3841,12 +4255,29 @@ span.ico{mix-blend-mode:normal;text-align:center}
   }
   var FEED_ICO = { donate: "📦", help: "💚", filled: "🎁", win: "⚔", emote: "💬",
                    join: "👋", war: "⚔", warend: "🏆", chest: "🎁", request: "📥", clan: "🛡" };
+  /* Emote-Zeilen im Feed tragen das TOKEN des gesendeten Spruchs — der
+     Text beginnt mit dem Emoji aus arena_clan.js, darueber wird es
+     zurueckgemappt. Alle anderen Zeilenarten behalten ihr Symbol. */
+  var EMOJI_TO_EMOTE = {};
+  Object.keys(EMOTE_ICO).forEach(function (k) {
+    var CL = window.ArenaClan;
+    if (!CL) return;
+    CL.EMOTES.forEach(function (e) { if (e.key === k) EMOJI_TO_EMOTE[e.emoji] = k; });
+  });
+  function feedIcoHTML(f) {
+    if (f.kind === "emote") {
+      for (var em in EMOJI_TO_EMOTE) {
+        if (f.text.indexOf(em) >= 0) return emoteTok(EMOJI_TO_EMOTE[em], em);
+      }
+    }
+    return FEED_ICO[f.kind] || "•";
+  }
   function renderClanFeed() {
     var CL = CLof(); if (!CL) return;
     var fd = CL.feed(null, 18);
     $("clanFeed").innerHTML = fd.map(function (f) {
       return '<div class="fe' + (f.bot ? "" : " me") + (f.kind === "help" ? " help" : "") + '">' +
-        '<span class="fi">' + (FEED_ICO[f.kind] || "•") + "</span>" +
+        '<span class="fi">' + feedIcoHTML(f) + "</span>" +
         '<span class="ft">' + f.text + "</span>" +
         '<span class="fa">' + f.agoText + "</span></div>";
     }).join("") || '<div class="fe"><span class="ft">Noch keine Aktivität.</span></div>';
@@ -3934,13 +4365,594 @@ span.ico{mix-blend-mode:normal;text-align:center}
     catch (e) { me.scrollIntoView(); }
   }
 
+
+  /* ==================================================================
+   * window.ArenaPass — Season-Pass „Goldene Fortuna"
+   * ------------------------------------------------------------------
+   * Bewusst KEIN eigenes Modul: Der Pass hat keine Formeln, die ein
+   * Balancing braucht (100 XP je Stufe, feste Belohnungstabelle), und
+   * keine Server-Naht wie der Clan. Er lebt gekapselt im Prototyp und
+   * persistiert unter localStorage "arenaPass".
+   *
+   * DIE SCHNITTSTELLE IST ABSICHTLICH IDENTISCH zu ArenaClan:
+   *     ArenaPass.reportEvent(type, amount)   // "win" | "pack" | "trophy"
+   * Damit ruft das Spiel spaeter EINE Zeile pro Ereignis auf und beide
+   * Systeme haengen dran — kein zweites Event-Schema.
+   *
+   * Saison = KALENDERMONAT (UTC). Deterministisch, ohne Serverzeit, und
+   * das Enddatum ist fuer jeden Spieler dasselbe.
+   * ================================================================== */
+  window.ArenaPass = (function () {
+    var KEY = "arenaPass";
+    var LEVELS = 50, XP_PER_LEVEL = 100, PREMIUM_GEMS = 950;
+    // XP-Gewichte je Ereignis. Ein Sieg ist die Basiseinheit.
+    var XP = { win: 40, pack: 25, trophy: 0.5 };
+    var ALIAS = { win: "win", wins: "win", pack: "pack", packs: "pack",
+                  trophy: "trophy", trophies: "trophy" };
+
+    function monthStart(ts) {
+      var d = new Date(ts);
+      return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1);
+    }
+    function monthEnd(ts) {
+      var d = new Date(ts);
+      return Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1);
+    }
+    function seasonKey(ts) {
+      var d = new Date(ts);
+      return d.getUTCFullYear() + "-" + (d.getUTCMonth() < 9 ? "0" : "") + (d.getUTCMonth() + 1);
+    }
+    var MONTH_DE = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli",
+                    "August", "September", "Oktober", "November", "Dezember"];
+    function seasonName(ts) {
+      var d = new Date(ts);
+      return MONTH_DE[d.getUTCMonth()] + " " + d.getUTCFullYear();
+    }
+
+    function fresh(ts) {
+      return { v: 1, season: seasonKey(ts), xp: 0, premium: false,
+               claimedFree: [], claimedPrem: [] };
+    }
+    function read() {
+      var o;
+      try { o = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) { o = null; }
+      var now = Date.now();
+      if (!o || typeof o !== "object") o = fresh(now);
+      // Saisonwechsel: alles zurueck auf null (auch der gekaufte Premium-Pass —
+      // genau das macht eine Saison zur Saison).
+      if (o.season !== seasonKey(now)) o = fresh(now);
+      o.xp = Math.max(0, o.xp | 0);
+      o.premium = !!o.premium;
+      if (!Array.isArray(o.claimedFree)) o.claimedFree = [];
+      if (!Array.isArray(o.claimedPrem)) o.claimedPrem = [];
+      return o;
+    }
+    function write(o) { try { localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) {} }
+
+    function levelOf(xp) { return Math.min(LEVELS, Math.floor(xp / XP_PER_LEVEL)); }
+
+    /* Belohnungstabelle — reine Funktion der Stufe. Abwechslung entsteht
+       aus den Teilbarkeiten: alle 10 ein Pack-Meilenstein, alle 5 ein
+       kleineres Pack, dazwischen Material und Gold. */
+    var MAT_BY_MOD = ["attack", "speed", "special"];
+    function reward(level, track) {
+      var ms = level % 10 === 0;
+      if (track === "free") {
+        if (ms) return { kind: "pack", key: "silver", ico: "pack_silver", emoji: "🎁",
+                         label: "Silber-Pack", sub: "Mindestens eine Seltene" };
+        if (level % 5 === 0) return { kind: "pack", key: "bronze", ico: "pack_bronze",
+                         emoji: "🎁", label: "Bronze-Pack", sub: "5 Karten + Material" };
+        if (level % 3 === 0) {
+          var mk = MAT_BY_MOD[(level / 3 | 0) % 3];
+          return { kind: "mat", key: mk, n: 10 + level, ico: "ess_" + mk, emoji: "⚗",
+                   label: (10 + level) + " Material", sub: matName(mk) };
+        }
+        return { kind: "gold", n: 300 + 40 * level, ico: "cur_gold", emoji: "🪙",
+                 label: fmt(300 + 40 * level) + " Gold", sub: "Sofort gutgeschrieben" };
+      }
+      if (level === LEVELS) return { kind: "skin", ico: "fort_castle", emoji: "🏰",
+                 label: "Burg-Skin", sub: "„Goldene Fortuna“ (exklusiv)" };
+      if (ms) return { kind: "pack", key: level >= 40 ? "arcane" : "gold",
+                 ico: level >= 40 ? "pack_arcane" : "pack_gold", emoji: "🎁",
+                 label: (level >= 40 ? "Arkan" : "Gold") + "-Pack",
+                 sub: level >= 40 ? "Legendär garantiert" : "Mindestens eine Epische" };
+      if (level % 7 === 0) return { kind: "emote", key: EMOTE_ORDER[(level / 7 | 0) % 6],
+                 ico: null, emoji: "💬", label: "Emote freigeschaltet", sub: "Für den Clan-Feed" };
+      if (level % 2 === 0) {
+        var mk2 = MAT_BY_MOD[(level / 2 | 0) % 3];
+        return { kind: "mat", key: mk2, n: 20 + 2 * level, ico: "ess_" + mk2, emoji: "⚗",
+                 label: (20 + 2 * level) + " Material", sub: matName(mk2) };
+      }
+      return { kind: "gold", n: 800 + 120 * level, ico: "cur_gold", emoji: "🪙",
+               label: fmt(800 + 120 * level) + " Gold", sub: "Sofort gutgeschrieben" };
+    }
+    var EMOTE_ORDER = ["gl", "thx", "need", "war", "nice", "hi"];
+    function matName(k) {
+      var n = "Essenz";
+      AC.MATERIALS.forEach(function (m) { if (m.key === k) n = m.name; });
+      return n;
+    }
+
+    function state() {
+      var o = read(), now = Date.now();
+      var lvl = levelOf(o.xp);
+      return {
+        season: o.season, seasonName: seasonName(now),
+        endsAt: monthEnd(now), msLeft: monthEnd(now) - now,
+        daysLeft: Math.max(0, Math.ceil((monthEnd(now) - now) / 86400000)),
+        xp: o.xp, level: lvl, levels: LEVELS,
+        xpInLevel: o.xp - lvl * XP_PER_LEVEL, xpPerLevel: XP_PER_LEVEL,
+        premium: o.premium, premiumGems: PREMIUM_GEMS,
+        claimedFree: o.claimedFree.slice(), claimedPrem: o.claimedPrem.slice(),
+        pending: pendingCount(o, lvl),
+      };
+    }
+    function pendingCount(o, lvl) {
+      var n = 0;
+      for (var L = 1; L <= lvl; L++) {
+        if (o.claimedFree.indexOf(L) < 0) n++;
+        if (o.premium && o.claimedPrem.indexOf(L) < 0) n++;
+      }
+      return n;
+    }
+    /* reportEvent(type, amount) — dieselbe Signatur wie ArenaClan. */
+    function reportEvent(type, amount) {
+      var ev = ALIAS[String(type || "").toLowerCase()];
+      if (!ev) return { counted: false, reason: "unknown" };
+      var n = Number(amount == null ? 1 : amount) || 0;
+      if (n <= 0) return { counted: false, reason: "amount" };
+      var gain = Math.round(XP[ev] * n);
+      if (gain <= 0) return { counted: false, reason: "amount" };
+      var o = read(), before = levelOf(o.xp);
+      o.xp = Math.min(LEVELS * XP_PER_LEVEL, o.xp + gain);
+      write(o);
+      var after = levelOf(o.xp);
+      return { counted: true, xp: gain, total: o.xp, level: after, levelUp: after > before };
+    }
+    function activate(gemsAvailable) {
+      var o = read();
+      if (o.premium) throw new Error("Der Premium-Pass ist bereits aktiv.");
+      if (gemsAvailable != null && gemsAvailable < PREMIUM_GEMS) {
+        throw new Error("Nicht genug Gems — der Pass kostet " + PREMIUM_GEMS + " 💎.");
+      }
+      o.premium = true;
+      write(o);
+      return { ok: true, gems: PREMIUM_GEMS };
+    }
+    /* claim(level, track) → Belohnung. Gold/Gems bucht der Hub (wie
+       ueberall im Projekt), Material bucht ArenaCards selbst. */
+    function claim(level, track) {
+      var o = read(), lvl = levelOf(o.xp);
+      level = level | 0;
+      if (level < 1 || level > LEVELS) throw new Error("Stufe nicht vorhanden.");
+      if (level > lvl) throw new Error("Stufe " + level + " ist noch nicht erreicht.");
+      var prem = track === "prem";
+      if (prem && !o.premium) throw new Error("Dafür brauchst du den Premium-Pass.");
+      var list = prem ? o.claimedPrem : o.claimedFree;
+      if (list.indexOf(level) >= 0) throw new Error("Diese Belohnung ist schon abgeholt.");
+      var rw = reward(level, prem ? "prem" : "free");
+      list.push(level);
+      write(o);
+      if (rw.kind === "mat") AC.addMaterial(rw.n, rw.key);
+      return rw;
+    }
+    function claimAll() {
+      var o = read(), lvl = levelOf(o.xp), out = [];
+      for (var L = 1; L <= lvl; L++) {
+        ["free", "prem"].forEach(function (tr) {
+          try { out.push({ level: L, track: tr, reward: claim(L, tr) }); } catch (e) {}
+        });
+      }
+      return out;
+    }
+    function reset() { write(fresh(Date.now())); }
+    return { state: state, reward: reward, reportEvent: reportEvent, activate: activate,
+             claim: claim, claimAll: claimAll, reset: reset,
+             LEVELS: LEVELS, XP_PER_LEVEL: XP_PER_LEVEL, PREMIUM_GEMS: PREMIUM_GEMS,
+             _key: KEY };
+  })();
+
+  /* ---------- Season-Pass: Ansicht ---------- */
+  var PASS_SEED_KEY = "arenaPassProtoSeed";
+  function seedPass() {
+    if (localStorage.getItem(PASS_SEED_KEY)) return;
+    // Demo-Stand: ein paar Wochen gespielt → Stufe 18, einiges abholbar.
+    ArenaPass.reportEvent("win", 32);
+    ArenaPass.reportEvent("pack", 14);
+    ArenaPass.reportEvent("trophy", 460);
+    localStorage.setItem(PASS_SEED_KEY, "1");
+  }
+  function rewardCellHTML(level, track, st) {
+    var rw = ArenaPass.reward(level, track);
+    var prem = track === "prem";
+    var claimed = (prem ? st.claimedPrem : st.claimedFree).indexOf(level) >= 0;
+    var reached = level <= st.level;
+    var blocked = prem && !st.premium;
+    var cls = "rwcell" + (prem ? " prem" : "") + (claimed ? " taken" : "") +
+      (blocked ? " blocked" : "") + (!claimed && reached && !blocked ? " claimable" : "");
+    var right = claimed ? '<span class="rchk">✔</span>'
+      : blocked ? '<span class="rlock">' + ico("icon_lock", "🔒") + "</span>"
+      : reached ? '<button class="rget pressable" data-claim="' + level + ":" + track +
+          '">HOLEN</button>'
+      : "";
+    return '<div class="' + cls + '" data-cell="' + level + ":" + track + '">' +
+      '<span class="rico" data-rico="' + (rw.ico || "") + '">' + rw.emoji + "</span>" +
+      '<span class="rtx">' + rw.label + "<small>" + rw.sub + "</small></span>" + right + "</div>";
+  }
+  function renderPass() {
+    seedPass();
+    var st = ArenaPass.state();
+    layer($("passArt"), "pass_keyart");
+    $("passSeason").textContent = st.seasonName;
+    $("passEnd").innerHTML = "Endet in <b>" + st.daysLeft + " Tag" +
+      (st.daysLeft === 1 ? "" : "en") + "</b> · 50 Stufen · 100 XP je Stufe";
+    $("passLvl").textContent = st.level;
+    $("passXp").textContent = st.xpInLevel + "/" + st.xpPerLevel + " XP";
+    $("passFill").style.width = (st.xpInLevel / st.xpPerLevel * 100).toFixed(1) + "%";
+    var bp = $("btnBuyPass");
+    bp.disabled = !!st.premium;
+    bp.textContent = st.premium ? "✔ Premium-Pass aktiv"
+      : "Pass aktivieren · " + st.premiumGems + " 💎";
+
+    var rows = "";
+    for (var L = 1; L <= st.levels; L++) {
+      var cls = L <= st.level ? "done" : (L === st.level + 1 ? "now" : "");
+      rows += '<div class="passrow ' + cls + '" data-passlvl="' + L + '">' +
+        '<div class="pnum">' + L + (L % 10 === 0 ? "<small>MEILE</small>" : "") + "</div>" +
+        rewardCellHTML(L, "free", st) + rewardCellHTML(L, "prem", st) + "</div>";
+    }
+    $("passList").innerHTML = rows;
+    Array.prototype.forEach.call($("passList").querySelectorAll("[data-rico]"), function (el) {
+      var k = el.getAttribute("data-rico");
+      if (k && ASSETS[k]) el.style.backgroundImage = 'url("' + ASSETS[k] + '"), ' +
+        "radial-gradient(circle at 45% 35%,#3a4c5c,#141d26 72%)";
+    });
+    Array.prototype.forEach.call($("passList").querySelectorAll("[data-claim]"), function (b) {
+      b.addEventListener("click", function (e) { claimPass(b.getAttribute("data-claim"), e); });
+    });
+    // Auf die naechste offene Stufe scrollen.
+    // Erst das, was man JETZT holen kann — erst danach die naechste Stufe.
+    var now = $("passList").querySelector(".rwcell.claimable") ||
+              $("passList").querySelector(".passrow.now");
+    if (now) $("passList").scrollTop = Math.max(0, now.offsetTop - $("passList").clientHeight * 0.4);
+    $("passNote").textContent = "Pass-XP kommt aus Matches, Packs und Trophäen — " +
+      "ArenaPass.reportEvent(type, amount) hat dieselbe Signatur wie ArenaClan.reportEvent(). " +
+      "Saison = Kalendermonat (UTC), Stand in localStorage „arenaPass“.";
+    UIBadge.set("pass", st.pending);
+    markPressable($("viewPass"));
+  }
+  function claimPass(spec, ev) {
+    var parts = String(spec).split(":");
+    try {
+      var rw = ArenaPass.claim(parseInt(parts[0], 10), parts[1]);
+      if (rw.kind === "gold") setGold(gold() + rw.n);
+      UISfx.reward();
+      fireSparkBurst(ev);
+      toast("Stufe " + parts[0] + ": " + rw.label + " erhalten");
+      renderPass(); renderTop();
+    } catch (e) { UISfx.deny(); toast(e.message); }
+  }
+  function buyPass() {
+    try {
+      ArenaPass.activate(gems());
+      setGems(gems() - ArenaPass.PREMIUM_GEMS);
+      UISfx.reward();
+      toast("Premium-Pass aktiviert — alle Premium-Belohnungen offen");
+      renderPass(); renderTop();
+    } catch (e) { UISfx.deny(); toast(e.message); }
+  }
+
+  /* ==================================================================
+   * HELDEN
+   * ------------------------------------------------------------------
+   * Besitzstand kommt aus der Kartenbank (ArenaCards.view), die Optik
+   * aus den Batch-4-Artworks. Ein nicht besessener Held wird NICHT
+   * versteckt — man muss sehen koennen, was es zu holen gibt.
+   * ================================================================== */
+  function renderHeroes() {
+    var ids = CARDS.filter(function (c) { return c.hero; }).map(function (c) { return c.id; });
+    $("heroList").innerHTML = ids.map(function (id) {
+      var m = BY_ID[id], v = AC.view(id), t = tierOf(v.tier);
+      var owned = v.owned;
+      var elName = { fire: "Feuer", water: "Wasser", nature: "Natur", earth: "Erde",
+                     light: "Licht", darkness: "Finsternis" }[m.elem] || m.elem;
+      var stats = owned
+        ? '<span class="cchip">' + t.name + " (" + t.colorName + ")</span>" +
+          '<span class="cchip">Level <b>' + v.lvl + "</b>/" + v.cap + "</span>" +
+          '<span class="cchip">Power <b>' + fmt(m.power * v.statMul) + "</b></span>" +
+          '<span class="cchip">Kopien <b>' + v.copies[v.tier] + "</b></span>"
+        : '<span class="cchip warn">Noch nicht im Besitz</span>';
+      var lock = owned ? "" :
+        '<div class="hlock">' + ico("icon_lock", "🔒") + " In Packs zu finden — Helden droppen " +
+        "5× seltener als Türme.</div>";
+      return '<div class="herocard' + (owned ? "" : " locked") + '" data-hero="' + id + '">' +
+        '<div class="herostage" style="border-color:' + (owned ? t.color : "#35485a") +
+          '"><span class="artbox">' + cardArtHTML(id) + "</span></div>" +
+        '<div class="hmeta">' +
+          '<div class="hnm goldtext">' + m.name + "</div>" +
+          '<div class="hel" style="color:' + m.color + '">' + elName.toUpperCase() +
+            " · HELD</div>" +
+          '<div class="hds">' + m.desc + "</div>" +
+          '<div class="hstat">' + stats + "</div>" + lock +
+        "</div></div>";
+    }).join("");
+    Array.prototype.forEach.call($("heroList").querySelectorAll("[data-hero]"), function (el) {
+      el.addEventListener("click", function () {
+        var id = el.getAttribute("data-hero");
+        if (AC.view(id).owned) openDetail(id);
+        else { UISfx.deny(); toast("Diesen Helden findest du in Booster-Packs"); }
+      });
+    });
+    $("heroNote").textContent = "Helden sind Karten wie alle anderen — dieselbe Kartenbank, " +
+      "dieselben Merges, dieselben Level-Caps. Sie sind nur seltener (HERO_WEIGHT 0.2) und " +
+      "dürfen NICHT im Clan verschickt werden.";
+    markPressable($("viewHeroes"));
+  }
+
+  /* ==================================================================
+   * EVENTS — deterministisch aus der Kalenderwoche
+   * ------------------------------------------------------------------
+   * Die Fenster sind so gelegt, dass IMMER genau eines aktiv ist:
+   * Essenz-Regen Mo-Do, Kristall-Turnier Fr-So.
+   * ================================================================== */
+  var EVENTS = [
+    { key: "essence", name: "Essenz-Regen", art: "event_essence", fromDay: 0, toDay: 4,
+      desc: "Jedes geöffnete Pack liefert die doppelte Menge Upgrade-Material. " +
+            "Der beste Zeitpunkt, gehortete Packs zu öffnen." },
+    { key: "tournament", name: "Kristall-Turnier", art: "event_tournament", fromDay: 4, toDay: 7,
+      desc: "Drei Leben, kein Trophäenverlust. Wer sechs Siege schafft, bekommt " +
+            "ein Arkan-Pack — wer drei Niederlagen kassiert, ist raus." },
+  ];
+  function weekStartLocalUTC(ts) {
+    var d = new Date(ts), iso = (d.getUTCDay() + 6) % 7;
+    return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - iso * 86400000;
+  }
+  function eventState(ev, now) {
+    var ws = weekStartLocalUTC(now);
+    var from = ws + ev.fromDay * 86400000, to = ws + ev.toDay * 86400000;
+    if (now >= from && now < to) return { live: true, msLeft: to - now, from: from, to: to };
+    // sonst der naechste Start (diese oder naechste Woche)
+    var next = now < from ? from : from + 7 * 86400000;
+    return { live: false, msLeft: next - now, from: next, to: next + (to - from) };
+  }
+  function dtText(ms) {
+    var h = Math.floor(ms / 3600000), d = Math.floor(h / 24);
+    if (d >= 1) return d + " Tag" + (d === 1 ? "" : "en") + " " + (h % 24) + " h";
+    var m = Math.floor(ms / 60000) % 60;
+    return h + " h " + (m < 10 ? "0" : "") + m + " min";
+  }
+  function renderEvents() {
+    var now = Date.now();
+    $("evList").innerHTML = EVENTS.map(function (ev) {
+      var st = eventState(ev, now);
+      var d = new Date(st.from);
+      var start = ("0" + d.getUTCDate()).slice(-2) + "." + ("0" + (d.getUTCMonth() + 1)).slice(-2) +
+        ". um " + ("0" + d.getUTCHours()).slice(-2) + ":00 UTC";
+      return '<div class="evcard" data-event="' + ev.key + '">' +
+        '<div class="evart" data-evart="' + ev.art + '"><div class="evshade"></div>' +
+          '<span class="evchip ' + (st.live ? "live" : "soon") + '">' +
+            (st.live ? "AKTIV" : "KOMMEND") + "</span>" +
+          '<div class="evtitle goldtext">' + ev.name + "</div></div>" +
+        '<div class="evbody"><div class="evds">' + ev.desc + "</div>" +
+          '<div class="evfoot"><span class="evtime" data-evtime="' + ev.key + '">' +
+            (st.live ? "Endet in " + dtText(st.msLeft) : "Startet " + start) + "</span>" +
+            '<button class="evjoin pressable' + (st.live ? "" : " soon") +
+              '" data-join="' + ev.key + '">' + (st.live ? "TEILNEHMEN" : "ERINNERN") +
+            "</button></div></div></div>";
+    }).join("");
+    Array.prototype.forEach.call($("evList").querySelectorAll("[data-evart]"), function (el) {
+      layer(el, el.getAttribute("data-evart"));
+    });
+    Array.prototype.forEach.call($("evList").querySelectorAll("[data-join]"), function (b) {
+      b.addEventListener("click", function () {
+        var k = b.getAttribute("data-join");
+        var ev = EVENTS.filter(function (x) { return x.key === k; })[0];
+        var st = eventState(ev, Date.now());
+        UISfx.confirm();
+        toast(st.live ? ev.name + " — im Prototyp Deko, im Spiel startet hier das Event"
+                      : "Erinnerung gesetzt: " + ev.name);
+      });
+    });
+    $("evNote").textContent = "Die Event-Fenster liegen fest in der Kalenderwoche " +
+      "(Essenz-Regen Mo–Do, Kristall-Turnier Fr–So) und sind damit ohne Server berechenbar — " +
+      "genau wie die Phasen des Clankriegs.";
+    markPressable($("viewEvents"));
+  }
+
+  /* ==================================================================
+   * POST / MAIL
+   * ------------------------------------------------------------------
+   * Gelesen/abgeholt liegt in localStorage "arenaMail". Belohnungen
+   * werden ECHT gutgeschrieben (Gold ueber die Hub-Wallet, Material
+   * ueber ArenaCards) — sonst ist ein Postfach nur Dekoration.
+   * ================================================================== */
+  var MAILS = [
+    { id: "m_welcome", from: "Arcane Prism TD", ico: "🎁",
+      subject: "Willkommen im Kristallhof!",
+      body: "Schön, dass du da bist. Als Startgeschenk legen wir dir Gold und " +
+            "Upgrade-Material ins Postfach — genug für die ersten Level-Ups deiner Türme.",
+      reward: { gold: 5000, material: 30, matType: "attack" } },
+    { id: "m_clanchest", from: "Prisma-Orden", ico: "🛡",
+      subject: "Clantruhe der Woche ausgeschüttet",
+      body: "Euer Clan hat die Wochen-Quests zu 91 % erfüllt — die Silber-Clantruhe " +
+            "ging an alle 30 Mitglieder. Weiter so am Wochenende im Krieg!",
+      reward: { gold: 2500, material: 15, matType: "special" } },
+    { id: "m_season", from: "Spielleitung", ico: "🎟",
+      subject: "Neue Saison: „Goldene Fortuna“",
+      body: "Die neue Season läuft bis zum Monatsende. 50 Stufen, zwei Spuren, " +
+            "auf Stufe 50 wartet ein exklusiver Burg-Skin.",
+      reward: null },
+    { id: "m_maint", from: "System", ico: "🛠",
+      subject: "Wartungsarbeiten abgeschlossen",
+      body: "Die Ranglisten-Berechnung war für 20 Minuten nicht erreichbar. " +
+            "Alle Trophäen wurden korrekt nachgebucht. Danke für die Geduld.",
+      reward: null },
+  ];
+  var MAIL_KEY = "arenaMail";
+  function mailState() {
+    var o;
+    try { o = JSON.parse(localStorage.getItem(MAIL_KEY) || "null"); } catch (e) { o = null; }
+    if (!o || typeof o !== "object") o = {};
+    if (!Array.isArray(o.read)) o.read = [];
+    if (!Array.isArray(o.claimed)) o.claimed = [];
+    return o;
+  }
+  function mailSave(o) { try { localStorage.setItem(MAIL_KEY, JSON.stringify(o)); } catch (e) {} }
+  function mailBadgeCount() {
+    var o = mailState();
+    return MAILS.filter(function (m) {
+      return o.read.indexOf(m.id) < 0 || (m.reward && o.claimed.indexOf(m.id) < 0);
+    }).length;
+  }
+  function renderMail() {
+    var o = mailState();
+    $("mailList").innerHTML = MAILS.map(function (m) {
+      var unread = o.read.indexOf(m.id) < 0;
+      var taken = o.claimed.indexOf(m.id) >= 0;
+      var rew = "";
+      if (m.reward) {
+        rew = '<div class="mrew">' +
+          '<span class="rchip">' + ico("cur_gold", "🪙") + " " + fmt(m.reward.gold) + "</span>" +
+          '<span class="rchip">' + ico("ess_" + m.reward.matType, "⚗") + " " +
+            m.reward.material + "</span>" +
+          '<button class="mailtake pressable' + (taken ? " done" : "") + '" data-mail="' +
+            m.id + '"' + (taken ? " disabled" : "") + ">" +
+            (taken ? "ABGEHOLT" : "ABHOLEN") + "</button></div>";
+      }
+      return '<div class="mailrow' + (unread ? " unread" : "") + '" data-mailrow="' + m.id + '">' +
+        '<div class="mico">' + m.ico + (unread ? '<span class="dot"></span>' : "") + "</div>" +
+        '<div class="mtx"><div class="msub">' + m.subject + "</div>" +
+          '<div class="mfrom">von ' + m.from + "</div>" +
+          '<div class="mbody">' + m.body + "</div>" + rew + "</div></div>";
+    }).join("");
+    Array.prototype.forEach.call($("mailList").querySelectorAll("[data-mail]"), function (b) {
+      b.addEventListener("click", function (e) {
+        e.stopPropagation();
+        takeMail(b.getAttribute("data-mail"), e);
+      });
+    });
+    Array.prototype.forEach.call($("mailList").querySelectorAll("[data-mailrow]"), function (el) {
+      el.addEventListener("click", function () {
+        var id = el.getAttribute("data-mailrow"), st = mailState();
+        if (st.read.indexOf(id) < 0) { st.read.push(id); mailSave(st); renderMail(); renderHubTiles(); }
+      });
+    });
+    $("mailNote").textContent = "Ungelesene Nachrichten und nicht abgeholte Belohnungen " +
+      "erzeugen den roten Punkt auf der Home-Kachel. Stand in localStorage „arenaMail“.";
+    UIBadge.set("mail", mailBadgeCount());
+    markPressable($("viewMail"));
+  }
+  function takeMail(id, ev) {
+    var m = MAILS.filter(function (x) { return x.id === id; })[0];
+    var st = mailState();
+    if (!m || !m.reward || st.claimed.indexOf(id) >= 0) { UISfx.deny(); toast("Schon abgeholt"); return; }
+    setGold(gold() + m.reward.gold);
+    AC.addMaterial(m.reward.material, m.reward.matType);
+    st.claimed.push(id);
+    if (st.read.indexOf(id) < 0) st.read.push(id);
+    mailSave(st);
+    UISfx.reward();
+    fireSparkBurst(ev);
+    toast("Erhalten: " + fmt(m.reward.gold) + " Gold + " + m.reward.material + " Material");
+    renderMail(); renderTop(); renderHubTiles();
+  }
+
+  /* ==================================================================
+   * EINSTELLUNGEN
+   * ------------------------------------------------------------------
+   * Der Sound-Schalter wirkt ECHT (UISfx.mute). Musik und Haptik haben
+   * im Prototyp keine Engine dahinter — sie persistieren ihren Zustand,
+   * damit die Verdrahtung im Spiel nur noch eine Zeile ist.
+   * ================================================================== */
+  var SET_KEY = "arenaSettings";
+  var APP_VERSION = "Prototyp 0.9 (Batch 4)";
+  function settings() {
+    var o;
+    try { o = JSON.parse(localStorage.getItem(SET_KEY) || "null"); } catch (e) { o = null; }
+    if (!o || typeof o !== "object") o = {};
+    return { sound: o.sound !== false, music: o.music !== false, haptic: o.haptic !== false };
+  }
+  function settingsSave(o) { try { localStorage.setItem(SET_KEY, JSON.stringify(o)); } catch (e) {} }
+  function applySettings() {
+    var s2 = settings();
+    UISfx.mute(!s2.sound);
+    ["sound", "music", "haptic"].forEach(function (k) {
+      var el = document.querySelector('[data-sw="' + k + '"]');
+      if (el) { el.classList.toggle("on", !!s2[k]); el.classList.toggle("off", !s2[k]); }
+    });
+  }
+  function toggleSetting(k) {
+    var s2 = settings();
+    s2[k] = !s2[k];
+    settingsSave(s2);
+    applySettings();
+    // Beim Einschalten darf man den Ton hoeren — beim Ausschalten nicht.
+    if (s2[k]) UISfx.confirm();
+    toast((k === "sound" ? "Sound" : k === "music" ? "Musik" : "Haptik") +
+      (s2[k] ? " an" : " aus"));
+  }
+  // Alle Prototyp-Schluessel an EINER Stelle — Export, Import und Reset
+  // arbeiten alle ueber diese Liste.
+  var SAVE_KEYS = ["arenaCards", "arenaHubGold", "arenaHubGems", "arenaFortress", "arenaSkins",
+    "arenaFortLayout", "arenaClan", "arenaPass", "arenaMail", "arenaSettings",
+    "arenaProtoSeed", "arenaClanProtoSeed", "arenaPassProtoSeed"];
+  function exportSave() {
+    var out = { _app: "arcane-prism-td", _v: 1, _ts: Date.now(), data: {} };
+    SAVE_KEYS.forEach(function (k) {
+      var v = localStorage.getItem(k);
+      if (v !== null) out.data[k] = v;
+    });
+    $("saveArea").value = JSON.stringify(out);
+    $("saveNote").textContent = "Exportiert: " + Object.keys(out.data).length + " Schlüssel, " +
+      $("saveArea").value.length + " Zeichen. Text kopieren und sicher aufbewahren.";
+    UISfx.confirm();
+    toast("Spielstand exportiert");
+  }
+  function importSave() {
+    var raw = ($("saveArea").value || "").trim();
+    if (!raw) { UISfx.deny(); $("saveNote").textContent = "Feld ist leer — erst einfügen."; return; }
+    var o;
+    try { o = JSON.parse(raw); }
+    catch (e) { UISfx.deny(); $("saveNote").textContent = "Kein gültiges JSON: " + e.message; return; }
+    if (!o || o._app !== "arcane-prism-td" || !o.data || typeof o.data !== "object") {
+      UISfx.deny();
+      $("saveNote").textContent = "Das ist kein Spielstand dieses Spiels (_app fehlt oder passt nicht).";
+      return;
+    }
+    var n = 0;
+    SAVE_KEYS.forEach(function (k) {
+      if (typeof o.data[k] === "string") { localStorage.setItem(k, o.data[k]); n++; }
+    });
+    UISfx.reward();
+    $("saveNote").textContent = n + " Schlüssel importiert — die Seite lädt neu.";
+    toast("Spielstand importiert (" + n + " Schlüssel)");
+    setTimeout(function () { location.reload(); }, 700);
+  }
+  function wipeSave() {
+    SAVE_KEYS.forEach(function (k) { localStorage.removeItem(k); });
+    toast("Alles zurückgesetzt — die Seite lädt neu");
+    setTimeout(function () { location.reload(); }, 600);
+  }
+  function renderSettings() {
+    applySettings();
+    $("credits").innerHTML = "Arcane Prism TD · " + APP_VERSION + "<br>" +
+      "Logik: arena_cards.js · arena_fortress.js · arena_clan.js · arena_rivals.js<br>" +
+      "100 Assets im Stil „Edel &amp; Kristallin“ · alle Texte Deutsch";
+    $("saveNote").textContent = "Der Export enthält ausschließlich die " + SAVE_KEYS.length +
+      " Prototyp-Schlüssel aus dem localStorage — keine Konto- oder Gerätedaten.";
+    markPressable($("viewSettings"));
+  }
+
   /* ================= Navigation ================= */
   var NAVS = { navHome: "viewHome", navCollection: "viewCollection",
                navForge: "viewForge", navPack: "viewPack",
                navShop: "viewShop", navFortress: "viewFortress",
-               navClan: "viewClan", navBoard: "viewBoard" };
+               navClan: "viewClan", navBoard: "viewBoard",
+               navPass: "viewPass", navHeroes: "viewHeroes", navEvents: "viewEvents",
+               navMail: "viewMail", navSettings: "viewSettings" };
   var NAV_IDS = ["navShop", "navCollection", "navHome", "navFortress", "navPack",
-                 "navTower", "navForge", "navClan", "navBoard"];
+                 "navTower", "navForge", "navClan", "navBoard",
+                 "navPass", "navHeroes", "navEvents", "navMail", "navSettings"];
   // navTower / navForge haben KEINEN eigenen Bottom-Nav-Knopf mehr (AA-
   // Ordnung, §15.5): die Detailkarte öffnet jede Karte, die Schmiede der
   // Forge-Button der Sammlung. Deshalb überall gegen null prüfen.
@@ -3964,6 +4976,11 @@ span.ico{mix-blend-mode:normal;text-align:center}
     if (navId === "navPack") { renderPackHeader(); renderTop(); }
     if (navId === "navClan") renderClan();
     if (navId === "navBoard") { renderBoard(); setTimeout(lbScrollToMe, 60); }
+    if (navId === "navPass") renderPass();
+    if (navId === "navHeroes") renderHeroes();
+    if (navId === "navEvents") renderEvents();
+    if (navId === "navMail") renderMail();
+    if (navId === "navSettings") renderSettings();
   }
 
   /* ================= Events ================= */
@@ -3972,7 +4989,7 @@ span.ico{mix-blend-mode:normal;text-align:center}
   // Trophäenstraße (User-Screenshots, §14.4). Genau das macht der
   // Prototyp jetzt auch; „Okay" schließt den Layer wieder.
   $("btnBattle").addEventListener("click", function () { openRoad(); });
-  $("tileEvents").addEventListener("click", function () { toast("Events sind im Prototyp Deko"); });
+  $("tileEvents").addEventListener("click", function () { show("navEvents"); });
   $("arenaDiorama").addEventListener("click", function () {
     var a = ARENA_TIERS[arenaIndexFor(DEMO_TROPHIES)];
     toast("Arena " + a.n + " von " + ARENA_TIERS.length + ": " + a.name);
@@ -3999,6 +5016,27 @@ span.ico{mix-blend-mode:normal;text-align:center}
   // Clan + Rangliste haengen an den Home-Hub-Kacheln (siehe Kommentar
   // im Markup) und haben deshalb keinen eigenen Bottom-Nav-Knopf.
   onNav("tileClan", "navClan"); onNav("tileBoard", "navBoard");
+  onNav("tilePass", "navPass"); onNav("tileMail", "navMail");
+  onNav("tileSettings", "navSettings");
+  ["passBack", "heroBack", "evBack", "mailBack", "setBack"].forEach(function (k) {
+    var el = $(k); if (el) el.addEventListener("click", function () { show("navHome"); });
+  });
+  $("btnBuyPass").addEventListener("click", buyPass);
+  Array.prototype.forEach.call(document.querySelectorAll("[data-sw]"), function (b) {
+    b.addEventListener("click", function () { toggleSetting(b.getAttribute("data-sw")); });
+  });
+  $("btnExport").addEventListener("click", exportSave);
+  $("btnImport").addEventListener("click", importSave);
+  $("btnWipe").addEventListener("click", function () { $("confirmDlg").classList.add("open"); });
+  $("cfNo").addEventListener("click", function () {
+    $("confirmDlg").classList.remove("open"); UISfx.tap();
+  });
+  $("cfYes").addEventListener("click", function () {
+    $("confirmDlg").classList.remove("open"); wipeSave();
+  });
+  $("confirmDlg").addEventListener("click", function (e) {
+    if (e.target === $("confirmDlg")) $("confirmDlg").classList.remove("open");
+  });
   $("clanBack").addEventListener("click", function () { show("navHome"); });
   $("boardBack").addEventListener("click", function () { show("navHome"); });
   $("lbJump").addEventListener("click", lbScrollToMe);
@@ -4041,9 +5079,14 @@ span.ico{mix-blend-mode:normal;text-align:center}
   $("selSortForge").addEventListener("change", function () {
     setSort($("selSortForge").value); renderForge();
   });
-  ["tabTowers", "tabSkills", "tabItems"].forEach(function (k) {
+  /* Der Helden-Tab fuehrt in den eigenen Helden-View: Helden brauchen
+     Buehnen-Artwork und Beschreibung, dafuer ist eine 5-Spalten-Kachel
+     zu klein. Skills/Items bleiben Platzhalter. */
+  var COLL_TABS = ["tabTowers", "tabSkills", "tabItems", "tabHeroes"];
+  COLL_TABS.forEach(function (k) {
     $(k).addEventListener("click", function () {
-      ["tabTowers", "tabSkills", "tabItems"].forEach(function (x) { $(x).classList.toggle("on", x === k); });
+      if (k === "tabHeroes") { show("navHeroes"); return; }
+      COLL_TABS.forEach(function (x) { $(x).classList.toggle("on", x === k); });
       if (k === "tabTowers") { $("collGrid").style.display = ""; renderCollection(); }
       else { $("collGrid").style.display = "none"; $("collHint").textContent = "Bald verfügbar."; }
     });
@@ -4073,6 +5116,9 @@ span.ico{mix-blend-mode:normal;text-align:center}
     $("tileBoardSub").textContent = "Rang #" + lb.myRank + " von " + lb.total;
     layer($("tileClan"), "hub_clan");
     layer($("tileBoard"), "hub_leaderboard");
+    seedPass();
+    UIBadge.set("pass", ArenaPass.state().pending);
+    UIBadge.set("mail", mailBadgeCount());
   }
 
   /* ================= Start ================= */
@@ -4084,6 +5130,7 @@ span.ico{mix-blend-mode:normal;text-align:center}
   renderPackHeader();
   renderHome();
   renderHubTiles();
+  applySettings();          // Sound-Schalter wirkt ab dem ersten Frame
   setNav("navHome");
   markPressable();         // EINE Interaktions-Schicht fuer alles Klickbare
   UIBadge.set("pack", 1);  // Demo: ein Gratis-Tagespack wartet
@@ -4105,7 +5152,16 @@ span.ico{mix-blend-mode:normal;text-align:center}
                      toggleWarDemo: toggleWarDemo, doDonate: doDonate, doAsk: doAsk,
                      doAttack: doAttack, claimChest: claimChest,
                      seedClan: seedClan, renderHubTiles: renderHubTiles,
-                     CL: function () { return window.ArenaClan; } };
+                     CL: function () { return window.ArenaClan; },
+                     renderPass: renderPass, renderHeroes: renderHeroes,
+                     renderEvents: renderEvents, renderMail: renderMail,
+                     renderSettings: renderSettings, buyPass: buyPass,
+                     claimPass: claimPass, takeMail: takeMail,
+                     toggleSetting: toggleSetting, exportSave: exportSave,
+                     importSave: importSave, settings: settings,
+                     gems: gems, setGems: setGems, mailBadgeCount: mailBadgeCount,
+                     cardArtHTML: cardArtHTML, CARD_ART: CARD_ART,
+                     EVENTS: EVENTS, eventState: eventState, MAILS: MAILS };
 })();
 </script>
 </body>
