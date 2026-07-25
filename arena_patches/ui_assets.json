@@ -1,808 +1,808 @@
 {
- "_meta": {
-  "titel": "Arcane Prism TD — Meta-UI-Assetsatz",
-  "stil": "Edel & Kristallin (Style-Variante 2)",
-  "styleSheetJob": "22646ce4-8685-46af-ad73-9ec32482c2c2",
-  "modell": "nano_banana_pro (Higgsfield), resolution 1k, Style-Sheet als Bild-Referenz",
-  "erzeugt": "2026-07-25",
-  "credits": "Batch 1: 25 Generationen x 2 = 50 Credits. Batch 2: 52 Generationen x 2 = 104 Credits. Batch 3 (Pack-Zeremonie): 1 Bild x 2 + 1 Video (kling3_0_turbo) x 7,5 = 9,5 Credits. Batch 3 (Festungs-Layout Variante 2 „Banner-Stapel\"): 4 Bilder x 2 = 8 Credits. Batch 4 (Karten-Artworks, Breitbanner, Emote-Tokens): 17 Bilder x 2 = 34 Credits. Gesamt 100 Assets / 205,5 Credits, 0 Retakes.",
-  "palette": {
-   "gold": "#e0b94a",
-   "violett": "#7a4fd6",
-   "bg": "#0e1418",
-   "raritaeten": [
-    "#9aa3ad",
-    "#58c26a",
-    "#3d9df2",
-    "#a45ef2",
-    "#f2a13d",
-    "#ff5e7e"
-   ]
+  "_meta": {
+    "titel": "Arcane Prism TD — Meta-UI-Assetsatz",
+    "stil": "Edel & Kristallin (Style-Variante 2)",
+    "styleSheetJob": "22646ce4-8685-46af-ad73-9ec32482c2c2",
+    "modell": "nano_banana_pro (Higgsfield), resolution 1k, Style-Sheet als Bild-Referenz",
+    "erzeugt": "2026-07-25",
+    "credits": "Batch 1: 25 Generationen x 2 = 50 Credits. Batch 2: 52 Generationen x 2 = 104 Credits. Batch 3 (Pack-Zeremonie): 1 Bild x 2 + 1 Video (kling3_0_turbo) x 7,5 = 9,5 Credits. Batch 3 (Festungs-Layout Variante 2 „Banner-Stapel\"): 4 Bilder x 2 = 8 Credits. Batch 4 (Karten-Artworks, Breitbanner, Emote-Tokens): 17 Bilder x 2 = 34 Credits. Gesamt 100 Assets / 205,5 Credits, 0 Retakes.",
+    "palette": {
+      "gold": "#e0b94a",
+      "violett": "#7a4fd6",
+      "bg": "#0e1418",
+      "raritaeten": [
+        "#9aa3ad",
+        "#58c26a",
+        "#3d9df2",
+        "#a45ef2",
+        "#f2a13d",
+        "#ff5e7e"
+      ]
+    },
+    "hinweise": [
+      "ALLE Assets sind TEXT-FREI (per Tesseract-OCR verifiziert). Beschriftung kommt als HTML-Ebene obendrauf (.goldtext).",
+      "Hintergrund ist flaches Dunkel #0e1418 — kein Freistellen nötig, die Meta-UI liegt ohnehin auf dunklem Grund.",
+      "Wo echte Transparenz gebraucht wird: in einer Sandbox mit ImageMagick `convert x.png -fuzz 12% -transparent '#0e1418' x.png`.",
+      "Die UI-Elemente sind mittig auf einer größeren Leinwand platziert. Im CSS deshalb mit background-size 100% 200% + background-position center arbeiten (zeigt das mittlere Drittel/Hälfte), oder `contain` und die dunklen Ränder mitlaufen lassen.",
+      "CDN-URLs sind aus der Agent-Umgebung NICHT erreichbar (Proxy), im Browser des Users schon. Der Prototyp hat für jedes Asset einen CSS-Gradient-Fallback.",
+      "Icons liegen auf #0e1418. Im Prototyp traegt .ico `mix-blend-mode:screen` — damit loest sich der dunkle Grund auf dunkler UI von selbst auf, ohne Freistellen.",
+      "Jedes Icon im Markup ist <img class=\"ico\" alt=\"<Emoji>\" onerror=\"UIIcon.fail(this)\"> — schlaegt das Laden fehl, ersetzt UIIcon.fail das Bild durch das Emoji aus alt. Emojis sind also NUR noch Fallback, nie primaere Darstellung.",
+      "cinematic_legendary ist ein MP4, kein Bild — beim Kopieren nach public/assets/ die curl-Schleife nicht auf *.png filtern."
+    ],
+    "cdnBase": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/",
+    "batches": {
+      "1": "25 Assets: Buttons, Rahmen, Raritaets-Frames, Packs, Panels, Arena-Dioramen 1-6.",
+      "2": "52 Assets: (A) 7 Waehrungs-/Ressourcen-Icons, (B) 13 Nav-/Hub-Icons, (C) 8 Strassen-Elemente, (D) 12 Teaser-Artworks, (E) 4 Leiter-/Liga-Embleme, (F) 4 Kleinteile, dazu 1 Burg-Basis-Artwork und 3 grosse Festungs-Track-Embleme.",
+      "3": "2 Assets für die Pack-Öffnung: Kartenrücken (Prisma-Emblem) und das Legendär-Vollbild-Cinematic (5 s, 720x1280)."
+    }
   },
-  "hinweise": [
-   "ALLE Assets sind TEXT-FREI (per Tesseract-OCR verifiziert). Beschriftung kommt als HTML-Ebene obendrauf (.goldtext).",
-   "Hintergrund ist flaches Dunkel #0e1418 — kein Freistellen nötig, die Meta-UI liegt ohnehin auf dunklem Grund.",
-   "Wo echte Transparenz gebraucht wird: in einer Sandbox mit ImageMagick `convert x.png -fuzz 12% -transparent '#0e1418' x.png`.",
-   "Die UI-Elemente sind mittig auf einer größeren Leinwand platziert. Im CSS deshalb mit background-size 100% 200% + background-position center arbeiten (zeigt das mittlere Drittel/Hälfte), oder `contain` und die dunklen Ränder mitlaufen lassen.",
-   "CDN-URLs sind aus der Agent-Umgebung NICHT erreichbar (Proxy), im Browser des Users schon. Der Prototyp hat für jedes Asset einen CSS-Gradient-Fallback.",
-   "Icons liegen auf #0e1418. Im Prototyp traegt .ico `mix-blend-mode:screen` — damit loest sich der dunkle Grund auf dunkler UI von selbst auf, ohne Freistellen.",
-   "Jedes Icon im Markup ist <img class=\"ico\" alt=\"<Emoji>\" onerror=\"UIIcon.fail(this)\"> — schlaegt das Laden fehl, ersetzt UIIcon.fail das Bild durch das Emoji aus alt. Emojis sind also NUR noch Fallback, nie primaere Darstellung.",
-   "cinematic_legendary ist ein MP4, kein Bild — beim Kopieren nach public/assets/ die curl-Schleife nicht auf *.png filtern."
-  ],
-  "cdnBase": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/",
-  "batches": {
-   "1": "25 Assets: Buttons, Rahmen, Raritaets-Frames, Packs, Panels, Arena-Dioramen 1-6.",
-   "2": "52 Assets: (A) 7 Waehrungs-/Ressourcen-Icons, (B) 13 Nav-/Hub-Icons, (C) 8 Strassen-Elemente, (D) 12 Teaser-Artworks, (E) 4 Leiter-/Liga-Embleme, (F) 4 Kleinteile, dazu 1 Burg-Basis-Artwork und 3 grosse Festungs-Track-Embleme.",
-   "3": "2 Assets für die Pack-Öffnung: Kartenrücken (Prisma-Emblem) und das Legendär-Vollbild-Cinematic (5 s, 720x1280)."
+  "btn_primary": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_094652_c3235d59-6aa8-4e7b-bf6e-8a86ae45e738.png",
+    "job": "c3235d59-6aa8-4e7b-bf6e-8a86ae45e738",
+    "type": "button",
+    "size": "1200x896",
+    "beschreibung": "Primär-Button, breite Gold-Kristall-Plakette mit leerem Label-Feld. Für UPGRADE / BATTLE / VERSCHMELZEN.",
+    "batch": 1
+  },
+  "btn_secondary": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_094715_3b933e5e-6d2f-488b-8093-f545aa5af6c5.png",
+    "job": "3b933e5e-6d2f-488b-8093-f545aa5af6c5",
+    "type": "button",
+    "size": "1200x896",
+    "beschreibung": "Sekundär-Button, dunkler Stein mit Silber-Filigran, leer. Für Zurück / Leeren / neutrale Aktionen.",
+    "batch": 1
+  },
+  "btn_danger": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_094716_0dfb3958-3823-42a2-a67f-754b847e263d.png",
+    "job": "0dfb3958-3823-42a2-a67f-754b847e263d",
+    "type": "button",
+    "size": "1200x896",
+    "beschreibung": "Gefahr/Ablegen-Button, violett-dunkles Amethyst-Kristall, leer. Für Ablegen / Zurücksetzen.",
+    "batch": 1
+  },
+  "pill_topbar": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095631_56a56b7e-7e2e-454a-8ff2-b7ecb71bea8e.png",
+    "job": "56a56b7e-7e2e-454a-8ff2-b7ecb71bea8e",
+    "type": "pill",
+    "size": "1376x768",
+    "beschreibung": "Schmale Top-Bar-Pille mit leerem runden Icon-Sockel links. Für Trophäen / Gems / Gold.",
+    "batch": 1
+  },
+  "panel": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095635_27685aa1-c11f-4320-a385-b859dd0914b5.png",
+    "job": "27685aa1-c11f-4320-a385-b859dd0914b5",
+    "type": "panel",
+    "size": "1200x896",
+    "beschreibung": "Rechteckiges Content-Panel, Glas-Interieur mit Goldrahmen und Gem-Cabochons, leer. Als border-image oder Hintergrund.",
+    "batch": 1
+  },
+  "tab": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095638_48493952-a47a-4ed8-acc8-1f47a65a5da0.png",
+    "job": "48493952-a47a-4ed8-acc8-1f47a65a5da0",
+    "type": "tab",
+    "size": "1376x768",
+    "beschreibung": "Kleines Tab-/Segment-Element, leer. Für Türme / Skills / Items.",
+    "batch": 1
+  },
+  "frame_common": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095642_526164c7-6bb9-4c1f-93b2-ef48d8687b51.png",
+    "job": "526164c7-6bb9-4c1f-93b2-ef48d8687b51",
+    "type": "cardframe",
+    "size": "848x1264",
+    "tier": "common",
+    "farbe": "#9aa3ad",
+    "beschreibung": "Kartenrahmen Gewöhnlich — schlicht, graues Stahl-Filigran, leeres dunkles Zentrum.",
+    "batch": 1
+  },
+  "frame_good": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095652_0e76b98e-5bc1-41d1-b7d6-1a7addd64c58.png",
+    "job": "0e76b98e-5bc1-41d1-b7d6-1a7addd64c58",
+    "type": "cardframe",
+    "size": "848x1264",
+    "tier": "good",
+    "farbe": "#58c26a",
+    "beschreibung": "Kartenrahmen Gut — grüner Kristall, ein Gem oben, noch zurückhaltend.",
+    "batch": 1
+  },
+  "frame_rare": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095656_f9462654-444a-47fb-af6d-01e758b3d09e.png",
+    "job": "f9462654-444a-47fb-af6d-01e758b3d09e",
+    "type": "cardframe",
+    "size": "848x1264",
+    "tier": "rare",
+    "farbe": "#3d9df2",
+    "beschreibung": "Kartenrahmen Selten — blauer Kristall, Splitter an den Ecken, kühler Glow.",
+    "batch": 1
+  },
+  "frame_epic": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095700_af4f1396-00ca-4392-baea-e034d09706d4.png",
+    "job": "af4f1396-00ca-4392-baea-e034d09706d4",
+    "type": "cardframe",
+    "size": "848x1264",
+    "tier": "epic",
+    "farbe": "#a45ef2",
+    "beschreibung": "Kartenrahmen Episch — violette Amethyst-Cluster an allen Ecken, Lichtpartikel.",
+    "batch": 1
+  },
+  "frame_legendary": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095704_08f4478c-de30-4653-aecb-5c659d420821.png",
+    "job": "08f4478c-de30-4653-aecb-5c659d420821",
+    "type": "cardframe",
+    "size": "848x1264",
+    "tier": "legendary",
+    "farbe": "#f2a13d",
+    "beschreibung": "Kartenrahmen Legendär — bernsteinfarben glühend, Flügel-Splitter, Ember-Partikel.",
+    "batch": 1
+  },
+  "frame_supreme": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095707_1878e9e4-ecb1-4eb1-89bc-6f1c60238b2f.png",
+    "job": "1878e9e4-ecb1-4eb1-89bc-6f1c60238b2f",
+    "type": "cardframe",
+    "size": "848x1264",
+    "tier": "supreme",
+    "farbe": "#ff5e7e",
+    "beschreibung": "Kartenrahmen Suprem — Höchststufe, karmesinroter Riesen-Gem, große Kristallflügel, Partikelkaskade.",
+    "batch": 1
+  },
+  "banner_rarity": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095716_6936452c-84d2-4fc4-ba15-4fa77ef8e6bd.png",
+    "job": "6936452c-84d2-4fc4-ba15-4fa77ef8e6bd",
+    "type": "banner",
+    "size": "1376x768",
+    "beschreibung": "Raritäts-Banner: Kristallband mit Flügelchen links/rechts, neutral-gold — per CSS-filter hue-rotate/sepia je Rarität tönbar.",
+    "batch": 1
+  },
+  "banner_title": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095720_71db8bf1-f9c9-4acd-9d17-8ce7462e384d.png",
+    "job": "71db8bf1-f9c9-4acd-9d17-8ce7462e384d",
+    "type": "banner",
+    "size": "1584x672",
+    "beschreibung": "Breites Titel-/Wave-Banner, Goldfiligran mit Schnörkeln, leer. Für Screen-Titel und Wellen-Ankündigung.",
+    "batch": 1
+  },
+  "pack_bronze": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095725_5c0984d9-f669-49ec-82f2-81817f8eab56.png",
+    "job": "5c0984d9-f669-49ec-82f2-81817f8eab56",
+    "type": "pack",
+    "size": "848x1264",
+    "beschreibung": "Bronze-Pack, kupfern, geschlossen, Hochformat.",
+    "batch": 1
+  },
+  "pack_silver": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095727_a48313e3-3fb7-4156-b276-9622a9f313a6.png",
+    "job": "a48313e3-3fb7-4156-b276-9622a9f313a6",
+    "type": "pack",
+    "size": "848x1264",
+    "beschreibung": "Silber-Pack, poliertes Silber, geschlossen, Hochformat.",
+    "batch": 1
+  },
+  "pack_gold": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095735_28c01416-737f-414d-b8b6-0dd21a18e8a9.png",
+    "job": "28c01416-737f-414d-b8b6-0dd21a18e8a9",
+    "type": "pack",
+    "size": "848x1264",
+    "beschreibung": "Gold-Pack, strahlendes Gold mit Bernstein-Kristall, geschlossen, Hochformat.",
+    "batch": 1
+  },
+  "pack_arcane": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095739_dad6b23f-bd87-42bb-934a-f0e05d24d4c3.png",
+    "job": "dad6b23f-bd87-42bb-934a-f0e05d24d4c3",
+    "type": "pack",
+    "size": "848x1264",
+    "beschreibung": "Arkan-Pack, violettes Obsidian-Kristall mit prismatischen Refraktionen, geschlossen, Hochformat.",
+    "batch": 1
+  },
+  "progress_frame": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095742_a6bc63f3-733e-416b-b018-8358ca597e98.png",
+    "job": "a6bc63f3-733e-416b-b018-8358ca597e98",
+    "type": "gauge",
+    "size": "1376x768",
+    "beschreibung": "Fortschrittsbalken-Rahmen, leere Kapsel-Rinne mit Gold-Rand und Gem-Kappen. Füllung per CSS obendrauf.",
+    "batch": 1
+  },
+  "arena1": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095747_28a90d71-c3ab-4911-afd5-969483bfa22c.png",
+    "job": "28a90d71-c3ab-4911-afd5-969483bfa22c",
+    "type": "arena",
+    "size": "1376x768",
+    "name": "Kristallhof",
+    "at": 0,
+    "beschreibung": "Arena 1 — ruhiger Steinhof mit ersten Kristallen, Tageslicht. Status-Key-Art, KEINE Match-Welt.",
+    "batch": 1
+  },
+  "arena2": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095757_8ddd3202-0a7c-4f43-82a7-1d9d6a06d038.png",
+    "job": "8ddd3202-0a7c-4f43-82a7-1d9d6a06d038",
+    "type": "arena",
+    "size": "1376x768",
+    "name": "Smaragdtal",
+    "at": 300,
+    "beschreibung": "Arena 2 — grüne Kristallgärten in Terrassen, Nachmittagslicht.",
+    "batch": 1
+  },
+  "arena3": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095801_d277827e-8704-485f-b0bb-b0f4498a2eba.png",
+    "job": "d277827e-8704-485f-b0bb-b0f4498a2eba",
+    "type": "arena",
+    "size": "1376x768",
+    "name": "Saphirfeste",
+    "at": 600,
+    "beschreibung": "Arena 3 — blaue Kristallfestung, abendlich, wehrhaft.",
+    "batch": 1
+  },
+  "arena4": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095808_72fb7754-d381-4be7-b741-6ff63150bcfb.png",
+    "job": "72fb7754-d381-4be7-b741-6ff63150bcfb",
+    "type": "arena",
+    "size": "1376x768",
+    "name": "Sturmspitze",
+    "at": 900,
+    "beschreibung": "Arena 4 — schwebende Felsen um eine Zackenspitze, Blitze, Gewitterwolken.",
+    "batch": 1
+  },
+  "arena5": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095811_7a6408ea-43bf-45d2-b9e3-e02d03d0f9c7.png",
+    "job": "7a6408ea-43bf-45d2-b9e3-e02d03d0f9c7",
+    "type": "arena",
+    "size": "1376x768",
+    "name": "Obsidian-Thron",
+    "at": 1200,
+    "beschreibung": "Arena 5 — schwarze Glas-Thronhalle, violette Runen, bedrohlich.",
+    "batch": 1
+  },
+  "arena6": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095815_26d38ce0-2889-4351-8b4c-ac50183d32ea.png",
+    "job": "26d38ce0-2889-4351-8b4c-ac50183d32ea",
+    "type": "arena",
+    "size": "1376x768",
+    "name": "Prisma-Zitadelle",
+    "at": 1500,
+    "beschreibung": "Arena 6 — strahlende Kristall-Zitadelle mit Regenbogen-Lichtsaum. Einziges Asset mit Prisma-Signatur.",
+    "batch": 1
+  },
+  "cur_trophy": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132705_cc44c539-2646-40d1-b0ff-6b81510c0307.png",
+    "job": "cc44c539-2646-40d1-b0ff-6b81510c0307",
+    "type": "currency",
+    "batch": 2,
+    "beschreibung": "Trophäen-Ikone: goldener Pokal aus geschliffenem Kristall. Ersetzt 🏆 in Topbar, Straße, Toren."
+  },
+  "cur_gem": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132708_f9dde68c-0307-479c-ad15-ca6f547df349.png",
+    "job": "f9dde68c-0307-479c-ad15-ca6f547df349",
+    "type": "currency",
+    "batch": 2,
+    "beschreibung": "Gem: magentafarbener Kristall mit Facettenglanz. Ersetzt 💎 in Topbar und Shop-Preisen."
+  },
+  "cur_gold": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132711_78da253c-5269-46c7-9d6a-eb30eb27bb56.png",
+    "job": "78da253c-5269-46c7-9d6a-eb30eb27bb56",
+    "type": "currency",
+    "batch": 2,
+    "beschreibung": "Goldmünze mit Filigran-Rand. Ersetzt 🪙 in allen Kostenzeilen (Upgrade, Shop, Festung)."
+  },
+  "ess_attack": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132812_0dd1e9db-ca2f-4d32-9132-8de9d1d1e9f6.png",
+    "job": "0dd1e9db-ca2f-4d32-9132-8de9d1d1e9f6",
+    "type": "currency",
+    "batch": 2,
+    "beschreibung": "Angriffs-Essenz: rot-orangener Kristallsplitter mit Klingenmotiv. Materialtyp „attack“ in Detail/Schmiede."
+  },
+  "ess_speed": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132813_d75a56de-91cb-4f9a-a716-59ef4d75a649.png",
+    "job": "d75a56de-91cb-4f9a-a716-59ef4d75a649",
+    "type": "currency",
+    "batch": 2,
+    "beschreibung": "Tempo-Essenz: cyanfarbener Kristall mit Blitzkante. Materialtyp „speed“."
+  },
+  "ess_special": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132814_976ad394-6e0a-4f76-943e-298eebf93410.png",
+    "job": "976ad394-6e0a-4f76-943e-298eebf93410",
+    "type": "currency",
+    "batch": 2,
+    "beschreibung": "Spezial-Essenz: violetter Sternkristall. Materialtyp „special“."
+  },
+  "cur_xp": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132815_3b34ad3b-cdf3-4b5d-be12-9cb6b0237543.png",
+    "job": "3b34ad3b-cdf3-4b5d-be12-9cb6b0237543",
+    "type": "currency",
+    "batch": 2,
+    "beschreibung": "XP-Stern, goldener Vierstrahl-Kristall. Für Fortschritts- und Pass-Anzeigen."
+  },
+  "nav_home": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132917_72f50976-9f2a-4278-891a-143342fda7c4.png",
+    "job": "72f50976-9f2a-4278-891a-143342fda7c4",
+    "type": "nav",
+    "batch": 2,
+    "beschreibung": "Bottom-Nav „Start“: Kristallburg-Silhouette auf quadratischer Kachel."
+  },
+  "nav_collection": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132918_511b5e7c-2c37-4f34-9d39-40b21155eac5.png",
+    "job": "511b5e7c-2c37-4f34-9d39-40b21155eac5",
+    "type": "nav",
+    "batch": 2,
+    "beschreibung": "Bottom-Nav „Sammlung“: aufgefächerte Kartenhand."
+  },
+  "nav_tower": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132919_6cb19273-0d12-4073-8231-d2e56424d692.png",
+    "job": "6cb19273-0d12-4073-8231-d2e56424d692",
+    "type": "nav",
+    "batch": 2,
+    "beschreibung": "Turm-Symbol (Kristallturm). Reserve — kein eigener Nav-Knopf mehr, wird in Karten-Kontexten genutzt."
+  },
+  "nav_forge": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132919_8a81e259-5be8-43e2-b797-bb957dccebda.png",
+    "job": "8a81e259-5be8-43e2-b797-bb957dccebda",
+    "type": "nav",
+    "batch": 2,
+    "beschreibung": "Schmiede: Hammer über Amboss. Sitzt auf dem Forge-Button der Sammlung."
+  },
+  "nav_packs": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132921_1a1ee40d-26a4-4e4f-bcad-53257fd22928.png",
+    "job": "1a1ee40d-26a4-4e4f-bcad-53257fd22928",
+    "type": "nav",
+    "batch": 2,
+    "beschreibung": "Bottom-Nav „Packs“: Kristall-Geschenkbox mit Goldband."
+  },
+  "hub_pass": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133025_671bafbb-8c27-4cff-8923-afab6d9f5c7b.png",
+    "job": "671bafbb-8c27-4cff-8923-afab6d9f5c7b",
+    "type": "hub",
+    "batch": 2,
+    "beschreibung": "Season-Pass: aufgeschlagenes Buch mit Kristallsiegel."
+  },
+  "hub_mail": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133026_25da2335-2caa-4a3c-9107-ada8980bf4f6.png",
+    "job": "25da2335-2caa-4a3c-9107-ada8980bf4f6",
+    "type": "hub",
+    "batch": 2,
+    "beschreibung": "Post: versiegelter Brief."
+  },
+  "hub_clan": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133027_22a8d954-80b4-4d56-9043-6d90eb809856.png",
+    "job": "22a8d954-80b4-4d56-9043-6d90eb809856",
+    "type": "hub",
+    "batch": 2,
+    "beschreibung": "Klan: Wappenschild mit gekreuzten Elementen."
+  },
+  "hub_events": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133029_f8199f4f-c610-4639-891e-3dfb69d8bbb7.png",
+    "job": "f8199f4f-c610-4639-891e-3dfb69d8bbb7",
+    "type": "hub",
+    "batch": 2,
+    "beschreibung": "Events: Marktzelt mit Wimpel."
+  },
+  "hub_challenges": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133030_a6c88f92-fb28-4d0e-84ef-c1a44034ef79.png",
+    "job": "a6c88f92-fb28-4d0e-84ef-c1a44034ef79",
+    "type": "hub",
+    "batch": 2,
+    "beschreibung": "Herausforderungen: Rundschild. Dient zugleich als Icon des Burg-HP-Tracks in Toasts."
+  },
+  "hub_shop": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133134_c4dd57e8-7213-4769-b4c3-d2de067d6c26.png",
+    "job": "c4dd57e8-7213-4769-b4c3-d2de067d6c26",
+    "type": "hub",
+    "batch": 2,
+    "beschreibung": "Shop: Schatztruhe mit Goldbeschlag."
+  },
+  "hub_leaderboard": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133135_123fa2d4-5a7f-43d2-9fe4-2b9643a61a68.png",
+    "job": "123fa2d4-5a7f-43d2-9fe4-2b9643a61a68",
+    "type": "hub",
+    "batch": 2,
+    "beschreibung": "Rangliste: Pokal auf Säulenpodest."
+  },
+  "hub_settings": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133135_db2d0a40-931f-439e-88d7-b6e5d7c7496d.png",
+    "job": "db2d0a40-931f-439e-88d7-b6e5d7c7496d",
+    "type": "hub",
+    "batch": 2,
+    "beschreibung": "Einstellungen: Zahnrad aus Kristall."
+  },
+  "road_platform": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133136_11a05067-59c0-4049-a72a-9cdfc1afb81a.png",
+    "job": "11a05067-59c0-4049-a72a-9cdfc1afb81a",
+    "type": "road",
+    "batch": 2,
+    "beschreibung": "Belohnungs-Podest der Trophäenstraße — Kristall-Sockel statt AAs grüner Wiese (unser Stil)."
+  },
+  "prop_fire": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133137_7133f405-242a-4360-af65-7d0344f37d32.png",
+    "job": "7133f405-242a-4360-af65-7d0344f37d32",
+    "type": "road",
+    "batch": 2,
+    "beschreibung": "Deko-Prop: Kristallfeuer in Schale. Links/rechts der Straßenknoten."
+  },
+  "prop_pouch": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133312_5c702ceb-1ca1-42d2-8753-bd3d6fc8bf4e.png",
+    "job": "5c702ceb-1ca1-42d2-8753-bd3d6fc8bf4e",
+    "type": "road",
+    "batch": 2,
+    "beschreibung": "Deko-Prop: Goldbeutel mit Münzen."
+  },
+  "prop_rune": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133312_cb122820-65dd-49b6-9047-c7f5ef253876.png",
+    "job": "cb122820-65dd-49b6-9047-c7f5ef253876",
+    "type": "road",
+    "batch": 2,
+    "beschreibung": "Deko-Prop: stehender Runenstein."
+  },
+  "prop_obelisk": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133313_0543d8f8-218d-44cd-a48f-51691e0aa3a6.png",
+    "job": "0543d8f8-218d-44cd-a48f-51691e0aa3a6",
+    "type": "road",
+    "batch": 2,
+    "beschreibung": "Deko-Prop: Mini-Obelisk mit Goldspitze."
+  },
+  "hex_slot": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133314_61df2470-d52e-46b7-8d39-adbc96da66bf.png",
+    "job": "61df2470-d52e-46b7-8d39-adbc96da66bf",
+    "type": "frame",
+    "batch": 2,
+    "beschreibung": "Sechseck-Rahmen für die vier Pack-Slots auf Home (leerer Innenraum)."
+  },
+  "arena_crest": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133315_995dd402-303e-4619-b57a-8ab08ab66483.png",
+    "job": "995dd402-303e-4619-b57a-8ab08ab66483",
+    "type": "frame",
+    "batch": 2,
+    "beschreibung": "Arena-Wappen als Hexagon, leere Mitte — trägt die Arena-Nummer als HTML-Text."
+  },
+  "chest_bronze": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133419_c6ce951d-516e-44ba-b8cc-149219299e48.png",
+    "job": "c6ce951d-516e-44ba-b8cc-149219299e48",
+    "type": "pack",
+    "batch": 2,
+    "beschreibung": "Geschlossene Bronzetruhe. Für gefüllte Home-Slots und Straßen-Belohnungen."
+  },
+  "tz_frenzy": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133422_9f9d2b66-9df7-4f29-8ae3-b0201f5a96d7.png",
+    "job": "9f9d2b66-9df7-4f29-8ae3-b0201f5a96d7",
+    "type": "teaser",
+    "batch": 2,
+    "beschreibung": "Map-Ziel „Zauber-Rausch“: wirbelnde Zauberkarten über einer Kristallebene."
+  },
+  "tz_bounty": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133423_95e3a49d-8dd5-4ee5-b93f-3ad894e0c1eb.png",
+    "job": "95e3a49d-8dd5-4ee5-b93f-3ad894e0c1eb",
+    "type": "teaser",
+    "batch": 2,
+    "beschreibung": "Map-Ziel „Kopfgeld-Blüte“: aufgeblühte Gem-Blume."
+  },
+  "tz_straight": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133424_8974903a-c02c-420f-b32a-d3fb048cfaff.png",
+    "job": "8974903a-c02c-420f-b32a-d3fb048cfaff",
+    "type": "teaser",
+    "batch": 2,
+    "beschreibung": "Map-Ziel „Schnurgerade“: schnurgerader Goldpfad durch Kristallfelsen."
+  },
+  "tz_blind": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133425_877bd158-0a80-49ef-9398-2cc2c38fce84.png",
+    "job": "877bd158-0a80-49ef-9398-2cc2c38fce84",
+    "type": "teaser",
+    "batch": 2,
+    "beschreibung": "Map-Ziel „Blindwahl“: drei verdeckte Karten mit Fragezeichen-Siegel."
+  },
+  "tz_starborn": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133658_1b2c3d86-bbdb-4749-9d02-dd8322838d00.png",
+    "job": "1b2c3d86-bbdb-4749-9d02-dd8322838d00",
+    "type": "teaser",
+    "batch": 2,
+    "beschreibung": "Map-Ziel „Sternengeburt“: goldener Turm, der aus einem Sternenriss wächst."
+  },
+  "tz_swift": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133702_949e2b93-321e-4d5f-b64f-c09d5ba099a5.png",
+    "job": "949e2b93-321e-4d5f-b64f-c09d5ba099a5",
+    "type": "teaser",
+    "batch": 2,
+    "beschreibung": "Map-Ziel „Flinker Trick“: grinsende goldene Maske in Bewegungsunschärfe."
+  },
+  "tk_chains": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133705_21ce5677-8a42-4d81-ad8d-061d76c788ed.png",
+    "job": "21ce5677-8a42-4d81-ad8d-061d76c788ed",
+    "type": "teaser",
+    "batch": 2,
+    "beschreibung": "Trick „Ketten der Bindung“: goldene Ketten, die einen Kristall fesseln."
+  },
+  "tk_weakness": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133709_18ac6ac6-cbd2-4591-849d-06509a3a88ce.png",
+    "job": "18ac6ac6-cbd2-4591-849d-06509a3a88ce",
+    "type": "teaser",
+    "batch": 2,
+    "beschreibung": "Trick „Fluch der Schwäche“: rote Abwärts-Aura über einer Figur."
+  },
+  "tk_cart": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133712_f9839e7a-e4da-430d-956f-4d07f3fd79d7.png",
+    "job": "f9839e7a-e4da-430d-956f-4d07f3fd79d7",
+    "type": "teaser",
+    "batch": 2,
+    "beschreibung": "Trick „Phantomkarren“: durchscheinender Geisterkarren auf dem Pfad."
+  },
+  "tk_silence": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133718_0244095d-7454-4b78-84d7-2aadd4e2ec5c.png",
+    "job": "0244095d-7454-4b78-84d7-2aadd4e2ec5c",
+    "type": "teaser",
+    "batch": 2,
+    "beschreibung": "Trick „Fluch der Stille“: geknebelte Maske, verstummte Runen."
+  },
+  "tk_starfall": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133726_de1c1e9d-c9f8-4b2e-8b4b-1089857f0828.png",
+    "job": "de1c1e9d-c9f8-4b2e-8b4b-1089857f0828",
+    "type": "teaser",
+    "batch": 2,
+    "beschreibung": "Trick „Sternenfall“: stürzender Stern mit Goldschweif."
+  },
+  "tk_wisp": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133730_f073465e-305a-4ea9-ae5d-6c3cf8383ac4.png",
+    "job": "f073465e-305a-4ea9-ae5d-6c3cf8383ac4",
+    "type": "teaser",
+    "batch": 2,
+    "beschreibung": "Trick „Geisterablenkung“: Irrlicht, das Gegner vom Pfad zieht."
+  },
+  "arena7": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133735_eecfb0b0-d6ea-408d-8f43-f9337c9e35d6.png",
+    "job": "eecfb0b0-d6ea-408d-8f43-f9337c9e35d6",
+    "type": "arena",
+    "batch": 2,
+    "beschreibung": "Arena 7 „Aschenmark“ — Insel-Diorama: verbrannte Handelsstadt über Aschewolken."
+  },
+  "arena8": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133755_444e1bf7-6dce-4a24-b511-31cc50d0b247.png",
+    "job": "444e1bf7-6dce-4a24-b511-31cc50d0b247",
+    "type": "arena",
+    "batch": 2,
+    "beschreibung": "Arena 8 „Frostbastion“ — Insel-Diorama: Eisfestung mit blauen Kristallzinnen."
+  },
+  "gate_emblem": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133759_5e7df04b-9d20-4c79-833f-e5e0f12d2173.png",
+    "job": "5e7df04b-9d20-4c79-833f-e5e0f12d2173",
+    "type": "league",
+    "batch": 2,
+    "beschreibung": "Liga-Tor-Emblem: dunkles Steintor mit Prisma-Schlussstein. Für alle Prisma-Liga-Tore."
+  },
+  "summit_emblem": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133802_c77dc4bd-420f-4d14-bc20-4da0a3dec1e2.png",
+    "job": "c77dc4bd-420f-4d14-bc20-4da0a3dec1e2",
+    "type": "league",
+    "batch": 2,
+    "beschreibung": "Spitzen-Emblem „Prisma-Krone“: Krone aus Prismen über dem letzten Tor (9 800 🏆)."
+  },
+  "btn_info": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133805_e56cd8c3-9817-47b0-8fce-7a555d6b44f2.png",
+    "job": "e56cd8c3-9817-47b0-8fce-7a555d6b44f2",
+    "type": "button",
+    "batch": 2,
+    "beschreibung": "Info-„i“-Knopf als runder Kristall. Auf allen Teaser-Bannern."
+  },
+  "icon_lock": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133808_d02b91b1-7af1-4214-a44e-116017f314e5.png",
+    "job": "d02b91b1-7af1-4214-a44e-116017f314e5",
+    "type": "icon",
+    "batch": 2,
+    "beschreibung": "Schloss aus Kristall und Gold. Gesperrte Knoten, Tore, Festungs-Stufen."
+  },
+  "icon_check": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133811_e6757de3-c63b-4dad-8f20-21b9b05baea7.png",
+    "job": "e6757de3-c63b-4dad-8f20-21b9b05baea7",
+    "type": "icon",
+    "batch": 2,
+    "beschreibung": "Häkchen-Siegel in Gold-Grün. Abgeholte Straßenknoten."
+  },
+  "fx_spark": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133822_6d0be656-3486-496c-9c16-f6996e549dcf.png",
+    "job": "6d0be656-3486-496c-9c16-f6996e549dcf",
+    "type": "fx",
+    "batch": 2,
+    "beschreibung": "Funken-Burst, radial. Vorlage für Tap-Funken und Kauf-Feedback."
+  },
+  "fort_castle": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_134052_5d6b036a-d610-45d0-ad32-6956fdb5808a.png",
+    "job": "5d6b036a-d610-45d0-ad32-6956fdb5808a",
+    "type": "fortress",
+    "batch": 2,
+    "beschreibung": "Basis-Artwork der LEBENDEN BURG: schwebende Kristallburg mit Prisma auf dem Dach, Diorama wie die Arena-Inseln. Standard-Skin „prisma“ in window.CastleSkins."
+  },
+  "track_hp": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_135828_29edbcf2-e256-4c35-b3a7-5fceb1ea7adc.png",
+    "job": "29edbcf2-e256-4c35-b3a7-5fceb1ea7adc",
+    "type": "fortress",
+    "batch": 2,
+    "beschreibung": "Track-Emblem „Burg-Stabilität“: Schildkristall. Bewusst GROSS/detailreich — Ast-Kopf, ca. 1/3 Kartenbreite."
+  },
+  "track_dmg": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_135832_3232967e-3798-473d-81fd-cf24183c75e1.png",
+    "job": "3232967e-3798-473d-81fd-cf24183c75e1",
+    "type": "fortress",
+    "batch": 2,
+    "beschreibung": "Track-Emblem „Prisma-Fokus“: gebündelter Prisma-Strahl. Groß, Ast-Kopf."
+  },
+  "track_rate": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_135837_d4de036f-acc4-40f7-95e6-e667d2dec6fe.png",
+    "job": "d4de036f-acc4-40f7-95e6-e667d2dec6fe",
+    "type": "fortress",
+    "batch": 2,
+    "beschreibung": "Track-Emblem „Prisma-Taktung“: Doppelblitz im Kristall. Groß, Ast-Kopf."
+  },
+  "card_back": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_144624_82b4b51d-f9d3-416d-8212-52e2f3c0c0a1.png",
+    "job": "82b4b51d-f9d3-416d-8212-52e2f3c0c0a1",
+    "type": "cardframe",
+    "batch": 3,
+    "size": "896x1200",
+    "beschreibung": "KARTENRÜCKEN: Prisma-Emblem in goldenem Filigran-Ring, Facetten-Kristall, violette Akzente. Liegt als .pcback auf jeder verdeckten Pack-Karte; die Karte dreht sich beim Antippen um 180° und zeigt die Vorderseite (§17.2)."
+  },
+  "cinematic_legendary": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_141315_94331286-780b-4b74-8ee1-c8a3e15b9dac.mp4",
+    "job": "94331286-780b-4b74-8ee1-c8a3e15b9dac",
+    "type": "video",
+    "batch": 3,
+    "size": "720x1280, 5,04 s",
+    "modell": "kling3_0_turbo (7,5 Credits)",
+    "beschreibung": "VOLLBILD-CINEMATIC für Legendär+-Pulls: Kristall-Pack zerspringt in Goldlicht, Splitter fliegen zur Kamera, eine leuchtende Karten-Silhouette steigt auf. OHNE Alpha-Kanal (Vollbild braucht keine Transparenz — umgeht das Mobile-Safari-Problem mit Overlay-Videos). Generisch pro Rarität, die echte Karte blendet danach als HTML-Ebene ein (§17.3)."
+  },
+  "fort_banner_track": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_150531_224eab67-a74f-40dd-a293-3caf809eb8b9.png",
+    "job": "224eab67-a74f-40dd-a293-3caf809eb8b9",
+    "type": "image",
+    "batch": 3,
+    "beschreibung": "Banner-Plakette Variante 2: dunkles Glas-Kristall-Interieur, Goldfiligran-Rahmen, Gem-Sockel links, Button-Zone rechts. Volle Breite, leer, text-frei."
+  },
+  "fort_pip_full": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_150534_85413c44-d6fc-41ea-a6ee-2b0589f1d5f7.png",
+    "job": "85413c44-d6fc-41ea-a6ee-2b0589f1d5f7",
+    "type": "image",
+    "batch": 3,
+    "beschreibung": "Fortschritts-Pip GEFÜLLT: goldener Facettenkristall in Goldring, glühend."
+  },
+  "fort_pip_empty": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_150536_445edf7f-152a-42cd-81f2-b18060e68ced.png",
+    "job": "445edf7f-152a-42cd-81f2-b18060e68ced",
+    "type": "image",
+    "batch": 3,
+    "beschreibung": "Fortschritts-Pip LEER: dunkler Stein-Sockel mit Silberring, unbeleuchtet."
+  },
+  "fort_milestone": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_150538_2ac9dd11-83f1-435b-8f5c-793e503b448b.png",
+    "job": "2ac9dd11-83f1-435b-8f5c-793e503b448b",
+    "type": "image",
+    "batch": 3,
+    "beschreibung": "Meilenstein-Gem: prismatischer Sternkristall in goldener Hex-Fassung. Alle 10 Stufen."
+  },
+  "card_ember": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_163302_2030f3d4-06f9-481f-b9ff-68596f587fb9.png",
+    "job": "2030f3d4-06f9-481f-b9ff-68596f587fb9",
+    "type": "image",
+    "subtype": "card_art",
+    "batch": 4,
+    "beschreibung": "Karten-Art EMBER: exakt der Ingame-Feuerturm (Lava-Mörser) auf dramatischer Bühne, Funkenflug. Design-Referenz: assets/card_fire.webp."
+  },
+  "card_frost": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_163306_f5f7b63e-a4ae-4473-bb89-2b7421051f16.png",
+    "job": "f5f7b63e-a4ae-4473-bb89-2b7421051f16",
+    "type": "image",
+    "subtype": "card_art",
+    "batch": 4,
+    "beschreibung": "Karten-Art FROST: exakt der Ingame-Eisturm (Eisdrachen-Kanone), kaltes Cyan-Glühen. Referenz: assets/card_water.webp."
+  },
+  "card_stone": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_163308_ec2dc5a4-5251-44e1-90c7-fd56a9309193.png",
+    "job": "ec2dc5a4-5251-44e1-90c7-fd56a9309193",
+    "type": "image",
+    "subtype": "card_art",
+    "batch": 4,
+    "beschreibung": "Karten-Art STONE: exakt das Ingame-Katapult, Bernstein-Glühen, Staub. Referenz: assets/card_earth.webp."
+  },
+  "card_thorn": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_163311_e6b29c3f-1e3b-44c5-8068-ed4be64f65e7.png",
+    "job": "e6b29c3f-1e3b-44c5-8068-ed4be64f65e7",
+    "type": "image",
+    "subtype": "card_art",
+    "batch": 4,
+    "beschreibung": "Karten-Art THORN: exakt die Ingame-Ranken-Balliste, giftgrünes Glühen. Referenz: assets/card_nature.webp."
+  },
+  "card_dawn": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_163314_d5ceac1b-a0a4-489e-b084-a4b35afc5486.png",
+    "job": "d5ceac1b-a0a4-489e-b084-a4b35afc5486",
+    "type": "image",
+    "subtype": "card_art",
+    "batch": 4,
+    "beschreibung": "Karten-Art DAWN: exakt der Ingame-Licht-Obelisk mit Gold-Halo. Referenz: assets/card_light.webp."
+  },
+  "card_hollow": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_163318_f95b1d45-da51-4ca8-ba40-1e8849ac1461.png",
+    "job": "f95b1d45-da51-4ca8-ba40-1e8849ac1461",
+    "type": "image",
+    "subtype": "card_art",
+    "batch": 4,
+    "beschreibung": "Karten-Art HOLLOW: exakt der Ingame-Dunkel-Obelisk mit violetten Blitzbögen. Referenz: assets/card_darkness.webp."
+  },
+  "card_solara": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_163321_b8b3a10d-c9e7-48d1-a374-ad3c3ead8577.png",
+    "job": "b8b3a10d-c9e7-48d1-a374-ad3c3ead8577",
+    "type": "image",
+    "subtype": "card_art",
+    "batch": 4,
+    "beschreibung": "Helden-Art SOLARA: exakt die Ingame-Heldin (hero_solara.webp), goldweiße Strahlung."
+  },
+  "card_magmor": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_163323_2e544b8e-568c-4c59-967c-83424bf3e1c1.png",
+    "job": "2e544b8e-568c-4c59-967c-83424bf3e1c1",
+    "type": "image",
+    "subtype": "card_art",
+    "batch": 4,
+    "beschreibung": "Helden-Art MAGMOR: exakt der Ingame-Magma-Titan (hero_magmor.webp), Glut und Rauch."
+  },
+  "pass_keyart": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160701_42a171b5-06f3-458d-a766-f4992e4210e5.png",
+    "job": "42a171b5-06f3-458d-a766-f4992e4210e5",
+    "type": "image",
+    "subtype": "banner",
+    "batch": 4,
+    "beschreibung": "Season-Pass-Keyart „Goldene Fortuna“: goldenes Fortuna-Rad, Schatzflut. Linkes Drittel ruhig für UI."
+  },
+  "event_tournament": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160704_9fb36583-0558-4407-a96c-83275fc4c95e.png",
+    "job": "9fb36583-0558-4407-a96c-83275fc4c95e",
+    "type": "image",
+    "subtype": "banner",
+    "batch": 4,
+    "beschreibung": "Event-Banner Turnier: Kristallarena mit zwei rivalisierenden Bannern über Schwebeinsel-Podium."
+  },
+  "event_essence": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160706_82a16544-3845-4947-8482-8104ab108bf6.png",
+    "job": "82a16544-3845-4947-8482-8104ab108bf6",
+    "type": "image",
+    "subtype": "banner",
+    "batch": 4,
+    "beschreibung": "Event-Banner Essenz-Regen: leuchtende Elementkristalle regnen in Schatzgefäße."
+  },
+  "emote_luck": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160713_d2da4068-32da-4d1a-950e-a554f7a3ec11.png",
+    "job": "d2da4068-32da-4d1a-950e-a554f7a3ec11",
+    "type": "image",
+    "subtype": "emote",
+    "batch": 4,
+    "beschreibung": "Emote Viel Glück: grünes Kristall-Kleeblatt im Goldring."
+  },
+  "emote_thanks": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160715_3b9758a1-6ccd-46fe-887b-c87ff28579f0.png",
+    "job": "3b9758a1-6ccd-46fe-887b-c87ff28579f0",
+    "type": "image",
+    "subtype": "emote",
+    "batch": 4,
+    "beschreibung": "Emote Danke: goldenes Kristallherz im Goldring."
+  },
+  "emote_cards": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160718_714b6f41-0b0f-4ebc-9284-e39af17401ea.png",
+    "job": "714b6f41-0b0f-4ebc-9284-e39af17401ea",
+    "type": "image",
+    "subtype": "emote",
+    "batch": 4,
+    "beschreibung": "Emote Karten?: leuchtende Karte mit Fragezeichen-Gem im Goldring."
+  },
+  "emote_attack": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160720_ca1c0844-21b8-40c1-b714-22bb44895f47.png",
+    "job": "ca1c0844-21b8-40c1-b714-22bb44895f47",
+    "type": "image",
+    "subtype": "emote",
+    "batch": 4,
+    "beschreibung": "Emote Angriff: gekreuzte Kristallschwerter im Goldring."
+  },
+  "emote_strong": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160722_700d087a-3ea5-4bb1-8178-7cf35e08d73f.png",
+    "job": "700d087a-3ea5-4bb1-8178-7cf35e08d73f",
+    "type": "image",
+    "subtype": "emote",
+    "batch": 4,
+    "beschreibung": "Emote Stark: Bernstein-Kristallarm mit Feuerglühen im Goldring."
+  },
+  "emote_welcome": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160724_83a735e4-f6f7-4853-86b5-23ebe574f386.png",
+    "job": "83a735e4-f6f7-4853-86b5-23ebe574f386",
+    "type": "image",
+    "subtype": "emote",
+    "batch": 4,
+    "beschreibung": "Emote Willkommen: winkende Kristallhand im Goldring."
   }
- },
- "btn_primary": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_094652_c3235d59-6aa8-4e7b-bf6e-8a86ae45e738.png",
-  "job": "c3235d59-6aa8-4e7b-bf6e-8a86ae45e738",
-  "type": "button",
-  "size": "1200x896",
-  "beschreibung": "Primär-Button, breite Gold-Kristall-Plakette mit leerem Label-Feld. Für UPGRADE / BATTLE / VERSCHMELZEN.",
-  "batch": 1
- },
- "btn_secondary": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_094715_3b933e5e-6d2f-488b-8093-f545aa5af6c5.png",
-  "job": "3b933e5e-6d2f-488b-8093-f545aa5af6c5",
-  "type": "button",
-  "size": "1200x896",
-  "beschreibung": "Sekundär-Button, dunkler Stein mit Silber-Filigran, leer. Für Zurück / Leeren / neutrale Aktionen.",
-  "batch": 1
- },
- "btn_danger": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_094716_0dfb3958-3823-42a2-a67f-754b847e263d.png",
-  "job": "0dfb3958-3823-42a2-a67f-754b847e263d",
-  "type": "button",
-  "size": "1200x896",
-  "beschreibung": "Gefahr/Ablegen-Button, violett-dunkles Amethyst-Kristall, leer. Für Ablegen / Zurücksetzen.",
-  "batch": 1
- },
- "pill_topbar": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095631_56a56b7e-7e2e-454a-8ff2-b7ecb71bea8e.png",
-  "job": "56a56b7e-7e2e-454a-8ff2-b7ecb71bea8e",
-  "type": "pill",
-  "size": "1376x768",
-  "beschreibung": "Schmale Top-Bar-Pille mit leerem runden Icon-Sockel links. Für Trophäen / Gems / Gold.",
-  "batch": 1
- },
- "panel": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095635_27685aa1-c11f-4320-a385-b859dd0914b5.png",
-  "job": "27685aa1-c11f-4320-a385-b859dd0914b5",
-  "type": "panel",
-  "size": "1200x896",
-  "beschreibung": "Rechteckiges Content-Panel, Glas-Interieur mit Goldrahmen und Gem-Cabochons, leer. Als border-image oder Hintergrund.",
-  "batch": 1
- },
- "tab": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095638_48493952-a47a-4ed8-acc8-1f47a65a5da0.png",
-  "job": "48493952-a47a-4ed8-acc8-1f47a65a5da0",
-  "type": "tab",
-  "size": "1376x768",
-  "beschreibung": "Kleines Tab-/Segment-Element, leer. Für Türme / Skills / Items.",
-  "batch": 1
- },
- "frame_common": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095642_526164c7-6bb9-4c1f-93b2-ef48d8687b51.png",
-  "job": "526164c7-6bb9-4c1f-93b2-ef48d8687b51",
-  "type": "cardframe",
-  "size": "848x1264",
-  "tier": "common",
-  "farbe": "#9aa3ad",
-  "beschreibung": "Kartenrahmen Gewöhnlich — schlicht, graues Stahl-Filigran, leeres dunkles Zentrum.",
-  "batch": 1
- },
- "frame_good": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095652_0e76b98e-5bc1-41d1-b7d6-1a7addd64c58.png",
-  "job": "0e76b98e-5bc1-41d1-b7d6-1a7addd64c58",
-  "type": "cardframe",
-  "size": "848x1264",
-  "tier": "good",
-  "farbe": "#58c26a",
-  "beschreibung": "Kartenrahmen Gut — grüner Kristall, ein Gem oben, noch zurückhaltend.",
-  "batch": 1
- },
- "frame_rare": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095656_f9462654-444a-47fb-af6d-01e758b3d09e.png",
-  "job": "f9462654-444a-47fb-af6d-01e758b3d09e",
-  "type": "cardframe",
-  "size": "848x1264",
-  "tier": "rare",
-  "farbe": "#3d9df2",
-  "beschreibung": "Kartenrahmen Selten — blauer Kristall, Splitter an den Ecken, kühler Glow.",
-  "batch": 1
- },
- "frame_epic": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095700_af4f1396-00ca-4392-baea-e034d09706d4.png",
-  "job": "af4f1396-00ca-4392-baea-e034d09706d4",
-  "type": "cardframe",
-  "size": "848x1264",
-  "tier": "epic",
-  "farbe": "#a45ef2",
-  "beschreibung": "Kartenrahmen Episch — violette Amethyst-Cluster an allen Ecken, Lichtpartikel.",
-  "batch": 1
- },
- "frame_legendary": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095704_08f4478c-de30-4653-aecb-5c659d420821.png",
-  "job": "08f4478c-de30-4653-aecb-5c659d420821",
-  "type": "cardframe",
-  "size": "848x1264",
-  "tier": "legendary",
-  "farbe": "#f2a13d",
-  "beschreibung": "Kartenrahmen Legendär — bernsteinfarben glühend, Flügel-Splitter, Ember-Partikel.",
-  "batch": 1
- },
- "frame_supreme": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095707_1878e9e4-ecb1-4eb1-89bc-6f1c60238b2f.png",
-  "job": "1878e9e4-ecb1-4eb1-89bc-6f1c60238b2f",
-  "type": "cardframe",
-  "size": "848x1264",
-  "tier": "supreme",
-  "farbe": "#ff5e7e",
-  "beschreibung": "Kartenrahmen Suprem — Höchststufe, karmesinroter Riesen-Gem, große Kristallflügel, Partikelkaskade.",
-  "batch": 1
- },
- "banner_rarity": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095716_6936452c-84d2-4fc4-ba15-4fa77ef8e6bd.png",
-  "job": "6936452c-84d2-4fc4-ba15-4fa77ef8e6bd",
-  "type": "banner",
-  "size": "1376x768",
-  "beschreibung": "Raritäts-Banner: Kristallband mit Flügelchen links/rechts, neutral-gold — per CSS-filter hue-rotate/sepia je Rarität tönbar.",
-  "batch": 1
- },
- "banner_title": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095720_71db8bf1-f9c9-4acd-9d17-8ce7462e384d.png",
-  "job": "71db8bf1-f9c9-4acd-9d17-8ce7462e384d",
-  "type": "banner",
-  "size": "1584x672",
-  "beschreibung": "Breites Titel-/Wave-Banner, Goldfiligran mit Schnörkeln, leer. Für Screen-Titel und Wellen-Ankündigung.",
-  "batch": 1
- },
- "pack_bronze": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095725_5c0984d9-f669-49ec-82f2-81817f8eab56.png",
-  "job": "5c0984d9-f669-49ec-82f2-81817f8eab56",
-  "type": "pack",
-  "size": "848x1264",
-  "beschreibung": "Bronze-Pack, kupfern, geschlossen, Hochformat.",
-  "batch": 1
- },
- "pack_silver": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095727_a48313e3-3fb7-4156-b276-9622a9f313a6.png",
-  "job": "a48313e3-3fb7-4156-b276-9622a9f313a6",
-  "type": "pack",
-  "size": "848x1264",
-  "beschreibung": "Silber-Pack, poliertes Silber, geschlossen, Hochformat.",
-  "batch": 1
- },
- "pack_gold": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095735_28c01416-737f-414d-b8b6-0dd21a18e8a9.png",
-  "job": "28c01416-737f-414d-b8b6-0dd21a18e8a9",
-  "type": "pack",
-  "size": "848x1264",
-  "beschreibung": "Gold-Pack, strahlendes Gold mit Bernstein-Kristall, geschlossen, Hochformat.",
-  "batch": 1
- },
- "pack_arcane": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095739_dad6b23f-bd87-42bb-934a-f0e05d24d4c3.png",
-  "job": "dad6b23f-bd87-42bb-934a-f0e05d24d4c3",
-  "type": "pack",
-  "size": "848x1264",
-  "beschreibung": "Arkan-Pack, violettes Obsidian-Kristall mit prismatischen Refraktionen, geschlossen, Hochformat.",
-  "batch": 1
- },
- "progress_frame": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095742_a6bc63f3-733e-416b-b018-8358ca597e98.png",
-  "job": "a6bc63f3-733e-416b-b018-8358ca597e98",
-  "type": "gauge",
-  "size": "1376x768",
-  "beschreibung": "Fortschrittsbalken-Rahmen, leere Kapsel-Rinne mit Gold-Rand und Gem-Kappen. Füllung per CSS obendrauf.",
-  "batch": 1
- },
- "arena1": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095747_28a90d71-c3ab-4911-afd5-969483bfa22c.png",
-  "job": "28a90d71-c3ab-4911-afd5-969483bfa22c",
-  "type": "arena",
-  "size": "1376x768",
-  "name": "Kristallhof",
-  "at": 0,
-  "beschreibung": "Arena 1 — ruhiger Steinhof mit ersten Kristallen, Tageslicht. Status-Key-Art, KEINE Match-Welt.",
-  "batch": 1
- },
- "arena2": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095757_8ddd3202-0a7c-4f43-82a7-1d9d6a06d038.png",
-  "job": "8ddd3202-0a7c-4f43-82a7-1d9d6a06d038",
-  "type": "arena",
-  "size": "1376x768",
-  "name": "Smaragdtal",
-  "at": 300,
-  "beschreibung": "Arena 2 — grüne Kristallgärten in Terrassen, Nachmittagslicht.",
-  "batch": 1
- },
- "arena3": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095801_d277827e-8704-485f-b0bb-b0f4498a2eba.png",
-  "job": "d277827e-8704-485f-b0bb-b0f4498a2eba",
-  "type": "arena",
-  "size": "1376x768",
-  "name": "Saphirfeste",
-  "at": 600,
-  "beschreibung": "Arena 3 — blaue Kristallfestung, abendlich, wehrhaft.",
-  "batch": 1
- },
- "arena4": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095808_72fb7754-d381-4be7-b741-6ff63150bcfb.png",
-  "job": "72fb7754-d381-4be7-b741-6ff63150bcfb",
-  "type": "arena",
-  "size": "1376x768",
-  "name": "Sturmspitze",
-  "at": 900,
-  "beschreibung": "Arena 4 — schwebende Felsen um eine Zackenspitze, Blitze, Gewitterwolken.",
-  "batch": 1
- },
- "arena5": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095811_7a6408ea-43bf-45d2-b9e3-e02d03d0f9c7.png",
-  "job": "7a6408ea-43bf-45d2-b9e3-e02d03d0f9c7",
-  "type": "arena",
-  "size": "1376x768",
-  "name": "Obsidian-Thron",
-  "at": 1200,
-  "beschreibung": "Arena 5 — schwarze Glas-Thronhalle, violette Runen, bedrohlich.",
-  "batch": 1
- },
- "arena6": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095815_26d38ce0-2889-4351-8b4c-ac50183d32ea.png",
-  "job": "26d38ce0-2889-4351-8b4c-ac50183d32ea",
-  "type": "arena",
-  "size": "1376x768",
-  "name": "Prisma-Zitadelle",
-  "at": 1500,
-  "beschreibung": "Arena 6 — strahlende Kristall-Zitadelle mit Regenbogen-Lichtsaum. Einziges Asset mit Prisma-Signatur.",
-  "batch": 1
- },
- "cur_trophy": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132705_cc44c539-2646-40d1-b0ff-6b81510c0307.png",
-  "job": "cc44c539-2646-40d1-b0ff-6b81510c0307",
-  "type": "currency",
-  "batch": 2,
-  "beschreibung": "Trophäen-Ikone: goldener Pokal aus geschliffenem Kristall. Ersetzt 🏆 in Topbar, Straße, Toren."
- },
- "cur_gem": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132708_f9dde68c-0307-479c-ad15-ca6f547df349.png",
-  "job": "f9dde68c-0307-479c-ad15-ca6f547df349",
-  "type": "currency",
-  "batch": 2,
-  "beschreibung": "Gem: magentafarbener Kristall mit Facettenglanz. Ersetzt 💎 in Topbar und Shop-Preisen."
- },
- "cur_gold": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132711_78da253c-5269-46c7-9d6a-eb30eb27bb56.png",
-  "job": "78da253c-5269-46c7-9d6a-eb30eb27bb56",
-  "type": "currency",
-  "batch": 2,
-  "beschreibung": "Goldmünze mit Filigran-Rand. Ersetzt 🪙 in allen Kostenzeilen (Upgrade, Shop, Festung)."
- },
- "ess_attack": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132812_0dd1e9db-ca2f-4d32-9132-8de9d1d1e9f6.png",
-  "job": "0dd1e9db-ca2f-4d32-9132-8de9d1d1e9f6",
-  "type": "currency",
-  "batch": 2,
-  "beschreibung": "Angriffs-Essenz: rot-orangener Kristallsplitter mit Klingenmotiv. Materialtyp „attack“ in Detail/Schmiede."
- },
- "ess_speed": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132813_d75a56de-91cb-4f9a-a716-59ef4d75a649.png",
-  "job": "d75a56de-91cb-4f9a-a716-59ef4d75a649",
-  "type": "currency",
-  "batch": 2,
-  "beschreibung": "Tempo-Essenz: cyanfarbener Kristall mit Blitzkante. Materialtyp „speed“."
- },
- "ess_special": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132814_976ad394-6e0a-4f76-943e-298eebf93410.png",
-  "job": "976ad394-6e0a-4f76-943e-298eebf93410",
-  "type": "currency",
-  "batch": 2,
-  "beschreibung": "Spezial-Essenz: violetter Sternkristall. Materialtyp „special“."
- },
- "cur_xp": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132815_3b34ad3b-cdf3-4b5d-be12-9cb6b0237543.png",
-  "job": "3b34ad3b-cdf3-4b5d-be12-9cb6b0237543",
-  "type": "currency",
-  "batch": 2,
-  "beschreibung": "XP-Stern, goldener Vierstrahl-Kristall. Für Fortschritts- und Pass-Anzeigen."
- },
- "nav_home": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132917_72f50976-9f2a-4278-891a-143342fda7c4.png",
-  "job": "72f50976-9f2a-4278-891a-143342fda7c4",
-  "type": "nav",
-  "batch": 2,
-  "beschreibung": "Bottom-Nav „Start“: Kristallburg-Silhouette auf quadratischer Kachel."
- },
- "nav_collection": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132918_511b5e7c-2c37-4f34-9d39-40b21155eac5.png",
-  "job": "511b5e7c-2c37-4f34-9d39-40b21155eac5",
-  "type": "nav",
-  "batch": 2,
-  "beschreibung": "Bottom-Nav „Sammlung“: aufgefächerte Kartenhand."
- },
- "nav_tower": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132919_6cb19273-0d12-4073-8231-d2e56424d692.png",
-  "job": "6cb19273-0d12-4073-8231-d2e56424d692",
-  "type": "nav",
-  "batch": 2,
-  "beschreibung": "Turm-Symbol (Kristallturm). Reserve — kein eigener Nav-Knopf mehr, wird in Karten-Kontexten genutzt."
- },
- "nav_forge": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132919_8a81e259-5be8-43e2-b797-bb957dccebda.png",
-  "job": "8a81e259-5be8-43e2-b797-bb957dccebda",
-  "type": "nav",
-  "batch": 2,
-  "beschreibung": "Schmiede: Hammer über Amboss. Sitzt auf dem Forge-Button der Sammlung."
- },
- "nav_packs": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132921_1a1ee40d-26a4-4e4f-bcad-53257fd22928.png",
-  "job": "1a1ee40d-26a4-4e4f-bcad-53257fd22928",
-  "type": "nav",
-  "batch": 2,
-  "beschreibung": "Bottom-Nav „Packs“: Kristall-Geschenkbox mit Goldband."
- },
- "hub_pass": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133025_671bafbb-8c27-4cff-8923-afab6d9f5c7b.png",
-  "job": "671bafbb-8c27-4cff-8923-afab6d9f5c7b",
-  "type": "hub",
-  "batch": 2,
-  "beschreibung": "Season-Pass: aufgeschlagenes Buch mit Kristallsiegel."
- },
- "hub_mail": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133026_25da2335-2caa-4a3c-9107-ada8980bf4f6.png",
-  "job": "25da2335-2caa-4a3c-9107-ada8980bf4f6",
-  "type": "hub",
-  "batch": 2,
-  "beschreibung": "Post: versiegelter Brief."
- },
- "hub_clan": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133027_22a8d954-80b4-4d56-9043-6d90eb809856.png",
-  "job": "22a8d954-80b4-4d56-9043-6d90eb809856",
-  "type": "hub",
-  "batch": 2,
-  "beschreibung": "Klan: Wappenschild mit gekreuzten Elementen."
- },
- "hub_events": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133029_f8199f4f-c610-4639-891e-3dfb69d8bbb7.png",
-  "job": "f8199f4f-c610-4639-891e-3dfb69d8bbb7",
-  "type": "hub",
-  "batch": 2,
-  "beschreibung": "Events: Marktzelt mit Wimpel."
- },
- "hub_challenges": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133030_a6c88f92-fb28-4d0e-84ef-c1a44034ef79.png",
-  "job": "a6c88f92-fb28-4d0e-84ef-c1a44034ef79",
-  "type": "hub",
-  "batch": 2,
-  "beschreibung": "Herausforderungen: Rundschild. Dient zugleich als Icon des Burg-HP-Tracks in Toasts."
- },
- "hub_shop": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133134_c4dd57e8-7213-4769-b4c3-d2de067d6c26.png",
-  "job": "c4dd57e8-7213-4769-b4c3-d2de067d6c26",
-  "type": "hub",
-  "batch": 2,
-  "beschreibung": "Shop: Schatztruhe mit Goldbeschlag."
- },
- "hub_leaderboard": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133135_123fa2d4-5a7f-43d2-9fe4-2b9643a61a68.png",
-  "job": "123fa2d4-5a7f-43d2-9fe4-2b9643a61a68",
-  "type": "hub",
-  "batch": 2,
-  "beschreibung": "Rangliste: Pokal auf Säulenpodest."
- },
- "hub_settings": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133135_db2d0a40-931f-439e-88d7-b6e5d7c7496d.png",
-  "job": "db2d0a40-931f-439e-88d7-b6e5d7c7496d",
-  "type": "hub",
-  "batch": 2,
-  "beschreibung": "Einstellungen: Zahnrad aus Kristall."
- },
- "road_platform": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133136_11a05067-59c0-4049-a72a-9cdfc1afb81a.png",
-  "job": "11a05067-59c0-4049-a72a-9cdfc1afb81a",
-  "type": "road",
-  "batch": 2,
-  "beschreibung": "Belohnungs-Podest der Trophäenstraße — Kristall-Sockel statt AAs grüner Wiese (unser Stil)."
- },
- "prop_fire": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133137_7133f405-242a-4360-af65-7d0344f37d32.png",
-  "job": "7133f405-242a-4360-af65-7d0344f37d32",
-  "type": "road",
-  "batch": 2,
-  "beschreibung": "Deko-Prop: Kristallfeuer in Schale. Links/rechts der Straßenknoten."
- },
- "prop_pouch": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133312_5c702ceb-1ca1-42d2-8753-bd3d6fc8bf4e.png",
-  "job": "5c702ceb-1ca1-42d2-8753-bd3d6fc8bf4e",
-  "type": "road",
-  "batch": 2,
-  "beschreibung": "Deko-Prop: Goldbeutel mit Münzen."
- },
- "prop_rune": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133312_cb122820-65dd-49b6-9047-c7f5ef253876.png",
-  "job": "cb122820-65dd-49b6-9047-c7f5ef253876",
-  "type": "road",
-  "batch": 2,
-  "beschreibung": "Deko-Prop: stehender Runenstein."
- },
- "prop_obelisk": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133313_0543d8f8-218d-44cd-a48f-51691e0aa3a6.png",
-  "job": "0543d8f8-218d-44cd-a48f-51691e0aa3a6",
-  "type": "road",
-  "batch": 2,
-  "beschreibung": "Deko-Prop: Mini-Obelisk mit Goldspitze."
- },
- "hex_slot": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133314_61df2470-d52e-46b7-8d39-adbc96da66bf.png",
-  "job": "61df2470-d52e-46b7-8d39-adbc96da66bf",
-  "type": "frame",
-  "batch": 2,
-  "beschreibung": "Sechseck-Rahmen für die vier Pack-Slots auf Home (leerer Innenraum)."
- },
- "arena_crest": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133315_995dd402-303e-4619-b57a-8ab08ab66483.png",
-  "job": "995dd402-303e-4619-b57a-8ab08ab66483",
-  "type": "frame",
-  "batch": 2,
-  "beschreibung": "Arena-Wappen als Hexagon, leere Mitte — trägt die Arena-Nummer als HTML-Text."
- },
- "chest_bronze": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133419_c6ce951d-516e-44ba-b8cc-149219299e48.png",
-  "job": "c6ce951d-516e-44ba-b8cc-149219299e48",
-  "type": "pack",
-  "batch": 2,
-  "beschreibung": "Geschlossene Bronzetruhe. Für gefüllte Home-Slots und Straßen-Belohnungen."
- },
- "tz_frenzy": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133422_9f9d2b66-9df7-4f29-8ae3-b0201f5a96d7.png",
-  "job": "9f9d2b66-9df7-4f29-8ae3-b0201f5a96d7",
-  "type": "teaser",
-  "batch": 2,
-  "beschreibung": "Map-Ziel „Zauber-Rausch“: wirbelnde Zauberkarten über einer Kristallebene."
- },
- "tz_bounty": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133423_95e3a49d-8dd5-4ee5-b93f-3ad894e0c1eb.png",
-  "job": "95e3a49d-8dd5-4ee5-b93f-3ad894e0c1eb",
-  "type": "teaser",
-  "batch": 2,
-  "beschreibung": "Map-Ziel „Kopfgeld-Blüte“: aufgeblühte Gem-Blume."
- },
- "tz_straight": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133424_8974903a-c02c-420f-b32a-d3fb048cfaff.png",
-  "job": "8974903a-c02c-420f-b32a-d3fb048cfaff",
-  "type": "teaser",
-  "batch": 2,
-  "beschreibung": "Map-Ziel „Schnurgerade“: schnurgerader Goldpfad durch Kristallfelsen."
- },
- "tz_blind": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133425_877bd158-0a80-49ef-9398-2cc2c38fce84.png",
-  "job": "877bd158-0a80-49ef-9398-2cc2c38fce84",
-  "type": "teaser",
-  "batch": 2,
-  "beschreibung": "Map-Ziel „Blindwahl“: drei verdeckte Karten mit Fragezeichen-Siegel."
- },
- "tz_starborn": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133658_1b2c3d86-bbdb-4749-9d02-dd8322838d00.png",
-  "job": "1b2c3d86-bbdb-4749-9d02-dd8322838d00",
-  "type": "teaser",
-  "batch": 2,
-  "beschreibung": "Map-Ziel „Sternengeburt“: goldener Turm, der aus einem Sternenriss wächst."
- },
- "tz_swift": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133702_949e2b93-321e-4d5f-b64f-c09d5ba099a5.png",
-  "job": "949e2b93-321e-4d5f-b64f-c09d5ba099a5",
-  "type": "teaser",
-  "batch": 2,
-  "beschreibung": "Map-Ziel „Flinker Trick“: grinsende goldene Maske in Bewegungsunschärfe."
- },
- "tk_chains": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133705_21ce5677-8a42-4d81-ad8d-061d76c788ed.png",
-  "job": "21ce5677-8a42-4d81-ad8d-061d76c788ed",
-  "type": "teaser",
-  "batch": 2,
-  "beschreibung": "Trick „Ketten der Bindung“: goldene Ketten, die einen Kristall fesseln."
- },
- "tk_weakness": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133709_18ac6ac6-cbd2-4591-849d-06509a3a88ce.png",
-  "job": "18ac6ac6-cbd2-4591-849d-06509a3a88ce",
-  "type": "teaser",
-  "batch": 2,
-  "beschreibung": "Trick „Fluch der Schwäche“: rote Abwärts-Aura über einer Figur."
- },
- "tk_cart": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133712_f9839e7a-e4da-430d-956f-4d07f3fd79d7.png",
-  "job": "f9839e7a-e4da-430d-956f-4d07f3fd79d7",
-  "type": "teaser",
-  "batch": 2,
-  "beschreibung": "Trick „Phantomkarren“: durchscheinender Geisterkarren auf dem Pfad."
- },
- "tk_silence": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133718_0244095d-7454-4b78-84d7-2aadd4e2ec5c.png",
-  "job": "0244095d-7454-4b78-84d7-2aadd4e2ec5c",
-  "type": "teaser",
-  "batch": 2,
-  "beschreibung": "Trick „Fluch der Stille“: geknebelte Maske, verstummte Runen."
- },
- "tk_starfall": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133726_de1c1e9d-c9f8-4b2e-8b4b-1089857f0828.png",
-  "job": "de1c1e9d-c9f8-4b2e-8b4b-1089857f0828",
-  "type": "teaser",
-  "batch": 2,
-  "beschreibung": "Trick „Sternenfall“: stürzender Stern mit Goldschweif."
- },
- "tk_wisp": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133730_f073465e-305a-4ea9-ae5d-6c3cf8383ac4.png",
-  "job": "f073465e-305a-4ea9-ae5d-6c3cf8383ac4",
-  "type": "teaser",
-  "batch": 2,
-  "beschreibung": "Trick „Geisterablenkung“: Irrlicht, das Gegner vom Pfad zieht."
- },
- "arena7": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133735_eecfb0b0-d6ea-408d-8f43-f9337c9e35d6.png",
-  "job": "eecfb0b0-d6ea-408d-8f43-f9337c9e35d6",
-  "type": "arena",
-  "batch": 2,
-  "beschreibung": "Arena 7 „Aschenmark“ — Insel-Diorama: verbrannte Handelsstadt über Aschewolken."
- },
- "arena8": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133755_444e1bf7-6dce-4a24-b511-31cc50d0b247.png",
-  "job": "444e1bf7-6dce-4a24-b511-31cc50d0b247",
-  "type": "arena",
-  "batch": 2,
-  "beschreibung": "Arena 8 „Frostbastion“ — Insel-Diorama: Eisfestung mit blauen Kristallzinnen."
- },
- "gate_emblem": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133759_5e7df04b-9d20-4c79-833f-e5e0f12d2173.png",
-  "job": "5e7df04b-9d20-4c79-833f-e5e0f12d2173",
-  "type": "league",
-  "batch": 2,
-  "beschreibung": "Liga-Tor-Emblem: dunkles Steintor mit Prisma-Schlussstein. Für alle Prisma-Liga-Tore."
- },
- "summit_emblem": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133802_c77dc4bd-420f-4d14-bc20-4da0a3dec1e2.png",
-  "job": "c77dc4bd-420f-4d14-bc20-4da0a3dec1e2",
-  "type": "league",
-  "batch": 2,
-  "beschreibung": "Spitzen-Emblem „Prisma-Krone“: Krone aus Prismen über dem letzten Tor (9 800 🏆)."
- },
- "btn_info": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133805_e56cd8c3-9817-47b0-8fce-7a555d6b44f2.png",
-  "job": "e56cd8c3-9817-47b0-8fce-7a555d6b44f2",
-  "type": "button",
-  "batch": 2,
-  "beschreibung": "Info-„i“-Knopf als runder Kristall. Auf allen Teaser-Bannern."
- },
- "icon_lock": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133808_d02b91b1-7af1-4214-a44e-116017f314e5.png",
-  "job": "d02b91b1-7af1-4214-a44e-116017f314e5",
-  "type": "icon",
-  "batch": 2,
-  "beschreibung": "Schloss aus Kristall und Gold. Gesperrte Knoten, Tore, Festungs-Stufen."
- },
- "icon_check": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133811_e6757de3-c63b-4dad-8f20-21b9b05baea7.png",
-  "job": "e6757de3-c63b-4dad-8f20-21b9b05baea7",
-  "type": "icon",
-  "batch": 2,
-  "beschreibung": "Häkchen-Siegel in Gold-Grün. Abgeholte Straßenknoten."
- },
- "fx_spark": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133822_6d0be656-3486-496c-9c16-f6996e549dcf.png",
-  "job": "6d0be656-3486-496c-9c16-f6996e549dcf",
-  "type": "fx",
-  "batch": 2,
-  "beschreibung": "Funken-Burst, radial. Vorlage für Tap-Funken und Kauf-Feedback."
- },
- "fort_castle": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_134052_5d6b036a-d610-45d0-ad32-6956fdb5808a.png",
-  "job": "5d6b036a-d610-45d0-ad32-6956fdb5808a",
-  "type": "fortress",
-  "batch": 2,
-  "beschreibung": "Basis-Artwork der LEBENDEN BURG: schwebende Kristallburg mit Prisma auf dem Dach, Diorama wie die Arena-Inseln. Standard-Skin „prisma“ in window.CastleSkins."
- },
- "track_hp": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_135828_29edbcf2-e256-4c35-b3a7-5fceb1ea7adc.png",
-  "job": "29edbcf2-e256-4c35-b3a7-5fceb1ea7adc",
-  "type": "fortress",
-  "batch": 2,
-  "beschreibung": "Track-Emblem „Burg-Stabilität“: Schildkristall. Bewusst GROSS/detailreich — Ast-Kopf, ca. 1/3 Kartenbreite."
- },
- "track_dmg": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_135832_3232967e-3798-473d-81fd-cf24183c75e1.png",
-  "job": "3232967e-3798-473d-81fd-cf24183c75e1",
-  "type": "fortress",
-  "batch": 2,
-  "beschreibung": "Track-Emblem „Prisma-Fokus“: gebündelter Prisma-Strahl. Groß, Ast-Kopf."
- },
- "track_rate": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_135837_d4de036f-acc4-40f7-95e6-e667d2dec6fe.png",
-  "job": "d4de036f-acc4-40f7-95e6-e667d2dec6fe",
-  "type": "fortress",
-  "batch": 2,
-  "beschreibung": "Track-Emblem „Prisma-Taktung“: Doppelblitz im Kristall. Groß, Ast-Kopf."
- },
- "card_back": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_144624_82b4b51d-f9d3-416d-8212-52e2f3c0c0a1.png",
-  "job": "82b4b51d-f9d3-416d-8212-52e2f3c0c0a1",
-  "type": "cardframe",
-  "batch": 3,
-  "size": "896x1200",
-  "beschreibung": "KARTENRÜCKEN: Prisma-Emblem in goldenem Filigran-Ring, Facetten-Kristall, violette Akzente. Liegt als .pcback auf jeder verdeckten Pack-Karte; die Karte dreht sich beim Antippen um 180° und zeigt die Vorderseite (§17.2)."
- },
- "cinematic_legendary": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_141315_94331286-780b-4b74-8ee1-c8a3e15b9dac.mp4",
-  "job": "94331286-780b-4b74-8ee1-c8a3e15b9dac",
-  "type": "video",
-  "batch": 3,
-  "size": "720x1280, 5,04 s",
-  "modell": "kling3_0_turbo (7,5 Credits)",
-  "beschreibung": "VOLLBILD-CINEMATIC für Legendär+-Pulls: Kristall-Pack zerspringt in Goldlicht, Splitter fliegen zur Kamera, eine leuchtende Karten-Silhouette steigt auf. OHNE Alpha-Kanal (Vollbild braucht keine Transparenz — umgeht das Mobile-Safari-Problem mit Overlay-Videos). Generisch pro Rarität, die echte Karte blendet danach als HTML-Ebene ein (§17.3)."
- },
- "fort_banner_track": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_150531_224eab67-a74f-40dd-a293-3caf809eb8b9.png",
-  "job": "224eab67-a74f-40dd-a293-3caf809eb8b9",
-  "type": "image",
-  "batch": 3,
-  "beschreibung": "Banner-Plakette Variante 2: dunkles Glas-Kristall-Interieur, Goldfiligran-Rahmen, Gem-Sockel links, Button-Zone rechts. Volle Breite, leer, text-frei."
- },
- "fort_pip_full": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_150534_85413c44-d6fc-41ea-a6ee-2b0589f1d5f7.png",
-  "job": "85413c44-d6fc-41ea-a6ee-2b0589f1d5f7",
-  "type": "image",
-  "batch": 3,
-  "beschreibung": "Fortschritts-Pip GEFÜLLT: goldener Facettenkristall in Goldring, glühend."
- },
- "fort_pip_empty": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_150536_445edf7f-152a-42cd-81f2-b18060e68ced.png",
-  "job": "445edf7f-152a-42cd-81f2-b18060e68ced",
-  "type": "image",
-  "batch": 3,
-  "beschreibung": "Fortschritts-Pip LEER: dunkler Stein-Sockel mit Silberring, unbeleuchtet."
- },
- "fort_milestone": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_150538_2ac9dd11-83f1-435b-8f5c-793e503b448b.png",
-  "job": "2ac9dd11-83f1-435b-8f5c-793e503b448b",
-  "type": "image",
-  "batch": 3,
-  "beschreibung": "Meilenstein-Gem: prismatischer Sternkristall in goldener Hex-Fassung. Alle 10 Stufen."
- },
- "card_ember": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160628_0633b136-c9aa-409a-911e-63b1a496b1b6.png",
-  "job": "0633b136-c9aa-409a-911e-63b1a496b1b6",
-  "type": "image",
-  "subtype": "card_art",
-  "batch": 4,
-  "beschreibung": "Karten-Art EMBER: Obsidianturm mit loderndem Feuerkristall, Funkenflug."
- },
- "card_frost": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160630_0d477f21-6425-4849-aff7-8e545647fd90.png",
-  "job": "0d477f21-6425-4849-aff7-8e545647fd90",
-  "type": "image",
-  "subtype": "card_art",
-  "batch": 4,
-  "beschreibung": "Karten-Art FROST: Eiskristallturm, kaltes blaues Innenglühen, Schneestaub."
- },
- "card_stone": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160633_f987f0ee-26c9-4923-83f7-c99490d5c932.png",
-  "job": "f987f0ee-26c9-4923-83f7-c99490d5c932",
-  "type": "image",
-  "subtype": "card_art",
-  "batch": 4,
-  "beschreibung": "Karten-Art STONE: wuchtiger Steinturm mit Bernstein-Adern, schwebende Felsbrocken."
- },
- "card_thorn": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160635_8b90cad8-d641-4874-9aee-5e86fa6988cc.png",
-  "job": "8b90cad8-d641-4874-9aee-5e86fa6988cc",
-  "type": "image",
-  "subtype": "card_art",
-  "batch": 4,
-  "beschreibung": "Karten-Art THORN: Rankenturm um Giftkristalle, toxisch-grünes Glühen."
- },
- "card_dawn": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160638_c6833184-bb6f-494f-a32a-d31e61c0b17f.png",
-  "job": "c6833184-bb6f-494f-a32a-d31e61c0b17f",
-  "type": "image",
-  "subtype": "card_art",
-  "batch": 4,
-  "beschreibung": "Karten-Art DAWN: weißgoldene Kristallspitze mit Lichthalo und Goldmoten."
- },
- "card_hollow": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160640_ac3247ff-7eff-41e0-97b7-f3fc263d6948.png",
-  "job": "ac3247ff-7eff-41e0-97b7-f3fc263d6948",
-  "type": "image",
-  "subtype": "card_art",
-  "batch": 4,
-  "beschreibung": "Karten-Art HOLLOW: violetter Obsidianturm mit schwarzem Void-Orb, Schattenschlieren."
- },
- "card_solara": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160644_4be1e01f-8e65-4d2d-b42f-2b2ad3d579de.png",
-  "job": "4be1e01f-8e65-4d2d-b42f-2b2ad3d579de",
-  "type": "image",
-  "subtype": "card_art",
-  "batch": 4,
-  "beschreibung": "Helden-Art SOLARA: Lichtheldin in Weißgold-Rüstung, Sonnenstrahl aus erhobener Hand."
- },
- "card_magmor": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160645_a9f23226-f8fe-4d2c-9bc0-afad20ce6d7c.png",
-  "job": "a9f23226-f8fe-4d2c-9bc0-afad20ce6d7c",
-  "type": "image",
-  "subtype": "card_art",
-  "batch": 4,
-  "beschreibung": "Helden-Art MAGMOR: Magma-Titan mit Lavaadern reißt den Boden auf."
- },
- "pass_keyart": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160701_42a171b5-06f3-458d-a766-f4992e4210e5.png",
-  "job": "42a171b5-06f3-458d-a766-f4992e4210e5",
-  "type": "image",
-  "subtype": "banner",
-  "batch": 4,
-  "beschreibung": "Season-Pass-Keyart „Goldene Fortuna“: goldenes Fortuna-Rad, Schatzflut. Linkes Drittel ruhig für UI."
- },
- "event_tournament": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160704_9fb36583-0558-4407-a96c-83275fc4c95e.png",
-  "job": "9fb36583-0558-4407-a96c-83275fc4c95e",
-  "type": "image",
-  "subtype": "banner",
-  "batch": 4,
-  "beschreibung": "Event-Banner Turnier: Kristallarena mit zwei rivalisierenden Bannern über Schwebeinsel-Podium."
- },
- "event_essence": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160706_82a16544-3845-4947-8482-8104ab108bf6.png",
-  "job": "82a16544-3845-4947-8482-8104ab108bf6",
-  "type": "image",
-  "subtype": "banner",
-  "batch": 4,
-  "beschreibung": "Event-Banner Essenz-Regen: leuchtende Elementkristalle regnen in Schatzgefäße."
- },
- "emote_luck": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160713_d2da4068-32da-4d1a-950e-a554f7a3ec11.png",
-  "job": "d2da4068-32da-4d1a-950e-a554f7a3ec11",
-  "type": "image",
-  "subtype": "emote",
-  "batch": 4,
-  "beschreibung": "Emote Viel Glück: grünes Kristall-Kleeblatt im Goldring."
- },
- "emote_thanks": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160715_3b9758a1-6ccd-46fe-887b-c87ff28579f0.png",
-  "job": "3b9758a1-6ccd-46fe-887b-c87ff28579f0",
-  "type": "image",
-  "subtype": "emote",
-  "batch": 4,
-  "beschreibung": "Emote Danke: goldenes Kristallherz im Goldring."
- },
- "emote_cards": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160718_714b6f41-0b0f-4ebc-9284-e39af17401ea.png",
-  "job": "714b6f41-0b0f-4ebc-9284-e39af17401ea",
-  "type": "image",
-  "subtype": "emote",
-  "batch": 4,
-  "beschreibung": "Emote Karten?: leuchtende Karte mit Fragezeichen-Gem im Goldring."
- },
- "emote_attack": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160720_ca1c0844-21b8-40c1-b714-22bb44895f47.png",
-  "job": "ca1c0844-21b8-40c1-b714-22bb44895f47",
-  "type": "image",
-  "subtype": "emote",
-  "batch": 4,
-  "beschreibung": "Emote Angriff: gekreuzte Kristallschwerter im Goldring."
- },
- "emote_strong": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160722_700d087a-3ea5-4bb1-8178-7cf35e08d73f.png",
-  "job": "700d087a-3ea5-4bb1-8178-7cf35e08d73f",
-  "type": "image",
-  "subtype": "emote",
-  "batch": 4,
-  "beschreibung": "Emote Stark: Bernstein-Kristallarm mit Feuerglühen im Goldring."
- },
- "emote_welcome": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160724_83a735e4-f6f7-4853-86b5-23ebe574f386.png",
-  "job": "83a735e4-f6f7-4853-86b5-23ebe574f386",
-  "type": "image",
-  "subtype": "emote",
-  "batch": 4,
-  "beschreibung": "Emote Willkommen: winkende Kristallhand im Goldring."
- }
 }
