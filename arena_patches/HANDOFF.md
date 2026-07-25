@@ -846,6 +846,41 @@ sofort mit allen 100 Stufen.
    (1 Artwork + Anker) und Match-Skin (24-Winkel-Sheet) sind getrennte Assets desselben
    Produkts — beim Bepreisen zusammen denken, beim Produzieren getrennt beauftragen.
 
+### Pack-Öffnung: Karten-Drehung + Legendär-Cinematic (§17)
+
+**Der Kern der Anforderung:** Jede Karte liegt verdeckt und wird **einzeln angeklickt** —
+kein Auto-Reveal. Der Klick dreht sie um.
+
+* **Echter 3D-Flip.** `.pcard` (Bühne, `perspective:620px`) → `.pc3d`
+  (`transform-style:preserve-3d`, dreht auf `rotateY(180deg)`) → zwei `.pcside` mit
+  `backface-visibility:hidden`: `.pcback` trägt das Kartenrücken-Asset (`card_back`),
+  `.pcfront` das Ergebnis, vorgedreht um 180°. Dauer **600 ms**,
+  `cubic-bezier(.34,1.42,.5,1)` für das Überschwingen.
+* **Glühen in der Drop-Raritätsfarbe** während der Drehung: `.pcglow` nutzt
+  `currentColor`, die Farbe steht als Inline-`color` auf der Karte — ein Wert, zwei
+  Effekte (Glühring + Vorderseiten-Rand).
+* **Partikel** bei t = 300 ms in der Kartenmitte über `UIFx.spark()`; 8 / 14 / 20 Funken
+  je nach Rarität.
+* **Ton:** `UISfx.flip()` (Swish + Ding) und für Legendär `UISfx.legend()` (Crescendo).
+  Beide gehören zur **selben Namensschnittstelle** wie `tap/confirm/deny/reward` und
+  werden beim Einbau **mit umgehängt** — nicht neu verdrahtet.
+* **„Alle aufdecken"** bleibt, spielt die Flips aber **sequenziell** (30 ms Versatz) statt
+  alle gleichzeitig, damit ein Legendär-Cinematic nicht überfahren wird.
+
+**Legendär-Cinematic** (`#cineLayer`, Asset `cinematic_legendary`, 5 s, 720×1280): läuft ab
+`tierIndex ≥ 4` (`LEGEND_FROM`) **vor** der Drehung, danach `.legend`-Nachglühen.
+
+> **⚠ Drei Auswege sind Pflicht, nicht Deko.** `onended` · `onerror`/abgelehntes `play()`
+> → CSS-Lichtausbruch (`.fallback`, 1 250 ms) · `setTimeout`-Netz nach 7 s, plus
+> „Weiter"-Knopf. Eine Zeremonie, die hängen bleibt, sperrt den Spieler aus seinem eigenen
+> Pack aus. Der Fallback-Pfad ist der, der offline läuft — und genau der, den der
+> Playwright-Test durchspielt.
+
+**Beim Einbau:** Das Video ist eine **MP4** in `ui_assets.json` — die `curl`-Schleife nach
+`public/assets/` darf nicht auf `*.png` filtern. `playsinline muted preload="none"` bleibt
+zwingend (Autoplay-Policy). Für Suprem kann später ein zweites Video dazukommen; dafür nur
+`LEGEND_FROM` und die Asset-Auswahl in `playCinematic()` anfassen.
+
 ### Wo `.goldtext` NICHT hin darf
 
 Stehende Regel nach zwei Bugs: `.goldtext` arbeitet mit `background-clip:text` und

@@ -2092,18 +2092,21 @@ span.ico{mix-blend-mode:normal;text-align:center}
    *   Karte → .turning nach der Drehung wieder abnehmen.
    * ================================================================== */
   var LEGEND_FROM = 4;            // Tier-Index ab dem das Cinematic laeuft
-  function flip(i, el, cb) {
+  function flip(i, el, cb, fast) {
     var s = packState[i];
     if (!s || s.done || s.busy) { if (cb) cb(); return; }
     var legendary = s.kind === "card" && s.d.tierIndex >= LEGEND_FROM;
     if (legendary && el) {
       s.busy = true;
-      playCinematic(function () { s.busy = false; doFlip(i, el, cb, true); });
+      playCinematic(function () { s.busy = false; doFlip(i, el, cb, true, fast); });
       return;
     }
-    doFlip(i, el, cb, false);
+    doFlip(i, el, cb, false, fast);
   }
-  function doFlip(i, el, cb, legendary) {
+  // fast = "Alle aufdecken": die Drehungen bleiben 600 ms lang, starten aber
+  // im Abstand von ~170 ms — dadurch laeuft eine Kaskade statt acht
+  // gleichzeitiger Flips (und statt acht Sekunden Wartezeit).
+  function doFlip(i, el, cb, legendary, fast) {
     var s = packState[i];
     if (!s || s.done) { if (cb) cb(); return; }
     s.done = true;
@@ -2132,10 +2135,8 @@ span.ico{mix-blend-mode:normal;text-align:center}
     renderTop();
     updateNavBadge();
     var allDone = packState.every(function (x) { return x.done; });
-    setTimeout(function () {
-      if (allDone) showSummary();
-      if (cb) cb();
-    }, el ? 660 : 0);
+    if (allDone) setTimeout(showSummary, el ? 680 : 0);
+    if (cb) setTimeout(cb, el ? (fast ? 170 : 660) : 0);
   }
 
   /* Vollbild-Cinematic mit garantiertem Ausweg (§17.3). */
@@ -2183,7 +2184,7 @@ span.ico{mix-blend-mode:normal;text-align:center}
       var k = i++;
       var legendary = packState[k].kind === "card" &&
                       packState[k].d.tierIndex >= LEGEND_FROM;
-      flip(k, els[k], function () { setTimeout(step, legendary ? 120 : 30); });
+      flip(k, els[k], function () { setTimeout(step, legendary ? 120 : 20); }, true);
     })();
   }
   function showSummary() {
