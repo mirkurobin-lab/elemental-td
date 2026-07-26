@@ -333,18 +333,63 @@ select.sel option{background:var(--panel);color:var(--txt)}
    AA haelt sie konstant bei 90-100 % Bildhoehe (§9.5b). `fixed` mit
    derselben Breite/Zentrierung wie #app stellt genau das her; die
    Views haben mit `padding-bottom:88px` bereits Platz dafuer. */
+/* ==================================================================
+ * HAUPTLEISTE — nach AAs Mechanik (Screenrecording 26.07., 18:12)
+ * ------------------------------------------------------------------
+ * Was AA dort tut, Bild fuer Bild nachgemessen:
+ *   • Die Reiter sind PLATTEN, die nebeneinander stehen — keine
+ *     freischwebenden Icons. Duenne dunkle Fugen dazwischen.
+ *   • Nur der AKTIVE Reiter traegt seine Beschriftung. Die uebrigen
+ *     zeigen ausschliesslich ihr Icon.
+ *   • Der aktive Reiter WAECHST in der Breite (er schiebt die anderen
+ *     zusammen), wird HELLER und HEBT SICH ueber die Leistenkante —
+ *     seine Platte ragt oben heraus und bekommt runde Schultern.
+ *   • Sein Icon wird groesser.
+ * Das ist der ganze Unterschied zu unserer bisherigen Leiste: dort
+ * standen fuenf gleich grosse Reiter mit dauerhafter Beschriftung, und
+ * der aktive war nur durch einen goldenen Strich markiert.
+ * ------------------------------------------------------------------
+ * Technisch: FLEX statt Grid. Nur so kann ein Reiter breiter werden und
+ * die anderen mitziehen — ein Grid mit festen Spalten kann das nicht.
+ * `flex` und `max-width` der Beschriftung sind die beiden animierten
+ * Groessen; beide sind auf derselben Kurve, damit Wachsen und Erscheinen
+ * ein einziger Vorgang sind und nicht zwei. */
 nav.bottom{position:fixed;left:50%;transform:translateX(-50%);width:100%;max-width:430px;
   bottom:0;background:var(--top);
-  border-top:1px solid #1b262e;display:grid;grid-template-columns:repeat(4,1fr);
-  padding:6px 0 10px;z-index:40}
+  border-top:1px solid #1b262e;display:flex;align-items:stretch;gap:3px;
+  padding:6px 4px 10px;z-index:40}
 /* AA laesst die Nav-Illustrationen OBEN aus der Leiste herausragen; die
    Mitte am weitesten. Deshalb overflow:visible auf der Leiste und ein
    negativer margin-top auf den Popouts. */
 nav.bottom{overflow:visible}
-nav.bottom button{position:relative;padding:5px 0 0;font-size:9.5px;color:#6d7f8c;
-  font-weight:700;text-align:center}
+nav.bottom button{position:relative;flex:1 1 0;min-width:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  padding:5px 2px 4px;font-size:9.5px;color:#8fa3b1;font-weight:800;text-align:center;
+  border-radius:12px 12px 8px 8px;
+  background:linear-gradient(180deg,#1d2a35,#141d26);
+  box-shadow:inset 0 1px 0 #ffffff12,0 1px 0 #0b1116;
+  transition:flex-grow var(--t-mid) var(--ease-overshoot),
+             background var(--t-mid) var(--ease-out),
+             color var(--t-mid) var(--ease-out),
+             transform var(--t-mid) var(--ease-overshoot),
+             box-shadow var(--t-mid) var(--ease-out)}
 nav.bottom button i{display:block;font-style:normal;font-size:18px;margin-bottom:1px}
-nav.bottom button.on{color:#fff}
+/* Der aktive Reiter: breiter, heller, angehoben. Die drei Aenderungen
+   zusammen — nicht einzeln — machen den Unterschied, den man bei AA
+   sofort sieht. */
+nav.bottom button.on{flex-grow:2.05;color:#fff;
+  transform:translateY(-7px);
+  background:linear-gradient(180deg,#3f596f,#27394a 62%,#1b2836);
+  box-shadow:inset 0 1px 0 #ffffff2e,0 -1px 0 #6f96b5aa,
+             0 6px 14px -6px #000,0 0 18px -8px #7fc4ff}
+/* Die Beschriftung erscheint NUR am aktiven Reiter. `max-width` statt
+   `display` — nur so laesst sie sich mitanimieren, und der Reiter
+   waechst und beschriftet sich in einer Bewegung. */
+nav.bottom button .nlbl{display:block;max-width:0;overflow:hidden;white-space:nowrap;
+  opacity:0;line-height:1.1;
+  transition:max-width var(--t-mid) var(--ease-overshoot),
+             opacity var(--t-fast) var(--ease-out)}
+nav.bottom button.on .nlbl{max-width:96px;opacity:1}
 /* Popout-Illustration. Bild als background (erster Layer) mit
    Emoji-Fallback im Textknoten darunter — faellt das CDN aus, bleibt die
    Nav vollstaendig benutzbar. */
@@ -356,12 +401,22 @@ nav.bottom button.on{color:#fff}
 nav.bottom button.on .navpop{filter:drop-shadow(0 4px 8px #000c) saturate(1.15) brightness(1.12);
   transform:translateY(-2px) scale(1.06)}
 /* Die Mitte (START) ist die groesste und ragt am weitesten heraus. */
-.nav-center .navpop{margin:-28px auto 1px;width:60px;height:60px;font-size:30px}
-nav.bottom button.on::after{content:"";position:absolute;left:26%;right:26%;bottom:-2px;
-  height:3px;border-radius:2px;background:linear-gradient(90deg,#f2c53d00,#f2c53d,#f2c53d00)}
+.nav-center .navpop{margin:-28px auto 1px;width:56px;height:56px;font-size:30px}
+/* Das Icon des aktiven Reiters waechst mit. Bei AA ist das der
+   deutlichste Teil der Geste. */
+nav.bottom button.on .navpop{width:50px;height:50px;font-size:25px}
+nav.bottom button.on.nav-center .navpop{width:62px;height:62px;font-size:32px}
+/* Der goldene Strich entfaellt: die Platte selbst markiert jetzt den
+   Zustand — breiter, heller, angehoben. Ein zusaetzlicher Strich waere
+   die dritte Ansage fuer dieselbe Sache. */
 @media (prefers-reduced-motion:reduce){.navpop{transition:none}}
-nav.bottom .nb{display:inline-block;min-width:14px;height:14px;line-height:14px;border-radius:7px;
-  background:var(--danger);color:#fff;font-size:9px;margin-left:3px;padding:0 3px}
+/* Der Zaehler sitzt wie bei AA OBEN RECHTS auf der Platte, nicht hinter
+   dem Text — sonst verschwindet er, sobald die Beschriftung eingeklappt
+   ist (also bei jedem inaktiven Reiter, wo er am wichtigsten ist). */
+nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
+  min-width:16px;height:16px;line-height:16px;border-radius:8px;
+  background:var(--danger);color:#fff;font-size:9.5px;font-weight:900;padding:0 4px;
+  box-shadow:0 1px 3px #000a,inset 0 1px 0 #ffffff3d}
 
 /* ---------- Modal / Turm-Detail (§2) ---------- */
 .modal{position:fixed;inset:0;display:none;z-index:60;justify-content:center}
@@ -781,9 +836,12 @@ footer{padding:6px 12px 14px;text-align:center}
   background:linear-gradient(180deg,#0a1420,#122238 45%,#0a1420)}
 .roadscroll{position:absolute;inset:0 0 66px 0;overflow-y:auto;
   padding:56px 12px 20px 54px;-webkit-overflow-scrolling:touch}
-.rail{position:absolute;left:22px;top:0;bottom:66px;width:12px;
+/* Die Schiene ist schmaler und glueht enger. Vorher lag ihr 12-px-Glow
+   bis x=46, waehrend die Trophaeenzahl bei x=40 begann — auf dem Telefon
+   las sich das als „der Slider liegt ueber den Trophaeen". */
+.rail{position:absolute;left:20px;top:0;bottom:66px;width:9px;
   background:linear-gradient(90deg,#8a6a1f,#e0b94a 40%,#fff7d6 55%,#a8842a);
-  box-shadow:0 0 12px #e0b94a4d;z-index:2;pointer-events:none}
+  box-shadow:0 0 6px #e0b94a3d;z-index:1;pointer-events:none}
 .roadfoot{position:absolute;left:0;right:0;bottom:0;height:66px;z-index:6;
   background:linear-gradient(180deg,#0e1418cc,#0a1420);border-top:1px solid #26343f;
   display:flex;align-items:center;justify-content:center}
@@ -794,7 +852,9 @@ footer{padding:6px 12px 14px;text-align:center}
   font-size:13px;padding:7px 22px;border-radius:10px;
   background:linear-gradient(180deg,#3fa9e8,#1c6ea8);color:#fff;font-weight:900;
   box-shadow:0 3px 0 #12496f;letter-spacing:.06em}
-.upfloat{position:absolute;left:10px;top:56px;z-index:8;width:38px;height:38px;
+/* Stand bei left:10px/top:56px genau ueber der ersten Trophaeenzahl
+   (x 40-84). Er sitzt jetzt rechts, ausserhalb der Zahlenspalte. */
+.upfloat{position:absolute;right:10px;top:56px;z-index:8;width:38px;height:38px;
   border-radius:10px;font-size:15px;color:#fff;
   background:linear-gradient(180deg,#3fa9e8,#1c6ea8);box-shadow:0 3px 0 #12496f}
 /* Der Hinweis lag im Live-Screenshot UEBER der rechten Kante des
@@ -809,9 +869,9 @@ footer{padding:6px 12px 14px;text-align:center}
 /* Die Zahl stand direkt AUF der goldenen Schiene (Schiene 22–34 px, Zahl
    ab 24 px) — hell auf hell, im Live-Screenshot kaum zu lesen. Sie sitzt
    jetzt rechts neben der Schiene auf einem eigenen dunklen Sockel. */
-.tick b{position:absolute;left:16px;top:-10px;font-size:11px;font-weight:900;color:#fff7d6;
-  background:#0b1116e0;border:1px solid #e0b94a5c;border-radius:9px;padding:1px 7px;
-  text-shadow:0 1px 2px #000}
+.tick b{position:absolute;left:22px;top:-10px;font-size:11px;font-weight:900;color:#fff7d6;
+  background:#0b1116f2;border:1px solid #e0b94a7a;border-radius:9px;padding:1px 7px;
+  text-shadow:0 1px 2px #000;z-index:5}
 .tick i{position:absolute;left:78px;top:-1px;width:14px;height:2px;background:#fff7d68c}
 .node{position:relative;margin:0 0 16px 0;border-radius:14px;padding:12px 14px 16px;
   display:flex;align-items:center;gap:12px;
@@ -1146,30 +1206,57 @@ span.ico{mix-blend-mode:normal;text-align:center}
    reserviert es seinen Platz und kann den Text darunter nicht
    ueberlappen. Der Rahmen bleibt absolut (er MUSS die ganze Kachel
    bedecken), das Produktbild braucht nur den Innenraum. */
-.prodcard .pcart{position:relative;z-index:0;width:82%;height:92px;margin:9px auto 0;
+/* Groesser als vorher: ohne Rahmenbild ist das Produktbild der Held der
+   Kachel. 82 % Breite / 92 px waren fuer eine Kachel MIT Rahmen bemessen. */
+.prodcard .pcart{position:relative;z-index:0;width:92%;height:108px;margin:10px auto 0;
   display:flex;align-items:center;justify-content:center;font-size:36px;
   filter:drop-shadow(0 4px 8px #000a)}
 .prodcard .pcart img.prodimg{width:100%;height:100%;object-fit:contain}
+/* Die Gold-Produktbilder sind gemessen stumpf: Farbton 35 Grad, aber nur
+   0,32-0,39 Saettigung gegen 0,58 beim Waehrungs-Icon. Bei 108 px liest
+   das als graue Muenze, nicht als Gold — genau der Befund „die Gold-Icons
+   sehen nicht schoen aus". Bis neue Grafiken da sind, hebt ein
+   Saettigungs-Schub sie auf denselben Wert; der Schatten gibt der Muenze
+   ausserdem die Kante zurueck, die sie auf dunklem Grund braucht.
+   ⚠ Das ist eine ZWISCHENLOESUNG, kein Ersatz fuer richtige Assets —
+   vermerkt in DESIGNSYSTEM.md §8. */
+.prodcard.fr-green .pcart img.prodimg{filter:saturate(1.45) contrast(1.08)
+  drop-shadow(0 2px 6px #000a)}
 .prodcard .pcart span.prodimg{line-height:1}
 .prodcard.wide{flex-direction:row;align-items:center;gap:var(--gap);padding:var(--pad)}
 .prodcard.wide .pcart{width:23%;height:74px;margin:0;flex:0 0 23%}
-/* Wie .frm ein 9-Slice und aus demselben gemessenen Grund — siehe den
-   ausfuehrlichen Kommentar dort. Hier ist das Seitenverhaeltnis der
-   Kachel deutlich breiter als das der Quelle (0,75); genau dafuer ist
-   9-Slice gemacht: die Ecken behalten ihre Form, nur die Kanten ziehen
-   mit. Ein `cover`-Bild haette entweder verzerrt oder — weil deckend —
-   das Produktbild zugedeckt. Letzteres ist passiert. */
+/* ⚠ HIER STAND EIN KARTENRAHMEN — UND DAS WAR EIN KATEGORIENFEHLER.
+   ------------------------------------------------------------------
+   `frame_card_*` sind KARTENrahmen: hochkant (0,75), mit kraeftigem Zier
+   auf allen vier Seiten, gemacht um ein Kartenbild zu fassen. Eine
+   Produktkachel ist quer (1,33) und traegt Bild, Name, Menge und Knopf.
+   Zieht man den Kartenrahmen als 9-Slice darum, wird aus dem oberen
+   Zierbalken ein breites Silberbrett und aus dem Ganzen ein leerer
+   Bilderrahmen mit einem kleinen Icon darin — auf dem Telefon genau so
+   zu sehen gewesen. Kein Schnittwert repariert das; der Rahmen gehoert
+   schlicht nicht auf diese Kachel.
+   Die Farbcodierung, um die es AA hier geht (IMG_3306-3308), traegt die
+   KANTE der Kachel: `.prodcard.fr-orange/green/light` weiter unten. Die
+   ist bei jedem Seitenverhaeltnis richtig, kostet kein Byte und laesst
+   dem Produktbild die ganze Flaeche.
+   Das Element bleibt im Markup, damit die Kachel eine Ebene fuer Glanz
+   und Zustand behaelt — es zeichnet nur keinen Rahmen mehr. */
 .prodcard .pcfrm{position:absolute;inset:0;z-index:2;pointer-events:none;
-  border:1px solid transparent;background:none;
-  border-image-slice:18% 16% 20% 16%;
-  border-image-width:16% 14% 18% 14%;
-  border-image-repeat:stretch}
-.prodcard.wide .pcfrm{border-image-width:22% 8% 24% 8%}
+  border-radius:inherit;background:none;
+  box-shadow:inset 0 1px 0 #ffffff1a,inset 0 -18px 26px -20px #000}
 /* Rahmen-Fallback: faellt das PNG aus, traegt ein farbiger Rand den
    AA-Farbcode weiter — die Kachel bleibt lesbar und zugeordnet. */
-.prodcard.fr-orange{border-color:#f2a13d8f;box-shadow:inset 0 0 0 1px #f2a13d3d}
-.prodcard.fr-green{border-color:#58c26a8f;box-shadow:inset 0 0 0 1px #58c26a3d}
-.prodcard.fr-light{border-color:#c9d2da7a;box-shadow:inset 0 0 0 1px #c9d2da2e}
+/* Die Kante traegt die Farbcodierung jetzt ALLEIN (vorher war sie nur der
+   Rueckfall hinter einem Rahmenbild). Deshalb kraeftiger: zwei Pixel
+   Farbe, ein Innenlicht oben und ein Schimmer nach aussen — das liest
+   auf 180 px Kachelbreite und bleibt bei jedem Seitenverhaeltnis richtig. */
+.prodcard{border-width:2px}
+.prodcard.fr-orange{border-color:#f2a13d;
+  box-shadow:var(--mat-raised),inset 0 1px 0 #ffd9a3aa,0 0 0 1px #f2a13d33,0 0 16px -6px #f2a13d}
+.prodcard.fr-green{border-color:#58c26a;
+  box-shadow:var(--mat-raised),inset 0 1px 0 #b6f7cdaa,0 0 0 1px #58c26a33,0 0 16px -6px #58c26a}
+.prodcard.fr-light{border-color:#c9d2da;
+  box-shadow:var(--mat-raised),inset 0 1px 0 #ffffffaa,0 0 0 1px #c9d2da2e,0 0 16px -6px #c9d2da}
 .prodcard .pcbody{position:relative;z-index:3;width:100%;margin-top:auto;
   padding:6px 8px 8px;display:flex;flex-direction:column;gap:1px}
 .prodcard.wide .pcbody{flex:1;min-width:0;margin-top:0;padding:0;
@@ -1184,6 +1271,21 @@ span.ico{mix-blend-mode:normal;text-align:center}
 .prodcard .pcbuy{margin-top:4px;width:100%;border-radius:var(--radius-sm);padding:7px 0;
   font-size:12px;font-weight:900}
 .prodcard.wide .pcbuy{width:auto;min-width:118px;padding:8px 14px}
+/* ⚠ WAEHRUNGS-ICON AUF SEINER EIGENEN FARBE.
+   Der Goldtaler auf dem goldenen Kaufknopf ist dieselbe Bugklasse wie
+   Goldtext auf Gold, nur eine Ebene tiefer: gleiche Farbe, gleiche
+   Helligkeit, keine Silhouette — auf dem Telefon ein brauner Klecks.
+   Dieselbe Loesung wie bei .utile img.utileimg: ein dunkler Schlagschatten
+   zieht die Kontur nach, dazu etwas mehr Kontrast. Das Icon behaelt seine
+   Farbe (es SOLL golden sein), bekommt aber wieder eine Kante.
+   Gilt fuer beide Waehrungen: gruene Gems auf gruenem Knopf haben
+   dasselbe Problem. */
+.pcbuy .ico,.buybtn .ico,.claimbtn .ico{
+  filter:drop-shadow(0 0 1px #00000096) drop-shadow(0 1px 2px #000000b3) contrast(1.12)}
+.pcbuy.goldprice .ico{filter:drop-shadow(0 0 1px #2b1d00) drop-shadow(0 1px 2px #000000c4)
+  contrast(1.18) saturate(1.15) brightness(1.06)}
+.pcbuy.gemprice .ico{filter:drop-shadow(0 0 1px #00240f) drop-shadow(0 1px 2px #000000c4)
+  contrast(1.18) saturate(1.15) brightness(1.06)}
 .pcbuy.gemprice{background:linear-gradient(180deg,#b6f7cd,#22b866 55%,#0d6b3a);
   -webkit-text-fill-color:#04240f;color:#04240f;box-shadow:var(--mat-raised),0 3px 0 #064a26}
 .pcbuy.goldprice{background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);
@@ -2132,10 +2234,20 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .frm{position:absolute;inset:0;z-index:3;pointer-events:none;
   border:1px solid transparent;background:none;
   border-image-slice:18% 16% 20% 16%;
-  border-image-width:18% 16% 20% 16%;
+  /* ⚠ Die Randbreite ist NICHT gleich dem Schnitt, und das ist Absicht.
+     Der Schnitt beschreibt, wo in der QUELLE das Zier endet (gemessen).
+     Die Randbreite bestimmt, wie viel vom ELEMENT das Zier bedeckt — und
+     bei Quellwerten fraesse es auf einer 86x114-Deckkarte 38 % der Hoehe
+     und 32 % der Breite. Uebrig blieben 58x71 px fuer den Turm: „die
+     Tower sind zu klein". border-image skaliert die Eckstuecke auf die
+     Randbreite, der Ring wird also nur duenner, nicht abgeschnitten.
+     Bei 12/10/14/10 bleiben 69x89 px Oeffnung — 43 % mehr Turmflaeche. */
+  border-image-width:12% 10% 14% 10%;
   border-image-repeat:stretch}
 .tile .artbox{font-size:22px}
-.deckslot .artbox{font-size:30px;inset:3px}
+/* Randlos: der Ring liegt DARUEBER, also darf die Bildflaeche bis an die
+   Kante laufen. 3 px Abstand liessen unter dem Ring einen dunklen Spalt. */
+.deckslot .artbox{font-size:30px;inset:0;border-radius:8px}
 .reqslot .artbox{font-size:24px;inset:3px}
 .tower .artbox,.tower .big.artbox{inset:0;margin:0;border-radius:12px;font-size:54px}
 .cercard .artbox{inset:3px;border-radius:9px;font-size:52px}
@@ -3621,12 +3733,14 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
        Clan braucht den Dauerplatz, weil er taeglich angefasst wird, das
        Pack-Oeffnen passiert dagegen ereignisgetrieben (nach Sieg, aus
        Truhe, aus dem Shop) und wird von dort ohnehin direkt angesprungen. -->
-  <nav class="bottom" style="grid-template-columns:repeat(5,1fr)">
-    <button id="navShop"><span class="navpop" data-pop="nav_shop">🛒</span>Shop<span id="badgeShop" class="nb" style="display:none">0</span></button>
-    <button id="navCollection"><span class="navpop" data-pop="nav_cards">🗂</span>Sammlung<span id="navBadge" class="nb" style="display:none">0</span></button>
-    <button id="navHome" class="on nav-center"><span class="navpop" data-pop="nav_start">🏛</span>Start</button>
-    <button id="navClan"><span class="navpop" data-pop="nav_clan">🛡</span>Clan<span id="badgeClan" class="nb" style="display:none">0</span></button>
-    <button id="navFortress"><span class="navpop" data-pop="nav_fortress">🗼</span>Burg</button>
+  <!-- Die Beschriftung steckt in .nlbl, damit sie sich ein- und ausklappen
+       laesst: bei AA traegt nur der aktive Reiter seinen Namen. -->
+  <nav class="bottom">
+    <button id="navShop"><span class="navpop" data-pop="nav_shop">🛒</span><span class="nlbl">Shop</span><span id="badgeShop" class="nb" style="display:none">0</span></button>
+    <button id="navCollection"><span class="navpop" data-pop="nav_cards">🗂</span><span class="nlbl">Sammlung</span><span id="navBadge" class="nb" style="display:none">0</span></button>
+    <button id="navHome" class="on nav-center"><span class="navpop" data-pop="nav_start">🏛</span><span class="nlbl">Start</span></button>
+    <button id="navClan"><span class="navpop" data-pop="nav_clan">🛡</span><span class="nlbl">Clan</span><span id="badgeClan" class="nb" style="display:none">0</span></button>
+    <button id="navFortress"><span class="navpop" data-pop="nav_fortress">🗼</span><span class="nlbl">Burg</span></button>
   </nav>
 </div>
 
@@ -4150,15 +4264,40 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     hide: function (img) { img.style.display = "none"; },
     /* Aufraeum-Sweep. `onerror` kommt bei haengenden Verbindungen manchmal
        gar nicht (Proxy antwortet nicht, Request laeuft ins Timeout) — dann
-       stuende dauerhaft ein LEERES Bildfeld im Layout. Der Sweep tauscht
-       alles, was nachweislich nicht geladen ist (`naturalWidth === 0`),
-       gegen sein Emoji. Keine Testkruecke, sondern die Absicherung fuer
-       schlechte Mobilverbindungen. */
-    sweep: function (root) {
+       stuende dauerhaft ein LEERES Bildfeld im Layout. Der Sweep tauscht,
+       was nachweislich fehlgeschlagen ist, gegen sein Emoji.
+       ------------------------------------------------------------------
+       ⚠ HIER LAG EIN SCHWERER FEHLER, und er ist lehrreich genug, um ihn
+       stehen zu lassen: die alte Bedingung war `!img.complete ||
+       naturalWidth === 0`. Solange jedes Bild sofort zu laden begann, war
+       das richtig. Mit `loading="lazy"` — eingefuehrt, um die Ladelast zu
+       senken — ist `complete === false` aber der NORMALZUSTAND fuer alles
+       ausserhalb des Sichtfelds. Der Sweep hat diese Bilder als Fehler
+       gewertet und dauerhaft durch ihr Emoji ersetzt. Im Shop hiess das:
+       das erste Gem-Paket zeigte sein Bild, alle darunter ein gruenes
+       Herz. Genau der Befund „der Shop zeigt die Gems und das Gold nicht".
+       Zwei Aenderungen, die je fuer sich harmlos waren, ergaben zusammen
+       den Fehler — und keine Pruefung sah ihn, weil lokal ohnehin kein
+       Bild laedt.
+       ------------------------------------------------------------------
+       Jetzt gilt sauber getrennt:
+       • `complete && naturalWidth === 0` → wirklich fehlgeschlagen.
+       • `!complete` → laedt noch. Bei lazy ist das erwartbar; nur was im
+         Sichtfeld steht und nach der Gnadenfrist immer noch haengt, wird
+         als Fehler gewertet (`hart === true`). */
+    sweep: function (root, hart) {
       Array.prototype.forEach.call(
         (root || document).querySelectorAll("img.ico, img.prodimg, img.navimg, img.plusimg"),
         function (img) {
-          if (!img.complete || img.naturalWidth === 0) window.UIIcon.fail(img);
+          if (img.complete) {
+            if (img.naturalWidth === 0) window.UIIcon.fail(img);
+            return;
+          }
+          if (!hart) return;
+          var r = img.getBoundingClientRect();
+          if (r.width > 0 && r.bottom > -240 && r.top < window.innerHeight + 240) {
+            window.UIIcon.fail(img);
+          }
         });
     },
     fail: function (img) {
@@ -5605,9 +5744,9 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       avail:3, give:function(){ AC.addMaterial(20, "speed"); } },
     { id:"d3", art:"shop_mat_special", emoji:"✨", name:"Spezial-Essenz ×15",  cost:4200,  cur:"gold",
       avail:2, give:function(){ AC.addMaterial(15, "special"); } },
-    { id:"d4", art:"frame_common", emoji:"🃏", name:"3 gewöhnliche Karten", cost:5400, cur:"gold",
+    { id:"d4", art:"card_back", emoji:"🃏", name:"3 gewöhnliche Karten", cost:5400, cur:"gold",
       avail:2, give:function(){ for (var i=0;i<3;i++) AC.addDrop(TOWER_IDS[(Math.random()*TOWER_IDS.length)|0], "common", 1); } },
-    { id:"d5", art:"frame_good",  emoji:"🂡", name:"1 gute Karte",        cost:9000,  cur:"gold",
+    { id:"d5", art:"card_back",    emoji:"🂡", name:"1 gute Karte",        cost:9000,  cur:"gold",
       avail:1, give:function(){ AC.addDrop(TOWER_IDS[(Math.random()*TOWER_IDS.length)|0], "good", 1); } },
     { id:"d6", art:"shop_gem_t1", emoji:"💚", name:"Gem-Bündel ×25",      cost:0,     cur:"free",
       avail:1, give:function(){ setGems(gems() + 25); } },
@@ -5634,7 +5773,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     { id:"starter", name:"Starter-Pack", sub:"Nur für neue Beschwörer · einmalig",
       art:"offer_starter", emoji:"✨", price:"Fr. 9.–", value:"+320 % Wert",
       items:[["cur_gold","🪙","20 000"],["cur_gem","💚","250"],["pack_gold","🎁","×2"],
-             ["frame_rare","🃏","1 Seltene"]] },
+             ["card_back","🃏","1 Seltene"]] },
   ];
   /* ---------- (6) Gem-Pakete (AA §8.1 Pos. 6) ----------
      Fuenf Staffeln. Die Siegel sitzen bewusst NICHT auf der teuersten
@@ -5772,18 +5911,24 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
        werden — dann bleibt das Bildfeld dauerhaft leer. Genau das ist im
        ersten Durchgang passiert. */
   function hydrateProdCards(root) {
+    /* Kein Rahmenbild mehr auf der Produktkachel — Begruendung bei
+       `.prodcard .pcfrm` im CSS. Das Attribut wird nur noch abgeraeumt,
+       damit kein toter Marker im DOM stehen bleibt. */
     Array.prototype.forEach.call(root.querySelectorAll("[data-prodfrm]"), function (el) {
-      var k = el.getAttribute("data-prodfrm");
-      // border-image, nicht background-image — Begruendung bei .frm im CSS.
-      if (k && ASSETS[k]) el.style.borderImageSource = 'url("' + ASSETS[k] + '")';
+      el.removeAttribute("data-prodfrm");
     });
     sweepSoon(root);
   }
   /* Nachgerenderte Bereiche brauchen ihren eigenen Sweep — der Boot-Sweep
      lief, bevor diese Karten existierten. */
+  /* Erst weich (nur echte Fehlschlaege), dann nach der Gnadenfrist hart
+     (auch haengende Bilder im Sichtfeld). Der harte Durchgang darf NICHT
+     frueh laufen: er wuerde sonst Bilder abraeumen, die gerade erst
+     angefangen haben zu laden. */
   function sweepSoon(root) {
     setTimeout(function () { UIIcon.sweep(root); }, 900);
     setTimeout(function () { UIIcon.sweep(root); }, 2200);
+    setTimeout(function () { UIIcon.sweep(root, true); }, 6000);
   }
 
   /* (1) Promo-Banner. Zeigt den Season-Pass, solange er nicht aktiv
@@ -9131,6 +9276,15 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   // (haengende Requests). Danach steht in keinem Bildfeld mehr ein Loch.
   setTimeout(function () { UIIcon.sweep(); }, 1200);
   setTimeout(function () { UIIcon.sweep(); }, 3000);
+  setTimeout(function () { UIIcon.sweep(null, true); }, 7000);
+  /* Beim Wischen und Scrollen kommen lazy geladene Bilder erst ins Bild.
+     Ein weicher Nachlauf raeumt dort auf, was wirklich fehlgeschlagen ist,
+     ohne die noch ladenden anzufassen. */
+  var sweepTakt = null;
+  window.addEventListener("scroll", function () {
+    if (sweepTakt) return;
+    sweepTakt = setTimeout(function () { sweepTakt = null; UIIcon.sweep(); }, 700);
+  }, true);
   applyAssets();
   /* Asset-Tabelle beim Avatar-Modul anmelden, BEVOR irgendwas rendert:
      ohne sie liefert active() nur Emoji-Fallbacks. */

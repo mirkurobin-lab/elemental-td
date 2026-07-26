@@ -4,7 +4,7 @@ Eine Regel gilt, wenn sie **getestet** ist. Jeder Abschnitt hier nennt darum die
 Prüfung, die ihn hält. Regeln ohne Prüfung sind Absichtserklärungen und rutschen
 innerhalb weniger Wochen zurück.
 
-Suiten: `run_v5.js` (93), `run_v6.js` (273), `run_v7.js` (240) — zusammen **606
+Suiten: `run_v5.js` (93), `run_v6.js` (273), `run_v7.js` (249) — zusammen **615
 Checks**. Ausführen:
 `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers node run_vN.js`
 
@@ -224,6 +224,93 @@ App, bei uns geht jedes Byte über die Leitung.
 > **Geprüft:** „Jedes Bild trägt `loading=lazy`" und „… `decoding=async`" über
 > alle `<img>` — beim ersten Anlauf liefen 15 von 48 an den Helfern vorbei.
 
+## 6d. Zwei Änderungen, die einzeln harmlos waren
+
+Der schwerste Fehler dieser Runde entstand nicht aus einer falschen
+Entscheidung, sondern aus **zwei richtigen, die zusammen nicht mehr galten**.
+
+1. `UIIcon.sweep()` tauschte alles gegen sein Emoji, was `!complete ||
+   naturalWidth === 0` war. Solange jedes Bild sofort zu laden begann: korrekt.
+2. `loading="lazy"` kam dazu, um die Ladelast zu senken. Damit ist
+   `complete === false` der **Normalzustand** für alles außerhalb des
+   Sichtfelds.
+
+Ergebnis: der Sweep hat jedes Bild unterhalb des Falzes dauerhaft durch sein
+Emoji ersetzt. Im Shop zeigte das **erste** Gem-Paket sein Bild, alle darunter
+ein grünes Herz. Der Befund „der Shop zeigt die Gems und das Gold nicht" war
+also nie ein Asset-Problem — die Dateien lagen die ganze Zeit mit HTTP 200 da.
+
+**Die Lehre ist nicht „mehr testen", sondern eine Frage beim Review:** wenn
+eine Änderung eine Annahme über Bilder ändert, wer verlässt sich sonst noch
+auf diese Annahme? Der Sweep stand 200 Zeilen entfernt und wurde nicht
+angefasst.
+
+Jetzt sauber getrennt: `complete && naturalWidth === 0` ist ein Fehlschlag;
+`!complete` heißt „lädt noch" und wird nur nach einer Gnadenfrist und nur im
+Sichtfeld als Hänger gewertet.
+
+> **Geprüft:** „Sweep wertet `nicht geladen` nicht mehr als Fehler" (Form) und
+> „Lazy geladene Produktbilder überleben den weichen Sweep" (Wirkung).
+
+## 6e. Der Kategorienfehler: Kartenrahmen auf einer Produktkachel
+
+`frame_card_*` sind **Kartenrahmen** — hochkant (0,75), kräftiges Zier auf
+allen vier Seiten, gemacht um ein Kartenbild zu fassen. Eine Produktkachel ist
+quer (1,33) und trägt Bild, Name, Menge und Knopf. Als 9-Slice darumgezogen
+wird aus dem oberen Zierbalken ein breites Silberbrett und aus dem Ganzen ein
+**leerer Bilderrahmen mit einem kleinen Icon darin**.
+
+Kein Schnittwert repariert das. Der Rahmen gehört nicht auf diese Kachel. Die
+Farbcodierung, um die es geht, trägt jetzt die **Kante** — richtig bei jedem
+Seitenverhältnis, kostet kein Byte, und das Produktbild bekommt die Fläche.
+
+**Die Regel dahinter:** ein Asset hat eine Rolle. Ein Rahmen für ein 3:4-Objekt
+ist kein Dekor für beliebige Flächen. Vor der Wiederverwendung eines Assets an
+neuer Stelle gehört das Verhältnis geprüft, nicht nur die Farbe.
+
+## 6f. Wieviel darf ein Rahmen vom Inhalt nehmen?
+
+`border-image-slice` beschreibt, wo in der **Quelle** das Zier endet. Das ist
+gemessen und unveränderlich. `border-image-width` bestimmt, wieviel vom
+**Element** der Ring bedeckt — und das ist eine Gestaltungsentscheidung.
+
+Setzt man beide gleich, frisst der Ring auf einer 86×114-Deckkarte 38 % der
+Höhe und 32 % der Breite; übrig bleiben 58×71 px für den Turm. Genau der Befund
+„die Tower sind zu klein". `border-image` skaliert die Eckstücke auf die
+Randbreite — der Ring wird also nur dünner, nicht abgeschnitten.
+
+| | Schnitt (Quelle) | Randbreite (Element) | Öffnung |
+|---|---|---|---|
+| vorher | 18/16/20/16 % | 18/16/20/16 % | 42 % der Fläche |
+| jetzt | 18/16/20/16 % | 12/10/14/10 % | **60 % der Fläche** |
+
+> **Geprüft:** „Der Ring lässt mindestens 55 % der Deckkarte für den Turm".
+
+## 6g. Hauptleiste: AAs Mechanik, nachgemessen
+
+Aus dem Screenrecording vom 26.07. Bild für Bild:
+
+| | AA | wir vorher |
+|---|---|---|
+| Reiter | Platten mit dünnen Fugen | freistehende Icons |
+| Beschriftung | **nur der aktive** trägt sie | alle, dauerhaft |
+| aktiver Reiter | wächst in der Breite, schiebt die anderen | gleich breit |
+| | hebt sich über die Leistenkante | flach |
+| | wird heller | goldener Strich darunter |
+| | sein Icon wächst | unverändert |
+
+Technisch heißt das **Flex statt Grid** — ein Grid mit festen Spalten kann
+einen Reiter nicht wachsen lassen. Animiert werden `flex-grow` und die
+`max-width` der Beschriftung auf derselben Kurve, damit Wachsen und Beschriften
+**eine** Bewegung sind statt zwei.
+
+Der goldene Strich ist entfallen: die Platte markiert den Zustand jetzt dreifach
+(breiter, heller, angehoben). Ein vierter Hinweis wäre Redundanz.
+
+> **Geprüft:** „Aktiver Reiter ist breiter als die übrigen" (136 gegen 68 px),
+> „Nur der aktive Reiter trägt seine Beschriftung", „Aktiver Reiter hebt sich
+> über die Leistenkante", „Die Hervorhebung wandert zum neuen Ziel".
+
 ## 7b. Die blinde Stelle der Suiten — und wie sie geschlossen ist
 
 **Die 590 lokalen Checks liefen vor und nach dem Rahmen-Fix grün.** Sie laufen
@@ -252,6 +339,7 @@ CDN-Ausfall mitten im Laden.
 | — | Typo-Leiter: 40 Schriftgrößen auf 8 benannte Stufen | offen |
 | — | Radien: 31 auf 4 | offen |
 | — | Fehlende Komponenten: Tooltips, gestaltete Scrollbars, Health/Mana-Balken, Damage-Zahlen, Freunde, Kampagne, Benachrichtigungssystem, Ladezustände | offen |
+| — | **Gold-Produktbilder neu erzeugen.** `shop_gold_t1..t4` messen Farbton 35°, aber nur 0,32–0,39 Sättigung gegen 0,58 beim Währungs-Icon. Bei 108 px lesen sie als graue Münze. Aktuell hebt ein CSS-Sättigungsschub sie an — eine Zwischenlösung, kein Ersatz | offen |
 
 **Regel für alles Neue:** eine Änderung am Design-System ohne begleitenden Check
 ist nicht fertig. Sonst steht in sechs Wochen wieder 89 % ohne Tiefe im Blatt und
