@@ -601,7 +601,7 @@ footer{padding:6px 12px 14px;text-align:center}
 .asset-btn{background-size:100% 210%,100% 100%}
 .asset-wide{background-size:100% 240%,100% 100%}
 .asset-fill{background-size:cover,cover}
-.asset-frame{background-size:100% 100%,100% 100%}
+.asset-frame{background-size:cover,100% 100%}
 
 /* ==================================================================
  * HOME-VIEW (Status-Arenen) — Inszenierung nach AA_UI_REFERENZ §9.5b
@@ -694,7 +694,7 @@ footer{padding:6px 12px 14px;text-align:center}
   padding:24px 18px;gap:14px}
 .certitle{font-size:27px;text-align:center;line-height:1.1}
 .cercard{width:132px;aspect-ratio:3/4;border-radius:12px;position:relative;
-  background-repeat:no-repeat;background-position:center;background-size:100% 100%,100% 100%;
+  background-repeat:no-repeat;background-position:center;background-size:cover,100% 100%;
   background-image:linear-gradient(160deg,#2c3a4b,#131c25);border:2px solid #e0b94a;
   display:flex;align-items:center;justify-content:center;font-size:52px;
   box-shadow:0 0 26px #e0b94a66;animation:cerpop .9s ease-out}
@@ -812,7 +812,7 @@ footer{padding:6px 12px 14px;text-align:center}
 .node .prop{font-size:20px;opacity:.9;filter:drop-shadow(0 2px 2px #0006)}
 .node .rw{width:60px;height:60px;border-radius:11px;display:flex;flex-direction:column;
   align-items:center;justify-content:center;font-size:25px;position:relative;
-  background-repeat:no-repeat;background-position:center;background-size:100% 100%,100% 100%;
+  background-repeat:no-repeat;background-position:center;background-size:cover,100% 100%;
   background-image:linear-gradient(180deg,#e9eef3,#a8b6c2);
   box-shadow:inset 0 0 0 2px #ffffff8c,0 3px 6px #0007}
 .node .rw .q{position:absolute;right:2px;bottom:1px;font-size:9px;font-weight:900;color:#20303f}
@@ -934,7 +934,7 @@ span.ico{mix-blend-mode:normal;text-align:center}
 .dealgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
 .shopcard{border-radius:var(--radius);border:1px solid var(--line);background:linear-gradient(180deg,#1b2732,#131c25);
   padding:9px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;
-  background-repeat:no-repeat;background-position:center;background-size:100% 100%,100% 100%}
+  background-repeat:no-repeat;background-position:center;background-size:cover,100% 100%}
 .shopcard .sart{font-size:26px;line-height:1.1}
 .shopcard .snm{font-size:10.5px;font-weight:800;color:#dbe6ef;line-height:1.25}
 .shopcard .savail{font-size:9px;color:var(--dim);font-weight:700}
@@ -1076,7 +1076,7 @@ span.ico{mix-blend-mode:normal;text-align:center}
 .prodcard.wide{flex-direction:row;align-items:center;gap:var(--gap);padding:var(--pad)}
 .prodcard.wide .pcart{width:23%;height:74px;margin:0;flex:0 0 23%}
 .prodcard .pcfrm{position:absolute;inset:0;z-index:2;pointer-events:none;
-  background-repeat:no-repeat;background-position:center;background-size:100% 100%}
+  background-repeat:no-repeat;background-position:center;background-size:cover}
 /* Rahmen-Fallback: faellt das PNG aus, traegt ein farbiger Rand den
    AA-Farbcode weiter — die Kachel bleibt lesbar und zugeordnet. */
 .prodcard.fr-orange{border-color:#f2a13d8f;box-shadow:inset 0 0 0 1px #f2a13d3d}
@@ -1117,9 +1117,27 @@ span.ico{mix-blend-mode:normal;text-align:center}
  * Projekt schon dreimal aufgetreten ist (.cerbtn, .okbtn, .battlebtn).
  * Die Ueberschrift traegt deshalb eine dunkle Fuellfarbe.
  * ================================================================== */
+/* Das Band UMSCHLIESST seinen Text, es wird nicht auf die Spaltenbreite
+   gezogen. Vorher war es ein Block-Flex und damit 366 px breit, waehrend
+   die Ueberschrift 105 px einnahm — die Bannergrafik wurde also auf das
+   Dreifache gestreckt und las sich als leere Leiste. Gemessen: 12 %
+   Fuellung (kleine Variante 7 %). Bei AA umschliesst das Band den Text.
+   min-width haelt sehr kurze Woerter trotzdem als Band erkennbar. */
+/* KEIN `background-size:100% 100%` fuer Artwork. Gemessen ueber alle
+   Views wurden Bannergrafiken auf voellig fremde Seitenverhaeltnisse
+   gequetscht — .packbtn um Faktor 9,1, .progbar um 7,5, dieses Band um
+   3,1. Bei einem Band heisst das: die Zierenden werden zu Schlieren
+   gestaucht, die Mitte flach gezogen, und es liest sich als leere
+   Leiste. `cover` beschneidet statt zu verzerren. Die Farbplatte in der
+   zweiten Ebene fuellt weiterhin die ganze Flaeche und bleibt die
+   Textgrundlage.
+   Richtig geloest waere das mit 9-Slice (border-image) oder mit Grafiken,
+   die im Zielverhaeltnis erzeugt werden — steht als P3 im
+   DESIGNSYSTEM.md, mit den jetzt bekannten Zielverhaeltnissen. */
 .secribbon{position:relative;display:flex;align-items:center;justify-content:center;
-  min-height:34px;margin:var(--gap-lg) 0 var(--gap);padding:5px 46px;
-  background-repeat:no-repeat;background-position:center;background-size:100% 100%,100% 100%;
+  width:fit-content;max-width:100%;min-width:190px;margin-inline:auto;
+  min-height:34px;margin-block:var(--gap-lg) var(--gap);padding:5px 30px;
+  background-repeat:no-repeat;background-position:center;background-size:cover,100% 100%;
   background-image:linear-gradient(180deg,#e9eef3,#b8c6d2 52%,#8fa2b3);
   border-radius:var(--radius-sm);
   filter:drop-shadow(0 3px 7px #0009);
@@ -1131,7 +1149,7 @@ span.ico{mix-blend-mode:normal;text-align:center}
      darunter bleibt die Textgrundlage. Damit ist die Ueberschrift in
      ALLEN drei Zustaenden lesbar: ohne Bild, mit Bild, bei CDN-Ausfall. */
   background-blend-mode:screen,normal}
-.secribbon.sm{min-height:28px;padding:4px 40px;
+.secribbon.sm{min-height:28px;padding:4px 24px;min-width:160px;
   background-image:linear-gradient(180deg,#dfe7ee,#aebdcb 52%,#8799aa);
   background-blend-mode:screen,normal}
 .secribbon .srt{font-size:12px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;
@@ -1141,8 +1159,11 @@ span.ico{mix-blend-mode:normal;text-align:center}
 .secribbon.sm .srt{font-size:10.5px}
 /* Zusatzinfo (Timer, Pity-Stand) haengt RECHTS AUSSEN am Ribbon, nicht
    darauf — auf dem hellen Band waere jede weitere Zeile Gedraengel. */
-.secribbon .srx{position:absolute;right:8px;top:50%;transform:translateY(-50%);
-  font-size:9px;font-weight:800;color:#1a2530b8;max-width:44%;white-space:nowrap;
+/* Der Zusatz laeuft MIT im Fluss. Absolut positioniert waere er bei einem
+   Band, das sich an den Text anpasst, entweder abgeschnitten oder ueber
+   dem Titel — so rechnet das Band seine Breite korrekt mit ihm. */
+.secribbon .srx{margin-left:10px;flex:0 1 auto;
+  font-size:9px;font-weight:800;color:#1a2530b8;white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis}
 .decorow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--gap);margin-top:var(--gap-lg)}
 .decotile{border-radius:var(--radius-sm);border:1px dashed #35485a;background:#111a21;padding:9px 6px;
@@ -1435,7 +1456,7 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
   text-transform:uppercase}
 .fortcard{margin-top:10px;border-radius:13px;border:1px solid var(--line);
   background:linear-gradient(180deg,#1b2732,#131c25);padding:10px 11px;
-  background-repeat:no-repeat;background-position:center;background-size:100% 100%,100% 100%}
+  background-repeat:no-repeat;background-position:center;background-size:cover,100% 100%}
 .fortcard .fh{display:flex;align-items:center;gap:8px}
 .fortcard .fh .fn{font-size:14px;font-weight:900;flex:1;min-width:0}
 .fortcard .fh .flv{font-size:10.5px;font-weight:900;color:#0e1418;background:#e0b94a;
@@ -1989,7 +2010,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
    nicht, darf hier NICHTS gezeichnet werden — sonst deckt der Fallback
    das Artwork zu. Die farbige Kachelkante traegt die Raritaet dann allein. */
 .frm{position:absolute;inset:0;z-index:3;pointer-events:none;
-  background-repeat:no-repeat;background-position:center;background-size:100% 100%}
+  background-repeat:no-repeat;background-position:center;background-size:cover}
 .tile .artbox{font-size:22px}
 .deckslot .artbox{font-size:30px;inset:3px}
 .reqslot .artbox{font-size:24px;inset:3px}
@@ -2063,7 +2084,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 
 .trackbanner{position:relative;display:flex;align-items:center;gap:10px;margin-top:var(--gap);
   min-height:var(--banner-h-lg);padding:var(--pad);border-radius:var(--radius);
-  background-repeat:no-repeat;background-position:center;background-size:100% 100%,cover;
+  background-repeat:no-repeat;background-position:center;background-size:cover,100% 100%;
   background-image:linear-gradient(150deg,#2a1c4a 0%,#1b1230 42%,#120c22 100%);
   border:1px solid #a45ef23d;
   box-shadow:0 10px 22px -12px #000e,inset 0 0 34px -8px #7a4fd63d}
@@ -2081,7 +2102,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .tb-emblem{flex:0 0 66px;width:66px;height:76px;position:relative;display:flex;
   align-items:center;justify-content:center;
   clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
-  background-repeat:no-repeat;background-position:center;background-size:100% 100%,cover;
+  background-repeat:no-repeat;background-position:center;background-size:cover,100% 100%;
   background-image:linear-gradient(180deg,#3a4c5c,#141d26);
   filter:drop-shadow(0 3px 6px #000a)}
 .tb-emblem .tb-art{width:76%;height:76%;display:flex;align-items:center;justify-content:center;
@@ -2119,7 +2140,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 /* --- rechts: Kosten-Button (GOLD ⇒ dunkle Schrift) --- */
 .tb-buy{flex:0 0 auto;min-width:96px;border-radius:12px;padding:11px 10px;text-align:center;
   font-size:13px;font-weight:900;line-height:1.2;
-  background-repeat:no-repeat;background-position:center;background-size:100% 100%,100% 100%;
+  background-repeat:no-repeat;background-position:center;background-size:cover,100% 100%;
   background-image:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);
   box-shadow:0 3px 0 #6d551a;
   -webkit-text-fill-color:#3a2b07;color:#3a2b07}
@@ -2167,7 +2188,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 /* ---------- Clan-Kopf: Banner + Kennzahlen ---------- */
 .clanhead{position:relative;display:flex;gap:11px;align-items:center;padding:11px;
   border-radius:14px;border:1px solid var(--line);overflow:hidden;
-  background-repeat:no-repeat;background-position:center;background-size:100% 100%,cover;
+  background-repeat:no-repeat;background-position:center;background-size:cover,100% 100%;
   background-image:linear-gradient(180deg,#1b2732,#121a22)}
 /* ⚠ NICHT .banner nennen — so hiess schon das Raritaets-Band der
    Turm-Detailkarte (#dBanner). Die Kollision hat dort den Text
@@ -2199,7 +2220,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 /* ---------- Quest-Karten ---------- */
 .qcard{margin-top:var(--gap);border-radius:var(--radius);border:1px solid var(--line);padding:var(--pad);
   background:linear-gradient(180deg,#1b2732,#131c25);
-  background-repeat:no-repeat;background-position:center;background-size:100% 100%,cover}
+  background-repeat:no-repeat;background-position:center;background-size:cover,100% 100%}
 .qcard .qtop{display:flex;align-items:center;gap:8px}
 .qcard .qsym{font-size:19px;flex:0 0 auto}
 .qcard .qtx{flex:1;min-width:0}
@@ -2254,7 +2275,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .reqcard{position:relative;flex:0 0 40px;width:40px;aspect-ratio:3/4;border-radius:7px;
   border:2px solid #9aa3ad;background:var(--panel2);display:flex;align-items:center;
   justify-content:center;font-size:18px;
-  background-repeat:no-repeat;background-position:center;background-size:100% 100%}
+  background-repeat:no-repeat;background-position:center;background-size:cover}
 .reqcard .rtier{position:absolute;left:0;right:0;bottom:0;background:#000b;font-size:6.5px;
   text-align:center;font-weight:900;letter-spacing:.04em;padding:1px 0;color:#cfd6dd}
 .reqmeta{flex:1;min-width:0}
@@ -2290,7 +2311,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
  * ================================================================== */
 .flycard{position:fixed;z-index:120;width:40px;aspect-ratio:3/4;border-radius:7px;
   border:2px solid #7ad14f;background:var(--panel2);pointer-events:none;
-  background-repeat:no-repeat;background-position:center;background-size:100% 100%;
+  background-repeat:no-repeat;background-position:center;background-size:cover;
   box-shadow:0 0 14px #7ad14f88;
   animation:flyto var(--fly-ms,520ms) cubic-bezier(.34,.72,.36,1) forwards}
 @keyframes flyto{
@@ -4749,6 +4770,14 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       (function (el) {
         // Raritätsrahmen-Asset über den Farbgradienten legen (Fallback bleibt).
         layer(el, "frame_" + tierOf(el.getAttribute("data-tier")).key);
+        /* Die EINE berechtigte Ausnahme von "Artwork nie strecken": ein
+           RAHMEN muss auf die Kante gezogen werden, sonst fehlt genau
+           der Rand, der ihn zum Rahmen macht. Die Klasse macht die
+           Ausnahme benennbar, damit die Banner-Prüfung sie zulassen kann,
+           ohne die Regel für alles andere aufzugeben. Richtig gelöst wäre
+           das mit border-image (9-Slice) — steht als P3 im
+           DESIGNSYSTEM.md. */
+        el.classList.add("rahmen-fuellt");
         el.style.backgroundSize = "100% 100%, 100% 100%";
         el.addEventListener("click", function () {
           pickForge(el.getAttribute("data-id"), el.getAttribute("data-tier"));
