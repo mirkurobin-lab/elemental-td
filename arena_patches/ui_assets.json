@@ -937,5 +937,317 @@
   "lizenz": "CC0",
   "quelle": "OpenGameArt.org",
   "beschreibung": "Niederlage-Stinger (10 s). Quelle: „Fantasy Orchestral Theme“, OpenGameArt, CC0 — Ausschnitt, verlangsamt. Siehe LIZENZEN.md."
+ },
+ "shop_gem_t1": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042629_77585abc-c36d-46c5-95ce-3e23e3603288.png",
+  "job": "77585abc-c36d-46c5-95ce-3e23e3603288",
+  "type": "shop_product",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Gem-Stufe 1: einzelne Smaragd-Kristallsplitter. Eskalations-Kette Kristalle Stufe 1/6."
+ },
+ "shop_gem_t2": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042632_66f0328d-63ef-4342-920a-decd43a32581.png",
+  "job": "66f0328d-63ef-4342-920a-decd43a32581",
+  "type": "shop_product",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Gem-Stufe 2: Smaragd-Haufen. Eskalations-Kette Stufe 2/6."
+ },
+ "shop_gem_t3": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042633_440afa12-072a-46a7-a475-489a3e15f5fb.png",
+  "job": "440afa12-072a-46a7-a475-489a3e15f5fb",
+  "type": "shop_product",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Gem-Stufe 3: Smaragde auf violettem Samtkissen. Stufe 3/6."
+ },
+ "shop_gem_t4": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042637_04bb7eef-58fe-4580-a996-5b3012162ad8.png",
+  "job": "04bb7eef-58fe-4580-a996-5b3012162ad8",
+  "type": "shop_product",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Gem-Stufe 4: Truhe schüttet Smaragde aus. Stufe 4/6."
+ },
+ "shop_gem_t5": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042639_b265fd47-1240-4d0a-b6b6-8e23378a4552.png",
+  "job": "b265fd47-1240-4d0a-b6b6-8e23378a4552",
+  "type": "shop_product",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Gem-Stufe 5: Gold-Pokal voller Smaragde. Stufe 5/6."
+ },
+ "shop_gem_t6": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042640_6a3c2b75-4484-433a-8a6c-1cff66e9c902.png",
+  "job": "6a3c2b75-4484-433a-8a6c-1cff66e9c902",
+  "type": "shop_product",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Gem-Stufe 6: offener Tresor voller Smaragde. Stufe 6/6, größtes Paket."
+ },
+ "shop_gold_t1": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042648_458a4b84-a99e-4814-ae0b-00a3d5ec6b3a.png",
+  "job": "458a4b84-a99e-4814-ae0b-00a3d5ec6b3a",
+  "type": "shop_product",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Gold-Stufe 1: Münzstapel. Eskalations-Kette Gold Stufe 1/4."
+ },
+ "shop_gold_t2": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042650_ea5835fa-9147-4cf3-96dd-f9ec21af6088.png",
+  "job": "ea5835fa-9147-4cf3-96dd-f9ec21af6088",
+  "type": "shop_product",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Gold-Stufe 2: violetter Münzbeutel. Stufe 2/4."
+ },
+ "shop_gold_t3": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042652_01540da3-f1b1-4c67-9779-9ef8a0e88921.png",
+  "job": "01540da3-f1b1-4c67-9779-9ef8a0e88921",
+  "type": "shop_product",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Gold-Stufe 3: strömender Goldschwall. Stufe 3/4."
+ },
+ "shop_gold_t4": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042654_b954fa5e-5d6e-4ab2-a2fd-a05f1ba2933f.png",
+  "job": "b954fa5e-5d6e-4ab2-a2fd-a05f1ba2933f",
+  "type": "shop_product",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Gold-Stufe 4: offene Truhe voller Gold. Stufe 4/4, größtes Paket."
+ },
+ "shop_mat_attack": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042656_2ed86a73-0ba8-442c-8ce6-e3e28e870218.png",
+  "job": "2ed86a73-0ba8-442c-8ce6-e3e28e870218",
+  "type": "shop_product",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Material-Bundle Angriff: rote Kristalle mit Goldband."
+ },
+ "shop_mat_speed": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042658_0e1c3c87-a56b-4948-a419-b8ca861c0493.png",
+  "job": "0e1c3c87-a56b-4948-a419-b8ca861c0493",
+  "type": "shop_product",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Material-Bundle Tempo: cyanfarbene Kristalle mit Goldband."
+ },
+ "shop_mat_special": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042705_1892cf67-384b-41fe-8b0f-6ae8ec989f87.png",
+  "job": "1892cf67-384b-41fe-8b0f-6ae8ec989f87",
+  "type": "shop_product",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Material-Bundle Spezial: violette Sternkristalle mit Goldband."
+ },
+ "offer_arena_pack": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042708_f26a5521-f28b-489d-b62f-01543a8facc6.png",
+  "job": "f26a5521-f28b-489d-b62f-01543a8facc6",
+  "type": "offer_art",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Arena-Pack-Artwork: leuchtende Kristallkarte mit Runen-Emblem und Strahlenexplosion."
+ },
+ "offer_starter": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042710_a70613fb-df46-48af-95a8-1d71ddae335e.png",
+  "job": "a70613fb-df46-48af-95a8-1d71ddae335e",
+  "type": "offer_art",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Starter-Angebot-Artwork: Karte + Goldmünzen + Smaragde auf Kristallpodest."
+ },
+ "offer_vault_bank": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042712_609d781f-a276-4767-a257-dea71279049b.png",
+  "job": "609d781f-a276-4767-a257-dea71279049b",
+  "type": "offer_art",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Kristalltresor-Artwork: Glaskugel-Sparbank randvoll mit Smaragden, Gold-Filigran."
+ },
+ "frame_card_orange": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042716_5bf79216-8800-472c-ab73-d9f93ea05991.png",
+  "job": "5bf79216-8800-472c-ab73-d9f93ea05991",
+  "type": "frame",
+  "size": "896x1200",
+  "batch": 6,
+  "beschreibung": "Produktkarten-Rahmen ORANGE (Gems-Sektion, AA-Farbcode). Leere Mitte für Produktbild."
+ },
+ "frame_card_green": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042717_86ae6639-d698-4dfe-b5d0-6d042162c301.png",
+  "job": "86ae6639-d698-4dfe-b5d0-6d042162c301",
+  "type": "frame",
+  "size": "896x1200",
+  "batch": 6,
+  "beschreibung": "Produktkarten-Rahmen GRÜN (Gold-Sektion, AA-Farbcode). Leere Mitte."
+ },
+ "frame_card_light": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042727_98b627aa-e2fa-4869-a7db-4ddc1dff974a.png",
+  "job": "98b627aa-e2fa-4869-a7db-4ddc1dff974a",
+  "type": "frame",
+  "size": "896x1200",
+  "batch": 6,
+  "beschreibung": "Produktkarten-Rahmen HELL-SILBER (Angebote/Neutral). Leere Mitte."
+ },
+ "ribbon_section_lg": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042730_8c38ed92-134a-440c-822d-e67c2d3f31d8.png",
+  "job": "8c38ed92-134a-440c-822d-e67c2d3f31d8",
+  "type": "ribbon",
+  "size": "1200x672",
+  "batch": 6,
+  "beschreibung": "Heller Sektions-Ribbon GROSS, nach Kit-Banner (WAVE-Stil): silber-blauer Kristall, Gold-Filigran. Für Sektionsüberschriften Shop/Views."
+ },
+ "ribbon_section_sm": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042732_68de7abf-33da-4465-8401-bc11d353a8b3.png",
+  "job": "68de7abf-33da-4465-8401-bc11d353a8b3",
+  "type": "ribbon",
+  "size": "1200x672",
+  "batch": 6,
+  "beschreibung": "Heller Sektions-Ribbon SCHMAL, gleiche Familie. Für Zwischenüberschriften."
+ },
+ "nav_shop": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042736_4eff429b-94e3-4111-a941-b3f16335b644.png",
+  "job": "4eff429b-94e3-4111-a941-b3f16335b644",
+  "type": "nav",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Bottom-Nav SHOP: Kristalltruhe mit Smaragden, Popout-Illustration."
+ },
+ "nav_cards": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042737_832db618-1425-486d-b83e-0897328ccf85.png",
+  "job": "832db618-1425-486d-b83e-0897328ccf85",
+  "type": "nav",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Bottom-Nav SAMMLUNG: Kristallkarten-Fächer, Popout-Illustration."
+ },
+ "nav_start": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042740_67eeb9a2-d790-432a-9781-6d80697b725c.png",
+  "job": "67eeb9a2-d790-432a-9781-6d80697b725c",
+  "type": "nav",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Bottom-Nav START (Mitte, groß): Kristallburg-Tor mit leuchtender Spitze."
+ },
+ "nav_clan_v1": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042750_5c90eeaa-0b17-435d-858f-3fef9010075a.png",
+  "job": "5c90eeaa-0b17-435d-858f-3fef9010075a",
+  "type": "nav",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Bottom-Nav CLAN V1 (Herz-Wappen — ERSETZT durch nav_clan V2, nicht verwenden)."
+ },
+ "nav_fortress": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042752_d69244e4-72b3-4c3a-84ad-5c2b3589d27c.png",
+  "job": "d69244e4-72b3-4c3a-84ad-5c2b3589d27c",
+  "type": "nav",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Bottom-Nav BURG: Kristall-Festungsturm, Popout-Illustration."
+ },
+ "ic_calendar": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042754_13862811-306e-4424-a780-e6415bf7a5f0.png",
+  "job": "13862811-306e-4424-a780-e6415bf7a5f0",
+  "type": "icon",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Utility-Icon Kalender (Daily-Login): Kristallkalender mit Goldringen."
+ },
+ "ic_mail": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042756_0ad1f893-014a-444b-87cb-b489d7667c38.png",
+  "job": "0ad1f893-014a-444b-87cb-b489d7667c38",
+  "type": "icon",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Utility-Icon Post: Gold-Umschlag mit violettem Kristallsiegel."
+ },
+ "ic_gear": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042758_10f0b02d-0cc0-46b6-8c95-6e6132151d3f.png",
+  "job": "10f0b02d-0cc0-46b6-8c95-6e6132151d3f",
+  "type": "icon",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Utility-Icon Einstellungen: Kristall-Zahnrad."
+ },
+ "ic_tent": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042800_4deec3f9-1bb9-4738-8fb6-95da9ea9cd1a.png",
+  "job": "4deec3f9-1bb9-4738-8fb6-95da9ea9cd1a",
+  "type": "icon",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Utility-Icon Events: violett-goldenes Kristallzelt."
+ },
+ "ic_compass": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042810_2d1a7716-4745-4feb-ac18-181ff41c5b82.png",
+  "job": "2d1a7716-4745-4feb-ac18-181ff41c5b82",
+  "type": "icon",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Utility-Icon Guide: goldener Kompass-Orb."
+ },
+ "ic_rank": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042812_96d96875-0ad7-4b28-ac69-131f972f9fa0.png",
+  "job": "96d96875-0ad7-4b28-ac69-131f972f9fa0",
+  "type": "icon",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Utility-Icon Rangliste: Pokal auf Kristallpodest."
+ },
+ "ic_helm": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042814_1e1d8383-da1d-4f44-a1a0-429e5d919143.png",
+  "job": "1e1d8383-da1d-4f44-a1a0-429e5d919143",
+  "type": "icon",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Utility-Icon Helden: goldener Flügelhelm."
+ },
+ "ic_quest": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042816_291cc3cc-0039-4df8-bbb1-84fa97250b3a.png",
+  "job": "291cc3cc-0039-4df8-bbb1-84fa97250b3a",
+  "type": "icon",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Utility-Icon Quests: Schriftrolle mit Smaragd-Siegel."
+ },
+ "ic_war": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042818_625922e2-1731-4af8-ba70-c819bbb8b615.png",
+  "job": "625922e2-1731-4af8-ba70-c819bbb8b615",
+  "type": "icon",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Utility-Icon Clankrieg: gekreuzte Kristallschwerter."
+ },
+ "ic_hourglass": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042820_1e88ee2a-8d71-4f76-b884-0f814ab9f57e.png",
+  "job": "1e88ee2a-8d71-4f76-b884-0f814ab9f57e",
+  "type": "icon",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Utility-Icon Timer: Kristall-Sanduhr mit Goldgestell."
+ },
+ "ic_plus": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_043121_14d3e7f4-4aa6-4a17-b5e8-68ff66b6d7e1.png",
+  "job": "14d3e7f4-4aa6-4a17-b5e8-68ff66b6d7e1",
+  "type": "icon",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Utility-Icon Plus-Button (Ressourcen hinzukaufen): goldenes Plus in Kristallrahmen."
+ },
+ "ic_gift": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_043123_c176ec0e-f156-4ef4-8af1-a11d0878a39f.png",
+  "job": "c176ec0e-f156-4ef4-8af1-a11d0878a39f",
+  "type": "icon",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Utility-Icon Geschenk: blaue Kristallbox mit smaragdgrüner Schleife."
+ },
+ "nav_clan": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_050047_94ca1b29-24d0-4367-9d2f-a6b4d3f238e3.png",
+  "job": "94ca1b29-24d0-4367-9d2f-a6b4d3f238e3",
+  "type": "nav",
+  "size": "1024x1024",
+  "batch": 6,
+  "beschreibung": "Bottom-Nav CLAN V2: silber-weißes Kristallschild mit Gold-Filigran, smaragdgrünem Hexagon-Wappenstein und gekreuzten Schwertern. Ersetzt nav_clan_v1."
  }
 }
