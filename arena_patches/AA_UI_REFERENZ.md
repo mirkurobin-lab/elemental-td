@@ -2126,3 +2126,31 @@ des Clans ist. Fehlend:
 6. **Helle Panels** nach §20.3, damit der Clan sich wie bei AA vom Rest abhebt.
 
 Punkte 1–4 sind reine CSS/JS-Choreografie und kosten kein Asset.
+
+### 20.6 Zwei Fehler, die erst der Browsertest mit echtem CDN zeigte
+
+Die lokale Playwright-Suite kann das CDN nicht erreichen — dort greifen ueberall die
+Emoji-Fallbacks. Layout und Farbflaechen sind so pruefbar, die **Assets selbst nicht**.
+Deshalb wurde derselbe Markup-Ausschnitt zusaetzlich im Higgsfield-Sandbox-Browser gerendert,
+der das CDN erreicht. Das deckte zwei Fehler auf, die lokal unsichtbar bleiben:
+
+**1. Sektions-Ribbons waren unlesbar.** Die Ribbon-PNGs wurden auf dunklem Grund generiert,
+dieser Grund ist im Bild eingebacken. Als Vollflaechen-Hintergrund deckte er die helle
+CSS-Platte zu — die dunkle Ueberschrift stand damit auf Dunkel. Lokal fiel das nicht auf,
+weil ohne CDN nur die helle Platte zu sehen war.
+
+*Fix:* `background-blend-mode:screen,normal`. Der dunkle PNG-Grund faellt gegen die helle
+Platte weg, das helle Band bleibt als Ornament stehen. Damit ist die Ueberschrift in allen
+drei Zustaenden lesbar: ohne Bild, mit Bild und bei CDN-Ausfall. Im Sandbox-Browser
+gegengeprueft (Varianten A–E, `screen` gewinnt).
+
+**2. Icon-Untergrenze liegt bei 20 px.** `ic_donate` im Spenden-Knopf (14 px) war ein
+unlesbarer Klumpen — diese Artworks tragen zu viel Detail fuer Knopfgroesse. Gemessen:
+14 px unbrauchbar, 20 px lesbar.
+
+*Fix:* Der kleine Knopf traegt **kein** Icon mehr (gruen + „SPENDEN" ist eindeutig genug).
+`ic_donate` sitzt jetzt mit 22 px an der Kontingent-Zeile, wo Flaeche ist, und ankert die
+Sektion als „Geben". `ic_request` im vollbreiten Knopf wurde von 16 auf 20 px gezogen.
+
+**Regel fuer alles Weitere:** Diese Artworks brauchen **mindestens 20 px**. Wo weniger Platz
+ist, gehoert kein Bild hin — dort tragen Farbe und Wort die Bedeutung.

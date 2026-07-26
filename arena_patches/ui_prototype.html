@@ -990,9 +990,18 @@ span.ico{mix-blend-mode:normal;text-align:center}
   background-repeat:no-repeat;background-position:center;background-size:100% 100%,100% 100%;
   background-image:linear-gradient(180deg,#e9eef3,#b8c6d2 52%,#8fa2b3);
   border-radius:var(--radius-sm);
-  filter:drop-shadow(0 3px 7px #0009)}
+  filter:drop-shadow(0 3px 7px #0009);
+  /* Die Ribbon-PNGs haben einen DUNKLEN Hintergrund eingebacken (sie
+     wurden auf dunklem Grund generiert). Ohne Blend deckt der die helle
+     Platte zu und die dunkle Schrift steht auf Dunkel — im Browsertest
+     mit erreichbarem CDN nachgewiesen. `screen` laesst den dunklen Grund
+     des PNGs wegfallen und nur das helle Band stehen; die Platte
+     darunter bleibt die Textgrundlage. Damit ist die Ueberschrift in
+     ALLEN drei Zustaenden lesbar: ohne Bild, mit Bild, bei CDN-Ausfall. */
+  background-blend-mode:screen,normal}
 .secribbon.sm{min-height:28px;padding:4px 40px;
-  background-image:linear-gradient(180deg,#dfe7ee,#aebdcb 52%,#8799aa)}
+  background-image:linear-gradient(180deg,#dfe7ee,#aebdcb 52%,#8799aa);
+  background-blend-mode:screen,normal}
 .secribbon .srt{font-size:12px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;
   /* dunkle Schrift auf hellem Ribbon — NIE .goldtext */
   -webkit-text-fill-color:#1a2530;color:#1a2530;text-shadow:0 1px 0 #ffffff8c;
@@ -1926,8 +1935,11 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   100% {transform:translate(-50%,-64%) scale(1);opacity:0}
 }
 /* Spenden-Knopf mit Icon: das Icon sitzt links vom Wort. */
-.donbtn img{width:14px;height:14px;object-fit:contain;vertical-align:-2px;margin-right:4px}
-.askbtn img{width:16px;height:16px;object-fit:contain;vertical-align:-3px;margin-right:5px}
+/* 20 px ist die Untergrenze, ab der diese Artworks lesbar bleiben — bei
+   14-16 px werden sie zu Kluempchen (im Browsertest mit echtem CDN
+   geprueft). Deshalb tragen nur Knoepfe MIT Flaeche ein Icon. */
+.askbtn img{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-right:6px}
+.quotabar img.qico{width:22px;height:22px;object-fit:contain;flex:0 0 22px}
 /* Karten-Wahl im Anfrage-Dialog */
 .pickgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
 .picktile{position:relative;border-radius:10px;border:2px solid #9aa3ad;padding:8px 4px;
@@ -5469,7 +5481,10 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
         (justSent && used && i === q.used - 1 ? " justused" : "") + '"></span>';
     }
     var html = secribbon("Sendekontingent");
-    html += '<div class="quotabar"><span>Sendekontingent</span>' +
+    // Das Spenden-Artwork sitzt HIER, wo Flaeche ist (22 px), und nicht
+    // im kleinen Knopf — es ankert die Sektion visuell als „Geben".
+    html += '<div class="quotabar">' + ico("ic_donate", "🤲", "qico") +
+      "<span>Sendekontingent</span>" +
       "<b>" + q.used + "/" + q.max + "</b>" +
       "<span>· " + (q.used ? "Reset in " + q.resetText : "voll verfügbar") + "</span>" +
       '<span class="qdots">' + dots + "</span></div>";
@@ -5482,7 +5497,11 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
         ? '<span class="gotpts">' + (r.closed ? "erfüllt" : "deine Anfrage") + "</span>"
         : '<button class="donbtn pressable' + (can ? "" : " is-disabled") +
           '" data-donate="' + r.id + '">' +
-          (r.closed ? "voll" : ico("ic_donate", "🤲") + "SPENDEN") + "</button>";
+          // BEWUSST ohne Icon: ic_donate ist bei 14 px im Knopf ein
+          // Klumpen (im Browsertest geprueft). Der gruene Knopf mit dem
+          // Wort ist eindeutig genug; das Icon braucht Flaeche und wird
+          // deshalb nur dort eingesetzt, wo sie da ist.
+          (r.closed ? "voll" : "SPENDEN") + "</button>";
       return '<div class="reqrow tinted edge' + (r.mine ? " mine" : "") +
         (r.closed ? " full" : "") + '" data-req="' + r.id +
         '" style="' + tintStyle(r.cardId) + '">' +
