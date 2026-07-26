@@ -1018,114 +1018,260 @@ span.ico{mix-blend-mode:normal;text-align:center}
 .decotile .dart{display:block;font-size:22px;margin-bottom:3px}
 
 /* ==================================================================
- * MATCH-ENDE (arena_matchend.js · AA_UI_REFERENZ §9.3)
+ * MATCH-ENDE — nachgebaut nach AAs Endscreen (IMG_3319-3321, Arena 5)
  * ------------------------------------------------------------------
- * Zwei Reiter: „Ergebnis" (Belohnung + Anschluss) und „Schaden"
- * (Bilanz beider Seiten). AA hat nur die Belohnungsansicht.
+ * AAs Aufbau, von oben nach unten:
+ *   Verlierer-Podest (ROT) mit Kronen-Abzeichen und Wimpel-Banner,
+ *   darunter „VS" und „GEWINNER!", darunter das Sieger-Podest (BLAU),
+ *   darunter drei Belohnungskarten in einer Reihe, unten links zwei
+ *   kleine Knoepfe (Balkendiagramm = Werte, Teilen), unten rechts die
+ *   Emote-Blase, ganz unten „TIPPEN ZUM SCHLIESSEN".
  *
- * Die Schadensbalken beider Seiten laufen auf EINER Skala — der
- * groesste Einzelschaden im Match ist 100 %. Nur so ist der Vergleich
- * ueber den Spielerwechsel hinweg aussagekraeftig; getrennte Skalen
- * wuerden jede Seite gleich stark aussehen lassen.
+ * Die Farben sind IDENTITAETEN, keine Zustaende: Blau ist immer die
+ * eigene Seite, Rot immer der Gegner — dieselbe Zuordnung wie bei den
+ * Podesten und den Reitern im Werte-Fenster. Deshalb wechselt beim
+ * Reiterwechsel nicht die Knopffarbe, sondern der RAHMEN der Kopfkarte.
  * ================================================================== */
-.mehead{position:relative;border-radius:var(--radius);padding:14px 12px 12px;
-  text-align:center;overflow:hidden;margin-bottom:var(--gap)}
-.mehead.win{background:radial-gradient(120% 130% at 50% 0%,#3c6b2a,#1d3319 62%,#141d26)}
-.mehead.lose{background:radial-gradient(120% 130% at 50% 0%,#6b2a2a,#331919 62%,#141d26)}
-.mehead .meh{font-size:30px;font-weight:900;letter-spacing:.1em;line-height:1}
-.mehead.win .meh{color:#bdf59a;text-shadow:0 2px 0 #0b2405,0 0 22px #7ad14f66}
-.mehead.lose .meh{color:#f5b0a0;text-shadow:0 2px 0 #240b05}
-.mehead .mesub{margin-top:6px;font-size:10.5px;color:#cfd6ddb8;font-weight:700}
-/* Trophaeen-Delta ist die wichtigste Zahl des Screens — entsprechend gross. */
-.medelta{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:9px;
-  font-size:26px;font-weight:900}
-.medelta img,.medelta span.ico{width:24px;height:24px;object-fit:contain}
-.medelta.up{color:#ffd76b}
-.medelta.down{color:#f59a8a}
-.medelta small{font-size:11px;color:#cfd6dd99;font-weight:800;align-self:flex-end;
-  margin-bottom:5px}
-/* Belohnungszeile */
-.merew{display:flex;gap:var(--gap);margin-bottom:var(--gap)}
-.merewc{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);
-  padding:9px 8px;text-align:center}
-.merewc .mrv{display:flex;align-items:center;justify-content:center;gap:5px;
-  font-size:15px;font-weight:900;color:#e8f0f7}
-.merewc .mrv img{width:18px;height:18px;object-fit:contain}
-.merewc .mrk{font-size:9px;color:var(--dim);font-weight:700;margin-top:2px;
-  letter-spacing:.05em;text-transform:uppercase}
-/* Anschluss: naechster Knoten der Trophaeenstrasse. Der eigentliche
-   „nochmal"-Ausloeser — deshalb klickbar direkt in die Strasse. */
-.menode{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);
-  padding:10px;margin-bottom:var(--gap)}
-.menode .mnt{font-size:11.5px;font-weight:800;color:#dbe6ef;display:flex;
+/* Die Flaeche des Endscreens. AA legt hier einen dunklen, ins Gruene
+   gezogenen Verlauf ueber das Spielfeld — dieselbe Technik wie bei den
+   uebrigen View-Waschungen (AA_UI_REFERENZ §20.3), damit kein Kind mit
+   negativem z-index hinter dem eigenen Hintergrund verschwindet. */
+.meview{position:relative;min-height:100%}
+#viewMatchEnd.view{background-image:
+  radial-gradient(120% 90% at 50% 20%,#1a2a1e 0%,#0d1512 55%,#070a0b 100%)}
+/* ---- Podest ---- */
+.mepod{position:relative;margin:0 auto var(--gap);max-width:340px;text-align:center}
+.mecrowns{display:flex;align-items:flex-end;justify-content:center;gap:6px;
+  margin-bottom:-10px;position:relative;z-index:2}
+.mecrown{width:38px;height:44px;display:flex;align-items:center;justify-content:center;
+  font-size:19px;font-weight:900;
+  clip-path:polygon(50% 0,100% 26%,100% 74%,50% 100%,0 74%,0 26%);
+  box-shadow:0 3px 0 #0006}
+.mecrown.big{width:54px;height:62px;font-size:26px}
+.mecrown.blue{background:linear-gradient(180deg,#f4d97a,#c9a13a);color:#1c3f6e;
+  border:0}
+.mecrown.red{background:linear-gradient(180deg,#f4d97a,#c9a13a);color:#7e1f16}
+.mecrown.off{background:linear-gradient(180deg,#4a5560,#2b333c);color:#6d7883}
+/* Der Sockel: gewoelbtes Kissen plus Wimpel, die links und rechts
+   herauslaufen. Reines CSS — dafuer braucht es kein Asset. */
+.mebase{position:relative;border-radius:20px 20px 12px 12px;padding:16px 14px 12px;
+  box-shadow:inset 0 2px 0 #ffffff40,0 6px 16px #0008}
+/* mine = eigene Seite (BLAU), opp = Gegner (ROT). Bewusst NICHT
+   win/lose benannt: die Farbe ist eine Identitaet, kein Zustand — sonst
+   waere sie im Sieg und in der Niederlage vertauscht und der Spieler
+   muesste bei jedem Screen neu lernen, wer er ist. */
+.mepod.mine .mebase{background:linear-gradient(180deg,#3f8fe0,#1f5fa8 62%,#17457c)}
+.mepod.opp .mebase{background:linear-gradient(180deg,#e0603f,#a83a26 62%,#7d2b1c)}
+.mebase::before,.mebase::after{content:"";position:absolute;top:34%;width:26px;height:30px}
+.mepod.mine .mebase::before,.mepod.mine .mebase::after{background:#2f7bc9}
+.mepod.opp .mebase::before,.mepod.opp .mebase::after{background:#c14a30}
+/* Der Sieger steht unten, direkt ueber den Belohnungen, und wird groesser
+   gezeichnet. Das Podest des Verlierers sitzt oben und ist zurueckgenommen. */
+.mepod.small{max-width:270px;opacity:.9}
+.mepod.small .mebase{padding:11px 12px 9px}
+.mepod.small .mebase .mpn{font-size:14px}
+.mebase::before{left:-24px;clip-path:polygon(100% 0,100% 100%,0 78%,26% 50%,0 22%)}
+.mebase::after{right:-24px;clip-path:polygon(0 0,0 100%,100% 78%,74% 50%,100% 22%)}
+.mebase .mpn{font-size:16px;font-weight:900;color:#fff;text-shadow:0 2px 3px #0007;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mebase .mpc{margin-top:3px;font-size:11px;font-weight:800;color:#eaf3ff;
+  display:flex;align-items:center;justify-content:center;gap:5px}
+.mebase .mpc img{width:14px;height:14px;object-fit:contain}
+/* ---- VS / GEWINNER ---- */
+.mevs{text-align:center;margin:2px 0 6px}
+.mevs .vs{font-size:19px;font-weight:900;color:#fff;letter-spacing:.08em;
+  text-shadow:0 2px 3px #000a}
+.mevs .wl{font-size:27px;font-weight:900;letter-spacing:.03em;line-height:1.05;
+  color:#63e8ff;text-shadow:0 2px 0 #08303d,0 0 20px #63e8ff55}
+.mevs .wl.lose{color:#ff9d8a;text-shadow:0 2px 0 #3d1008}
+/* ---- Belohnungsreihe (drei Karten) ---- */
+.merew{display:flex;gap:var(--gap);margin:var(--gap-lg) auto var(--gap);max-width:340px}
+.merewc{position:relative;flex:1;border-radius:var(--radius-sm);padding:12px 6px 9px;
+  text-align:center;background:linear-gradient(180deg,#2b4f7e,#1b3557);
+  border:2px solid #4f89cf;box-shadow:0 3px 0 #12233a}
+.merewc .mrv{display:flex;align-items:center;justify-content:center;gap:4px;
+  font-size:15px;font-weight:900;color:#fff}
+.merewc .mrv img{width:20px;height:20px;object-fit:contain}
+.merewc .mrv small{font-size:11px}
+.merewc .mrk{font-size:8.5px;color:#bcd4ee;font-weight:800;margin-top:3px;
+  letter-spacing:.06em;text-transform:uppercase}
+/* Ecken-Marke wie AAs „?+2" und die Flamme */
+.merewc .mrbadge{position:absolute;top:-9px;right:-6px;min-width:26px;padding:2px 5px;
+  border-radius:9px;font-size:10px;font-weight:900;
+  background:linear-gradient(180deg,#f4d97a,#c9a13a);color:#3a2a06;
+  box-shadow:0 2px 4px #0008}
+.merewc .mrbadge.fire{background:linear-gradient(180deg,#ff9a3d,#e0451f);color:#fff}
+/* Zweizeilige Karte (Trophaeen + XP) */
+.merewc .mrline{display:flex;align-items:center;justify-content:center;gap:4px;
+  font-size:13px;font-weight:900;color:#fff}
+.merewc .mrline+.mrline{margin-top:4px}
+.merewc .mrline img{width:17px;height:17px;object-fit:contain}
+/* ---- Fussleiste: Werte / Teilen / Emote ---- */
+.mefoot{display:flex;align-items:center;gap:var(--gap);margin:var(--gap-lg) 0 4px}
+.mefbtn{width:44px;height:38px;border-radius:10px;display:flex;align-items:center;
+  justify-content:center;font-size:17px;
+  background:linear-gradient(180deg,#57c8ee,#2b8fc4);color:#fff;
+  box-shadow:0 3px 0 #1b6b95}
+.mefbtn img{width:20px;height:20px;object-fit:contain}
+/* Emote-Blase unten rechts — rund, das Bild fuellt sie ganz aus. */
+.mefbtn.em{width:46px;height:46px;border-radius:50%;overflow:hidden;padding:0;
+  background:linear-gradient(180deg,#f0e2bd,#c9ac74);box-shadow:0 3px 0 #8a7340}
+.mefbtn.em img{width:100%;height:100%;object-fit:cover}
+.mefoot .sp{flex:1}
+.metap{text-align:center;font-size:12px;font-weight:800;letter-spacing:.1em;
+  color:#ffffffb0;margin-top:var(--gap-lg);text-transform:uppercase}
+/* Anschluss-Bloecke bleiben, nur an die neue Flaeche angepasst. */
+.menode{max-width:340px;margin:0 auto var(--gap);background:#16263ac9;
+  border:1px solid #3c5f8a;border-radius:var(--radius-sm);padding:10px}
+.menode .mnt{font-size:11.5px;font-weight:800;color:#e8f0f7;display:flex;
   align-items:center;gap:6px}
 .menode .mnt img{width:16px;height:16px;object-fit:contain}
 .menode .mnb{position:relative;height:9px;border-radius:5px;margin-top:7px;overflow:hidden;
   background:#0b1116;border:1px solid #2b3b47}
 .menode .mnb i{position:absolute;left:0;top:0;bottom:0;
   background:linear-gradient(90deg,#f2c53d,#ffe9a3)}
-.menode .mns{font-size:9.5px;color:var(--dim);margin-top:5px}
-/* Level-Tipp — der Turm mit dem besten Schaden je Stufe. */
-.metip{display:flex;align-items:center;gap:9px;background:#141d26;
-  border:1px solid #2b3b47;border-left:3px solid #63d0ee;border-radius:var(--radius-sm);
-  padding:9px 10px;margin-bottom:var(--gap)}
+.menode .mns{font-size:9.5px;color:#a9bccb;margin-top:5px}
+.metip{display:flex;align-items:center;gap:9px;max-width:340px;margin:0 auto var(--gap);
+  background:#16263ac9;border:1px solid #3c5f8a;border-left:3px solid #63d0ee;
+  border-radius:var(--radius-sm);padding:9px 10px}
 .metip .mtart{flex:0 0 34px;width:34px;aspect-ratio:3/4;border-radius:6px;overflow:hidden;
   background:var(--panel2);display:flex;align-items:center;justify-content:center;font-size:16px}
 .metip .mtart img{width:100%;height:100%;object-fit:cover}
-.metip .mtx{flex:1;min-width:0;font-size:10.5px;color:#cfd6dd;line-height:1.45}
+.metip .mtx{flex:1;min-width:0;font-size:10.5px;color:#dbe6ef;line-height:1.45}
 .metip .mtx b{color:#9fe6ff}
-/* ---- Reiter „Schaden" ---- */
-.medv{font-size:11.5px;font-weight:800;color:#dbe6ef;text-align:center;
-  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);
-  padding:9px;margin-bottom:var(--gap)}
-.mesidehd{display:flex;align-items:baseline;gap:6px;margin:var(--gap-lg) 0 var(--gap)}
-.mesidehd .msn{font-size:12.5px;font-weight:900;color:#e8f0f7}
-.mesidehd .mst{margin-left:auto;font-size:10.5px;font-weight:800;color:var(--gold)}
-.mesidehd .msc{font-size:9.5px;color:var(--dim)}
-.mrow{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:var(--radius-sm);
-  border:1px solid var(--line);background:linear-gradient(180deg,#1b2732,#131c25);
-  margin-bottom:6px}
-.mrow.mvp{border-color:#f2c53d88;box-shadow:0 0 10px #f2c53d22}
-.mrow.isHero{border-color:#c39bff66;background:linear-gradient(180deg,#241f33,#161320)}
-.mrow .mrk2{flex:0 0 16px;font-size:10px;font-weight:900;color:#6d8497;text-align:center}
-.mrow .mart{flex:0 0 30px;width:30px;aspect-ratio:3/4;border-radius:5px;overflow:hidden;
-  background:var(--panel2);display:flex;align-items:center;justify-content:center;font-size:14px}
-.mrow .mart img{width:100%;height:100%;object-fit:cover}
-.mrow .mmid{flex:1;min-width:0}
-.mrow .mnm{font-size:11px;font-weight:800;color:#dbe6ef;display:flex;align-items:center;gap:5px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mrow .mnm img.el{width:13px;height:13px;object-fit:contain;flex:0 0 13px}
-/* Held-Marke und MVP-Marke: beides kleine Chips, damit die Zeile nicht
-   wackelt. Der Held ist markiert, weil sein Schaden NICHT mit Turmschaden
-   vergleichbar ist (andere Investition dahinter). */
-.mrow .chiph{flex:0 0 auto;font-size:8px;font-weight:900;letter-spacing:.06em;
-  padding:1px 5px;border-radius:4px;background:#c39bff;color:#1b1030}
-.mrow .chipm{flex:0 0 auto;font-size:8px;font-weight:900;letter-spacing:.06em;
-  padding:1px 5px;border-radius:4px;background:linear-gradient(180deg,#f4e3a6,#c9a13a);
-  color:#3a2a06}
-.mrow .mbar{position:relative;height:8px;border-radius:4px;margin-top:5px;overflow:hidden;
-  background:#0b1116;border:1px solid #2b3b47}
-.mrow .mbar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px}
-.mrow .msub{font-size:9px;color:var(--dim);margin-top:4px}
-.mrow .mnum{flex:0 0 auto;text-align:right}
-.mrow .mnum b{display:block;font-size:12px;font-weight:900;color:#e8f0f7}
-.mrow .mnum small{display:block;font-size:8.5px;color:var(--dim);font-weight:700}
-.menote{font-size:10px;color:var(--dim);line-height:1.5;margin-top:var(--gap);
-  border-left:2px solid #63d0ee66;padding-left:8px}
-/* Abschluss-Knoepfe */
-.mebtns{display:flex;gap:var(--gap);margin-top:var(--gap-lg)}
+.mebtns{display:flex;gap:var(--gap);max-width:340px;margin:var(--gap-lg) auto 0}
 .mebtn{flex:1;border-radius:var(--radius-sm);padding:12px 0;font-size:13px;font-weight:900;
   letter-spacing:.04em}
 .mebtn.again{background:linear-gradient(180deg,#58fa1b,#3aad16);color:#0a2404;
   box-shadow:0 3px 0 #1f6b09}
-.mebtn.next{background:var(--panel);color:#c2cfd9;border:1px solid var(--line);flex:0 0 38%}
+.mebtn.next{background:#1b3557;color:#cfe2f7;border:1px solid #4f89cf;flex:0 0 38%}
 /* Das Match-Ende ist ein ABSCHLUSS, keine Station: Solange es offen ist,
    verschwindet die Bottom-Nav. Sonst konkurrieren fuenf Reiseziele mit
    „Revanche" und genau der Anschluss geht verloren, um den es hier geht.
-   Im echten Spiel wird das ein Layer ueber dem Match — dieselbe Wirkung.
-   Der Platz unter den Knoepfen wird gleichzeitig frei. */
-body.me-open .bottomnav{display:none}
+   Im echten Spiel wird das ein Layer ueber dem Match — dieselbe Wirkung. */
+body.me-open nav.bottom{display:none}
+/* AA zeigt auf dem Endscreen KEINE Waehrungsleiste — der Screen soll das
+   Ergebnis erzaehlen, nicht den Kontostand. Die Belohnungskarten sagen
+   ohnehin schon, was dazugekommen ist. */
+body.me-open .topbar{display:none}
 body.me-open #viewMatchEnd.view{padding-bottom:22px}
+
+/* ==================================================================
+ * WERTE-FENSTER (AAs „STATS", IMG_3320/3321)
+ * ------------------------------------------------------------------
+ * Oeffnet aus dem Balkendiagramm-Knopf unten links. Aufbau: Bannertitel
+ * mit rotem X, Arena-Pille, Reiter ICH/GEGNER, Kopfkarte der Seite,
+ * darunter die Einheitenzeilen.
+ *
+ * Der BALKEN zeigt den Anteil der EIGENEN Seite — genau wie bei AA und
+ * damit passend zum Prozentlabel daneben. (Ein Balken auf gemeinsamer
+ * Skala haette dem eigenen Label widersprochen; der Quervergleich steht
+ * stattdessen als Gesamtschaden in den beiden Kopfkarten.)
+ * ================================================================== */
+.stlayer{position:fixed;inset:0;z-index:70;display:none;align-items:flex-start;
+  justify-content:center;padding:56px 10px 20px;background:#000000a8}
+.stlayer.open{display:flex}
+.stbox{position:relative;width:100%;max-width:390px;max-height:100%;
+  display:flex;flex-direction:column;
+  background:linear-gradient(180deg,#c3d5ea,#9db6d2);
+  border-radius:18px;border:2px solid #7f9dbe;box-shadow:0 12px 30px #000b}
+/* Bannertitel mit Pfeilenden — dieselbe Form, die AA fuer alle
+   Fenstertitel nutzt. Heller Grund, DUNKLE Schrift (nie .goldtext). */
+.sthead{position:relative;margin:-16px auto 0;min-width:60%;padding:9px 30px;
+  border-radius:12px;text-align:center;
+  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);
+  border:2px solid #7fd0ff;box-shadow:0 4px 10px #0007}
+.sthead .stt{font-size:15px;font-weight:900;letter-spacing:.1em;color:#fff;
+  text-shadow:0 2px 2px #0006}
+.stx{position:absolute;top:-13px;right:-9px;width:40px;height:40px;border-radius:11px;
+  font-size:19px;font-weight:900;color:#fff;
+  background:linear-gradient(180deg,#f2665a,#c22e22);border:2px solid #ffb0a6;
+  box-shadow:0 3px 0 #8b1a11}
+.starena{margin:10px auto 8px;padding:6px 20px;border-radius:11px;
+  background:#8fa9c6;border:1px solid #6f8caa;
+  font-size:13px;font-weight:900;letter-spacing:.06em;color:#16263a}
+.sttabs{display:flex;justify-content:center;gap:8px;padding:0 12px}
+.sttab{position:relative;padding:9px 26px;border-radius:11px 11px 0 0;
+  font-size:14px;font-weight:900;letter-spacing:.04em;color:#fff;
+  text-shadow:0 1px 2px #0006}
+.sttab.me{background:linear-gradient(180deg,#57c8ee,#2b8fc4);border:2px solid #9ae4ff;
+  border-bottom:0}
+.sttab.opp{background:linear-gradient(180deg,#f2665a,#c22e22);border:2px solid #ffb0a6;
+  border-bottom:0}
+.sttab{transform:translateY(4px);filter:brightness(.82) saturate(.9)}
+.sttab.on{transform:none;filter:none}
+/* Krone auf dem Reiter der Seite, die gewonnen hat. */
+.sttab .stcr{position:absolute;left:-7px;top:-12px;font-size:15px;
+  filter:drop-shadow(0 2px 2px #0008)}
+.stbody{flex:1;min-height:0;overflow-y:auto;padding:0 10px 12px;
+  -webkit-overflow-scrolling:touch}
+/* Kopfkarte. Der RAHMEN sagt, welche Seite man ansieht: blau = ich,
+   rot = Gegner. Genau so macht es AA. */
+.stcard{border-radius:12px;padding:8px;background:#5f7590;
+  border:3px solid #57c8ee;box-shadow:inset 0 0 0 1px #ffffff30}
+.stcard.opp{border-color:#f2665a}
+.stcrow{display:flex;align-items:center;gap:9px}
+.stav{flex:0 0 58px;width:58px;height:58px;border-radius:12px;overflow:hidden;
+  background:#2b3b4c;display:flex;align-items:center;justify-content:center;font-size:26px}
+.stav img{width:100%;height:100%;object-fit:cover}
+.stnm{flex:1;min-width:0}
+.stnm .n1{font-size:15px;font-weight:900;color:#fff;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.stnm .n2{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;
+  color:#dfe9f5;margin-top:2px}
+.stnm .n2 img{width:14px;height:14px;object-fit:contain}
+.sttro{flex:0 0 auto;text-align:right;background:#00000030;border-radius:8px;
+  padding:5px 8px}
+.sttro .k{font-size:9px;font-weight:800;color:#dfe9f5;letter-spacing:.04em}
+.sttro .v{display:flex;align-items:center;justify-content:flex-end;gap:4px;
+  font-size:14px;font-weight:900;margin-top:1px}
+.sttro .v img{width:16px;height:16px;object-fit:contain}
+.sttro .v.up{color:#7ef29a}
+.sttro .v.down{color:#ffb3a6}
+/* Zweite Zeile der Kopfkarte: Gesamtschaden und Siegrate */
+.stsum{display:flex;align-items:center;gap:8px;margin-top:7px;
+  background:#00000030;border-radius:8px;padding:6px 8px}
+.stsum .sk{font-size:10px;font-weight:800;color:#dfe9f5}
+.stsum .sv{font-size:14px;font-weight:900;color:#ffd76b}
+.stsum .sp{flex:1}
+.stsum .sv2{font-size:14px;font-weight:900;color:#7fe8ff}
+/* Einheitenzeile */
+.strow{display:flex;align-items:center;gap:9px;margin-top:7px;padding:7px 8px;
+  border-radius:11px;background:#5f7590;box-shadow:inset 0 0 0 1px #ffffff26}
+.strow.mvp{box-shadow:inset 0 0 0 2px #f2c53d}
+.start{position:relative;flex:0 0 46px;width:46px;aspect-ratio:1/1;border-radius:9px;
+  overflow:hidden;background:#2b3b4c;border:2px solid #9ab2cc;
+  display:flex;align-items:center;justify-content:center;font-size:19px}
+.start img{width:100%;height:100%;object-fit:cover}
+/* Raritaetsrahmen wie bei AA am Kartenbild */
+.start.t-common{border-color:#9aa3ad}
+.start.t-good{border-color:#5fd07a}
+.start.t-rare{border-color:#4aa8f0}
+.start.t-epic{border-color:#b478ff}
+.start.t-legendary{border-color:#f2c53d}
+.start.t-supreme{border-color:#ff7ad1}
+/* Anzahl-Marke („x2") unten rechts am Kartenbild */
+.stcnt{position:absolute;right:1px;bottom:0;font-size:9px;font-weight:900;color:#fff;
+  text-shadow:0 1px 2px #000,0 0 3px #000;line-height:1.1}
+.stmid{flex:1;min-width:0}
+.strow .sthero{display:inline-block;margin-left:5px;padding:1px 5px;border-radius:6px;
+  font-size:8.5px;font-weight:900;letter-spacing:.06em;vertical-align:middle;
+  background:linear-gradient(180deg,#f4d97a,#c9a13a);color:#3a2a06}
+.stmid .un{font-size:14px;font-weight:900;color:#fff;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.stbar{position:relative;height:15px;border-radius:8px;margin-top:5px;overflow:hidden;
+  background:#3d4d60;box-shadow:inset 0 1px 2px #0006}
+.stbar i{position:absolute;left:0;top:0;bottom:0;border-radius:8px;
+  background:linear-gradient(180deg,#ffd15c,#f0a021)}
+.stbar span{position:absolute;right:7px;top:0;bottom:0;display:flex;align-items:center;
+  font-size:11px;font-weight:900;color:#fff;text-shadow:0 1px 2px #0009}
+.stright{flex:0 0 auto;text-align:right}
+.ststars{display:flex;gap:1px;justify-content:flex-end;font-size:12px;line-height:1}
+.ststars i{font-style:normal;color:#f2c53d;text-shadow:0 1px 1px #0007}
+.ststars i.off{color:#4a5866}
+.stdmg{font-size:15px;font-weight:900;color:#fff;margin-top:2px}
+.stnote{font-size:9.5px;color:#33475e;line-height:1.5;margin-top:9px;
+  border-left:2px solid #6f8caa;padding-left:7px}
 
 /* ---------- FESTUNG (§9.9) ---------- */
 .castlewrap{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:16/9;
@@ -2382,6 +2528,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .manbody ul{margin:8px 0 0;padding-left:16px}
 .manbody li{font-size:10.5px;color:#a9bccb;line-height:1.6;margin-bottom:3px}
 .manbody li b{color:#dbe6ef}
+
 /* ==================================================================
  * PROFIL BEARBEITEN — Avatar-Raster + Rahmen-Reiter (AAs EDIT PROFILE)
  * ------------------------------------------------------------------
@@ -3007,24 +3154,54 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
        dieser View ist reine Praesentation. Mehr Stufen sind spaeter NUR
        Daten — die Karten rendern generisch aus allTracks(). -->
   <!-- ===== VIEW: MATCH-ENDE (arena_matchend.js · §9.3) =====
-       Der Screen, der uns gegen AA gefehlt hat. Zwei Reiter:
-         Ergebnis — Belohnung, naechster Trophaeenknoten, Level-Tipp
-         Schaden  — Bilanz beider Seiten auf gemeinsamer Skala,
-                    Helden mitgezaehlt und markiert
+       Nachgebaut nach AAs Endscreen (IMG_3319-3322). AAs Grammatik:
+       EIN Screen, keine Reiter — Verlierer-Podest oben, VS + Ergebnis,
+       Sieger-Podest unten, drei Belohnungskarten, Fussleiste. Der
+       Schadenszaehler ist bei AA KEIN Reiter, sondern liegt hinter dem
+       Balkendiagramm-Knopf unten links und oeffnet als eigenes Fenster.
+       Genau so hier: #meStatsBtn oeffnet #stLayer.
+
+       Was wir ZUSAETZLICH haben (unser Unterschied zu AA): der Anschluss.
+       AAs Screen ist eine Quittung; unserer zeigt darunter den naechsten
+       Trophaeenknoten und den Level-Tipp und wird damit zum Auftakt der
+       naechsten Runde.
+
        Im echten Spiel ruft arena_pan.html showMatchEnd(model) auf; im
        Prototyp gibt es zwei Demo-Knoepfe in den Einstellungen. -->
-  <section id="viewMatchEnd" class="view">
-    <div class="viewhead"><button class="backbtn" id="meBack">‹</button>
-      <h2 class="title">Match-Ende</h2></div>
-    <div id="meHead"></div>
-    <div class="tabs">
-      <button class="tab on" id="metabResult" data-metab="result">Ergebnis</button>
-      <button class="tab" id="metabDmg" data-metab="dmg">Schaden</button>
+  <section id="viewMatchEnd" class="view meview">
+    <!-- Reihenfolge kommt aus dem Ergebnis: der Verlierer steht oben. -->
+    <div id="meTop"></div>
+    <div class="mevs" id="meVs"></div>
+    <div id="meBottom"></div>
+    <div id="meRew"></div>
+    <div class="mefoot">
+      <button class="mefbtn pressable" id="meStatsBtn" aria-label="Werte">📊</button>
+      <button class="mefbtn pressable" id="meShareBtn" aria-label="Teilen">↗</button>
+      <span class="sp"></span>
+      <button class="mefbtn em pressable" id="meEmoteBtn" aria-label="Emote"></button>
     </div>
+    <!-- Anschluss-Bloecke (nicht bei AA) -->
     <div id="mePaneResult"></div>
-    <div id="mePaneDmg" style="display:none"></div>
+    <div class="metap pressable" id="meTap">Tippen zum Schließen</div>
     <p class="hint" id="meNote">—</p>
   </section>
+
+  <!-- ===== WERTE-FENSTER (AAs „STATS") =====
+       Oeffnet aus dem Balkendiagramm-Knopf. Reiter ICH/GEGNER sind
+       IDENTITAETEN (blau/rot) — welche Seite gerade offen ist, sagt der
+       Rahmen der Kopfkarte, nicht die Knopffarbe. -->
+  <div class="stlayer" id="stLayer">
+    <div class="stbox">
+      <button class="stx pressable" id="stClose" aria-label="Schließen">✕</button>
+      <div class="sthead"><span class="stt">WERTE</span></div>
+      <div class="starena" id="stArena">ARENA</div>
+      <div class="sttabs" id="stTabs">
+        <button class="sttab me on" data-stab="me">ICH</button>
+        <button class="sttab opp" data-stab="them">GEGNER</button>
+      </div>
+      <div class="stbody" id="stBody"></div>
+    </div>
+  </div>
 
   <section id="viewFortress" class="view">
     <h2 class="title">Festung</h2>
@@ -5352,7 +5529,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
    * baut das Modell mit ArenaMatchEnd.build(...) und ruft das hier auf.
    * Diese Funktionen rechnen nichts — sie stellen nur dar.
    * ================================================================== */
-  var meModel = null, meTab = "result";
+  var meModel = null;
 
   function meUnitName(u) {
     if (u.name) return u.name;
@@ -5375,34 +5552,75 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
         : c.art) + "</span>";
   }
 
-  function renderMatchEndHead() {
+  /* ---- Podest -------------------------------------------------------
+     `mine` entscheidet die FARBE (blau = ich, rot = Gegner), `big` die
+     Groesse. Die Reihenfolge im DOM entscheidet die Position: bei AA
+     steht der Verlierer oben, der Sieger unten ueber den Belohnungen. */
+  function mePodium(side, mine, big) {
+    var c = "";
+    for (var i = 0; i < 3; i++) {
+      var on = i < side.crowns;
+      c += '<span class="mecrown ' + (on ? (mine ? "blue" : "red") : "off") +
+        (big && i === 1 ? " big" : "") + '">♛</span>';
+    }
+    var d = side.trophyDelta;
+    var sub = "";
+    if (side.clan) sub += ico("hub_clan", "🛡️") + side.clan;
+    if (d !== null) {
+      sub += (sub ? " · " : "") + ico("cur_trophy", "🏆") +
+        (d >= 0 ? "+" : "") + fmt(d);
+    }
+    return '<div class="mepod ' + (mine ? "mine" : "opp") + (big ? "" : " small") +
+      '" data-mepod="' + (mine ? "me" : "them") + '">' +
+      '<div class="mecrowns">' + c + "</div>" +
+      '<div class="mebase">' +
+        '<div class="mpn">' + side.name + "</div>" +
+        (sub ? '<div class="mpc">' + sub + "</div>" : "") +
+      "</div></div>";
+  }
+
+  /* Verlierer oben, Sieger unten — unabhaengig davon, wer wir sind. Die
+     Position sagt „wer hat gewonnen", die Farbe sagt „wer bin ich". Zwei
+     Aussagen, zwei Kanaele, kein Konflikt. */
+  function renderMatchEndPodiums() {
     var m = meModel; if (!m) return;
+    var me = m.sides.me, them = m.sides.them;
+    $("meTop").innerHTML = m.isWin ? mePodium(them, false, false)
+                                   : mePodium(me, true, false);
+    $("meBottom").innerHTML = m.isWin ? mePodium(me, true, true)
+                                      : mePodium(them, false, true);
+    $("meVs").innerHTML = '<div class="vs">VS</div>' +
+      '<div class="wl' + (m.isWin ? "" : " lose") + '">' +
+      (m.isWin ? "GEWINNER!" : "NIEDERLAGE") + "</div>";
+    hydrateIcons($("meTop")); hydrateIcons($("meBottom"));
+  }
+
+  /* ---- Belohnungsreihe ---------------------------------------------- */
+  function renderMatchEndRewards() {
+    var m = meModel; if (!m) return;
+    var np = m.reward.packs.length;
     var d = m.reward.trophiesDelta;
-    $("meHead").innerHTML =
-      '<div class="mehead ' + (m.isWin ? "win" : "lose") + '">' +
-        '<div class="meh">' + m.headline + "</div>" +
-        '<div class="mesub">' + m.durationText + " · Welle " + m.waves + " · " +
-          m.sides.me.name + " vs " + m.sides.them.name + "</div>" +
-        '<div class="medelta ' + (d >= 0 ? "up" : "down") + '">' +
-          ico("cur_trophy", "🏆") +
-          "<span>" + (d >= 0 ? "+" : "") + fmt(d) + "</span>" +
-          "<small>" + fmt(m.reward.trophiesAfter) + " gesamt</small>" +
-        "</div>" +
+    $("meRew").innerHTML = '<div class="merew">' +
+      '<div class="merewc">' +
+        (np ? '<span class="mrbadge">+' + np + "</span>" : "") +
+        '<div class="mrv">' + ico("ic_gift", "🎁") + (np || "—") +
+        '</div><div class="mrk">Packs</div></div>' +
+      '<div class="merewc">' +
+        '<div class="mrline">' + ico("cur_trophy", "🏆") +
+          (d >= 0 ? "+" : "") + fmt(d) + "</div>" +
+        (m.reward.xp > 0
+          ? '<div class="mrline">' + ico("cur_xp", "✦") + "+" + fmt(m.reward.xp) + "</div>"
+          : "") +
+        '<div class="mrk">Trophäen' + (m.reward.xp > 0 ? " · XP" : "") + "</div></div>" +
+      '<div class="merewc"><div class="mrv">' + ico("cur_gold", "🪙") + fmt(m.reward.gold) +
+        '</div><div class="mrk">Gold</div></div>' +
       "</div>";
-    hydrateIcons($("meHead"));
+    hydrateIcons($("meRew"));
   }
 
   function renderMatchEndResult() {
     var m = meModel; if (!m) return;
-    var h = '<div class="merew">' +
-      '<div class="merewc"><div class="mrv">' + ico("cur_gold", "🪙") + fmt(m.reward.gold) +
-        '</div><div class="mrk">Gold</div></div>' +
-      '<div class="merewc"><div class="mrv">' + ico("cur_trophy", "🏆") +
-        (m.reward.trophiesDelta >= 0 ? "+" : "") + fmt(m.reward.trophiesDelta) +
-        '</div><div class="mrk">Trophäen</div></div>' +
-      '<div class="merewc"><div class="mrv">' + ico("ic_gift", "🎁") +
-        (m.reward.packs.length || "—") + '</div><div class="mrk">Packs</div></div>' +
-      "</div>";
+    var h = "";
 
     // Anschluss. Ohne diesen Block ist der Screen eine Quittung; mit ihm
     // ist er der Auftakt zur naechsten Runde.
@@ -5448,100 +5666,149 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     $("meClose").addEventListener("click", function () { UISfx.tap(); show("navHome"); });
   }
 
-  /* Eine Schadenszeile. `scale` ist die GEMEINSAME Skala beider Seiten —
-     deshalb wird sie hereingegeben und nicht je Seite neu bestimmt. */
-  function meRow(u, scale, dim) {
-    var w = scale > 0 ? (u.dmg / scale) * 100 : 0;
-    var el = BY_ID[u.cardId];
-    var bar = meUnitColor(u) + (dim ? ";opacity:.62" : "");
-    return '<div class="mrow' + (u.isMvp ? " mvp" : "") + (u.hero ? " isHero" : "") +
-      '" data-medmg="' + u.cardId + '">' +
-      '<span class="mrk2">#' + u.rank + "</span>" +
-      meArt(u, "mart") +
-      '<div class="mmid">' +
-        '<div class="mnm">' +
-          (el ? elIco(el.elem, el.art, "el") : "") +
-          "<span>" + meUnitName(u) + "</span>" +
-          (u.hero ? '<span class="chiph">HELD</span>' : "") +
-          (u.isMvp ? '<span class="chipm">MVP</span>' : "") +
-        "</div>" +
-        '<div class="mbar"><i style="width:' + w.toFixed(1) + "%;background:" +
-          bar + '"></i></div>' +
-        '<div class="msub">Stufe ' + u.lvl + " · " +
-          (u.measured ? fmt(Math.round(u.perLevel)) + " je Stufe" : "ohne Messung") +
-          (u.kills ? " · " + fmt(u.kills) + " Kills" : "") + "</div>" +
-      "</div>" +
-      '<div class="mnum"><b>' + fmt(u.dmg) + "</b><small>" +
-        (u.share * 100).toFixed(0) + " %</small></div>" +
-    "</div>";
-  }
+  /* ==================================================================
+   * WERTE-FENSTER — AAs „STATS", eine Seite je Reiter
+   * ------------------------------------------------------------------
+   * Der Balken zeigt den Anteil an der EIGENEN Seite (u.share), damit er
+   * zum Prozentlabel daneben passt. Der Quervergleich zwischen den
+   * Seiten steht als Gesamtschaden in der Kopfkarte — dafuer bleibt
+   * m.scale im Modell erhalten, diese Ansicht braucht es nur nicht.
+   * ================================================================== */
+  var stSide = "me";
 
-  function meSideBlock(side, label, scale, color) {
-    var h = '<div class="mesidehd"><span class="msn">' + label + "</span>" +
-      '<span class="msc">' + side.name + "</span>" +
-      '<span class="mst">' + fmt(side.total) + " Schaden</span></div>";
-    if (!side.units.length) {
-      h += '<div class="mrow"><div class="mmid"><div class="msub">Keine Einheiten ' +
-        "übermittelt.</div></div></div>";
-      return h;
-    }
-    h += side.units.map(function (u) { return meRow(u, scale, color); }).join("");
-    // Aufteilung Türme/Held nur zeigen, wenn ein Held dabei war — sonst
-    // ist die Zeile eine leere Behauptung.
-    if (side.heroTotal > 0) {
-      h += '<div class="msub" style="padding:0 4px 2px;font-size:9.5px;color:#8fa0ad">' +
-        "Türme " + fmt(side.towerTotal) + " · Held " + fmt(side.heroTotal) + "</div>";
+  function stStars(u) {
+    var h = "";
+    for (var i = 0; i < u.starsMax; i++) {
+      h += "<i" + (i < u.stars ? "" : ' class="off"') + ">★</i>";
     }
     return h;
   }
 
-  function renderMatchEndDmg() {
+  /* Kartenbild mit Raritaetsrahmen und Anzahl-Marke — wie bei AA. */
+  function stArt(u) {
+    var c = BY_ID[u.cardId] || { art: "❔" };
+    var key = "card_" + u.cardId;
+    return '<span class="start t-' + u.tier + '">' +
+      (ASSETS[key]
+        ? '<img src="' + ASSETS[key] + '" alt="' + c.art + '" onerror="UIIcon.fail(this)">'
+        : c.art) +
+      (u.count > 1 ? '<span class="stcnt">x' + u.count + "</span>" : "") +
+      "</span>";
+  }
+
+  function stRow(u) {
+    var el = BY_ID[u.cardId];
+    var w = (u.share * 100);
+    return '<div class="strow' + (u.isMvp ? " mvp" : "") + (u.hero ? " isHero" : "") +
+      '" data-stdmg="' + u.cardId + '">' +
+      stArt(u) +
+      '<div class="stmid"><div class="un">' +
+        (el ? elIco(el.elem, el.art, "el") : "") + meUnitName(u) +
+        (u.hero ? '<span class="sthero">HELD</span>' : "") + "</div>" +
+        '<div class="stbar"><i style="width:' + w.toFixed(1) + '%"></i>' +
+          "<span>" + w.toFixed(0) + " %</span></div>" +
+      "</div>" +
+      '<div class="stright"><div class="ststars">' + stStars(u) + "</div>" +
+        '<div class="stdmg">' + fmt(u.dmg) + "</div></div>" +
+    "</div>";
+  }
+
+  function renderStats() {
     var m = meModel; if (!m) return;
-    var h = '<div class="medv">' + m.verdict + "</div>";
-    h += meSideBlock(m.sides.me, "Du", m.scale, false);
-    // Gegnerseite: dieselben ELEMENTFARBEN, nur gedaempft. Ein grauer
-    // Balken hatte sich wie „deaktiviert" gelesen — und die Elementfarbe
-    // ist die nuetzlichere Information. Welche Seite man ansieht, sagen
-    // ohnehin der Seitenkopf und die Zeilentoenung.
-    h += meSideBlock(m.sides.them, "Gegner", m.scale, true);
-    h += '<div class="menote">Beide Seiten liegen auf <b>derselben Skala</b> — der größte ' +
-      "Einzelschaden im Match ist der volle Balken. Nur so ist der Vergleich über den " +
-      "Spielerwechsel hinweg aussagekräftig.<br>" +
-      "<b>Je Stufe</b> zeigt, was eine investierte Stufe zurückgibt — der ehrlichste " +
-      "Hinweis darauf, was sich zu leveln lohnt.";
+    var mine = stSide === "me";
+    var side = mine ? m.sides.me : m.sides.them;
+    var d = side.trophyDelta;
+    var ai = ARENA_TIERS[arenaIndexFor(DEMO_TROPHIES)];
+    $("stArena").textContent = "ARENA " + ai.n + " · " + ai.name.toUpperCase();
+
+    // Krone auf den Reiter der Seite, die gewonnen hat.
+    var tabs = $("stTabs").querySelectorAll("[data-stab]");
+    Array.prototype.forEach.call(tabs, function (b) {
+      var k = b.getAttribute("data-stab");
+      b.classList.toggle("on", k === stSide);
+      var winner = m.isWin ? "me" : "them";
+      var cr = b.querySelector(".stcr");
+      if (k === winner && !cr) {
+        var s = document.createElement("span");
+        s.className = "stcr"; s.textContent = "👑"; b.appendChild(s);
+      } else if (k !== winner && cr) { cr.remove(); }
+    });
+
+    var h = '<div class="stcard' + (mine ? "" : " opp") + '"><div class="stcrow">' +
+      '<span class="stav">' +
+        (side.avatarKey && ASSETS[side.avatarKey]
+          ? '<img src="' + ASSETS[side.avatarKey] + '" alt="🧙" onerror="UIIcon.fail(this)">'
+          : "🧙") +
+      "</span>" +
+      '<div class="stnm"><div class="n1">' + side.name + "</div>" +
+        '<div class="n2">' + (side.flag ? side.flag + " " : "") +
+          (side.clan ? ico("hub_clan", "🛡️") + side.clan : "Kein Clan") + "</div></div>" +
+      '<div class="sttro"><div class="k">TROPHÄEN</div>' +
+        '<div class="v ' + (d === null ? "" : (d >= 0 ? "up" : "down")) + '">' +
+          ico("cur_trophy", "🏆") +
+          (d === null ? "—" : (d >= 0 ? "+" : "") + fmt(d)) + "</div></div>" +
+      "</div>" +
+      '<div class="stsum"><span class="sk">Schaden</span><span class="sv">' +
+        fmt(side.total) + "</span><span class=\"sp\"></span>" +
+        '<span class="sk">Siegrate</span><span class="sv2">' +
+        (side.winRate === null ? "—" : Math.round(side.winRate * 100) + " %") +
+      "</span></div></div>";
+
+    if (!side.units.length) {
+      h += '<div class="strow"><div class="stmid"><div class="un">Keine Einheiten ' +
+        "übermittelt.</div></div></div>";
+    } else {
+      h += side.units.map(stRow).join("");
+      // Aufteilung Türme/Held nur zeigen, wenn ein Held dabei war — sonst
+      // ist die Zeile eine leere Behauptung.
+      if (side.heroTotal > 0) {
+        h += '<div class="stnote">Türme <b>' + fmt(side.towerTotal) + "</b> · Held <b>" +
+          fmt(side.heroTotal) + "</b></div>";
+      }
+    }
+
+    h += '<div class="stnote">' + m.verdict + "<br>Der Balken zeigt den Anteil an " +
+      "dieser Seite — deshalb passt er zum Prozentwert daneben. Der Vergleich der " +
+      "Seiten steht als <b>Schaden</b> in der Kopfkarte.";
     if (!m.sides.me.anyMeasured) {
       h += "<br><b>Hinweis:</b> Für dieses Match wurde kein Schaden gezählt. " +
         "Im Spiel liefert arena_pan.html die Werte (siehe Kopf von arena_matchend.js).";
     }
     h += "</div>";
-    $("mePaneDmg").innerHTML = h;
-    hydrateIcons($("mePaneDmg"));
-    // Zeile antippen → Detailkarte der Turmkarte. Der Screen wird damit
+
+    $("stBody").innerHTML = h;
+    hydrateIcons($("stBody"));
+    // Zeile antippen → Detailkarte der Turmkarte. Das Fenster wird damit
     // zum Einstieg in die Progression, nicht zur Sackgasse.
-    Array.prototype.forEach.call($("mePaneDmg").querySelectorAll("[data-medmg]"), function (r) {
+    Array.prototype.forEach.call($("stBody").querySelectorAll("[data-stdmg]"), function (r) {
       r.addEventListener("click", function () {
-        var id = r.getAttribute("data-medmg");
-        if (BY_ID[id]) { UISfx.tap(); openDetail(id); }
+        var id = r.getAttribute("data-stdmg");
+        if (BY_ID[id]) { UISfx.tap(); closeStats(); openDetail(id); }
       });
     });
   }
 
-  function setMeTab(which) {
-    meTab = which;
-    $("mePaneResult").style.display = which === "result" ? "" : "none";
-    $("mePaneDmg").style.display = which === "dmg" ? "" : "none";
-    $("metabResult").classList.toggle("on", which === "result");
-    $("metabDmg").classList.toggle("on", which === "dmg");
-    if (which === "dmg") renderMatchEndDmg();
+  function openStats() {
+    if (!meModel) return;
+    $("stLayer").classList.add("open");
+    renderStats();
+    track("match_stats_opened", { side: stSide });
   }
+  function closeStats() { $("stLayer").classList.remove("open"); }
+  function setStSide(which) { stSide = which; renderStats(); }
 
   /* Einstiegspunkt fuer arena_pan.html. */
   function showMatchEnd(model) {
     if (!model) return;
     meModel = model;
-    renderMatchEndHead();
+    stSide = "me";
+    closeStats();
+    renderMatchEndPodiums();
+    renderMatchEndRewards();
     renderMatchEndResult();
-    setMeTab("result");
+    $("meEmoteBtn").innerHTML = ASSETS.emote_thanks
+      ? '<img src="' + ASSETS.emote_thanks + '" alt="😊" onerror="UIIcon.fail(this)">'
+      : "😊";
     $("meNote").textContent = "Logik: arena_matchend.js — Rangliste, Anteile, MVP, " +
       "gemeinsame Skala und Anschluss werden dort gerechnet, diese View stellt nur dar.";
     show("navMatchEnd");
@@ -5559,26 +5826,44 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   function demoMatchEnd(win) {
     var deck = DECK.slice(0, 4);
     var base = [
-      { cardId: deck[0], lvl: 16, tier: "rare",   dmg: 48210, hits: 312, kills: 41 },
-      { cardId: "solara", lvl: 8, tier: "epic",   dmg: 31900, hits: 88,  kills: 12, hero: true },
-      { cardId: deck[1], lvl: 12, tier: "good",   dmg: 22140, hits: 288, kills: 19 },
-      { cardId: deck[2], lvl: 4,  tier: "common", dmg: 14000, hits: 140, kills: 6 },
+      { cardId: deck[0], lvl: 16, tier: "rare",   dmg: 48210, hits: 312, kills: 41,
+        count: 3, stars: 2 },
+      { cardId: "solara", lvl: 8, tier: "epic",   dmg: 31900, hits: 88,  kills: 12, hero: true,
+        count: 1, stars: 3 },
+      { cardId: deck[1], lvl: 12, tier: "good",   dmg: 22140, hits: 288, kills: 19,
+        count: 2, stars: 1 },
+      { cardId: deck[2], lvl: 4,  tier: "common", dmg: 14000, hits: 140, kills: 6,
+        count: 4, stars: 0 },
     ];
     var opp = [
-      { cardId: "earth", lvl: 20, tier: "epic",   dmg: win ? 40300 : 60300, hits: 210, kills: 52 },
-      { cardId: "magmor", lvl: 7, tier: "rare",   dmg: 24800, hits: 64,  kills: 9, hero: true },
-      { cardId: "darkness", lvl: 9, tier: "good", dmg: 18400, hits: 176, kills: 14 },
+      // Im Niederlage-Fall muss der Gegner nicht nur die staerkste
+      // Einzeleinheit haben, sondern auch den hoeheren GESAMTschaden —
+      // sonst erzaehlt der Screen eine Niederlage mit besseren Zahlen und
+      // der Spieler lernt daraus das Falsche.
+      { cardId: "earth", lvl: 20, tier: "epic",   dmg: win ? 40300 : 78000, hits: 210, kills: 52,
+        count: 2, stars: 3 },
+      { cardId: "magmor", lvl: 7, tier: "rare",   dmg: 24800, hits: 64,  kills: 9, hero: true,
+        count: 1, stars: 2 },
+      { cardId: "darkness", lvl: 9, tier: "good", dmg: win ? 18400 : 26000, hits: 176, kills: 14,
+        count: 1, stars: 1 },
     ];
+    var d = win ? 39 : -18;
     return window.ArenaMatchEnd.build({
       result: win ? "victory" : "defeat",
       durationMs: win ? 258000 : 191000,
       wavesSurvived: win ? 14 : 9,
       trophiesBefore: DEMO_TROPHIES,
-      trophiesDelta: win ? 39 : -18,
+      trophiesDelta: d,
       gold: win ? 610 : 120,
+      xp: win ? 120 : 45,
       packs: win ? [{ tier: "bronze" }] : [],
-      me: { name: "Prisma-Magier", clan: "Prisma-Orden", units: base },
-      them: { name: "Netherghost", clan: null, units: opp },
+      // crowns/flag/winRate/avatarKey liefert im Spiel arena_pan.html.
+      me: { name: "Prisma-Magier", clan: "Prisma-Orden", units: base,
+            flag: "🇩🇪", winRate: 0.61, trophyDelta: d, crowns: win ? 3 : 1,
+            avatarKey: "card_solara" },
+      them: { name: "Netherghost", clan: null, units: opp,
+            flag: "🇯🇵", winRate: 0.54, trophyDelta: -d, crowns: win ? 1 : 3,
+            avatarKey: "card_magmor" },
     });
   }
 
@@ -8110,12 +8395,33 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     renderEditProfile();
     if (r && !r.neu.length) toast("Arena 5 ist schon abgeglichen.");
   });
-  /* Match-Ende: Reiter, Zurück und die zwei Demo-Einstiege. */
-  $("meBack").addEventListener("click", function () { show("navHome"); });
-  Array.prototype.forEach.call(document.querySelectorAll("[data-metab]"), function (b) {
+  /* Match-Ende: Fussleiste, Werte-Fenster und die zwei Demo-Einstiege.
+     Der Schadenszaehler liegt — wie bei AA — hinter dem Knopf unten
+     links, nicht hinter einem Reiter. */
+  $("meStatsBtn").addEventListener("click", function () { UISfx.tap(); openStats(); });
+  $("stClose").addEventListener("click", function () { UISfx.tap(); closeStats(); });
+  // Klick auf den dunklen Rand schliesst ebenfalls — Pflicht bei jedem
+  // Vollbild-Layer, sonst fuehlt sich das Fenster wie eine Falle an.
+  $("stLayer").addEventListener("click", function (e) {
+    if (e.target === $("stLayer")) { UISfx.tap(); closeStats(); }
+  });
+  Array.prototype.forEach.call($("stTabs").querySelectorAll("[data-stab]"), function (b) {
     b.addEventListener("click", function () {
-      UISfx.tap(); setMeTab(b.getAttribute("data-metab"));
+      UISfx.tap(); setStSide(b.getAttribute("data-stab"));
     });
+  });
+  $("meShareBtn").addEventListener("click", function () {
+    UISfx.tap(); track("match_share_tapped", {});
+    toast("Teilen — im echten Spiel geht hier das Systemblatt auf.");
+  });
+  $("meEmoteBtn").addEventListener("click", function () {
+    UISfx.confirm(); track("match_emote_tapped", {});
+    toast("Emote gesendet.");
+  });
+  // TIPPEN ZUM SCHLIESSEN: nur wenn das Werte-Fenster zu ist.
+  $("meTap").addEventListener("click", function () {
+    if ($("stLayer").classList.contains("open")) return;
+    UISfx.tap(); show("navHome");
   });
   $("btnDemoWin").addEventListener("click", function () { showMatchEnd(demoMatchEnd(true)); });
   $("btnDemoLose").addEventListener("click", function () { showMatchEnd(demoMatchEnd(false)); });
@@ -8404,6 +8710,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
                      claimGuideTask: claimGuideTask, claimGuideChapter: claimGuideChapter,
                      openDaily: openDaily, closeDaily: closeDaily,
                      renderProfile: renderProfile, renderHubTiles2: renderHubTiles,
+                     GD: function () { return window.ArenaGuide; },
                      renderEditProfile: renderEditProfile, setAvTab: setAvTab,
                      avPick: avPick, avTab: function () { return avTab; },
                      syncAvatarUnlocks: syncAvatarUnlocks, seedAvatars: seedAvatars,
