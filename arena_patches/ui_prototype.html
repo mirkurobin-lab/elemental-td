@@ -130,8 +130,21 @@ button{font-family:inherit;color:inherit;border:0;background:none;cursor:pointer
 /* ---------- Top-Bar (§1) ---------- */
 /* Die Leiste zentriert ihren Inhalt, statt ihn ueber die volle Breite zu
    ziehen — sonst entstehen genau die Luecken, die der Nutzer gemeldet hat. */
-.topbar{background:var(--top);padding:9px 10px;display:flex;gap:7px;align-items:center;
-  justify-content:center;border-bottom:1px solid #000;flex:0 0 auto}
+/* Kopf: Portrait links ueber beide Zeilen, Spalte rechts.
+   Masse aus IMG_3344 (921x2000 gerendert, Anteile davon):
+     Portrait   x   0,0-21,7 %   y  4,4-15,0 %
+     Waehrungen x  24,8-99,3 %   y  5,9-10,0 %
+     Namenszeile x 24,8-97,5 %   y 10,75-15,0 %
+   Das Portrait sitzt buendig am linken Rand und wird davon
+   angeschnitten — genau das gibt AAs Kopf seine Tiefe. */
+.apphead{background:var(--top);border-bottom:1px solid #000;flex:0 0 auto;
+  position:relative;display:flex;align-items:stretch;gap:0;padding:0 8px 0 0;
+  min-height:74px;overflow:visible;z-index:6}
+.apphead .headcol{flex:1;min-width:0;display:flex;flex-direction:column;
+  justify-content:center;gap:4px;padding:7px 0}
+.topbar{background:linear-gradient(180deg,#101922,#0a1017);border:1px solid #1d2a35;
+  border-radius:11px;padding:4px 7px;display:flex;gap:0;align-items:center;
+  justify-content:space-between;flex:0 0 auto;box-shadow:var(--mat-well)}
 /* ⚠ „Die Inhalte fuellen nicht richtig den Button" — der Befund stimmte
    und die Ursache war die Aufteilung. Jede Pille hatte `flex:1`, also ein
    Drittel der Leiste, egal wie lang ihre Zahl ist. Bei „1 136" blieb
@@ -141,18 +154,30 @@ button{font-family:inherit;color:inherit;border:0;background:none;cursor:pointer
    und Icon wie Zahl sind deutlich groesser.
    `flex:0 1 auto` statt `flex:1` heisst: so breit wie noetig, schrumpft
    nur bei Platznot. Damit fuellt der Inhalt die Pille wieder. */
-.cur{flex:0 1 auto;min-width:0;display:flex;align-items:center;gap:7px;background:#0d1519;
-  border:1px solid #1d2a33;border-radius:20px;padding:6px 12px;font-size:14px;font-weight:800;
-  white-space:nowrap;overflow:hidden}
+/* ⚠ Dritter Anlauf, diesmal am Bild abgelesen statt hergeleitet. AA hat
+   KEINE drei Pillen nebeneinander, sondern EINE dunkle Platte, in der die
+   drei Waehrungen ohne eigene Raender stehen (IMG_3344). Genau daran lag
+   die abgeschnittene Zahl: drei Pillen mit je 24 px Innenabstand und
+   2 px Rand fressen 78 px der 299 px, die der Kopf neben dem Portrait
+   noch hat. „1 136" wurde dadurch zu „1…".
+   Die Platte traegt jetzt der .topbar, die Waehrungen sind nur noch
+   Gruppen mit einem duennen Trenner dazwischen. */
+.cur{flex:0 1 auto;min-width:0;display:flex;align-items:center;gap:4px;
+  background:none;border:0;border-radius:0;padding:0 6px;font-size:14px;font-weight:800;
+  white-space:nowrap;overflow:visible}
+.cur + .cur{border-left:1px solid #1d2a35}
 .cur i{font-style:normal;font-size:17px;display:flex;align-items:center}
-.cur .ico{width:22px;height:22px}
+.cur .ico{width:21px;height:21px}
 /* Die Zahl bekommt Luft nach rechts, damit der Plus-Knopf nicht klebt. */
 .cur span:not(.plus){letter-spacing:.01em}
 /* Waehrungs-Pillen tragen die Identitaetsfarbe ihrer Waehrung: die Zahl
    und der Rand, nicht die ganze Flaeche — sonst kippt die Lesbarkeit. */
-.cur.c-gem{border-color:#2fd47a5c;box-shadow:inset 0 0 12px -6px #2fd47a}
+/* Die Randfarbe ist mit den Pillen entfallen; die Identitaet traegt jetzt
+   allein die Zahl — das war ohnehin die Regel (Farbflaeche kippt die
+   Lesbarkeit, DESIGNSYSTEM §5). */
+.cur.c-gem{box-shadow:none}
 .cur.c-gem span:not(.plus){color:var(--gemc)}
-.cur.c-gold{border-color:#f2c53d4a}
+.cur.c-gold{}
 .cur.c-gold span:not(.plus){color:var(--gold)}
 .cur.c-trophy span:not(.plus){color:#e8eef3}
 /* Plus-Knopf traegt jetzt ic_plus; das "+" bleibt als Fallback-Text. */
@@ -886,22 +911,57 @@ footer{padding:6px 12px 14px;text-align:center}
   border-radius:22px;pointer-events:none;
   background:radial-gradient(60% 60% at 50% 45%,#070b0fd9 0%,#070b0f8c 55%,#070b0f00 100%)}
 .arenakicker,.arenaname,.arenachip{position:relative}
-.arenakicker{font-size:11px;letter-spacing:.24em;font-weight:800;color:#b9c9d6;
-  text-transform:uppercase;text-shadow:0 1px 3px #000}
-.arenaname{font-size:31px;line-height:1.05;text-align:center;margin:4px 0 0}
-.arenachip{margin-top:6px;background:#0b1116d9;border:1px solid #3a4c5c;border-radius:20px;
+/* Bei AA sind beide Titelzeilen GLEICH gross und weiss („Arena 5:" /
+   „Aztec Grounds", je 2,3 % der Hoehe). Unser Kicker war 11 px klein und
+   der Name gold — zusammen las sich das als Unterzeile plus Ueberschrift
+   statt als ein zweizeiliger Titel. */
+.arenakicker{font-size:23px;line-height:1.1;font-weight:900;color:#fff;
+  letter-spacing:.01em;text-transform:none;
+  text-shadow:0 2px 0 #08111a,0 3px 10px #000c}
+.arenaname{font-size:23px;line-height:1.1;text-align:center;margin:0;
+  font-weight:900;color:#fff;text-shadow:0 2px 0 #08111a,0 3px 10px #000c}
+.arenachip{margin-top:4px;background:#0b1116d9;border:1px solid #3a4c5c;border-radius:20px;
   padding:4px 13px;font-size:10.5px;font-weight:800;letter-spacing:.1em;color:#cfe0ec}
 .crestmini{flex:0 0 30px;height:30px;border-radius:8px;font-size:15px;
   background:linear-gradient(180deg,#4a5f78,#1b2735);box-shadow:0 0 0 2px #e0b94a55;
   display:flex;align-items:center;justify-content:center}
-.progwrap{width:100%;margin-top:16px;display:flex;align-items:center;gap:8px}
-.progbar{flex:1;height:22px;border-radius:12px;position:relative;overflow:hidden;
+/* AAs Pass-Fortschritt unter dem Banner (x 26,6-74,4 %, also 82 % der
+   Mittelspalte). Medaillen-Chip aussen links, Stufenzahl im Sechseck
+   rechts, dazwischen ein flacher Balken. */
+.passprog{width:82%;margin:7px auto 0;display:flex;align-items:center;gap:7px}
+.passprog .ppm{font-style:normal;font-size:15px;flex:0 0 auto;display:flex;
+  align-items:center;filter:var(--frei) drop-shadow(0 1px 2px #000a)}
+.passprog .ppm .ico{width:19px;height:19px}
+.passprog .ppbar{flex:1;height:13px;border-radius:8px;overflow:hidden;
+  background:linear-gradient(180deg,#0a1017,#16202a);border:1px solid #2b3b47;
+  box-shadow:var(--mat-well)}
+.passprog .ppfill{height:100%;border-radius:8px;
+  background:linear-gradient(180deg,#8fd0ff,#3f8fd0 62%,#22587f);
+  box-shadow:0 0 8px #63b1ee66;transition:width var(--t-slow) var(--ease-out)}
+.passprog .ppn{flex:0 0 auto;min-width:26px;text-align:center;font-size:10.5px;
+  font-weight:900;color:#2a1d00;padding:2px 6px;border-radius:6px;
+  background:linear-gradient(180deg,#f4e3a6,#e0b94a 58%,#a8842a);
+  box-shadow:var(--mat-raised)}
+
+/* Trophaeenbalken: AA misst 31,5 % der BILDSCHIRMbreite — das sind 54 %
+   der Mittelspalte, nicht 100 %. Unserer war 41,9 % breit und wirkte
+   dadurch wie ein zweiter Pass-Balken. Die Trophaee sitzt INNEN links,
+   der Belohnungs-Chip haengt UNTER dem Balken. */
+.progwrap{width:54%;margin:0 auto;padding-bottom:16px;position:relative;
+  display:flex;align-items:center;gap:0}
+.progbar{flex:1;height:22px;border-radius:12px;position:relative;overflow:visible;
   background-repeat:no-repeat;background-position:center;background-size:100% 240%,100% 100%;
   background-image:linear-gradient(180deg,#0b1116,#16202a);border:1px solid #e0b94a4d}
+.progbar .pgico{position:absolute;left:-9px;top:50%;transform:translateY(-50%);z-index:3;
+  font-style:normal;font-size:15px;display:flex;align-items:center;
+  filter:var(--frei) drop-shadow(0 1px 3px #000c)}
+.progbar .pgico .ico{width:24px;height:24px}
+.progwrap .crestmini{position:absolute;left:50%;bottom:-2px;transform:translateX(-50%);
+  flex:0 0 30px;z-index:4}
 .progfill{position:absolute;left:2px;top:2px;bottom:2px;border-radius:10px;
   background:linear-gradient(180deg,#f4e3a6,#e0b94a 60%,#a8842a);box-shadow:0 0 10px #e0b94a80}
 .proglabel{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:10px;font-weight:900;letter-spacing:.05em;color:#0e1418;text-shadow:0 1px 0 #ffffff55}
+  font-size:9px;padding-left:20px;font-weight:900;letter-spacing:.05em;color:#0e1418;text-shadow:0 1px 0 #ffffff55}
 .homerow{display:flex;gap:10px;align-items:stretch;padding:14px 14px 0}
 .eventtile{flex:0 0 88px;border-radius:14px;border:1px solid #3a4c5c;
   background:linear-gradient(180deg,#243342,#141d26);display:flex;flex-direction:column;
@@ -1032,10 +1092,23 @@ footer{padding:6px 12px 14px;text-align:center}
 /* Buehne: Diorama plus Titel liegen uebereinander, wie bei AA. Die Buehne
    ist so hoch wie das Diorama, der Titel sitzt in ihrer unteren Haelfte
    und ragt darunter heraus — dadurch beginnt der Name in AAs Band. */
+/* ⚠ KORREKTUR meiner eigenen Referenz. §19.1 stand: „Der Name liegt AUF
+   dem Diorama, nicht darunter." Das war falsch. IMG_3344 in voller
+   Aufloesung zeigt eindeutig: der Titel steht UEBER dem Diorama, in
+   eigenem Raum, zweizeilig und gross —
+     „Arena 5:"      y 28,0-30,3 %
+     „Aztec Grounds" y 30,5-32,8 %
+     Chip „Neutral"  y 33,6-35,3 %
+     Diorama         y 36,0-55,0 %
+   Aus dem Ueberlagern folgte alles Weitere: das Diorama sass 12 Punkte
+   zu hoch, und weil der Titel keinen eigenen Platz brauchte, rutschten
+   Trophaeenbalken, Truhen und Kampfreihe 7 Punkte zu tief.
+   Der Titel ist deshalb kein Overlay mehr, sondern ein Geschwister. */
 .arenastage{position:relative;width:100%;display:flex;flex-direction:column;
-  align-items:center}
-.arenatitle{position:absolute;left:0;right:0;top:52%;display:flex;
-  flex-direction:column;align-items:center;pointer-events:none}
+  align-items:center;gap:0}
+.arenatitle{position:static;display:flex;order:-1;
+  flex-direction:column;align-items:center;pointer-events:none;
+  margin-bottom:10px}
 /* ⚠ „Arena in der Mitte ist zu klein" — gemessen stimmte das:
    AAs Diorama ist 52,7 % breit und 17,7 % hoch (IMG_3344), unseres war
    46 % breit bei 190 px Deckel, also auf einem 390-px-Geraet nur 43 %.
@@ -1043,7 +1116,11 @@ footer{padding:6px 12px 14px;text-align:center}
    ueberstimmt, sobald das Geraet breiter als 413 px war. */
 /* Das Diorama sitzt jetzt IN der Mittelspalte (58 % des Bildschirms).
    AAs Diorama misst 52,7 % des Bildschirms — das sind 91 % der Spalte. */
-.diorama{margin-top:0;width:90%;max-width:260px;aspect-ratio:4/3;border-radius:18px;
+/* AA misst 54,3 % der Bildschirmbreite und 19,0 % der Hoehe. Die
+   Mittelspalte ist 58,5 % breit, also braucht das Diorama 93 % davon —
+   nicht 90 %, und der 260-px-Deckel wuerde auf breiten Geraeten wieder
+   binden. */
+.diorama{margin-top:0;width:92%;max-width:300px;aspect-ratio:4/3;border-radius:18px;
   background-repeat:no-repeat;background-position:center;background-size:cover,cover;
   background-image:linear-gradient(160deg,#2c3a4b,#131c25);
   border:1px solid #ffffff1f;
@@ -3012,21 +3089,37 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
  *     Profilzeile, wo AA Postfach-, Freundes- und Menue-Icon hat (§14.3)
  *   · der erklaerende Fliesstext unter der Leiter
  * ================================================================== */
-.profrow{display:flex;align-items:center;gap:9px;padding:16px 14px 0}
-.avatar{position:relative;flex:0 0 40px;width:40px;height:40px;border-radius:50%;
-  background:conic-gradient(#63b1ee var(--xp,62%),#26343f 0);
-  display:flex;align-items:center;justify-content:center}
-.avatar i{width:32px;height:32px;border-radius:50%;font-style:normal;font-size:17px;
-  display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(160deg,#3a4c5c,#141d26);border:1px solid #0b1116}
-.avatar b{position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);
-  font-size:8px;font-weight:900;color:#0b1116;background:var(--gold);
-  border-radius:6px;padding:0 4px;line-height:11px}
-.profname{flex:1;min-width:0}
-.profname .pn{display:block;font-size:12.5px;font-weight:900;line-height:1.2;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.profname .px{display:block;font-size:9px;color:var(--dim);font-weight:700;margin-top:1px}
+/* Die Namensplatte ist bei AA ein eigener dunkler Koerper, nicht nur
+   Text auf dem Kopfgrund — sie hebt sich vom Portrait ab. */
+.profrow{display:flex;align-items:center;gap:7px;padding:0}
+.profname{flex:1;min-width:0;display:flex;align-items:center;gap:9px;
+  background:linear-gradient(180deg,#101922,#0a1017);border:1px solid #1d2a35;
+  border-radius:11px;padding:5px 11px;box-shadow:var(--mat-well)}
+.profname .pn{font-size:13px;font-weight:900;line-height:1.2;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.profname .px{font-size:10px;color:#cfe0ec;font-weight:900;flex:0 0 auto;
+  display:flex;align-items:center;gap:5px;
+  white-space:nowrap;border-left:1px solid #22303c;padding-left:8px}
+.xpring{width:17px;height:17px;border-radius:50%;flex:0 0 17px;
+  background:conic-gradient(#63b1ee var(--xp,62%),#1d2a35 0);
+  display:flex;align-items:center;justify-content:center;position:relative}
+.xpring::after{content:"XP";position:absolute;inset:2px;border-radius:50%;
+  background:#0a1017;font-size:6px;font-weight:900;color:#8fb7d6;
+  display:flex;align-items:center;justify-content:center;letter-spacing:.02em}
 .hubicons{display:flex;gap:5px;flex:0 0 auto}
+/* 21,7 % von 390 px sind 85 px. Das Portrait ist hochformatig (AA misst
+   200x212 im 921er Rendering) und ragt links aus dem Kopf heraus. */
+.avatar{position:relative;flex:0 0 21.7%;max-width:96px;align-self:stretch;
+  margin:0;border-radius:0;background:none;
+  display:flex;align-items:flex-end;justify-content:center;overflow:visible}
+.avatar i{position:absolute;left:-6%;right:-6%;top:-8px;bottom:-2px;
+  border-radius:14px;font-style:normal;font-size:34px;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(120% 90% at 50% 22%,#3a4c5c,#0d151c 78%);
+  border:0;box-shadow:inset 0 -14px 22px -10px #000c}
+.avatar b{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);z-index:2;
+  font-size:9px;font-weight:900;color:#0b1116;background:var(--gold);
+  border-radius:6px;padding:0 5px;line-height:13px;box-shadow:0 1px 3px #000a}
 /* ==================================================================
  * HUB-BAND — AAs Dreispaltigkeit, nachgemessen an IMG_3344
  * ------------------------------------------------------------------
@@ -3055,7 +3148,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
    Ansicht. Mit `.active` im Selektor gewinnt sie nur im richtigen
    Zustand. */
 #viewHome.view.active{display:flex;flex-direction:column;min-height:100%;padding-bottom:84px}
-#viewHome .hubband{flex:1 1 auto}
+#viewHome .hubband{flex:0 0 auto}
 /* stretch, nicht flex-start: sonst ist die Mittelspalte nur so hoch wie
    ihr Inhalt und das flex:1 der Arena-Buehne greift ins Leere. Die
    Schienen bleiben oben, weil ihre Kacheln feste Seitenverhaeltnisse
@@ -3064,14 +3157,17 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 /* Die Mittelspalte schiebt Diorama und Truhen auseinander, wenn Platz da
    ist — sie ist der Ort, an dem AA die Hoehe verteilt. */
 .hubmid{justify-content:flex-start}
-/* Der freie Platz gehoert NICHT gleichmaessig zwischen alle drei Kinder.
-   Bei AA liegt er komplett zwischen Arena-Chip (27 %) und Trophaeenbalken
-   (58 %) — 31 Punkte Luft, waehrend Balken und Truhenreihe direkt
-   aufeinander sitzen. space-between hat ihn halbiert und die Truhen auf
-   48 % gezogen. Jetzt: Buehne oben, Balken per margin-top:auto nach
-   unten, Truhen dicht darunter. */
-#viewHome .arenahero{flex:1 1 auto;justify-content:flex-start}
-#viewHome .arenahero .progwrap{margin-top:auto}
+/* ⚠ Zweite Korrektur an derselben Stelle. Vorher stand hier, der freie
+   Platz liege bei AA zwischen Chip und Trophaeenbalken. Auch das war eine
+   Folge der falsch gelesenen Titelposition: sobald der Titel UEBER dem
+   Diorama steht statt darauf, ist zwischen Chip und Balken gar keine Luft
+   mehr — die Elemente stehen dicht.
+   AAs freier Platz liegt woanders, naemlich UNTEN: die Kampfreihe endet
+   bei 82,5 %, die Bottom-Nav beginnt erst bei 91,5 %. Neun Punkte leer.
+   Deshalb waechst hier nichts mehr; der Rest sammelt sich unter der
+   Kampfreihe. */
+#viewHome .arenahero{flex:0 0 auto;justify-content:flex-start}
+#viewHome .homerow3{flex:0 0 auto;margin-bottom:auto}
 .hubrail{flex:0 0 17%;display:flex;flex-direction:column;gap:var(--gap)}
 .hubmid{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--gap)}
 /* Die Arena-Buehne hat ihren eigenen Aussenabstand verloren: sie sitzt
@@ -3614,6 +3710,21 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
        "Your Trophies: 425" im ersten Feld, dazu die Icon-Farbmessung
        (Feld 2 magenta #DC1DDB = Gem, Feld 3 goldgelb #F3B733 = Münze).
        Demo-Werte entsprechen dem Video-11-Account (1136 🏆 → Arena 4). -->
+  <!-- ==================================================================
+       KOPFBEREICH — AAs Aufbau, an IMG_3344 nachgemessen (1320x2868).
+       AA hat KEINE Waehrungsleiste ueber die volle Breite. Links steht
+       das Portrait (21,7 % breit, y 4,4-15,0 %) und ragt ueber BEIDE
+       Zeilen; rechts daneben stapeln sich Waehrungsleiste (y 5,9-10,0 %)
+       und Namensplatte (y 10,75-15,0 %). Deshalb ist der Avatar jetzt
+       Geschwister beider Zeilen statt Kind einer davon — anders kann er
+       nicht ueber beide reichen.
+       Der Kopf ist global, nicht nur auf der Startseite: AA zeigt ihn
+       auch hinter dem Profil- und dem Belohnungsfenster (IMG_3347,
+       IMG_3338). Die Namensplatte ist deshalb aus #viewHome hierher
+       gewandert. -->
+  <header class="apphead">
+    <span class="avatar" id="profAvatar"><i>🜂</i><b id="profLvl">4</b></span>
+    <div class="headcol">
   <div class="topbar">
     <div class="cur c-trophy"><i data-ico="cur_trophy" data-emoji="🏆"></i><span id="curTrophies">0</span></div>
     <div class="cur c-gem"><i data-ico="cur_gem" data-emoji="💚"></i><span id="curGems">0</span><span class="plus" data-plus>+</span></div>
@@ -3627,6 +3738,25 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
          Einsteiger-Guide und das Gegner-Nachschlagewerk zwei Dinge
          sind (AA_UI_REFERENZ §18.2). -->
   </div>
+    <div class="profrow">
+      <span class="profname"><span class="pn" id="profName">Prisma-Magier</span>
+        <!-- AA setzt hier einen XP-RING mit „Level 15" daneben, keinen
+             Fliesstext. Unser „Stufe 4 · 620/1000 XP" war 105 px breit und
+             hat den Spielernamen aus der Platte gedraengt. -->
+        <span class="px"><i class="xpring" id="profXpRing"></i><b id="profXp">Stufe 4</b></span></span>
+      <!-- AA hat hier NUR zwei Knoepfe: Freunde, dann Menue (IMG_3344,
+           gemessen bei x 77,3-97,5 % der Breite). -->
+      <span class="hubicons">
+        <button class="tbmenu tbfriends pressable" id="tbFriends" title="Freunde"
+                aria-label="Freunde"><i data-ico="ic_friends" data-emoji="👥"></i>
+          <i class="nb2" id="badgeFriends" style="display:none">0</i></button>
+        <button class="tbmenu pressable" id="tbMenu" aria-label="Menü"
+                aria-haspopup="true" aria-expanded="false">
+          <span></span><span></span><span></span></button>
+      </span>
+    </div>
+    </div>
+  </header>
   <!-- Aufklapp-Menue. Liegt bewusst NICHT in der Topbar: die ist
        overflow-begrenzt, das Menue muss darueber hinausragen. -->
   <div id="tbMenuLayer" hidden>
@@ -3723,35 +3853,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     <!-- 12 %: Profilzeile. Rechts die Icon-Leiste an der Stelle, an der
          AA Postfach-, Freundes- und Menue-Icon hat (§14.3). Alles, was
          frueher als zwei Kachelreihen den Screen fuellte, sitzt hier. -->
-    <div class="profrow">
-      <span class="avatar" id="profAvatar"><i>🜂</i><b id="profLvl">4</b></span>
-      <span class="profname"><span class="pn" id="profName">Prisma-Magier</span>
-        <span class="px" id="profXp">Stufe 4 · 620/1000 XP</span></span>
-      <!-- AA hat hier NUR zwei Knoepfe: Freunde, dann Menue (IMG_3344,
-           gemessen bei x 78-98 % der Namenszeile). Die fuenf Hub-Icons,
-           die vorher hier standen, sind bei AA die SEITENSCHIENEN neben
-           dem Pass-Banner — sie sind dorthin gewandert. -->
-      <span class="hubicons">
-        <!-- Freundesliste. Ort und Plattenklasse bleiben wie sie sind
-             (links vom Hamburger, AAs Reihenfolge), ebenso die Badge-Id.
-             Zwei Aenderungen:
-             (1) zusaetzliche Klasse .tbfriends — sonst macht die Regel
-                 `.tbmenu span` aus dem Emoji-Rueckfall einen
-                 Hamburger-Balken, und das Zeichen liest nicht bei seiner
-                 Anzeigegroesse (20-px-Regel, DESIGNSYSTEM §6).
-             (2) das Zeichen steckt in <i data-ico> statt als nacktes
-                 Emoji: ui_assets.json hat heute KEIN Personen-Motiv (alle
-                 174 Schluessel geprueft), ico() faellt deshalb auf 👥
-                 zurueck — und sobald "ic_friends" existiert, zieht der
-                 Knopf das Artwork ohne Code-Aenderung. -->
-        <button class="tbmenu tbfriends pressable" id="tbFriends" title="Freunde"
-                aria-label="Freunde"><i data-ico="ic_friends" data-emoji="👥"></i>
-          <i class="nb2" id="badgeFriends" style="display:none">0</i></button>
-        <button class="tbmenu pressable" id="tbMenu" aria-label="Menü"
-                aria-haspopup="true" aria-expanded="false">
-          <span></span><span></span><span></span></button>
-      </span>
-    </div>
+    <!-- Die Profilzeile ist in den globalen Kopf gewandert (siehe dort):
+         AA zeigt sie auf jedem Bildschirm, nicht nur auf der Startseite. -->
 
     <!-- ==================================================================
          DIE MITTLERE BANDBREITE — nach AAs Aufbau, nachgemessen an
@@ -3785,26 +3888,38 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
             <span class="pbd" id="pbSub">—</span></span>
           <span class="pbb" id="pbBtn">ÖFFNEN</span>
         </button>
+        <!-- AAs Pass-Fortschritt: eine eigene schmale Leiste DIREKT unter
+             dem Banner (x 26,6-74,4 %, y 24,0-27,25 %), mit Medaillen-Chip
+             links und der Stufenzahl in einem Sechseck rechts. Die hat uns
+             komplett gefehlt — das Banner endete im Nichts. -->
+        <div class="passprog" id="passProg">
+          <i class="ppm" data-ico="ic_medal" data-emoji="🎖"></i>
+          <div class="ppbar"><div class="ppfill" id="ppFill" style="width:0%"></div></div>
+          <b class="ppn" id="ppLvl">0</b>
+        </div>
     <div class="arenahero" id="arenaHero">
-      <!-- AAs Achse (§19.1), gemessen als OBERKANTEN und um AAs iOS-
-           Statusleiste (7 % von 2868 px) korrigiert:
-             Diorama 18 % · Arenaname 23 % · Chip 27 %
-           Der Abstand Diorama->Name betraegt bei AA nur 5 Punkte, das
-           Diorama selbst ist 12 Punkte hoch. Der Name liegt also AUF dem
-           Diorama, nicht darunter. Wir hatten ihn darunter, und dadurch
-           lagen Name und Chip 18 bis 19 Punkte zu tief. -->
+      <!-- AAs Achse, an IMG_3344 in voller Aufloesung nachgemessen:
+             Titel Zeile 1  28,0 %   Zeile 2  30,5 %
+             Chip           33,6 %
+             Diorama        36,0-55,0 %
+             Trophaeenbalken 57,0-60,5 % (nur 31,5 % breit!)
+             Truhen         63,75-70,5 %
+             Kampfreihe     72,0-82,5 %
+           Der alte Kommentar hier behauptete, der Name liege AUF dem
+           Diorama. Das war eine Fehllesung einer zu kleinen Vorlage. -->
       <div class="arenastage">
-        <button class="diorama" id="arenaDiorama" title="Arena-Rang"></button>
         <div class="arenatitle">
           <div class="arenakicker" id="arenaKicker">Arena 1</div>
-          <div class="arenaname goldtext" id="arenaName">Kristallhof</div>
+          <div class="arenaname" id="arenaName">Kristallhof</div>
           <div class="arenachip" id="arenaChip">◎ Neutral</div>
         </div>
+        <button class="diorama" id="arenaDiorama" title="Arena-Rang"></button>
       </div>
-      <!-- 58 %: Trophaeenbalken, Reward-Icon am rechten Ende (§14.3) -->
+      <!-- Trophaeenbalken: bei AA schmal (31,5 %), Trophaee INNEN links,
+           und der Belohnungs-Chip haengt UNTER dem Balken, nicht daneben. -->
       <div class="progwrap">
-        <i data-ico="cur_trophy" data-emoji="🏆" style="font-size:15px"></i>
         <div class="progbar" id="arenaProg">
+          <i data-ico="cur_trophy" data-emoji="🏆" class="pgico"></i>
           <div class="progfill" id="arenaProgFill" style="width:0%"></div>
           <div class="proglabel" id="arenaProgLabel">—</div>
         </div>
@@ -6192,7 +6307,9 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     var i = arenaIndexFor(t);
     var cur = ARENA_TIERS[i], nxt = ARENA_TIERS[i + 1] || null;
 
-    $("arenaKicker").textContent = "Arena " + cur.n;
+    // AA schreibt „Arena 5:" mit Doppelpunkt — die zweite Zeile ist die
+    // Fortsetzung, nicht eine eigene Ueberschrift.
+    $("arenaKicker").textContent = "Arena " + cur.n + ":";
     $("arenaName").textContent = cur.name;
     // AA zeigt hier den aktiven Map-Modifier; ohne Objective steht dort
     // wörtlich "Neutral". Bei uns immer neutral — die Welt ist random.
@@ -10525,7 +10642,10 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     var xpPct = 62;                            // Demo-XP-Ring
     $("profAvatar").style.setProperty("--xp", xpPct + "%");
     $("profName").textContent = "Prisma-Magier";
-    $("profXp").textContent = "Stufe 4 · 620/1000 XP";
+    $("profXp").textContent = "Stufe 4";
+    // Der Ring zeigt, was der Fliesstext vorher ausgeschrieben hat.
+    $("profXpRing").style.setProperty("--xp", xpPct + "%");
+    $("profXpRing").title = "620/1000 XP";
     /* Gewaehlter Avatar + Rahmen in der Profilzeile. Genau dieselben
        zwei Werte liest spaeter der Ladebildschirm und das In-Game-HUD
        (siehe HANDOFF.md, Abschnitt „Avatar-System"). */
@@ -10550,6 +10670,19 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
         " · endet in " + st.daysLeft + " Tag" + (st.daysLeft === 1 ? "" : "en");
       $("pbBtn").textContent = st.pending ? st.pending + " BEREIT" : "ÖFFNEN";
       UIBadge.set("pass", st.pending);
+      /* AAs Fortschrittsleiste unter dem Banner: der Balken zeigt den Weg
+         zur NAECHSTEN Stufe, das Sechseck rechts die erreichte Stufe —
+         nicht der Gesamtfortschritt der Saison. Genau so steht bei AA
+         eine „40" rechts, obwohl die Saison 50 Stufen hat. */
+      if ($("ppFill")) {
+        // ArenaPass.state() liefert xpInLevel/xpPerLevel — der Weg zur
+        // naechsten Stufe. Genau das zeigt AAs Balken.
+        var proz = st.xpPerLevel
+          ? Math.max(0, Math.min(100, st.xpInLevel / st.xpPerLevel * 100))
+          : (st.level / st.levels * 100);
+        $("ppFill").style.width = proz.toFixed(1) + "%";
+        $("ppLvl").textContent = st.level;
+      }
     }
     layer($("passBanner"), "pass_keyart");
   }
@@ -10789,7 +10922,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     var hintR = document.createElement("div"); hintR.className = "swhint r"; hintR.textContent = "›";
     document.body.appendChild(hintL); document.body.appendChild(hintR);
 
-    var aktiv = false, achse = null, x0 = 0, y0 = 0, t0 = 0, dx = 0, view = null, W = 320;
+    var aktiv = false, achse = null, x0 = 0, y0 = 0, t0 = 0, dx = 0, dy = 0, view = null, W = 320;
     var scroller = null;
     var laeuft = false;
 
@@ -10877,9 +11010,14 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
                           ziel: aktuellesZiel, laeuft: function () { return laeuft; } };
 
     app.addEventListener("pointerdown", function (e) {
+      /* Die Sperre gilt genau fuer den Klick, der zur GERADE beendeten
+         Geste gehoert. Bleibt sie stehen — weil unter dem Finger nichts
+         Klickbares lag —, frisst sie den naechsten echten Klick. Beim
+         naechsten Druck ist sie deshalb wieder offen. */
+      klickSperre = false;
       if (laeuft || offen() || aktuellesZiel() === null) return;
       if (e.pointerType === "mouse" && e.button !== 0) return;
-      aktiv = true; achse = null; dx = 0;
+      aktiv = true; achse = null; dx = 0; dy = 0;
       x0 = e.clientX; y0 = e.clientY; t0 = Date.now();
       // Den Scroller JETZT merken: beim Loslassen kann das Element
       // unter dem Finger schon ein anderes sein.
@@ -10891,6 +11029,10 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     app.addEventListener("pointermove", function (e) {
       if (!aktiv || !view) return;
       var ax = e.clientX - x0, ay = e.clientY - y0;
+      // Weg IMMER mitschreiben, auch wenn die Achse senkrecht ist —
+      // die Klick-Sperre haengt am zurueckgelegten Weg, nicht an der
+      // Richtung (siehe los()).
+      dx = ax; dy = ay;
       if (achse === null) {
         if (Math.abs(ax) < 7 && Math.abs(ay) < 7) return;
         // Einmal entscheiden, dann dabei bleiben. Ein Umschalten mitten
@@ -10913,10 +11055,33 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       hinweis(!ende && dx > 40, !ende && dx < -40);
     }, { passive: true });
 
+    /* ⚠ Eine Wischgeste, die auf einem Knopf beginnt, hat bisher beim
+       Loslassen ZUSAETZLICH dessen Klick ausgeloest. Auf der Startseite
+       liegt in der Bildschirmmitte das Arena-Diorama — jeder Wisch von
+       dort aus hat also die Trophaeenstrasse geoeffnet, und weil ein
+       offener Layer das Wischen sperrt, war die naechste Geste tot.
+       Gefunden beim Nachstellen mit dem Zeiger, nicht durch Lesen.
+       Ein Klick nach einer Zieh-Geste ist nie gemeint. */
+    var klickSperre = false;
+    app.addEventListener("click", function (e) {
+      if (!klickSperre) return;
+      klickSperre = false;
+      e.stopPropagation(); e.preventDefault();
+    }, true);
+
     function los() {
       if (!aktiv) return;
       aktiv = false;
       hinweis(false, false);
+      /* ⚠ Zweite Korrektur an derselben Stelle. Die Sperre galt nur fuer
+         waagerechte Gesten. Eine SCHRAEGE — 70 px quer, 150 px hoch —
+         wird als senkrecht eingestuft, hat aber trotzdem 165 px Weg
+         zurueckgelegt und loeste den Klick des Startelements aus. Auf der
+         Startseite liegt dort das Arena-Diorama: jedes Hochziehen ueber
+         die Bildschirmmitte hat die Trophaeenstrasse geoeffnet.
+         Was einen Klick ausschliesst, ist der WEG, nicht die Richtung —
+         genau so unterscheiden native Listen Tippen von Ziehen. */
+      if (Math.hypot(dx, dy) > 10) klickSperre = true;
       if (achse !== "x" || !view) { achse = null; return; }
       var dt = Math.max(1, Date.now() - t0);
       var speed = Math.abs(dx) / dt;                 // px/ms

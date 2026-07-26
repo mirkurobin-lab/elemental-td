@@ -497,6 +497,87 @@ Zwei Nebenbefunde beim Bauen:
 > was nur bei unerreichbarem CDN trifft (§7b); jetzt wird der Text geprüft,
 > den es in beiden Fällen gibt.
 
+## 6k. AAs Startseite, ein zweites Mal — und was beim ersten Mal falsch war
+
+Der Nutzer nach dem ersten Umbau: *„Die Hauptseite sieht noch immer nicht so
+aus wie bei AA."* Er hatte recht, und die Ursache war eine **falsche Zeile in
+unserer eigenen Referenz**.
+
+`AA_UI_REFERENZ §19.1` behauptete: „Der Abstand Diorama→Name beträgt bei AA nur
+5 Punkte, das Diorama selbst ist 12 Punkte hoch. Der Name liegt also AUF dem
+Diorama." IMG_3344 in voller Auflösung zeigt das Gegenteil:
+
+| | AA |
+|---|---|
+| Titel Zeile 1 „Arena 5:" | 28,0–30,3 % |
+| Titel Zeile 2 „Aztec Grounds" | 30,5–32,8 % |
+| Chip „Neutral" | 33,6–35,3 % |
+| **Diorama** | **36,0–55,0 %** |
+
+Der Titel steht **über** dem Diorama, in eigenem Raum, zweizeilig, beide Zeilen
+gleich groß und **weiß** — nicht gold. Aus der Fehllesung folgte alles Weitere:
+das Diorama saß 12 Punkte zu hoch, und weil der Titel keinen eigenen Platz
+brauchte, rutschten Trophäenbalken, Truhen und Kampfreihe 7 Punkte zu tief.
+
+**Vier weitere Befunde aus demselben Bild:**
+
+1. **Das Portrait spannt über beide Kopfzeilen** (x 0–21,7 %, y 4,4–15,0 %) und
+   wird vom linken Bildschirmrand angeschnitten. Es ist deshalb Geschwister
+   beider Zeilen, nicht Kind einer davon. Der Kopf ist **global** — AA zeigt
+   ihn auch hinter Profil- und Belohnungsfenster (IMG_3347, IMG_3338); die
+   Namensplatte ist aus `#viewHome` dorthin gewandert.
+2. **Eine Platte, nicht drei Pillen.** AAs Währungen stehen ohne eigene Ränder
+   in einem dunklen Körper. Drei Pillen mit je 24 px Innenabstand fressen 78 px
+   der 299 px, die neben dem Portrait bleiben — daraus wurde „1 136" zu „1…".
+3. **Der Pass-Fortschritt fehlte komplett.** AA hat unter dem Banner eine eigene
+   Leiste (x 26,6–74,4 %) mit Medaillen-Chip und Stufenzahl im Sechseck.
+4. **Der Trophäenbalken ist schmal** — 31,5 % der Bildschirmbreite, nicht 42 %.
+   Die Trophäe sitzt innen links, der Belohnungs-Chip hängt **unter** dem Balken.
+
+**Der freie Platz liegt unten, nicht in der Mitte.** AAs Kampfreihe endet bei
+82,5 %, die Bottom-Nav beginnt bei 91,5 % — neun Punkte leer. Ich hatte den
+Rest vorher in die Bühne verteilt.
+
+**Vergleichsmethode, die zählt:** AAs Screenshot enthält oben 4,4 %
+iOS-Statusleiste, unsere Seite nicht. Absolute Y-Werte sind deshalb nicht
+vergleichbar. Aussagekräftig ist der **Anteil am Band zwischen Kopf-Unterkante
+und Nav-Oberkante**:
+
+| | AA | wir |
+|---|---|---|
+| Pass-Banner | 1,6 % | 2,9 % |
+| Titel | 17,0 % | 19,1 % |
+| Diorama | 27,5–52,3 % | 31,7–55,2 % |
+| Trophäenbalken | 54,9 % | 55,1 % |
+| Truhen | 63,7 % | 62,9 % |
+| Kampfreihe | 74,5 % | 73,2 % |
+
+Diorama 54,3 % breit bei AA, 54,2 % bei uns.
+
+## 6l. Eine Zieh-Geste darf keinen Klick auslösen
+
+Beim Nachstellen der Wischgesten mit dem Zeiger gefunden, nicht durch Lesen:
+eine Geste, die auf einem Knopf beginnt, hat beim Loslassen **zusätzlich dessen
+Klick ausgelöst**. Auf der Startseite liegt in der Bildschirmmitte das
+Arena-Diorama — jeder Wisch von dort aus öffnete die Trophäenstraße, und weil
+ein offener Layer das Wischen sperrt, war die nächste Geste tot.
+
+Zwei Anläufe, beide lehrreich:
+
+1. Sperre nur für **waagerechte** Gesten → eine schräge (70 px quer, 150 px
+   hoch) wird als senkrecht eingestuft, hat aber 165 px Weg zurückgelegt und
+   löste den Klick weiter aus. **Was einen Klick ausschließt, ist der Weg,
+   nicht die Richtung** — genau so unterscheiden native Listen Tippen von
+   Ziehen. Schwelle: 10 px.
+2. Die Sperre blieb stehen, wenn nach der Geste gar kein Klick kam, und fraß
+   den **nächsten echten** Klick. Sie wird jetzt bei jedem `pointerdown`
+   zurückgesetzt.
+
+> **Geprüft:** `run_v7.js`, Wisch-Abschnitt — nach allen sieben Gesten ist
+> `roadLayer` geschlossen und der View der erwartete. Vorher war die
+> Trophäenstraße ab der vierten Geste offen und der Abschnitt danach lief in
+> einen Timeout.
+
 ## 8. Was noch offen ist
 
 | Paket | Inhalt | Stand |
