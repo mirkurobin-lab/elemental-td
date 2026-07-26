@@ -1109,3 +1109,211 @@ Danach im Prototyp `CDN` und `CDNA` auf `./assets/img/` bzw. `./assets/audio/` u
 > Wappen-`clip-path`) haben dort den Text abgeschnitten („EPISCH" → „PISC"). Das Wappen heißt
 > jetzt `.cbanner`; die Playwright-Suite prüft **beide** Elemente auf ihre eigene Größe. Wer neue
 > Bausteine benennt: **im ganzen Dokument nach dem Klassennamen greppen**, bevor er vergeben wird.
+
+---
+
+## Avatar-System (`arena_avatars.js`) — Profilbild, Rahmen, Freischalt-Zeremonie
+
+**Anlass:** In AA schaltet Arena 5 einen neuen Avatar frei. Bisher hatte das Spiel **einen**
+Avatar. Das Modul liefert Katalog, Zustand und Freischalt-Logik; die Darstellung liegt
+vollständig im UI (`ui_prototype.html`, View `viewEditProfile`).
+
+### Was drin ist
+
+| | Anzahl | Bedingungs-Typen |
+|---|---|---|
+| **Porträts** (`AVATARS`) | 12 | `start`, `arena`, `trophaeen`, `liga`, `pass` |
+| **Rahmen** (`FRAMES`) | 8 | dieselben fünf |
+
+**Zwei getrennte Sammlungen, frei kombinierbar.** Ein Profilbild ist `PORTRÄT + RAHMEN`. Beide
+haben eigenen Katalog, eigene Bedingungen und einen eigenen Zustandszweig mit eigenem
+`gewaehlt`. `select()` fasst den Rahmen nie an, `selectFrame()` das Porträt nie — 12 × 8 = 96
+Kombinationen. Genau dafür ist der Zustand zweigeteilt und nicht ein flaches Feld.
+
+**Höchststand statt Tageswert.** Trophäen können sinken. `syncUnlocks()` schreibt deshalb einen
+Höchststand (`state.stand`) fort und merkt jeden je erreichten Schlüssel in `bekannt`.
+Freigeschaltet bleibt freigeschaltet — sonst würde ein Saison-Reset dem Spieler seinen Avatar
+aus dem Profil reißen. `bekannt` trennt zugleich „schon frei" von „gerade frei": `syncUnlocks()`
+gibt **nur** die neuen Einträge zurück, und das ist die Zeremonie-Liste. Zweiter Aufruf → leer,
+also läuft die Zeremonie nie doppelt, auch nicht nach einem Reload.
+
+**Speicher:** `localStorage["apd_avatars_v1"]`, versionierte Migration in `migrate()`.
+Angehoben werden: der Alt-Schlüssel `apd_avatar` (nur ein Avatar-Name als String) und flache
+v0-Objekte `{gewaehlt:"key"}`. Eine unbekannt **höhere** Version wird nicht heruntergerechnet,
+sondern verworfen. Zeitstempel laufen durch `ts0()` — **niemals `v | 0`** (32-Bit-Overflow).
+
+### API
+
+```js
+ArenaAvatars.assets(ASSETS);              // EINMALIG: Asset-Tabelle anmelden
+ArenaAvatars.list();                      // 12 Porträts, je mit locked/gewaehlt/unlockText
+ArenaAvatars.listFrames();                // 8 Rahmen, gleiche Form
+ArenaAvatars.unlockedFor(1200);           // reine Abfrage: was WÜRDE dieser Stand freischalten
+ArenaAvatars.syncUnlocks({trophaeen:1200});// schreibt Höchststand, gibt {neu, avatare, rahmen}
+ArenaAvatars.apply({trophaeen:1200});     // syncUnlocks + fertiges Anzeigepaket in .aktiv
+ArenaAvatars.select("solara");             // {ok, meldung} — Rahmen bleibt unberührt
+ArenaAvatars.selectFrame("saphirkranz");   // {ok, meldung} — Porträt bleibt unberührt
+ArenaAvatars.grant("avatar","fortuna");    // Season-Pass / Shop / Event
+ArenaAvatars.active();                     // {avatar, frame, portraitUrl, emoji, ringUrl, tierColor}
+ArenaAvatars.missingPortraits();           // Bestellliste für die Bildgenerierung
+```
+
+`unlockedFor()` und `syncUnlocks()` nehmen entgegen, was der Aufrufer hat: eine Zahl (Trophäen),
+`{trophaeen}`, `{trophies, best}` (= `ArenaProfile.get()`) oder `{arena}`. Fehlende Felder werden
+aus den Trophäen abgeleitet; ein mitgeliefertes **höheres** Feld gewinnt.
+
+Selbsttest: `node arena_patches/arena_avatars.js` → 90 Checks, endet mit `ALLE TESTS OK`.
+
+### Verdrahtung in `vs.html` — Ladebildschirm
+
+Der VS-/Matchmaking-Screen zeigt beide Profilbilder. **Eigenes** Bild kommt aus dem Modul, das
+**gegnerische** aus dem Rival-Datensatz (Bots haben noch keine Avatare — bis dahin das
+Element-Emoji des Rivalen, siehe unten).
+
+1. Script einbinden — **nach** `arena_profile.js`, **vor** dem Haupt-`<script>`:
+   ```html
+   <script src="./arena_profile.js"></script>
+   <script src="./arena_rivals.js"></script>
+   <script src="./arena_avatars.js"></script>
+   ```
+2. Einmalig die Asset-Tabelle anmelden. In `vs.html` gibt es keine `ASSETS`-Map wie im
+   Prototyp — dort zeigt sie auf den ausgelieferten Ordner:
+   ```js
+   ArenaAvatars.assets(function (key) { return "./assets/img/" + key + ".png"; });
+   ```
+   Ohne diesen Aufruf sind alle URLs `null` und das UI zeichnet die Emoji-Rückfallebene. Das ist
+   **kein Fehler**, sondern die vorgesehene Stufe — genau wie bei `ico()`.
+3. Im Aufbau des VS-Blocks (dort, wo heute `ArenaRivals.vsCardHTML(rival)` steht):
+   ```js
+   const av = ArenaAvatars.active();
+   myPortraitEl.innerHTML =
+     '<span class="vsav" style="--avring:' + av.frame.tierColor + '">' +
+       '<span class="vsemo">' + av.emoji + '</span>' +
+       (av.portraitUrl
+         ? '<img src="' + av.portraitUrl + '" alt="' + av.emoji +
+           '" onerror="this.style.display=\'none\'">' : '') +
+       '<span class="vsring"' +
+         (av.ringUrl ? ' style="background-image:url(\'' + av.ringUrl + '\')"' : '') +
+       '></span>' +
+     '</span>';
+   myNameEl.textContent = ArenaProfile.get().name || "Prisma-Magier";
+   ```
+   **Reihenfolge im Markup ist Absicht:** Emoji zuerst (liegt unten und bleibt stehen), Bild
+   darüber, Rahmen ganz oben. Fällt das Bild aus, ist das Emoji schon da. Dieselbe Staffelung
+   wie `cardArtHTML()`.
+4. CSS dazu (Prototyp-Vorlage: `.avpvpic` / `.avpvring`). **Kein `overflow:hidden` auf der
+   Portraitfläche** — der Ring liegt mit negativem `inset` außerhalb des Kreises und würde
+   weggeschnitten. Beschnitten wird das **Bild** über seinen eigenen `border-radius`:
+   ```css
+   .vsav{position:relative;width:96px;height:96px;border-radius:50%;display:flex;
+     align-items:center;justify-content:center;
+     background:radial-gradient(circle at 50% 35%,#33475c,#0d151c 72%)}
+   .vsav img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+   .vsring{position:absolute;inset:-5%;pointer-events:none;border-radius:50%;
+     background-repeat:no-repeat;background-position:center;background-size:contain;
+     box-shadow:inset 0 0 0 3px var(--avring,#9aa3ad)}
+   ```
+   > ⚠ **Mindestens 96 px im Ladebildschirm.** Unter 20 px tragen diese Artworks nur noch Farbe
+   > und Wort. Im HUD (unten) sind 28 px die Untergrenze — deshalb steht dort der **Name**
+   > daneben, nicht nur das Bild.
+5. Gegnerseite, bis Bots eigene Avatare haben:
+   ```js
+   const rival = ArenaRivals.current() || ArenaRivals.pick(ArenaProfile.get().trophies);
+   foePortraitEl.innerHTML = '<span class="vsav" style="--avring:#ff5e7e">' +
+     '<span class="vsemo">' + (rival.emoji || "👤") + '</span></span>';
+   ```
+
+### Verdrahtung in `vs.html` — In-Game-HUD
+
+Das HUD liegt in `arena_pan.html`, wird aber aus `vs.html` heraus betreten; der gewählte Avatar
+muss über den Screenwechsel hinweg gelten. Er tut es automatisch — beide Seiten lesen
+denselben `localStorage`-Schlüssel. **Nichts durchreichen, nichts in die URL hängen.**
+
+1. Script auch in `arena_pan.html` einbinden und `assets()` genauso anmelden.
+2. Beim Aufbau der HUD-Kopfzeile (die Zeile mit eigenem Namen und Burg-HP):
+   ```js
+   const av = ArenaAvatars.active();
+   hudAvatarEl.style.setProperty("--avring", av.frame.tierColor);
+   hudAvatarEl.innerHTML = '<span class="hudemo">' + av.emoji + '</span>' +
+     (av.portraitUrl ? '<img src="' + av.portraitUrl + '" alt="' + av.emoji +
+       '" onerror="this.style.display=\'none\'">' : '');
+   ```
+   `hudAvatarEl` ist 28 px groß, der farbige Ring kommt aus `--avring` (2 px `inset`-Schatten).
+   **Einmal beim Match-Start setzen, nicht pro Frame** — `active()` liest bei jedem Aufruf den
+   Speicher; im Render-Loop wäre das ein Parse pro Frame.
+
+### Wann die Zeremonie läuft
+
+Die Freischaltung wird nach dem **Match-Ergebnis** ausgelöst, nicht beim Öffnen des Profils —
+sonst sähe man sie erst, wenn man ohnehin schon im Profil ist.
+
+In `resolveEnd()` (`arena_pan.html`), direkt **nach** `ArenaProfile.applyMatchResult()`, weil erst
+danach die neuen Trophäen stehen:
+```js
+const res  = ArenaProfile.applyMatchResult({ win, stars, /* … */ });
+const neue = ArenaAvatars.syncUnlocks({ trophaeen: res.trophies }).neu;
+// `neue` in den Hub mitgeben — die Zeremonie gehört NICHT auf den Result-Screen,
+// sie würde dort mit Trophäen-, Pack- und Rang-Meldung um Aufmerksamkeit ringen.
+if (neue.length) sessionStorage.setItem("apd_avatar_neu", JSON.stringify(neue));
+```
+Im Hub (`deck.html` / `ui_prototype.html`) beim ersten Frame nach der Rückkehr:
+```js
+const roh = sessionStorage.getItem("apd_avatar_neu");
+if (roh) { sessionStorage.removeItem("apd_avatar_neu"); showAvatarCeremony(JSON.parse(roh)); }
+```
+`showAvatarCeremony(liste)` steht im Prototyp und arbeitet die Liste als **Warteschlange** ab:
+ein Overlay, ein Eintrag, ein Tap („TIPPEN ZUM FORTFAHREN"). Wer nach einer langen Pause drei
+Avatare freischaltet, sieht sie **nacheinander** statt drei gestapelte Overlays. Die Liste kommt
+schon in der richtigen Reihenfolge — Rarität **aufsteigend**, das Beste zuletzt, dieselbe
+Eskalation wie die Pack-Zeremonie.
+
+Ist der Hub übersprungen (Direkt-Revanche), passiert nichts Schlimmes: `bekannt` ist gesetzt,
+die Einträge sind frei, nur die Zeremonie fällt aus. Wer sie retten will, legt die Liste statt in
+`sessionStorage` in den Zustand (`state.avatar.offen`) — dann überlebt sie auch einen Neustart.
+
+### Prototyp-Naht
+
+| Funktion | Rolle |
+|---|---|
+| `renderEditProfile()` | Vorschau + Reiter + Raster, ruft nur Modul-Getter |
+| `avPick(key)` | Reiter-abhängig `select()` / `selectFrame()`, Toast bei Ablehnung |
+| `setAvTab("avatars"\|"frames")` | wechselt nur, WELCHE Sammlung das Raster zeigt |
+| `showAvatarCeremony(neu)` / `avCerStep()` | Warteschlange, ein Overlay |
+| `syncAvatarUnlocks(t)` | die EINE Naht zwischen Fortschritt und Avataren |
+| `seedAvatars()` | einmaliger **stiller** Abgleich beim ersten Start (keine Zeremonie) |
+
+Einstieg ist das Porträt der Home-Profilzeile (`#profAvatar`) — dieselbe Stelle wie in AA.
+CSS-Präfix des ganzen Blocks: **`av` / `avg`**. Der goldene „AUSGEWÄHLT"-Streifen trägt
+**dunkle** Schrift (`.goldtext` ist auf hellen Flächen verboten — Bug-Klasse aus dem Farb-Pass).
+Jede Kachel hat denselben Innenabstand unten, auch ohne Streifen: sonst wäre der Name der
+gewählten Kachel halb verdeckt oder das Raster würde beim Wechseln um 8 px springen.
+
+### ⚠ Offen: 10 von 12 Porträts fehlen
+
+Vorhanden sind nur die zwei Helden-Artworks aus Batch 4: **`card_solara`** (→ Avatar `solara`)
+und **`card_magmor`** (→ Avatar `magmor`). Die anderen zehn tragen `portrait: null` und einen
+`portraitWunsch`-Schlüssel; das Raster markiert sie mit „Art folgt", angezeigt wird das Emoji.
+
+Zu generieren (1:1, rund beschnittenes Brustporträt, textfrei, gleiche Bildsprache wie die
+Karten-Artworks):
+
+| Asset-Key | Avatar | Rarität |
+|---|---|---|
+| `av_novize`   | Prisma-Novize        | Gewöhnlich |
+| `av_scherbe`  | Scherbenschmiedin    | Gewöhnlich |
+| `av_smaragd`  | Smaragd-Wächter      | Gut |
+| `av_saphir`   | Saphir-Kanonier      | Gut |
+| `av_sturm`    | Sturmruferin         | Selten |
+| `av_obsidian` | Obsidian-Fürst       | Episch |
+| `av_prisma`   | Prisma-Erzmagier     | Legendär |
+| `av_asche`    | Aschenmark-Veteranin | Legendär |
+| `av_frost`    | Frostbastion-Hüterin | Legendär |
+| `av_fortuna`  | Fortunas Erbin       | Suprem |
+
+Sobald ein Asset existiert: `portrait:` im Katalog setzen, `portraitWunsch` entfernen — der
+Eintrag verschwindet dann von selbst aus `missingPortraits()` und die „Art folgt"-Marke geht weg.
+
+**Rahmen brauchen keine neuen Assets**, greifen aber auf die sechs *Karten*-Raritätsrahmen
+(`frame_common` … `frame_supreme`) zu. Die sind rechteckig; im runden Avatar-Ring trägt deshalb
+aktuell die **Farbe** die Aussage, nicht die Kontur. Acht runde Ring-Artworks wären ein eigener
+kleiner Batch — kein Blocker, das Farbsystem funktioniert ohne sie vollständig.

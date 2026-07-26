@@ -2382,6 +2382,143 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .manbody ul{margin:8px 0 0;padding-left:16px}
 .manbody li{font-size:10.5px;color:#a9bccb;line-height:1.6;margin-bottom:3px}
 .manbody li b{color:#dbe6ef}
+/* ==================================================================
+ * PROFIL BEARBEITEN — Avatar-Raster + Rahmen-Reiter (AAs EDIT PROFILE)
+ * ------------------------------------------------------------------
+ * Praefix `av` / `avg`. Alle Groessen kommen aus der Banner-Metrik;
+ * die Kachel ist --tile (84px), das Vorschau-Portrait --banner-h-lg
+ * (128px). Keine Zwischenwerte.
+ *
+ * AAs Aufbau, von oben nach unten:
+ *   1. VORSCHAU  — grosses Profilbild mit Rahmen, Name, Level, Arena.
+ *                  Sie zeigt IMMER die aktuelle Kombination, damit die
+ *                  Wirkung einer Wahl sofort sichtbar ist.
+ *   2. REITER    — „Avatare" | „Rahmen". Zwei GETRENNTE Sammlungen,
+ *                  frei kombinierbar (siehe arena_avatars.js).
+ *   3. RASTER    — 4 Spalten. Gesperrte Kacheln tragen ein Schloss UND
+ *                  die Bedingung als Text; die aktuelle Wahl einen
+ *                  goldenen Ring.
+ *
+ * ⚠ Die Kachel ist 84 px, das Portrait darin 60 px — deutlich ueber der
+ *   20-px-Grenze, unter der von diesen Artworks nur noch Farbe und Wort
+ *   uebrig bleiben. Deshalb 4 Spalten und nicht 5.
+ * ⚠ Der goldene „Ausgewaehlt"-Streifen traegt DUNKLE Schrift (nie
+ *   .goldtext auf goldenem Grund — Bug-Klasse aus dem Farb-Pass).
+ * ================================================================== */
+.avprev{position:relative;display:flex;align-items:center;gap:var(--gap-lg);
+  margin:var(--gap-lg) 14px 0;padding:var(--pad);border-radius:var(--radius);
+  border:1px solid var(--line);overflow:hidden;
+  background:linear-gradient(135deg,#243547,#16202a 62%,#0e1418)}
+/* ⚠ KEIN overflow:hidden auf der Portraitflaeche. Der Rahmenring liegt
+   mit negativem inset AUSSERHALB des Kreises; ein Clip auf dem Eltern-
+   element hat ihn in der ersten Fassung komplett weggeschnitten — der
+   Rahmen war unsichtbar, obwohl alles gesetzt war. Beschnitten wird
+   deshalb das BILD selbst (eigener border-radius). */
+.avpvpic{position:relative;flex:0 0 var(--banner-h-lg);width:var(--banner-h-lg);
+  height:var(--banner-h-lg);border-radius:50%;display:flex;align-items:center;
+  justify-content:center;
+  background:radial-gradient(circle at 50% 35%,#33475c,#0d151c 72%)}
+.avpvpic img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.avpvpic .avemo{font-size:52px;line-height:1}
+/* Rahmen liegt UEBER dem Portrait und faengt keine Klicks. Ohne Bild
+   bleibt der farbige Ring aus --avring stehen — das Portrait wird nie
+   zugedeckt (dieselbe Regel wie bei hydrateFrames). */
+.avpvring{position:absolute;inset:-5%;pointer-events:none;border-radius:50%;
+  background-repeat:no-repeat;background-position:center;background-size:contain;
+  box-shadow:inset 0 0 0 3px var(--avring,#9aa3ad),0 0 14px -4px var(--avring,#9aa3ad)}
+.avpvtxt{flex:1;min-width:0}
+.avpvtxt .avpvn{display:block;font-size:15px;font-weight:900;line-height:1.2}
+.avpvtxt .avpvr{display:block;font-size:9.5px;font-weight:900;letter-spacing:.1em;
+  margin-top:3px;color:var(--avring,#9aa3ad)}
+.avpvtxt .avpvs{display:block;font-size:10px;color:var(--dim);font-weight:700;margin-top:5px;
+  line-height:1.5}
+.avpvtxt .avpvs b{color:#dbe6ef}
+.avpvhint{margin:var(--gap) 14px 0;font-size:10px;color:var(--dim);line-height:1.5}
+.avpvhint b{color:#cfe0ec}
+/* Reiter — bewusst dieselbe Optik wie .tabs, aber eigene Klassen, damit
+   die Reiter-Logik dieses Views niemanden sonst anfasst. */
+.avtabs{display:flex;gap:var(--gap);margin:var(--gap-lg) 14px 0}
+.avtab{flex:1;padding:9px 0;border-radius:var(--radius-sm);border:1px solid var(--line);
+  font-size:11.5px;font-weight:900;color:var(--dim);
+  background:linear-gradient(180deg,#1b2732,#111a21)}
+.avtab.on{color:#0b1116;border-color:#e0b94a;
+  background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);
+  -webkit-text-fill-color:#3a2b07}
+.avtab .avtc{font-size:9px;font-weight:800;opacity:.8;margin-left:4px}
+.avgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gap);
+  margin:var(--gap-lg) 14px 0}
+/* Der Innenabstand unten ist bei JEDER Kachel gleich gross, auch ohne
+   „AUSGEWAEHLT"-Streifen: Sonst waere der Name der gewaehlten Kachel
+   halb verdeckt (erste Fassung) oder das Raster wuerde beim Wechseln
+   der Auswahl um 8 px springen. */
+.avcell{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:6px 3px 14px;border-radius:var(--radius-sm);border:1px solid var(--line);
+  min-height:var(--tile);text-align:center;
+  background:linear-gradient(180deg,#1b2732,#131c25)}
+.avcell.sel{border-color:#e0b94a;box-shadow:0 0 0 2px #e0b94a55,inset 0 0 18px -6px #f2c53d88}
+.avcell.locked{opacity:.62}
+.avcpic{position:relative;width:60px;height:60px;border-radius:50%;display:flex;
+  align-items:center;justify-content:center;
+  background:radial-gradient(circle at 50% 35%,#2c3d4f,#0d151c 74%)}
+.avcpic img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.avcpic .avemo{font-size:26px;line-height:1}
+.avcring{position:absolute;inset:-6%;pointer-events:none;border-radius:50%;
+  background-repeat:no-repeat;background-position:center;background-size:contain;
+  box-shadow:inset 0 0 0 2px var(--avring,#9aa3ad)}
+.avcn{font-size:8.5px;font-weight:800;line-height:1.25;color:#cfe0ec;
+  overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+/* Bedingung unter der gesperrten Kachel. Sie steht als TEXT da und nicht
+   nur als Schloss: Ein Schloss allein sagt „nein", der Text sagt „so". */
+.avcc{font-size:7.5px;font-weight:800;line-height:1.2;color:#8fa0ad}
+.avlock{position:absolute;top:4px;right:4px;width:17px;height:17px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:9px;
+  background:#0b1116cc;border:1px solid #3a4c5c}
+.avlock .ico{width:11px;height:11px}
+/* Goldener „Ausgewaehlt"-Streifen: heller Grund → DUNKLE Schrift. */
+.avcsel{position:absolute;bottom:0;left:0;right:0;font-size:7px;font-weight:900;
+  letter-spacing:.08em;padding:1px 0;
+  background:linear-gradient(180deg,#f4e3a6,#e0b94a);color:#3a2b07;
+  -webkit-text-fill-color:#3a2b07;border-radius:0 0 8px 8px}
+/* Das 32-px-Portrait der Home-Profilzeile. Additive Regel auf dem
+   bestehenden `.avatar i`; die Rahmenfarbe uebernimmt die Kontur, das
+   Bild fuellt die Flaeche. 32 px liegt ueber der 20-px-Grenze. */
+.avatar i.avmini{overflow:hidden;padding:0}
+.avatar i.avmini img{width:100%;height:100%;object-fit:cover}
+.avmiss{position:absolute;top:4px;left:4px;font-size:7px;font-weight:900;
+  padding:0 3px;border-radius:5px;background:#0b1116cc;color:#8fa0ad;
+  border:1px solid #3a4c5c}
+
+/* ---------- NEU-AVATAR-ZEREMONIE ----------
+   Vollbild-Overlay, EIN Eintrag zur Zeit. z-index 86 liegt ueber dem
+   Tagesziel-Layer (84) und unter dem Cinematic — eine Freischaltung
+   darf nichts anderes ueberdecken, aber auch von nichts verdeckt
+   werden. Weiterschalten per Tap auf die GANZE Flaeche (AA: „TAP TO
+   CONTINUE"), deshalb liegt der Tap-Handler auf dem Layer selbst. */
+#avCerLayer{position:fixed;inset:0;display:none;z-index:86;align-items:center;
+  justify-content:center;padding:24px;background:radial-gradient(circle at 50% 42%,
+  #2a3a52ee,#05090cfa 72%)}
+#avCerLayer.open{display:flex}
+.avcer{width:100%;max-width:340px;text-align:center}
+.avcerk{font-size:10px;font-weight:900;letter-spacing:.22em;color:#f2c53d}
+.avcerpic{position:relative;width:200px;height:200px;margin:16px auto 0;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 50% 35%,#3a4f66,#0d151c 72%)}
+.avcerpic img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.avcerpic .avemo{font-size:96px;line-height:1}
+.avcerring{position:absolute;inset:-5%;pointer-events:none;border-radius:50%;
+  background-repeat:no-repeat;background-position:center;background-size:contain;
+  box-shadow:inset 0 0 0 4px var(--avring,#9aa3ad)}
+.avcerglow{position:absolute;inset:-18%;pointer-events:none;border-radius:50%;
+  background:radial-gradient(circle,var(--avring,#9aa3ad)44,transparent 68%)}
+.avcern{margin-top:18px;font-size:24px;font-weight:900;line-height:1.15}
+.avcerr{margin-top:6px;font-size:12px;font-weight:900;letter-spacing:.14em;
+  color:var(--avring,#9aa3ad)}
+.avcerc{margin-top:10px;font-size:10.5px;color:#a9bccb;line-height:1.5}
+.avcertap{margin-top:26px;font-size:10.5px;font-weight:900;letter-spacing:.16em;
+  color:#8fa0ad;animation:avtap 1.5s ease-in-out infinite}
+.avcerq{margin-top:8px;font-size:9px;color:#6f8291;font-weight:800}
+@keyframes avtap{0%,100%{opacity:.35}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.avcertap{animation:none;opacity:.8}}
 </style>
 </head>
 <body>
@@ -2721,6 +2858,35 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     <p class="credits" id="credits">—</p>
   </section>
 
+  <!-- ===== VIEW EP: PROFIL BEARBEITEN (AAs EDIT PROFILE) =====
+       Vorschau → Reiter (Avatare | Rahmen) → Raster. Alle Zahlen,
+       Namen, Bedingungen und der locked-Zustand kommen aus
+       window.ArenaAvatars; dieser View enthaelt KEINE eigene
+       Freischalt-Logik und weiss nicht, was eine Arena ist.
+       Erreichbar ueber das Portrait der Home-Profilzeile. -->
+  <section id="viewEditProfile" class="view">
+    <div class="viewhead"><button class="backbtn" id="avBack">‹</button>
+      <h2 class="title">Profil bearbeiten</h2></div>
+    <!-- Vorschau: zeigt IMMER die aktuelle Kombination Portrait+Rahmen -->
+    <div class="avprev" id="avPreview"></div>
+    <p class="avpvhint" id="avHint">—</p>
+    <div class="avtabs">
+      <button class="avtab on pressable" id="avTabAvatars" data-avtab="avatars">Avatare
+        <span class="avtc" id="avCntA">0/12</span></button>
+      <button class="avtab pressable" id="avTabFrames" data-avtab="frames">Rahmen
+        <span class="avtc" id="avCntF">0/8</span></button>
+    </div>
+    <div class="avgrid" id="avGrid"></div>
+    <p class="fortnote" id="avNote">—</p>
+    <!-- Prototyp-Einstieg in die Freischalt-Zeremonie. Im Spiel loest
+         sie das Match-Ergebnis aus (ArenaAvatars.syncUnlocks), nicht ein
+         Knopf — siehe HANDOFF.md, Abschnitt „Avatar-System". -->
+    <div class="setbtns" style="margin:var(--gap-lg) 14px 0">
+      <button class="setbtn ghost pressable" id="avDemo" style="flex:1">Demo: Arena 5
+        erreichen</button>
+    </div>
+  </section>
+
   <!-- ===== VIEW G: EINSTEIGER-GUIDE =====
        Gestaffelte Kapitel mit Aufgabenliste. Die Haekchen kommen aus
        window.ArenaGuide, das sie wiederum aus den bestehenden Zustaenden
@@ -3049,6 +3215,16 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   </div>
 </div>
 
+<!-- ===== NEU-AVATAR-ZEREMONIE =====
+     Wird von ArenaAvatars.syncUnlocks() gespeist und spielt die neuen
+     Eintraege EINZELN ab (Rarität aufsteigend, Bestes zuletzt). Tippen
+     auf die ganze Flaeche schaltet weiter; beim letzten Eintrag
+     schliesst der Layer. Traegt bewusst KEINEN Schliessen-Knopf: Der
+     Moment soll gesehen werden, ist aber nach einem Tap vorbei. -->
+<div id="avCerLayer">
+  <div class="avcer" id="avCer"></div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- ===== Karten-Wahl fuer die eigene Clan-Anfrage =====
@@ -3078,6 +3254,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 <script src="./arena_vault.js"></script>
 <script src="./arena_daily.js"></script>
 <script src="./arena_guide.js"></script>
+<script src="./arena_avatars.js"></script>
 <script src="./arena_matchend.js"></script>
 <script>
 (function () {
@@ -7671,6 +7848,186 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     markPressable($("viewManual"));
   }
 
+  /* ==================================================================
+   * PROFIL BEARBEITEN — Avatar-Raster, Rahmen-Reiter, Zeremonie
+   * ------------------------------------------------------------------
+   * Dieser Block ist reine Praesentation. JEDE Aussage darueber, was
+   * frei ist und warum, kommt aus window.ArenaAvatars — das UI kennt
+   * weder Schwellen noch Raritaets-Reihenfolge.
+   *
+   * DIE ZENTRALE EIGENSCHAFT: Portrait und Rahmen sind ZWEI Sammlungen.
+   * Der Reiter wechselt nur, WELCHE davon das Raster zeigt; die Wahl
+   * der einen laesst die andere unberuehrt. Die Vorschau oben zeigt
+   * beide zusammen, damit die Kombination sichtbar ist, auch wenn man
+   * gerade nur eine Haelfte bearbeitet.
+   * ================================================================== */
+  function AVof() { return window.ArenaAvatars || null; }
+  var avTab = "avatars";
+
+  /* Portrait-Flaeche. Reihenfolge der Fallbacks wie bei cardArtHTML():
+     Emoji liegt UNTEN und bleibt stehen, das Bild kommt darueber und
+     verschwindet bei Ladefehler (UIIcon.hide). Ohne Portrait-Asset —
+     zehn von zwoelf — bleibt also das Emoji. */
+  function avPicHTML(eintrag, picCls, ringCls, ringUrl, ringFarbe) {
+    var emo = '<span class="avemo">' + (eintrag.emoji || "❔") + "</span>";
+    var img = eintrag.portraitUrl
+      ? '<img src="' + eintrag.portraitUrl + '" alt="' + (eintrag.emoji || "") +
+        '" onerror="UIIcon.hide(this)">' : "";
+    var ring = '<span class="' + ringCls + '"' +
+      (ringUrl ? ' style="background-image:url(&quot;' + ringUrl + '&quot;)"' : "") + "></span>";
+    return '<span class="' + picCls + '" style="--avring:' + ringFarbe + '">' +
+      emo + img + ring + "</span>";
+  }
+
+  function renderEditProfile() {
+    var A = AVof();
+    if (!A) { $("avNote").textContent = "arena_avatars.js nicht geladen."; return; }
+    var act = A.active();
+    var avatare = A.list(), rahmen = A.listFrames();
+    var freiA = avatare.filter(function (e) { return !e.locked; }).length;
+    var freiF = rahmen.filter(function (e) { return !e.locked; }).length;
+
+    /* --- Vorschau: aktuelle Kombination, gross --- */
+    var arena = ARENA_TIERS[arenaIndexFor(DEMO_TROPHIES)];
+    $("avPreview").innerHTML =
+      avPicHTML(act.avatar, "avpvpic", "avpvring", act.ringUrl, act.avatar.tierColor) +
+      '<span class="avpvtxt">' +
+        '<span class="avpvn">Prisma-Magier</span>' +
+        '<span class="avpvr">' + act.avatar.tierName.toUpperCase() + "</span>" +
+        '<span class="avpvs">' + act.avatar.name + " · Rahmen <b>" + act.frame.name + "</b><br>" +
+          "Stufe 4 · Arena " + arena.n + " " + arena.name + " · " +
+          fmt(DEMO_TROPHIES) + " 🏆</span>" +
+      "</span>";
+    // Die Ring-Farbe der Vorschau folgt dem RAHMEN, nicht dem Portrait —
+    // sonst wuerde ein supremer Rahmen um ein graues Portrait grau.
+    $("avPreview").querySelector(".avpvpic").style.setProperty("--avring", act.frame.tierColor);
+    ambient($("avPreview"), 5);
+
+    $("avHint").innerHTML = "Avatar und Rahmen sind <b>unabhängig</b> — jeder " +
+      "freigeschaltete Rahmen passt zu jedem freigeschalteten Avatar.";
+    $("avCntA").textContent = freiA + "/" + avatare.length;
+    $("avCntF").textContent = freiF + "/" + rahmen.length;
+    $("avTabAvatars").classList.toggle("on", avTab === "avatars");
+    $("avTabFrames").classList.toggle("on", avTab === "frames");
+
+    /* --- Raster ---
+       RINGFARBE: Sie traegt immer die Raritaet des EINTRAGS, den die
+       Kachel zeigt — im Avatar-Reiter also die des Avatars, im
+       Rahmen-Reiter die des Rahmens. Das ist dieselbe Lesart wie beim
+       Raritaetsrahmen einer Karte: die Farbe sagt „wie selten", nicht
+       „was traegst du gerade". Was getragen wird, sagt der goldene
+       Streifen. Nur die VORSCHAU oben folgt dem Rahmen, weil dort der
+       Rahmen tatsaechlich am Portrait sitzt.
+       RINGBILD: im Avatar-Reiter der GEWAEHLTE Rahmen (so sieht man die
+       Kombination), im Rahmen-Reiter der Rahmen der Kachel selbst. */
+    var liste = avTab === "avatars" ? avatare : rahmen;
+    $("avGrid").innerHTML = liste.map(function (e) {
+      var ringUrl = avTab === "avatars" ? act.ringUrl : e.ringUrl;
+      var pic = avPicHTML(
+        avTab === "avatars" ? e : { emoji: e.emoji, portraitUrl: null },
+        "avcpic", "avcring", ringUrl, e.tierColor);
+      return '<button class="avcell' + (e.gewaehlt ? " sel" : "") +
+          (e.locked ? " locked" : "") + '" data-avpick="' + e.key + '">' +
+        pic +
+        '<span class="avcn">' + e.name + "</span>" +
+        (e.locked ? '<span class="avcc">' + e.unlockText + "</span>" : "") +
+        (e.locked ? '<span class="avlock">' + ico("ic_lock", "🔒") + "</span>" : "") +
+        (e.portraitFehlt && !e.locked ? '<span class="avmiss">Art folgt</span>' : "") +
+        (e.gewaehlt ? '<span class="avcsel">AUSGEWÄHLT</span>' : "") +
+        "</button>";
+    }).join("");
+    Array.prototype.forEach.call($("avGrid").querySelectorAll("[data-avpick]"), function (b) {
+      b.addEventListener("click", function () { avPick(b.getAttribute("data-avpick")); });
+    });
+
+    $("avNote").textContent = avTab === "avatars"
+      ? freiA + " von " + avatare.length + " Avataren freigeschaltet. Gesperrte zeigen " +
+        "ihre Bedingung — Arenen, Trophäen, Liga-Tore und Season-Pass."
+      : freiF + " von " + rahmen.length + " Rahmen freigeschaltet. Der Rahmen bleibt " +
+        "erhalten, wenn du den Avatar wechselst.";
+    markPressable($("viewEditProfile"));
+  }
+
+  function avPick(key) {
+    var A = AVof(); if (!A) return;
+    var r = avTab === "avatars" ? A.select(key) : A.selectFrame(key);
+    if (!r.ok) { UISfx.deny(); toast(r.meldung); return; }
+    UISfx.confirm();
+    track("avatar_gewaehlt", { art: avTab, key: key });
+    renderEditProfile();
+    renderProfile();          // Profilzeile auf Home zieht sofort mit
+    toast(avTab === "avatars" ? "Avatar gewählt" : "Rahmen gewählt");
+  }
+
+  function setAvTab(t) {
+    avTab = t === "frames" ? "frames" : "avatars";
+    renderEditProfile();
+  }
+
+  /* ---------- Zeremonie ----------
+     avCerQueue haelt die noch nicht gezeigten Eintraege. Bewusst EINE
+     Warteschlange und kein Stapel von Overlays: Wer nach einer langen
+     Pause drei Avatare freischaltet, sieht sie nacheinander statt
+     uebereinander. */
+  var avCerQueue = [];
+  function showAvatarCeremony(neu) {
+    if (!neu || !neu.length) return;
+    avCerQueue = neu.slice();
+    avCerStep();
+  }
+  function avCerStep() {
+    if (!avCerQueue.length) {
+      $("avCerLayer").classList.remove("open");
+      renderProfile();
+      return;
+    }
+    var e = avCerQueue.shift();
+    var A = AVof();
+    var ringUrl = e.art === "frame" ? e.ringUrl : (A ? A.active().ringUrl : null);
+    $("avCer").innerHTML =
+      '<div class="avcerk">' + (e.art === "frame" ? "NEUER RAHMEN" : "NEUER AVATAR") + "</div>" +
+      '<div class="avcerpic" style="--avring:' + e.tierColor + '">' +
+        '<span class="avcerglow"></span>' +
+        '<span class="avemo">' + (e.emoji || "❔") + "</span>" +
+        (e.portraitUrl ? '<img src="' + e.portraitUrl + '" alt="' + (e.emoji || "") +
+          '" onerror="UIIcon.hide(this)">' : "") +
+        '<span class="avcerring"' + (ringUrl ? ' style="background-image:url(&quot;' +
+          ringUrl + '&quot;)"' : "") + "></span>" +
+      "</div>" +
+      '<div class="avcern">' + e.name + "</div>" +
+      '<div class="avcerr" style="color:' + e.tierColor + '">' +
+        e.tierName.toUpperCase() + "</div>" +
+      '<div class="avcerc">Freigeschaltet: ' + e.unlockText + "</div>" +
+      '<div class="avcertap">TIPPEN ZUM FORTFAHREN</div>' +
+      (avCerQueue.length ? '<div class="avcerq">noch ' + avCerQueue.length +
+        " weitere" + (avCerQueue.length === 1 ? "" : "") + "</div>" : "");
+    $("avCerLayer").classList.add("open");
+    UISfx.reward();
+    track("avatar_zeremonie", { art: e.art, key: e.key, tier: e.tier });
+  }
+
+  /* syncAvatarUnlocks(trophaeen) — die EINE Naht zwischen Fortschritt
+     und Avataren. Im Spiel steht sie nach dem Match-Ergebnis; im
+     Prototyp hinter dem Demo-Knopf. */
+  function syncAvatarUnlocks(trophaeen) {
+    var A = AVof(); if (!A) return null;
+    var t = trophaeen == null ? DEMO_TROPHIES : trophaeen;
+    var r = A.syncUnlocks({ trophaeen: t, arena: A.arenaFor(t) });
+    if (r.neu.length) showAvatarCeremony(r.neu);
+    return r;
+  }
+  /* seedAvatars() — einmaliger STILLER Abgleich beim ersten Start, damit
+     das Demo-Profil bei 1 136 🏆 nicht vor einem fast leeren Raster
+     steht. Bewusst OHNE Zeremonie: Sieben Overlays direkt nach dem
+     Login-Kalender waeren kein Moment, sondern eine Schleuse. */
+  var AV_SEED_KEY = "arenaAvatarProtoSeed";
+  function seedAvatars() {
+    var A = AVof(); if (!A) return;
+    if (localStorage.getItem(AV_SEED_KEY)) return;
+    A.syncUnlocks({ trophaeen: DEMO_TROPHIES, arena: A.arenaFor(DEMO_TROPHIES) });
+    localStorage.setItem(AV_SEED_KEY, "1");
+  }
+
   /* ================= Navigation ================= */
   var NAVS = { navHome: "viewHome", navCollection: "viewCollection",
                navForge: "viewForge", navPack: "viewPack",
@@ -7679,6 +8036,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
                navPass: "viewPass", navHeroes: "viewHeroes", navEvents: "viewEvents",
                navMail: "viewMail", navSettings: "viewSettings",
                navGuide: "viewGuide", navManual: "viewManual",
+               navEditProfile: "viewEditProfile",
                navMatchEnd: "viewMatchEnd" };
   var NAV_IDS = ["navShop", "navCollection", "navHome", "navClan", "navFortress", "navPack",
                  "navTower", "navForge", "navClan", "navBoard",
@@ -7721,6 +8079,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     if (navId === "navSettings") renderSettings();
     if (navId === "navGuide") renderGuide();
     if (navId === "navManual") renderManual();
+    if (navId === "navEditProfile") renderEditProfile();
   }
 
   /* ================= Events ================= */
@@ -7730,6 +8089,27 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   // Prototyp jetzt auch; „Okay" schließt den Layer wieder.
   $("btnBattle").addEventListener("click", function () { openRoad(); });
   $("tileEvents").addEventListener("click", function () { show("navEvents"); });
+
+  /* ---------- Profil bearbeiten ----------
+     Einstieg ist das Portrait der Home-Profilzeile — dieselbe Stelle wie
+     in AA. `.avatar` steht nicht in PRESS_SEL, deshalb wird die
+     Druck-Klasse hier von Hand gesetzt. */
+  $("profAvatar").classList.add("pressable");
+  $("profAvatar").addEventListener("click", function () { show("navEditProfile"); });
+  $("avBack").addEventListener("click", function () { show("navHome"); });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-avtab]"), function (b) {
+    b.addEventListener("click", function () {
+      UISfx.tap(); setAvTab(b.getAttribute("data-avtab"));
+    });
+  });
+  // Zeremonie: Tap auf die GANZE Flaeche schaltet weiter (AA-Verhalten).
+  $("avCerLayer").addEventListener("click", function () { UISfx.tap(); avCerStep(); });
+  $("avDemo").addEventListener("click", function () {
+    // 1 200 🏆 = Arena 5 (Obsidian-Thron) — der Fall aus AA.
+    var r = syncAvatarUnlocks(1200);
+    renderEditProfile();
+    if (r && !r.neu.length) toast("Arena 5 ist schon abgeglichen.");
+  });
   /* Match-Ende: Reiter, Zurück und die zwei Demo-Einstiege. */
   $("meBack").addEventListener("click", function () { show("navHome"); });
   Array.prototype.forEach.call(document.querySelectorAll("[data-metab]"), function (b) {
@@ -7892,6 +8272,21 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     $("profAvatar").style.setProperty("--xp", xpPct + "%");
     $("profName").textContent = "Prisma-Magier";
     $("profXp").textContent = "Stufe 4 · 620/1000 XP";
+    /* Gewaehlter Avatar + Rahmen in der Profilzeile. Genau dieselben
+       zwei Werte liest spaeter der Ladebildschirm und das In-Game-HUD
+       (siehe HANDOFF.md, Abschnitt „Avatar-System"). */
+    var AV = AVof();
+    if (AV) {
+      var act = AV.active();
+      var bx = $("profAvatar").querySelector("i");
+      bx.className = "avmini";
+      bx.innerHTML = '<span class="avemo">' + act.emoji + "</span>" +
+        (act.portraitUrl ? '<img src="' + act.portraitUrl + '" alt="' + act.emoji +
+          '" onerror="UIIcon.hide(this)">' : "");
+      bx.style.borderColor = act.frame.tierColor;
+      $("profAvatar").title = act.avatar.name + " · " + act.frame.name +
+        " — tippen zum Bearbeiten";
+    }
     var P = window.ArenaPass;
     if (P) {
       seedPass();
@@ -7943,6 +8338,9 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   setTimeout(function () { UIIcon.sweep(); }, 1200);
   setTimeout(function () { UIIcon.sweep(); }, 3000);
   applyAssets();
+  /* Asset-Tabelle beim Avatar-Modul anmelden, BEVOR irgendwas rendert:
+     ohne sie liefert active() nur Emoji-Fallbacks. */
+  if (window.ArenaAvatars) { ArenaAvatars.assets(ASSETS); seedAvatars(); }
   renderCollection();
   renderShop();
   renderPackHeader();
@@ -8006,7 +8404,12 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
                      claimGuideTask: claimGuideTask, claimGuideChapter: claimGuideChapter,
                      openDaily: openDaily, closeDaily: closeDaily,
                      renderProfile: renderProfile, renderHubTiles2: renderHubTiles,
-                     GD: function () { return window.ArenaGuide; } };
+                     renderEditProfile: renderEditProfile, setAvTab: setAvTab,
+                     avPick: avPick, avTab: function () { return avTab; },
+                     syncAvatarUnlocks: syncAvatarUnlocks, seedAvatars: seedAvatars,
+                     showAvatarCeremony: showAvatarCeremony, avCerStep: avCerStep,
+                     avCerQueue: function () { return avCerQueue; },
+                     AV: function () { return window.ArenaAvatars; } };
 })();
 </script>
 </body>
