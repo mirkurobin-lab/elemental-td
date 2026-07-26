@@ -1301,7 +1301,19 @@ Monetarisierungs-Layout, das wir bewusst nicht übernehmen.
 
 ### 14.4 ✅ Aufbau der Trophäenstraße
 
-**Trigger:** BATTLE-Button. **Abschluss:** unten fixierter **`Okay`**-Button.
+> ⚠️ **BEWUSSTE ABWEICHUNG (Produktentscheidung, 26.07.2026).**
+> Bei AA öffnet der BATTLE-Button die Trophäenstraße — das ist unten korrekt
+> gemessen und bleibt als AA-Befund stehen. **Wir machen es anders:** bei uns
+> startet KAMPF den Kampf, und die Straße hängt am **Arena-Diorama in der
+> Bildmitte**. Begründung: ein Spieler, der auf KAMPF drückt, will spielen und
+> nicht erst seinen Kontostand ansehen. AAs Weg kostet auf jedem Spielstart
+> einen zusätzlichen Schritt.
+> Wer diesen Abschnitt später liest und die Straße „zurück auf KAMPF" legt,
+> macht damit eine Produktentscheidung rückgängig — nicht einen Fehler.
+> Verdrahtet in `ui_prototype.html`: `btnBattle → startBattle()`,
+> `arenaDiorama → openRoad()`. Abgesichert in run_v5/v6/v7.
+
+**Trigger (bei AA):** BATTLE-Button. **Abschluss:** unten fixierter **`Okay`**-Button.
 **Scroll-Richtung:** Die Straße wächst **von unten nach oben** — Arena 1 (0 🏆) liegt
 ganz unten, höhere Trophäen weiter oben.
 

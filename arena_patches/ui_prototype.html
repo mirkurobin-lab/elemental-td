@@ -108,6 +108,48 @@ button{font-family:inherit;color:inherit;border:0;background:none;cursor:pointer
 .view.active{display:block}
 
 /* ==================================================================
+ * GEGNERSUCHE (Naht zum echten Match)
+ * ------------------------------------------------------------------
+ * KAMPF startet den Kampf. Weil der Prototyp kein Match rechnet, zeigt
+ * er die Sekunden davor: eigener Avatar gegen den Gegner, dann Uebergabe.
+ * Im echten Spiel ersetzt arena_pan.html genau die Mitte dieses Ablaufs —
+ * Anfang (Suche) und Ende (Match-Ende) bleiben, wie sie hier stehen.
+ * ================================================================== */
+.mmlayer{position:fixed;inset:0;z-index:75;display:none;flex-direction:column;
+  align-items:center;justify-content:center;gap:var(--gap-lg);
+  background:radial-gradient(120% 80% at 50% 30%,#1b2c3d 0%,#0e1720 55%,#070b0f 100%)}
+.mmlayer.open{display:flex}
+.mmttl{font-size:13px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;
+  color:#9fe6ff;text-shadow:0 2px 6px #000}
+.mmrow{display:flex;align-items:center;gap:var(--gap-lg)}
+.mmside{width:112px;text-align:center}
+.mmav{position:relative;width:96px;height:96px;margin:0 auto;border-radius:20px;
+  overflow:hidden;background:#22303c;border:3px solid #57c8ee;
+  display:flex;align-items:center;justify-content:center;font-size:40px;
+  box-shadow:0 8px 20px #000a,inset 0 2px 0 #ffffff33}
+.mmside.opp .mmav{border-color:#f2665a}
+.mmav img{width:100%;height:100%;object-fit:cover}
+.mmnm{margin-top:7px;font-size:13px;font-weight:900;color:#fff;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.mmtr{margin-top:2px;font-size:11px;font-weight:800;color:#cfe2f7;
+  display:flex;align-items:center;justify-content:center;gap:4px}
+.mmtr img{width:13px;height:13px;object-fit:contain}
+.mmvs{font-size:22px;font-weight:900;color:#fff;text-shadow:0 2px 4px #000}
+/* Der Gegner erscheint erst, wenn er gefunden ist. Ein Platzhalter mit
+   Fragezeichen sagt „wir suchen noch" ohne einen zweiten Zustand. */
+.mmside.opp{opacity:.35;transition:opacity .3s}
+.mmlayer.found .mmside.opp{opacity:1}
+.mmlayer.found .mmside.opp .mmav{animation:mmpop .34s cubic-bezier(.2,1.5,.4,1)}
+@keyframes mmpop{from{transform:scale(.7)}to{transform:scale(1)}}
+.mmbar{width:190px;height:8px;border-radius:5px;overflow:hidden;background:#0b1116;
+  border:1px solid #2b3b47}
+.mmbar i{display:block;height:100%;width:0;
+  background:linear-gradient(90deg,#57c8ee,#9fe6ff);transition:width .9s linear}
+.mmnote{font-size:11px;color:#8fa8bd}
+.mmcancel{padding:9px 22px;border-radius:11px;font-size:12px;font-weight:900;
+  background:#1b3557;color:#cfe2f7;border:1px solid #4f89cf}
+
+/* ==================================================================
  * WISCHEN ZWISCHEN DEN HAUPT-VIEWS
  * ------------------------------------------------------------------
  * Ein Hub ohne Wischen fuehlt sich auf dem Telefon wie eine Webseite
@@ -3237,6 +3279,19 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     <p class="hint" id="meNote">—</p>
   </section>
 
+  <!-- Gegnersuche: die Sekunden zwischen KAMPF und Match. -->
+  <div class="mmlayer" id="mmLayer">
+    <div class="mmttl" id="mmTitle">Gegner wird gesucht</div>
+    <div class="mmrow">
+      <div class="mmside me" id="mmMe"></div>
+      <div class="mmvs">VS</div>
+      <div class="mmside opp" id="mmOpp"></div>
+    </div>
+    <div class="mmbar"><i id="mmBar"></i></div>
+    <div class="mmnote" id="mmNote">Arena wird vorbereitet …</div>
+    <button class="mmcancel pressable" id="mmCancel">Abbrechen</button>
+  </div>
+
   <!-- ===== WERTE-FENSTER (AAs „STATS") =====
        Oeffnet aus dem Balkendiagramm-Knopf. Reiter ICH/GEGNER sind
        IDENTITAETEN (blau/rot) — welche Seite gerade offen ist, sagt der
@@ -3539,8 +3594,14 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   ];
   var BY_ID = {};
   CARDS.forEach(function (c) { BY_ID[c.id] = c; });
+  /* POOL_IDS = ALLES, was aus einem Pack fallen kann (Tuerme und Helden).
+     TOWER_IDS = nur Tuerme. Das ist die Liste fuer die Sammlung und die
+     Schmiede: ein Held ist KEIN Turm, er hat einen eigenen Reiter. Vorher
+     lief beides ueber POOL_IDS, deshalb standen Solara und Magmor im
+     Sammlungsraster zwischen den Tuermen. */
   var POOL_IDS = CARDS.map(function (c) { return c.id; });
   var HERO_IDS = CARDS.filter(function (c) { return c.hero; }).map(function (c) { return c.id; });
+  var TOWER_IDS = CARDS.filter(function (c) { return !c.hero; }).map(function (c) { return c.id; });
   var DECK = ["fire", "water", "nature", "light"];
 
   /* ================= Hub-Wallet (Gold liegt NICHT in ArenaCards) ======== */
@@ -4316,7 +4377,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   /* ================= Collection (§7) ================= */
   var sortMode = "level";
   function sortedIds() {
-    var ids = POOL_IDS.slice();
+    var ids = TOWER_IDS.slice();
     ids.sort(function (a, b) {
       var va = AC.view(a), vb = AC.view(b);
       if (sortMode === "level") return (vb.lvl - va.lvl) || (vb.tierIndex - va.tierIndex);
@@ -4324,9 +4385,18 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     });
     return ids;
   }
+  /* Zaehlt nur TUERME. Die Marke sitzt am Sammlungs-Reiter, und dort
+     stehen keine Helden — eine Marke, die auf etwas zeigt, das man auf
+     dem Ziel-Screen nicht findet, ist schlimmer als keine Marke. */
   function mergeableCount() {
     var n = 0;
-    POOL_IDS.forEach(function (id) { if (AC.progressToNextMerge(id).ready) n++; });
+    TOWER_IDS.forEach(function (id) { if (AC.progressToNextMerge(id).ready) n++; });
+    return n;
+  }
+  /* Dasselbe fuer Helden — die Marke gehoert an den Helden-Reiter. */
+  function heroMergeableCount() {
+    var n = 0;
+    HERO_IDS.forEach(function (id) { if (AC.progressToNextMerge(id).ready) n++; });
     return n;
   }
   function tileHTML(id, opts) {
@@ -5212,9 +5282,9 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     { id:"d3", art:"shop_mat_special", emoji:"✨", name:"Spezial-Essenz ×15",  cost:4200,  cur:"gold",
       avail:2, give:function(){ AC.addMaterial(15, "special"); } },
     { id:"d4", art:"frame_common", emoji:"🃏", name:"3 gewöhnliche Karten", cost:5400, cur:"gold",
-      avail:2, give:function(){ for (var i=0;i<3;i++) AC.addDrop(POOL_IDS[(Math.random()*6)|0], "common", 1); } },
+      avail:2, give:function(){ for (var i=0;i<3;i++) AC.addDrop(TOWER_IDS[(Math.random()*TOWER_IDS.length)|0], "common", 1); } },
     { id:"d5", art:"frame_good",  emoji:"🂡", name:"1 gute Karte",        cost:9000,  cur:"gold",
-      avail:1, give:function(){ AC.addDrop(POOL_IDS[(Math.random()*6)|0], "good", 1); } },
+      avail:1, give:function(){ AC.addDrop(TOWER_IDS[(Math.random()*TOWER_IDS.length)|0], "good", 1); } },
     { id:"d6", art:"shop_gem_t1", emoji:"💚", name:"Gem-Bündel ×25",      cost:0,     cur:"free",
       avail:1, give:function(){ setGems(gems() + 25); } },
   ];
@@ -7163,7 +7233,12 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
         ? '<span class="cchip">' + t.name + " (" + t.colorName + ")</span>" +
           '<span class="cchip">Level <b>' + v.lvl + "</b>/" + v.cap + "</span>" +
           '<span class="cchip">Power <b>' + fmt(m.power * v.statMul) + "</b></span>" +
-          '<span class="cchip">Kopien <b>' + v.copies[v.tier] + "</b></span>"
+          '<span class="cchip">Kopien <b>' + v.copies[v.tier] + "</b></span>" +
+          // Helden stehen NICHT mehr in der Sammlung, also auch nicht in
+          // der Marke am Sammlungs-Reiter. Ihre Merge-Bereitschaft muss
+          // deshalb HIER sichtbar sein, sonst verschwindet sie ganz.
+          (AC.progressToNextMerge(id).ready
+            ? '<span class="cchip warn">🔴 Bereit zum Verschmelzen</span>' : "")
         : '<span class="cchip warn">Noch nicht im Besitz</span>';
       var lock = owned ? "" :
         '<div class="hlock">' + ico("icon_lock", "🔒") + " In Packs zu finden — Helden droppen " +
@@ -7188,9 +7263,13 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
         else { UISfx.deny(); toast("Diesen Helden findest du in Booster-Packs"); }
       });
     });
-    $("heroNote").textContent = "Helden sind Karten wie alle anderen — dieselbe Kartenbank, " +
-      "dieselben Merges, dieselben Level-Caps. Sie sind nur seltener (HERO_WEIGHT 0.2) und " +
-      "dürfen NICHT im Clan verschickt werden.";
+    var hm = heroMergeableCount();
+    $("heroNote").textContent = "Ein Held ist KEIN Turm — er steht nicht im " +
+      "Sammlungsraster und nicht in der Schmiede, sondern nur hier. Technisch laufen " +
+      "beide über dieselbe Kartenbank, also dieselben Merges und Level-Caps; Helden " +
+      "sind nur seltener (HERO_WEIGHT 0.2) und dürfen nicht im Clan verschickt werden. " +
+      "Antippen öffnet die Detailkarte — dort wird gelevelt und verschmolzen." +
+      (hm ? " " + hm + " Held(en) bereit zum Verschmelzen." : "");
     markPressable($("viewHeroes"));
   }
 
@@ -8442,7 +8521,16 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   // Home → KAMPF: In AA öffnet der Battle-Button ZUERST die
   // Trophäenstraße (User-Screenshots, §14.4). Genau das macht der
   // Prototyp jetzt auch; „Okay" schließt den Layer wieder.
-  $("btnBattle").addEventListener("click", function () { openRoad(); });
+  /* KAMPF startet den Kampf. Vorher oeffnete der Knopf die
+     Trophaeenstrasse — das ist ein Umweg: der Spieler will spielen, nicht
+     erst seinen Stand ansehen. Der Stand haengt jetzt dort, wo er
+     hingehoert: am Arena-Diorama in der Mitte. */
+  $("btnBattle").addEventListener("click", function () { startBattle(); });
+  $("mmCancel").addEventListener("click", function () {
+    UISfx.deny(); closeBattle();
+    if (window.ArenaAudio) ArenaAudio.music("audio_theme");
+    track("battle_cancelled", {});
+  });
   $("tileEvents").addEventListener("click", function () { show("navEvents"); });
 
   /* ---------- Profil bearbeiten ----------
@@ -8495,9 +8583,14 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   });
   $("btnDemoWin").addEventListener("click", function () { showMatchEnd(demoMatchEnd(true)); });
   $("btnDemoLose").addEventListener("click", function () { showMatchEnd(demoMatchEnd(false)); });
+  /* Klick auf die Arena in der Mitte = Trophaeenstrasse mit dem
+     aktuellen Stand. Vorher gab es hier nur einen Toast mit dem
+     Arenanamen, also eine Auskunft ohne Ziel. */
   $("arenaDiorama").addEventListener("click", function () {
+    UISfx.tap();
     var a = ARENA_TIERS[arenaIndexFor(DEMO_TROPHIES)];
-    toast("Arena " + a.n + " von " + ARENA_TIERS.length + ": " + a.name);
+    track("arena_opened", { arena: a.n });
+    openRoad();
   });
   $("arenaProgIcon").addEventListener("click", function (e) { e.stopPropagation(); openRoad(); });
   Array.prototype.forEach.call(document.querySelectorAll("[data-fortlay]"), function (b) {
@@ -8788,6 +8881,83 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
                      avCerQueue: function () { return avCerQueue; },
                      AV: function () { return window.ArenaAvatars; } };
   /* ==================================================================
+   * GEGNERSUCHE — die Naht zum echten Match
+   * ------------------------------------------------------------------
+   * startBattle() ist der EINZIGE Einstieg in ein Match. Im echten Spiel
+   * ersetzt arena_pan.html die Mitte: statt des Zeitgebers laedt dort das
+   * Spielfeld, und am Ende ruft es showMatchEnd(model) auf. Anfang und
+   * Ende bleiben exakt so, wie sie hier stehen — deshalb ist der Prototyp
+   * an dieser Stelle keine Attrappe, sondern die Vorlage.
+   *
+   * Der eigene Avatar kommt aus arena_avatars.js. Genau dieselbe Anzeige
+   * braucht der Ladebildschirm im Match (siehe HANDOFF.md).
+   * ================================================================== */
+  var mmTimer = [];
+  function mmSeite(el, name, trophies, avatarUrl, emoji) {
+    el.innerHTML = '<div class="mmav">' +
+      (avatarUrl ? '<img src="' + avatarUrl + '" alt="' + emoji +
+                   '" onerror="UIIcon.fail(this)">' : emoji) + "</div>" +
+      '<div class="mmnm">' + name + "</div>" +
+      '<div class="mmtr">' + ico("cur_trophy", "🏆") + fmt(trophies) + "</div>";
+    hydrateIcons(el);
+  }
+  function mmStop() {
+    mmTimer.forEach(clearTimeout); mmTimer = [];
+  }
+  function closeBattle() {
+    mmStop();
+    $("mmLayer").classList.remove("open", "found");
+    $("mmBar").style.width = "0";
+  }
+  function startBattle() {
+    var av = window.ArenaAvatars ? ArenaAvatars.active() : null;
+    var L = $("mmLayer");
+    mmStop();
+    L.classList.remove("found");
+    $("mmTitle").textContent = "Gegner wird gesucht";
+    $("mmNote").textContent = "Arena wird vorbereitet …";
+    mmSeite($("mmMe"), "Prisma-Magier", DEMO_TROPHIES,
+            av && av.portraitUrl, (av && av.emoji) || "🧙");
+    // Solange gesucht wird, steht auf der Gegnerseite ein Fragezeichen.
+    mmSeite($("mmOpp"), "…", 0, null, "❓");
+    L.classList.add("open");
+    UISfx.confirm();
+    track("battle_started", { trophies: DEMO_TROPHIES });
+    if (window.ArenaAudio) ArenaAudio.music("audio_battle");
+    // Balken laeuft los (der Wert muss NACH dem Einblenden gesetzt werden,
+    // sonst faellt Start- und Zielbreite in denselben Stilrechenschritt).
+    requestAnimationFrame(function () { $("mmBar").style.width = "100%"; });
+
+    /* Jeder Schritt prueft SELBST, ob die Suche noch laeuft. clearTimeout
+       allein reicht nicht: der Layer kann auch anders geschlossen werden
+       (Zuruecktaste, ein anderer Layer, ein Reset im Test) — dann liefe
+       die Kette weiter und das Match-Ende wuerde Sekunden spaeter
+       ungefragt hereinspringen. Genau das ist beim ersten Aufbau
+       passiert. */
+    function laeuftNoch() { return L.classList.contains("open"); }
+    mmTimer.push(setTimeout(function () {
+      if (!laeuftNoch()) return;
+      var g = (window.ArenaRivals && ArenaRivals.pick)
+        ? ArenaRivals.pick(DEMO_TROPHIES) : null;
+      var name = (g && (g.name || g.nick)) || "Netherghost";
+      var tr = (g && (g.trophies || g.troph)) || DEMO_TROPHIES + 12;
+      mmSeite($("mmOpp"), name, tr, ASSETS.card_magmor, "👹");
+      L.classList.add("found");
+      $("mmTitle").textContent = "Gegner gefunden";
+      $("mmNote").textContent = "Im Spiel laedt hier das Spielfeld (arena_pan.html).";
+      UISfx.reward();
+    }, 1100));
+
+    // Uebergabe. Im echten Spiel steht hier der Match-Start.
+    mmTimer.push(setTimeout(function () {
+      if (!laeuftNoch()) return;
+      closeBattle();
+      showMatchEnd(demoMatchEnd(Math.random() < 0.5));
+    }, 2600));
+  }
+  window.startBattle = startBattle;
+
+  /* ==================================================================
    * WISCHEN ZWISCHEN DEN HAUPT-VIEWS
    * ------------------------------------------------------------------
    * Die fuenf Bottom-Nav-Ziele sind eine REIHE. Nach links wischen geht
@@ -8807,7 +8977,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
    * ================================================================== */
   var SWIPE_ORDER = ["navShop", "navCollection", "navHome", "navClan", "navFortress"];
   var SWIPE_LAYERS = ["#detailModal", "#roadLayer", "#stLayer", "#dailyLayer",
-                      "#loginLayer", "#offerLayer", "#avCerLayer"];
+                      "#loginLayer", "#offerLayer", "#avCerLayer", "#mmLayer"];
 
   (function installSwipe() {
     var app = $("app");
