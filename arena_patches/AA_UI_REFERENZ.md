@@ -2154,3 +2154,325 @@ Sektion als „Geben". `ic_request` im vollbreiten Knopf wurde von 16 auf 20 px 
 
 **Regel fuer alles Weitere:** Diese Artworks brauchen **mindestens 20 px**. Wo weniger Platz
 ist, gehoert kein Bild hin — dort tragen Farbe und Wort die Bedeutung.
+
+---
+
+## 21. Merge-System und Level-Caps aus 14 neuen User-Screenshots (2026-07-26)
+
+> Anlass: Der User lieferte 14 AA-Screenshots nach und vermutete
+> *„grad grün maximum 20 level, blau maximum 30 lvl usw"*. Dieser Abschnitt prüft die
+> Vermutung an den Bildern. **Ergebnis vorweg: die Vermutung ist für grün und blau
+> bestätigt** — mit einer wichtigen Präzisierung, welche Stufe „grün" eigentlich ist.
+
+### 21.1 Methode und Bildquellen
+
+**Werkzeug.** Die Bilder liegen auf Google Drive; der lokale Agent-Proxy blockiert
+`drive.usercontent.google.com`, deshalb lief die Auswertung vollständig in der
+Higgsfield-Sandbox. Dort wurde **Tesseract 5.3.0** installiert und über
+`pytesseract.image_to_data` betrieben, sodass zu jedem Wort **Konfidenz und
+Bildkoordinaten** vorliegen. Vorverarbeitung: Graustufe → `autocontrast` → **Invertierung**
+(AA schreibt hell auf dunkel, uninvertiert liest Tesseract praktisch nichts). Alle Bilder
+sind **1320 × 2868 px**; die genannten y-Werte sind Originalkoordinaten.
+
+**Zweistufig.** OCR erkennt AAs **Fließtext** sehr gut (Konfidenz 90-96), scheitert aber
+zuverlässig an der **stilisierten Zierschrift mit Kontur**, in der AA alle *Zahlen* auf
+Buttons und im Statraster setzt — dort liefert Tesseract auch mit Digit-Whitelist und
+psm 7/8/13 nur Konfidenz 0-2. Diese Zahlen wurden deshalb **visuell** gelesen: Ausschnitt
+zuschneiden, 2-3× hochskalieren, als WebP über Base64 übertragen und ansehen. Jede Zahl
+unten ist mit ihrer Ableseart markiert (*OCR* / *visuell*).
+
+**Was welches Bild zeigt** (alle 14 klassifiziert, damit nichts unbelegt herumliegt):
+
+| Bild | Screen | für Karten/Merge relevant |
+|---|---|---|
+| **3310** | Forge-/Merge-Screen mit Divine-Sword-Vorschau | **ja — Kernbeleg** |
+| **3311** | Zeremonie `PERFECT MERGE!` | **ja — Kernbeleg** |
+| **3317** | Turm-Detailkarte **WOLF BARRACKS · GOOD · LVL 20/20** | **ja — Kernbeleg** |
+| **3318** | Turm-Detailkarte **DIVINE SWORD · RARE · LVL 20/30** | **ja — Kernbeleg** |
+| 3309 | Clan-Anfragen („Requesting Hawk Nest blueprints!", `10/30`, `DONATE`) | ja, indirekt (§21.4) |
+| 3300 | Quests, Tab **DAILY** („Upgrade your cards in the Challenge 25 time(s) 7/25") | Randnotiz |
+| 3301 | Quests, Tab **LIFETIME** („Unlock 15 towers", „Reach fortress level 15", `2087/2500` Gem) | Randnotiz |
+| 3299 | Quests, Tab **WEEKLY** | nein |
+| 3298 | Login-Kalender (Tage 22-30, „Next reward in 39h 15m", `x1 x20 x50 x100`) | nein |
+| 3306 | Shop, Truhen (Explorer/Mystic, Truhentexte wie §3) | nein |
+| 3307 | Shop | nein |
+| 3308 | Shop / Daily Deals („Free") | nein |
+| 3313 | Offline-Earnings-Dialog | nein |
+| 3314 | Offline-Earnings beschleunigen („Remaining: 3") | nein |
+
+Zehn der vierzehn Bilder betreffen also **nicht** das Kartensystem. Die vier relevanten
+sind dafür ungewöhnlich ergiebig, weil sie die **zwei Enden eines Merges** zeigen: eine
+Karte, die an ihrem Cap klebt, und eine Karte, die den Merge hinter sich hat.
+
+### 21.2 Level-Caps je Rarität
+
+#### Direkt gelesen — belastbar
+
+| Rarität | Cap | Beleg | Ableseart |
+|---|---|---|---|
+| **Good** (grün) | **20** | **3317**: `LVL: 20/20` (y 981) **und** darunter statt eines Upgrade-Buttons der Satz **`Card has reached the level cap`** (y 2182) | Level *visuell* + *OCR* (Konf. 84-96); Satz *OCR* (Konf. 84-96) |
+| **Rare** (blau) | **30** | **3318**: `LVL: 20/30` (y 981) — Karte auf Level 20, Cap 30 | *visuell*, zusätzlich Digit-OCR `20/30` |
+| Good → Rare | 20 ⇒ 30 | **3310** Merge-Vorschau `MAX LEVEL 20 ➜ 30` (y 302) und **3311** Zeremonie `MAX LEVEL` / `20 ➜ 30` (y 1609/1697) | *OCR*, Konf. 92-96 |
+
+Die Zeile `Card has reached the level cap` ist der stärkste Einzelbefund des Durchgangs:
+Sie belegt nicht nur die **Zahl** 20, sondern auch die **Härte** des Caps — die Karte hatte
+mit `31/10` reichlich Material (§21.4) und konnte trotzdem nicht aufgewertet werden.
+Der Merge ist damit keine Option, sondern das **einzige Tor** nach Level 20.
+
+#### Stimmt die Vermutung des Users?
+
+**Ja — mit einer Präzisierung.** „Grün = 20" und „blau = 30" sind beide direkt belegt.
+Die Präzisierung: **grün ist nicht die unterste Stufe.** AAs Leiter ist
+`Common → Good → Rare → Epic → Legendary` (§3), grün ist **Stufe 2 („Good")**, grau ist
+Stufe 1 („Common"). Wer „grün = 20" als „Anfängerkarte = 20" liest, verschiebt die ganze
+Leiter um eine Stufe. Das steht auf den Bildern wörtlich: Unter dem Kartennamen sitzt in
+kleiner Schrift das **Raritätswort** — `GOOD` bei Wolf Barracks (3317), `RARE` bei Divine
+Sword (3318), beides *visuell* zweifelsfrei gelesen.
+
+#### Interpoliert / vermutet — NICHT auf diesen Bildern
+
+| Rarität | Cap | Status |
+|---|---|---|
+| Common (grau) | 10 | **nicht auf diesen 14 Bildern.** Stammt aus §13.3 (Boulder-Badge `…/10`), bleibt dort belegt — hier gibt es **keine** unabhängige Bestätigung, weil keine Common-Karte zu sehen war. |
+| Epic | 40 | **reine Fortschreibung** der Schrittweite +10. Keine Epic-Karte auf irgendeinem der 14 Bilder. |
+| Legendary | 50 | **reine Fortschreibung.** Ebenso ungesehen. |
+
+Die Schrittweite **+10 pro Stufe** ist durch 20 → 30 an *einer* Übergangsstelle gemessen.
+Ob sie oben konstant bleibt oder AA dort größere Sprünge macht (z. B. 30 → 45 → 60), ist
+**unbekannt**. Bei der Kalibrierung unserer Tabellen sollte Epic/Legendary weiter als
+Annahme markiert bleiben und nicht als Messwert durchgehen.
+
+#### Korrektur zu §3: der blaue Namensbanner ist keine Raritätsfarbe
+
+§3 führt „Detail-Banner **#2379EC / #1D73E6** (blau)" als **Rare**-Farbe, gesampelt am
+Ice-Blaster-Banner. Die Messung an 3317 und 3318 widerlegt das: Der Bereich um den
+Namensbanner (y 360-470) liefert bei **beiden** Karten **identisch** `h210 · s0,9 · v0,9`
+auf 46 % der Fläche — bei der **Good**-Karte genauso wie bei der **Rare**-Karte. Der
+Banner ist also **UI-Chrome**, nicht raritätsabhängig. Die Rarität wird in AA auf der
+Detailkarte **durch das Wort** ausgedrückt, nicht durch die Bannerfarbe. Für Rare bleibt
+damit nur der **Kartenrahmen** im Raster als Farbbeleg (§3).
+
+### 21.3 Merge-System
+
+#### Die Merge-Gleichung ist auf 3310 grafisch aufgelöst
+
+Der Merge-Screen zeigt rechts oben die Vorschau und darunter die Bedingung **als Bild**,
+nicht als Text (Originalkoordinaten):
+
+```
+y 233   DIVINE SWORD                       (Panelkopf)
+y 302   MAX LEVEL      20  ➜  30
+y 353   BONUS HEALTH   23.26%  ➜  24.4%
+y 405   BONUS DAMAGE   11.97%  ➜  13.22%
+
+y 470   ┌───────┐                          Ergebniskarte, Badge  LvL 15
+        │       │
+y 555      ⇧                               Aufwärtspfeil
+y 640   ┌───────┐   +   ┌─────┐ ┌─────┐
+        │Basis  │       │Kopie│ │Kopie│
+        │LvL 15 │       │LvL 1│ │LvL 1│
+        └───────┘       └─────┘ └─────┘
+y 1196  ⚙  [ Merge All ]
+y 2721  [ Back ]                [ Merge ]
+```
+
+**Daraus folgt die Semantik von „Merge 3 identical cards":** Es sind die **Karte selbst
+plus 2 weitere Kopien**. Nicht drei Kopien *zusätzlich* zur Karte. Die Gleichung ist
+`1 Basis + 2 Kopien → 1 aufgestufte Karte`, und die Ergebniskarte oberhalb des Pfeils
+trägt dasselbe Level-Badge (`LvL 15`) wie die Basis — **das Level wird übernommen**, was
+§4.4/§13.1 auf einer zweiten Karte bestätigt.
+
+Die beiden Kopien standen hier auf `LvL 1`. Daraus folgt **nicht**, dass Kopien auf Level 1
+stehen müssen — es ist einfach der Bestand dieses Accounts. **Eine Level-Anforderung an
+die Kopien ist auf den Bildern nicht erkennbar.**
+
+#### Kosten
+
+Auf dem gesamten Merge-Screen (3310) und in der Zeremonie (3311) erscheint **kein
+Goldbetrag** — nicht auf dem `Merge`-Button, nicht an der Kopien-Reihe, nirgends. Das
+deckt sich mit §4.4 („Merge kostet kein Gold"). ⚠ **Methodisch ehrlich:** Diese beiden
+Bilder zeigen keine Top-Bar mit Kontostand, ein Vorher/Nachher-Vergleich ist an ihnen
+also **nicht** möglich. Die Aussage „kostenlos" ruht weiter auf der Kontostandsmessung aus
+Video 7 (§13.1), hier kommt nur die **Abwesenheit einer Preisangabe** als schwächeres
+Indiz hinzu.
+
+#### Zeremonie — Aufbau auf einer zweiten Karte bestätigt
+
+3311, alles *OCR* mit Konfidenz 92-96:
+
+| y | Inhalt |
+|---|---|
+| 309 | **`PERFECT MERGE!`** |
+| 1609 / 1697 | `MAX LEVEL` · **`20 ➜ 30`** |
+| 1870 / 1959 | `BONUS HEALTH` · `23.26% ➜ 24.4%` |
+| 2132 / 2220 | `BONUS DAMAGE` · `11.97% ➜ 13.22%` |
+| 2719 | **`TAP TO CLOSE`** |
+
+Identisches Layout wie in §4.4 (dort Catapult) — die Zeremonie ist also **eine
+Schablone**, nicht pro Karte gestaltet. Für den Nachbau heißt das: ein Overlay mit drei
+Vorher/Nachher-Zeilen genügt, egal welche Karte.
+
+#### Der Merge-Bonus wächst — und kann DREI Stats betreffen
+
+| Karte / Stufe | Ankündigungstext auf der Detailkarte | Beleg |
+|---|---|---|
+| Divine Sword, **Good** | „… to unlock: Bonus Health **+1 %** and Bonus Damage **+1 %**" | §4.2 (Video 11) |
+| Divine Sword, **Rare** | „Merge 3 identical Divine Sword cards to unlock: Bonus Health **+2 %** and Bonus Damage **+2 %**" | **3318**, y 1623/1671, *OCR* Konf. 92-96 |
+| Wolf Barracks, **Good** | „Merge 3 identical Wolf Barracks cards to unlock: Damage **+5 %**, Max Health **+5 %** and Attack Rate **−5 %**" | **3317**, y 1627/1671, *OCR* Konf. 91-96 |
+
+Zwei Befunde:
+
+1. **§13.1 bestätigt:** Der Bonus wächst pro Raritätsstufe (Divine Sword +1 % als Good →
+   +2 % als Rare), und der Text beschreibt immer den **nächsten** Merge.
+2. **NEU — ein Merge-Bonus kann DREI Stats anfassen.** §4.2 kannte nur das Muster
+   „Bonus A **and** Bonus B". Wolf Barracks bringt **drei** Werte mit
+   Aufzählungskomma: `Damage +5 %, Max Health +5 % and Attack Rate −5 %`. Der Nachbau
+   darf die Bonusliste also **nicht** auf zwei Einträge hart verdrahten.
+   (Nebenbei: Attack Rate erscheint wieder als **negativer** Prozentwert = schneller, §4.2.)
+
+### 21.4 Sonstiges Aufschlussreiches
+
+#### Der Level-Cap entfernt den Upgrade-Button vollständig
+
+Direkter Vergleich derselben Bildzone (y 1840-2500) bei beiden Detailkarten, *visuell*:
+
+```
+3317  Good, LVL 20/20  (am Cap)          3318  Rare, LVL 20/30  (nicht am Cap)
+      Upgrade Material                         Upgrade Material
+      [Materialicon]  31/10                    [Materialicon]  0/10
+      Card has reached the level cap
+      [ Unequip ]                              [ Unequip ]  [ Upgrade 🪙25000 ]  [ Max Level ]
+```
+
+* §13.4 („drei Buttons statt zwei") ist damit **bestätigt** — 3318 zeigt exakt die dort
+  notierte Dreierreihe `Unequip | Upgrade 🪙<Kosten> | Max Level`.
+* **Neu:** Am Cap fallen `Upgrade` **und** `Max Level` weg und werden durch **einen
+  Satz im Panel** ersetzt. AA sperrt den Button nicht grau, es **entfernt** ihn und
+  erklärt stattdessen. Gute Vorlage für unseren Prototyp.
+
+#### Neuer Gold-Datenpunkt — und ein Widerspruch zur Kurve aus §13.2
+
+**Divine Sword · Rare · Lv 20 → 21 kostet `🪙 25 000`.** Gelesen *visuell* an einem
+2× hochskalierten Ausschnitt (Bild 3318, Button bei y ≈ 2300-2410): die Ziffern stehen
+groß und mit klarer Kontur, **`25000`** ist zweifelsfrei. Digit-Whitelist-OCR versagte an
+dieser Schrift (Konfidenz 2) und wurde nicht verwendet.
+
+Gegenprobe an §13.2 (Catapult, Rare): 16 → 17 = **15 000**, 17 → 18 = **18 000**. Eine
+konstante Steigung von +3 000 pro Level würde für 20 → 21 **27 000** vorhersagen.
+Gemessen sind **25 000**.
+
+| Level-Up | Gold | Quelle | Methode |
+|---|---|---|---|
+| Rare 16 → 17 | 15 000 | §13.2 | Kontostandsdifferenz (stark) |
+| Rare 17 → 18 | 18 000 | §13.2 | Button-OCR |
+| **Rare 20 → 21** | **25 000** | **3318** | **Button, visuell (klar lesbar)** |
+
+⚠ **Bewertung, ohne die Zahl zu überdehnen:** Die 25 000 sind eine Button-Ablesung, also
+methodisch schwächer als eine Kontostandsdifferenz — genau die Schwäche, an der der
+verworfene Wert „8000 Gold" (§13.2) gescheitert ist. Anders als damals war die Zahl hier
+aber **groß, kontrastreich und eindeutig**, nicht erschlossen. Wenn sie stimmt, ist die
+Kurve **oberhalb ~Lv18 flacher als +3 000/Level** (von 18 000 auf 25 000 sind es
+≈ +2 333 je Level über drei Stufen). **Empfehlung: als offene Frage führen und bei der
+nächsten Aufnahme über Kontostandsdifferenz prüfen, nicht sofort in `GOLD_BANDS`
+einrechnen.**
+
+#### Materialbedarf hängt offenbar am LEVEL, nicht an der Rarität
+
+| Karte | Stufe | Level | Bedarf | Bestand | Beleg |
+|---|---|---|---|---|---|
+| Wolf Barracks | **Good** | 20 | **10** | 31 | 3317, `31/10`, *visuell* (3× Crop, unmissverständlich) |
+| Divine Sword | **Rare** | 20 | **10** | 0 | 3318, `0/10`, *visuell* |
+
+Beide Karten stehen auf **Level 20** und brauchen **beide 10** — obwohl sie
+**unterschiedliche Raritäten** haben. Zusammen mit den älteren Ankern (§13.2: Common Lv 1
+→ 1, Good Lv 15 → 5, Rare Lv 16 → 5) sieht die Reihe so aus:
+
+```
+Lv 1 → 1     Lv 15 → 5     Lv 16 → 5     Lv 20 → 10
+```
+
+Das ist eine **reine Level-Funktion**; die Rarität taucht darin nicht auf. ⚠ Damit ist
+die in §13.6 notierte Formel `1 + tierIdx + floor(lvl/10)` **unvereinbar** — sie ergäbe
+für Good/Lv 20 den Wert **4**, gemessen sind **10**. Einschränkung: Es gibt mindestens
+acht Materialsorten (§7.1/§12.3), und ob alle dieselbe Bedarfskurve haben, ist ungeprüft;
+Skyflares `40/3` (§5) passt in kein Level-Schema, das Level dazu ist aber unbekannt.
+**Nicht angefasst** — dies ist eine Dokumentationsnotiz, keine Codeänderung.
+
+#### Zwei vollständig gelesene Turm-Detailkarten
+
+**WOLF BARRACKS · GOOD · LVL 20/20** (3317). Statwerte *visuell* aus einem 780-px-Crop,
+alle Ziffern scharf:
+
+```
+Targets: Ground
+„Spawns angry wolves that leap into melee combat.
+ They don't wait for the full moons to start biting."      (OCR Konf. 92-96)
+LVL: 20/20        Power: 2441
+Damage 214.9      Max Health 473.3
+Attack Rate 1.31 sec   Grid Range 5
+Unit Count 3
+```
+
+`Unit Count` ist ein Stat, den §2 nicht führt — Barracks-Türme haben in AA also eine
+**fünfte** Statzeile für die Zahl der gespawnten Einheiten.
+
+**DIVINE SWORD · RARE · LVL 20/30** (3318). Labels *OCR* (Konf. 93-96), Zahlen der
+Einzelstats **nicht** lesbar (Zierschrift, zu wenig Crop-Budget):
+
+```
+Targets: Air & Ground
+„Empowers surrounding towers with silent support.
+ Does nothing loudly, but everything effectively."
+LVL: 20/30        Power: 3041
+Bonus Health · Bonus Damage · Bonus Push Strength · Bonus Crit Chance · Grids Covered
+```
+
+Divine Sword ist damit klar als **reiner Aura-/Supportturm** ausgewiesen: **fünf** Stats,
+alle als „Bonus …" plus `Grids Covered` — kein eigener Schaden, keine Reichweite. Das
+erklärt rückblickend, warum sein Merge-Bonus mit +1 %/+2 % so viel kleiner ausfällt als
+der eines Schadensturms (§4.2). Aus der Vorschau in 3310 lassen sich zwei Werte der
+Rare-Stufe rekonstruieren: **Bonus Health 24,4 %**, **Bonus Damage 13,22 %**.
+
+#### Clan: Kartenkopien heißen „blueprints", Anfragegröße 30
+
+3309 (*OCR*, Konf. 72-96): `Requesting Hawk Nest blueprints!` · `Requesting Archer
+blueprints!` · Zähler **`10/30`**, **`10/30`**, **`0/30`** · Buttons `DONATE` ·
+`Time left to collect:` · `7h 59m` · `Members online: 1`.
+
+Zwei Punkte für unser Clan-System (§20.5): AA nennt die spendbaren Kartenkopien
+**„blueprints"** (nicht „cards"), und eine Anfrage läuft gegen ein Ziel von **30**
+Einheiten mit einer **Sammelfrist** (hier ~8 h Restlaufzeit). Unsere Anfragezeilen sollten
+also eine Zielzahl **und** eine Restzeit tragen.
+
+#### Quests koppeln direkt an die Kartenwirtschaft
+
+* 3300 (DAILY): `Upgrade your cards in the Challenge 25 time(s)` — Fortschritt **`7/25`**;
+  `Upgrade card 1/5 time(s)`; `Request donations in the clan/5 time(s)` — **`2/5`**.
+* 3301 (LIFETIME): `Unlock 15 towers`; `Reach fortress level 15`; `Reach Player Level`;
+  ein Gem-Meilenstein **`2087/2500`**.
+
+Karten-Upgrades sind in AA also **Questwährung** — ein Grund mehr, das Upgrade billig und
+oft zu machen, statt es zu einer seltenen Großentscheidung zu erheben.
+
+### 21.5 Was auf diesen Bildern NICHT zu sehen war
+
+1. ❌ **Keine Epic- und keine Legendary-Karte** — auf keinem der 14 Bilder. Damit bleiben
+   **Caps 40/50 ungemessen** und die **Rahmenfarben ungesampelt** (§13.7 Punkt 3 bleibt
+   offen).
+2. ❌ **Keine Common-Karte** — Common = 10 aus §13.3 konnte hier nicht gegengeprüft werden.
+3. 🟡 **Die Zeile `REQUIRED CARDS` fehlt auf 3310.** Die Bedingung erscheint nur als
+   grafische Gleichung (§21.3). Die in §13.7 Punkt 4 als unklar markierte Zeile
+   `x1 GOOD CATAPULT` taucht **nicht** auf — ihre Semantik bleibt **ungeklärt**.
+4. 🟡 **Level-Anforderung an die Kopien:** unbekannt. Beide Kopien standen auf `LvL 1`,
+   was weder eine Anforderung belegt noch ausschließt.
+5. 🟡 **Kopienzahl höherer Stufen:** Nur der Fall Good → Rare ist sichtbar (1 + 2). Ob
+   Rare → Epic ebenfalls zwei Kopien kostet, ist **nicht** belegt.
+6. ❌ **Merge von Skills/Items** — weiterhin nur der Turm-Fall (§13.7 Punkt 2 bleibt offen).
+7. ❌ **`Merge All` und `Max Level` in Aktion** — beide Buttons sind belegt, ihre Wirkung
+   in keinem Bild ausgeführt (§13.7 Punkt 5 bleibt offen).
+8. 🟡 **Merge-Kosten per Kontostand:** Weder 3310 noch 3311 zeigt eine Top-Bar. Der Beweis
+   „kostet kein Gold" ruht unverändert allein auf §13.1.
+9. 🟡 **Einzelstatwerte von Divine Sword** (Bonus Push Strength, Bonus Crit Chance, Grids
+   Covered) — Labels gelesen, Zahlen nicht.
+10. ❌ **Gold-Kurve unterhalb Lv 20 und oberhalb Lv 21** — der neue Punkt 25 000 steht
+    isoliert; ob die Kurve dort wirklich abflacht, braucht eine zweite Messung (§21.4).
