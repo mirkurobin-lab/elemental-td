@@ -329,6 +329,115 @@ Artwork ist erst geprüft, wenn sie **mit geladenen Bildern** angesehen wurde.
 Zwei Zustände genügen nicht — es sind drei: ohne Bild, mit Bild, bei
 CDN-Ausfall mitten im Laden.
 
+## 6h. Icons werden freigestellt, nicht gemischt
+
+> **Regel: alles unter 24 % Helligkeit ist Hintergrund.**
+
+**Gemessen über alle 163 ausgelieferten Bilddateien: kein einziges hat
+Transparenz.** Alpha 255/255, 0,0 % durchsichtige Pixel — nicht nur die elf
+Rahmen aus §6c, sondern der *gesamte* Satz. Das Motiv liegt auf einer flachen
+dunklen Platte, die je nach Familie 50–90 % der Bildfläche einnimmt.
+
+Die Platten der UI reichen von L 0,027 (Hauptleiste) bis L 0,865 (`.node .rw`,
+`.utile`). Ein Mischmodus muss sich für eine Seite entscheiden — er kann nicht
+gleichzeitig auf beiden richtig liegen. Genau das war der Fehler:
+
+| Technik | dE Ecke Ø | dE max | Motivverlust dunkel / mittel / hell |
+|---|---|---|---|
+| nichts tun | 116,3 | 350,2 | 0,2 / 0,2 / 0,2 % |
+| `screen` (stand auf `.ico`) | 36,0 | 95,3 | 27,0 / 89,5 / **96,4 %** |
+| `lighten` (stand auf `.navimg`) | 6,4 | 69,9 | 1,2 / 44,7 / 92,5 % |
+| `mask-mode:luminance` | 0,0 | 0,0 | 98,0 / 92,9 / 95,9 % |
+| `filter:url("data:…")` | 116,3 | 350,2 | wirkungslos |
+| **SVG-Filter im Dokument, Rampe 0,24→0,28** | **0,0** | **1,6** | **4,8 / 6,4 / 8,4 %** |
+
+Drei Befunde, die man ohne Messung nicht bekommt:
+
+1. **`screen` löst das Rechteck nie auf.** Es hellt den Untergrund *um* den
+   Grund herum auf — auf der dunkelsten Platte +0,114 Helligkeit, also ein
+   sichtbar **helleres** Kästchen. Nach „gar nichts tun" die schlechteste Option.
+2. **`lighten` scheitert genau dort, wo es eingebaut war.** Es hilft nur,
+   solange der Untergrund heller ist als der Grund. Die Hauptleiste misst
+   L 0,027, `nav_clan` bringt L 0,192 mit. Am Live-Stand gemessen: dE bis 166,8.
+   Dazu trägt `.navpop` selbst ein `filter:` und bildet damit eine eigene
+   Mischgruppe, in der ein Mischmodus des Kindes ohnehin ins Leere läuft.
+3. **`filter:url()` auf eine `data:`-URL ignoriert Chromium still.** Das
+   Ergebnis ist pixelgleich mit gar keinem Filter. Der Filter muss im Dokument
+   stehen.
+
+Die Schwelle ist kein Schätzwert: der hellste eingebackene Grund im ganzen Satz
+ist `rank_gold` mit L 0,232. 24 % sitzt knapp darüber. Sechs Schwellenlagen
+wurden getestet; 0,20→0,28 verliert weniger Motiv, versagt aber bei `rank_gold`.
+
+Umgesetzt als ein `<svg>` mit `feColorMatrix` (Helligkeit → Alpha) plus
+`feComponentTransfer` direkt nach `<body>`, und **einer** CSS-Regel:
+
+```css
+img.ico{--frei:url(#icoFrei);filter:var(--frei)}
+```
+
+`--frei` steht in `:root` leer. Dadurch gilt dieselbe Schattenregel für Bild
+**und** Emoji-Rückfall — `filter:var(--frei) drop-shadow(…)` ergibt beim `<img>`
+`url("#icoFrei") drop-shadow(…)` und beim `<span>` nur `drop-shadow(…)`. Elf
+Regeln tragen das Präfix; die Freistellung muss **zuerst** laufen, sonst hebt
+ein aufhellender Filter den Grund über die Schwelle.
+
+Keine Ausnahmeliste nötig: jedes Icon der UI kommt aus `ico()` und trägt
+deshalb immer `class="ico …"` — auch `navimg`, `prodimg`, `plusimg`.
+
+**Preis, offen benannt:** dunkle Motivteile unter 24 % verschwinden mit.
+Gemessen 4,8 % (dunkle Platte) bis 8,4 % (helle Platte) des Kernmotivs, am
+stärksten `hub_clan` 15,8 %, `cur_gem` 13,6 %, `ic_gear` 11,1 %. Auf hellen
+Platten fehlt dem Icon dadurch der dunkle Rand, den es vorher aus dem Grund
+hatte — deshalb müssen die `drop-shadow`-Regeln auf `.node .rw`, `.utile`,
+`.pcbuy` und `.mecrown` **erhalten bleiben**.
+
+**Aufnahmekriterium für neue Assets:** Eckfeld-Helligkeit < 0,20 und
+Motiv-p05 > 0,30. Ein Icon mit hellerem Grund bricht die Schwelle.
+
+**Der Filter ist ein Netz, kein Ersatz für saubere Assets.** Richtig
+freigestellte Dateien hätten weiche, antialiaste Kanten statt eines
+4-%-Helligkeitssprungs, würden die 5–8 % Motivverlust vermeiden und auch die
+**Platten und Rahmen** heilen, die ein `img`-Filter grundsätzlich nicht
+erreicht. Lohnend für die 68 Icon-Dateien (icon 23, nav 11, currency 10, hub 8,
+element 6, road 5, rank 3, league 2) — Kartenartwork, Arenen und Teaser
+brauchen ihren Grund.
+
+> **Geprüft:** `pruefungen/iconfrei.js`. Zwei Aufnahmen derselben Ansicht,
+> einmal mit und einmal ohne Icons, verglichen werden die vier Eckfelder der
+> gezeichneten Fläche. Am Live-Stand: **ohne Patch 12 frei / 44 mit Kasten,
+> mit Patch 50 frei / 6 mit Kasten.** Die sechs Restbefunde liegen alle im
+> Shop; einer davon (`card_back`) ist erklärt und richtig so, die anderen fünf
+> sind **nicht aufgeklärt** — wahrscheinlich Rest-Schlagschatten der Ahnen.
+
+## 6i. AAs Startseite, nachgemessen
+
+IMG_3344 nebeneinander mit unserem Stand. Was AA anders macht, ist nicht
+Geschmack, sondern Flächenverteilung:
+
+| | AA | vorher | jetzt |
+|---|---|---|---|
+| Währungsleiste | 73,8 % | 66 % (gleich breite Pillen) | 75,4 % |
+| Pass-Banner | 57,2 % | 91 % | 58,5 % |
+| linke / rechte Schiene | 16,8 / 16,5 % | fehlten | 16,1 / 16,1 % |
+| Arena-Diorama | 52,7 % breit, 17,7 % hoch | 43 % / 13 % | 53,1 % / 18,2 % |
+| Kampfreihe y | 72,0–82,7 % | 57,6–65,9 % | 78,9–90,0 % |
+
+Die fünf Kopf-Icons in der Profilzeile waren meine Zwischenlösung. AA verteilt
+sie auf **zwei senkrechte Schienen** neben der Arena: links die
+Belohnungsstaffel (Login/Daily, Wöchentlich, Lebenszeit = Erfolge), rechts die
+Verwaltung (Packs, Rangliste, Post, Tresor). In der Profilzeile bleiben nur
+Freundesliste und Menü.
+
+**Ein Detail, das zweimal falsch war:** der freie Platz gehört *nicht*
+gleichmäßig zwischen alle Kinder der Arena-Bühne. Bei AA liegt er komplett
+zwischen Arena-Chip (27 %) und Trophäenbalken (58 %) — 31 Punkte Luft, während
+Balken und Truhenreihe direkt aufeinander sitzen. `justify-content:space-between`
+hat ihn halbiert und die Truhen auf 48 % gezogen. Und `align-items:flex-start`
+auf dem Band ließ das `flex:1` der Bühne ins Leere greifen: die Mittelspalte war
+nur so hoch wie ihr Inhalt. Erst `stretch` + `margin-top:auto` auf dem Balken
+ergibt AAs Achse.
+
 ## 8. Was noch offen ist
 
 | Paket | Inhalt | Stand |
@@ -338,7 +447,7 @@ CDN-Ausfall mitten im Laden.
 | P4 | Bewegungssprache: Overshoot, Squash, Hochzählen, Belohnungs-Choreografie | Tokens stehen, Choreografie fehlt |
 | — | Typo-Leiter: 40 Schriftgrößen auf 8 benannte Stufen | offen |
 | — | Radien: 31 auf 4 | offen |
-| — | Fehlende Komponenten: Tooltips, gestaltete Scrollbars, Health/Mana-Balken, Damage-Zahlen, Freunde, Kampagne, Benachrichtigungssystem, Ladezustände | offen |
+| — | Fehlende Komponenten: Tooltips, gestaltete Scrollbars, Health/Mana-Balken, Damage-Zahlen, Kampagne, Benachrichtigungssystem, Ladezustände | offen |
 | — | **Gold-Produktbilder neu erzeugen.** `shop_gold_t1..t4` messen Farbton 35°, aber nur 0,32–0,39 Sättigung gegen 0,58 beim Währungs-Icon. Bei 108 px lesen sie als graue Münze. Aktuell hebt ein CSS-Sättigungsschub sie an — eine Zwischenlösung, kein Ersatz | offen |
 
 **Regel für alles Neue:** eine Änderung am Design-System ohne begleitenden Check

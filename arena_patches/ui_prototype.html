@@ -36,6 +36,9 @@
 :root{
   --bg:#0e1418; --panel:#16202a; --panel2:#1c2833; --line:#26343f;
   --txt:#e8eef3; --dim:#8fa0ad; --top:#01090b;
+  /* Leer. Wird nur auf img.ico gefuellt, damit die Schattenregeln weiter
+     unten fuer Bild UND Emoji-Rueckfall dieselben bleiben koennen. */
+  --frei: ;
   --up:#48e222; --gold:#f2c53d; --danger:#ff5e7e;
   /* ---------- GEM-IDENTITAET: SMARAGDGRUEN ----------
      Bewusste Abgrenzung von AA (dort sind Gems magenta/blau). Gems sind
@@ -125,12 +128,26 @@ body{display:flex;flex-direction:column;align-items:center;min-height:100vh}
 button{font-family:inherit;color:inherit;border:0;background:none;cursor:pointer}
 
 /* ---------- Top-Bar (§1) ---------- */
-.topbar{background:var(--top);padding:10px 12px;display:flex;gap:8px;align-items:center;
-  border-bottom:1px solid #000;flex:0 0 auto}
-.cur{flex:1;min-width:0;display:flex;align-items:center;gap:4px;background:#0d1519;
-  border:1px solid #1d2a33;border-radius:20px;padding:4px 6px;font-size:11.5px;font-weight:700;
+/* Die Leiste zentriert ihren Inhalt, statt ihn ueber die volle Breite zu
+   ziehen — sonst entstehen genau die Luecken, die der Nutzer gemeldet hat. */
+.topbar{background:var(--top);padding:9px 10px;display:flex;gap:7px;align-items:center;
+  justify-content:center;border-bottom:1px solid #000;flex:0 0 auto}
+/* ⚠ „Die Inhalte fuellen nicht richtig den Button" — der Befund stimmte
+   und die Ursache war die Aufteilung. Jede Pille hatte `flex:1`, also ein
+   Drittel der Leiste, egal wie lang ihre Zahl ist. Bei „1 136" blieb
+   dadurch die halbe Pille leer.
+   AA macht es anders (IMG_3344 nachgemessen): die drei Waehrungen stehen
+   in EINER Leiste ueber 74 % der Breite, jede so breit wie ihr Inhalt,
+   und Icon wie Zahl sind deutlich groesser.
+   `flex:0 1 auto` statt `flex:1` heisst: so breit wie noetig, schrumpft
+   nur bei Platznot. Damit fuellt der Inhalt die Pille wieder. */
+.cur{flex:0 1 auto;min-width:0;display:flex;align-items:center;gap:7px;background:#0d1519;
+  border:1px solid #1d2a33;border-radius:20px;padding:6px 12px;font-size:14px;font-weight:800;
   white-space:nowrap;overflow:hidden}
-.cur i{font-style:normal;font-size:12px}
+.cur i{font-style:normal;font-size:17px;display:flex;align-items:center}
+.cur .ico{width:22px;height:22px}
+/* Die Zahl bekommt Luft nach rechts, damit der Plus-Knopf nicht klebt. */
+.cur span:not(.plus){letter-spacing:.01em}
 /* Waehrungs-Pillen tragen die Identitaetsfarbe ihrer Waehrung: die Zahl
    und der Rand, nicht die ganze Flaeche — sonst kippt die Lesbarkeit. */
 .cur.c-gem{border-color:#2fd47a5c;box-shadow:inset 0 0 12px -6px #2fd47a}
@@ -402,16 +419,15 @@ nav.bottom button.on .nlbl{max-width:96px;opacity:1}
    Leiste selbst durchgehend dunkel war, fiel das nicht auf. Seit der
    aktive Reiter eine hellere Platte traegt, steht um jedes Icon ein
    dunkles Rechteck.
-   `mix-blend-mode:lighten` loest das ohne neue Grafiken: wo das Bild
-   DUNKLER ist als der Untergrund, gewinnt der Untergrund — das
-   eingebackene Rechteck verschwindet. Wo die Illustration heller ist,
-   gewinnt sie. `screen` waere hier falsch: es wuerde den Untergrund
-   zusaetzlich aufhellen und ein leuchtendes Rechteck hinterlassen. */
-.navpop img.navimg{width:100%;height:100%;object-fit:contain;
-  mix-blend-mode:lighten}
-/* Das Emoji ist ein Textknoten und darf NICHT blenden — sonst frisst der
-   Modus die dunklen Teile des Emojis. */
-.navpop span.navimg{mix-blend-mode:normal}
+   `mix-blend-mode:lighten` stand hier und hat NICHTS bewirkt: es hilft
+   nur, solange der Untergrund HELLER ist als der eingebackene Grund. Die
+   Leiste misst L 0,027, `nav_clan` bringt L 0,192 mit — der Untergrund
+   ist dunkler, also gewinnt das Rechteck. Am Live-Stand gemessen: dE bis
+   166,8. Dazu traegt `.navpop` selbst ein `filter:` und bildet damit eine
+   eigene Mischgruppe, in der ein Mischmodus des Kindes ohnehin ins Leere
+   laeuft. Die Freistellung auf `img.ico` (§Icon-Ebene) macht beides
+   ueberfluessig — `navimg` ist ein `.ico`. */
+.navpop img.navimg{width:100%;height:100%;object-fit:contain}
 nav.bottom button.on .navpop{filter:drop-shadow(0 4px 8px #000c) saturate(1.15) brightness(1.12);
   transform:translateY(-2px) scale(1.06)}
 /* Die Mitte (START) ist die groesste und ragt am weitesten heraus. */
@@ -444,7 +460,11 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
   background:linear-gradient(180deg,#3fa9e8,#1c6ea8);
   box-shadow:var(--mat-raised),0 3px 0 #12496f}
+.tbmenu{position:relative;font-size:16px;line-height:1}
 .tbmenu span{display:block;width:16px;height:2px;border-radius:1px;background:#eaf6ff}
+.tbmenu .nb2{position:absolute;right:-4px;top:-4px;min-width:15px;height:15px;line-height:15px;
+  border-radius:8px;background:var(--danger);color:#fff;font-size:8.5px;font-weight:900;
+  text-align:center;padding:0 3px}
 .tbmenu[aria-expanded="true"]{background:linear-gradient(180deg,#5dc0f6,#2d84c4)}
 #tbMenuLayer{position:fixed;inset:0;z-index:55;background:#05090cb8;
   display:flex;justify-content:center;align-items:flex-start}
@@ -461,7 +481,7 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
   box-shadow:var(--mat-raised),0 3px 0 #12496f;
   animation:tbmin var(--t-mid) var(--ease-overshoot) backwards}
 .tbmi .ico{width:20px;height:20px;flex:0 0 20px;
-  filter:drop-shadow(0 1px 2px #00000096)}
+  filter:var(--frei) drop-shadow(0 1px 2px #00000096)}
 .tbmi span.ico{font-size:16px;text-align:center}
 @keyframes tbmin{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.tbmi{animation:none}}
@@ -953,7 +973,14 @@ footer{padding:6px 12px 14px;text-align:center}
   align-items:center}
 .arenatitle{position:absolute;left:0;right:0;top:52%;display:flex;
   flex-direction:column;align-items:center;pointer-events:none}
-.diorama{margin-top:0;width:46%;max-width:190px;aspect-ratio:16/10;border-radius:18px;
+/* ⚠ „Arena in der Mitte ist zu klein" — gemessen stimmte das:
+   AAs Diorama ist 52,7 % breit und 17,7 % hoch (IMG_3344), unseres war
+   46 % breit bei 190 px Deckel, also auf einem 390-px-Geraet nur 43 %.
+   Der Deckel war das eigentliche Problem: er hat die Prozentangabe
+   ueberstimmt, sobald das Geraet breiter als 413 px war. */
+/* Das Diorama sitzt jetzt IN der Mittelspalte (58 % des Bildschirms).
+   AAs Diorama misst 52,7 % des Bildschirms — das sind 91 % der Spalte. */
+.diorama{margin-top:0;width:90%;max-width:260px;aspect-ratio:4/3;border-radius:18px;
   background-repeat:no-repeat;background-position:center;background-size:cover,cover;
   background-image:linear-gradient(160deg,#2c3a4b,#131c25);
   border:1px solid #ffffff1f;
@@ -1052,7 +1079,7 @@ footer{padding:6px 12px 14px;text-align:center}
 /* Die Platte ist HELL. Unsere Kristall- und Essenz-Icons sind ebenfalls
    hell — ohne Absetzung verschwinden sie darin. Dieselbe Behandlung wie
    bei .utile img.utileimg, wo derselbe Fall schon aufgetreten ist. */
-.node .rw .ico{filter:drop-shadow(0 1px 2px #0009)}
+.node .rw .ico{filter:var(--frei) drop-shadow(0 1px 2px #0009)}
 /* Die Beschriftung sitzt auf EIGENEM dunklem Plaettchen, nicht direkt auf
    dem Knoten. Grund: der Knoten traegt das Artwork `road_platform`, und
    das ist eine HELLE Kristallplatte — der gruene Verlauf darunter ist nur
@@ -1152,7 +1179,7 @@ h2.title.band9{border-image-width:0 44px}
    deshalb mit dunklem Schlagschatten abgesetzt — sonst verschwindet der
    helle Kristall im hellen Verlauf. */
 .utile img.utileimg{width:78%;height:78%;object-fit:contain;
-  filter:drop-shadow(0 1px 2px #0009)}
+  filter:var(--frei) drop-shadow(0 1px 2px #0009)}
 .utile span.utileimg{font-size:23px}
 .objcard{width:100%;max-width:330px;margin-top:9px;border-radius:11px;
   display:flex;align-items:center;gap:9px;padding:9px 11px;position:relative;overflow:hidden;
@@ -1177,14 +1204,23 @@ h2.title.band9{border-image-width:0 44px}
  * Technik: <img> mit `alt` = Original-Emoji und `onerror` -> UIIcon.fail(),
  * das das <img> gegen ein <span> mit dem Emoji tauscht. Laedt das CDN
  * nicht, sieht man also weiterhin das Emoji.
- * `mix-blend-mode:screen` loest den dunklen #0e1418-Grund der Icons auf
- * dunklem UI-Grund praktisch auf — kein Freistellen noetig.
+ * Die Icon-Dateien sind zu 100 % deckend — gemessen ueber alle 163 Bilder
+ * des Satzes: Alpha 255/255, 0,0 % durchsichtige Pixel. Das Motiv liegt
+ * auf einer flachen dunklen Platte, die 50-90 % der Bildflaeche einnimmt.
+ * Ein Mischmodus kann das nicht aufloesen, weil er sich fuer eine Seite
+ * entscheiden muss und die UI beide hat (Platten von L 0,03 bis L 0,86).
+ * `screen` hat den Grund als HELLERES Rechteck auf jede Platte gehaengt
+ * und dabei bis zu 96 % des Motivs verwaschen. Deshalb wird nicht
+ * gemischt, sondern freigestellt — danach ist der Untergrund egal.
  * ================================================================== */
+img.ico{--frei:url(#icoFrei);filter:var(--frei)}
 .ico{width:1.25em;height:1.25em;object-fit:contain;display:inline-block;
-  vertical-align:-.26em;mix-blend-mode:screen}
+  vertical-align:-.26em}
 .ico.big{width:1.9em;height:1.9em;vertical-align:-.5em}
 .ico.xl{width:2.6em;height:2.6em;vertical-align:-.7em}
-span.ico{mix-blend-mode:normal;text-align:center}
+/* Das Emoji ist Text. Der Filter wuerde seine dunklen Teile wegschneiden,
+   also bleibt --frei hier leer (geerbt aus :root). */
+span.ico{text-align:center}
 
 /* ==================================================================
  * INTERAKTIONS-EBENE (eine Schicht fuer alles Klickbare)
@@ -1384,7 +1420,7 @@ span.ico{mix-blend-mode:normal;text-align:center}
    ausserdem die Kante zurueck, die sie auf dunklem Grund braucht.
    ⚠ Das ist eine ZWISCHENLOESUNG, kein Ersatz fuer richtige Assets —
    vermerkt in DESIGNSYSTEM.md §8. */
-.prodcard.fr-green .pcart img.prodimg{filter:saturate(1.45) contrast(1.08)
+.prodcard.fr-green .pcart img.prodimg{filter:var(--frei) saturate(1.45) contrast(1.08)
   drop-shadow(0 2px 6px #000a)}
 .prodcard .pcart span.prodimg{line-height:1}
 .prodcard.wide{flex-direction:row;align-items:center;gap:var(--gap);padding:var(--pad)}
@@ -1445,10 +1481,10 @@ span.ico{mix-blend-mode:normal;text-align:center}
    Gilt fuer beide Waehrungen: gruene Gems auf gruenem Knopf haben
    dasselbe Problem. */
 .pcbuy .ico,.buybtn .ico,.claimbtn .ico{
-  filter:drop-shadow(0 0 1px #00000096) drop-shadow(0 1px 2px #000000b3) contrast(1.12)}
-.pcbuy.goldprice .ico{filter:drop-shadow(0 0 1px #2b1d00) drop-shadow(0 1px 2px #000000c4)
+  filter:var(--frei) drop-shadow(0 0 1px #00000096) drop-shadow(0 1px 2px #000000b3) contrast(1.12)}
+.pcbuy.goldprice .ico{filter:var(--frei) drop-shadow(0 0 1px #2b1d00) drop-shadow(0 1px 2px #000000c4)
   contrast(1.18) saturate(1.15) brightness(1.06)}
-.pcbuy.gemprice .ico{filter:drop-shadow(0 0 1px #00240f) drop-shadow(0 1px 2px #000000c4)
+.pcbuy.gemprice .ico{filter:var(--frei) drop-shadow(0 0 1px #00240f) drop-shadow(0 1px 2px #000000c4)
   contrast(1.18) saturate(1.15) brightness(1.06)}
 .pcbuy.gemprice{background:linear-gradient(180deg,#b6f7cd,#22b866 55%,#0d6b3a);
   -webkit-text-fill-color:#04240f;color:#04240f;box-shadow:var(--mat-raised),0 3px 0 #064a26}
@@ -1576,11 +1612,11 @@ span.ico{mix-blend-mode:normal;text-align:center}
    lasen die gesperrten grauen Abzeichen besser als die verdienten. AA
    loest es genauso: dunkle Krone auf goldenem Sechseck. Ein Lichtsaum
    nach oben haelt die Silhouette vom Sockelrand getrennt. */
-.mecrown.on img{filter:brightness(.4) saturate(1.7) contrast(1.2)
+.mecrown.on img{filter:var(--frei) brightness(.4) saturate(1.7) contrast(1.2)
   drop-shadow(0 -1px 0 #fff6cf88)}
 /* Nicht verdient: dieselbe Krone, nur ausgegraut. Zwei Artworks fuer
    denselben Gegenstand wuerden garantiert irgendwann auseinanderlaufen. */
-.mecrown.off img{filter:grayscale(1) brightness(.72) contrast(1.15)}
+.mecrown.off img{filter:var(--frei) grayscale(1) brightness(.72) contrast(1.15)}
 /* Emoji-Rueckfall, wenn das CDN nicht antwortet. */
 .mecrown span{font-size:19px;font-weight:900;line-height:1;color:#7e5a12}
 .mecrown.big span{font-size:27px}
@@ -2927,7 +2963,72 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .profname .pn{display:block;font-size:12.5px;font-weight:900;line-height:1.2;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .profname .px{display:block;font-size:9px;color:var(--dim);font-weight:700;margin-top:1px}
-.hubicons{display:flex;gap:5px}
+.hubicons{display:flex;gap:5px;flex:0 0 auto}
+/* ==================================================================
+ * HUB-BAND — AAs Dreispaltigkeit, nachgemessen an IMG_3344
+ * ------------------------------------------------------------------
+ *   linke Schiene 16,8 %  ·  Mitte 57,2 %  ·  rechte Schiene 16,5 %
+ * Unser Pass-Banner war 91 % breit und hat die ganze Zeile fuer sich
+ * beansprucht — deshalb wirkte es zu gross und es blieb kein Platz fuer
+ * die Kacheln, die bei AA links und rechts danebenstehen. Die fuenf
+ * Hub-Icons, die vorher als Reihe oben klebten, sitzen jetzt dort.
+ * `align-items:flex-start` ist wichtig: die Schienen sind unterschiedlich
+ * lang (drei gegen vier Kacheln) und duerfen sich nicht strecken.
+ * ================================================================== */
+/* `flex:1` auf dem Band, `#viewHome` als Spalte: der uebrige Platz
+   verteilt sich auf die Mitte, statt als totes Feld ueber der Bottom-Nav
+   stehenzubleiben. Nach dem Umbau sass die KAMPF-Reihe bei 54 % statt
+   AAs 74 % — darunter war ein Fuenftel des Bildschirms leer.
+   Diese Loesung haelt auch auf anderen Geraetehoehen: sie verteilt den
+   Rest, statt feste Abstaende zu raten. */
+/* Der untere Rand haelt die KAMPF-Reihe ueber der Bottom-Nav. Ohne ihn
+   verteilt `flex:1` den Platz bis unter die fixierte Leiste — gemessen
+   endete die Reihe bei 89,6 % und lag damit unter der Nav. */
+/* ⚠ `.active` ist hier NICHT schmueckendes Beiwerk, sondern der ganze
+   Unterschied. `.view{display:none}` und `.view.active{display:block}`
+   schalten die Ansichten. Eine Regel `#viewHome.view{display:flex}` hat
+   dieselbe Spezifitaet wie `.view.active`, steht aber weiter unten —
+   damit war die Startseite IMMER sichtbar und lag unter jeder anderen
+   Ansicht. Mit `.active` im Selektor gewinnt sie nur im richtigen
+   Zustand. */
+#viewHome.view.active{display:flex;flex-direction:column;min-height:100%;padding-bottom:84px}
+#viewHome .hubband{flex:1 1 auto}
+/* stretch, nicht flex-start: sonst ist die Mittelspalte nur so hoch wie
+   ihr Inhalt und das flex:1 der Arena-Buehne greift ins Leere. Die
+   Schienen bleiben oben, weil ihre Kacheln feste Seitenverhaeltnisse
+   haben — sie bekommen nur eine hoehere Spalte, keine hoeheren Kacheln. */
+.hubband{display:flex;align-items:stretch;gap:var(--gap);padding:12px 10px 0}
+/* Die Mittelspalte schiebt Diorama und Truhen auseinander, wenn Platz da
+   ist — sie ist der Ort, an dem AA die Hoehe verteilt. */
+.hubmid{justify-content:flex-start}
+/* Der freie Platz gehoert NICHT gleichmaessig zwischen alle drei Kinder.
+   Bei AA liegt er komplett zwischen Arena-Chip (27 %) und Trophaeenbalken
+   (58 %) — 31 Punkte Luft, waehrend Balken und Truhenreihe direkt
+   aufeinander sitzen. space-between hat ihn halbiert und die Truhen auf
+   48 % gezogen. Jetzt: Buehne oben, Balken per margin-top:auto nach
+   unten, Truhen dicht darunter. */
+#viewHome .arenahero{flex:1 1 auto;justify-content:flex-start}
+#viewHome .arenahero .progwrap{margin-top:auto}
+.hubrail{flex:0 0 17%;display:flex;flex-direction:column;gap:var(--gap)}
+.hubmid{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--gap)}
+/* Die Arena-Buehne hat ihren eigenen Aussenabstand verloren: sie sitzt
+   jetzt im Stapel der Mittelspalte und bekommt ihren Abstand von dort. */
+.hubmid .arenahero{padding:2px 0 0}
+.railtile{position:relative;width:100%;aspect-ratio:1/1;border-radius:var(--radius-sm);
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+  border:1px solid #3a4c5c;
+  background:linear-gradient(180deg,#243342,#141d26);
+  box-shadow:var(--mat-raised);
+  transition:transform var(--t-fast) var(--ease-out)}
+.railtile:active{transform:translateY(1px)}
+.railtile .rti{display:flex;align-items:center;justify-content:center;
+  width:78%;height:78%}
+.railtile .ico{width:100%;height:100%;object-fit:contain}
+.railtile span.ico{font-size:22px}
+.railtile .nb2{position:absolute;right:-4px;top:-4px;min-width:16px;height:16px;
+  line-height:16px;border-radius:8px;background:var(--danger);color:#fff;
+  font-size:9px;font-weight:900;text-align:center;padding:0 4px;
+  box-shadow:0 1px 3px #000a,inset 0 1px 0 #ffffff3d}
 .hubicon{position:relative;width:32px;height:32px;border-radius:var(--radius-sm);
   display:flex;align-items:center;justify-content:center;font-size:15px;
   border:1px solid #2b3b47;background:linear-gradient(180deg,#1b2732,#111a21)}
@@ -2936,8 +3037,12 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   border-radius:8px;background:var(--danger);color:#fff;font-size:8.5px;font-weight:900;
   text-align:center;padding:0 3px}
 /* Season-Pass-Banner — AAs „GOLDEN FORTUNE" bei 21 % Hoehe (§9.5b). */
-.passbanner{position:relative;display:flex;align-items:center;gap:10px;margin:16px 14px 0;
-  min-height:var(--banner-h);padding:0 12px;border-radius:var(--radius);overflow:hidden;
+/* Kein eigener Rand mehr: das Banner sitzt in `.hubmid` und bekommt seine
+   Breite von der Spalte. AAs Banner ist auch NIEDRIGER als unseres war
+   (7,0 % der Bildschirmhoehe gegen unsere 7,2 % bei deutlich groesserer
+   Breite) — mit --banner-h-sm statt --banner-h stimmt das Verhaeltnis. */
+.passbanner{position:relative;display:flex;align-items:center;gap:8px;margin:0;width:100%;
+  min-height:var(--banner-h-sm);padding:0 10px;border-radius:var(--radius);overflow:hidden;
   background-repeat:no-repeat;background-position:center;background-size:cover,cover;
   background-image:linear-gradient(110deg,#4a2a7a,#2a1b46 55%,#141d2b);
   border:1px solid #a45ef255;box-shadow:0 8px 20px -12px #000,inset 0 0 30px -10px #a45ef255}
@@ -3007,7 +3112,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   background:linear-gradient(180deg,#33405a,#1a2333)}
 .logincell.today .lgd{color:var(--gold)}
 .logincell.locked{opacity:.62}
-.logincell.locked .lgi{filter:grayscale(.7)}
+.logincell.locked .lgi{filter:var(--frei) grayscale(.7)}
 /* Tag 7 ist das Finale: volle Breite, festlicher Rahmen. */
 .logincell.finale{grid-column:span 4;min-height:74px;flex-direction:row;gap:10px;
   justify-content:flex-start;padding:9px 12px;text-align:left;
@@ -3290,9 +3395,153 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 /* --- Eine Bewegungssprache fuer alles Anfassbare. --- */
 .pressable{transition:transform var(--t-fast) var(--ease-out),
   box-shadow var(--t-fast) var(--ease-out)}
+
+/* ==================================================================
+ * FREUNDESLISTE — Knopf oben rechts und eigene View
+ * ------------------------------------------------------------------
+ * Der Knopf steht schon (.tbmenu-Platte in .hubicons, links vom
+ * Hamburger — AAs Reihenfolge). Er braucht nur sein Zeichen:
+ * `.tbmenu span` macht aus JEDEM span im Knopf einen 16x2-Balken des
+ * Hamburgers. Der Emoji-Rueckfall von ico() IST ein span — ohne die
+ * drei Regeln unten wird aus dem Personen-Icon ein Strich.
+ *
+ * Alle Flaechen der View tragen ihr Material INLINE (var(--mat-raised) /
+ * var(--mat-well)). Sie gehoeren deshalb NICHT zusaetzlich in den
+ * Material-Durchgang am Ende des Blattes — der ist einklassig und wuerde
+ * die Sockel der Knoepfe ueberschreiben.
+ * ================================================================== */
+.tbfriends i{display:flex;align-items:center;justify-content:center;font-style:normal}
+/* 20-px-Regel (DESIGNSYSTEM §6): das Icon liest in seiner Anzeigegroesse. */
+.tbfriends .ico{width:20px;height:20px;filter:var(--frei) drop-shadow(0 1px 2px #00000096)}
+.tbfriends span.ico{display:flex;align-items:center;justify-content:center;
+  width:20px;height:20px;background:none;border-radius:0;font-size:19px;line-height:1}
+
+/* ---------- Kopf der View ---------- */
+.frhead{display:flex;align-items:center;gap:var(--gap-lg);padding:var(--pad);
+  min-height:var(--banner-h-sm);border-radius:var(--radius);
+  background:linear-gradient(180deg,#1b2732,#131c25);box-shadow:var(--mat-raised)}
+.frhmeta{flex:1;min-width:0}
+.frhtitle{font-size:14px;font-weight:900;color:#eaf6ff}
+.frhsub{font-size:10px;color:var(--dim);margin-top:3px;line-height:1.45}
+/* Der eigene Code ist Text zum ABTIPPEN, kein Schmuck: eigenes
+   eingesenktes Plaettchen mit eigener dunkler Flaeche. Er liegt nie auf
+   einer Grafik — die Lesbarkeit darf nicht davon abhaengen, welches
+   Artwork gerade laedt (DESIGNSYSTEM §6c). */
+.frcode{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:2px;
+  padding:6px 10px;border-radius:var(--radius-sm);background:#0b1116;
+  box-shadow:var(--mat-well);cursor:pointer;
+  transition:transform var(--t-fast) var(--ease-out)}
+.frcode:active{transform:translateY(1px)}
+.frclbl{font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.frcval{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;font-weight:900;
+  color:#eaf6ff;letter-spacing:.06em}
+/* Zaehler am Reiter „Anfragen" — dieselbe Rolle wie das Badge am Knopf. */
+.frtabn{display:inline-block;margin-left:5px;min-width:14px;height:14px;line-height:14px;
+  border-radius:7px;padding:0 4px;background:var(--danger);color:#fff;
+  font-size:8.5px;font-weight:900;text-align:center;box-shadow:0 1px 2px #000a}
+
+/* ---------- Eine Zeile pro Spieler ---------- */
+.frrow{display:flex;align-items:center;gap:9px;margin-top:var(--gap);padding:var(--pad);
+  min-height:var(--banner-h);border-radius:var(--radius);border:1px solid var(--line);
+  background:linear-gradient(180deg,#1b2732,#131c25);box-shadow:var(--mat-raised);
+  animation:frin var(--t-mid) var(--ease-out) backwards}
+.frrow.req{border-color:#63b1ee66;box-shadow:var(--mat-raised),0 0 10px #63b1ee22}
+.frrow.out{min-height:var(--banner-h-sm);opacity:.85}
+@keyframes frin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.frrow{animation:none}}
+/* Avatar: es gibt keine Portraits fuer fremde Spieler — das Element-Icon
+   auf einem eingesenkten Plaettchen traegt die Kachel. Der Punkt oben
+   rechts ist der Online-Zustand. */
+.fravatar{position:relative;flex:0 0 40px;width:40px;height:40px;border-radius:var(--radius-sm);
+  display:flex;align-items:center;justify-content:center;background:#0b1116;
+  box-shadow:var(--mat-well)}
+.fravatar .frav{width:26px;height:26px;object-fit:contain}
+.fravatar span.frav{font-size:20px;line-height:1}
+.frdot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;
+  background:#4a5f78;box-shadow:inset 0 1px 0 #ffffff45,0 1px 2px #000a}
+.frdot.on{background:linear-gradient(180deg,#7ef06a,#2f9a2f)}
+.frmeta{flex:1;min-width:0}
+.frnm{display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:800;color:#dbe6ef;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.frfav{color:var(--gold);font-size:11px}
+.frtag{flex:0 0 auto;font-size:8px;font-weight:900;letter-spacing:.06em;padding:1px 5px;
+  border-radius:6px;background:#1c6ea8;color:#eaf6ff;box-shadow:var(--lit),var(--unlit)}
+.frsub{font-size:9.5px;color:var(--dim);margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.frcodesm{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.04em}
+/* Gold auf DUNKLER Flaeche — das ist die erlaubte Richtung (§4). */
+.frtr{display:flex;align-items:center;gap:4px;margin-top:4px;
+  font-size:11px;font-weight:900;color:var(--gold)}
+.frtr .ico{width:13px;height:13px}
+.frtr span.ico{font-size:11px}
+
+/* ---------- Knoepfe ---------- */
+.frbtns{flex:0 0 auto;display:flex;align-items:center;gap:6px}
+/* Duell: blau wie jede neutrale Aktion, weisse Schrift auf dunkelblau. */
+.frduel{border-radius:var(--radius-sm);padding:9px 11px;font-size:11px;font-weight:900;
+  letter-spacing:.04em;color:#fff;background:linear-gradient(180deg,#3fa9e8,#1c6ea8);
+  box-shadow:var(--lit),var(--unlit),0 3px 0 #12496f}
+/* Spenden: gruen wie .donbtn im Clan — dieselbe Handlung, dieselbe
+   Farbe. Die Flaeche ist HELL, die Schrift deshalb DUNKEL (§4). */
+.frgift{width:38px;height:36px;border-radius:var(--radius-sm);
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,#58fa1b,#3aad16);color:#0a2404;
+  box-shadow:var(--lit),var(--unlit),0 3px 0 #1f6b09}
+.frgift .ico{width:20px;height:20px}
+.frgift span.ico{font-size:16px;line-height:1}
+.frduel.is-disabled,.frgift.is-disabled{background:linear-gradient(180deg,#3a4a58,#222e39);
+  color:#8fa0ad;box-shadow:var(--mat-sunken)}
+.fracc,.frdec{min-width:36px;height:36px;border-radius:var(--radius-sm);padding:0 10px;
+  font-size:12px;font-weight:900}
+.fracc{background:linear-gradient(180deg,#58fa1b,#3aad16);color:#0a2404;
+  box-shadow:var(--lit),var(--unlit),0 3px 0 #1f6b09}
+.frdec{background:linear-gradient(180deg,#3a4a58,#222e39);color:#dbe6ef;
+  box-shadow:var(--lit),var(--unlit),0 3px 0 #16202a}
+.fradd{border-radius:var(--radius-sm);padding:9px 11px;font-size:10.5px;font-weight:900;
+  letter-spacing:.04em;color:#fff;background:linear-gradient(180deg,#3fa9e8,#1c6ea8);
+  box-shadow:var(--lit),var(--unlit),0 3px 0 #12496f}
+.frstate{font-size:10px;font-weight:800;color:var(--dim);padding:0 4px}
+
+/* ---------- Suche und Hinweise ---------- */
+.frsearch{display:flex;gap:var(--gap);margin-top:var(--gap)}
+/* Ein Eingabefeld ist eine Vertiefung, kein Knopf. */
+.frinput{flex:1;min-width:0;font-family:inherit;font-size:12px;font-weight:700;
+  color:var(--txt);padding:10px var(--pad);border-radius:var(--radius-sm);
+  border:1px solid var(--line);background:#0b1116;box-shadow:var(--mat-well)}
+.frinput::placeholder{color:#5d7284}
+.frgo{flex:0 0 auto;border-radius:var(--radius-sm);padding:0 14px;font-size:11.5px;
+  font-weight:900;letter-spacing:.04em;color:#fff;
+  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);
+  box-shadow:var(--lit),var(--unlit),0 3px 0 #12496f}
+.frempty{margin-top:var(--gap);padding:var(--pad);border-radius:var(--radius);
+  font-size:10.5px;line-height:1.55;color:var(--dim);background:#0b1116;
+  box-shadow:var(--mat-well)}
+.frnote{margin-top:var(--gap-lg);font-size:10px;color:var(--dim);line-height:1.55;
+  border-left:2px solid #3fa9e866;padding-left:8px}
+
 </style>
 </head>
 <body>
+
+<!-- Freistell-Filter fuer alle Kristall-Icons.
+     Warum im Markup und nicht im CSS: Chromium ignoriert einen
+     filter:url() auf eine data:-URL still — gemessen pixelgleich mit
+     gar keinem Filter. Die Referenz muss im Dokument liegen.
+     Warum sRGB: ohne color-interpolation-filters rechnet der Filter in
+     linearem Licht, dann sitzt die Schwelle woanders als gemessen. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="icoFrei" color-interpolation-filters="sRGB">
+    <!-- Helligkeit -> Alphakanal -->
+    <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  .299 .587 .114 0 0"/>
+    <!-- 26 Stuetzstellen im Abstand 4 %: 0 bis einschliesslich 24 %,
+         ab 28 % voll. Der hellste eingebackene Grund im Satz misst
+         23,2 % (rank_gold) — die Schwelle sitzt knapp darueber. -->
+    <feComponentTransfer>
+      <feFuncA type="table" tableValues="0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1"/>
+    </feComponentTransfer>
+  </filter>
+</svg>
+
 <div id="app">
 
   <!-- ===== Top-Bar (§1) =====
@@ -3314,9 +3563,6 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
          ergaenzen das Bestiarium als eigenen Eintrag, weil bei uns der
          Einsteiger-Guide und das Gegner-Nachschlagewerk zwei Dinge
          sind (AA_UI_REFERENZ §18.2). -->
-    <button class="tbmenu pressable" id="tbMenu" aria-label="Menü"
-            aria-haspopup="true" aria-expanded="false">
-      <span></span><span></span><span></span></button>
   </div>
   <!-- Aufklapp-Menue. Liegt bewusst NICHT in der Topbar: die ist
        overflow-begrenzt, das Menue muss darueber hinausragen. -->
@@ -3418,36 +3664,64 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       <span class="avatar" id="profAvatar"><i>🜂</i><b id="profLvl">4</b></span>
       <span class="profname"><span class="pn" id="profName">Prisma-Magier</span>
         <span class="px" id="profXp">Stufe 4 · 620/1000 XP</span></span>
+      <!-- AA hat hier NUR zwei Knoepfe: Freunde, dann Menue (IMG_3344,
+           gemessen bei x 78-98 % der Namenszeile). Die fuenf Hub-Icons,
+           die vorher hier standen, sind bei AA die SEITENSCHIENEN neben
+           dem Pass-Banner — sie sind dorthin gewandert. -->
       <span class="hubicons">
-        <button class="hubicon pressable" id="icoDaily" title="Tagesziele &amp; Login">
-          <span data-ico="ic_calendar" data-emoji="🗓"></span>
-          <i class="nb2" id="tileDailyBadge" style="display:none">0</i></button>
-        <!-- Der Clan hat jetzt einen Dauerplatz in der Bottom-Nav; dieser
-             Slot traegt deshalb die PACKS (vorher Bottom-Nav-Tab). -->
-        <button class="hubicon pressable" id="icoPack" title="Booster-Packs">
-          <span data-ico="ic_gift" data-emoji="🎁"></span>
-          <i class="nb2" id="badgePack" style="display:none">0</i></button>
-        <button class="hubicon pressable" id="icoBoard" title="Rangliste">
-          <span data-ico="ic_rank" data-emoji="🏅"></span></button>
-        <button class="hubicon pressable" id="icoMail" title="Post">
-          <span data-ico="ic_mail" data-emoji="✉"></span>
-          <i class="nb2" id="tileMailBadge" style="display:none">0</i></button>
-        <button class="hubicon pressable" id="icoSettings" title="Einstellungen">
-          <span data-ico="ic_gear" data-emoji="⚙"></span></button>
+        <!-- Freundesliste. Ort und Plattenklasse bleiben wie sie sind
+             (links vom Hamburger, AAs Reihenfolge), ebenso die Badge-Id.
+             Zwei Aenderungen:
+             (1) zusaetzliche Klasse .tbfriends — sonst macht die Regel
+                 `.tbmenu span` aus dem Emoji-Rueckfall einen
+                 Hamburger-Balken, und das Zeichen liest nicht bei seiner
+                 Anzeigegroesse (20-px-Regel, DESIGNSYSTEM §6).
+             (2) das Zeichen steckt in <i data-ico> statt als nacktes
+                 Emoji: ui_assets.json hat heute KEIN Personen-Motiv (alle
+                 174 Schluessel geprueft), ico() faellt deshalb auf 👥
+                 zurueck — und sobald "ic_friends" existiert, zieht der
+                 Knopf das Artwork ohne Code-Aenderung. -->
+        <button class="tbmenu tbfriends pressable" id="tbFriends" title="Freunde"
+                aria-label="Freunde"><i data-ico="ic_friends" data-emoji="👥"></i>
+          <i class="nb2" id="badgeFriends" style="display:none">0</i></button>
+        <button class="tbmenu pressable" id="tbMenu" aria-label="Menü"
+                aria-haspopup="true" aria-expanded="false">
+          <span></span><span></span><span></span></button>
       </span>
     </div>
 
-    <!-- 21 %: SEASON-PASS. AA setzt ihn als breites zentriertes Banner
-         GENAU hier — nicht in die Nav, nicht zu den Hub-Kacheln
-         (§9.5b y 592, §9.4 mit Countdown). -->
-    <button class="passbanner pressable" id="passBanner">
-      <span class="pbs" data-ico="hub_pass" data-emoji="🎟"></span>
-      <span class="pbt"><span class="pbk">SAISON</span>
-        <span class="pbn goldtext" id="pbName">Goldene Fortuna</span>
-        <span class="pbd" id="pbSub">—</span></span>
-      <span class="pbb" id="pbBtn">ÖFFNEN</span>
-    </button>
+    <!-- ==================================================================
+         DIE MITTLERE BANDBREITE — nach AAs Aufbau, nachgemessen an
+         IMG_3344 (1320x2868). Drei Spalten:
+           linke Schiene 16,8 %  ·  Mitte 57,2 %  ·  rechte Schiene 16,5 %
+         In der Mitte stehen Pass-Banner und Pass-Fortschritt; links und
+         rechts die Kacheln, die vorher als Icon-Reihe oben klebten.
+         Der Unterschied ist nicht Geschmack: unser Pass-Banner war 91 %
+         breit und hat die ganze Zeile fuer sich beansprucht, waehrend
+         AAs Banner 57 % misst und links wie rechts Platz laesst. Genau
+         das hat der Nutzer als „der Banner ist zu gross" gemeldet.
+         ================================================================== -->
+    <div class="hubband">
+      <div class="hubrail left">
+        <button class="railtile pressable" id="icoDaily" title="Tagesziele &amp; Login">
+          <span class="rti" data-ico="ic_calendar" data-emoji="🗓"></span>
+          <i class="nb2" id="tileDailyBadge" style="display:none">0</i></button>
+        <button class="railtile pressable" id="icoWeekly" title="Wochenziele">
+          <span class="rti" data-ico="ic_quest" data-emoji="📜"></span>
+          <i class="nb2" id="badgeWeekly" style="display:none">0</i></button>
+        <button class="railtile pressable" id="icoLifetime" title="Erfolge">
+          <span class="rti" data-ico="ic_trophy" data-emoji="🎖"></span>
+          <i class="nb2" id="badgeLifetime" style="display:none">0</i></button>
+      </div>
+      <div class="hubmid">
 
+        <button class="passbanner pressable" id="passBanner">
+          <span class="pbs" data-ico="hub_pass" data-emoji="🎟"></span>
+          <span class="pbt"><span class="pbk">SAISON</span>
+            <span class="pbn goldtext" id="pbName">Goldene Fortuna</span>
+            <span class="pbd" id="pbSub">—</span></span>
+          <span class="pbb" id="pbBtn">ÖFFNEN</span>
+        </button>
     <div class="arenahero" id="arenaHero">
       <!-- AAs Achse (§19.1), gemessen als OBERKANTEN und um AAs iOS-
            Statusleiste (7 % von 2868 px) korrigiert:
@@ -3475,6 +3749,21 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       </div>
       <!-- 64 %: vier Hex-Slots fuer Truhen/Packs (§14.3) -->
       <div class="slotrow" id="packSlots"></div>
+    </div>
+      </div>
+      <div class="hubrail right">
+        <button class="railtile pressable" id="icoPack" title="Booster-Packs">
+          <span class="rti" data-ico="ic_gift" data-emoji="🎁"></span>
+          <i class="nb2" id="badgePack" style="display:none">0</i></button>
+        <button class="railtile pressable" id="icoBoard" title="Rangliste">
+          <span class="rti" data-ico="ic_rank" data-emoji="🏅"></span></button>
+        <button class="railtile pressable" id="icoMail" title="Post">
+          <span class="rti" data-ico="ic_mail" data-emoji="✉"></span>
+          <i class="nb2" id="tileMailBadge" style="display:none">0</i></button>
+        <button class="railtile pressable" id="icoVault" title="Kristalltresor">
+          <span class="rti" data-ico="ic_gear" data-emoji="🔮"></span>
+          <i class="nb2" id="badgeVault" style="display:none">0</i></button>
+      </div>
     </div>
 
     <!-- 74-83 %: EVENTS | BATTLE (55 % Breite) | CHALLENGES (§14.3).
@@ -3519,6 +3808,29 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     <div class="emotebar" id="emoteBar"></div>
     <div class="feed" id="clanFeed"></div>
     <p class="fortnote" id="clanNote">—</p>
+  </section>
+
+  <!-- ===== VIEW F: FREUNDE =====
+       AA zeigt oben rechts ein Personen-Icon; die Liste dahinter fehlte
+       bei uns komplett. Logik: arena_friends.js (localStorage
+       "arenaFriends"). Drei Reiter, weil es drei verschiedene Handlungen
+       sind: sehen und spielen · beantworten · finden.
+       BEWUSST NICHT in SWIPE_ORDER: die Freundesliste ist wie Rangliste
+       und Post ein Ziel aus der Topbar, kein Hauptreiter (§15.5). -->
+  <section id="viewFriends" class="view">
+    <div class="viewhead"><button class="backbtn" id="frBack">‹</button>
+      <h2 class="title">Freunde</h2></div>
+    <div class="frhead" id="frHead"></div>
+    <div class="tabs">
+      <button class="tab on" id="frTabList" data-frtab="list">Liste</button>
+      <button class="tab" id="frTabReq" data-frtab="req">Anfragen<span
+        class="frtabn" id="frTabN" style="display:none">0</span></button>
+      <button class="tab" id="frTabSearch" data-frtab="search">Suchen</button>
+    </div>
+    <div class="frpane" id="frPaneList"></div>
+    <div class="frpane" id="frPaneReq" style="display:none"></div>
+    <div class="frpane" id="frPaneSearch" style="display:none"></div>
+    <p class="frnote" id="frNote">—</p>
   </section>
 
   <!-- ===== VIEW L: RANGLISTE =====
@@ -4122,6 +4434,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 <script src="./arena_fortress.js"></script>
 <script src="./arena_rivals.js"></script>
 <script src="./arena_clan.js"></script>
+<script src="./arena_friends.js"></script>
 <script src="./arena_vault.js"></script>
 <script src="./arena_daily.js"></script>
 <script src="./arena_guide.js"></script>
@@ -4747,6 +5060,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   window.UIBadge = (function () {
     var MAP = { collection: "navBadge", shop: "badgeShop", pack: "badgePack",
                 clan: "badgeClan", mail: "tileMailBadge",
+                friends: "badgeFriends",
                 daily: "tileDailyBadge", guide: "tileGuideBadge",
                 events: "tileEventBadge" };
     return {
@@ -7541,6 +7855,279 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     UIBadge.set("clan", CL.notifications().length);
   }
 
+  /* ==================================================================
+   * FREUNDESLISTE — AAs Personen-Icon links neben dem Hamburger
+   * ------------------------------------------------------------------
+   * Reine Praesentation. Jede Regel (wer darf spenden, was kostet ein
+   * Duell, wie lange braucht eine Anfrage) steht in arena_friends.js;
+   * hier wird nur gezeichnet, was die API sagt, und die Fehlermeldung
+   * des Moduls als Toast gezeigt — sie ist dafuer schon formuliert.
+   * ================================================================== */
+  function FRof() { return window.ArenaFriends || null; }
+  var friendsTab = "list";
+  var frHits = null;                 // letztes Suchergebnis, null = noch nichts gesucht
+
+  /* Der Demo-Bestand wird EINMAL angelegt, wie beim Clan. Er braucht den
+     Clan zuerst: zwei der Freunde sind Clankameraden, und nur die
+     duerfen ueberhaupt Karten empfangen. */
+  var FRIENDS_SEED_KEY = "arenaFriendsProtoSeed";
+  function seedFriends() {
+    var FR = FRof(); if (!FR) return;
+    if (localStorage.getItem(FRIENDS_SEED_KEY)) return;
+    seedClan();
+    FR.seedDemoFriends();
+    localStorage.setItem(FRIENDS_SEED_KEY, "1");
+  }
+
+  /* Das Badge zaehlt NUR eingehende Anfragen — also genau das, was eine
+     Handlung verlangt. Duell-Ergebnisse und Statuswechsel bekommen
+     keinen roten Punkt: ein Zaehler, der auch fuer „nichts zu tun"
+     leuchtet, wird nach zwei Tagen ignoriert. */
+  function updateFriendsBadge() {
+    var FR = FRof(); if (!FR) return;
+    var n = FR.pendingCount();
+    UIBadge.set("friends", n);
+    var t = $("frTabN");
+    if (t) { t.textContent = n > 99 ? "99+" : String(n); t.style.display = n > 0 ? "" : "none"; }
+  }
+
+  function frRowMeta(f, extra) {
+    return '<div class="frmeta">' +
+      '<div class="frnm">' + (f.fav ? '<span class="frfav">★</span>' : "") + f.name +
+        (f.clanMate ? '<span class="frtag">Clan</span>' : "") + "</div>" +
+      '<div class="frsub">' + f.arenaName + " · " + f.statusText +
+        (extra ? " · " + extra : "") + "</div>" +
+      '<div class="frtr">' + ico("cur_trophy", "🏆") + "<b>" + f.trophies + "</b></div>" +
+      "</div>";
+  }
+  function frAvatar(f) {
+    return '<div class="fravatar">' + elIco(f.el, EL_EMO[f.el] || "👤", "frav") +
+      '<span class="frdot' + (f.online ? " on" : "") + '"></span></div>';
+  }
+
+  function renderFriendsHead() {
+    var FR = FRof(), s = FR.summary();
+    $("frHead").innerHTML =
+      '<div class="frhmeta"><div class="frhtitle">Deine Freunde</div>' +
+        '<div class="frhsub">' + s.friends + "/" + s.max + " · " + s.online +
+          " online · " + s.duels + " Duelle</div></div>" +
+      '<div class="frcode" id="frCode"><span class="frclbl">Dein Code</span>' +
+        '<span class="frcval">' + s.code + "</span></div>";
+    $("frCode").addEventListener("click", function () {
+      UISfx.tap();
+      try { if (navigator.clipboard) navigator.clipboard.writeText(s.code); } catch (e) {}
+      toast("Freundescode " + s.code + " kopiert.");
+    });
+  }
+
+  function renderFriendsList() {
+    var FR = FRof(), rows = FR.list(), gift = {};
+    FR.giftableFriends().forEach(function (g) { gift[g.id] = g; });
+    var html = secribbon("Freundesliste", rows.length ? String(rows.length) : "leer");
+    if (!rows.length) {
+      html += '<div class="frempty">Noch keine Freunde. Such unter „Suchen" nach ' +
+        "einem Namen oder gib einen Freundescode ein.</div>";
+    }
+    html += rows.map(function (f) {
+      var g = gift[f.id] || { ok: false, reason: "Karten spenden" };
+      return '<div class="frrow" data-friend="' + f.id + '">' +
+        frAvatar(f) + frRowMeta(f, "Bilanz " + f.recordText) +
+        '<div class="frbtns">' +
+          '<button class="frduel pressable" data-duel="' + f.id + '">DUELL</button>' +
+          '<button class="frgift pressable' + (g.ok ? "" : " is-disabled") +
+            '" data-gift="' + f.id + '" title="' + (g.reason || "Karten spenden") + '">' +
+            ico("ic_donate", "🤲") + "</button>" +
+        "</div></div>";
+    }).join("");
+    $("frPaneList").innerHTML = html;
+    hydrateRibbons($("frPaneList"));
+    frBind($("frPaneList"), "data-duel", frDuel);
+    frBind($("frPaneList"), "data-gift", frGift);
+    markPressable($("frPaneList"));
+    sweepSoon($("frPaneList"));
+  }
+
+  function renderFriendsRequests() {
+    var FR = FRof(), inc = FR.requestsIn(), out = FR.requestsOut();
+    var html = secribbon("Eingehend", inc.length ? String(inc.length) : "keine");
+    html += inc.length ? inc.map(function (r) {
+      return '<div class="frrow req">' + frAvatar(r) + frRowMeta(r, "angefragt " + r.ageText) +
+        '<div class="frbtns">' +
+          '<button class="fracc pressable" data-accept="' + r.id + '" ' +
+            'aria-label="Annehmen">✓</button>' +
+          '<button class="frdec pressable" data-decline="' + r.id + '" ' +
+            'aria-label="Ablehnen">✕</button>' +
+        "</div></div>";
+    }).join("") : '<div class="frempty">Keine offenen Anfragen.</div>';
+
+    html += secribbon("Gesendet", out.length ? String(out.length) : "keine");
+    html += out.length ? out.map(function (o) {
+      return '<div class="frrow out"><div class="frmeta">' +
+        '<div class="frnm">' + o.name + "</div>" +
+        '<div class="frsub">' + o.answerText + "</div></div>" +
+        '<div class="frbtns"><button class="frdec pressable" data-cancel="' + o.id +
+          '">Zurückziehen</button></div></div>';
+    }).join("") : '<div class="frempty">Keine gesendeten Anfragen.</div>';
+
+    $("frPaneReq").innerHTML = html;
+    hydrateRibbons($("frPaneReq"));
+    frBind($("frPaneReq"), "data-accept", function (id) { frAnswer(id, true); });
+    frBind($("frPaneReq"), "data-decline", function (id) { frAnswer(id, false); });
+    frBind($("frPaneReq"), "data-cancel", frCancel);
+    markPressable($("frPaneReq"));
+    sweepSoon($("frPaneReq"));
+  }
+
+  /* Suche. Jeder Treffer kennt genau EINEN Zustand und traegt deshalb
+     genau einen Knopf — nie zwei, die sich widersprechen. */
+  function renderFriendsSearch() {
+    var html = secribbon("Spieler suchen");
+    html += '<div class="frsearch">' +
+      '<input id="frQuery" class="frinput" type="search" autocomplete="off" ' +
+        'placeholder="Name oder Code (APT-XXXX-XXXX)" aria-label="Spieler suchen">' +
+      '<button class="frgo pressable" id="frGo">SUCHEN</button></div>';
+    if (frHits === null) {
+      html += '<div class="frempty">Mindestens 3 Zeichen des Namens — oder der ' +
+        "vollständige Freundescode.</div>";
+    } else if (frHits.self) {
+      html += '<div class="frempty">Das ist dein eigener Freundescode.</div>';
+    } else if (!frHits.hits.length) {
+      html += '<div class="frempty">Kein Spieler zu „' + frHits.query + "“ gefunden.</div>";
+    } else {
+      html += frHits.hits.map(function (h) {
+        var lbl = h.state === "friend" ? "Freund"
+          : h.state === "outgoing" ? "angefragt"
+          : h.state === "incoming" ? "ANNEHMEN" : "HINZUFÜGEN";
+        return '<div class="frrow">' + frAvatar(h) +
+          '<div class="frmeta"><div class="frnm">' + h.name + "</div>" +
+            '<div class="frsub">' + h.arenaName + " · " + h.statusText + "</div>" +
+            '<div class="frsub frcodesm">' + h.code + "</div></div>" +
+          '<div class="frbtns">' +
+            (h.canAdd ? '<button class="fradd pressable" data-add="' + h.id + '">' +
+                        lbl + "</button>"
+                      : '<span class="frstate">' + lbl + "</span>") +
+          "</div></div>";
+      }).join("");
+    }
+    $("frPaneSearch").innerHTML = html;
+    hydrateRibbons($("frPaneSearch"));
+    $("frGo").addEventListener("click", frSearch);
+    $("frQuery").addEventListener("keydown", function (e) { if (e.key === "Enter") frSearch(); });
+    if (frHits) $("frQuery").value = frHits.query;
+    frBind($("frPaneSearch"), "data-add", frAdd);
+    markPressable($("frPaneSearch"));
+    sweepSoon($("frPaneSearch"));
+  }
+
+  function frBind(root, attr, fn) {
+    Array.prototype.forEach.call(root.querySelectorAll("[" + attr + "]"), function (b) {
+      b.addEventListener("click", function () { fn(b.getAttribute(attr)); });
+    });
+  }
+  function frFehler(e) { UISfx.deny(); toast(e && e.message ? e.message : "Das ging nicht."); }
+
+  function frSearch() {
+    var FR = FRof();
+    try { frHits = FR.search($("frQuery").value); UISfx.tap(); }
+    catch (e) { frHits = null; frFehler(e); }
+    renderFriendsSearch();
+  }
+  function frAdd(id) {
+    var FR = FRof();
+    try {
+      var r = FR.sendRequest(id);
+      UISfx.confirm();
+      toast(r.accepted ? r.friend.name + " ist jetzt dein Freund."
+                       : "Anfrage an " + r.name + " gesendet.");
+      if (frHits) { try { frHits = FR.search(frHits.query); } catch (e2) { frHits = null; } }
+    } catch (e) { frFehler(e); }
+    renderFriends();
+  }
+  function frAnswer(id, ja) {
+    var FR = FRof();
+    try {
+      var r = ja ? FR.acceptRequest(id) : FR.declineRequest(id);
+      UISfx.confirm();
+      toast(ja ? r.friend.name + " ist jetzt dein Freund."
+               : "Anfrage von " + r.name + " abgelehnt.");
+    } catch (e) { frFehler(e); }
+    renderFriends();
+  }
+  function frCancel(id) {
+    var FR = FRof();
+    try {
+      var r = FR.cancelRequest(id);
+      UISfx.tap();
+      toast("Anfrage an " + r.name + " zurückgezogen.");
+    } catch (e) { frFehler(e); }
+    renderFriends();
+  }
+  /* Duell. Der Prototyp spielt kein Match — er holt das Loadout, wuerfelt
+     den Ausgang und verbucht ihn. Die Meldung nennt AUSDRUECKLICH, dass
+     keine Trophaeen wandern; sonst rechnet der Spieler damit. */
+  function frDuel(id) {
+    var FR = FRof();
+    try {
+      var lo = FR.startDuel(id);
+      var win = Math.random() < 0.5;
+      var r = FR.resolveDuel(id, { win: win });
+      UISfx[win ? "reward" : "deny"]();
+      toast((win ? "Duell gegen " : "Duell gegen ") + lo.name +
+        (win ? " gewonnen" : " verloren") + " — " + r.recordText +
+        ". Keine Trophäen, es war ein Freundschaftsspiel.");
+    } catch (e) { frFehler(e); }
+    renderFriends();
+  }
+  /* Spende. ArenaFriends reicht an ArenaClan.donateCards() durch — also
+     muss hier GENAU dasselbe passieren wie in doDonate(): Gold bucht der
+     Hub, die Tagesquest bekommt ihr Ereignis, die Telemetrie ihren
+     Eintrag. Sonst waere dieselbe Handlung je nach Knopf verschieden
+     viel wert. (Das ist KEIN Widerspruch zum duellfreien Duell: hier
+     verlaesst eine echte Karte den eigenen Bestand, und das
+     Sendekontingent begrenzt es.) */
+  function frGift(id) {
+    var FR = FRof();
+    try {
+      var r = FR.giftCards(id, 1);
+      track("donation_sent", { card: r.cardId, n: r.count, via: "friends" });
+      var DY = DYof(); if (DY) DY.reportEvent("donate", r.count);
+      setGold(gold() + r.reward.gold);
+      UISfx.confirm();
+      toast(r.count + " × " + r.cardName + " an " + r.friendName + " gespendet (" +
+        r.quota.used + "/" + r.quota.max + ").");
+      renderTop();
+    } catch (e) { frFehler(e); }
+    renderFriends();
+  }
+
+  function setFriendsTab(k) {
+    friendsTab = k;
+    [["list", "frTabList", "frPaneList"], ["req", "frTabReq", "frPaneReq"],
+     ["search", "frTabSearch", "frPaneSearch"]].forEach(function (x) {
+      var t = $(x[1]); if (t) t.classList.toggle("on", x[0] === k);
+      var p = $(x[2]); if (p) p.style.display = x[0] === k ? "" : "none";
+    });
+  }
+
+  function renderFriends() {
+    var FR = FRof();
+    if (!FR) { $("frNote").textContent = "arena_friends.js nicht geladen."; return; }
+    seedFriends();
+    renderFriendsHead();
+    renderFriendsList();
+    renderFriendsRequests();
+    renderFriendsSearch();
+    setFriendsTab(friendsTab);
+    updateFriendsBadge();
+    /* markSeen() erst NACH dem Zeichnen: der Spieler soll die neuen
+       Eintraege noch als frisch sehen, bevor sie es nicht mehr sind. */
+    FR.markSeen();
+    $("frNote").textContent = "Logik: arena_friends.js (localStorage „arenaFriends“). " +
+      "Freundes-Duelle kosten und geben KEINE Trophäen — sonst wäre die Rangliste über " +
+      "abgesprochene Duelle manipulierbar. Kartenspenden laufen über die Anfragetafel " +
+      "des Clans und nur an Clan-Mitglieder.";
+  }
+
   /* ---------- Rangliste ---------- */
   function renderBoard() {
     var CL = CLof();
@@ -9365,6 +9952,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
                navForge: "viewForge", navPack: "viewPack",
                navShop: "viewShop", navFortress: "viewFortress",
                navClan: "viewClan", navBoard: "viewBoard",
+               navFriends: "viewFriends",
                navPass: "viewPass", navHeroes: "viewHeroes", navEvents: "viewEvents",
                navMail: "viewMail", navSettings: "viewSettings",
                navGuide: "viewGuide", navManual: "viewManual",
@@ -9404,6 +9992,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       ArenaAudio.music(navId === "navClan" && clanTab === "war" ? "audio_war" : "audio_theme");
     }
     if (navId === "navClan") renderClan();
+    if (navId === "navFriends") renderFriends();
     if (navId === "navBoard") { renderBoard(); setTimeout(lbScrollToMe, 60); }
     if (navId === "navPass") renderPass();
     if (navId === "navHeroes") renderHeroes();
@@ -9518,6 +10107,31 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   // fuehrt zu den Packs.
   onNav("navClan"); onNav("icoPack", "navPack"); onNav("icoBoard", "navBoard");
   onNav("passBanner", "navPass"); onNav("icoMail", "navMail");
+  /* Die neuen Schienen-Kacheln. Wochenziele und Erfolge zeigen vorerst
+     denselben Tagesziel-Bildschirm mit einem Hinweis — sie stehen an
+     AAs Stelle, aber ihre eigenen Inhalte kommen erst, wenn der Nutzer
+     die Belohnungs-Screenshots geschickt hat. Lieber ein ehrlicher
+     Platzhalter als eine leere Kachel, die nichts tut. */
+  $("icoWeekly").addEventListener("click", function () {
+    UISfx.tap(); openDaily(); toast("Wochenziele — Aufbau folgt");
+  });
+  $("icoLifetime").addEventListener("click", function () {
+    UISfx.tap(); openDaily(); toast("Erfolge (Lifetime) — Aufbau folgt");
+  });
+  $("icoVault").addEventListener("click", function () {
+    UISfx.tap();
+    if (window.ArenaVault) { show("navShop"); toast("Kristalltresor im Shop"); }
+    else toast("Tresor noch nicht geladen");
+  });
+  /* Freundesliste: der Knopf oben rechts fuehrt in die View. KEIN
+     Bottom-Nav-Tab und kein Eintrag in SWIPE_ORDER — sie ist, wie
+     Rangliste und Post, ein Ziel aus der Kopfzeile. */
+  onNav("tbFriends", "navFriends");
+  $("frBack").addEventListener("click", function () { UISfx.tap(); show("navHome"); });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-frtab]"), function (b) {
+    b.addEventListener("click", function () { UISfx.tap(); setFriendsTab(b.getAttribute("data-frtab")); });
+  });
+  updateFriendsBadge();
   // Promo-Banner an Shop-Position 1 fuehrt in den Season-Pass (§8.1).
   onNav("shopPromo", "navPass");
   /* ==================================================================
@@ -9591,7 +10205,11 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     UISfx.confirm(); bsSeite = 2; renderBestiary();
   });
 
-  onNav("icoSettings", "navSettings"); onNav("tileGuide", "navGuide");
+  /* Die Einstellungen sind vom Startbildschirm in das Aufklapp-Menue
+     gewandert — genau wie bei AA, wo SETTINGS der fuenfte Menue-Eintrag
+     ist. Der alte Knopf `icoSettings` existiert nicht mehr; `onNav`
+     wuerde darueber stolpern. */
+  onNav("tileGuide", "navGuide");
   $("icoDaily").addEventListener("click", openDaily);
   $("dailyClose").addEventListener("click", closeDaily);
   $("dailyLayer").addEventListener("click", function (e) {
@@ -9756,11 +10374,18 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
        Profilzeile bekommt seine Farbfamilie (Konsistenz-Sweep). */
     tint($("tileEvents"), "nature");
     tint($("tileGuide"), "gold");
+    /* Die linke Schiene traegt AAs Belohnungsstaffel — Tag, Woche,
+       Lebenszeit. Sie steigt in der Wertigkeit, also steigt auch die
+       Farbe: Gold -> Smaragd -> Arkan. */
     tint($("icoDaily"), "pack_gold");
+    tint($("icoWeekly"), "gems");
+    tint($("icoLifetime"), "pack_arcane");
     tint($("icoPack"), "pack_gold");
     tint($("icoBoard"), "gold");
     tint($("icoMail"), "speed");
-    tint($("icoSettings"), "neutral");
+    /* icoSettings gibt es nicht mehr (siehe oben) — der Tresor-Knopf der
+       rechten Schiene sitzt jetzt an seiner Stelle. */
+    tint($("icoVault"), "neutral");
     tint($("passBanner"), "special");
     layer($("tileEvents"), "hub_events");
     layer($("tileGuide"), "hub_challenges");
