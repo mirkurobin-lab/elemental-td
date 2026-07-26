@@ -113,7 +113,31 @@ function helligkeit(farbe) {
           r.every(x => !/fill/.test(x.slice)), r[0].slice);
   }
   await rahmen("navCollection", ".tile .frm", "Sammlungs-Kartenrahmen");
-  await rahmen("navShop", ".prodcard .pcfrm", "Shop-Produktrahmen");
+  /* GEÄNDERTE ERWARTUNG, mit Absicht (DESIGNSYSTEM §6e).
+     Auf den Produktkacheln lag ein KARTENrahmen — Hochformat 0,75 auf
+     einer Kachel im Querformat 1,33. Das ist ein Kategorienfehler, kein
+     Zuschnittfehler: dorthin gehört gar kein Rahmen. `.pcfrm` ist nur
+     noch eine Glanzschicht, die Rarität trägt der 2-px-Rand der Kachel.
+     Geprüft wird deshalb, dass genau das so bleibt — die alte Prüfung
+     hätte den Rahmen wieder eingefordert. */
+  await go("navShop");
+  await seite.waitForTimeout(1500);
+  const pc = await seite.evaluate(() => [...document.querySelectorAll(".view.active .prodcard")]
+    .slice(0, 8).map(e => {
+      const f = e.querySelector(".pcfrm"), cs = getComputedStyle(e);
+      return {
+        rahmenbild: f ? getComputedStyle(f).borderImageSource !== "none" : false,
+        flaeche:    f ? getComputedStyle(f).backgroundImage   !== "none" : false,
+        rand:       parseFloat(cs.borderTopWidth) || 0,
+        randfarbe:  cs.borderTopColor,
+      };
+    }));
+  pruef("Produktkachel trägt KEINEN Kartenrahmen (§6e)",
+        pc.length > 0 && pc.every(x => !x.rahmenbild && !x.flaeche),
+        pc.filter(x => x.rahmenbild || x.flaeche).length + " von " + pc.length);
+  pruef("Rarität sitzt stattdessen im Rand der Kachel",
+        pc.length > 0 && pc.every(x => x.rand >= 2),
+        (pc[0] || {}).rand + "px " + (pc[0] || {}).randfarbe);
 
   /* ---------- Text auf Artwork ----------
      Die zweite Variante derselben Klasse. Das Artwork ersetzt die dunkle
