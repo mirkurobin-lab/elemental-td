@@ -397,7 +397,21 @@ nav.bottom button.on .nlbl{max-width:96px;opacity:1}
   margin:-18px auto 1px;width:44px;height:44px;font-size:22px;line-height:1;
   filter:drop-shadow(0 3px 5px #000a) saturate(.9) brightness(.86);
   transition:transform 140ms ease,filter 140ms ease}
-.navpop img.navimg{width:100%;height:100%;object-fit:contain}
+/* ⚠ Auch die Nav-Illustrationen sind DECKENDE PNGs mit eingebackenem
+   dunklem Grund — dieselbe Familie wie die Rahmen (§6c). Solange die
+   Leiste selbst durchgehend dunkel war, fiel das nicht auf. Seit der
+   aktive Reiter eine hellere Platte traegt, steht um jedes Icon ein
+   dunkles Rechteck.
+   `mix-blend-mode:lighten` loest das ohne neue Grafiken: wo das Bild
+   DUNKLER ist als der Untergrund, gewinnt der Untergrund — das
+   eingebackene Rechteck verschwindet. Wo die Illustration heller ist,
+   gewinnt sie. `screen` waere hier falsch: es wuerde den Untergrund
+   zusaetzlich aufhellen und ein leuchtendes Rechteck hinterlassen. */
+.navpop img.navimg{width:100%;height:100%;object-fit:contain;
+  mix-blend-mode:lighten}
+/* Das Emoji ist ein Textknoten und darf NICHT blenden — sonst frisst der
+   Modus die dunklen Teile des Emojis. */
+.navpop span.navimg{mix-blend-mode:normal}
 nav.bottom button.on .navpop{filter:drop-shadow(0 4px 8px #000c) saturate(1.15) brightness(1.12);
   transform:translateY(-2px) scale(1.06)}
 /* Die Mitte (START) ist die groesste und ragt am weitesten heraus. */
