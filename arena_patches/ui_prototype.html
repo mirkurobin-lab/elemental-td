@@ -797,25 +797,44 @@ footer{padding:6px 12px 14px;text-align:center}
 .upfloat{position:absolute;left:10px;top:56px;z-index:8;width:38px;height:38px;
   border-radius:10px;font-size:15px;color:#fff;
   background:linear-gradient(180deg,#3fa9e8,#1c6ea8);box-shadow:0 3px 0 #12496f}
-.scrollhint{position:absolute;right:6px;top:50%;transform:translateY(-50%);z-index:8;
-  width:20px;height:44px;border-radius:6px;font-size:10px;line-height:1.1;color:#0e1418;
+/* Der Hinweis lag im Live-Screenshot UEBER der rechten Kante des
+   Arena-Bandes (das Band ist max-width:330px, zentriert in 390 px, also
+   nur 30 px vom Rand entfernt — der 20 px breite Hinweis bei right:6px
+   ragte hinein). Er sitzt jetzt am aeussersten Rand und schmaler. */
+.scrollhint{position:absolute;right:1px;top:50%;transform:translateY(-50%);z-index:8;
+  width:14px;height:40px;border-radius:5px;font-size:8.5px;line-height:1.1;color:#0e1418;
   background:linear-gradient(180deg,#f4e3a6,#e0b94a);display:flex;flex-direction:column;
-  align-items:center;justify-content:center;font-weight:900;pointer-events:none}
+  align-items:center;justify-content:center;font-weight:900;pointer-events:none;opacity:.9}
 .tick{position:relative;height:0;margin:0 0 0 -30px;z-index:3}
-.tick b{position:absolute;left:0;top:-9px;font-size:11px;font-weight:900;color:#fff;
-  text-shadow:0 1px 3px #000,0 0 8px #000}
-.tick i{position:absolute;left:34px;top:-1px;width:12px;height:2px;background:#fff7d68c}
-.node{position:relative;margin:0 0 16px 0;border-radius:14px;padding:12px 10px 16px;
-  display:flex;align-items:center;justify-content:space-around;
+/* Die Zahl stand direkt AUF der goldenen Schiene (Schiene 22–34 px, Zahl
+   ab 24 px) — hell auf hell, im Live-Screenshot kaum zu lesen. Sie sitzt
+   jetzt rechts neben der Schiene auf einem eigenen dunklen Sockel. */
+.tick b{position:absolute;left:16px;top:-10px;font-size:11px;font-weight:900;color:#fff7d6;
+  background:#0b1116e0;border:1px solid #e0b94a5c;border-radius:9px;padding:1px 7px;
+  text-shadow:0 1px 2px #000}
+.tick i{position:absolute;left:78px;top:-1px;width:14px;height:2px;background:#fff7d68c}
+.node{position:relative;margin:0 0 16px 0;border-radius:14px;padding:12px 14px 16px;
+  display:flex;align-items:center;gap:12px;
   background:linear-gradient(180deg,#5fbe3a,#3f8f26 68%,#2b6a1a);
   box-shadow:0 7px 0 #24344a,0 12px 16px -6px #000a;border:1px solid #7ad14f66}
-.node .prop{font-size:20px;opacity:.9;filter:drop-shadow(0 2px 2px #0006)}
-.node .rw{width:60px;height:60px;border-radius:11px;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;font-size:25px;position:relative;
+/* Ein Zierprop, am rechten Rand, als Abschluss — nicht zwei, die mit der
+   Belohnung um Aufmerksamkeit konkurrieren. */
+.node .prop{margin-left:auto;font-size:22px;opacity:.85;filter:drop-shadow(0 2px 2px #0006)}
+.node .rw{flex:0 0 62px;width:62px;height:62px;border-radius:11px;display:flex;
+  align-items:center;justify-content:center;font-size:26px;position:relative;
   background-repeat:no-repeat;background-position:center;background-size:cover,100% 100%;
   background-image:linear-gradient(180deg,#e9eef3,#a8b6c2);
   box-shadow:inset 0 0 0 2px #ffffff8c,0 3px 6px #0007}
-.node .rw .q{position:absolute;right:2px;bottom:1px;font-size:9px;font-weight:900;color:#20303f}
+/* Die Platte ist HELL. Unsere Kristall- und Essenz-Icons sind ebenfalls
+   hell — ohne Absetzung verschwinden sie darin. Dieselbe Behandlung wie
+   bei .utile img.utileimg, wo derselbe Fall schon aufgetreten ist. */
+.node .rw .ico{filter:drop-shadow(0 1px 2px #0009)}
+.node .rwtx{min-width:0;display:flex;flex-direction:column;gap:1px}
+.node .rwn{font-size:13px;font-weight:900;line-height:1.15;color:#f2fbee;
+  text-shadow:0 1px 2px #0b2a06,0 0 6px #0b2a0699;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.node .rwq{font-size:15px;font-weight:900;line-height:1.1;color:#fff7d6;
+  text-shadow:0 1px 2px #0b2a06}
 .node .chk{position:absolute;right:-7px;top:-9px;font-size:17px;
   filter:drop-shadow(0 1px 2px #000)}
 .node.done{filter:saturate(.5) brightness(.72)}
@@ -825,6 +844,7 @@ footer{padding:6px 12px 14px;text-align:center}
 .node.lock{background:linear-gradient(180deg,#3a4a58,#222e39 70%,#18222b);
   border-color:#ffffff14;box-shadow:0 7px 0 #16202a,0 10px 14px -6px #000a}
 .node.lock .rw{background-image:linear-gradient(180deg,#4a5967,#2b3743);filter:grayscale(.7)}
+.node.lock .rwn,.node.lock .rwq{color:#c3cdd6;text-shadow:0 1px 2px #0a1016}
 .arenasec{position:relative;margin:6px 0 22px;padding:16px 6px 14px;
   display:flex;flex-direction:column;align-items:center;
   border-top:2px solid #ffffff26}
@@ -832,14 +852,58 @@ footer{padding:6px 12px 14px;text-align:center}
 .secchip{margin-top:11px;background:#0b1116b3;border:1px solid #3a4c5c;border-radius:20px;
   padding:3px 12px;font-size:10px;font-weight:800;letter-spacing:.09em;color:#cfe0ec}
 .secname{margin-top:7px;font-size:22px;text-align:center;line-height:1.1}
+/* ==================================================================
+ * BAENDER ALS 9-SLICE (.band9)
+ * ------------------------------------------------------------------
+ * Ein Band ist immer viel breiter als hoch — das Arena-Band 330x46 ist
+ * 7,2 : 1, die Bandgrafik nach dem Zuschnitt 4,45 : 1. Weder `cover`
+ * noch `100% 100%` loest das: `cover` beschneidet senkrecht und zeigt
+ * nur den flachen Mittelstreifen, `100% 100%` staucht die Zierenden zu
+ * Schlieren. Dieselbe Wirkung hatte die vorherige Loesung, senkrecht zu
+ * zoomen (`background-size:100% 260%`): sie war fuer die UNzugeschnittene
+ * Grafik gedacht, in der das Band nur 35 % der Leinwand fuellte. Nach
+ * dem Zuschnitt vergroessert derselbe Zoom das Band um 2,6x — sichtbar
+ * bleibt eine leere Flaeche ohne Zierrand. Genau der Befund „der Banner
+ * ist nicht komplett gefuellt".
+ * 9-Slice loest es fuer JEDES Seitenverhaeltnis: waagerecht geschnitten,
+ * `fill` behaelt die Mitte. Die Zierenden behalten ihre Form, nur die
+ * Mitte zieht mit. Die Randbreite der Enden entspricht der BANDHOEHE —
+ * die Enden der Grafik sind nahezu quadratisch (269x275), so bleiben sie
+ * unverzerrt.
+ * `border-image-slice:0 …` heisst: keine waagerechten Schnittlinien, die
+ * Mittelzeile spannt die ganze Hoehe.
+ * ================================================================== */
+.band9{border-style:solid;border-top-width:0;border-bottom-width:0;
+  border-left-width:1px;border-right-width:1px;
+  border-image-slice:0 22% fill;border-image-repeat:stretch;
+  /* Vorgabe fuer die Enden. Ohne diesen Wert wuerde border-image-width auf
+     die border-width von 1 px zurueckfallen und die Zierenden auf einen
+     Strich stauchen. Jede Bandklasse setzt ihren eigenen Wert = Bandhoehe. */
+  border-image-width:0 34px}
+h2.title.band9{border-image-width:0 44px}
 .ribbon{position:relative;margin-top:11px;width:100%;max-width:330px;min-height:46px;
-  display:flex;align-items:center;justify-content:space-between;padding:8px 26px;
-  background-repeat:no-repeat;background-position:center;background-size:100% 260%,100% 100%;
+  display:flex;align-items:center;justify-content:center;gap:14px;padding:8px 16px;
+  background-repeat:no-repeat;background-position:center;background-size:cover,100% 100%;
   background-image:linear-gradient(180deg,#f06ad2,#c72fa8 55%,#8d1c78);
   clip-path:polygon(0 8%,7% 0,93% 0,100% 8%,100% 78%,93% 100%,7% 100%,0 78%);
   box-shadow:0 5px 12px -4px #000a}
-.ribbon .rl{font-size:15px}
-.ribbon .rr{font-size:15px}
+.ribbon.band9{border-image-width:0 46px}
+/* Das Band ist nach dem Zuschnitt HELL (cremefarbenes Kristallband).
+   Damit gilt hier die Projektregel ohne Ausnahme: .goldtext gehoert auf
+   dunkle Flaechen. Auf Creme verschwindet sowohl der Gold- als auch der
+   helle `pale`-Verlauf — im Live-Screenshot war „Arena 1" kaum zu lesen
+   und die Trophaeenzahl praktisch unsichtbar. Dunkle Fuellfarbe mit
+   weissem Lichtsaum, dieselbe Behandlung wie bei .secribbon .srt. */
+.ribbon .rl,.ribbon .rr{font-family:Cinzel,Georgia,"Times New Roman",serif;
+  font-variant:small-caps;font-weight:700;letter-spacing:.06em;
+  -webkit-text-fill-color:#20303f;color:#20303f;
+  text-shadow:0 1px 0 #ffffff9e;white-space:nowrap}
+.ribbon .rl{font-size:18px}
+/* Die Trophaeenschwelle ist die eigentliche Information des Bandes
+   („ab wann bin ich hier") — sie steht deshalb nicht kleiner als der
+   Arenaname, und ihr Icon liest bei 20 px (20-px-Regel, §6). */
+.ribbon .rr{font-size:17px;display:inline-flex;align-items:center;gap:5px}
+.ribbon .rr .ico{width:20px;height:20px}
 .unlockhead{margin:16px 0 9px;font-size:13px;letter-spacing:.1em}
 .unlockgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%;
   max-width:330px}
@@ -1155,7 +1219,7 @@ span.ico{mix-blend-mode:normal;text-align:center}
    `cover` tatsaechlich das Band. */
 .secribbon{position:relative;display:flex;align-items:center;justify-content:center;
   width:fit-content;max-width:100%;min-width:190px;margin-inline:auto;
-  min-height:34px;margin-block:var(--gap-lg) var(--gap);padding:5px 30px;
+  min-height:34px;margin-block:var(--gap-lg) var(--gap);padding:5px 22px;
   background-repeat:no-repeat;background-position:center;background-size:cover,100% 100%;
   background-image:linear-gradient(180deg,#e9eef3,#b8c6d2 52%,#8fa2b3);
   border-radius:var(--radius-sm);
@@ -1168,7 +1232,9 @@ span.ico{mix-blend-mode:normal;text-align:center}
      darunter bleibt die Textgrundlage. Damit ist die Ueberschrift in
      ALLEN drei Zustaenden lesbar: ohne Bild, mit Bild, bei CDN-Ausfall. */
   background-blend-mode:screen,normal}
-.secribbon.sm{min-height:28px;padding:4px 24px;min-width:160px;
+.secribbon.band9{border-image-width:0 34px}
+.secribbon.sm.band9{border-image-width:0 28px}
+.secribbon.sm{min-height:28px;padding:4px 18px;min-width:160px;
   background-image:linear-gradient(180deg,#dfe7ee,#aebdcb 52%,#8799aa);
   background-blend-mode:screen,normal}
 .secribbon .srt{font-size:12px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;
@@ -4225,8 +4291,22 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   }
   function hydrateRibbons(root) {
     Array.prototype.forEach.call((root || document).querySelectorAll("[data-ribbon]"), function (el) {
-      layer(el, el.getAttribute("data-ribbon"));
+      band(el, el.getAttribute("data-ribbon"));
     });
+  }
+  /* band(el, key) — eine Bandgrafik als 9-SLICE anlegen, nicht als
+     Bildflaeche. Der Grund steht ausfuehrlich bei `.band9` im CSS: ein
+     Band ist 7:1, die Grafik 4,45:1, und jede Bildflaechen-Variante
+     zeigt entweder den flachen Mittelstreifen (`cover`) oder gestauchte
+     Zierenden (`100% 100%`).
+     Die Farbplatte bleibt als `background-image` liegen: faellt die
+     Grafik aus, ist `border-image-source` ungueltig und die Platte
+     traegt das Band allein. Alle drei Zustaende bleiben damit lesbar —
+     ohne Bild, mit Bild, bei CDN-Ausfall. */
+  function band(el, key) {
+    if (!el) return;
+    el.classList.add("band9");
+    if (ASSETS[key]) el.style.borderImageSource = 'url("' + ASSETS[key] + '")';
   }
 
   /* ==================================================================
@@ -4688,16 +4768,23 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     var m = BY_ID[curId], v = AC.view(curId), t = tierOf(v.tier);
     $("dName").textContent = m.name;
     var bn = $("dBanner");
-    // Raritäts-Banner: das text-freie Kristallband-Asset wird per CSS-Filter
-    // auf die Raritätsfarbe getönt; der Name kommt als Gold-Gradient-Text.
-    bn.innerHTML = '<span class="goldtext">' + t.name + "</span>";
+    /* Raritaetsband. Das Band-Asset ist ein HELLES Kristallband — der
+       frueher darueber gelegte Farb-Wasch (`inset 0 0 0 999px <farbe>38`)
+       hat die Raritaet kaum getragen und gleichzeitig Goldtext auf helle
+       Flaeche gestellt, also genau die dreimal aufgetretene Bugklasse.
+       Die Raritaet traegt jetzt die SCHRIFT und ein farbiger Saum unter
+       dem Band; das Band selbst bleibt neutral und lesbar.
+       Ein Wasch-Tint waere hier ausserdem technisch wirkungslos: als
+       border-image gezeichnetes Band liegt ueber jedem inset-Schatten. */
+    bn.innerHTML = "<span>" + t.name + "</span>";
     bn.style.background = t.color;
-    bn.style.backgroundImage = 'url("' + ASSETS.banner_rarity + '"), linear-gradient(180deg,' +
-      t.color + "," + t.color + ")";
-    bn.style.backgroundSize = "100% 300%, 100% 100%";
-    bn.style.backgroundPosition = "center";
-    bn.style.backgroundRepeat = "no-repeat";
-    bn.style.boxShadow = "inset 0 0 0 999px " + t.color + "38";
+    band(bn, "banner_rarity");
+    bn.style.borderImageWidth = "0 34px";
+    bn.style.boxShadow = "0 2px 0 " + t.color + ", 0 4px 10px -3px #000a";
+    var sp = bn.firstChild;
+    sp.style.webkitTextFillColor = "#1a2530";
+    sp.style.color = "#1a2530";
+    sp.style.textShadow = "0 1px 0 #ffffff9e";
     $("dArt").innerHTML = cardArtHTML(curId);
     $("dArt").classList.add("artbox");
     attachLoop($("dArt"), curId);          // bewegte Fassung oben drauf
@@ -5328,14 +5415,23 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       var rw = nodeReward(at);
       var p1 = idx % props.length, p2 = (idx + 2) % props.length;
       html.push(
+        /* Die Belohnung wird BENANNT, nicht nur bebildert. Der Knoten ist
+           324x90 gross und trug vorher zwei 20-px-Zierprops und eine
+           60-px-Platte mit Icon — der Nutzerbefund war „man kann garnicht
+           erkennen was man dort bekommt". Ein Icon allein kann die Frage
+           „was bekomme ich hier" nicht beantworten, sobald mehrere
+           Belohnungen aehnliche Silhouetten haben (Gold-Pack, Silber-Pack,
+           Bronze-Pack). Name und Menge stehen jetzt daneben, die
+           Zierprops nur noch einmal am Rand. */
         '<div class="node ' + st + '" data-at="' + at + '" data-state="' + st + '">' +
-          '<span class="prop">' + ico(props[p1], propEmoji[p1]) + "</span>" +
-          '<div class="rw" data-asset="' + rw.ico + '" title="' + rw.label + '">' +
-            ico(rw.ico, rw.icon, "big") + '<span class="q">' + rw.q + "</span>" +
+          '<div class="rw" title="' + rw.label + '">' +
+            ico(rw.ico, rw.icon, "big") +
             (st === "done" ? '<span class="chk">' + ico("icon_check", "✅") + "</span>" : "") +
             (st === "lock" ? '<span class="chk">' + ico("icon_lock", "🔒") + "</span>" : "") +
           "</div>" +
-          '<span class="prop">' + ico(props[p2], propEmoji[p2]) + "</span>" +
+          '<div class="rwtx"><span class="rwn">' + rw.label + "</span>" +
+            '<span class="rwq">' + rw.q + "</span></div>" +
+          '<span class="prop">' + ico(props[p1], propEmoji[p1]) + "</span>" +
         "</div>");
     });
     $("roadScroll").innerHTML = html.join("");
@@ -5345,7 +5441,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       layer(el, el.getAttribute("data-arenakey"));
     });
     Array.prototype.forEach.call($("roadScroll").querySelectorAll(".ribbon"), function (el) {
-      layer(el, "banner_rarity");
+      band(el, "banner_rarity");
     });
     Array.prototype.forEach.call($("roadScroll").querySelectorAll(".node"), function (el) {
       layer(el, "road_platform");
@@ -5396,8 +5492,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       '<div class="diorama" data-arenakey="' + a.key + '"></div>' +
       '<div class="secchip">◎ Zufallswelt</div>' +
       '<div class="secname goldtext">' + a.name + "</div>" +
-      '<div class="ribbon"><span class="rl goldtext pale">Arena ' + a.n + "</span>" +
-        '<span class="rr goldtext pale">' + ico("cur_trophy", "🏆") + " " + fmt(a.at) + "</span></div>" +
+      '<div class="ribbon"><span class="rl">Arena ' + a.n + "</span>" +
+        '<span class="rr">' + ico("cur_trophy", "🏆") + fmt(a.at) + "</span></div>" +
       '<div class="unlockhead goldtext">Schaltet frei:</div>' +
       '<div class="unlockgrid">' + un + "</div>" + te +
       "</section>";
@@ -5412,9 +5508,9 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       '<div class="leaguehead goldtext">' + LEAGUE_NAME + "</div>" +
       '<div class="gateemblem" data-arenakey="' + (summit ? "summit_emblem" : "gate_emblem") + '"></div>' +
       '<div class="secname goldtext" style="font-size:19px">' + g.name + "</div>" +
-      '<div class="ribbon"><span class="rl goldtext pale">' +
+      '<div class="ribbon"><span class="rl">' +
         (summit ? "Spitze" : "Tor " + g.n) + "</span>" +
-        '<span class="rr goldtext pale">' + ico("cur_trophy", "🏆") + " " + fmt(g.at) + "</span></div>" +
+        '<span class="rr">' + ico("cur_trophy", "🏆") + fmt(g.at) + "</span></div>" +
       '<div class="seasonline">Saison endet in 9 T 10 Std · Trophäen werden zum ' +
         "Saisonende teilweise zurückgesetzt</div>" +
       "</section>";
@@ -5469,10 +5565,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       if (!h.querySelector(".goldtext")) {
         h.innerHTML = '<span class="goldtext">' + h.textContent + "</span>";
       }
-      layer(h, "banner_title");
-      h.style.backgroundSize = "100% 330%, 100% 100%";
-      h.style.backgroundPosition = "center";
-      h.style.backgroundRepeat = "no-repeat";
+      band(h, "banner_title");
       h.style.padding = "10px 0";
       h.style.textAlign = "center";
       h.style.fontSize = "17px";
