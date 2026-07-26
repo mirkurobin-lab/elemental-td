@@ -3913,7 +3913,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     if (!u) return emo;
     // onerror blendet das Bild aus; darunter liegt bereits das Emoji.
     return emo + '<img class="cart ' + (cls || "") + '" src="' + u + '" alt="' + emoji +
-      '" onerror="UIIcon.hide(this)">';
+      '" loading="lazy" decoding="async" loading="lazy" decoding="async" onerror="UIIcon.hide(this)">';
   }
   /* CARD_LOOP — bewegte Fassung jeder Karte (Batch 5, 720x1280).
      attachLoop() haengt sie NACHTRAeGLICH an eine bereits gerenderte
@@ -3960,11 +3960,19 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       el.removeAttribute("data-frame");
     });
   }
+  /* loading="lazy" ist hier KEINE Mikro-Optimierung, sondern die Bremse
+     gegen ein gemessenes Problem: der Prototyp haelt 17 Views im DOM, und
+     ohne lazy laedt das Telefon auch die Bilder der Views, die es nie zu
+     sehen bekommt. decoding="async" haelt das Dekodieren aus dem Haupt-
+     Thread, damit Wischen waehrend des Ladens nicht ruckelt.
+     ACHTUNG: das loest nur die ANZAHL. Die GROESSE der Dateien loest es
+     nicht — dafuer braucht die Produktion einen Bildschritt, siehe
+     HANDOFF.md "Bilder fuer die Auslieferung". */
   function ico(key, emoji, cls) {
     var u = ASSETS[key];
     if (!u) return '<span class="ico ' + (cls || "") + '">' + emoji + "</span>";
     return '<img class="ico ' + (cls || "") + '" src="' + u + '" alt="' + emoji +
-      '" onerror="UIIcon.fail(this)">';
+      '" loading="lazy" decoding="async" loading="lazy" decoding="async" onerror="UIIcon.fail(this)">';
   }
   // Platzhalter im Markup (<i data-ico="..." data-emoji="...">) aufloesen.
   function hydrateIcons(root) {
@@ -5687,7 +5695,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     var key = "card_" + u.cardId;
     return '<span class="' + cls + '">' +
       (ASSETS[key]
-        ? '<img src="' + ASSETS[key] + '" alt="' + c.art + '" onerror="UIIcon.fail(this)">'
+        ? '<img src="' + ASSETS[key] + '" alt="' + c.art + '" loading="lazy" decoding="async" onerror="UIIcon.fail(this)">'
         : c.art) + "</span>";
   }
 
@@ -5828,7 +5836,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     var key = "card_" + u.cardId;
     return '<span class="start t-' + u.tier + '">' +
       (ASSETS[key]
-        ? '<img src="' + ASSETS[key] + '" alt="' + c.art + '" onerror="UIIcon.fail(this)">'
+        ? '<img src="' + ASSETS[key] + '" alt="' + c.art + '" loading="lazy" decoding="async" onerror="UIIcon.fail(this)">'
         : c.art) +
       (u.count > 1 ? '<span class="stcnt">x' + u.count + "</span>" : "") +
       "</span>";
@@ -5875,7 +5883,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     var h = '<div class="stcard' + (mine ? "" : " opp") + '"><div class="stcrow">' +
       '<span class="stav">' +
         (side.avatarKey && ASSETS[side.avatarKey]
-          ? '<img src="' + ASSETS[side.avatarKey] + '" alt="🧙" onerror="UIIcon.fail(this)">'
+          ? '<img src="' + ASSETS[side.avatarKey] + '" alt="🧙" loading="lazy" decoding="async" onerror="UIIcon.fail(this)">'
           : "🧙") +
       "</span>" +
       '<div class="stnm"><div class="n1">' + side.name + "</div>" +
@@ -5947,7 +5955,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     $("meStatsBtn").innerHTML = ico("ic_chart", "📊");
     $("meShareBtn").innerHTML = ico("ic_share", "↗");
     $("meEmoteBtn").innerHTML = ASSETS.emote_thanks
-      ? '<img src="' + ASSETS.emote_thanks + '" alt="😊" onerror="UIIcon.fail(this)">'
+      ? '<img src="' + ASSETS.emote_thanks + '" alt="😊" loading="lazy" decoding="async" onerror="UIIcon.fail(this)">'
       : "😊";
     $("meNote").textContent = "Logik: arena_matchend.js — Rangliste, Anteile, MVP, " +
       "gemeinsame Skala und Anschluss werden dort gerechnet, diese View stellt nur dar.";
@@ -6782,7 +6790,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     var u = ASSETS[EMOTE_ICO[key]];
     var inner = '<span class="cartemo">' + emoji + "</span>" +
       (u ? '<img class="cart" src="' + u + '" alt="' + emoji +
-           '" onerror="UIIcon.hide(this)">' : "");
+           '" loading="lazy" decoding="async" onerror="UIIcon.hide(this)">' : "");
     return '<span class="emotok">' + inner + "</span>";
   }
   function renderEmotes() {
@@ -8306,7 +8314,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     var emo = '<span class="avemo">' + (eintrag.emoji || "❔") + "</span>";
     var img = eintrag.portraitUrl
       ? '<img src="' + eintrag.portraitUrl + '" alt="' + (eintrag.emoji || "") +
-        '" onerror="UIIcon.hide(this)">' : "";
+        '" loading="lazy" decoding="async" onerror="UIIcon.hide(this)">' : "";
     var ring = '<span class="' + ringCls + '"' +
       (ringUrl ? ' style="background-image:url(&quot;' + ringUrl + '&quot;)"' : "") + "></span>";
     return '<span class="' + picCls + '" style="--avring:' + ringFarbe + '">' +
@@ -8424,7 +8432,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
         '<span class="avcerglow"></span>' +
         '<span class="avemo">' + (e.emoji || "❔") + "</span>" +
         (e.portraitUrl ? '<img src="' + e.portraitUrl + '" alt="' + (e.emoji || "") +
-          '" onerror="UIIcon.hide(this)">' : "") +
+          '" loading="lazy" decoding="async" onerror="UIIcon.hide(this)">' : "") +
         '<span class="avcerring"' + (ringUrl ? ' style="background-image:url(&quot;' +
           ringUrl + '&quot;)"' : "") + "></span>" +
       "</div>" +
@@ -8751,7 +8759,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       bx.className = "avmini";
       bx.innerHTML = '<span class="avemo">' + act.emoji + "</span>" +
         (act.portraitUrl ? '<img src="' + act.portraitUrl + '" alt="' + act.emoji +
-          '" onerror="UIIcon.hide(this)">' : "");
+          '" loading="lazy" decoding="async" onerror="UIIcon.hide(this)">' : "");
       bx.style.borderColor = act.frame.tierColor;
       $("profAvatar").title = act.avatar.name + " · " + act.frame.name +
         " — tippen zum Bearbeiten";
@@ -8896,7 +8904,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   function mmSeite(el, name, trophies, avatarUrl, emoji) {
     el.innerHTML = '<div class="mmav">' +
       (avatarUrl ? '<img src="' + avatarUrl + '" alt="' + emoji +
-                   '" onerror="UIIcon.fail(this)">' : emoji) + "</div>" +
+                   '" loading="lazy" decoding="async" onerror="UIIcon.fail(this)">' : emoji) + "</div>" +
       '<div class="mmnm">' + name + "</div>" +
       '<div class="mmtr">' + ico("cur_trophy", "🏆") + fmt(trophies) + "</div>";
     hydrateIcons(el);

@@ -1317,3 +1317,38 @@ Eintrag verschwindet dann von selbst aus `missingPortraits()` und die „Art fol
 (`frame_common` … `frame_supreme`) zu. Die sind rechteckig; im runden Avatar-Ring trägt deshalb
 aktuell die **Farbe** die Aussage, nicht die Kontur. Acht runde Ring-Artworks wären ein eigener
 kleiner Batch — kein Blocker, das Farbsystem funktioniert ohne sie vollständig.
+
+## Bilder fuer die Auslieferung (P0, gemessen am 26.07.2026)
+
+**Das Problem, in Zahlen.** Die Assets liegen als 1024x1024-PNG am CDN, angezeigt
+werden sie bei 15 bis 20 px. Auf einem iPhone-Format gemessen:
+
+| | vorher | nachher |
+|---|---|---|
+| Bild-Bytes einer Seitenladung | **82,78 MB** | **0,59 MB** |
+| alle 158 Assets zusammen | 210,97 MB | 1,98 MB |
+| Ladezeit bis `load` | 2630 ms | 697 ms |
+
+Von 28 sichtbaren Bildern war **jedes** mehr als dreifach ueberdimensioniert.
+
+**Warum das kein Detail ist.** Eine Seite, die auf Mobilfunk minutenlang laedt,
+liest niemand als hochwertig — egal wie gut die Fasen sind. Und die verbreitete
+Empfehlung aus der Unity-Welt ("Assets immer groesser erzeugen als noetig,
+Panels mit 4096 px") ist hier aktiv schaedlich: dort kommen die Bilder offline
+komprimiert mit der App, bei uns geht jedes Byte ueber die Leitung.
+
+**Der Bildschritt.** Vor der Auslieferung einmal ueber alle Assets:
+
+1. Deckel je Typ (das 2- bis 3-fache der groessten Anzeigegroesse):
+   Icon/Waehrung/Element/Rang 96 · Rahmen 128 · Nav 160 · Ribbon/Kartenrahmen 256
+   · Knopf/Pack/Strasse/Shop-Produkt 320 · Arena/Bild/Teaser/Festung 512
+   · Banner/Panel 640 · alles andere 320
+2. Skalieren mit Lanczos, speichern als **WebP q86**.
+3. Adressen umbiegen: die Bild-Adressen zeigen auf den lokalen Ordner,
+   `.mp4`/`.mp3` bleiben am CDN.
+
+Erledigt fuer die Vorschau unter `prisma-td-vorschau.higgsfield.app` — das
+Skript steht im Sitzungsprotokoll und muss fuer die echte Auslieferung in einen
+Build-Schritt wandern. `ui_prototype.html` selbst traegt `loading="lazy"` und
+`decoding="async"` an jedem Bild; das begrenzt die ANZAHL der Anfragen (17 Views
+im DOM), nicht die Groesse der Dateien.
