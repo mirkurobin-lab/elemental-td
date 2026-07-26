@@ -113,6 +113,43 @@ Einzelframes, aus denen Werte stammen, sind unten jeweils als
 
 ---
 
+## §1.7 Wo der Guide im Menü hängt — nachgemessen
+
+Die erste Fassung dieser Datei nannte den Fahrplan, aber nicht den **Ort**.
+Nachgeholt am selben Video, Frame für Frame:
+
+| Zeit | Zustand |
+|---|---|
+| 0 – 1,9 s | Hauptmenü, statisch (Bilddifferenz **exakt 0,0**) |
+| 1,9 – 2,3 s | Aufklapp-Menü fährt ein (Differenz 29,8 → 18,7) |
+| 2,3 – 2,9 s | Menü steht offen, statisch (0,3 → 0,2) |
+| ab ~3 s | Defender's Guide, Seite 1 |
+
+Der Knopf sitzt **oben rechts** in der Kopfleiste, direkt neben dem
+Freundeslisten-Knopf: drei waagerechte Striche auf blauer Platte. Das Menü
+klappt darunter auf, rechtsbündig, und trägt **fünf** Einträge — jeder eine
+blaue Pille mit Icon links und Versalien-Beschriftung:
+
+```
+  LEADERBOARDS
+  COMMUNITY
+  MAIL
+  GUIDE          ← der Defender's Guide
+  SETTINGS
+```
+
+Kein Vollbild-Overlay, kein Bottom-Sheet, kein eigener Schließen-Knopf — ein
+Tipp daneben schließt.
+
+**Unsere Umsetzung** übernimmt Ort und Reihenfolge und fügt genau einen
+Eintrag hinzu: *Gegner* zwischen *Guide* und *Einstellungen*. Grund: AA führt
+Einsteiger-Hilfe und Gegner-Nachschlagewerk unter einem Wort, wir haben beides
+getrennt (`AA_UI_REFERENZ` §18.2 — Einsteiger-Guide mit Aufgabenliste, Handbuch
+mit acht Erklärseiten). Ein gemeinsamer Eintrag müsste sich erst verzweigen;
+zwei Einträge sagen sofort, was dahinter liegt.
+
+---
+
 ## §2 Defenders Guide: Aufbau der Seite
 
 ### §2.1 Seite 1 — Element-Regel und Rad
@@ -526,6 +563,39 @@ Beim Austausch gilt: jedes Monster hängt mit **genau einem** Faktor
 ersetzt, ändert Namen, Artwork-Key, Element, Target, Movement und diese
 zwei Faktoren — **keine einzige Formel**. Der `key` sollte stabil
 bleiben, weil der Wellenplan daran hängt.
+
+### §7.7 Die UI, und was beim Bauen auffiel
+
+Gebaut ist der Guide als **eine** View mit drei Ebenen (`bsSeite` 1/2/3), nicht
+als drei Views. AA führt sie auch als eine Strecke: Rad → Gitter → Detail, und
+`Back` geht jeweils **eine Ebene hoch**, nicht sofort hinaus. Drei Views wären
+dreimal dieselbe Kopfzeile und dreimal derselbe Wisch-Ausschluss gewesen.
+
+**Das Element-Rad ist ein SVG, keine CSS-Kanten.** AA hat vier Knoten in einer
+Raute, wir haben sechs in einem Kreis; die Pfeile müssen zwischen beliebigen
+Paaren laufen. Mit CSS-Rändern wären das ein Dutzend Sonderfälle, als SVG-Linie
+mit Marker ist es eine Zeile. Die Pfeile enden 9 % vor dem Zielknoten, sonst
+verschwindet die Spitze darunter.
+
+**Ein Fehler beim Verdrahten, der hierher gehört:** ich habe `elementRelation()`
+zuerst mit *einem* Argument gerufen. Die Funktion nimmt aber **zwei** Elemente
+und sagt, wie sie zueinander stehen — mit einem Argument liefert sie immer
+`"neutral"`. Ergebnis: ein Rad ohne einen einzigen Pfeil und der Hinweistext
+„Neutral hat weder Stärke noch Schwäche" für *jedes* Element. Die Beziehungen
+stehen direkt am Element (`strongAgainst` / `weakAgainst`). Gemerkt hat es kein
+Blick auf den Code, sondern die Zählung: `pfeile: 0`.
+
+Daraus die Prüfung **„Jedes Element hat seinen Stark-gegen-Pfeil"** — sie zählt
+sechs. Eine Prüfung „das Rad rendert" hätte den Fehler nicht gesehen.
+
+**Keine Zahl wird in der UI gerechnet.** Alles kommt aus `ArenaWaves`. Das ist
+die Bedingung dafür, dass das Balancing an *einer* Stelle gedreht werden kann
+(Block FORMELN in `arena_waves.js`) und die Anzeige ohne Nacharbeit folgt. Eine
+eigene Prüfung hält das fest.
+
+**Der Wellenplan zeigt Marken, nicht alle 27 Wellen** (1 · 7 · 9 · 14 · 18 · 22
+· 27 — Aktwechsel und Bosswellen). Eine 27-zeilige Liste wäre vollständig und
+unlesbar.
 
 ### §7.6 Nicht nachgebaut
 

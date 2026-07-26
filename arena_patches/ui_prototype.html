@@ -432,6 +432,156 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
   background:var(--danger);color:#fff;font-size:9.5px;font-weight:900;padding:0 4px;
   box-shadow:0 1px 3px #000a,inset 0 1px 0 #ffffff3d}
 
+/* ==================================================================
+ * MENUE-KNOPF UND AUFKLAPP-MENUE (AA-Position)
+ * ------------------------------------------------------------------
+ * Belegt aus dem Screenrecording 13-09-58: der Knopf sitzt oben rechts
+ * neben der Freundesliste, das Menue klappt darunter auf und traegt
+ * fuenf Eintraege. Kein Vollbild-Overlay, kein Bottom-Sheet — eine
+ * Liste, die den Hintergrund nur abdunkelt.
+ * ================================================================== */
+.tbmenu{flex:0 0 34px;width:34px;height:30px;border-radius:9px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);
+  box-shadow:var(--mat-raised),0 3px 0 #12496f}
+.tbmenu span{display:block;width:16px;height:2px;border-radius:1px;background:#eaf6ff}
+.tbmenu[aria-expanded="true"]{background:linear-gradient(180deg,#5dc0f6,#2d84c4)}
+#tbMenuLayer{position:fixed;inset:0;z-index:55;background:#05090cb8;
+  display:flex;justify-content:center;align-items:flex-start}
+#tbMenuLayer[hidden]{display:none}
+.tbmlist{width:100%;max-width:430px;padding:52px 12px 0;
+  display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+/* Die Eintraege laufen von oben herein, leicht versetzt — dieselbe
+   Staffelung wie bei AA, wo die Liste nicht als Block erscheint. */
+.tbmi{width:210px;display:flex;align-items:center;gap:9px;
+  padding:9px 12px;border-radius:12px;font-size:12.5px;font-weight:900;
+  letter-spacing:.06em;text-transform:uppercase;
+  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);
+  -webkit-text-fill-color:#eaf6ff;color:#eaf6ff;
+  box-shadow:var(--mat-raised),0 3px 0 #12496f;
+  animation:tbmin var(--t-mid) var(--ease-overshoot) backwards}
+.tbmi .ico{width:20px;height:20px;flex:0 0 20px;
+  filter:drop-shadow(0 1px 2px #00000096)}
+.tbmi span.ico{font-size:16px;text-align:center}
+@keyframes tbmin{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.tbmi{animation:none}}
+
+/* ==================================================================
+ * DEFENDERS GUIDE (Bestiarium) — nachgebaut nach AA
+ * ------------------------------------------------------------------
+ * Drei Ebenen, exakt AAs Aufbau (AA_WELLEN_REFERENZ §2):
+ *   Seite 1  Element-Regel als Satz + Element-Rad
+ *   Seite 2  Gegner-Kachelgitter
+ *   Seite 3  Detailkarte mit Stufenregler und 2x2-Wertegitter
+ * AA zeigt auf der Detailkarte GENAU VIER Werte (Max Health, Damage,
+ * Attack Speed, Movement Speed) und KEIN Element-Feld — bei uns steht
+ * das Element zusaetzlich drauf, weil unsere Matrix sechs Elemente hat
+ * statt AAs drei plus Neutral (§7.2).
+ * ================================================================== */
+.bsintro{font-size:12px;line-height:1.6;color:#c6d3dd;
+  background:linear-gradient(180deg,#1b2732,#131c25);
+  border:1px solid var(--line);border-radius:var(--radius);
+  padding:var(--pad);box-shadow:var(--mat-well)}
+.bsintro b{color:var(--up)}
+.bsintro i{font-style:normal;color:var(--danger)}
+/* Das Element-Rad. AA stellt vier Knoten in eine Raute; wir haben sechs
+   Elemente, also ein Sechseck — dieselbe Idee, unser Kreis. Die Ringe
+   liegen als CSS-Winkel, damit kein Bild noetig ist und die Beschriftung
+   uebersetzbar bleibt (Regel: nie Text in einer Grafik). */
+.elwheel{position:relative;width:100%;aspect-ratio:1/1;max-width:290px;
+  margin:var(--gap-lg) auto 0}
+.elnode{position:absolute;width:66px;height:66px;margin:-33px 0 0 -33px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  border-radius:14px;font-size:8.5px;font-weight:900;letter-spacing:.04em;
+  text-transform:uppercase;color:#e8eef3;text-align:center;line-height:1.1;
+  background:linear-gradient(180deg,#243342,#141d26);
+  border:2px solid var(--line);box-shadow:var(--mat-raised)}
+.elnode .ico{width:26px;height:26px}
+.elnode span.ico{font-size:20px}
+.elnode.sel{border-color:#e0b94a;box-shadow:var(--mat-raised),0 0 16px -3px #e0b94a}
+.elwheel svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.elhint{margin-top:var(--gap-lg);font-size:11px;color:var(--dim);line-height:1.55;
+  text-align:center}
+.elhint b{color:#e8eef3}
+/* Gegner-Kachelgitter (Seite 2) */
+.mobgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);
+  margin-top:var(--gap-lg)}
+.mobtile{position:relative;border-radius:var(--radius-sm);overflow:hidden;
+  aspect-ratio:3/4;display:flex;flex-direction:column;
+  background:linear-gradient(160deg,#243342,#0e1418);
+  border:2px solid var(--line);box-shadow:var(--mat-raised)}
+.mobtile .mart{flex:1;display:flex;align-items:center;justify-content:center;
+  font-size:30px;min-height:0}
+.mobtile .mart img{width:86%;height:86%;object-fit:contain}
+.mobtile .mnm{font-size:9px;font-weight:900;line-height:1.15;padding:4px 3px 5px;
+  text-align:center;color:#dbe6ef;background:#0b1116d9;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mobtile .mel{position:absolute;left:4px;top:4px;width:16px;height:16px;
+  border-radius:5px;display:flex;align-items:center;justify-content:center;
+  font-size:10px;background:#0b1116cc;box-shadow:0 1px 3px #000a}
+.mobtile .mel .ico{width:12px;height:12px}
+.mobtile.boss{border-color:#f2a13d;box-shadow:var(--mat-raised),0 0 14px -4px #f2a13d}
+.mobtile .bosslbl{position:absolute;right:4px;top:4px;font-size:7.5px;font-weight:900;
+  letter-spacing:.08em;padding:2px 5px;border-radius:6px;
+  background:linear-gradient(180deg,#f7c877,#c9761d);
+  -webkit-text-fill-color:#2b1a05;color:#2b1a05}
+/* Detailkarte (Seite 3) */
+.mobhead{display:flex;align-items:center;gap:10px;margin-bottom:var(--gap)}
+.mobhead .mh{flex:1;min-width:0}
+.mobhead .mhn{font-size:16px;font-weight:900;color:#fff;line-height:1.15}
+.mobhead .mhe{font-size:10.5px;color:var(--dim);margin-top:2px}
+.mobcols{display:flex;gap:var(--gap-lg);align-items:flex-start}
+.mobport{flex:0 0 118px;border-radius:var(--radius-sm);aspect-ratio:3/4;
+  display:flex;align-items:center;justify-content:center;font-size:44px;
+  background:linear-gradient(160deg,#2c3a4b,#0e1418);
+  border:2px solid var(--line);box-shadow:var(--mat-raised);overflow:hidden}
+.mobport img{width:88%;height:88%;object-fit:contain}
+.mobside{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.mobfield{display:flex;align-items:baseline;gap:6px;font-size:11px}
+.mobfield b{flex:0 0 auto;color:var(--dim);font-weight:800;letter-spacing:.05em;
+  text-transform:uppercase;font-size:9px}
+.mobfield span{color:#e8eef3;font-weight:800}
+.mobdesc{font-size:11px;line-height:1.55;color:#c6d3dd}
+/* Stufenregler — AA setzt ihn UNTER das Portraet, mit Pfeilen links und
+   rechts und der Anzeige `LvL n/27` in der Mitte. */
+.lvlrow{display:flex;align-items:center;gap:6px;margin-top:8px}
+.lvlrow button{flex:0 0 30px;width:30px;height:30px;border-radius:9px;font-size:15px;
+  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);color:#fff;font-weight:900;
+  box-shadow:var(--mat-raised),0 2px 0 #12496f}
+.lvlrow button[disabled]{background:linear-gradient(180deg,#3a4a58,#222e39);
+  box-shadow:0 2px 0 #16202a;color:#8fa0ad}
+.lvlrow .lvltx{flex:1;text-align:center;font-size:11.5px;font-weight:900;
+  letter-spacing:.06em;color:#fff7d6}
+/* Das 2x2-Wertegitter. Genau vier Felder wie bei AA. */
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);
+  margin-top:var(--gap-lg)}
+.statcell{border-radius:var(--radius-sm);padding:9px 10px;
+  background:linear-gradient(180deg,#1b2732,#131c25);
+  border:1px solid var(--line);box-shadow:var(--mat-well)}
+.statcell .sl{display:block;font-size:8.5px;font-weight:900;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--dim)}
+.statcell .sv{display:block;font-size:17px;font-weight:900;line-height:1.2;
+  margin-top:2px;color:#fff}
+.statcell.hp .sv{color:#7ee08a}
+.statcell.dmg .sv{color:#f2846a}
+/* Schwaeche/Resistenz — bei AA nicht auf der Karte, bei uns schon (§7.2). */
+.weakrow{display:flex;gap:var(--gap);margin-top:var(--gap)}
+.weakcell{flex:1;border-radius:var(--radius-sm);padding:8px 10px;font-size:10.5px;
+  display:flex;align-items:center;gap:7px;font-weight:800;
+  background:linear-gradient(180deg,#1b2732,#131c25);border:1px solid var(--line)}
+.weakcell .ico{width:18px;height:18px}
+.weakcell.w{border-color:#7ee08a55;color:#bff0c6}
+.weakcell.r{border-color:#f2846a55;color:#f6c3b6}
+/* Wellenvorschau */
+.waverow{display:flex;align-items:center;gap:8px;padding:8px 10px;
+  border-radius:var(--radius-sm);margin-top:var(--gap);
+  background:linear-gradient(180deg,#1b2732,#131c25);border:1px solid var(--line)}
+.waverow .wn{flex:0 0 44px;font-size:11px;font-weight:900;color:#fff7d6}
+.waverow .wl{flex:1;min-width:0;font-size:10px;color:#c6d3dd;line-height:1.4;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.waverow.boss{border-color:#f2a13d7a}
+.waverow .wt{flex:0 0 auto;font-size:10px;font-weight:900;color:#9fb3c1}
+
 /* ---------- Modal / Turm-Detail (§2) ---------- */
 .modal{position:fixed;inset:0;display:none;z-index:60;justify-content:center}
 .modal.open{display:flex}
@@ -3156,6 +3306,22 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     <div class="cur c-trophy"><i data-ico="cur_trophy" data-emoji="🏆"></i><span id="curTrophies">0</span></div>
     <div class="cur c-gem"><i data-ico="cur_gem" data-emoji="💚"></i><span id="curGems">0</span><span class="plus" data-plus>+</span></div>
     <div class="cur c-gold"><i data-ico="cur_gold" data-emoji="🪙"></i><span id="curGold">0</span><span class="plus" data-plus>+</span></div>
+    <!-- Menue-Knopf. Position belegt: im Screenrecording vom 26.07.
+         (13-09-58) oeffnet der Knopf oben rechts bei t=1,9 s ein
+         Aufklapp-Menue mit fuenf Eintraegen — LEADERBOARDS, COMMUNITY,
+         MAIL, GUIDE, SETTINGS. Der Defender's Guide haengt dort am
+         vierten Eintrag. Wir uebernehmen Ort und Reihenfolge und
+         ergaenzen das Bestiarium als eigenen Eintrag, weil bei uns der
+         Einsteiger-Guide und das Gegner-Nachschlagewerk zwei Dinge
+         sind (AA_UI_REFERENZ §18.2). -->
+    <button class="tbmenu pressable" id="tbMenu" aria-label="Menü"
+            aria-haspopup="true" aria-expanded="false">
+      <span></span><span></span><span></span></button>
+  </div>
+  <!-- Aufklapp-Menue. Liegt bewusst NICHT in der Topbar: die ist
+       overflow-begrenzt, das Menue muss darueber hinausragen. -->
+  <div id="tbMenuLayer" hidden>
+    <div class="tbmlist" id="tbMenuList" role="menu"></div>
   </div>
 
   <!-- ===== VIEW S: SHOP (§8) =====
@@ -3834,6 +4000,37 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
      In AA oeffnet der BATTLE-Button zuerst diesen Layer: eine von UNTEN
      nach OBEN wachsende Strasse mit allen Arenen. Aufbau nach den
      User-Screenshots IMG_3293/3294/3295. Unten fixiert "Okay". -->
+<!-- ===== VIEW: DEFENDERS GUIDE (Bestiarium) =====
+     Nachbau aus AA_WELLEN_REFERENZ §2. Drei Ebenen in EINER View, weil
+     AA sie auch als eine Strecke fuehrt (Rad -> Gitter -> Detail, mit
+     Zurueck). Ein eigener View je Ebene waere dreimal dieselbe Kopfzeile
+     und dreimal derselbe Wisch-Ausschluss. -->
+<section id="viewBestiary" class="view">
+  <div class="viewhead">
+    <button class="backbtn pressable" id="bsBack">‹</button>
+    <h2 class="title">Defenders Guide</h2>
+    <span class="headico"><i data-ico="ic_shield" data-emoji="🛡"></i></span>
+  </div>
+  <div id="bsPage1">
+    <div class="bsintro">
+      Türme machen <b>+20 %</b> Schaden gegen das Element, gegen das sie
+      stark sind, und <i>−20 %</i> gegen das, gegen das sie schwach sind.
+      <b>Neutrale</b> Gegner haben weder Stärke noch Schwäche.
+    </div>
+    <div class="elwheel" id="elWheel"></div>
+    <div class="elhint" id="elHint"></div>
+    <button class="battlebtn pressable" id="bsToGrid"
+      style="width:100%;min-height:46px;font-size:14px;margin-top:16px">Gegner ansehen</button>
+  </div>
+  <div id="bsPage2" hidden>
+    <div class="bsintro">Diese Gegner können in Kämpfen und Wellen auftauchen.</div>
+    <div class="mobgrid" id="mobGrid"></div>
+    <div class="secribbon sm" data-ribbon="ribbon_section_sm"><span class="srt">Wellenplan</span></div>
+    <div id="waveList"></div>
+  </div>
+  <div id="bsPage3" hidden></div>
+</section>
+
 <div class="modal" id="roadLayer">
   <div class="roadwrap">
     <div class="rail"></div>
@@ -3930,6 +4127,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 <script src="./arena_guide.js"></script>
 <script src="./arena_avatars.js"></script>
 <script src="./arena_matchend.js"></script>
+<script src="./arena_waves.js"></script>
 <script>
 (function () {
   "use strict";
@@ -8632,6 +8830,219 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     if (G) G.mark(key);
   }
   var guideOpen = {};        // welche Kapitel sind aufgeklappt
+  /* ==================================================================
+   * DEFENDERS GUIDE (Bestiarium)
+   * ------------------------------------------------------------------
+   * Reine Darstellung. Jede Zahl kommt aus ArenaWaves — hier wird nicht
+   * gerechnet. Das ist die Bedingung dafuer, dass das Balancing an einer
+   * Stelle gedreht werden kann (arena_waves.js, Block FORMELN) und die
+   * UI ohne Nacharbeit folgt.
+   *
+   * Drei Ebenen wie bei AA (AA_WELLEN_REFERENZ §2), umgeschaltet ueber
+   * `bsSeite`. Zurueck geht immer eine Ebene hoch, nie sofort raus —
+   * AAs `Back` verhaelt sich genauso.
+   * ================================================================== */
+  var bsSeite = 1;         // 1 Rad · 2 Gitter · 3 Detailkarte
+  var bsMob = null;        // Schluessel des gezeigten Gegners
+  var bsLevel = 1;         // Stand des Stufenreglers
+
+  function AW() { return window.ArenaWaves || null; }
+
+  /* Das Element-Rad. AA stellt vier Knoten in eine Raute; wir haben
+     sechs Elemente, also einen Kreis. Die Pfeile sind ein SVG, weil sie
+     zwischen beliebigen Knotenpaaren laufen muessen — mit CSS-Kanten
+     waere das ein Dutzend Sonderfaelle. */
+  function renderElWheel() {
+    var W = AW(); if (!W) return;
+    var els = W.elements();
+    var box = $("elWheel");
+    var n = els.length, R = 36;               // Radius in Prozent
+    var pos = els.map(function (e, i) {
+      var a = (-90 + i * 360 / n) * Math.PI / 180;
+      return { e: e, x: 50 + R * Math.cos(a), y: 50 + R * Math.sin(a) };
+    });
+    /* ⚠ Die Beziehungen stehen DIREKT am Element (`strongAgainst` /
+       `weakAgainst`). `elementRelation()` ist etwas anderes: es nimmt
+       ZWEI Elemente und sagt, wie sie zueinander stehen. Ich hatte es
+       zuerst mit einem Argument gerufen — das liefert immer "neutral",
+       und das Rad blieb pfeillos. Nachgeprueft am Modul, nicht geraten. */
+    var linien = "";
+    pos.forEach(function (p, i) {
+      if (!p.e.strongAgainst) return;
+      var z = pos.filter(function (q) { return q.e.key === p.e.strongAgainst; })[0];
+      if (!z) return;
+      /* Der Pfeil endet VOR dem Zielknoten, sonst verschwindet die Spitze
+         darunter. 8 % Rueckzug entspricht dem halben Knoten. */
+      var dx = z.x - p.x, dy = z.y - p.y, len = Math.sqrt(dx * dx + dy * dy) || 1;
+      var ex = z.x - dx / len * 9, ey = z.y - dy / len * 9;
+      var sx = p.x + dx / len * 9, sy = p.y + dy / len * 9;
+      linien += '<line x1="' + sx + '" y1="' + sy + '" x2="' + ex + '" y2="' + ey +
+        '" stroke="' + p.e.farbe + '" stroke-width="0.8" stroke-dasharray="2 2"' +
+        ' marker-end="url(#bsarrow)" opacity=".85"/>';
+    });
+    box.innerHTML =
+      '<svg viewBox="0 0 100 100" aria-hidden="true"><defs>' +
+        '<marker id="bsarrow" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="4"' +
+        ' markerHeight="4" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#cfe0ec"/></marker>' +
+      "</defs>" + linien + "</svg>" +
+      pos.map(function (p) {
+        return '<div class="elnode" data-el="' + p.e.key + '" style="left:' + p.x +
+          "%;top:" + p.y + "%;border-color:" + p.e.farbe + '55">' +
+          ico(p.e.asset, p.e.emoji || "◆") +
+          "<b>" + p.e.de + "</b></div>";
+      }).join("");
+    Array.prototype.forEach.call(box.querySelectorAll(".elnode"), function (el) {
+      el.addEventListener("click", function () {
+        UISfx.tap();
+        Array.prototype.forEach.call(box.querySelectorAll(".elnode"), function (o) {
+          o.classList.toggle("sel", o === el);
+        });
+        elHinweis(el.getAttribute("data-el"));
+      });
+    });
+    elHinweis(null);
+  }
+  function elHinweis(key) {
+    var W = AW(); if (!W) return;
+    if (!key) {
+      $("elHint").innerHTML = "Tippe ein Element an, um seine Stärke und " +
+        "Schwäche zu sehen.";
+      return;
+    }
+    var els = W.elements();
+    var e = els.filter(function (x) { return x.key === key; })[0];
+    function de(k) {
+      var f = els.filter(function (x) { return x.key === k; })[0];
+      return f ? f.de : "—";
+    }
+    $("elHint").innerHTML = e && e.strongAgainst
+      ? "<b>" + e.de + "</b> macht <b>+20 %</b> gegen <b>" + de(e.strongAgainst) +
+        "</b> und <b>−20 %</b> gegen <b>" + de(e.weakAgainst) + "</b>."
+      : "<b>Neutral</b> hat weder Stärke noch Schwäche.";
+  }
+
+  /* Kachelgitter. Der Stufenstand wird MITGEFUEHRT, damit ein Sprung ins
+     Detail nicht auf Stufe 1 zurueckfaellt — AA macht das genauso. */
+  function renderMobGrid() {
+    var W = AW(); if (!W) return;
+    var liste = W.bestiary(bsLevel);
+    $("mobGrid").innerHTML = liste.map(function (m) {
+      return '<button class="mobtile pressable' + (m.boss ? " boss" : "") +
+        '" data-mob="' + m.key + '">' +
+        (m.boss ? '<span class="bosslbl">BOSS</span>' : "") +
+        '<span class="mel">' + (m.elementAsset ? ico(m.elementAsset, "◆") : "◇") + "</span>" +
+        '<span class="mart">' + ico(m.artKey, "👾") + "</span>" +
+        '<span class="mnm">' + m.nameDe + "</span></button>";
+    }).join("");
+    Array.prototype.forEach.call($("mobGrid").querySelectorAll("[data-mob]"), function (b) {
+      b.addEventListener("click", function () {
+        UISfx.tap();
+        bsMob = b.getAttribute("data-mob");
+        bsSeite = 3;
+        renderBestiary();
+      });
+    });
+    /* Wellenplan: nicht alle 27 Wellen, sondern die Marken, an denen sich
+       etwas aendert — Aktwechsel und Bosswellen. Eine 27-zeilige Liste
+       waere vollstaendig und unlesbar. */
+    var marken = [1, 7, 9, 14, 18, 22, 27];
+    $("waveList").innerHTML = marken.map(function (n) {
+      var w = W.waveAt(n);
+      var namen = w.entries.map(function (e) { return e.count + "× " + e.nameDe; });
+      var summe = w.entries.reduce(function (a, e) { return a + e.hpTotal; }, 0);
+      return '<div class="waverow' + (w.boss ? " boss" : "") + '">' +
+        '<span class="wn">' + (w.boss ? "★ " : "") + "W " + w.wave + "</span>" +
+        '<span class="wl">' + namen.join(" · ") + "</span>" +
+        '<span class="wt">' + fmt(summe) + " LP</span></div>";
+    }).join("");
+  }
+
+  /* Detailkarte. AA zeigt GENAU VIER Werte in einem 2x2-Gitter; wir
+     ergaenzen Element, Schwaeche und Resistenz, weil unsere Matrix sechs
+     Elemente hat und die Information sonst nirgends steht (§7.2). */
+  function renderMobDetail() {
+    var W = AW(); if (!W || !bsMob) return;
+    var m = W.statsFor(bsMob, bsLevel);
+    var b = W.bestiary(bsLevel).filter(function (x) { return x.key === bsMob; })[0];
+    if (!m || !b) return;
+    var els = W.elements();
+    function elDe(k) {
+      var f = els.filter(function (e) { return e.key === k; })[0];
+      return f ? { de: f.de, asset: f.asset } : null;
+    }
+    var wk = b.weakTo ? elDe(b.weakTo) : null;
+    var rs = b.resistantTo ? elDe(b.resistantTo) : null;
+    var bewegung = { slow: "Langsam", normal: "Normal", fast: "Schnell" };
+    var ziel = { ground: "Boden", air: "Luft", both: "Luft & Boden" };
+    $("bsPage3").innerHTML =
+      '<div class="mobhead">' +
+        '<span class="mh"><span class="mhn">' + m.nameDe + "</span>" +
+        '<span class="mhe">' + m.elementDe +
+          (m.boss ? " · Boss" : "") + " · ab Welle " + b.fromWave + "</span></span>" +
+      "</div>" +
+      '<div class="mobcols">' +
+        '<div><div class="mobport">' + ico(m.artKey, "👾") + "</div>" +
+          '<div class="lvlrow">' +
+            '<button class="pressable" id="bsLvlDown"' + (bsLevel <= 1 ? " disabled" : "") + ">◀</button>" +
+            '<span class="lvltx">Stufe ' + m.level + "/" + m.maxLevel + "</span>" +
+            '<button class="pressable" id="bsLvlUp"' +
+              (bsLevel >= m.maxLevel ? " disabled" : "") + ">▶</button>" +
+          "</div></div>" +
+        '<div class="mobside">' +
+          '<div class="mobfield"><b>Ziel</b><span>' + (ziel[m.target] || m.target) + "</span></div>" +
+          '<div class="mobfield"><b>Bewegung</b><span>' +
+            (bewegung[m.movement] || m.movement) + "</span></div>" +
+          '<div class="mobdesc">' + m.descDe + "</div>" +
+        "</div>" +
+      "</div>" +
+      '<div class="statgrid">' +
+        '<div class="statcell hp"><span class="sl">Max. Leben</span>' +
+          '<span class="sv" id="bsHp">' + fmt(m.hp) + "</span></div>" +
+        '<div class="statcell dmg"><span class="sl">Schaden</span>' +
+          '<span class="sv">' + fmt(m.damage) + "</span></div>" +
+        '<div class="statcell"><span class="sl">Angriffstempo</span>' +
+          '<span class="sv">' + m.attackSpeed.toFixed(2) + "</span></div>" +
+        '<div class="statcell"><span class="sl">Lauftempo</span>' +
+          '<span class="sv">' + (bewegung[m.movement] || m.movement) + "</span></div>" +
+      "</div>" +
+      (wk || rs
+        ? '<div class="weakrow">' +
+            (wk ? '<span class="weakcell w">' + ico(wk.asset, "◆") +
+              "Schwach gegen " + wk.de + "</span>" : "") +
+            (rs ? '<span class="weakcell r">' + ico(rs.asset, "◆") +
+              "Resistent gegen " + rs.de + "</span>" : "") +
+          "</div>"
+        : '<div class="weakrow"><span class="weakcell">◇ Neutral — keine Stärke, ' +
+          "keine Schwäche</span></div>");
+    var dn = $("bsLvlDown"), up = $("bsLvlUp");
+    if (dn) dn.addEventListener("click", function () {
+      if (bsLevel > 1) { bsLevel--; UISfx.tap(); renderMobDetail(); }
+    });
+    if (up) up.addEventListener("click", function () {
+      if (bsLevel < m.maxLevel) { bsLevel++; UISfx.tap(); renderMobDetail(); }
+    });
+    markPressable($("bsPage3"));
+    sweepSoon($("bsPage3"));
+  }
+
+  function renderBestiary() {
+    var W = AW();
+    if (!W) {
+      $("bsPage1").innerHTML = '<div class="bsintro">Das Wellen-Modul ist nicht geladen.</div>';
+      return;
+    }
+    $("bsPage1").hidden = bsSeite !== 1;
+    $("bsPage2").hidden = bsSeite !== 2;
+    $("bsPage3").hidden = bsSeite !== 3;
+    if (bsSeite === 1) renderElWheel();
+    if (bsSeite === 2) renderMobGrid();
+    if (bsSeite === 3) renderMobDetail();
+    hydrateIcons($("viewBestiary"));
+    hydrateRibbons($("viewBestiary"));
+    markPressable($("viewBestiary"));
+    sweepSoon($("viewBestiary"));
+  }
+
   function renderGuide() {
     var G = GDof();
     if (!G) { $("guideNote").textContent = "arena_guide.js nicht geladen."; return; }
@@ -8954,6 +9365,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
                navPass: "viewPass", navHeroes: "viewHeroes", navEvents: "viewEvents",
                navMail: "viewMail", navSettings: "viewSettings",
                navGuide: "viewGuide", navManual: "viewManual",
+               navBestiary: "viewBestiary",
                navEditProfile: "viewEditProfile",
                navMatchEnd: "viewMatchEnd" };
   var NAV_IDS = ["navShop", "navCollection", "navHome", "navClan", "navFortress", "navPack",
@@ -8996,6 +9408,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     if (navId === "navMail") renderMail();
     if (navId === "navSettings") renderSettings();
     if (navId === "navGuide") renderGuide();
+    if (navId === "navBestiary") renderBestiary();
     if (navId === "navManual") renderManual();
     if (navId === "navEditProfile") renderEditProfile();
   }
@@ -9104,6 +9517,77 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   onNav("passBanner", "navPass"); onNav("icoMail", "navMail");
   // Promo-Banner an Shop-Position 1 fuehrt in den Season-Pass (§8.1).
   onNav("shopPromo", "navPass");
+  /* ==================================================================
+   * AUFKLAPP-MENUE OBEN RECHTS — AAs Ort fuer den Guide
+   * ------------------------------------------------------------------
+   * Belegt aus dem Screenrecording 13-09-58: bei t=1,9 s oeffnet der
+   * Knopf oben rechts eine Liste mit LEADERBOARDS · COMMUNITY · MAIL ·
+   * GUIDE · SETTINGS; der Defender's Guide haengt am vierten Eintrag.
+   * Reihenfolge und Ort uebernommen. Der einzige Zusatz ist ein eigener
+   * Eintrag fuers Bestiarium, weil bei uns Einsteiger-Guide und
+   * Gegner-Nachschlagewerk zwei Dinge sind (AA_UI_REFERENZ §18.2) —
+   * AA hat nur eines und fuehrt beides darunter.
+   * ================================================================== */
+  var TB_MENU = [
+    { nav: "navBoard",    ico: "hub_leaderboard", emo: "🏅", txt: "Rangliste" },
+    { nav: "navClan",     ico: "hub_clan",        emo: "🛡", txt: "Community" },
+    { nav: "navMail",     ico: "hub_mail",        emo: "✉",  txt: "Post" },
+    { nav: "navGuide",    ico: "hub_challenges",  emo: "📖", txt: "Guide" },
+    { nav: "navBestiary", ico: "ic_shield",       emo: "👾", txt: "Gegner" },
+    { nav: "navSettings", ico: "hub_settings",    emo: "⚙",  txt: "Einstellungen" }
+  ];
+  function tbMenuAuf() {
+    var L = $("tbMenuLayer");
+    $("tbMenuList").innerHTML = TB_MENU.map(function (e, i) {
+      return '<button class="tbmi pressable" role="menuitem" data-nav="' + e.nav +
+        '" style="animation-delay:' + (i * 34) + 'ms">' +
+        ico(e.ico, e.emo) + e.txt + "</button>";
+    }).join("");
+    Array.prototype.forEach.call($("tbMenuList").querySelectorAll("[data-nav]"), function (b) {
+      b.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+        UISfx.tap();
+        var ziel = b.getAttribute("data-nav");
+        /* Das Bestiarium startet IMMER auf Seite 1. Ein Nachschlagewerk,
+           das dort wieder aufmacht, wo man zuletzt war, verwirrt beim
+           zweiten Besuch mehr als es hilft. */
+        if (ziel === "navBestiary") { bsSeite = 1; bsMob = null; bsLevel = 1; }
+        tbMenuZu();
+        show(ziel);
+      });
+    });
+    L.hidden = false;
+    $("tbMenu").setAttribute("aria-expanded", "true");
+    markPressable(L);
+    sweepSoon(L);
+  }
+  function tbMenuZu() {
+    $("tbMenuLayer").hidden = true;
+    $("tbMenu").setAttribute("aria-expanded", "false");
+  }
+  $("tbMenu").addEventListener("click", function (e) {
+    e.stopPropagation();
+    UISfx.tap();
+    if ($("tbMenuLayer").hidden) tbMenuAuf(); else tbMenuZu();
+  });
+  // Tippen daneben schliesst — wie bei AA, kein eigener Schliessen-Knopf.
+  $("tbMenuLayer").addEventListener("click", function () { UISfx.tap(); tbMenuZu(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !$("tbMenuLayer").hidden) tbMenuZu();
+  });
+
+  /* Zurueck im Bestiarium geht eine EBENE hoch, nicht sofort raus —
+     AAs `Back` verhaelt sich genauso (Detail -> Gitter -> Rad -> Start). */
+  $("bsBack").addEventListener("click", function () {
+    UISfx.tap();
+    if (bsSeite === 3) { bsSeite = 2; renderBestiary(); return; }
+    if (bsSeite === 2) { bsSeite = 1; renderBestiary(); return; }
+    show("navHome");
+  });
+  $("bsToGrid").addEventListener("click", function () {
+    UISfx.confirm(); bsSeite = 2; renderBestiary();
+  });
+
   onNav("icoSettings", "navSettings"); onNav("tileGuide", "navGuide");
   $("icoDaily").addEventListener("click", openDaily);
   $("dailyClose").addEventListener("click", closeDaily);
@@ -9470,6 +9954,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
    * ================================================================== */
   var SWIPE_ORDER = ["navShop", "navCollection", "navHome", "navClan", "navFortress"];
   var SWIPE_LAYERS = ["#detailModal", "#roadLayer", "#stLayer", "#dailyLayer",
+                      "#tbMenuLayer",
                       "#loginLayer", "#offerLayer", "#avCerLayer", "#mmLayer"];
 
   (function installSwipe() {
