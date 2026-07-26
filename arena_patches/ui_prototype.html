@@ -108,6 +108,39 @@ button{font-family:inherit;color:inherit;border:0;background:none;cursor:pointer
 .view.active{display:block}
 
 /* ==================================================================
+ * WISCHEN ZWISCHEN DEN HAUPT-VIEWS
+ * ------------------------------------------------------------------
+ * Ein Hub ohne Wischen fuehlt sich auf dem Telefon wie eine Webseite
+ * an, nicht wie eine App — man MUSS die Leiste treffen, um weiter zu
+ * kommen. Die fuenf Bottom-Nav-Ziele liegen darum auch als Reihe
+ * nebeneinander: nach links wischen geht ein Ziel weiter.
+ *
+ * Zwei Dinge, an denen so etwas normalerweise scheitert:
+ *   1. Es frisst das vertikale Scrollen. Deshalb entscheidet die
+ *      RICHTUNG der ersten Fingerbewegung, wer die Geste bekommt, und
+ *      die Entscheidung wird fuer die Dauer der Geste festgehalten.
+ *   2. Es frisst die querscrollenden Reihen (Trophaeenstrasse,
+ *      Kartenreihen). Deshalb wird eine Geste, die in einem quer
+ *      scrollbaren Element beginnt, gar nicht erst angenommen.
+ * ================================================================== */
+.view.swdrag{transition:none;will-change:transform}
+.view.swsnap{transition:transform .22s cubic-bezier(.22,.61,.36,1)}
+/* Am Ende der Reihe gibt es kein Ziel mehr. Statt gar nichts zu tun
+   federt der View — die Geste wird beantwortet, nur mit „hier ist
+   Schluss". Ein stummer Fehlschlag liest sich als Bug. */
+.view.swedge{transition:transform .16s ease-out}
+/* Richtungsanzeige am Rand, waehrend der Finger zieht. */
+.swhint{position:fixed;top:50%;width:34px;height:64px;z-index:45;pointer-events:none;
+  transform:translateY(-50%);opacity:0;transition:opacity .12s;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;font-weight:900;color:#fff;text-shadow:0 2px 4px #000}
+.swhint.l{left:0;border-radius:0 12px 12px 0;
+  background:linear-gradient(90deg,#63d0eecc,#63d0ee00)}
+.swhint.r{right:0;border-radius:12px 0 0 12px;
+  background:linear-gradient(270deg,#63d0eecc,#63d0ee00)}
+.swhint.on{opacity:1}
+
+/* ==================================================================
  * FARBFLAECHEN JE VIEW (AA_UI_REFERENZ §20.3)
  * ------------------------------------------------------------------
  * Messergebnis aus Video 6 und 11: AA wirkt nicht deshalb lebendiger,
@@ -8754,6 +8787,192 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
                      showAvatarCeremony: showAvatarCeremony, avCerStep: avCerStep,
                      avCerQueue: function () { return avCerQueue; },
                      AV: function () { return window.ArenaAvatars; } };
+  /* ==================================================================
+   * WISCHEN ZWISCHEN DEN HAUPT-VIEWS
+   * ------------------------------------------------------------------
+   * Die fuenf Bottom-Nav-Ziele sind eine REIHE. Nach links wischen geht
+   * ein Ziel weiter, nach rechts eins zurueck. Ohne das fuehlt sich der
+   * Hub auf dem Telefon wie eine Webseite an: man muss die Leiste
+   * treffen, um irgendwohin zu kommen.
+   *
+   * Drei Regeln, an denen so etwas normalerweise scheitert:
+   *   1. Vertikales Scrollen darf nicht verloren gehen. Die RICHTUNG der
+   *      ersten Bewegung entscheidet, wer die Geste bekommt, und die
+   *      Entscheidung haelt bis zum Loslassen.
+   *   2. Querscrollende Reihen (Trophaeenstrasse, Kartenreihen) gehoeren
+   *      sich selbst. Beginnt die Geste in so einem Element, wird sie gar
+   *      nicht angenommen.
+   *   3. Am Ende der Reihe federt der View statt stumm zu bleiben. Eine
+   *      Geste ohne Antwort liest sich als Fehler.
+   * ================================================================== */
+  var SWIPE_ORDER = ["navShop", "navCollection", "navHome", "navClan", "navFortress"];
+  var SWIPE_LAYERS = ["#detailModal", "#roadLayer", "#stLayer", "#dailyLayer",
+                      "#loginLayer", "#offerLayer", "#avCerLayer"];
+
+  (function installSwipe() {
+    var app = $("app");
+    if (!app) return;
+
+    var hintL = document.createElement("div"); hintL.className = "swhint l"; hintL.textContent = "‹";
+    var hintR = document.createElement("div"); hintR.className = "swhint r"; hintR.textContent = "›";
+    document.body.appendChild(hintL); document.body.appendChild(hintR);
+
+    var aktiv = false, achse = null, x0 = 0, y0 = 0, t0 = 0, dx = 0, view = null, W = 320;
+    var scroller = null;
+    var laeuft = false;
+
+    function offen() {
+      if (document.body.classList.contains("me-open")) return true;
+      for (var i = 0; i < SWIPE_LAYERS.length; i++) {
+        var el = document.querySelector(SWIPE_LAYERS[i]);
+        if (el && el.classList.contains("open")) return true;
+      }
+      return false;
+    }
+    function aktuellerView() { return document.querySelector(".view.active"); }
+    function aktuellesZiel() {
+      var v = aktuellerView(); if (!v) return null;
+      for (var k in NAVS) if (NAVS[k] === v.id) {
+        if (SWIPE_ORDER.indexOf(k) >= 0) return k;
+      }
+      return null;
+    }
+    /* Der naechste querscrollende Vorfahr, oder null. Wichtig: NICHT
+       einfach die Geste abweisen. Ein Screen, dessen Mitte eine
+       querscrollende Reihe ist (Kriegsboard, Trophaeenstrasse), waere
+       sonst eine Falle — man kaeme mittig nicht mehr heraus.
+       Stattdessen gilt die Uebergabe-Regel, die native Listen auch
+       benutzen: solange der innere Scroller noch Weg hat, gehoert die
+       Geste ihm; ist er am Ende, uebernimmt der View. */
+    function querscroller(el) {
+      for (var n = el; n && n !== app; n = n.parentElement) {
+        if (n.scrollWidth > n.clientWidth + 2) {
+          var ox = getComputedStyle(n).overflowX;
+          if (ox === "auto" || ox === "scroll") return n;
+        }
+      }
+      return null;
+    }
+    /* Hat der Scroller in Zugrichtung noch Weg? dx > 0 heisst: der Finger
+       geht nach rechts, gesucht wird also Inhalt LINKS davon. */
+    function hatWeg(n, dx) {
+      if (!n) return false;
+      var max = n.scrollWidth - n.clientWidth;
+      return dx > 0 ? n.scrollLeft > 1 : n.scrollLeft < max - 1;
+    }
+    function hinweis(l, r) {
+      hintL.classList.toggle("on", !!l);
+      hintR.classList.toggle("on", !!r);
+    }
+    function zuruecksetzen(v) {
+      if (!v) return;
+      v.classList.remove("swdrag", "swsnap", "swedge");
+      v.style.transform = "";
+    }
+
+    function wechseln(schritt) {
+      var ziel = aktuellesZiel(); if (ziel === null) return false;
+      var i = SWIPE_ORDER.indexOf(ziel) + schritt;
+      if (i < 0 || i >= SWIPE_ORDER.length) return false;
+      var von = aktuellerView();
+      laeuft = true;
+      von.classList.remove("swdrag");
+      von.classList.add("swsnap");
+      von.style.transform = "translateX(" + (-schritt * W) + "px)";
+      setTimeout(function () {
+        zuruecksetzen(von);
+        show(SWIPE_ORDER[i]);
+        var neu = aktuellerView();
+        if (!neu) { laeuft = false; return; }
+        neu.classList.add("swdrag");
+        neu.style.transform = "translateX(" + (schritt * W) + "px)";
+        // Erst im naechsten Rahmen umschalten, sonst faellt der
+        // Startzustand mit dem Ziel in denselben Stilrechenschritt und
+        // die Bewegung ist unsichtbar.
+        requestAnimationFrame(function () {
+          neu.classList.remove("swdrag");
+          neu.classList.add("swsnap");
+          neu.style.transform = "translateX(0)";
+          setTimeout(function () { zuruecksetzen(neu); laeuft = false; }, 240);
+        });
+      }, 200);
+      if (window.UISfx) UISfx.tap();
+      track("view_swiped", { to: SWIPE_ORDER[i], dir: schritt });
+      return true;
+    }
+    // Fuer Tests und fuer Knoepfe, die dieselbe Bewegung wollen.
+    window.ArenaSwipe = { order: SWIPE_ORDER, to: wechseln,
+                          ziel: aktuellesZiel, laeuft: function () { return laeuft; } };
+
+    app.addEventListener("pointerdown", function (e) {
+      if (laeuft || offen() || aktuellesZiel() === null) return;
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      aktiv = true; achse = null; dx = 0;
+      x0 = e.clientX; y0 = e.clientY; t0 = Date.now();
+      // Den Scroller JETZT merken: beim Loslassen kann das Element
+      // unter dem Finger schon ein anderes sein.
+      scroller = querscroller(e.target);
+      view = aktuellerView();
+      W = app.getBoundingClientRect().width || 320;
+    }, { passive: true });
+
+    app.addEventListener("pointermove", function (e) {
+      if (!aktiv || !view) return;
+      var ax = e.clientX - x0, ay = e.clientY - y0;
+      if (achse === null) {
+        if (Math.abs(ax) < 7 && Math.abs(ay) < 7) return;
+        // Einmal entscheiden, dann dabei bleiben. Ein Umschalten mitten
+        // in der Geste ist das, was sich "verschluckt" anfuehlt.
+        achse = Math.abs(ax) > Math.abs(ay) * 1.3 ? "x" : "y";
+        // Uebergabe-Regel: hat der innere Scroller in dieser Richtung
+        // noch Weg, gehoert die Geste ihm und der View haelt still.
+        if (achse === "x" && hatWeg(scroller, ax)) achse = "y";
+        if (achse === "x") view.classList.add("swdrag");
+      }
+      if (achse !== "x") return;
+      dx = ax;
+      var ziel = aktuellesZiel();
+      var i = SWIPE_ORDER.indexOf(ziel);
+      var ende = (dx < 0 && i >= SWIPE_ORDER.length - 1) || (dx > 0 && i <= 0);
+      // Am Rand zaeh, in der Mitte 1:1 minus ein Rest, damit der View
+      // sichtbar hinter dem Finger herlaeuft statt an ihm zu kleben.
+      var v = ende ? dx * 0.22 : dx * 0.82;
+      view.style.transform = "translateX(" + v.toFixed(1) + "px)";
+      hinweis(!ende && dx > 40, !ende && dx < -40);
+    }, { passive: true });
+
+    function los() {
+      if (!aktiv) return;
+      aktiv = false;
+      hinweis(false, false);
+      if (achse !== "x" || !view) { achse = null; return; }
+      var dt = Math.max(1, Date.now() - t0);
+      var speed = Math.abs(dx) / dt;                 // px/ms
+      var weit = Math.abs(dx) > W * 0.25 || speed > 0.55;
+      var v = view;
+      if (weit && wechseln(dx < 0 ? 1 : -1)) { achse = null; view = null; return; }
+      // Kein Wechsel: zurueckfedern. swedge ist kuerzer als swsnap —
+      // ein abgewiesener Zug soll sich schneller anfuehlen als ein
+      // erfolgreicher, sonst wirkt die Absage wie Traegheit.
+      v.classList.remove("swdrag");
+      v.classList.add(weit ? "swedge" : "swsnap");
+      v.style.transform = "translateX(0)";
+      setTimeout(function () { zuruecksetzen(v); }, 240);
+      achse = null; view = null;
+    }
+    app.addEventListener("pointerup", los, { passive: true });
+    app.addEventListener("pointercancel", los, { passive: true });
+    app.addEventListener("pointerleave", los, { passive: true });
+
+    /* Tastatur: dieselbe Bewegung mit Links/Rechts. Kostet nichts und
+       macht den Prototyp am Rechner pruefbar. */
+    document.addEventListener("keydown", function (e) {
+      if (offen() || laeuft) return;
+      if (e.key === "ArrowRight") wechseln(1);
+      else if (e.key === "ArrowLeft") wechseln(-1);
+    });
+  })();
+
 })();
 </script>
 </body>
