@@ -623,17 +623,25 @@ footer{padding:6px 12px 14px;text-align:center}
 #viewHome .arenahero .progwrap{margin-top:auto}
 #viewHome .homerow3{padding-bottom:10px}
 .arenahero{position:relative;min-height:250px;display:flex;flex-direction:column;
-  align-items:center;padding:26px 14px 16px;
+  align-items:center;padding:8px 14px 16px;
   background-repeat:no-repeat;background-position:center center;
   background-size:cover,cover;
   background-image:linear-gradient(165deg,#1d2a3a,#0e1418 70%)}
 .arenahero::after{content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(180deg,#0e141866 0%,#0e141800 34%,#0e1418cc 82%,#0e1418 100%)}
 .arenahero>*{position:relative;z-index:2}
+/* Der Titel liegt jetzt auf dem Artwork. Ohne eigene Abdunklung waere er
+   auf hellen Dioramen unlesbar — das ist derselbe Fehler wie Gold auf
+   Gold bei den Kronen, nur mit Schrift. */
+.arenatitle::before{content:"";position:absolute;left:50%;top:-14px;
+  transform:translateX(-50%);width:min(300px,86%);height:calc(100% + 26px);
+  border-radius:22px;pointer-events:none;
+  background:radial-gradient(60% 60% at 50% 45%,#070b0fd9 0%,#070b0f8c 55%,#070b0f00 100%)}
+.arenakicker,.arenaname,.arenachip{position:relative}
 .arenakicker{font-size:11px;letter-spacing:.24em;font-weight:800;color:#b9c9d6;
   text-transform:uppercase;text-shadow:0 1px 3px #000}
 .arenaname{font-size:31px;line-height:1.05;text-align:center;margin:4px 0 0}
-.arenachip{margin-top:9px;background:#0b1116b3;border:1px solid #3a4c5c;border-radius:20px;
+.arenachip{margin-top:6px;background:#0b1116d9;border:1px solid #3a4c5c;border-radius:20px;
   padding:4px 13px;font-size:10.5px;font-weight:800;letter-spacing:.1em;color:#cfe0ec}
 .crestmini{flex:0 0 30px;height:30px;border-radius:8px;font-size:15px;
   background:linear-gradient(180deg,#4a5f78,#1b2735);box-shadow:0 0 0 2px #e0b94a55;
@@ -719,7 +727,14 @@ footer{padding:6px 12px 14px;text-align:center}
    breit und die Insel nicht mehr lesbar. 46 % ist der Kompromiss, der
    AAs „kleines schwebendes Objekt auf ruhigem Grund" trifft, ohne das
    Artwork zu verschenken — vorher waren es 74 %. */
-.diorama{margin-top:12px;width:46%;max-width:190px;aspect-ratio:16/10;border-radius:18px;
+/* Buehne: Diorama plus Titel liegen uebereinander, wie bei AA. Die Buehne
+   ist so hoch wie das Diorama, der Titel sitzt in ihrer unteren Haelfte
+   und ragt darunter heraus — dadurch beginnt der Name in AAs Band. */
+.arenastage{position:relative;width:100%;display:flex;flex-direction:column;
+  align-items:center}
+.arenatitle{position:absolute;left:0;right:0;top:52%;display:flex;
+  flex-direction:column;align-items:center;pointer-events:none}
+.diorama{margin-top:0;width:46%;max-width:190px;aspect-ratio:16/10;border-radius:18px;
   background-repeat:no-repeat;background-position:center;background-size:cover,cover;
   background-image:linear-gradient(160deg,#2c3a4b,#131c25);
   border:1px solid #ffffff1f;
@@ -2998,13 +3013,21 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     </button>
 
     <div class="arenahero" id="arenaHero">
-      <!-- 25 %: freischwebendes Insel-Diorama auf ruhigem Grund (§14.2) -->
-      <button class="diorama" id="arenaDiorama" title="Arena-Rang"></button>
-      <!-- 28-33 %: Arenaname zweizeilig zentriert (§9.5b) -->
-      <div class="arenakicker" id="arenaKicker">Arena 1</div>
-      <div class="arenaname goldtext" id="arenaName">Kristallhof</div>
-      <!-- 34 %: Modifier-Chip -->
-      <div class="arenachip" id="arenaChip">◎ Neutral</div>
+      <!-- AAs Achse (§19.1), gemessen als OBERKANTEN und um AAs iOS-
+           Statusleiste (7 % von 2868 px) korrigiert:
+             Diorama 18 % · Arenaname 23 % · Chip 27 %
+           Der Abstand Diorama->Name betraegt bei AA nur 5 Punkte, das
+           Diorama selbst ist 12 Punkte hoch. Der Name liegt also AUF dem
+           Diorama, nicht darunter. Wir hatten ihn darunter, und dadurch
+           lagen Name und Chip 18 bis 19 Punkte zu tief. -->
+      <div class="arenastage">
+        <button class="diorama" id="arenaDiorama" title="Arena-Rang"></button>
+        <div class="arenatitle">
+          <div class="arenakicker" id="arenaKicker">Arena 1</div>
+          <div class="arenaname goldtext" id="arenaName">Kristallhof</div>
+          <div class="arenachip" id="arenaChip">◎ Neutral</div>
+        </div>
+      </div>
       <!-- 58 %: Trophaeenbalken, Reward-Icon am rechten Ende (§14.3) -->
       <div class="progwrap">
         <i data-ico="cur_trophy" data-emoji="🏆" style="font-size:15px"></i>
