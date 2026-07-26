@@ -1017,6 +1017,116 @@ span.ico{mix-blend-mode:normal;text-align:center}
   text-align:center;font-size:9.5px;color:var(--dim);font-weight:700}
 .decotile .dart{display:block;font-size:22px;margin-bottom:3px}
 
+/* ==================================================================
+ * MATCH-ENDE (arena_matchend.js · AA_UI_REFERENZ §9.3)
+ * ------------------------------------------------------------------
+ * Zwei Reiter: „Ergebnis" (Belohnung + Anschluss) und „Schaden"
+ * (Bilanz beider Seiten). AA hat nur die Belohnungsansicht.
+ *
+ * Die Schadensbalken beider Seiten laufen auf EINER Skala — der
+ * groesste Einzelschaden im Match ist 100 %. Nur so ist der Vergleich
+ * ueber den Spielerwechsel hinweg aussagekraeftig; getrennte Skalen
+ * wuerden jede Seite gleich stark aussehen lassen.
+ * ================================================================== */
+.mehead{position:relative;border-radius:var(--radius);padding:14px 12px 12px;
+  text-align:center;overflow:hidden;margin-bottom:var(--gap)}
+.mehead.win{background:radial-gradient(120% 130% at 50% 0%,#3c6b2a,#1d3319 62%,#141d26)}
+.mehead.lose{background:radial-gradient(120% 130% at 50% 0%,#6b2a2a,#331919 62%,#141d26)}
+.mehead .meh{font-size:30px;font-weight:900;letter-spacing:.1em;line-height:1}
+.mehead.win .meh{color:#bdf59a;text-shadow:0 2px 0 #0b2405,0 0 22px #7ad14f66}
+.mehead.lose .meh{color:#f5b0a0;text-shadow:0 2px 0 #240b05}
+.mehead .mesub{margin-top:6px;font-size:10.5px;color:#cfd6ddb8;font-weight:700}
+/* Trophaeen-Delta ist die wichtigste Zahl des Screens — entsprechend gross. */
+.medelta{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:9px;
+  font-size:26px;font-weight:900}
+.medelta img,.medelta span.ico{width:24px;height:24px;object-fit:contain}
+.medelta.up{color:#ffd76b}
+.medelta.down{color:#f59a8a}
+.medelta small{font-size:11px;color:#cfd6dd99;font-weight:800;align-self:flex-end;
+  margin-bottom:5px}
+/* Belohnungszeile */
+.merew{display:flex;gap:var(--gap);margin-bottom:var(--gap)}
+.merewc{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:9px 8px;text-align:center}
+.merewc .mrv{display:flex;align-items:center;justify-content:center;gap:5px;
+  font-size:15px;font-weight:900;color:#e8f0f7}
+.merewc .mrv img{width:18px;height:18px;object-fit:contain}
+.merewc .mrk{font-size:9px;color:var(--dim);font-weight:700;margin-top:2px;
+  letter-spacing:.05em;text-transform:uppercase}
+/* Anschluss: naechster Knoten der Trophaeenstrasse. Der eigentliche
+   „nochmal"-Ausloeser — deshalb klickbar direkt in die Strasse. */
+.menode{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:10px;margin-bottom:var(--gap)}
+.menode .mnt{font-size:11.5px;font-weight:800;color:#dbe6ef;display:flex;
+  align-items:center;gap:6px}
+.menode .mnt img{width:16px;height:16px;object-fit:contain}
+.menode .mnb{position:relative;height:9px;border-radius:5px;margin-top:7px;overflow:hidden;
+  background:#0b1116;border:1px solid #2b3b47}
+.menode .mnb i{position:absolute;left:0;top:0;bottom:0;
+  background:linear-gradient(90deg,#f2c53d,#ffe9a3)}
+.menode .mns{font-size:9.5px;color:var(--dim);margin-top:5px}
+/* Level-Tipp — der Turm mit dem besten Schaden je Stufe. */
+.metip{display:flex;align-items:center;gap:9px;background:#141d26;
+  border:1px solid #2b3b47;border-left:3px solid #63d0ee;border-radius:var(--radius-sm);
+  padding:9px 10px;margin-bottom:var(--gap)}
+.metip .mtart{flex:0 0 34px;width:34px;aspect-ratio:3/4;border-radius:6px;overflow:hidden;
+  background:var(--panel2);display:flex;align-items:center;justify-content:center;font-size:16px}
+.metip .mtart img{width:100%;height:100%;object-fit:cover}
+.metip .mtx{flex:1;min-width:0;font-size:10.5px;color:#cfd6dd;line-height:1.45}
+.metip .mtx b{color:#9fe6ff}
+/* ---- Reiter „Schaden" ---- */
+.medv{font-size:11.5px;font-weight:800;color:#dbe6ef;text-align:center;
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:9px;margin-bottom:var(--gap)}
+.mesidehd{display:flex;align-items:baseline;gap:6px;margin:var(--gap-lg) 0 var(--gap)}
+.mesidehd .msn{font-size:12.5px;font-weight:900;color:#e8f0f7}
+.mesidehd .mst{margin-left:auto;font-size:10.5px;font-weight:800;color:var(--gold)}
+.mesidehd .msc{font-size:9.5px;color:var(--dim)}
+.mrow{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:var(--radius-sm);
+  border:1px solid var(--line);background:linear-gradient(180deg,#1b2732,#131c25);
+  margin-bottom:6px}
+.mrow.mvp{border-color:#f2c53d88;box-shadow:0 0 10px #f2c53d22}
+.mrow.isHero{border-color:#c39bff66;background:linear-gradient(180deg,#241f33,#161320)}
+.mrow .mrk2{flex:0 0 16px;font-size:10px;font-weight:900;color:#6d8497;text-align:center}
+.mrow .mart{flex:0 0 30px;width:30px;aspect-ratio:3/4;border-radius:5px;overflow:hidden;
+  background:var(--panel2);display:flex;align-items:center;justify-content:center;font-size:14px}
+.mrow .mart img{width:100%;height:100%;object-fit:cover}
+.mrow .mmid{flex:1;min-width:0}
+.mrow .mnm{font-size:11px;font-weight:800;color:#dbe6ef;display:flex;align-items:center;gap:5px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mrow .mnm img.el{width:13px;height:13px;object-fit:contain;flex:0 0 13px}
+/* Held-Marke und MVP-Marke: beides kleine Chips, damit die Zeile nicht
+   wackelt. Der Held ist markiert, weil sein Schaden NICHT mit Turmschaden
+   vergleichbar ist (andere Investition dahinter). */
+.mrow .chiph{flex:0 0 auto;font-size:8px;font-weight:900;letter-spacing:.06em;
+  padding:1px 5px;border-radius:4px;background:#c39bff;color:#1b1030}
+.mrow .chipm{flex:0 0 auto;font-size:8px;font-weight:900;letter-spacing:.06em;
+  padding:1px 5px;border-radius:4px;background:linear-gradient(180deg,#f4e3a6,#c9a13a);
+  color:#3a2a06}
+.mrow .mbar{position:relative;height:8px;border-radius:4px;margin-top:5px;overflow:hidden;
+  background:#0b1116;border:1px solid #2b3b47}
+.mrow .mbar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px}
+.mrow .msub{font-size:9px;color:var(--dim);margin-top:4px}
+.mrow .mnum{flex:0 0 auto;text-align:right}
+.mrow .mnum b{display:block;font-size:12px;font-weight:900;color:#e8f0f7}
+.mrow .mnum small{display:block;font-size:8.5px;color:var(--dim);font-weight:700}
+.menote{font-size:10px;color:var(--dim);line-height:1.5;margin-top:var(--gap);
+  border-left:2px solid #63d0ee66;padding-left:8px}
+/* Abschluss-Knoepfe */
+.mebtns{display:flex;gap:var(--gap);margin-top:var(--gap-lg)}
+.mebtn{flex:1;border-radius:var(--radius-sm);padding:12px 0;font-size:13px;font-weight:900;
+  letter-spacing:.04em}
+.mebtn.again{background:linear-gradient(180deg,#58fa1b,#3aad16);color:#0a2404;
+  box-shadow:0 3px 0 #1f6b09}
+.mebtn.next{background:var(--panel);color:#c2cfd9;border:1px solid var(--line);flex:0 0 38%}
+/* Das Match-Ende ist ein ABSCHLUSS, keine Station: Solange es offen ist,
+   verschwindet die Bottom-Nav. Sonst konkurrieren fuenf Reiseziele mit
+   „Revanche" und genau der Anschluss geht verloren, um den es hier geht.
+   Im echten Spiel wird das ein Layer ueber dem Match — dieselbe Wirkung.
+   Der Platz unter den Knoepfen wird gleichzeitig frei. */
+body.me-open .bottomnav{display:none}
+body.me-open #viewMatchEnd.view{padding-bottom:22px}
+
 /* ---------- FESTUNG (§9.9) ---------- */
 .castlewrap{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:16/9;
   background-repeat:no-repeat;background-position:center;background-size:cover,cover;
@@ -2580,6 +2690,21 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
         <button class="setbtn pressable" id="btnSetLogin">Anzeigen</button></div>
     </div>
 
+    <!-- Match-Ende gibt es im Prototyp nur ueber diese zwei Knoepfe, weil
+         hier kein Match laeuft. Im Spiel ruft arena_pan.html
+         showMatchEnd(ArenaMatchEnd.build(...)) auf. -->
+    <div class="secribbon sm" data-ribbon="ribbon_section_sm"><span class="srt">MATCH-ENDE</span></div>
+    <div class="setgrp">
+      <div class="setrow" style="display:block">
+        <p class="lbnote">Der Screen, der uns gegen AA gefehlt hat — mit Schadensbilanz
+          beider Seiten und Helden. Zwei Beispiel-Matches:</p>
+        <div class="setbtns">
+          <button class="setbtn pressable" id="btnDemoWin">Sieg ansehen</button>
+          <button class="setbtn ghost pressable" id="btnDemoLose">Niederlage ansehen</button>
+        </div>
+      </div>
+    </div>
+
     <div class="secribbon sm" data-ribbon="ribbon_section_sm"><span class="srt">SPIELSTAND</span></div>
     <div class="setgrp">
       <div class="setrow" style="display:block">
@@ -2715,6 +2840,26 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
        Die Logik liegt vollstaendig in arena_fortress.js (window.ArenaFortress);
        dieser View ist reine Praesentation. Mehr Stufen sind spaeter NUR
        Daten — die Karten rendern generisch aus allTracks(). -->
+  <!-- ===== VIEW: MATCH-ENDE (arena_matchend.js · §9.3) =====
+       Der Screen, der uns gegen AA gefehlt hat. Zwei Reiter:
+         Ergebnis — Belohnung, naechster Trophaeenknoten, Level-Tipp
+         Schaden  — Bilanz beider Seiten auf gemeinsamer Skala,
+                    Helden mitgezaehlt und markiert
+       Im echten Spiel ruft arena_pan.html showMatchEnd(model) auf; im
+       Prototyp gibt es zwei Demo-Knoepfe in den Einstellungen. -->
+  <section id="viewMatchEnd" class="view">
+    <div class="viewhead"><button class="backbtn" id="meBack">‹</button>
+      <h2 class="title">Match-Ende</h2></div>
+    <div id="meHead"></div>
+    <div class="tabs">
+      <button class="tab on" id="metabResult" data-metab="result">Ergebnis</button>
+      <button class="tab" id="metabDmg" data-metab="dmg">Schaden</button>
+    </div>
+    <div id="mePaneResult"></div>
+    <div id="mePaneDmg" style="display:none"></div>
+    <p class="hint" id="meNote">—</p>
+  </section>
+
   <section id="viewFortress" class="view">
     <h2 class="title">Festung</h2>
     <!-- Layout-Umschalter. ZWEI gleichwertige Darstellungen derselben
@@ -2933,6 +3078,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 <script src="./arena_vault.js"></script>
 <script src="./arena_daily.js"></script>
 <script src="./arena_guide.js"></script>
+<script src="./arena_matchend.js"></script>
 <script>
 (function () {
   "use strict";
@@ -5020,6 +5166,243 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
                                     : "Darstellung: Kristall-Konstellation");
       renderFortress();
     }
+  }
+
+  /* ==================================================================
+   * MATCH-ENDE — Anzeige (Logik: arena_matchend.js)
+   * ------------------------------------------------------------------
+   * showMatchEnd(model) ist die EINZIGE Naht nach draussen. arena_pan.html
+   * baut das Modell mit ArenaMatchEnd.build(...) und ruft das hier auf.
+   * Diese Funktionen rechnen nichts — sie stellen nur dar.
+   * ================================================================== */
+  var meModel = null, meTab = "result";
+
+  function meUnitName(u) {
+    if (u.name) return u.name;
+    var c = BY_ID[u.cardId];
+    return c ? c.name : u.cardId.toUpperCase();
+  }
+  function meUnitColor(u) {
+    var c = BY_ID[u.cardId];
+    return c ? c.color : "#9aa3ad";
+  }
+  /* Kartenbild in der Zeile — dasselbe Artwork wie in der Sammlung, damit
+     der Spieler die Karte sofort wiedererkennt. Faellt das CDN aus, bleibt
+     das Emoji stehen (cardArtHTML-Muster). */
+  function meArt(u, cls) {
+    var c = BY_ID[u.cardId] || { art: "❔" };
+    var key = "card_" + u.cardId;
+    return '<span class="' + cls + '">' +
+      (ASSETS[key]
+        ? '<img src="' + ASSETS[key] + '" alt="' + c.art + '" onerror="UIIcon.fail(this)">'
+        : c.art) + "</span>";
+  }
+
+  function renderMatchEndHead() {
+    var m = meModel; if (!m) return;
+    var d = m.reward.trophiesDelta;
+    $("meHead").innerHTML =
+      '<div class="mehead ' + (m.isWin ? "win" : "lose") + '">' +
+        '<div class="meh">' + m.headline + "</div>" +
+        '<div class="mesub">' + m.durationText + " · Welle " + m.waves + " · " +
+          m.sides.me.name + " vs " + m.sides.them.name + "</div>" +
+        '<div class="medelta ' + (d >= 0 ? "up" : "down") + '">' +
+          ico("cur_trophy", "🏆") +
+          "<span>" + (d >= 0 ? "+" : "") + fmt(d) + "</span>" +
+          "<small>" + fmt(m.reward.trophiesAfter) + " gesamt</small>" +
+        "</div>" +
+      "</div>";
+    hydrateIcons($("meHead"));
+  }
+
+  function renderMatchEndResult() {
+    var m = meModel; if (!m) return;
+    var h = '<div class="merew">' +
+      '<div class="merewc"><div class="mrv">' + ico("cur_gold", "🪙") + fmt(m.reward.gold) +
+        '</div><div class="mrk">Gold</div></div>' +
+      '<div class="merewc"><div class="mrv">' + ico("cur_trophy", "🏆") +
+        (m.reward.trophiesDelta >= 0 ? "+" : "") + fmt(m.reward.trophiesDelta) +
+        '</div><div class="mrk">Trophäen</div></div>' +
+      '<div class="merewc"><div class="mrv">' + ico("ic_gift", "🎁") +
+        (m.reward.packs.length || "—") + '</div><div class="mrk">Packs</div></div>' +
+      "</div>";
+
+    // Anschluss. Ohne diesen Block ist der Screen eine Quittung; mit ihm
+    // ist er der Auftakt zur naechsten Runde.
+    if (m.nextNode) {
+      h += '<div class="menode" id="meNodeGo">' +
+        '<div class="mnt">' + ico("cur_trophy", "🏆") +
+          "Noch <b>" + fmt(m.nextNode.missing) + "</b> bis " + m.nextNode.label +
+          " bei " + fmt(m.nextNode.at) + "</div>" +
+        '<div class="mnb"><i style="width:' + (m.nextNode.pct * 100).toFixed(1) + '%"></i></div>' +
+        '<div class="mns">Tippen öffnet die Trophäenstraße an dieser Stelle.</div></div>';
+    } else {
+      h += '<div class="menode"><div class="mnt">' + ico("cur_trophy", "🏆") +
+        "Straßenende erreicht — ab hier zählt nur die Rangliste.</div></div>";
+    }
+
+    if (m.levelTip) {
+      var u = { cardId: m.levelTip.cardId };
+      h += '<div class="metip" id="meTipGo">' + meArt(u, "mtart") +
+        '<div class="mtx">Bester Schaden <b>je Stufe</b>: <b>' +
+          meUnitName({ cardId: m.levelTip.cardId }) + "</b> auf Stufe " + m.levelTip.lvl +
+          " — " + fmt(Math.round(m.levelTip.perLevel)) +
+          " Schaden pro Stufe. Hier bringt jede Stufe am meisten." +
+        "</div></div>";
+    }
+
+    h += '<div class="mebtns">' +
+      '<button class="mebtn again pressable" id="meAgain">REVANCHE</button>' +
+      '<button class="mebtn next pressable" id="meClose">Weiter</button></div>';
+
+    $("mePaneResult").innerHTML = h;
+    hydrateIcons($("mePaneResult"));
+    markPressable($("mePaneResult"));
+    var ng = $("meNodeGo");
+    if (ng) ng.addEventListener("click", function () { UISfx.tap(); openRoad(); });
+    var tg = $("meTipGo");
+    if (tg) tg.addEventListener("click", function () {
+      UISfx.tap(); openDetail(m.levelTip.cardId);
+    });
+    $("meAgain").addEventListener("click", function () {
+      UISfx.confirm(); track("rematch_tapped", { result: m.result });
+      toast("Revanche — im echten Spiel startet hier das nächste Match.");
+    });
+    $("meClose").addEventListener("click", function () { UISfx.tap(); show("navHome"); });
+  }
+
+  /* Eine Schadenszeile. `scale` ist die GEMEINSAME Skala beider Seiten —
+     deshalb wird sie hereingegeben und nicht je Seite neu bestimmt. */
+  function meRow(u, scale, dim) {
+    var w = scale > 0 ? (u.dmg / scale) * 100 : 0;
+    var el = BY_ID[u.cardId];
+    var bar = meUnitColor(u) + (dim ? ";opacity:.62" : "");
+    return '<div class="mrow' + (u.isMvp ? " mvp" : "") + (u.hero ? " isHero" : "") +
+      '" data-medmg="' + u.cardId + '">' +
+      '<span class="mrk2">#' + u.rank + "</span>" +
+      meArt(u, "mart") +
+      '<div class="mmid">' +
+        '<div class="mnm">' +
+          (el ? elIco(el.elem, el.art, "el") : "") +
+          "<span>" + meUnitName(u) + "</span>" +
+          (u.hero ? '<span class="chiph">HELD</span>' : "") +
+          (u.isMvp ? '<span class="chipm">MVP</span>' : "") +
+        "</div>" +
+        '<div class="mbar"><i style="width:' + w.toFixed(1) + "%;background:" +
+          bar + '"></i></div>' +
+        '<div class="msub">Stufe ' + u.lvl + " · " +
+          (u.measured ? fmt(Math.round(u.perLevel)) + " je Stufe" : "ohne Messung") +
+          (u.kills ? " · " + fmt(u.kills) + " Kills" : "") + "</div>" +
+      "</div>" +
+      '<div class="mnum"><b>' + fmt(u.dmg) + "</b><small>" +
+        (u.share * 100).toFixed(0) + " %</small></div>" +
+    "</div>";
+  }
+
+  function meSideBlock(side, label, scale, color) {
+    var h = '<div class="mesidehd"><span class="msn">' + label + "</span>" +
+      '<span class="msc">' + side.name + "</span>" +
+      '<span class="mst">' + fmt(side.total) + " Schaden</span></div>";
+    if (!side.units.length) {
+      h += '<div class="mrow"><div class="mmid"><div class="msub">Keine Einheiten ' +
+        "übermittelt.</div></div></div>";
+      return h;
+    }
+    h += side.units.map(function (u) { return meRow(u, scale, color); }).join("");
+    // Aufteilung Türme/Held nur zeigen, wenn ein Held dabei war — sonst
+    // ist die Zeile eine leere Behauptung.
+    if (side.heroTotal > 0) {
+      h += '<div class="msub" style="padding:0 4px 2px;font-size:9.5px;color:#8fa0ad">' +
+        "Türme " + fmt(side.towerTotal) + " · Held " + fmt(side.heroTotal) + "</div>";
+    }
+    return h;
+  }
+
+  function renderMatchEndDmg() {
+    var m = meModel; if (!m) return;
+    var h = '<div class="medv">' + m.verdict + "</div>";
+    h += meSideBlock(m.sides.me, "Du", m.scale, false);
+    // Gegnerseite: dieselben ELEMENTFARBEN, nur gedaempft. Ein grauer
+    // Balken hatte sich wie „deaktiviert" gelesen — und die Elementfarbe
+    // ist die nuetzlichere Information. Welche Seite man ansieht, sagen
+    // ohnehin der Seitenkopf und die Zeilentoenung.
+    h += meSideBlock(m.sides.them, "Gegner", m.scale, true);
+    h += '<div class="menote">Beide Seiten liegen auf <b>derselben Skala</b> — der größte ' +
+      "Einzelschaden im Match ist der volle Balken. Nur so ist der Vergleich über den " +
+      "Spielerwechsel hinweg aussagekräftig.<br>" +
+      "<b>Je Stufe</b> zeigt, was eine investierte Stufe zurückgibt — der ehrlichste " +
+      "Hinweis darauf, was sich zu leveln lohnt.";
+    if (!m.sides.me.anyMeasured) {
+      h += "<br><b>Hinweis:</b> Für dieses Match wurde kein Schaden gezählt. " +
+        "Im Spiel liefert arena_pan.html die Werte (siehe Kopf von arena_matchend.js).";
+    }
+    h += "</div>";
+    $("mePaneDmg").innerHTML = h;
+    hydrateIcons($("mePaneDmg"));
+    // Zeile antippen → Detailkarte der Turmkarte. Der Screen wird damit
+    // zum Einstieg in die Progression, nicht zur Sackgasse.
+    Array.prototype.forEach.call($("mePaneDmg").querySelectorAll("[data-medmg]"), function (r) {
+      r.addEventListener("click", function () {
+        var id = r.getAttribute("data-medmg");
+        if (BY_ID[id]) { UISfx.tap(); openDetail(id); }
+      });
+    });
+  }
+
+  function setMeTab(which) {
+    meTab = which;
+    $("mePaneResult").style.display = which === "result" ? "" : "none";
+    $("mePaneDmg").style.display = which === "dmg" ? "" : "none";
+    $("metabResult").classList.toggle("on", which === "result");
+    $("metabDmg").classList.toggle("on", which === "dmg");
+    if (which === "dmg") renderMatchEndDmg();
+  }
+
+  /* Einstiegspunkt fuer arena_pan.html. */
+  function showMatchEnd(model) {
+    if (!model) return;
+    meModel = model;
+    renderMatchEndHead();
+    renderMatchEndResult();
+    setMeTab("result");
+    $("meNote").textContent = "Logik: arena_matchend.js — Rangliste, Anteile, MVP, " +
+      "gemeinsame Skala und Anschluss werden dort gerechnet, diese View stellt nur dar.";
+    show("navMatchEnd");
+    if (window.ArenaAudio) {
+      ArenaAudio.sfx(model.isWin ? "audio_victory" : "audio_defeat");
+    }
+    track("match_end_shown", { result: model.result, delta: model.reward.trophiesDelta });
+  }
+  window.showMatchEnd = showMatchEnd;
+
+  /* Demo-Daten fuer den Prototyp. Im Spiel kommen diese Zahlen aus dem
+     Match; hier sind sie so gewaehlt, dass jeder Fall sichtbar wird:
+     ein starker Held, ein billiger Turm mit gutem Schaden je Stufe und
+     ein Gegnerturm, der die gemeinsame Skala setzt. */
+  function demoMatchEnd(win) {
+    var deck = DECK.slice(0, 4);
+    var base = [
+      { cardId: deck[0], lvl: 16, tier: "rare",   dmg: 48210, hits: 312, kills: 41 },
+      { cardId: "solara", lvl: 8, tier: "epic",   dmg: 31900, hits: 88,  kills: 12, hero: true },
+      { cardId: deck[1], lvl: 12, tier: "good",   dmg: 22140, hits: 288, kills: 19 },
+      { cardId: deck[2], lvl: 4,  tier: "common", dmg: 14000, hits: 140, kills: 6 },
+    ];
+    var opp = [
+      { cardId: "earth", lvl: 20, tier: "epic",   dmg: win ? 40300 : 60300, hits: 210, kills: 52 },
+      { cardId: "magmor", lvl: 7, tier: "rare",   dmg: 24800, hits: 64,  kills: 9, hero: true },
+      { cardId: "darkness", lvl: 9, tier: "good", dmg: 18400, hits: 176, kills: 14 },
+    ];
+    return window.ArenaMatchEnd.build({
+      result: win ? "victory" : "defeat",
+      durationMs: win ? 258000 : 191000,
+      wavesSurvived: win ? 14 : 9,
+      trophiesBefore: DEMO_TROPHIES,
+      trophiesDelta: win ? 39 : -18,
+      gold: win ? 610 : 120,
+      packs: win ? [{ tier: "bronze" }] : [],
+      me: { name: "Prisma-Magier", clan: "Prisma-Orden", units: base },
+      them: { name: "Netherghost", clan: null, units: opp },
+    });
   }
 
   function renderFortress() {
@@ -7295,7 +7678,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
                navClan: "viewClan", navBoard: "viewBoard",
                navPass: "viewPass", navHeroes: "viewHeroes", navEvents: "viewEvents",
                navMail: "viewMail", navSettings: "viewSettings",
-               navGuide: "viewGuide", navManual: "viewManual" };
+               navGuide: "viewGuide", navManual: "viewManual",
+               navMatchEnd: "viewMatchEnd" };
   var NAV_IDS = ["navShop", "navCollection", "navHome", "navClan", "navFortress", "navPack",
                  "navTower", "navForge", "navClan", "navBoard",
                  "navPass", "navHeroes", "navEvents", "navMail", "navSettings"];
@@ -7310,6 +7694,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   function show(navId) {
     if (navId === "navTower") { openDetail(curId); return; }
     $("detailModal").classList.remove("open");
+    // Match-Ende blendet die Bottom-Nav aus (siehe CSS body.me-open).
+    document.body.classList.toggle("me-open", navId === "navMatchEnd");
     for (var k in NAVS) {
       var vw = $(NAVS[k]); if (vw) vw.classList.toggle("active", k === navId);
     }
@@ -7344,6 +7730,15 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   // Prototyp jetzt auch; „Okay" schließt den Layer wieder.
   $("btnBattle").addEventListener("click", function () { openRoad(); });
   $("tileEvents").addEventListener("click", function () { show("navEvents"); });
+  /* Match-Ende: Reiter, Zurück und die zwei Demo-Einstiege. */
+  $("meBack").addEventListener("click", function () { show("navHome"); });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-metab]"), function (b) {
+    b.addEventListener("click", function () {
+      UISfx.tap(); setMeTab(b.getAttribute("data-metab"));
+    });
+  });
+  $("btnDemoWin").addEventListener("click", function () { showMatchEnd(demoMatchEnd(true)); });
+  $("btnDemoLose").addEventListener("click", function () { showMatchEnd(demoMatchEnd(false)); });
   $("arenaDiorama").addEventListener("click", function () {
     var a = ARENA_TIERS[arenaIndexFor(DEMO_TROPHIES)];
     toast("Arena " + a.n + " von " + ARENA_TIERS.length + ": " + a.name);
