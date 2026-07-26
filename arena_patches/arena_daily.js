@@ -126,8 +126,16 @@
       name: "Silber-Pack" },
     { day: 6, sym: "💎", kind: "gems",     gold: 0,    material: 0,  gems: 60, pack: null,
       name: "60 Gems" },
-    { day: 7, sym: "🏆", kind: "finale",   gold: 5000, material: 0,  gems: 0,  pack: "gold",
-      name: "GOLD-Pack + 5 000 Gold", finale: true },
+    /* Tag 7 trägt VIER Plätze. Gemessen an AAs Login-Reiter (IMG_3338):
+     * die Wochenkachel liegt dort über die volle Breite und zeigt vier
+     * Belohnungen nebeneinander (Gems · Essenz · Gold · Schlüssel).
+     * Eine Schlüssel-Währung gibt es bei uns nicht — der vierte Platz
+     * bleibt das GOLD-Pack, der Anker des Zyklus. Die Kachelzahl stimmt
+     * damit mit AA überein, ohne dass eine Währung erfunden wird.
+     * Das Belohnungs-Fenster (arena_rewards.js) liest genau diese Zeile;
+     * sie ist die EINZIGE Quelle des Zyklus. */
+    { day: 7, sym: "🏆", kind: "finale",   gold: 5000, material: 100, gems: 50, pack: "gold",
+      name: "GOLD-Pack + 5 000 Gold + 100 Material + 50 Gems", finale: true },
   ];
   var LOGIN_CYCLE = LOGIN_REWARDS.length;      // 7
 

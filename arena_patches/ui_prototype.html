@@ -673,7 +673,16 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
   margin-bottom:12px}
 .reqpanel .lbl{text-align:right;margin-bottom:7px}
 .reqslots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.reqslot{aspect-ratio:3/4;border-radius:10px;border:2px dashed #35485a;background:#111a21;
+/* ⚠ position:relative ist hier KEIN Feinschliff, sondern der Grund, warum
+   die Fusion nicht ausführbar war. `.artbox` ist `position:absolute;
+   inset:2px` — ohne positionierten Vorfahren bezieht sie sich auf den
+   nächsten, und das war die Ansicht selbst. Gemessen: das Kartenbild im
+   Anforderungs-Slot war 390 x 1012 px statt 108 x 144, drei davon
+   übereinander. Der Licht-Turm hat damit den ganzen Bildschirm samt
+   VERSCHMELZEN-Knopf zugedeckt. `.tile` hatte relative von Anfang an,
+   `.reqslot` nicht — derselbe Baustein, zwei verschiedene Behandlungen. */
+.reqslot{position:relative;overflow:hidden;
+  aspect-ratio:3/4;border-radius:10px;border:2px dashed #35485a;background:#111a21;
   display:flex;align-items:center;justify-content:center;font-size:24px;color:#3a4c5c}
 .reqslot.filled{border-style:solid}
 .forgeactions{display:flex;gap:8px;margin-top:10px}
@@ -932,13 +941,67 @@ footer{padding:6px 12px 14px;text-align:center}
 #mergeCeremony .cersheet{background:#05090ceb;align-items:center;justify-content:center;
   padding:24px 18px;gap:14px}
 .certitle{font-size:27px;text-align:center;line-height:1.1}
+
+/* ---------- Fusions-Choreografie (Nutzer-Vorgabe) ----------
+   „das bei der Fusion dann 3 gleiche Karten je nach Tower welcher
+   fusioniert wird sich im kreis dreht und miteinander verschmilzt,
+   danach wird es die selbe Karte mit dem dementsprechenden besseren
+   Rahmen also 1 Rahmen höher als zuvor und danach sieht man die stat
+   Verbesserungen z.B von 212 dmg zu 242."
+
+   Vier Phasen, in JS mit requestAnimationFrame gefahren statt in
+   Keyframes: der Radius muss von 66 px auf 0 laufen, und eine
+   CSS-Variable im Keyframe braucht @property — das trägt Safari erst
+   spät. Die Bühne hat feste Höhe, damit beim Phasenwechsel nichts
+   springt. */
+.cerstage{position:relative;width:100%;height:236px;display:flex;
+  align-items:center;justify-content:center}
+.cerring{position:absolute;inset:0;pointer-events:none}
+.orbcard{position:absolute;left:50%;top:50%;width:84px;aspect-ratio:3/4;
+  margin:-56px 0 0 -42px;border-radius:10px;border:2px solid #35485a;overflow:hidden;
+  background:linear-gradient(160deg,#243342,#0e1418);
+  box-shadow:0 10px 20px -8px #000c,0 0 0 1px #00000055;
+  will-change:transform,opacity;backface-visibility:hidden}
+/* Der Blitz im Moment des Verschmelzens. Er liegt UNTER der Ergebniskarte,
+   damit er sie umspielt statt sie zuzudecken. */
+.cerflash{position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;
+  border-radius:50%;opacity:0;pointer-events:none;
+  background:radial-gradient(circle,#fff 0%,#ffe9a8 26%,#e0b94a55 52%,#e0b94a00 72%)}
+.cerflash.go{animation:cerflash .62s var(--ease-out) forwards}
+@keyframes cerflash{0%{opacity:0;transform:scale(1)}
+  18%{opacity:1;transform:scale(15)}100%{opacity:0;transform:scale(30)}}
+/* Vor der Enthüllung ist die Ergebniskarte nicht da — sonst stünde sie
+   die ganze Kreisbewegung über schon im Bild und die Fusion hätte kein
+   Ergebnis mehr zu zeigen. */
+.cercard.warten{opacity:0;pointer-events:none}
+.cercard.zeigen{animation:cerreveal .78s var(--ease-overshoot) both}
+@keyframes cerreveal{0%{opacity:0;transform:scale(.55) rotate(-10deg)}
+  55%{opacity:1;transform:scale(1.12) rotate(3deg)}
+  100%{opacity:1;transform:scale(1) rotate(0)}}
+/* Der neue Rahmen zieht sich einmal nach — ein Lichtsaum in der Farbe der
+   erreichten Stufe, damit der Stufenwechsel nicht nur „anders bunt" ist. */
+.cercard.zeigen::before{content:"";position:absolute;inset:-3px;border-radius:14px;
+  pointer-events:none;z-index:4;
+  box-shadow:0 0 0 2px var(--tierfarbe,#e0b94a),0 0 26px 4px var(--tierfarbe,#e0b94a);
+  animation:cerrahmen 1.1s var(--ease-out) .16s both}
+@keyframes cerrahmen{0%{opacity:0;transform:scale(1.28)}
+  40%{opacity:1;transform:scale(1)}100%{opacity:.34;transform:scale(1)}}
+/* Die Wertzeilen kommen nacheinander, nicht als Block — sonst liest man
+   sie nicht, sondern sieht nur „da steht jetzt was". */
+.certable .row2{opacity:0;transform:translateY(7px);
+  animation:cerrow .34s var(--ease-out) forwards}
+@media (prefers-reduced-motion:reduce){
+  .cerflash.go,.cercard.zeigen,.cercard.zeigen::before,.certable .row2{animation:none}
+  .cercard.zeigen{opacity:1;transform:none}
+  .certable .row2{opacity:1;transform:none}
+}
+@keyframes cerrow{to{opacity:1;transform:none}}
+
 .cercard{width:132px;aspect-ratio:3/4;border-radius:12px;position:relative;
   background-repeat:no-repeat;background-position:center;background-size:cover,100% 100%;
   background-image:linear-gradient(160deg,#2c3a4b,#131c25);border:2px solid #e0b94a;
   display:flex;align-items:center;justify-content:center;font-size:52px;
-  box-shadow:0 0 26px #e0b94a66;animation:cerpop .9s ease-out}
-@keyframes cerpop{0%{transform:scale(.4) rotate(-8deg);opacity:0}
-  60%{transform:scale(1.14) rotate(2deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+  box-shadow:0 0 26px #e0b94a66;z-index:2}
 .cercard .cerlvl{position:absolute;left:0;right:0;bottom:0;background:#000b;font-size:11px;
   text-align:center;font-weight:900;padding:3px 0;letter-spacing:.06em}
 .certable{width:100%;max-width:300px;background:#0e1418cc;border:1px solid #2b3b47;
@@ -4062,9 +4125,15 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 
   <!-- ===== VIEW 3: FORGE / MERGE (§4.3) ===== -->
   <section id="viewForge" class="view">
-    <h2 class="title">Wähle Karten zum Verschmelzen!</h2>
+    <!-- ⚠ Der Titel hieß „Wähle Karten zum Verschmelzen!" — 30 Zeichen.
+         Jeder andere Titel im Spiel hat höchstens 17. Auf dem Bandasset
+         (Enden je 44 px) ist das zweizeilig, 60 px hoch, und die Schrift
+         läuft in die Zierenden: „Fusions Banner ist kaum lesbar".
+         Das Band trägt jetzt ein Wort, die Anweisung steht dort, wo man
+         sie braucht — direkt über den Slots. -->
+    <h2 class="title">Verschmelzen</h2>
     <div class="reqpanel">
-      <div class="lbl">Benötigte Karten</div>
+      <div class="lbl">Drei identische Karten derselben Stufe</div>
       <div class="reqslots" id="reqSlots"></div>
       <!-- Merge-VORSCHAU. Video 7 (§13.1) zeigt: AA blendet vor dem Merge
            MAX LEVEL alt → neu plus zwei Stat-Vorschauen ein und verlangt
@@ -4332,8 +4401,15 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 <div class="modal" id="mergeCeremony">
   <div class="sheet cersheet">
     <div class="certitle goldtext" id="cerTitle">Perfekte Verschmelzung!</div>
-    <div class="cercard" id="cerCard"><span id="cerArt">✨</span>
-      <div class="cerlvl" id="cerLvl">LvL 1</div></div>
+    <!-- Bühne für die vier Phasen: kreisen · verschmelzen · enthüllen ·
+         Werte. Alle Ebenen liegen übereinander, die Choreografie schaltet
+         sie um — kein Umbau des Baums während der Animation. -->
+    <div class="cerstage" id="cerStage">
+      <div class="cerring" id="cerRing"></div>
+      <div class="cerflash" id="cerFlash"></div>
+      <div class="cercard" id="cerCard"><span id="cerArt">✨</span>
+        <div class="cerlvl" id="cerLvl">LvL 1</div></div>
+    </div>
     <div class="certable" id="cerTable"></div>
     <button class="cerbtn goldtext" id="cerBtn">Weiter</button>
   </div>
@@ -5623,9 +5699,10 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     var from = tierOf(req.tier), to = tierOf(nk), m = BY_ID[req.id];
     var v = AC.view(req.id);
     // Stat-Vorschau: die zwei ersten Stats mit dem Merge-Faktor der Zielstufe.
-    var boni = AC.perksFor ? null : null;
-    var f = 1 + 0.16 + (to.index - 1) * 0.02; // Näherung; echte Werte via PERKS
-    return { m: m, from: from, to: to, lvl: v.lvl, f: f };
+    // Eine Quelle für den Faktor — siehe mergeFaktor(). Vorher stand die
+    // Formel hier UND in der Zeremonie; zwei Kopien heißen, dass die
+    // Vorschau etwas anderes versprechen kann als das Ergebnis zeigt.
+    return { m: m, from: from, to: to, lvl: v.lvl, f: mergeFaktor(to) };
   }
   function renderMergePreview() {
     var el = $("mergePreview"), d = mergePreviewData();
@@ -5650,39 +5727,158 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 
   /* Merge-Zeremonie (§13.1): Titel, Karte mit hochzählendem Level-Badge,
      Vorher/Nachher-Tafel, Abschluss "Weiter" → "Tippen zum Schließen". */
+  /* Der Merge-Faktor stand zweimal im Code — einmal in der Vorschau, einmal
+     hier. Zwei Kopien derselben Formel heißt: die Vorschau kann etwas
+     anderes versprechen, als die Zeremonie zeigt. Jetzt eine Quelle. */
+  function mergeFaktor(to) { return 1 + 0.16 + (to.index - 1) * 0.02; }
+
+  /* Die zwei Werte, die der Nutzer sehen will („von 212 dmg zu 242").
+     Rückgabe: [{k, vor, nach}] — schon gerundet, aber als Zahl, damit die
+     Zeremonie hochzählen kann. */
+  function mergeWerte(m, to) {
+    var f = mergeFaktor(to), out = [];
+    (m.stats || []).slice(0, 2).forEach(function (s) {
+      out.push({ k: s.k, vor: s.b, nach: Math.round(s.b * f * 10) / 10 });
+    });
+    return out;
+  }
+
+  var CER = { raf: 0, timer: 0, zaehler: [] };
+  function cerStopp() {
+    if (CER.raf) { cancelAnimationFrame(CER.raf); CER.raf = 0; }
+    if (CER.timer) { clearTimeout(CER.timer); CER.timer = 0; }
+    CER.zaehler.forEach(function (t) { clearInterval(t); });
+    CER.zaehler = [];
+    if (window.__cerTimer) { clearInterval(window.__cerTimer); window.__cerTimer = null; }
+  }
+
+  /* Fusions-Zeremonie in vier Phasen (Nutzer-Vorgabe):
+       1. drei identische Karten kreisen  0 → 1150 ms
+       2. sie fahren zusammen, Blitz      1150 → 1780 ms
+       3. dieselbe Karte, ein Rahmen höher 1780 → 2560 ms
+       4. Wertverbesserungen zählen hoch   ab 2360 ms
+     Die Phasen 1 und 2 laufen über requestAnimationFrame, weil der Radius
+     von 66 px auf 0 muss — das ist in Keyframes ohne @property nicht
+     zuverlässig zu machen. */
   function playCeremony(id, fromTierKey, newTierKey, lvl, copyOnly) {
     var from = tierOf(fromTierKey), to = tierOf(newTierKey), m = BY_ID[id];
-    var box = $("mergeCeremony");
-    $("cerTitle").textContent = copyOnly
-      ? "Verschmolzen!" : "Perfekte Verschmelzung!";
+    var box = $("mergeCeremony"), karte = $("cerCard"), ring = $("cerRing");
+    var flash = $("cerFlash"), tafel = $("cerTable");
+    var ruhig = window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    cerStopp();
+
+    $("cerTitle").textContent = copyOnly ? "Verschmolzen!" : "Perfekte Verschmelzung!";
     $("cerArt").className = "artbox";
     $("cerArt").innerHTML = cardArtHTML(id);
-    $("cerCard").style.borderColor = to.color;
-    layer($("cerCard"), "frame_" + to.key);
-    hydrateFrames($("cerCard"));
-    $("cerTable").innerHTML =
-      '<div class="row2"><span class="k2">Max. Level</span><span class="v2"><s>' + from.cap +
-        "</s> → <em>" + to.cap + "</em></span></div>" +
-      '<div class="row2"><span class="k2">Stufe</span><span class="v2"><s>' + from.name +
-        "</s> → <em>" + to.name + "</em></span></div>" +
-      '<div class="row2"><span class="k2">Kosten</span><span class="v2"><em>0 ' +
-        ico("cur_gold", "🪙") + "</em> + 3 Kopien</span></div>";
+    karte.style.borderColor = to.color;
+    karte.style.setProperty("--tierfarbe", to.color);
+    layer(karte, "frame_" + to.key);
+    hydrateFrames(karte);
+    tafel.innerHTML = "";
     $("cerBtn").textContent = "Weiter";
+    $("cerLvl").textContent = "LvL " + Math.max(1, lvl | 0);
+
+    /* Phase 1+2: drei Kopien der AUSGANGSkarte — dieselbe Grafik, dieselbe
+       Ausgangsstufe. Genau das verschmilzt ja. */
+    ring.innerHTML = "";
+    var karten = [0, 1, 2].map(function (i) {
+      var d = document.createElement("div");
+      d.className = "orbcard";
+      d.style.borderColor = from.color;
+      d.innerHTML = artBox(id, from.key);
+      ring.appendChild(d);
+      return d;
+    });
+    hydrateFrames(ring);
+
     box.classList.add("open");
-    // Level zählt von 1 auf den echten Wert hoch — genau das zeigt AA
-    // (t=21 "LvL 1" → t=22 "LvL 16" auf derselben Karte).
-    var n = 1, tgt = Math.max(1, lvl | 0);
-    $("cerLvl").textContent = "LvL " + n;
-    if (window.__cerTimer) clearInterval(window.__cerTimer);
-    window.__cerTimer = setInterval(function () {
-      n += Math.max(1, Math.ceil(tgt / 14));
-      if (n >= tgt) { n = tgt; clearInterval(window.__cerTimer); window.__cerTimer = null;
-        $("cerBtn").textContent = "Tippen zum Schließen"; }
-      $("cerLvl").textContent = "LvL " + n;
-    }, 70);
+    karte.classList.remove("zeigen");
+    karte.classList.add("warten");
+    flash.classList.remove("go");
+
+    function enthuellen() {
+      ring.innerHTML = "";
+      karte.classList.remove("warten");
+      // Neustart der Animation erzwingen, sonst läuft sie beim zweiten
+      // Merge in derselben Sitzung nicht wieder an.
+      karte.classList.remove("zeigen"); void karte.offsetWidth;
+      karte.classList.add("zeigen");
+      // UISfx hat kein play(name) — die Blips heißen einzeln. Der Stufen-
+      // aufstieg bekommt das Crescendo, eine reine Kopie den Reward-Akkord.
+      if (window.UISfx) (copyOnly ? UISfx.reward : UISfx.legend)();
+      CER.timer = setTimeout(function () { werte(); }, ruhig ? 0 : 580);
+    }
+
+    function werte() {
+      var w = mergeWerte(m, to);
+      var zeilen = [
+        { k: "Stufe", vor: from.name, nach: to.name, txt: 1 },
+        // ganz:1 — ein Level ist eine ganze Zahl. Ohne das Flag zählte der
+        // Balken „25 → 36,6 → 40" hoch und behauptete für einen Moment ein
+        // Level, das es nicht gibt.
+        { k: "Max. Level", vor: from.cap, nach: to.cap, ganz: 1 },
+      ].concat(w).concat([{ k: "Kosten", vor: null,
+        nach: "0 " + ico("cur_gold", "🪙") + " + 3 Kopien", txt: 1 }]);
+      tafel.innerHTML = zeilen.map(function (z, i) {
+        var f = z.ganz ? function (n) { return String(Math.round(n)); } : r1;
+        var wert = z.txt
+          ? (z.vor === null ? '<em>' + z.nach + '</em>'
+                            : '<s>' + z.vor + '</s> → <em>' + z.nach + '</em>')
+          : '<s>' + f(z.vor) + '</s> → <em data-von="' + z.vor + '" data-bis="' + z.nach +
+            '"' + (z.ganz ? ' data-ganz="1"' : '') + '>' + f(z.vor) + "</em>";
+        return '<div class="row2" style="animation-delay:' + (ruhig ? 0 : i * 90) +
+          'ms"><span class="k2">' + z.k + '</span><span class="v2">' + wert + "</span></div>";
+      }).join("");
+      // Die Zahlen laufen hoch, statt fertig dazustehen — 212 → 242 ist die
+      // Aussage, nicht „242".
+      Array.prototype.forEach.call(tafel.querySelectorAll("em[data-bis]"), function (em, i) {
+        var von = parseFloat(em.getAttribute("data-von"));
+        var bis = parseFloat(em.getAttribute("data-bis"));
+        var fmt = em.getAttribute("data-ganz")
+          ? function (n) { return String(Math.round(n)); } : r1;
+        if (ruhig) { em.textContent = fmt(bis); return; }
+        var t0 = 0, schritte = 18;
+        var iv = setInterval(function () {
+          t0++;
+          var q = t0 / schritte;
+          em.textContent = fmt(von + (bis - von) * (q < 1 ? 1 - Math.pow(1 - q, 3) : 1));
+          if (t0 >= schritte) { clearInterval(iv); em.textContent = fmt(bis); }
+        }, 34);
+        CER.zaehler.push(iv);
+      });
+      $("cerBtn").textContent = "Tippen zum Schließen";
+    }
+
+    if (ruhig) { enthuellen(); return; }
+
+    var R = 66, T1 = 1150, T2 = 1780, start = 0;
+    function schritt(ts) {
+      if (!start) start = ts;
+      var t = ts - start;
+      var kreisen = Math.min(t, T1) / T1;
+      var winkel = kreisen * 2 * Math.PI * 2;           // zwei volle Runden
+      var q = t <= T1 ? 0 : Math.min(1, (t - T1) / (T2 - T1));
+      var rad = R * (1 - q * q);                         // easeIn nach innen
+      var sk = 1 - 0.3 * q;
+      for (var i = 0; i < 3; i++) {
+        var a = winkel + i * (2 * Math.PI / 3);
+        var x = Math.cos(a - Math.PI / 2) * rad;
+        var y = Math.sin(a - Math.PI / 2) * rad;
+        karten[i].style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) +
+          "px) rotate(" + (a * 12).toFixed(1) + "deg) scale(" + sk.toFixed(3) + ")";
+        karten[i].style.opacity = q > 0.72 ? String(Math.max(0, (1 - q) / 0.28)) : "1";
+      }
+      if (t < T2) { CER.raf = requestAnimationFrame(schritt); return; }
+      CER.raf = 0;
+      flash.classList.remove("go"); void flash.offsetWidth; flash.classList.add("go");
+      enthuellen();
+    }
+    CER.raf = requestAnimationFrame(schritt);
   }
   function closeCeremony() {
-    if (window.__cerTimer) { clearInterval(window.__cerTimer); window.__cerTimer = null; }
+    cerStopp();
+    $("cerRing").innerHTML = "";
     $("mergeCeremony").classList.remove("open");
     maybeAskBonus(window.__cerId || null);
   }

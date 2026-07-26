@@ -438,6 +438,65 @@ auf dem Band ließ das `flex:1` der Bühne ins Leere greifen: die Mittelspalte w
 nur so hoch wie ihr Inhalt. Erst `stretch` + `margin-top:auto` auf dem Balken
 ergibt AAs Achse.
 
+## 6j. Die Fusion: zwei Fehler und eine Choreografie
+
+Der Nutzer konnte die Fusion **nicht ausführen** — „der Licht Tower überdeckt
+mein ganzes Display". Gemessen war das kein Grafik-, sondern ein
+Positionierungsfehler:
+
+`.artbox` ist `position:absolute; inset:2px`. Ohne positionierten Vorfahren
+bezieht sie sich auf den nächsten — und das war die Ansicht selbst. Das
+Kartenbild im Anforderungs-Slot maß dadurch **390 × 1012 px statt 99 × 136**,
+drei davon übereinander. Sie haben den Bildschirm samt VERSCHMELZEN-Knopf
+zugedeckt. `.tile` trug `position:relative` von Anfang an, `.reqslot` nicht —
+derselbe Baustein, zwei verschiedene Behandlungen.
+
+> **Regel:** ein Container, der `.artbox` aufnimmt, braucht `position:relative`
+> **und** `overflow:hidden`. Ohne das zweite ragt das Bild über die Ecken.
+
+Zweiter Befund, dieselbe Klasse: der Titel hieß „Wähle Karten zum
+Verschmelzen!" — **30 Zeichen**. Alle 16 anderen Titel im Spiel haben
+höchstens 17. Auf dem Bandasset (Zierenden je 44 px) war das zweizeilig,
+60 px hoch, und die Schrift lief in die Ornamente: „kaum lesbar". Das Band
+trägt jetzt ein Wort, die Anweisung steht über den Slots.
+
+> **Regel:** ein `h2.title` ist einzeilig. Das Band ist auf eine Zeile
+> geschnitten, nicht auf einen Absatz.
+
+**Die Choreografie** folgt der Vorgabe des Nutzers wörtlich — drei gleiche
+Karten kreisen, verschmelzen, das Ergebnis trägt einen Rahmen mehr, danach
+die Wertverbesserungen:
+
+| Phase | Zeit | Was |
+|---|---|---|
+| 1 Kreisen | 0–1150 ms | drei Kopien der **Ausgangs**karte auf einer Kreisbahn r = 66 px, zwei volle Umläufe |
+| 2 Verschmelzen | 1150–1780 ms | Radius → 0 (easeIn), Maßstab 1 → 0,7, Ausblenden im letzten Viertel, dann Lichtblitz |
+| 3 Enthüllung | 1780–2360 ms | dieselbe Karte, Rahmen der **nächsthöheren** Stufe, Lichtsaum in der Stufenfarbe |
+| 4 Werte | ab 2360 ms | Zeilen gestaffelt (90 ms), Zahlen zählen hoch: 64 → 74,2 |
+
+Phase 1 und 2 laufen über `requestAnimationFrame`, nicht über Keyframes: der
+Radius muss von 66 px auf 0, und eine CSS-Variable im Keyframe braucht
+`@property`, das Safari erst spät trägt. `prefers-reduced-motion` springt
+direkt in Phase 3.
+
+Zwei Nebenbefunde beim Bauen:
+- Der Merge-Faktor stand **zweimal** im Code — in der Vorschau und in der
+  Zeremonie. Zwei Kopien derselben Formel heißen, dass die Vorschau etwas
+  anderes versprechen kann, als das Ergebnis zeigt. Jetzt eine Quelle
+  (`mergeFaktor`).
+- Das Max-Level zählte „25 → 36,6 → 40" hoch und behauptete für einen Moment
+  ein Level, das es nicht gibt. Ganzzahlige Werte brauchen ein eigenes Flag.
+
+> **Geprüft** (`run_v5.js`, 5 neue Schritte): „Kartenbild bleibt im
+> Anforderungs-Slot" (113×154 in 123×164), „VERSCHMELZEN-Knopf ist anklickbar
+> (nichts liegt darüber)", „Fusions-Titel bleibt einzeilig auf dem Band", „Die
+> drei Ausgangskarten sind nach dem Verschmelzen weg", „Ergebniskarte ist
+> enthüllt". Die alte Zusicherung las die Werttafel 500 ms nach dem Klick —
+> vorher richtig, jetzt zu früh. Sie wartet nun auf die Tafel, statt die
+> Choreografie wieder abzuschaffen. Sie suchte außerdem das Emoji „0 🪙",
+> was nur bei unerreichbarem CDN trifft (§7b); jetzt wird der Text geprüft,
+> den es in beiden Fällen gibt.
+
 ## 8. Was noch offen ist
 
 | Paket | Inhalt | Stand |
