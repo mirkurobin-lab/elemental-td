@@ -3913,6 +3913,37 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
        Clan braucht den Dauerplatz, weil er taeglich angefasst wird, das
        Pack-Oeffnen passiert dagegen ereignisgetrieben (nach Sieg, aus
        Truhe, aus dem Shop) und wird von dort ohnehin direkt angesprungen. -->
+<!-- ===== VIEW: DEFENDERS GUIDE (Bestiarium) =====
+     Nachbau aus AA_WELLEN_REFERENZ §2. Drei Ebenen in EINER View, weil
+     AA sie auch als eine Strecke fuehrt (Rad -> Gitter -> Detail, mit
+     Zurueck). Ein eigener View je Ebene waere dreimal dieselbe Kopfzeile
+     und dreimal derselbe Wisch-Ausschluss. -->
+<section id="viewBestiary" class="view">
+  <div class="viewhead">
+    <button class="backbtn pressable" id="bsBack">‹</button>
+    <h2 class="title">Defenders Guide</h2>
+    <span class="headico"><i data-ico="ic_shield" data-emoji="🛡"></i></span>
+  </div>
+  <div id="bsPage1">
+    <div class="bsintro">
+      Türme machen <b>+20 %</b> Schaden gegen das Element, gegen das sie
+      stark sind, und <i>−20 %</i> gegen das, gegen das sie schwach sind.
+      <b>Neutrale</b> Gegner haben weder Stärke noch Schwäche.
+    </div>
+    <div class="elwheel" id="elWheel"></div>
+    <div class="elhint" id="elHint"></div>
+    <button class="battlebtn pressable" id="bsToGrid"
+      style="width:100%;min-height:46px;font-size:14px;margin-top:16px">Gegner ansehen</button>
+  </div>
+  <div id="bsPage2" hidden>
+    <div class="bsintro">Diese Gegner können in Kämpfen und Wellen auftauchen.</div>
+    <div class="mobgrid" id="mobGrid"></div>
+    <div class="secribbon sm" data-ribbon="ribbon_section_sm"><span class="srt">Wellenplan</span></div>
+    <div id="waveList"></div>
+  </div>
+  <div id="bsPage3" hidden></div>
+</section>
+
   <!-- Die Beschriftung steckt in .nlbl, damit sie sich ein- und ausklappen
        laesst: bei AA traegt nur der aktive Reiter seinen Namen. -->
   <nav class="bottom">
@@ -4000,37 +4031,6 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
      In AA oeffnet der BATTLE-Button zuerst diesen Layer: eine von UNTEN
      nach OBEN wachsende Strasse mit allen Arenen. Aufbau nach den
      User-Screenshots IMG_3293/3294/3295. Unten fixiert "Okay". -->
-<!-- ===== VIEW: DEFENDERS GUIDE (Bestiarium) =====
-     Nachbau aus AA_WELLEN_REFERENZ §2. Drei Ebenen in EINER View, weil
-     AA sie auch als eine Strecke fuehrt (Rad -> Gitter -> Detail, mit
-     Zurueck). Ein eigener View je Ebene waere dreimal dieselbe Kopfzeile
-     und dreimal derselbe Wisch-Ausschluss. -->
-<section id="viewBestiary" class="view">
-  <div class="viewhead">
-    <button class="backbtn pressable" id="bsBack">‹</button>
-    <h2 class="title">Defenders Guide</h2>
-    <span class="headico"><i data-ico="ic_shield" data-emoji="🛡"></i></span>
-  </div>
-  <div id="bsPage1">
-    <div class="bsintro">
-      Türme machen <b>+20 %</b> Schaden gegen das Element, gegen das sie
-      stark sind, und <i>−20 %</i> gegen das, gegen das sie schwach sind.
-      <b>Neutrale</b> Gegner haben weder Stärke noch Schwäche.
-    </div>
-    <div class="elwheel" id="elWheel"></div>
-    <div class="elhint" id="elHint"></div>
-    <button class="battlebtn pressable" id="bsToGrid"
-      style="width:100%;min-height:46px;font-size:14px;margin-top:16px">Gegner ansehen</button>
-  </div>
-  <div id="bsPage2" hidden>
-    <div class="bsintro">Diese Gegner können in Kämpfen und Wellen auftauchen.</div>
-    <div class="mobgrid" id="mobGrid"></div>
-    <div class="secribbon sm" data-ribbon="ribbon_section_sm"><span class="srt">Wellenplan</span></div>
-    <div id="waveList"></div>
-  </div>
-  <div id="bsPage3" hidden></div>
-</section>
-
 <div class="modal" id="roadLayer">
   <div class="roadwrap">
     <div class="rail"></div>
@@ -8877,8 +8877,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       var ex = z.x - dx / len * 9, ey = z.y - dy / len * 9;
       var sx = p.x + dx / len * 9, sy = p.y + dy / len * 9;
       linien += '<line x1="' + sx + '" y1="' + sy + '" x2="' + ex + '" y2="' + ey +
-        '" stroke="' + p.e.farbe + '" stroke-width="0.8" stroke-dasharray="2 2"' +
-        ' marker-end="url(#bsarrow)" opacity=".85"/>';
+        '" stroke="' + p.e.farbe + '" stroke-width="1.6" stroke-dasharray="3 2.4"' +
+        ' marker-end="url(#bsarrow)" opacity=".95"/>';
     });
     box.innerHTML =
       '<svg viewBox="0 0 100 100" aria-hidden="true"><defs>' +
@@ -8992,7 +8992,10 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
           '<div class="mobfield"><b>Ziel</b><span>' + (ziel[m.target] || m.target) + "</span></div>" +
           '<div class="mobfield"><b>Bewegung</b><span>' +
             (bewegung[m.movement] || m.movement) + "</span></div>" +
-          '<div class="mobdesc">' + m.descDe + "</div>" +
+          /* ⚠ descDe kommt aus bestiary(), NICHT aus statsFor() — dort
+             gibt es das Feld nicht. Ohne diesen Unterschied stand auf
+             der Karte woertlich „undefined". Am Modul nachgeprueft. */
+          '<div class="mobdesc">' + b.descDe + "</div>" +
         "</div>" +
       "</div>" +
       '<div class="statgrid">' +

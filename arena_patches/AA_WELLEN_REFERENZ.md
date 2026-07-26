@@ -593,6 +593,24 @@ die Bedingung dafür, dass das Balancing an *einer* Stelle gedreht werden kann
 (Block FORMELN in `arena_waves.js`) und die Anzeige ohne Nacharbeit folgt. Eine
 eigene Prüfung hält das fest.
 
+**Drei Fehler beim Bauen, die die Prüfungen jetzt halten:**
+
+1. `elementRelation()` mit *einem* Argument gerufen — sie nimmt zwei. Ergebnis:
+   ein Rad ohne einen einzigen Pfeil. Gemerkt hat es die Zählung `pfeile: 0`,
+   nicht der Blick auf den Code.
+2. `descDe` aus `statsFor()` gelesen — das Feld gibt es nur in `bestiary()`.
+   Auf der Karte stand wörtlich **„undefined"**. Kein Struktur-Check hätte das
+   gesehen; erst der Blick auf die gerenderte Seite.
+3. Der View lag zuerst **neben einem Modal statt in `#app`**. Ohne dessen
+   Breitenbegrenzung war er 1067 px breit, die Kacheln 350 px — aus drei
+   Spalten wurde optisch eine. Die Prüfung „9 Kacheln" war dabei die ganze Zeit
+   grün. **Anzahl und Layout sind zwei verschiedene Fragen**, und nur die erste
+   war geprüft.
+
+Der dritte ist der lehrreichste: eine Zählung sagt nichts über Anordnung. Es
+gibt jetzt zwei Prüfungen dafür — „liegt in `#app` und ist auf Spaltenbreite
+begrenzt" und „drei Kacheln je Reihe (nicht optisch eine)".
+
 **Der Wellenplan zeigt Marken, nicht alle 27 Wellen** (1 · 7 · 9 · 14 · 18 · 22
 · 27 — Aktwechsel und Bosswellen). Eine 27-zeilige Liste wäre vollständig und
 unlesbar.
