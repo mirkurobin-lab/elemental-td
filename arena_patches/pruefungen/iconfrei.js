@@ -28,6 +28,14 @@ const S = 1;
    der Messung aus, danach zurueck. */
 const SCHATTEN_AUS = () => {
   document.querySelectorAll("img.ico").forEach(e => {
+    /* Auch der Schatten am Icon SELBST faerbt die Ecke — .prodimg traegt
+       drop-shadow(0 2px 6px #000a), das reicht mit 6 px Weichzeichnung
+       weit in ein Eckfeld von ~5 px hinein. Fuer die Frage „bringt das
+       Icon ein eingebackenes Rechteck mit" ist er Rauschen. Die
+       Freistellung selbst bleibt stehen, sonst misst man sie nicht. */
+    if (/drop-shadow/.test(getComputedStyle(e).filter)) {
+      e.dataset.altS = e.style.filter; e.style.filter = "url(#icoFrei)";
+    }
     for (let a = e.parentElement; a && a !== document.documentElement; a = a.parentElement) {
       const f = getComputedStyle(a).filter;
       if (f !== "none" && /drop-shadow/.test(f)) { a.dataset.altF = a.style.filter; a.style.filter = "none"; }
@@ -35,6 +43,7 @@ const SCHATTEN_AUS = () => {
 };
 const SCHATTEN_AN = () => {
   document.querySelectorAll("[data-alt-f]").forEach(a => { a.style.filter = a.dataset.altF; delete a.dataset.altF; });
+  document.querySelectorAll("[data-alt-s]").forEach(a => { a.style.filter = a.dataset.altS; delete a.dataset.altS; });
 };
 
 /* object-fit:contain: die gezeichnete Flaeche ist kleiner als die Box.
@@ -55,6 +64,23 @@ const SAMMLE = min => [...document.querySelectorAll("img.ico")].filter(e => {
              x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) };
   });
 
+/* Ein Eckfeld, in das ein ANDERES Icon hineinragt, misst nicht mehr dieses
+   Icon. Die Messung blendet alle Icons gleichzeitig aus — verschwindet der
+   Nachbar mit, springt die Ecke, obwohl das gepruefte Icon sauber
+   freigestellt ist. Genau so entstand der Befund „nav_shop dE 52,2": in
+   seinem rechten oberen Eckfeld liegt ein zweites Icon (212,131,64 mit
+   Icons, 21,32,40 ohne). Solche Felder fallen raus; bleibt kein Feld
+   uebrig, faellt das Icon aus der Messung — nicht durch. */
+const OHNE_NACHBARN = kacheln => kacheln.map((t, i) => ({
+  ...t,
+  felder: [[0, 0], [1, 0], [0, 1], [1, 1]].filter(([fx, fy]) => {
+    const k = Math.max(2, Math.round(Math.min(t.w, t.h) * 0.14));
+    const ax = t.x + fx * (t.w - k), ay = t.y + fy * (t.h - k);
+    return !kacheln.some((o, j) => j !== i &&
+      o.x < ax + k && o.x + o.w > ax && o.y < ay + k && o.y + o.h > ay);
+  }),
+})).filter(t => t.felder.length > 0);
+
 async function ecken(seite, mitB64, ohneB64, kacheln) {
   return seite.evaluate(async ([a, b, k, s]) => {
     async function bild(d) {
@@ -65,8 +91,8 @@ async function ecken(seite, mitB64, ohneB64, kacheln) {
     const A = await bild(a), B = await bild(b);
     return k.map(t => {
       const kk = Math.max(2, Math.round(Math.min(t.w, t.h) * s * 0.14));
-      const felder = [[t.x*s, t.y*s], [t.x*s+t.w*s-kk, t.y*s],
-                      [t.x*s, t.y*s+t.h*s-kk], [t.x*s+t.w*s-kk, t.y*s+t.h*s-kk]];
+      const felder = t.felder.map(([fx, fy]) =>
+        [t.x*s + fx*(t.w*s-kk), t.y*s + fy*(t.h*s-kk)]);
       let sa = [0,0,0], sb = [0,0,0], n = 0;
       for (const [fx, fy] of felder) {
         const da = A.getImageData(Math.round(fx), Math.round(fy), kk, kk).data;
@@ -99,7 +125,7 @@ async function ecken(seite, mitB64, ohneB64, kacheln) {
     await seite.waitForTimeout(1100);
     await seite.evaluate(SCHATTEN_AUS);
     await seite.waitForTimeout(200);
-    const kacheln = await seite.evaluate(SAMMLE, MINGROESSE);
+    const kacheln = OHNE_NACHBARN(await seite.evaluate(SAMMLE, MINGROESSE));
     if (!kacheln.length) { await seite.evaluate(SCHATTEN_AN); continue; }
     const mit = (await seite.screenshot()).toString("base64");
     await seite.evaluate(() => document.querySelectorAll("img.ico").forEach(e => { e.style.visibility = "hidden"; }));
