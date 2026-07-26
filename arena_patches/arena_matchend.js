@@ -11,6 +11,25 @@
  * Vergleich beider Seiten, Belohnung, Anschluss-Hinweise. Es rendert
  * NICHTS und kennt kein DOM.
  *
+ * NACHTRAG (AA-Endscreen-Screenshots IMG_3319-3322, Arena 5): Der echte
+ * AA-Screen ist jetzt belegt und dieses Modul liefert genau seine Daten.
+ * Belegte Struktur:
+ *   - REIHENFOLGE: Der HELD steht immer ganz oben, danach die Tuerme
+ *     absteigend nach Schaden. (Beide Screenshots: Frost als Held zuerst,
+ *     obwohl er mit 2 % bzw. 6 % der schwaechste Poster war.)
+ *   - Je Zeile: Kartenbild mit Raritaetsrahmen und ANZAHL-Marke (x1..x4 —
+ *     wie viele Exemplare platziert wurden), Name, STERNSTUFE (3 Sterne,
+ *     gefuellt/leer), Schadenszahl, Balken mit Prozent.
+ *   - BALKEN = Anteil der EIGENEN Seite, nicht des Matches. Er stimmt
+ *     damit mit dem Prozentlabel daneben ueberein. (Catapult 206K von
+ *     538.193 → 39 %, Balken ~39 %.) `scale` bleibt im Modell erhalten,
+ *     falls ein Aufrufer doch quer vergleichen will — die AA-Ansicht
+ *     nutzt es nicht.
+ *   - Kopfkarte je Seite: Avatar, Name, Flagge/Clan, Trophaeen-Delta,
+ *     GESAMTSCHADEN und SIEGRATE (Karrierewert, kein Matchwert).
+ *   - Zwei Reiter ICH / GEGNER statt beider Seiten untereinander.
+ *   - Kronen je Seite (Podest-Abzeichen): Verlierer 2, Sieger 3.
+ *
  * Drei Dinge, die AA NICHT zeigt und die hier bewusst drin sind:
  *
  *   1. SCHADENSBILANZ BEIDER SEITEN auf GEMEINSAMER SKALA. Nur so
@@ -45,11 +64,20 @@
  *          trophiesBefore: ArenaProfile.trophies(),
  *          trophiesDelta: won ? +39 : -18,
  *          gold: won ? 610 : 120,
- *          me:   { name: myName,  units: towers.map(toUnit) },
- *          them: { name: oppName, units: oppTowers.map(toUnit) },
+ *          xp:   won ? 120 : 45,          // Pass-XP, optional
+ *          packs: won ? [{ tier:"bronze" }] : [],
+ *          me:   { name: myName,  units: towers.map(toUnit),
+ *                  clan: myClan, flag: myFlag, winRate: myWinRate,
+ *                  trophyDelta: +39, crowns: myCrowns, avatarKey: myAvatar },
+ *          them: { name: oppName, units: oppTowers.map(toUnit),
+ *                  clan: oppClan, flag: oppFlag, winRate: oppWinRate,
+ *                  trophyDelta: -39, crowns: oppCrowns, avatarKey: oppAvatar },
  *        });
  *      toUnit(t) = { cardId:t.id, lvl:t.lvl, tier:t.tier, dmg:t.dmgDone,
- *                    hits:t.hits, kills:t.kills, hero:!!t.hero }
+ *                    hits:t.hits, kills:t.kills, hero:!!t.hero,
+ *                    count:t.copies, stars:t.stars }
+ *      Alles ausser name/units ist optional. Fehlt winRate, zeigt die UI
+ *      einen Strich — eine 0 % waere eine Aussage, die niemand gemacht hat.
  *   4. Modell an die UI geben (im Prototyp: showMatchEnd(model)).
  *
  * ROBUSTHEIT: Das Modul rechnet auch mit unvollständigen Daten. Fehlt
@@ -121,13 +149,25 @@
         // Schaden gezählt hat, soll die UI das SAGEN können.
         measured: !!(u && typeof u.dmg === "number" && isFinite(u.dmg)),
         perLevel: dmg / lvl,
+        // Wie viele Exemplare dieses Turms auf dem Feld standen — AAs
+        // „x2"/„x4"-Marke am Kartenbild. Ohne Angabe eins.
+        count: Math.max(1, Math.round(num(u && u.count) || 1)),
+        // Sternstufe wie bei AA: drei Sterne, gefüllt/leer.
+        stars: Math.max(0, Math.min(3, Math.round(num(u && u.stars)))),
+        starsMax: 3,
       };
     });
 
-    // Absteigend nach Schaden. Bei Gleichstand entscheidet Schaden je
-    // Stufe — damit steht bei zwei gleich starken Türmen der günstigere
-    // oben, und das ist die nützlichere Aussage.
+    /* AAs Reihenfolge, belegt aus beiden Endscreen-Screenshots: der HELD
+       steht immer oben, danach die Türme absteigend nach Schaden. In
+       beiden Aufnahmen war der Held der SCHWÄCHSTE Poster (2 % bzw. 6 %)
+       und stand trotzdem zuerst — er ist die Identität des Boards, kein
+       Konkurrent in derselben Rangliste.
+       Bei Gleichstand unter den Türmen entscheidet Schaden je Stufe:
+       dann steht der günstigere oben, und das ist die nützlichere
+       Aussage für die Level-Entscheidung. */
     units.sort(function (a, b) {
+      if (a.hero !== b.hero) return a.hero ? -1 : 1;
       return (b.dmg - a.dmg) || (b.perLevel - a.perLevel);
     });
 
@@ -135,20 +175,38 @@
     var heroTotal = units.reduce(function (s, u) { return s + (u.hero ? u.dmg : 0); }, 0);
     var towerTotal = total - heroTotal;
 
+    // MVP ist der staerkste Poster der Seite — unabhaengig von der
+    // Anzeigereihenfolge. Seit der Held oben festgepinnt ist, waere
+    // „Position 0" dafuer falsch: In beiden AA-Screenshots war der Held
+    // der SCHWAECHSTE Poster und haette die Marke zu Unrecht getragen.
+    var top = null;
+    units.forEach(function (u) { if (!top || u.dmg > top.dmg) top = u; });
     units.forEach(function (u, i) {
       u.rank = i + 1;
       u.share = total > 0 ? u.dmg / total : 0;
-      u.isMvp = i === 0 && u.dmg > 0;
+      u.isMvp = !!top && u === top && u.dmg > 0;
     });
 
     return {
       name: side.name || "—",
       clan: side.clan || null,
+      // Kopfkarte der AA-Ansicht: Flagge/Region, Siegrate (Karrierewert),
+      // Trophaeen-Delta und Kronen fuer die Podest-Abzeichen.
+      flag: side.flag || null,
+      winRate: (typeof side.winRate === "number" && isFinite(side.winRate))
+        ? clampPct(side.winRate) : null,
+      trophyDelta: (typeof side.trophyDelta === "number" && isFinite(side.trophyDelta))
+        ? Math.round(side.trophyDelta) : null,
+      crowns: Math.max(0, Math.min(3, Math.round(num(side.crowns)))),
+      avatarKey: side.avatarKey || null,
       units: units,
       total: total,
       heroTotal: heroTotal,
       towerTotal: towerTotal,
-      mvp: units.length && units[0].dmg > 0 ? units[0] : null,
+      // Der staerkste Poster, NICHT die erste Zeile. Seit der Held oben
+      // festgepinnt ist, waere units[0] falsch — genau das hat der
+      // Selbsttest hier abgefangen.
+      mvp: top && top.dmg > 0 ? top : null,
       // Wurde überhaupt gemessen? Steuert den Hinweis in der UI.
       anyMeasured: units.some(function (u) { return u.measured; }),
     };
@@ -235,6 +293,10 @@
         trophiesBefore: tBefore,
         trophiesAfter: tAfter,
         gold: Math.max(0, Math.round(num(inp.gold))),
+        // Pass-XP. AAs Endscreen zeigt sie neben den Trophaeen in derselben
+        // Karte; ohne uebergebenen Wert bleibt sie 0 und die UI laesst die
+        // Zeile weg, statt eine 0 zu behaupten.
+        xp: Math.max(0, Math.round(num(inp.xp))),
         packs: Array.isArray(inp.packs) ? inp.packs.slice() : [],
       },
       sides: { me: me, them: them },
@@ -292,10 +354,22 @@
         " Lv" + u.lvl + "  " + u.dmg + "  " + (u.share * 100).toFixed(1) + " %  " +
         "je Stufe " + u.perLevel.toFixed(0) + (u.isMvp ? "  ← MVP" : ""));
     });
-    check("absteigend nach Schaden sortiert", m.sides.me.units[0].cardId === "fire" &&
-      m.sides.me.units[1].cardId === "solara" && m.sides.me.units[2].cardId === "water");
-    check("MVP ist der stärkste Turm", m.sides.me.mvp.cardId === "fire" &&
-      m.sides.me.units[0].isMvp === true);
+    // AAs Reihenfolge: Held zuerst, dann Türme absteigend.
+    check("Held steht ganz oben (AA-Reihenfolge)",
+      m.sides.me.units[0].hero === true && m.sides.me.units[0].cardId === "solara",
+      m.sides.me.units[0].cardId);
+    check("darunter die Türme absteigend nach Schaden",
+      m.sides.me.units[1].cardId === "fire" && m.sides.me.units[2].cardId === "water" &&
+      m.sides.me.units[3].cardId === "light",
+      m.sides.me.units.slice(1).map(function (u) { return u.cardId; }).join(","));
+    /* Die MVP-Marke haengt am staerksten Poster, NICHT an Position 0 —
+       sonst haette sie hier der Held getragen, der mit 27 % nur Zweiter
+       war. Genau dieser Fehler waere beim Festpinnen des Helden leicht
+       passiert, deshalb steht er als eigener Check da. */
+    check("MVP ist der stärkste Poster, nicht die erste Zeile",
+      m.sides.me.mvp.cardId === "fire" && m.sides.me.units[0].isMvp === false &&
+      m.sides.me.units[1].isMvp === true,
+      "MVP=" + m.sides.me.mvp.cardId);
     check("nur EIN MVP je Seite",
       m.sides.me.units.filter(function (u) { return u.isMvp; }).length === 1);
     check("Summe eigene Seite", m.sides.me.total === 48210 + 22140 + 31900 + 14000,
@@ -306,8 +380,32 @@
     check("Held getrennt ausgewiesen", m.sides.me.heroTotal === 31900, m.sides.me.heroTotal);
     check("Turmsumme ohne Held", m.sides.me.towerTotal === 48210 + 22140 + 14000,
       m.sides.me.towerTotal);
-    check("Held bleibt in der Rangliste", m.sides.me.units.some(function (u) {
-      return u.hero && u.rank === 2; }));
+    check("Held trägt Rang 1", m.sides.me.units.some(function (u) {
+      return u.hero && u.rank === 1; }));
+    // Anzahl-Marke und Sternstufe (AAs „x2" am Kartenbild, 3 Sterne)
+    var mz = build({ me: { units: [
+      { cardId: "fire", lvl: 9, dmg: 100, count: 3, stars: 2 },
+      { cardId: "water", lvl: 9, dmg: 50 } ] }, them: { units: [] } });
+    check("Anzahl-Marke wird übernommen", mz.sides.me.units[0].count === 3,
+      mz.sides.me.units[0].count);
+    check("Sternstufe wird übernommen und auf 3 begrenzt",
+      mz.sides.me.units[0].stars === 2 && mz.sides.me.units[0].starsMax === 3);
+    check("ohne Angabe: Anzahl 1, Sterne 0",
+      mz.sides.me.units[1].count === 1 && mz.sides.me.units[1].stars === 0);
+    var mz2 = build({ me: { units: [{ cardId: "x", lvl: 1, dmg: 1, stars: 9, count: 0 }] },
+      them: { units: [] } });
+    check("Sterne über 3 werden gekappt, Anzahl unter 1 auf 1 gehoben",
+      mz2.sides.me.units[0].stars === 3 && mz2.sides.me.units[0].count === 1);
+    // Kopfdaten der Seite (Siegrate, Flagge, Kronen)
+    var mk = build({ me: { name: "A", flag: "CH", winRate: 0.61, trophyDelta: 22, crowns: 3,
+      units: [] }, them: { units: [] } });
+    check("Siegrate, Flagge, Trophäen-Delta und Kronen landen im Modell",
+      mk.sides.me.winRate === 0.61 && mk.sides.me.flag === "CH" &&
+      mk.sides.me.trophyDelta === 22 && mk.sides.me.crowns === 3);
+    check("Kronen werden auf 3 begrenzt",
+      build({ me: { crowns: 9, units: [] }, them: { units: [] } }).sides.me.crowns === 3);
+    check("fehlende Siegrate bleibt null (nicht 0 — 0 % wäre eine Aussage)",
+      build({ me: { units: [] }, them: { units: [] } }).sides.me.winRate === null);
 
     console.log("\nGemeinsame Skala: " + m.scale);
     check("Skala ist der größte Einzelschaden BEIDER Seiten", m.scale === 60300, m.scale);
@@ -393,6 +491,15 @@
     check("nextNodeAt(50) = 100", API.nextNodeAt(50) === 100, API.nextNodeAt(50));
     check("nextNodeAt(9799) = 9800", API.nextNodeAt(9799) === 9800, API.nextNodeAt(9799));
     check("nextNodeAt über dem Ende = null", API.nextNodeAt(12000) === null);
+
+    // XP ist optional. Ohne Angabe 0 — die UI laesst die Zeile dann weg,
+    // statt eine ausgedachte Null zu zeigen.
+    var gx = build({ me: { units: [] }, them: { units: [] } });
+    check("XP ohne Angabe ist 0", gx.reward.xp === 0, gx.reward.xp);
+    var gx2 = build({ xp: 120.6, me: { units: [] }, them: { units: [] } });
+    check("XP wird gerundet übernommen", gx2.reward.xp === 121, gx2.reward.xp);
+    var gx3 = build({ xp: -50, me: { units: [] }, them: { units: [] } });
+    check("negative XP wird auf 0 geklemmt", gx3.reward.xp === 0, gx3.reward.xp);
 
     console.log("\n" + (fail === 0 ? "ALLE TESTS OK" : fail + " TEST(S) FEHLGESCHLAGEN") + "\n");
     if (fail) process.exitCode = 1;
