@@ -138,14 +138,36 @@ Zwei Ursachen, beide behoben:
 fehlt genau der Rand, der ihn zum Rahmen macht. Solche Elemente tragen
 `rahmen-fuellt` — die Ausnahme ist benannt, statt die Regel zu verwässern.
 
-**Das Band umschließt seinen Text.** `.secribbon` war über die volle Spaltenbreite
-gezogen: 366 px Fläche bei 105 px Text = **12 % Füllung** (kleine Variante 7 %).
-Jetzt `width:fit-content` mit `min-width`, gemessen 37–55 % Füllung bei maximal
-308 px Breite. Der Zusatz (`.srx`) läuft im Fluss mit, damit das Band seine
-Breite korrekt mitrechnet.
+**Das Band umschloss seinen Text — und tut es nicht mehr.** `.secribbon` war
+über die volle Spaltenbreite gezogen: 366 px Fläche bei 105 px Text = **12 %
+Füllung** (kleine Variante 7 %). Der Fix war `width:fit-content`, gemessen
+37–55 % Füllung bei maximal 308 px Breite.
+
+> **Zurückgenommen (26.07.), und zwar begründet.** `fit-content` war eine
+> Antwort auf `background-size:cover` — auf eine *gestreckte Bildfläche*.
+> Seit die Bandgrafik als **9-Slice** liegt (§6c), gibt es das Problem
+> nicht mehr: die Zierenden behalten bei jeder Breite ihre Form, gestreckt
+> wird nur die Mitte. Der Screen-Titel führt das seit dem ersten Tag vor —
+> 366 px breit, 9,15 : 1, saubere Enden. Umgekehrt **kostete** `fit-content`
+> genau den Platz, den der Zusatztext braucht: gemessen lag `.srx` **11,0 px
+> unter dem Zierende** und war auf dem Telefon nicht zu lesen.
+> Die Regel dahinter, allgemeiner formuliert: *eine Maßnahme überlebt ihre
+> Ursache nicht automatisch.* Wird die Ursache anders gelöst, gehört die
+> Maßnahme geprüft — sonst schleppt man Nebenwirkungen ohne Nutzen mit.
+
+Stattdessen gilt jetzt: **ein Screen, eine Bandfamilie.** Alle `.secribbon`
+tragen dieselbe Grafik wie `h2.title` (`banner_title`), volle Breite, 44 px
+hoch, Zierenden 44 px, `padding-inline` 50 px — das Polster ist **größer** als
+das Zierende, damit kein Text darunter läuft. Der Zusatz (`.srx`) steht in
+einer **zweiten Zeile** statt daneben: nebeneinander hätten „Booster-Packs ·
+Episch ≤20 · Legendär ≤55" 316,5 px gebraucht, im Band sind 266 px frei — die
+Zeile wäre gekürzt worden, also wieder unlesbar, nur mit anderem Symptom.
 
 > **Geprüft:** „Keine Bannergrafik wird gestreckt (Artwork-Ebene nie 100 % 100 %)"
-> über 13 Views, und „Sektionsband umschließt seinen Text".
+> über 13 Views, „Sektionsbänder tragen dieselbe Grafik wie der Screen-Titel",
+> „Bandtext liegt im Polster, nicht im Zierende" und „Kein Bandtext wird
+> gekürzt". Die alte Prüfung „Sektionsband umschließt seinen Text" ist
+> **entfallen** — sie hätte die überholte Bauart festgeschrieben.
 
 **P3 kennt jetzt seine Zielverhältnisse.** Die richtige Lösung ist nicht `cover`,
 sondern **9-Slice** (`border-image`) oder Grafiken, die im Zielverhältnis erzeugt
@@ -199,10 +221,21 @@ antwortete. **Lehre: die Textgrundlage darf nie davon abhängen, welches Artwork
 gerade lädt.** Beim Straßenknoten sitzt die Beschriftung darum auf einem eigenen
 dunklen Plättchen, nicht direkt auf der Plattform.
 
+**Nachtrag 26.07. — dieselbe Falle, seitenverkehrt.** Die Sektionsbänder tragen
+jetzt das **dunkle** Titelband statt des hellen Kristallbandes. Damit ist die
+Regel „auf einem Band steht dunkle Schrift" **falsch geworden** — sie war nie
+die Regel, sondern der damalige Einzelfall. Die Regel lautet: *die Schrift
+kontrastiert gegen ihren Grund.* Die Prüfung ist entsprechend umgeschrieben
+und liest die Bandfamilie aus `data-band`, das `band()` beim Anlegen setzt.
+Nebenbefund: eine Helligkeitsmessung an `-webkit-text-fill-color` ist bei
+**Verlaufsschrift blind** — die Füllfarbe ist dort transparent und misst immer
+0,00. Die Prüfung nimmt jetzt die erste Farbe des Verlaufs.
+
 > **Geprüft:** „Kartenrahmen sind nie eine deckende Bildfläche" über vier Views,
 > „Rahmen-Schnitt ohne `fill`", „Rahmen-Randbreite in Prozent", „Sektionsbänder
 > sind 9-Slice", „Bandschnitt mit `fill`", „Band-Enden nicht auf einen Strich
-> gestaucht (≥ 20 px)", „Kein heller Verlaufstext auf den hellen Bändern",
+> gestaucht (≥ 20 px)", „Bandschrift kontrastiert gegen ihren Bandgrund"
+> (ersetzt „Kein heller Verlaufstext auf den hellen Bändern"),
 > „Beschriftung sitzt auf eigenem dunklem Plättchen".
 
 ## 7. Auslieferung

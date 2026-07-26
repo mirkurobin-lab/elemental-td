@@ -1413,15 +1413,37 @@ span.ico{text-align:center}
 .shopcard .sart{font-size:26px;line-height:1.1}
 .shopcard .snm{font-size:10.5px;font-weight:800;color:#dbe6ef;line-height:1.25}
 .shopcard .savail{font-size:9px;color:var(--dim);font-weight:700}
-.shopcard .sbuy{margin-top:3px;width:100%;border-radius:9px;padding:6px 0;font-size:12px;
+/* Feste Mindesthoehe: ein Knopf MIT Waehrungsicon war gemessen 30,1 px
+   hoch, einer mit reinem Text („Abholen") nur 26,0 px. Dieselbe
+   Bauart-Panne wie beim Arkan-Knopf, nur eine Ebene tiefer. */
+.shopcard .sbuy{margin-top:3px;width:100%;min-height:30px;border-radius:9px;padding:6px 0;
+  font-size:12px;
   font-weight:900;background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);
   color:#3a2b07;box-shadow:0 2px 0 #6d551a}
 .shopcard .sbuy.gems{background:linear-gradient(180deg,#f5a7f7,#dc1ddb 55%,#8d1c78);color:#fff;
   box-shadow:0 2px 0 #5e1152;text-shadow:0 1px 2px #0008}
 .shopcard.sold{filter:grayscale(.7) brightness(.6)}
 .packshop{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+.packshop .shopcard.wide{grid-column:1/-1}
 .packshop .shopcard .sart{font-size:34px}
-.packshop .promise{font-size:8.5px;color:#a9bccb;line-height:1.3}
+/* ⚠ DIE PREISKNOEPFE MUESSEN AUF EINER LINIE SITZEN, EGAL WIE LANG DER
+   TEXT IST. Befund vom Telefon: der Arkan-Knopf stand hoeher als der
+   Gold-Knopf. Ursache gemessen — die Beschreibung ist bei „Gold-Pack"
+   zweizeilig (22,1 px), bei „Arkan-Pack" einzeilig (11,0 px), und der
+   Knopf folgt ihr im Fluss: 11,0 px Versatz.
+   Zwei Massnahmen, beide noetig:
+     `flex:1` schiebt den Knopf an den unteren Rand der Kachel — das
+       richtet die Knoepfe INNERHALB einer Rasterreihe aus (die Kacheln
+       einer Reihe sind ohnehin gleich hoch, `align-items:stretch`).
+     `min-height:2.6em` reserviert zwei Zeilen — das richtet die Kacheln
+       auch ZWISCHEN den Reihen auf dieselbe Hoehe aus. Ohne das waere
+       Reihe 2 elf Pixel flacher als Reihe 1.
+   Die volle Breite unten (Tages-Bronze-Pack) ist davon ausgenommen: sie
+   steht allein in ihrer Reihe, dort gibt es nichts auszurichten. */
+.packshop .promise{font-size:8.5px;color:#a9bccb;line-height:1.3;
+  display:flex;align-items:flex-start;justify-content:center;text-align:center;
+  flex:1 0 auto}
+.packshop .shopcard:not(.wide) .promise{min-height:2.6em}
 .freebadge{position:absolute;right:-4px;top:-6px;background:var(--up);color:#06280a;
   font-size:8.5px;font-weight:900;border-radius:8px;padding:1px 5px}
 /* ==================================================================
@@ -1608,7 +1630,12 @@ span.ico{text-align:center}
 .prodcard.fr-green .pcamt{color:var(--gold)}
 .prodcard.fr-light .pcamt{color:#e8eef3;font-size:12px}
 .prodcard .pcsub{font-size:8.5px;color:#a9bccb;line-height:1.3}
-.prodcard .pcbuy{margin-top:4px;width:100%;border-radius:var(--radius-sm);padding:7px 0;
+/* Gleiche Panne, gleiche Loesung wie bei .shopcard .sbuy: mit Icon war
+   der Knopf 32,1 px hoch, ohne (Gratis-Kachel, „Fr. 3.–") nur 28,0 px —
+   im Tagesangebots-Raster stand der Gratis-Knopf dadurch 4,1 px hoeher
+   als sein Nachbar. */
+.prodcard .pcbuy{margin-top:4px;width:100%;min-height:32px;border-radius:var(--radius-sm);
+  padding:7px 0;
   font-size:12px;font-weight:900}
 .prodcard.wide .pcbuy{width:auto;min-width:118px;padding:8px 14px}
 /* ⚠ WAEHRUNGS-ICON AUF SEINER EIGENEN FARBE.
@@ -1640,69 +1667,88 @@ span.ico{text-align:center}
 .prodcard.wide.hasseal .pcart{margin-top:0}
 
 /* ==================================================================
- * SEKTIONS-RIBBONS (ribbon_section_lg / _sm)
+ * SEKTIONS-BAENDER — EINE Machart, die des SHOP-Bandes
  * ------------------------------------------------------------------
- * Das Ribbon ist HELL-SILBER. Damit ist .goldtext hier VERBOTEN — der
- * goldene Verlauf auf hellem Grund ist genau die Bug-Klasse, die im
- * Projekt schon dreimal aufgetreten ist (.cerbtn, .okbtn, .battlebtn).
- * Die Ueberschrift traegt deshalb eine dunkle Fuellfarbe.
+ * BEFUND vom Live-Stand (iPhone, 26.07., IMG_3349-3353): ganz oben im
+ * Shop steht das breite, verzierte Titelband (`banner_title`, violettes
+ * Kristallfeld mit Goldfiligran) — und direkt darunter sieben schmale,
+ * helle Schleifenbaender aus einer voellig anderen Familie. Zwei
+ * Bandarten in EINEM Screen, dazu der Zusatztext („Echtgeld ·
+ * Platzhalter", „Neu in 6h 58m", „Episch ≤20 · Legendär ≤55") halb
+ * unter der Zierkante. Die Sektionsbaender tragen jetzt dieselbe
+ * Grafik, dieselbe Geometrie und dieselbe Schriftbehandlung wie der
+ * Screen-Titel.
+ *
+ * WARUM DAS BAND JETZT DIE VOLLE BREITE HAT.
+ * `width:fit-content` war der Fix gegen eine GESTRECKTE Bildflaeche
+ * (§6b): das Band lag damals als `background-size:cover` auf 366 px
+ * Breite bei 105 px Text, die Zierenden wurden zu Schlieren. Seit die
+ * Grafik als 9-Slice liegt (§6c), gibt es diesen Grund nicht mehr — die
+ * Enden behalten bei JEDER Breite ihre Form, gestreckt wird nur die
+ * Mitte. Der Screen-Titel ist der Beweis: 366 px breit, 9,15 : 1, und
+ * seine Zierenden sitzen sauber. `fit-content` kostete dagegen genau
+ * den Platz, den der Zusatztext gebraucht haette.
+ *
+ * ZWEI SICHERHEITEN, die zusammengehoeren:
+ *  1. `padding-inline` ist GROESSER als `border-image-width`. Sonst
+ *     laeuft der Text unter das Zierende — gemessen lagen 22 px Polster
+ *     gegen 34 px Ende, der Zusatz stand also 12 px im Zierrand.
+ *  2. Die Fallback-Platte ist DUNKEL, weil die Grafik dunkel ist. Die
+ *     Textgrundlage darf nie davon abhaengen, welches Artwork gerade
+ *     laedt (§6c — genau diese Falle hat im letzten Durchgang
+ *     zugeschlagen, nur andersherum).
+ *
+ * GILT GLOBAL, nicht nur im Shop. Dieselbe Klasse traegt die Baender in
+ * Einstellungen, Wellenplan, Clan und Freunde. Zwei Bandfamilien
+ * nebeneinander waeren genau der Bruch, den der Nutzer im Shop
+ * beanstandet hat — nur eine View weiter.
  * ================================================================== */
-/* Das Band UMSCHLIESST seinen Text, es wird nicht auf die Spaltenbreite
-   gezogen. Vorher war es ein Block-Flex und damit 366 px breit, waehrend
-   die Ueberschrift 105 px einnahm — die Bannergrafik wurde also auf das
-   Dreifache gestreckt und las sich als leere Leiste. Gemessen: 12 %
-   Fuellung (kleine Variante 7 %). Bei AA umschliesst das Band den Text.
-   min-width haelt sehr kurze Woerter trotzdem als Band erkennbar. */
-/* KEIN `background-size:100% 100%` fuer Artwork. Gemessen ueber alle
-   Views wurden Bannergrafiken auf voellig fremde Seitenverhaeltnisse
-   gequetscht — .packbtn um Faktor 9,1, .progbar um 7,5, dieses Band um
-   3,1. Bei einem Band heisst das: die Zierenden werden zu Schlieren
-   gestaucht, die Mitte flach gezogen, und es liest sich als leere
-   Leiste. `cover` beschneidet statt zu verzerren. Die Farbplatte in der
-   zweiten Ebene fuellt weiterhin die ganze Flaeche und bleibt die
-   Textgrundlage.
-   ------------------------------------------------------------------
-   `cover` allein reichte aber NICHT, und der Grund lag in der Grafik,
-   nicht im CSS: gemessen nahm das eigentliche Band nur die mittleren
-   35 % seiner Leinwand ein (1376x768 Datei, 1218x269 Band). In einem
-   34 px hohen Streifen schnitt `cover` also fast nur leere Leinwand
-   heraus — dieselbe Wirkung wie vorher, nur anders zustande gekommen.
-   Die Bandgrafiken sind darum nachgeschnitten (`_v2`, Verhaeltnis 4,45
-   statt 1,79); die Originale stehen als `_v1` daneben. Erst damit zeigt
-   `cover` tatsaechlich das Band. */
-.secribbon{position:relative;display:flex;align-items:center;justify-content:center;
-  width:fit-content;max-width:100%;min-width:190px;margin-inline:auto;
-  min-height:34px;margin-block:var(--gap-lg) var(--gap);padding:5px 22px;
-  background-repeat:no-repeat;background-position:center;background-size:cover,100% 100%;
-  background-image:linear-gradient(180deg,#e9eef3,#b8c6d2 52%,#8fa2b3);
+.secribbon{position:relative;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:1px;
+  width:100%;max-width:100%;margin-inline:auto;
+  min-height:44px;margin-block:var(--gap-lg) var(--gap);padding:6px 50px;
+  background-repeat:no-repeat;background-position:center;background-size:100% 100%;
+  /* Dunkle Platte, passend zum Titelband — Rueckfall bei CDN-Ausfall. */
+  background-image:linear-gradient(180deg,#3b2668,#26174a 52%,#160e2c);
   border-radius:var(--radius-sm);
-  filter:drop-shadow(0 3px 7px #0009);
-  /* Die Ribbon-PNGs haben einen DUNKLEN Hintergrund eingebacken (sie
-     wurden auf dunklem Grund generiert). Ohne Blend deckt der die helle
-     Platte zu und die dunkle Schrift steht auf Dunkel — im Browsertest
-     mit erreichbarem CDN nachgewiesen. `screen` laesst den dunklen Grund
-     des PNGs wegfallen und nur das helle Band stehen; die Platte
-     darunter bleibt die Textgrundlage. Damit ist die Ueberschrift in
-     ALLEN drei Zustaenden lesbar: ohne Bild, mit Bild, bei CDN-Ausfall. */
-  background-blend-mode:screen,normal}
-.secribbon.band9{border-image-width:0 34px}
-.secribbon.sm.band9{border-image-width:0 28px}
-.secribbon.sm{min-height:28px;padding:4px 18px;min-width:160px;
-  background-image:linear-gradient(180deg,#dfe7ee,#aebdcb 52%,#8799aa);
-  background-blend-mode:screen,normal}
-.secribbon .srt{font-size:12px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;
-  /* dunkle Schrift auf hellem Ribbon — NIE .goldtext */
-  -webkit-text-fill-color:#1a2530;color:#1a2530;text-shadow:0 1px 0 #ffffff8c;
+  filter:drop-shadow(0 3px 7px #0009)}
+/* Randbreite = Bandhoehe, wie bei h2.title.band9 (§6c). */
+.secribbon.band9{border-image-width:0 44px}
+.secribbon.sm.band9{border-image-width:0 34px}
+.secribbon.sm{min-height:34px;padding:5px 38px;
+  background-image:linear-gradient(180deg,#33215c,#211441 52%,#140c28)}
+/* Der Grund ist jetzt DUNKEL — damit gilt hier dieselbe Behandlung wie
+   beim Screen-Titel: heller Goldverlauf mit Schlagschatten. Die Regel
+   des Projekts lautet nicht „auf Baendern steht dunkle Schrift", sondern
+   „Schrift kontrastiert gegen ihren Grund". Auf dem alten HELLEN
+   Schleifenband war Gold verboten; auf diesem ist es richtig.
+   Der Verlauf steht hier ausgeschrieben statt als .goldtext-Klasse: die
+   Klasse wird an anderer Stelle mit `pale` umgeschaltet, und ein Band
+   soll nicht versehentlich hell werden. */
+.secribbon .srt{font-family:Cinzel,Georgia,"Times New Roman",serif;
+  font-variant:small-caps;font-size:15px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;
+  background-image:linear-gradient(180deg,#fff7d6 0%,#f4e3a6 32%,#e0b94a 62%,#8a6a1f 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  filter:drop-shadow(0 1px 1px rgba(0,0,0,.85)) drop-shadow(0 0 7px rgba(224,185,74,.30));
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.secribbon.sm .srt{font-size:10.5px}
-/* Zusatzinfo (Timer, Pity-Stand) haengt RECHTS AUSSEN am Ribbon, nicht
-   darauf — auf dem hellen Band waere jede weitere Zeile Gedraengel. */
-/* Der Zusatz laeuft MIT im Fluss. Absolut positioniert waere er bei einem
-   Band, das sich an den Text anpasst, entweder abgeschnitten oder ueber
-   dem Titel — so rechnet das Band seine Breite korrekt mit ihm. */
-.secribbon .srx{margin-left:10px;flex:0 1 auto;
-  font-size:9px;font-weight:800;color:#1a2530b8;white-space:nowrap;
-  overflow:hidden;text-overflow:ellipsis}
+.secribbon.sm .srt{font-size:12.5px;letter-spacing:.12em}
+/* ⚠ DER ZUSATZ STEHT UNTER DEM TITEL, NICHT NEBEN IHM — und das ist
+   gemessen, nicht Geschmack. Nebeneinander bleiben im Band 262 px
+   Textbreite (366 minus zweimal Polster). Gebraucht haetten „Booster-
+   Packs · Episch ≤20 · Legendär ≤55" 316,5 px und „Kristalltresor ·
+   Stufe 1/5 · 0x geöffnet" 306,5 px. Die Zeile passt also NICHT — sie
+   wuerde per `text-overflow` gekuerzt, und dann steht „BOOSTER-P… ·
+   Episch ≤20 · Legen…" da. Genau die Unlesbarkeit, die behoben werden
+   sollte, nur mit anderem Symptom.
+   Untereinander braucht die breiteste Zeile 154,5 px — reichlich Platz,
+   volle Information, und die Bandhoehe bleibt bei 44 px (zwei Zeilen
+   plus Polster ergeben 42 px). */
+.secribbon .srx{max-width:100%;
+  font-size:9.5px;font-weight:800;letter-spacing:.02em;line-height:1.15;
+  -webkit-text-fill-color:#d9cbf2;color:#d9cbf2;text-shadow:0 1px 2px #0b0716;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .decorow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--gap);margin-top:var(--gap-lg)}
 .decotile{border-radius:var(--radius-sm);border:1px dashed #35485a;background:#111a21;padding:9px 6px;
   text-align:center;font-size:9.5px;color:var(--dim);font-weight:700}
@@ -5202,9 +5248,24 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
      Grafik aus, ist `border-image-source` ungueltig und die Platte
      traegt das Band allein. Alle drei Zustaende bleiben damit lesbar —
      ohne Bild, mit Bild, bei CDN-Ausfall. */
+  /* Ein Screen, EINE Bandfamilie. Das Markup nennt weiterhin
+     `ribbon_section_lg/_sm` — die Keys stehen an gut zwei Dutzend
+     Stellen, und ein Alias an genau EINER Stelle ist die Aenderung, die
+     nicht die Haelfte davon vergisst. Aufgeloest wird auf `banner_title`,
+     die Grafik des Screen-Titels: Befund IMG_3349 — das SHOP-Band oben
+     gefaellt, die sieben Baender darunter sind eine andere Familie.
+     Die alten Grafiken bleiben in ASSETS registriert; sie sind nicht
+     kaputt, sie passen nur nicht mehr zum Titelband. */
+  var BAND_ALIAS = { ribbon_section_lg: "banner_title", ribbon_section_sm: "banner_title" };
   function band(el, key) {
     if (!el) return;
+    key = BAND_ALIAS[key] || key;
     el.classList.add("band9");
+    /* Der aufgeloeste Key steht im DOM, damit die Sichtpruefung die
+       Textfarbe gegen die RICHTIGE Bandfamilie pruefen kann (heller
+       Grund ⇒ dunkle Schrift, dunkler Grund ⇒ helle Schrift) statt gegen
+       eine fest verdrahtete Annahme. */
+    el.setAttribute("data-band", key);
     if (ASSETS[key]) el.style.borderImageSource = 'url("' + ASSETS[key] + '")';
   }
 
@@ -6723,8 +6784,12 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     { id:"g3", name:"Kissen Gems",    amt:1200, price:"Fr. 19.–", art:"shop_gem_t3", seal:null },
     { id:"g4", name:"Truhe Gems",     amt:2500, price:"Fr. 39.–", art:"shop_gem_t4", seal:"best" },
     { id:"g5", name:"Pokal der Gems", amt:4000, price:"Fr. 59.–", art:"shop_gem_t5", seal:null },
-    { id:"g6", name:"Gem-Tresor",     amt:6500, price:"Fr. 89.–", art:"shop_gem_t6", seal:null,
-      wide:true },
+    /* Steht NICHT mehr quer unter dem Raster. Gemessen liess „Pokal der
+       Gems" als fuenfte Kachel rechts ein Loch von 179 x 213 px stehen,
+       waehrend der Tresor als volle Breite darunter lag. Als normale
+       Kachel fuellt er genau dieses Loch: sechs Kacheln, drei volle
+       Reihen, kein Rest. */
+    { id:"g6", name:"Gem-Tresor",     amt:6500, price:"Fr. 89.–", art:"shop_gem_t6", seal:null },
   ];
   /* ---------- (7) Gold-Tausch (AA §8.1 Pos. 7) ----------
      Bei uns GEMS → GOLD statt Echtgeld → Gold: Gold ist die Waehrung,
@@ -6732,14 +6797,21 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
      Tausch ist die Bruecke aus der Premium- in die Spielwaehrung.
      AAs „ein Gold-Paket gratis per Werbevideo" wird bei uns zu einem
      werbefreien Tages-Gratispaket (§19.1: keine Ads). */
+  /* REIHENFOLGE: Tagesgold zuerst, links oben, rechts daneben der
+     Muenzstapel — danach aufsteigend. Vorher stand das Gratispaket als
+     volle Breite ganz unten und liess in der zweiten Reihe rechts ein
+     Loch von 179 x 227 px offen. Vier Kacheln in zwei vollen Reihen
+     schliessen es.
+     Das ist bewusst NICHT die reine Preisreihenfolge wie bei den Gems:
+     das Gratispaket ist der taegliche Anlass, ueberhaupt in diese
+     Sektion zu schauen — es gehoert nach oben, nicht ans Ende. */
   var GOLD_PACKS = [
+    { id:"go0", name:"Tagesgold",   amt:2500,   cost:0,   free:true,  art:"shop_gold_t4" },
     { id:"go1", name:"Münzstapel",  amt:10500,  cost:80,  free:false, art:"shop_gold_t1" },
     { id:"go2", name:"Münzbeutel",  amt:31500,  cost:220, free:false, art:"shop_gold_t2",
       seal:"pop" },
     { id:"go3", name:"Goldschwall", amt:126000, cost:800, free:false, art:"shop_gold_t3",
       seal:"best" },
-    { id:"go0", name:"Tagesgold",   amt:2500,   cost:0,   free:true,  art:"shop_gold_t4",
-      wide:true },
   ];
   var goldFreeTaken = false;
 
@@ -6777,7 +6849,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
         '<button class="sbuy' + (sp.cur === "gems" ? " gems" : "") + '" data-buypack="' + sp.key +
           '">' + price + "</button></div>";
     }).join("") +
-      '<div class="shopcard" style="position:relative;grid-column:1/-1">' +
+      '<div class="shopcard wide" style="position:relative">' +
         (freeDailyTaken ? "" : '<span class="freebadge">GRATIS</span>') +
         '<span class="sart">' + ico("chest_bronze", "🥉", "xl") + "</span>" +
         '<span class="snm">Tages-Bronze-Pack</span>' +
@@ -6930,8 +7002,11 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   function renderGoldPacks() {
     $("goldShop").innerHTML = GOLD_PACKS.map(function (g) {
       var taken = g.free && goldFreeTaken;
+      /* Kuerzeres Label: die Kachel ist jetzt halb so breit wie vorher
+         (179 statt 366 px). „GRATIS · 1× täglich" passte quer, im
+         Raster bricht es um. */
       var label = g.free
-        ? (taken ? "Wieder morgen" : "GRATIS · 1× täglich")
+        ? (taken ? "Morgen wieder" : "GRATIS · täglich")
         : ico("cur_gem", "💚") + " " + fmt(g.cost);
       return prodCard({
         frame: "green", art: g.art, emoji: "🪙", seal: g.seal, wide: g.wide,

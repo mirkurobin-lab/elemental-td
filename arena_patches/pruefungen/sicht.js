@@ -140,39 +140,85 @@ function helligkeit(farbe) {
         (pc[0] || {}).rand + "px " + (pc[0] || {}).randfarbe);
 
   /* ---------- Text auf Artwork ----------
-     Die zweite Variante derselben Klasse. Das Artwork ersetzt die dunkle
-     Fallback-Platte durch eine helle Fläche; heller Text darauf ist weg.
-     Geprüft wird die Regel, nicht der Einzelfall: auf allen Bändern steht
-     dunkle Schrift, und keine trägt `.goldtext`. */
-  const bandtext = await seite.evaluate(() => {
+     ⚠ GEÄNDERTE ERWARTUNG, mit Absicht.
+     Die alte Prüfung schrieb fest: „auf einem Band steht IMMER dunkle
+     Schrift". Das war nie die Regel, sondern der damalige Einzelfall —
+     alle Bänder trugen helle Grafiken (`ribbon_section_*` silberblau,
+     `banner_rarity` creme). Die Sektionsbänder tragen jetzt dieselbe
+     Grafik wie der Screen-Titel: `banner_title`, ein DUNKLES violettes
+     Kristallfeld mit Goldfiligran. Dunkle Schrift wäre dort genau der
+     Fehler, den die alte Prüfung verhindern sollte, nur seitenverkehrt —
+     und sie hätte ihn nicht nur durchgelassen, sondern eingefordert.
+     Eine Prüfung, die eine überholte Bauart festschreibt, ist schlimmer
+     als keine.
+     Geprüft wird jetzt die Regel, die immer gemeint war: DIE SCHRIFT
+     KONTRASTIERT GEGEN IHREN GRUND. Welche Grafik ein Band trägt, sagt
+     `data-band` — den aufgelösten Schlüssel setzt `band()` beim Anlegen. */
+  const DUNKLE_BAENDER = ["banner_title"];
+  const bandtext = await seite.evaluate((dunkel) => {
     const schlecht = [];
-    document.querySelectorAll(".ribbon .rl, .ribbon .rr, .secribbon .srt")
-      .forEach(e => {
+    const lum = f => {
+      const m = /rgba?\((\d+), *(\d+), *(\d+)/.exec(f || "");
+      return m ? (+m[1] * 0.299 + +m[2] * 0.587 + +m[3] * 0.114) / 255 : null;
+    };
+    document.querySelectorAll(".ribbon, .secribbon").forEach(bd => {
+      const key = bd.getAttribute("data-band") || "";
+      if (!key) { schlecht.push("Band ohne data-band"); return; }
+      const dunklerGrund = dunkel.indexOf(key) >= 0;
+      bd.querySelectorAll(".rl, .rr, .srt, .srx").forEach(e => {
         const cs = getComputedStyle(e);
-        if (e.classList.contains("goldtext")) schlecht.push("goldtext auf Band");
-        schlecht.push.apply(schlecht, []);
-        const f = cs.webkitTextFillColor || cs.color;
-        const m = /rgba?\((\d+), *(\d+), *(\d+)/.exec(f);
-        if (m) {
-          const l = (+m[1] * 0.299 + +m[2] * 0.587 + +m[3] * 0.114) / 255;
-          if (l > 0.45) schlecht.push(e.className + " hell " + l.toFixed(2));
-        }
+        /* Verlaufsschrift (`background-clip:text`) hat eine TRANSPARENTE
+           Füllfarbe. Eine Helligkeitsmessung daran ergibt immer 0,00 und
+           läuft ins Leere — die alte Prüfung wäre an goldenem
+           Verlaufstext auf hellem Band stumm vorbeigelaufen, sobald
+           jemand die `.goldtext`-Klasse nicht benutzt, sondern den
+           Verlauf ausschreibt. Gemessen wird deshalb die erste Farbe des
+           Verlaufs. */
+        const verlauf = /text/.test(cs.webkitBackgroundClip || cs.backgroundClip);
+        const farbe = verlauf
+          ? (/(rgba?\([^)]+\))/.exec(cs.backgroundImage) || [])[1]
+          : (cs.webkitTextFillColor || cs.color);
+        const l = lum(farbe);
+        if (l === null) return;
+        if (dunklerGrund && l < 0.55)
+          schlecht.push(key + "/" + e.className + " zu dunkel " + l.toFixed(2));
+        if (!dunklerGrund && l > 0.45)
+          schlecht.push(key + "/" + e.className + " zu hell " + l.toFixed(2));
       });
+    });
     return schlecht;
-  });
-  pruef("Kein heller Text auf den hellen Bändern", bandtext.length === 0,
+  }, DUNKLE_BAENDER);
+  pruef("Bandschrift kontrastiert gegen ihren Bandgrund", bandtext.length === 0,
         bandtext.slice(0, 4).join(" | ") || "sauber");
 
   /* ---------- Bänder ---------- */
+  const titelband = await seite.evaluate(() => {
+    const h = document.querySelector(".view.active h2.title");
+    return h ? (h.getAttribute("data-band") || "") : "";
+  });
   const baender = await seite.evaluate(() =>
-    [...document.querySelectorAll(".secribbon")].slice(0, 4).map(r => {
-      const cs = getComputedStyle(r);
-      return {
-        quelle: cs.borderImageSource !== "none",
-        slice: cs.borderImageSlice,
-        enden: parseFloat((cs.borderImageWidth || "").split(" ").pop()) || 0
-      };
-    }));
+    [...document.querySelectorAll(".view.active .secribbon")]
+      .filter(r => r.getBoundingClientRect().width > 0)   // ausgeblendete zählen nicht
+      .map(r => {
+        const cs = getComputedStyle(r), b = r.getBoundingClientRect();
+        const ende = parseFloat((cs.borderImageWidth || "").split(" ").pop()) || 0;
+        const kinder = [...r.querySelectorAll(".srt,.srx")];
+        /* Luft zwischen Text und Zierende. NEGATIV heißt: der Text liegt
+           unter dem Zier — genau der Befund „der Zusatztext hängt halb im
+           Rand und ist schlecht lesbar". Gemessen waren es −11,0 px. */
+        const luft = kinder.map(e => {
+          const k = e.getBoundingClientRect();
+          return Math.min(k.left - b.left - ende, b.right - ende - k.right);
+        });
+        return {
+          quelle: cs.borderImageSource !== "none",
+          band: r.getAttribute("data-band") || "",
+          slice: cs.borderImageSlice,
+          enden: ende,
+          luft: luft.length ? +Math.min.apply(null, luft).toFixed(1) : null,
+          gekuerzt: kinder.some(e => e.scrollWidth > e.clientWidth + 0.5)
+        };
+      }));
   pruef("Sektionsbänder tragen ihre Grafik als border-image",
         baender.length > 0 && baender.every(b => b.quelle),
         baender.filter(b => b.quelle).length + "/" + baender.length);
@@ -182,6 +228,90 @@ function helligkeit(farbe) {
   pruef("Band-Enden nicht auf einen Strich gestaucht (≥ 20 px)",
         baender.length > 0 && baender.every(b => b.enden >= 20),
         baender.map(b => b.enden).join("/"));
+  /* NEU — hält den Befund „alle Bänder wie das oberste": eine Bandfamilie
+     pro Screen, und zwar die des Titels. Verglichen wird gegen den
+     TATSÄCHLICHEN Titel-Key, nicht gegen einen konstanten String — sonst
+     müsste man zwei Stellen ändern, wenn das Titelbanner mal wechselt. */
+  pruef("Sektionsbänder tragen dieselbe Grafik wie der Screen-Titel",
+        !!titelband && baender.length > 0 && baender.every(b => b.band === titelband),
+        titelband + " ← " + [...new Set(baender.map(b => b.band))].join(","));
+  pruef("Bandtext liegt im Polster, nicht im Zierende",
+        baender.length > 0 && baender.every(b => b.luft === null || b.luft >= 0),
+        "engste Stelle " +
+        Math.min.apply(null, baender.map(b => b.luft === null ? 999 : b.luft)).toFixed(1) + " px");
+  pruef("Kein Bandtext wird gekürzt",
+        baender.length > 0 && baender.every(b => !b.gekuerzt),
+        baender.filter(b => b.gekuerzt).length + " gekürzt");
+
+  /* ---------- Shop-Raster: Knöpfe auf einer Linie, kein leeres Feld ----------
+     Drei Ausprägungen DERSELBEN Bauart-Panne, alle am Telefon gesehen:
+       · der Arkan-Knopf stand 11,0 px höher als der Gold-Knopf, weil die
+         Beschreibung einzeilig statt zweizeilig ist;
+       · der Gratis-Knopf im Tagesangebots-Raster 4,1 px höher als sein
+         Nachbar, weil ein Knopf ohne Währungsicon niedriger baut;
+       · Gem- und Gold-Raster ließen je ein leeres Feld stehen, unter dem
+         eine Kachel quer lag (Gem-Tresor, Tagesgold).
+     Sie sind zusammen geprüft, weil sie zusammen entstehen: Inhalt
+     bestimmt Geometrie, statt dass Geometrie den Inhalt trägt. */
+  const raster = await seite.evaluate(() => {
+    /* Größter Höhenversatz der Preisknöpfe INNERHALB einer Rasterreihe.
+       Reihen werden über die Oberkante der Kachel gebildet — das ist
+       robuster als über den Index, weil `.wide`-Kacheln allein stehen. */
+    const reihen = (sel, knopf) => {
+      const nach = {};
+      [...document.querySelectorAll(sel)].forEach(e => {
+        const k = e.querySelector(knopf); if (!k) return;
+        const y = Math.round(e.getBoundingClientRect().top);
+        (nach[y] = nach[y] || []).push(k.getBoundingClientRect().bottom);
+      });
+      return Object.keys(nach).map(y => {
+        const v = nach[y];
+        return +(Math.max.apply(null, v) - Math.min.apply(null, v)).toFixed(1);
+      });
+    };
+    /* Zählt LEERE Rasterfelder. Ein bloßes `kinder % spalten` reicht
+       nicht: eine Kachel, die quer über alle Spalten liegt, verschiebt
+       die Rechnung und lässt genau die Lücke unsichtbar, um die es geht
+       (fünf Gem-Kacheln plus ein querer Tresor ergaben `6 % 2 = 0`, das
+       Loch stand trotzdem da). */
+    const rest = sel => {
+      const g = document.querySelector(sel); if (!g) return -1;
+      const sp = getComputedStyle(g).gridTemplateColumns.split(" ").length;
+      const gb = g.getBoundingClientRect().width;
+      let cursor = 0, loecher = 0;
+      [...g.children].forEach(c => {
+        const span = c.getBoundingClientRect().width > gb * 0.7 ? sp : 1;
+        if (cursor + span > sp) { loecher += sp - cursor; cursor = 0; }
+        cursor = (cursor + span) % sp;
+      });
+      if (cursor !== 0) loecher += sp - cursor;
+      return loecher;
+    };
+    return {
+      packs: reihen("#packShop .shopcard", ".sbuy"),
+      deals: reihen("#dealGrid .prodcard", ".pcbuy"),
+      gems:  reihen("#gemShop .prodcard", ".pcbuy"),
+      gold:  reihen("#goldShop .prodcard", ".pcbuy"),
+      packhoehen: [...document.querySelectorAll("#packShop .shopcard:not(.wide)")]
+        .map(e => +e.getBoundingClientRect().height.toFixed(1)),
+      restGem: rest("#gemShop"), restGold: rest("#goldShop"),
+      restPack: rest("#packShop"), restDeal: rest("#dealGrid")
+    };
+  });
+  const versatz = [].concat(raster.packs, raster.deals, raster.gems, raster.gold);
+  pruef("Preisknöpfe einer Rasterreihe sitzen auf einer Linie",
+        versatz.length > 0 && versatz.every(d => d <= 0.5),
+        "größter Versatz " + Math.max.apply(null, versatz).toFixed(1) + " px");
+  pruef("Alle vier Pack-Kacheln sind gleich hoch",
+        raster.packhoehen.length === 4 &&
+        Math.max.apply(null, raster.packhoehen) -
+        Math.min.apply(null, raster.packhoehen) <= 0.5,
+        raster.packhoehen.join("/"));
+  pruef("Kein Shop-Raster lässt ein leeres Feld stehen",
+        raster.restGem === 0 && raster.restGold === 0 &&
+        raster.restPack === 0 && raster.restDeal === 0,
+        "Gems " + raster.restGem + " · Gold " + raster.restGold +
+        " · Packs " + raster.restPack + " · Angebote " + raster.restDeal);
 
   /* ---------- Trophäenstraße ---------- */
   await go("navHome");
