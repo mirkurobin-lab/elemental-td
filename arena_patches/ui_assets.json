@@ -146,20 +146,22 @@
     "batch": 1
   },
   "banner_rarity": {
-    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095716_6936452c-84d2-4fc4-ba15-4fa77ef8e6bd.png",
+    "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/52569a9a-4930-4364-b84c-7d6e20bb0e27.png",
     "job": "6936452c-84d2-4fc4-ba15-4fa77ef8e6bd",
     "type": "banner",
-    "size": "1376x768",
+    "size": "998x322",
     "beschreibung": "Raritäts-Banner: Kristallband mit Flügelchen links/rechts, neutral-gold — per CSS-filter hue-rotate/sepia je Rarität tönbar.",
-    "batch": 1
+    "batch": 1,
+    "zuschnitt": "Auf das Band zugeschnitten. Original 1376x768, Band darin nur 998x322 — der Rest leere Leinwand. In einem flachen Streifen zeigte `cover` deshalb fast nur die Leinwand statt des Bandes."
   },
   "banner_title": {
-    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095720_71db8bf1-f9c9-4acd-9d17-8ce7462e384d.png",
+    "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/346f0446-686b-454e-a5af-0d81967dcde5.png",
     "job": "71db8bf1-f9c9-4acd-9d17-8ce7462e384d",
     "type": "banner",
-    "size": "1584x672",
+    "size": "1414x449",
     "beschreibung": "Breites Titel-/Wave-Banner, Goldfiligran mit Schnörkeln, leer. Für Screen-Titel und Wellen-Ankündigung.",
-    "batch": 1
+    "batch": 1,
+    "zuschnitt": "Auf das Band zugeschnitten. Original 1584x672, Band darin nur 1414x449 — der Rest leere Leinwand. In einem flachen Streifen zeigte `cover` deshalb fast nur die Leinwand statt des Bandes."
   },
   "pack_bronze": {
     "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095725_5c0984d9-f669-49ec-82f2-81817f8eab56.png",
@@ -1093,20 +1095,22 @@
     "beschreibung": "Produktkarten-Rahmen HELL-SILBER (Angebote/Neutral). Leere Mitte."
   },
   "ribbon_section_lg": {
-    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042730_8c38ed92-134a-440c-822d-e67c2d3f31d8.png",
+    "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/9e9d3522-24e2-45af-a9e2-4aa4d3360c66.png",
     "job": "8c38ed92-134a-440c-822d-e67c2d3f31d8",
     "type": "ribbon",
-    "size": "1200x672",
+    "size": "1224x275",
     "batch": 6,
-    "beschreibung": "Heller Sektions-Ribbon GROSS, nach Kit-Banner (WAVE-Stil): silber-blauer Kristall, Gold-Filigran. Für Sektionsüberschriften Shop/Views."
+    "beschreibung": "Heller Sektions-Ribbon GROSS, nach Kit-Banner (WAVE-Stil): silber-blauer Kristall, Gold-Filigran. Für Sektionsüberschriften Shop/Views.",
+    "zuschnitt": "Auf das Band zugeschnitten. Original 1376x768, Band darin nur 1224x275 — der Rest leere Leinwand. In einem flachen Streifen zeigte `cover` deshalb fast nur die Leinwand statt des Bandes."
   },
   "ribbon_section_sm": {
-    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042732_68de7abf-33da-4465-8401-bc11d353a8b3.png",
+    "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/f66ace74-e877-41be-ace5-087ab6ed7829.png",
     "job": "68de7abf-33da-4465-8401-bc11d353a8b3",
     "type": "ribbon",
-    "size": "1200x672",
+    "size": "1160x241",
     "batch": 6,
-    "beschreibung": "Heller Sektions-Ribbon SCHMAL, gleiche Familie. Für Zwischenüberschriften."
+    "beschreibung": "Heller Sektions-Ribbon SCHMAL, gleiche Familie. Für Zwischenüberschriften.",
+    "zuschnitt": "Auf das Band zugeschnitten. Original 1376x768, Band darin nur 1160x241 — der Rest leere Leinwand. In einem flachen Streifen zeigte `cover` deshalb fast nur die Leinwand statt des Bandes."
   },
   "nav_shop": {
     "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042736_4eff429b-94e3-4111-a941-b3f16335b644.png",
@@ -1411,5 +1415,41 @@
     "size": "1024x1024",
     "batch": 8,
     "beschreibung": "Teilen-Glyphe: ein dicker Pfeil nach rechts oben, cremeweiss mit Goldschimmer. Zweiter Knopf in der Endscreen-Fussleiste."
+  },
+  "ribbon_section_lg_v1": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042730_8c38ed92-134a-440c-822d-e67c2d3f31d8.png",
+    "job": "8c38ed92-134a-440c-822d-e67c2d3f31d8",
+    "type": "ribbon",
+    "size": "1376x768",
+    "batch": 6,
+    "beschreibung": "Heller Sektions-Ribbon GROSS, nach Kit-Banner (WAVE-Stil): silber-blauer Kristall, Gold-Filigran. Für Sektionsüberschriften Shop/Views.",
+    "ersetzt_durch": "ribbon_section_lg (v2, zugeschnitten)"
+  },
+  "ribbon_section_sm_v1": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042732_68de7abf-33da-4465-8401-bc11d353a8b3.png",
+    "job": "68de7abf-33da-4465-8401-bc11d353a8b3",
+    "type": "ribbon",
+    "size": "1376x768",
+    "batch": 6,
+    "beschreibung": "Heller Sektions-Ribbon SCHMAL, gleiche Familie. Für Zwischenüberschriften.",
+    "ersetzt_durch": "ribbon_section_sm (v2, zugeschnitten)"
+  },
+  "banner_rarity_v1": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095716_6936452c-84d2-4fc4-ba15-4fa77ef8e6bd.png",
+    "job": "6936452c-84d2-4fc4-ba15-4fa77ef8e6bd",
+    "type": "banner",
+    "size": "1376x768",
+    "beschreibung": "Raritäts-Banner: Kristallband mit Flügelchen links/rechts, neutral-gold — per CSS-filter hue-rotate/sepia je Rarität tönbar.",
+    "batch": 1,
+    "ersetzt_durch": "banner_rarity (v2, zugeschnitten)"
+  },
+  "banner_title_v1": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095720_71db8bf1-f9c9-4acd-9d17-8ce7462e384d.png",
+    "job": "71db8bf1-f9c9-4acd-9d17-8ce7462e384d",
+    "type": "banner",
+    "size": "1584x672",
+    "beschreibung": "Breites Titel-/Wave-Banner, Goldfiligran mit Schnörkeln, leer. Für Screen-Titel und Wellen-Ankündigung.",
+    "batch": 1,
+    "ersetzt_durch": "banner_title (v2, zugeschnitten)"
   }
 }

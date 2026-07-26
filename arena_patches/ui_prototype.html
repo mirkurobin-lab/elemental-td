@@ -1049,7 +1049,10 @@ span.ico{mix-blend-mode:normal;text-align:center}
  *     frame_card_orange  → Gems      frame_card_green → Gold
  *     frame_card_light   → Angebote / Material / neutral
  *
- * ⚠ AUFBAU: Die Rahmen-PNGs haben eine LEERE MITTE. Deshalb drei Ebenen:
+ * ⚠ AUFBAU: Die Rahmen-PNGs haben KEINE leere Mitte — gemessen sind alle
+ * elf Rahmendateien vollstaendig deckend (Alpha 255/255). Der Rahmen wird
+ * darum als 9-Slice gezeichnet (`border-image` ohne `fill`), was die Mitte
+ * der Grafik verwirft. Drei Ebenen:
  *     .pcart  (z 0)  das Produktbild, fuellt den Kartenkoerper
  *     .pcfrm  (z 2)  der Rahmen als eigenes Element DARUEBER
  *     Text/Button (z 3) sitzen ueber beidem.
@@ -1075,8 +1078,18 @@ span.ico{mix-blend-mode:normal;text-align:center}
 .prodcard .pcart span.prodimg{line-height:1}
 .prodcard.wide{flex-direction:row;align-items:center;gap:var(--gap);padding:var(--pad)}
 .prodcard.wide .pcart{width:23%;height:74px;margin:0;flex:0 0 23%}
+/* Wie .frm ein 9-Slice und aus demselben gemessenen Grund — siehe den
+   ausfuehrlichen Kommentar dort. Hier ist das Seitenverhaeltnis der
+   Kachel deutlich breiter als das der Quelle (0,75); genau dafuer ist
+   9-Slice gemacht: die Ecken behalten ihre Form, nur die Kanten ziehen
+   mit. Ein `cover`-Bild haette entweder verzerrt oder — weil deckend —
+   das Produktbild zugedeckt. Letzteres ist passiert. */
 .prodcard .pcfrm{position:absolute;inset:0;z-index:2;pointer-events:none;
-  background-repeat:no-repeat;background-position:center;background-size:cover}
+  border:1px solid transparent;background:none;
+  border-image-slice:18% 16% 20% 16%;
+  border-image-width:16% 14% 18% 14%;
+  border-image-repeat:stretch}
+.prodcard.wide .pcfrm{border-image-width:22% 8% 24% 8%}
 /* Rahmen-Fallback: faellt das PNG aus, traegt ein farbiger Rand den
    AA-Farbcode weiter — die Kachel bleibt lesbar und zugeordnet. */
 .prodcard.fr-orange{border-color:#f2a13d8f;box-shadow:inset 0 0 0 1px #f2a13d3d}
@@ -1131,9 +1144,15 @@ span.ico{mix-blend-mode:normal;text-align:center}
    Leiste. `cover` beschneidet statt zu verzerren. Die Farbplatte in der
    zweiten Ebene fuellt weiterhin die ganze Flaeche und bleibt die
    Textgrundlage.
-   Richtig geloest waere das mit 9-Slice (border-image) oder mit Grafiken,
-   die im Zielverhaeltnis erzeugt werden — steht als P3 im
-   DESIGNSYSTEM.md, mit den jetzt bekannten Zielverhaeltnissen. */
+   ------------------------------------------------------------------
+   `cover` allein reichte aber NICHT, und der Grund lag in der Grafik,
+   nicht im CSS: gemessen nahm das eigentliche Band nur die mittleren
+   35 % seiner Leinwand ein (1376x768 Datei, 1218x269 Band). In einem
+   34 px hohen Streifen schnitt `cover` also fast nur leere Leinwand
+   heraus — dieselbe Wirkung wie vorher, nur anders zustande gekommen.
+   Die Bandgrafiken sind darum nachgeschnitten (`_v2`, Verhaeltnis 4,45
+   statt 1,79); die Originale stehen als `_v1` daneben. Erst damit zeigt
+   `cover` tatsaechlich das Band. */
 .secribbon{position:relative;display:flex;align-items:center;justify-content:center;
   width:fit-content;max-width:100%;min-width:190px;margin-inline:auto;
   min-height:34px;margin-block:var(--gap-lg) var(--gap);padding:5px 30px;
@@ -2006,11 +2025,38 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 /* Bildflaeche einer Karte: fuellt die Kachel, der Rahmen liegt darueber. */
 .artbox{position:absolute;inset:2px;border-radius:6px;overflow:hidden;z-index:0;
   background:linear-gradient(160deg,#243342,#0e1418)}
-/* Rahmen-Overlay. BEWUSST ohne Gradient-Fallback: laedt das Rahmenbild
-   nicht, darf hier NICHTS gezeichnet werden — sonst deckt der Fallback
-   das Artwork zu. Die farbige Kachelkante traegt die Raritaet dann allein. */
+/* Rahmen-Overlay als 9-SLICE, nicht als Bildflaeche.
+   ------------------------------------------------------------------
+   Der Grund ist gemessen, nicht vermutet: ALLE elf generierten Rahmen-
+   und Plattendateien sind vollstaendig deckend — Alpha 255/255, 0,0 %
+   transparente Pixel. Beim orangen Kartenrahmen hat der Generator die
+   „transparente" Mitte sogar als Transparenz-Schachbrett hineingemalt
+   (44 % der Bildflaeche). Als Ebene UEBER dem Inhalt deckt so ein Bild
+   den Inhalt komplett zu — das war der Fehler „die Tower werden nicht
+   angezeigt" und „der Shop zeigt die Gems nicht".
+   `border-image` OHNE das Schluesselwort `fill` verwirft die Mitte der
+   Grafik vollstaendig: gezeichnet werden nur vier Kanten und vier Ecken.
+   Die gemalte Mitte kann damit nichts mehr zudecken, der Zierrand bleibt.
+   ------------------------------------------------------------------
+   Zwei verschiedene Prozentwerte, absichtlich:
+   • border-image-slice bezieht sich auf die QUELLE. 16 % / 18 % / 20 %
+     liegen genau an der gemessenen Innenkante des Ziers (links/rechts
+     15,7 %, oben 18,1 %, unten 20,0 % von 896x1200). Im Vergleichsrender
+     blutete 22 % als heller Streifen ein — der Schnitt lag dort schon in
+     der gemalten Mitte.
+   • border-image-width bezieht sich auf das ELEMENT. Dieselben Werte
+     halten den Zierrand proportional gleich gross, egal ob die Kachel
+     84 px oder 132 px breit ist — ohne eine einzige Groessenangabe in px.
+   `border-width:1px` haelt die Randbox am Leben; die Grafik darf darueber
+   hinaus nach innen zeichnen. Faellt das Bild aus, ist border-image-source
+   ungueltig und es bleibt ein transparenter 1-px-Rand: kein Fallback, der
+   das Artwork zudeckt. Die farbige Kachelkante traegt die Raritaet dann
+   allein. */
 .frm{position:absolute;inset:0;z-index:3;pointer-events:none;
-  background-repeat:no-repeat;background-position:center;background-size:cover}
+  border:1px solid transparent;background:none;
+  border-image-slice:18% 16% 20% 16%;
+  border-image-width:18% 16% 20% 16%;
+  border-image-repeat:stretch}
 .tile .artbox{font-size:22px}
 .deckslot .artbox{font-size:30px;inset:3px}
 .reqslot .artbox{font-size:24px;inset:3px}
@@ -3775,7 +3821,14 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
    * man den Gradient — der Prototyp bleibt voll funktionsfähig.
    * ================================================================== */
   var CDN = "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/";
-  // Audio liegt auf einem eigenen CDN-Pfad (CC0-Material, LIZENZEN.md).
+  /* Zweiter CDN-Pfad. Dort liegt das Audio (CC0-Material, LIZENZEN.md) und
+     dort liegen die NACHGESCHNITTENEN Bandgrafiken.
+     Warum nachgeschnitten: gemessen füllte das eigentliche Band nur die
+     mittleren 35 % seiner Leinwand — `ribbon_section_lg` ist 1376x768 groß,
+     das Band darin aber nur 1218x269 (Verhältnis 4,53 statt 1,79). In einem
+     34 px hohen Streifen zeigt `cover` deshalb fast nur die leere Leinwand:
+     genau der Befund „der Banner wird nicht aufgefüllt". Die `_v1`-Einträge
+     behalten die Originale, damit der Zuschnitt nachvollziehbar bleibt. */
   var CDNA = "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/";
   var ASSETS = {
     btn_primary:    CDN + "hf_20260725_094652_c3235d59-6aa8-4e7b-bf6e-8a86ae45e738.png",
@@ -3790,8 +3843,10 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     frame_epic:     CDN + "hf_20260725_095700_af4f1396-00ca-4392-baea-e034d09706d4.png",
     frame_legendary:CDN + "hf_20260725_095704_08f4478c-de30-4653-aecb-5c659d420821.png",
     frame_supreme:  CDN + "hf_20260725_095707_1878e9e4-ecb1-4eb1-89bc-6f1c60238b2f.png",
-    banner_rarity:  CDN + "hf_20260725_095716_6936452c-84d2-4fc4-ba15-4fa77ef8e6bd.png",
-    banner_title:   CDN + "hf_20260725_095720_71db8bf1-f9c9-4acd-9d17-8ce7462e384d.png",
+    banner_rarity:  CDNA + "52569a9a-4930-4364-b84c-7d6e20bb0e27.png",   // v2, zugeschnitten
+    banner_rarity_v1: CDN + "hf_20260725_095716_6936452c-84d2-4fc4-ba15-4fa77ef8e6bd.png",
+    banner_title:   CDNA + "346f0446-686b-454e-a5af-0d81967dcde5.png",   // v2, zugeschnitten
+    banner_title_v1: CDN + "hf_20260725_095720_71db8bf1-f9c9-4acd-9d17-8ce7462e384d.png",
     pack_bronze:    CDN + "hf_20260725_095725_5c0984d9-f669-49ec-82f2-81817f8eab56.png",
     pack_silver:    CDN + "hf_20260725_095727_a48313e3-3fb7-4156-b276-9622a9f313a6.png",
     pack_gold:      CDN + "hf_20260725_095735_28c01416-737f-414d-b8b6-0dd21a18e8a9.png",
@@ -3925,8 +3980,10 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     frame_card_orange:     CDN + "hf_20260726_042716_5bf79216-8800-472c-ab73-d9f93ea05991.png",
     frame_card_green:      CDN + "hf_20260726_042717_86ae6639-d698-4dfe-b5d0-6d042162c301.png",
     frame_card_light:      CDN + "hf_20260726_042727_98b627aa-e2fa-4869-a7db-4ddc1dff974a.png",
-    ribbon_section_lg:     CDN + "hf_20260726_042730_8c38ed92-134a-440c-822d-e67c2d3f31d8.png",
-    ribbon_section_sm:     CDN + "hf_20260726_042732_68de7abf-33da-4465-8401-bc11d353a8b3.png",
+    ribbon_section_lg:     CDNA + "9e9d3522-24e2-45af-a9e2-4aa4d3360c66.png",  // v2, zugeschnitten
+    ribbon_section_lg_v1:  CDN + "hf_20260726_042730_8c38ed92-134a-440c-822d-e67c2d3f31d8.png",
+    ribbon_section_sm:     CDNA + "f66ace74-e877-41be-ace5-087ab6ed7829.png",  // v2, zugeschnitten
+    ribbon_section_sm_v1:  CDN + "hf_20260726_042732_68de7abf-33da-4465-8401-bc11d353a8b3.png",
     nav_shop:              CDN + "hf_20260726_042736_4eff429b-94e3-4111-a941-b3f16335b644.png",
     nav_cards:             CDN + "hf_20260726_042737_832db618-1425-486d-b83e-0897328ccf85.png",
     nav_start:             CDN + "hf_20260726_042740_67eeb9a2-d790-432a-9781-6d80697b725c.png",
@@ -4053,7 +4110,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     if (!u) return emo;
     // onerror blendet das Bild aus; darunter liegt bereits das Emoji.
     return emo + '<img class="cart ' + (cls || "") + '" src="' + u + '" alt="' + emoji +
-      '" loading="lazy" decoding="async" loading="lazy" decoding="async" onerror="UIIcon.hide(this)">';
+      '" loading="lazy" decoding="async" onerror="UIIcon.hide(this)">';
   }
   /* CARD_LOOP — bewegte Fassung jeder Karte (Batch 5, 720x1280).
      attachLoop() haengt sie NACHTRAeGLICH an eine bereits gerenderte
@@ -4090,13 +4147,20 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     return '<span class="artbox ' + (cls || "") + '">' + cardArtHTML(id) + "</span>" +
       (tierKey ? '<span class="frm" data-frame="frame_' + tierKey + '"></span>' : "");
   }
-  /* Rahmen-Overlays aufloesen. Anders als layer() OHNE Gradient-Fallback:
-     ein Overlay, das bei fehlendem Bild einen Verlauf malt, wuerde das
-     Artwork darunter zudecken. */
+  /* Rahmen-Overlays aufloesen. Zwei Dinge sind hier anders als bei layer():
+     kein Gradient-Fallback (ein Overlay, das bei fehlendem Bild einen
+     Verlauf malt, wuerde das Artwork darunter zudecken) — und die Quelle
+     geht an `border-image-source`, NICHT an `background-image`.
+     Der Unterschied ist der ganze Fix: die Rahmen-PNGs sind gemessen
+     vollstaendig deckend (Alpha 255/255 bei allen elf Dateien), als
+     Bildflaeche decken sie den Inhalt also zu. Als border-image ohne
+     `fill` wird die Mitte der Grafik gar nicht gezeichnet. Schnitt und
+     Randbreite stehen im CSS bei `.frm`, damit sie pro Klasse anpassbar
+     bleiben. */
   function hydrateFrames(root) {
     Array.prototype.forEach.call((root || document).querySelectorAll("[data-frame]"), function (el) {
       var k = el.getAttribute("data-frame");
-      if (ASSETS[k]) el.style.backgroundImage = 'url("' + ASSETS[k] + '")';
+      if (ASSETS[k]) el.style.borderImageSource = 'url("' + ASSETS[k] + '")';
       el.removeAttribute("data-frame");
     });
   }
@@ -4112,7 +4176,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     var u = ASSETS[key];
     if (!u) return '<span class="ico ' + (cls || "") + '">' + emoji + "</span>";
     return '<img class="ico ' + (cls || "") + '" src="' + u + '" alt="' + emoji +
-      '" loading="lazy" decoding="async" loading="lazy" decoding="async" onerror="UIIcon.fail(this)">';
+      '" loading="lazy" decoding="async" onerror="UIIcon.fail(this)">';
   }
   // Platzhalter im Markup (<i data-ico="..." data-emoji="...">) aufloesen.
   function hydrateIcons(root) {
@@ -5606,7 +5670,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   function hydrateProdCards(root) {
     Array.prototype.forEach.call(root.querySelectorAll("[data-prodfrm]"), function (el) {
       var k = el.getAttribute("data-prodfrm");
-      if (k && ASSETS[k]) el.style.backgroundImage = 'url("' + ASSETS[k] + '")';
+      // border-image, nicht background-image — Begruendung bei .frm im CSS.
+      if (k && ASSETS[k]) el.style.borderImageSource = 'url("' + ASSETS[k] + '")';
     });
     sweepSoon(root);
   }
