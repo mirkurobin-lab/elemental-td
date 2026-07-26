@@ -1043,15 +1043,33 @@ span.ico{mix-blend-mode:normal;text-align:center}
 .mepod{position:relative;margin:0 auto var(--gap);max-width:340px;text-align:center}
 .mecrowns{display:flex;align-items:flex-end;justify-content:center;gap:6px;
   margin-bottom:-10px;position:relative;z-index:2}
+/* Kronen-Abzeichen: Sechseck-Sockel plus echtes Kronen-Artwork. Der
+   Sockel sagt „verdient oder nicht", nicht die Seite — welche Seite man
+   ansieht, sagt schon die Podestfarbe. Deshalb nur zwei Zustaende.
+   clip-path beschneidet auch box-shadow, der Schlagschatten laeuft
+   darum ueber filter:drop-shadow, das NACH dem Beschneiden greift. */
 .mecrown{width:38px;height:44px;display:flex;align-items:center;justify-content:center;
-  font-size:19px;font-weight:900;
   clip-path:polygon(50% 0,100% 26%,100% 74%,50% 100%,0 74%,0 26%);
-  box-shadow:0 3px 0 #0006}
-.mecrown.big{width:54px;height:62px;font-size:26px}
-.mecrown.blue{background:linear-gradient(180deg,#f4d97a,#c9a13a);color:#1c3f6e;
-  border:0}
-.mecrown.red{background:linear-gradient(180deg,#f4d97a,#c9a13a);color:#7e1f16}
-.mecrown.off{background:linear-gradient(180deg,#4a5560,#2b333c);color:#6d7883}
+  filter:drop-shadow(0 3px 2px #0009)}
+.mecrown.big{width:56px;height:64px}
+.mecrown.on{background:linear-gradient(180deg,#ffeaa0,#f4d97a 38%,#c9a13a)}
+.mecrown.off{background:linear-gradient(180deg,#5a6672,#3a444e 46%,#242c34)}
+.mecrown img{width:76%;height:76%;object-fit:contain;display:block}
+.mecrown.big img{width:78%;height:78%}
+/* Verdient: die Krone wird DUNKEL gerechnet. Das Artwork ist goldenes
+   Metall, und Gold auf goldenem Sockel verschwindet — im ersten Aufbau
+   lasen die gesperrten grauen Abzeichen besser als die verdienten. AA
+   loest es genauso: dunkle Krone auf goldenem Sechseck. Ein Lichtsaum
+   nach oben haelt die Silhouette vom Sockelrand getrennt. */
+.mecrown.on img{filter:brightness(.4) saturate(1.7) contrast(1.2)
+  drop-shadow(0 -1px 0 #fff6cf88)}
+/* Nicht verdient: dieselbe Krone, nur ausgegraut. Zwei Artworks fuer
+   denselben Gegenstand wuerden garantiert irgendwann auseinanderlaufen. */
+.mecrown.off img{filter:grayscale(1) brightness(.72) contrast(1.15)}
+/* Emoji-Rueckfall, wenn das CDN nicht antwortet. */
+.mecrown span{font-size:19px;font-weight:900;line-height:1;color:#7e5a12}
+.mecrown.big span{font-size:27px}
+.mecrown.off span{color:#6d7883}
 /* Der Sockel: gewoelbtes Kissen plus Wimpel, die links und rechts
    herauslaufen. Reines CSS — dafuer braucht es kein Asset. */
 .mebase{position:relative;border-radius:20px 20px 12px 12px;padding:16px 14px 12px;
@@ -3175,8 +3193,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     <div id="meBottom"></div>
     <div id="meRew"></div>
     <div class="mefoot">
-      <button class="mefbtn pressable" id="meStatsBtn" aria-label="Werte">📊</button>
-      <button class="mefbtn pressable" id="meShareBtn" aria-label="Teilen">↗</button>
+      <button class="mefbtn pressable" id="meStatsBtn" aria-label="Werte"></button>
+      <button class="mefbtn pressable" id="meShareBtn" aria-label="Teilen"></button>
       <span class="sp"></span>
       <button class="mefbtn em pressable" id="meEmoteBtn" aria-label="Emote"></button>
     </div>
@@ -3702,7 +3720,13 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
        ⚠ cur_gem und el_natur sind beide gruen. Unterscheidungsmerkmal
          ist die Ranke bei el_natur; die beiden duerfen nie direkt
          nebeneinander stehen (siehe ui_assets.json). */
-    cur_gold:              CDN + "hf_20260726_052849_03378697-c40c-40bc-a0fa-bf067fac65c0.png",
+    /* cur_gold_v2 ist der blasse Ziertaler aus Batch 7. Bei 20 px — der
+       Groesse, in der er in der Top-Bar und auf den Belohnungskarten
+       steht — war er ein beiger Punkt ohne Aussage, waehrend Pokal und
+       Kristall klar lasen. Ersetzt durch einen satten Muenzstapel; der
+       Key bleibt derselbe, damit alle Aufrufstellen mitumziehen. */
+    cur_gold_v2:           CDN + "hf_20260726_052849_03378697-c40c-40bc-a0fa-bf067fac65c0.png",
+    cur_gold:              CDN + "hf_20260726_104310_f2790c69-df09-41cb-bfcf-a2bfcc46979c.png",
     cur_gem:               CDN + "hf_20260726_052852_3ecd5982-c573-4d8e-a549-2e408758481a.png",
     cur_material:          CDN + "hf_20260726_052854_33cca747-1fb8-47e6-b3c0-a7273684bded.png",
     /* cur_trophy zeigt auf denselben Goldpokal wie ic_trophy: Der Key
@@ -3720,6 +3744,18 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     ic_speed:              CDN + "hf_20260726_052926_59ed62e7-2bb3-49ab-976a-4e0d29a5c1a6.png",
     ic_donate:             CDN + "hf_20260726_054429_a6875569-1c35-443a-8d54-ac80ccd048a4.png",
     ic_request:            CDN + "hf_20260726_052931_a1d94d5c-ee43-4d35-b8b5-8d1a9f88347b.png",
+    /* ---- Endscreen-Politur Batch 8 (3 Assets) ----
+       Die Kronen auf den Podesten waren Textzeichen (♛) in einem
+       Goldsechseck — bei einem Screen, der laut Vorlage „sauber und
+       poliert" wirken soll, die schwaechste Stelle. Ein Artwork fuer
+       BEIDE Zustaende: verdient = Goldsockel, offen = derselbe Sockel in
+       Stein und die Krone per CSS-Filter entsaettigt. Zwei getrennte
+       Artworks fuer denselben Gegenstand laufen garantiert irgendwann
+       auseinander.
+       ic_chart und ic_share lagen in der Fussleiste als Emoji. */
+    ic_crown:              CDN + "hf_20260726_104303_90a36532-4afb-4313-9bf2-4c7c052c275a.png",
+    ic_chart:              CDN + "hf_20260726_104318_99e89ba7-6862-42c2-8ebd-ba218330c9c6.png",
+    ic_share:              CDN + "hf_20260726_104326_6402593a-2a9d-447d-899a-0af123ddc15a.png",
     rank_bronze:           CDN + "hf_20260726_052942_8ef33f1b-1803-4c89-864d-bf3a1be8be4b.png",
     rank_silber:           CDN + "hf_20260726_052943_00925509-375f-43fe-a393-93f252637407.png",
     rank_gold:             CDN + "hf_20260726_052945_ee96b1b3-1d0c-426f-ab2f-3192f13259f5.png",
@@ -5559,9 +5595,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   function mePodium(side, mine, big) {
     var c = "";
     for (var i = 0; i < 3; i++) {
-      var on = i < side.crowns;
-      c += '<span class="mecrown ' + (on ? (mine ? "blue" : "red") : "off") +
-        (big && i === 1 ? " big" : "") + '">♛</span>';
+      c += '<span class="mecrown ' + (i < side.crowns ? "on" : "off") +
+        (big && i === 1 ? " big" : "") + '">' + ico("ic_crown", "👑") + "</span>";
     }
     var d = side.trophyDelta;
     var sub = "";
@@ -5806,6 +5841,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     renderMatchEndPodiums();
     renderMatchEndRewards();
     renderMatchEndResult();
+    $("meStatsBtn").innerHTML = ico("ic_chart", "📊");
+    $("meShareBtn").innerHTML = ico("ic_share", "↗");
     $("meEmoteBtn").innerHTML = ASSETS.emote_thanks
       ? '<img src="' + ASSETS.emote_thanks + '" alt="😊" onerror="UIIcon.fail(this)">'
       : "😊";
