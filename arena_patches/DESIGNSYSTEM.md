@@ -4,7 +4,7 @@ Eine Regel gilt, wenn sie **getestet** ist. Jeder Abschnitt hier nennt darum die
 Prüfung, die ihn hält. Regeln ohne Prüfung sind Absichtserklärungen und rutschen
 innerhalb weniger Wochen zurück.
 
-Suiten: `run_v5.js` (92), `run_v6.js` (273), `run_v7.js` (222) — zusammen **587
+Suiten: `run_v5.js` (92), `run_v6.js` (273), `run_v7.js` (223) — zusammen **588
 Checks**. Ausführen:
 `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers node run_vN.js`
 
@@ -25,14 +25,18 @@ Bausteine: `--lit` `--lit-2` `--unlit` `--ao` `--rim` `--sunk` `--sunk-2`.
 **Benutzt werden die fertigen Materialien, nicht die Bausteine.**
 
 Gemessen vor dem Durchgang trugen **89 %** der sichtbaren Fläche keine Tiefe,
-danach **12 %**. Das war der eigentliche Abstand zu AA — nicht Bewegung (AAs
+danach **5 %** (schwächste einzelne View: 16 %). Das war der eigentliche Abstand zu AA — nicht Bewegung (AAs
 Meta-UI ist praktisch statisch, `AA_UI_REFERENZ` §20.2) und nicht mehr die Icons.
 
-> **Geprüft:** „Höchstens 15 % der sichtbaren Fläche ohne Tiefe", plus vier
-> Checks auf die Token-Form. Der Flächen-Check läuft über 12 Views und fällt,
-> sobald jemand eine große Fläche ohne Material nachschiebt — er hat beim ersten
-> Anlauf `.lbrow` gefunden, mit 29 % die größte Fläche der App, die meine
-> Handmessung übersehen hatte.
+> **Geprüft:** zwei Kennzahlen — „Höchstens 15 % der sichtbaren Fläche ohne
+> Tiefe" **und** „Auch die schwächste einzelne View bleibt unter 25 %". Der
+> zweite Check ist der wichtigere: der Mittelwert stand bei 12 %, während die
+> **Startseite** — der Screen, den man beim Öffnen zuerst sieht — bei **64 %**
+> lag. Ein Durchschnitt ist kein Qualitätsversprechen.
+> Zusammen haben die beiden Checks vier Dinge aufgedeckt, die meine Handmessung
+> übersehen hatte: `.lbrow` (29 % der App-Fläche, Rangliste war beim Messen
+> nicht gerendert), dann die Startseite, dann Pack (100 %), Schmiede (36 %) und
+> Pass (25 %). Dazu vier Checks auf die Token-Form.
 
 **Warum einklassige Selektoren.** Der Material-Durchgang am Ende des `<style>`
 nutzt ausschließlich einklassige Regeln. Zustandsregeln sind zweiklassig

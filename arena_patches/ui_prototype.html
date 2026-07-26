@@ -2834,6 +2834,22 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .qbar,.artbox,.reqslot,.emotok,.castlestage,.mnb,.mmbar{box-shadow:var(--mat-well)}
 /* Der Fuellstand liegt IM Behaelter, also erhaben mit Oberkante. */
 .qfill,.mnb i,.mmbar i{box-shadow:var(--lit),var(--unlit)}
+/* --- STARTSEITE: der erste Screen war mit 64 % ohne Tiefe der
+   schwaechste von allen, und der Mittelwert ueber 12 Views hatte das
+   verdeckt. Wer die App oeffnet, sieht genau diese Flaechen zuerst. --- */
+.slotrow,.sidetile,.hubicon,.arenachip,.avatar,.avmini,.crestmini,
+.nb2{box-shadow:var(--mat-raised)}
+/* Der KAMPF-Knopf ist der wichtigste Knopf des Spiels und traegt die
+   kraeftige Fassung. */
+.battlebtn{box-shadow:var(--mat-raised-lg)}
+/* Fortschrittsleisten sind Behaelter, ihre Fuellung liegt darin. */
+.progbar,.pbb{box-shadow:var(--mat-well)}
+.progfill{box-shadow:var(--lit),var(--unlit)}
+/* --- Pack, Schmiede, Pass: die drei Views, die der Einzel-View-Check
+   nach der Startseite als naechste aufgedeckt hat (100 / 36 / 25 %). --- */
+.packbtn,.pity,.mini,.btn,.rico,.rget,.buypass,.pnum,
+.keyart{box-shadow:var(--mat-raised)}
+.reqpanel,.passbar,.pb{box-shadow:var(--mat-well)}
 /* --- Sektionsbanner: ohne Kante klebt ein Banner auf dem Hintergrund. */
 .secribbon{box-shadow:var(--lit-2),var(--unlit),var(--sh-2)}
 /* --- Eine Bewegungssprache fuer alles Anfassbare. --- */
