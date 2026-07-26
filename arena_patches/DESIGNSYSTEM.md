@@ -4,9 +4,13 @@ Eine Regel gilt, wenn sie **getestet** ist. Jeder Abschnitt hier nennt darum die
 Prüfung, die ihn hält. Regeln ohne Prüfung sind Absichtserklärungen und rutschen
 innerhalb weniger Wochen zurück.
 
-Suiten: `run_v5.js` (92), `run_v6.js` (273), `run_v7.js` (225) — zusammen **590
+Suiten: `run_v5.js` (93), `run_v6.js` (273), `run_v7.js` (240) — zusammen **606
 Checks**. Ausführen:
 `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers node run_vN.js`
+
+Dazu ein zweiter Prüfstand, `sicht.js`, der gegen die **Live-URL mit
+tatsächlich geladenen Bildern** misst. Warum das kein Luxus ist, steht in §7b —
+es ist die einzige Prüfung, die eine ganze Fehlerklasse überhaupt sehen kann.
 
 ---
 
@@ -147,6 +151,60 @@ Breite korrekt mitrechnet.
 sondern **9-Slice** (`border-image`) oder Grafiken, die im Zielverhältnis erzeugt
 werden. Die Tabelle oben nennt die benötigten Verhältnisse pro Element.
 
+## 6c. Fassungen und Bänder: 9-Slice, nicht Bildfläche
+
+**Alle elf generierten Rahmen- und Plattendateien sind vollständig deckend.**
+Gemessen: `Alpha min/max 255/255`, **0,0 %** transparente Pixel. Beim orangen
+Kartenrahmen hat der Generator die „transparente" Mitte sogar als
+Transparenz-Schachbrett hineingemalt — 44 % der Bildfläche.
+
+| | Datei | Alpha | transparent | Füllung beginnt |
+|---|---|---|---|---|
+| `frame_card_orange` | 896×1200 | 255/255 | 0,0 % | oben 18,1 % · unten 20,0 % · seitlich 15,7 % |
+| `frame_card_green` | 896×1200 | 255/255 | 0,0 % | — |
+| `frame_card_light` | 896×1200 | 255/255 | 0,0 % | — |
+| die sechs Raritätsrahmen | 848×1264 | 255/255 | 0,0 % | ~17–19 % |
+| `panel`, `progress_frame` | — | 255/255 | 0,0 % | ~8–11 % |
+
+Als Ebene **über** dem Inhalt deckt so eine Datei den Inhalt komplett zu. Das
+war der Fehler „die Tower werden nicht angezeigt" und „der Shop zeigt die Gems
+nicht an": `.frm` (z 3) und `.pcfrm` (z 2) lagen über Kartenartwork und
+Produktbild.
+
+**Die Regel:**
+
+| Rolle | Technik | `fill` |
+|---|---|---|
+| Rahmen über Inhalt | `border-image` | **nein** — die Mitte wird verworfen |
+| Band, Platte (Inhalt liegt darauf) | `border-image` | **ja** — die Mitte bleibt |
+| Kulisse, Diorama, Key-Art | `background-size:cover` | — |
+
+`border-image-slice` bezieht sich auf die **Quelle**, `border-image-width` auf
+das **Element**. Dieselben Prozentwerte in beiden halten den Zierrand
+proportional gleich groß, unabhängig von der Kachelgröße. Bei Bändern ist der
+Schnitt nur waagerecht (`0 22% fill`) und die Randbreite gleich der
+**Bandhöhe** — die Enden der Bandgrafik sind nahezu quadratisch.
+
+**Zweiter Befund, gleiche Klasse: die Bandgrafiken füllten ihre Leinwand nur zu
+35 %.** `ribbon_section_lg` ist 1376×768, das Band darin nur 1218×269
+(Verhältnis 4,53 statt 1,79). In einem 34 px hohen Streifen schnitt `cover`
+deshalb fast nur leere Leinwand heraus. Vier Grafiken sind auf ihr Band
+zugeschnitten; die Originale bleiben als `_v1` erhalten.
+
+**Die Folgefalle, die daraus entstand und die man kennen muss:** der Zuschnitt
+hat die dunkle Fallback-Platte durch das **echte, helle** Artwork ersetzt — und
+darauf stand Gold- bzw. heller `pale`-Verlaufstext. Das ist die Bugklasse aus
+§4, zum vierten Mal. Sie war unsichtbar, solange das CDN im Test nicht
+antwortete. **Lehre: die Textgrundlage darf nie davon abhängen, welches Artwork
+gerade lädt.** Beim Straßenknoten sitzt die Beschriftung darum auf einem eigenen
+dunklen Plättchen, nicht direkt auf der Plattform.
+
+> **Geprüft:** „Kartenrahmen sind nie eine deckende Bildfläche" über vier Views,
+> „Rahmen-Schnitt ohne `fill`", „Rahmen-Randbreite in Prozent", „Sektionsbänder
+> sind 9-Slice", „Bandschnitt mit `fill`", „Band-Enden nicht auf einen Strich
+> gestaucht (≥ 20 px)", „Kein heller Verlaufstext auf den hellen Bändern",
+> „Beschriftung sitzt auf eigenem dunklem Plättchen".
+
 ## 7. Auslieferung
 
 | | vorher | nachher |
@@ -166,12 +224,30 @@ App, bei uns geht jedes Byte über die Leitung.
 > **Geprüft:** „Jedes Bild trägt `loading=lazy`" und „… `decoding=async`" über
 > alle `<img>` — beim ersten Anlauf liefen 15 von 48 an den Helfern vorbei.
 
+## 7b. Die blinde Stelle der Suiten — und wie sie geschlossen ist
+
+**Die 590 lokalen Checks liefen vor und nach dem Rahmen-Fix grün.** Sie laufen
+ohne erreichbares CDN: jedes Icon fällt auf sein Emoji zurück, jedes
+Rahmen-Overlay bleibt leer. Damit ist die Fehlerklasse **„ein Asset deckt den
+Inhalt zu"** für sie *strukturell unsichtbar*. Kein Check hätte den Fehler
+finden können, den der Nutzer auf dem ersten Blick sah.
+
+Deshalb gibt es einen zweiten Prüfstand: `sicht.js` läuft in der Sandbox gegen
+die **Live-URL**, wartet bis `document.images` vollständig geladen sind und
+misst dann. Er hat die Bandgrafik-Befunde gefunden, die lokal nicht auffallen —
+und zwar sowohl den Zuschnitt-Fehler als auch den hellen Text darauf.
+
+**Regel:** eine Änderung an Rahmen, Platten, Bändern oder Textfarben auf
+Artwork ist erst geprüft, wenn sie **mit geladenen Bildern** angesehen wurde.
+Zwei Zustände genügen nicht — es sind drei: ohne Bild, mit Bild, bei
+CDN-Ausfall mitten im Laden.
+
 ## 8. Was noch offen ist
 
 | Paket | Inhalt | Stand |
 |---|---|---|
 | P2 | Zustandsmatrix je Knopfklasse: normal / pressed / disabled / loading / selected | `selected`, `loading`, `hover` gibt es **null** mal |
-| P3 | Fassungen als Assets: 9-Slice-Panel-Platte, Kartenrahmen je Rarität, Bannerplatte | offen — **Zielverhältnisse jetzt gemessen, siehe §6b** |
+| P3 | Fassungen als Assets: 9-Slice-Panel-Platte, Kartenrahmen je Rarität, Bannerplatte | **Kartenrahmen und Bänder erledigt** (§6c). Panel-Platte und `progress_frame` noch offen — beide brauchen erst einen Zuschnitt. |
 | P4 | Bewegungssprache: Overshoot, Squash, Hochzählen, Belohnungs-Choreografie | Tokens stehen, Choreografie fehlt |
 | — | Typo-Leiter: 40 Schriftgrößen auf 8 benannte Stufen | offen |
 | — | Radien: 31 auf 4 | offen |
