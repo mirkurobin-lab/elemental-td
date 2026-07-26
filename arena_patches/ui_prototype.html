@@ -660,6 +660,12 @@ footer{padding:6px 12px 14px;text-align:center}
   box-shadow:inset 0 0 0 2px #ffffff9e,0 3px 5px #0007}
 .utile .gem{position:absolute;left:-3px;top:-3px;width:15px;height:15px;
   transform:rotate(45deg);border-radius:3px;box-shadow:0 0 0 1.5px #fffc,0 1px 3px #000a}
+/* Element-Icon in der Freischalt-Kachel. Die Kachel ist HELL, das Icon
+   deshalb mit dunklem Schlagschatten abgesetzt — sonst verschwindet der
+   helle Kristall im hellen Verlauf. */
+.utile img.utileimg{width:78%;height:78%;object-fit:contain;
+  filter:drop-shadow(0 1px 2px #0009)}
+.utile span.utileimg{font-size:23px}
 .objcard{width:100%;max-width:330px;margin-top:9px;border-radius:11px;
   display:flex;align-items:center;gap:9px;padding:9px 11px;position:relative;overflow:hidden;
   border:2px solid #f2a13d;background:linear-gradient(100deg,#3a2a56,#6b4a2a 60%,#2c3b22)}
@@ -1797,6 +1803,74 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .sendnote{margin-top:10px;font-size:10px;color:var(--dim);line-height:1.55;
   border-left:2px solid #f2a13d66;padding-left:8px}
 .sendnote b{color:var(--gold)}
+
+/* ==================================================================
+ * SENDE-ZEREMONIE (AA_UI_REFERENZ §20.5)
+ * ------------------------------------------------------------------
+ * Der Moment, in dem man einem Clankameraden hilft, war vorher nur ein
+ * Toast. Er ist aber der emotionale Kern des Clans, also bekommt er die
+ * Behandlung, die AA seinen Belohnungsmomenten gibt: etwas fliegt,
+ * etwas schlaegt ein, Zahlen steigen auf.
+ *
+ * Alles laeuft ueber position:fixed und wird nach der Animation aus dem
+ * DOM entfernt — kein Layout-Einfluss, keine Reflow-Kosten in der Liste.
+ * pointer-events:none, damit die Zeremonie keinen Klick abfaengt.
+ * ================================================================== */
+.flycard{position:fixed;z-index:120;width:40px;aspect-ratio:3/4;border-radius:7px;
+  border:2px solid #7ad14f;background:var(--panel2);pointer-events:none;
+  background-repeat:no-repeat;background-position:center;background-size:100% 100%;
+  box-shadow:0 0 14px #7ad14f88;
+  animation:flyto var(--fly-ms,520ms) cubic-bezier(.34,.72,.36,1) forwards}
+@keyframes flyto{
+  0%   {transform:translate(0,0) scale(1) rotate(0deg);opacity:1}
+  70%  {opacity:1}
+  100% {transform:translate(var(--dx),var(--dy)) scale(.42) rotate(14deg);opacity:.2}
+}
+/* Einschlag: ein kurzer gruener Ring auf der Zielzeile. */
+.reqrow.hitflash{animation:reqflash 620ms ease-out}
+@keyframes reqflash{
+  0%   {box-shadow:0 0 0 0 #7ad14f00}
+  22%  {box-shadow:0 0 16px 2px #7ad14fcc;border-color:#7ad14f}
+  100% {box-shadow:0 0 0 0 #7ad14f00}
+}
+/* Aufsteigende Belohnungszahlen. */
+.floatrew{position:fixed;z-index:121;pointer-events:none;font-size:12.5px;font-weight:900;
+  display:flex;align-items:center;gap:4px;text-shadow:0 2px 4px #000c;
+  animation:rewrise 1000ms ease-out forwards}
+.floatrew img{width:15px;height:15px;object-fit:contain}
+.floatrew.gold{color:#ffd76b}
+.floatrew.mat{color:#c39bff}
+@keyframes rewrise{
+  0%   {transform:translateY(0) scale(.8);opacity:0}
+  18%  {transform:translateY(-8px) scale(1.06);opacity:1}
+  100% {transform:translateY(-42px) scale(1);opacity:0}
+}
+/* Der Kontingent-Punkt, der gerade verbraucht wurde, blitzt einmal auf —
+   so wird die 10-pro-3-Stunden-Regel begreifbar statt nur gezaehlt. */
+.quotabar .qd.justused{animation:qdpop 520ms ease-out}
+@keyframes qdpop{
+  0%   {transform:scaleY(1);   box-shadow:0 0 0 0 #f2c53d00}
+  30%  {transform:scaleY(1.5); box-shadow:0 0 8px 2px #f2c53dcc}
+  100% {transform:scaleY(1);   box-shadow:0 0 0 0 #f2c53d00}
+}
+/* „Anfrage erfuellt!" — eigene Bestaetigung, wenn die Spende die Zeile
+   voll macht. Ohne das faellt der wichtigste Ausgang unter den Tisch. */
+.reqdone{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  z-index:122;padding:7px 14px;border-radius:11px;font-size:12px;font-weight:900;
+  letter-spacing:.05em;white-space:nowrap;pointer-events:none;
+  background:linear-gradient(180deg,#7ad14f,#3d8f22);color:#06230a;
+  box-shadow:0 4px 14px #000a,inset 0 0 0 1.5px #ffffff66;
+  animation:donepop 1400ms ease-out forwards}
+@keyframes donepop{
+  0%   {transform:translate(-50%,-50%) scale(.6);opacity:0}
+  16%  {transform:translate(-50%,-50%) scale(1.08);opacity:1}
+  28%  {transform:translate(-50%,-50%) scale(1);opacity:1}
+  78%  {opacity:1}
+  100% {transform:translate(-50%,-64%) scale(1);opacity:0}
+}
+/* Spenden-Knopf mit Icon: das Icon sitzt links vom Wort. */
+.donbtn img{width:14px;height:14px;object-fit:contain;vertical-align:-2px;margin-right:4px}
+.askbtn img{width:16px;height:16px;object-fit:contain;vertical-align:-3px;margin-right:5px}
 /* Karten-Wahl im Anfrage-Dialog */
 .pickgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
 .picktile{position:relative;border-radius:10px;border:2px solid #9aa3ad;padding:8px 4px;
@@ -1840,7 +1914,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .ghostrow.hit{opacity:.5}
 .ghostrow .gav{flex:0 0 34px;width:34px;height:34px;border-radius:9px;display:flex;
   align-items:center;justify-content:center;font-size:16px;background:#0b1116;
-  border:1px solid #2b3b47}
+  border:1px solid #2b3b47;overflow:hidden}
+.ghostrow .gav img.gavimg{width:100%;height:100%;object-fit:contain}
 .ghostrow .gtx{flex:1;min-width:0}
 .ghostrow .gnm{font-size:11.5px;font-weight:800;white-space:nowrap;overflow:hidden;
   text-overflow:ellipsis}
@@ -2904,9 +2979,14 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     arena6:         CDN + "hf_20260725_095815_26d38ce0-2889-4351-8b4c-ac50183d32ea.png",
     /* ---- Asset-Batch 2 (Icons, Strassen-Elemente, Teaser-Artworks,
        Leiter-Ergaenzung, Kleinkram) — siehe ui_assets.json ---- */
-    cur_trophy:      CDN + "hf_20260725_132705_cc44c539-2646-40d1-b0ff-6b81510c0307.png",
-    cur_gem:         CDN + "hf_20260725_132708_f9dde68c-0307-479c-ad15-ca6f547df349.png",
-    cur_gold:        CDN + "hf_20260725_132711_78da253c-5269-46c7-9d6a-eb30eb27bb56.png",
+    /* Die drei Waehrungs-Icons aus Batch 2 sind durch Batch 7 ERSETZT —
+       sie standen als silber-weisse Kristallformen zu nah an der uebrigen
+       Bildsprache und verschwammen bei 20 px. Die Keys bleiben unter
+       *_v1 registriert, damit die Job-Historie nachvollziehbar ist; die
+       gueltigen Definitionen stehen weiter unten in Batch 7. */
+    cur_trophy_v1:   CDN + "hf_20260725_132705_cc44c539-2646-40d1-b0ff-6b81510c0307.png",
+    cur_gem_v1:      CDN + "hf_20260725_132708_f9dde68c-0307-479c-ad15-ca6f547df349.png",
+    cur_gold_v1:     CDN + "hf_20260725_132711_78da253c-5269-46c7-9d6a-eb30eb27bb56.png",
     ess_attack:      CDN + "hf_20260725_132812_0dd1e9db-ca2f-4d32-9132-8de9d1d1e9f6.png",
     ess_speed:       CDN + "hf_20260725_132813_d75a56de-91cb-4f9a-a716-59ef4d75a649.png",
     ess_special:     CDN + "hf_20260725_132814_976ad394-6e0a-4f76-943e-298eebf93410.png",
@@ -3039,6 +3119,36 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     ic_hourglass:          CDN + "hf_20260726_042820_1e88ee2a-8d71-4f76-b884-0f814ab9f57e.png",
     ic_plus:               CDN + "hf_20260726_043121_14d3e7f4-4aa6-4a17-b5e8-68ff66b6d7e1.png",
     ic_gift:               CDN + "hf_20260726_043123_c176ec0e-f156-4ef4-8af1-a11d0878a39f.png",
+    /* ---- AAA-Icon-Sweep Batch 7 (18 Assets) ----
+       Die Luecken aus der Emoji-Zaehlung in AA_UI_REFERENZ.md §20.4.
+       Zuerst die beiden WAEHRUNGEN — sie stehen in der Top-Bar und an
+       jedem Preis, also auf praktisch jedem Screen. Dann die sechs
+       ELEMENTE, die Trophaee (haeufigstes Icon der UI) und die
+       Liga-Medaillen.
+       ⚠ cur_gem und el_natur sind beide gruen. Unterscheidungsmerkmal
+         ist die Ranke bei el_natur; die beiden duerfen nie direkt
+         nebeneinander stehen (siehe ui_assets.json). */
+    cur_gold:              CDN + "hf_20260726_052849_03378697-c40c-40bc-a0fa-bf067fac65c0.png",
+    cur_gem:               CDN + "hf_20260726_052852_3ecd5982-c573-4d8e-a549-2e408758481a.png",
+    cur_material:          CDN + "hf_20260726_052854_33cca747-1fb8-47e6-b3c0-a7273684bded.png",
+    /* cur_trophy zeigt auf denselben Goldpokal wie ic_trophy: Der Key
+       steckt an 33 Aufrufstellen, der Alias zieht sie alle mit um. */
+    ic_trophy:             CDN + "hf_20260726_052859_9bd75b52-3056-4a40-91fd-9591adcdfe5d.png",
+    cur_trophy:            CDN + "hf_20260726_052859_9bd75b52-3056-4a40-91fd-9591adcdfe5d.png",
+    el_feuer:              CDN + "hf_20260726_052900_8e4d3b7c-b3d9-47b8-8d9d-3a1f867a2832.png",
+    el_wasser:             CDN + "hf_20260726_052906_ecc26734-3e67-4f82-8045-eca084387316.png",
+    el_erde:               CDN + "hf_20260726_052908_20f9637e-9ee6-429a-a89f-299d3fa5c1eb.png",
+    el_natur:              CDN + "hf_20260726_052910_d0e69f59-eb8d-4439-be80-ecf5593633e5.png",
+    el_licht:              CDN + "hf_20260726_052912_37863c64-eac8-4c9f-9ba3-c103f6fea92e.png",
+    el_dunkelheit:         CDN + "hf_20260726_052914_a2e7eacb-a8a4-4e5c-8a2c-eac576f5a690.png",
+    ic_lock:               CDN + "hf_20260726_052921_6a87019c-7525-40bf-b59f-6c974340fe53.png",
+    ic_shield:             CDN + "hf_20260726_052923_a55b0fb2-590a-4c0f-9b17-04e8c6a55076.png",
+    ic_speed:              CDN + "hf_20260726_052926_59ed62e7-2bb3-49ab-976a-4e0d29a5c1a6.png",
+    ic_donate:             CDN + "hf_20260726_054429_a6875569-1c35-443a-8d54-ac80ccd048a4.png",
+    ic_request:            CDN + "hf_20260726_052931_a1d94d5c-ee43-4d35-b8b5-8d1a9f88347b.png",
+    rank_bronze:           CDN + "hf_20260726_052942_8ef33f1b-1803-4c89-864d-bf3a1be8be4b.png",
+    rank_silber:           CDN + "hf_20260726_052943_00925509-375f-43fe-a393-93f252637407.png",
+    rank_gold:             CDN + "hf_20260726_052945_ee96b1b3-1d0c-426f-ab2f-3192f13259f5.png",
     /* ---- Festungs-Layout Variante 2 „Banner-Stapel" (Batch 3) ---- */
     fort_banner_track: CDN + "hf_20260725_150531_224eab67-a74f-40dd-a293-3caf809eb8b9.png",
     fort_pip_full:     CDN + "hf_20260725_150534_85413c44-d6fc-41ea-a6ee-2b0589f1d5f7.png",
@@ -3177,6 +3287,16 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       el.innerHTML = ico("ic_plus", "+", "plusimg");
       el.setAttribute("data-plusdone", "1");
     });
+  }
+  /* elIco(elementSchluessel, ersatzEmoji) — Element-Icon aus Batch 7.
+     Eine Stelle, an der die sechs Elemente auf ihre Assets abgebildet
+     werden; alles andere ruft nur noch hier durch. */
+  var EL_ICON = {
+    fire: "el_feuer", water: "el_wasser", nature: "el_natur",
+    earth: "el_erde", light: "el_licht", darkness: "el_dunkelheit",
+  };
+  function elIco(el, emoji, cls) {
+    return ico(EL_ICON[el] || "", emoji || "◆", cls);
   }
   /* secribbon(titel, extra, klein) — Sektions-Trenner im hellen
      Kit-Banner-Stil. Das Ribbon ist HELL, der Text deshalb DUNKEL —
@@ -3402,16 +3522,27 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
    * ================================================================== */
   var ROAD_TOP = 9800;
   function stepAt(t) { return t < 1500 ? 50 : (t < 5000 ? 100 : 200); }
+  /* Freischalt-Vorschau je Arena. Drittes Feld ist der ELEMENT-Schluessel:
+     Damit bekommt jede Kachel ein echtes Element-Icon aus Batch 7 statt
+     eines Emojis, ohne dass fuer die 38 Kacheln 38 eigene Assets
+     gebraucht werden. Das Emoji bleibt als Fallback im alt-Attribut. */
   var UNLOCKS = {
-    1: [["🔥", "#ff6b3d"], ["❄", "#3dc8ff"], ["🌿", "#46c46a"], ["🪨", "#e0a43c"],
-        ["☀", "#ffe36b"], ["🌑", "#9b6bff"]],
-    2: [["💥", "#ff6b3d"], ["🧊", "#3dc8ff"], ["🌾", "#46c46a"], ["⛰", "#e0a43c"], ["✨", "#ffd23d"]],
-    3: [["🌋", "#ff4d2d"], ["🌀", "#3dc8ff"], ["🍃", "#46c46a"], ["💎", "#e0a43c"]],
-    4: [["⚡", "#ffe36b"], ["🕸", "#9b6bff"], ["🔮", "#a45ef2"], ["🗡", "#ffd23d"]],
-    5: [["☄", "#ff6b3d"], ["🌫", "#3dc8ff"], ["🕯", "#9b6bff"], ["⚔", "#e0a43c"]],
-    6: [["🌈", "#a45ef2"], ["👁", "#ff5e7e"], ["🔥", "#ffd23d"], ["💧", "#3dc8ff"]],
-    7: [["🌪", "#e0a43c"], ["🪶", "#9b6bff"], ["🕳", "#ff6b3d"], ["🏵", "#46c46a"]],
-    8: [["☃", "#3dc8ff"], ["🗿", "#9aa3ad"], ["🧊", "#3d9df2"], ["🔱", "#a45ef2"]],
+    1: [["🔥", "#ff6b3d", "fire"], ["❄", "#3dc8ff", "water"], ["🌿", "#46c46a", "nature"],
+        ["🪨", "#e0a43c", "earth"], ["☀", "#ffe36b", "light"], ["🌑", "#9b6bff", "darkness"]],
+    2: [["💥", "#ff6b3d", "fire"], ["🧊", "#3dc8ff", "water"], ["🌾", "#46c46a", "nature"],
+        ["⛰", "#e0a43c", "earth"], ["✨", "#ffd23d", "light"]],
+    3: [["🌋", "#ff4d2d", "fire"], ["🌀", "#3dc8ff", "water"], ["🍃", "#46c46a", "nature"],
+        ["💎", "#e0a43c", "earth"]],
+    4: [["⚡", "#ffe36b", "light"], ["🕸", "#9b6bff", "darkness"], ["🔮", "#a45ef2", "darkness"],
+        ["🗡", "#ffd23d", "light"]],
+    5: [["☄", "#ff6b3d", "fire"], ["🌫", "#3dc8ff", "water"], ["🕯", "#9b6bff", "darkness"],
+        ["⚔", "#e0a43c", "earth"]],
+    6: [["🌈", "#a45ef2", "darkness"], ["👁", "#ff5e7e", "darkness"], ["🔥", "#ffd23d", "fire"],
+        ["💧", "#3dc8ff", "water"]],
+    7: [["🌪", "#e0a43c", "earth"], ["🪶", "#9b6bff", "darkness"], ["🕳", "#ff6b3d", "fire"],
+        ["🏵", "#46c46a", "nature"]],
+    8: [["☃", "#3dc8ff", "water"], ["🗿", "#9aa3ad", "earth"], ["🧊", "#3d9df2", "water"],
+        ["🔱", "#a45ef2", "darkness"]],
   };
   /* (i)-Teaser: Kategorie · Name · Artwork-Asset · Emoji-Fallback ·
      Beschreibungstext (ein Satz, deutsch — erscheint im (i)-Dialog). */
@@ -3707,7 +3838,10 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       " — für diesen Turm nicht verwendbar";
     var chk = AC.canLevelUp(curId, gold());
     var up = $("btnUpgrade");
-    $("dUpCost").textContent = v.atCap ? "Merge nötig" : "🪙 " + fmt(v.needGold);
+    // innerHTML, nicht textContent: ico() liefert ein <img>, sobald das
+    // Waehrungs-Asset da ist — mit textContent stuende das Markup als Text.
+    $("dUpCost").innerHTML = v.atCap ? "Merge nötig"
+      : ico("cur_gold", "🪙") + " " + fmt(v.needGold);
     up.disabled = !chk.ok;
     up.firstChild.nodeValue = v.atCap ? "CAP ERREICHT" : "UPGRADE";
     renderTop();
@@ -3835,7 +3969,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
         "</s> → <em>" + to.cap + "</em></span></div>" +
       '<div class="row2"><span class="k2">Stufe</span><span class="v2"><s>' + from.name +
         "</s> → <em>" + to.name + "</em></span></div>" +
-      '<div class="row2"><span class="k2">Kosten</span><span class="v2"><em>0 🪙</em> + 3 Kopien</span></div>';
+      '<div class="row2"><span class="k2">Kosten</span><span class="v2"><em>0 ' +
+        ico("cur_gold", "🪙") + "</em> + 3 Kopien</span></div>";
     $("cerBtn").textContent = "Weiter";
     box.classList.add("open");
     // Level zählt von 1 auf den echten Wert hoch — genau das zeigt AA
@@ -4005,7 +4140,9 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
         '<span class="pc3d">' +
           '<span class="pcside pcback" style="background-image:url(&quot;' + back +
             '&quot;),radial-gradient(circle at 50% 42%,#3b2a5e,#141b26 68%)">' +
-            '<span class="bk">' + (s.kind === "card" ? "✦" : s.kind === "mat" ? "⚗" : "🪙") + "</span></span>" +
+            '<span class="bk">' + (s.kind === "card" ? "✦"
+              : s.kind === "mat" ? ico("cur_material", "⚗")
+              : ico("cur_gold", "🪙")) + "</span></span>" +
           '<span class="pcside pcfront" style="border-color:' + color +
             ";box-shadow:inset 0 0 14px -4px " + color + '88">' + face + "</span>" +
         "</span></button>";
@@ -4309,7 +4446,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   function arenaSectionHtml(a, troph) {
     var locked = troph < a.at;
     var un = (UNLOCKS[a.n] || []).map(function (u) {
-      return '<div class="utile">' + u[0] +
+      return '<div class="utile">' + elIco(u[2], u[0], "utileimg") +
         '<span class="gem" style="background:' + u[1] + '"></span></div>';
     }).join("");
     var te = (TEASERS[a.n] || []).map(function (x) {
@@ -5217,8 +5354,9 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
         '<span class="cart">' + s.sym + "</span>" +
         '<div class="cnm2">' + s.name.replace("-Clantruhe", "") + "</div>" +
         '<div class="cat">ab ' + Math.round(s.at * 100) + " %</div>" +
-        '<div class="cin">' + s.pack.toUpperCase() + "-Pack<br>" + fmt(s.gold) + " 🪙 · " +
-          s.material + " ⚗</div></div>";
+        '<div class="cin">' + s.pack.toUpperCase() + "-Pack<br>" + fmt(s.gold) + " " +
+          ico("cur_gold", "🪙") + " · " + s.material + " " +
+          ico("cur_material", "⚗") + "</div></div>";
     }).join("") + "</div>";
 
     var btnTxt, dis = "";
@@ -5255,12 +5393,15 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   }
 
   /* ---------- Tab 2: Spenden ---------- */
-  function renderClanDonate() {
+  function renderClanDonate(justSent) {
     var CL = CLof(); if (!CL) return;
     var q = CL.sendQuota(), reqs = CL.requests();
     var dots = "";
     for (var i = 0; i < CL.SEND_MAX; i++) {
-      dots += '<span class="qd' + (i < q.used ? " on" : "") + '"></span>';
+      // Der letzte gesetzte Punkt ist der gerade verbrauchte.
+      var used = i < q.used;
+      dots += '<span class="qd' + (used ? " on" : "") +
+        (justSent && used && i === q.used - 1 ? " justused" : "") + '"></span>';
     }
     var html = '<div class="quotabar"><span>Sendekontingent</span>' +
       "<b>" + q.used + "/" + q.max + "</b>" +
@@ -5273,7 +5414,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       var btn = r.mine
         ? '<span class="gotpts">' + (r.closed ? "erfüllt" : "deine Anfrage") + "</span>"
         : '<button class="donbtn pressable' + (can ? "" : " is-disabled") +
-          '" data-donate="' + r.id + '">' + (r.closed ? "voll" : "SPENDEN") + "</button>";
+          '" data-donate="' + r.id + '">' +
+          (r.closed ? "voll" : ico("ic_donate", "🤲") + "SPENDEN") + "</button>";
       return '<div class="reqrow tinted edge' + (r.mine ? " mine" : "") +
         (r.closed ? " full" : "") + '" data-req="' + r.id +
         '" style="' + tintStyle(r.cardId) + '">' +
@@ -5291,7 +5433,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     var hasMine = reqs.some(function (r) { return r.mine && !r.closed; });
     html += '<button class="askbtn pressable" id="btnAskCards"' +
       (hasMine ? " disabled" : "") + ">" +
-      (hasMine ? "Du hast bereits eine offene Anfrage" : "📥 Karten anfragen") + "</button>";
+      (hasMine ? "Du hast bereits eine offene Anfrage"
+               : ico("ic_request", "📥") + "Karten anfragen") + "</button>";
     html += '<div class="sendnote">Es dürfen <b>nur Turmkarten</b> und <b>nur graue ' +
       "Basis-Kopien</b> versendet werden — keine Helden, kein Material, kein Gold. " +
       "<b>10 Karten pro 3 Stunden</b> (rollierendes Fenster). " +
@@ -5308,6 +5451,65 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     if (ab) ab.addEventListener("click", openReqDlg);
     markPressable($("paneDonate"));
   }
+  /* ------------------------------------------------------------------
+   * Sende-Zeremonie. Reine Praesentation — sie liest den Zustand VOR
+   * dem Neu-Rendern aus, weil renderClan() die Zielzeile ersetzt.
+   *
+   * Ablauf: Karte fliegt vom Spenden-Knopf zur Kartenminiatur der
+   * Anfrage, Zeile blitzt auf, Gold und Material steigen auf, bei
+   * Erfuellung zusaetzlich die Bestaetigung. Danach erst wird neu
+   * gerendert, damit der Flug nicht mitten im Lauf wegge-rendert wird.
+   * ------------------------------------------------------------------ */
+  function sendCeremony(reqId, from, to, cardId, reward, closed) {
+    if (!from || !to) return;
+    var fly = document.createElement("div");
+    fly.className = "flycard";
+    fly.style.left = from.left + from.width / 2 - 20 + "px";
+    fly.style.top = from.top + from.height / 2 - 27 + "px";
+    fly.style.setProperty("--dx", (to.left + to.width / 2 - (from.left + from.width / 2)) + "px");
+    fly.style.setProperty("--dy", (to.top + to.height / 2 - (from.top + from.height / 2)) + "px");
+    var art = ASSETS["card_" + cardId];
+    if (art) fly.style.backgroundImage = 'url("' + art + '")';
+    document.body.appendChild(fly);
+
+    setTimeout(function () {
+      if (fly.parentNode) fly.parentNode.removeChild(fly);
+      // Belohnungen steigen aus der Einschlagstelle auf, leicht versetzt.
+      // Sie haengen an FESTEN Koordinaten, nicht an der Zeile — deshalb
+      // stoert es nicht, dass die Liste zwischenzeitlich neu gerendert
+      // wurde.
+      floatReward(to, "gold", "+" + fmt(reward.gold), 0);
+      floatReward(to, "mat", "+" + reward.material, 150);
+      // Die Zeile ist nach dem Neu-Rendern ein ANDERES Element — deshalb
+      // hier frisch suchen. Ist sie weg (Liste umsortiert), entfaellt
+      // nur das Aufblitzen, die Zahlen steigen trotzdem.
+      var live = $("paneDonate") &&
+        $("paneDonate").querySelector('[data-req="' + reqId + '"]');
+      if (!live) return;
+      live.classList.add("hitflash");
+      if (closed) {
+        var d = document.createElement("div");
+        d.className = "reqdone";
+        d.textContent = "ANFRAGE ERFÜLLT!";
+        live.style.position = "relative";
+        live.appendChild(d);
+        UISfx.reward();
+      }
+    }, 520);
+  }
+  function floatReward(rect, kind, text, delay) {
+    setTimeout(function () {
+      var f = document.createElement("div");
+      f.className = "floatrew " + kind;
+      f.innerHTML = ico(kind === "gold" ? "cur_gold" : "cur_material",
+                        kind === "gold" ? "🪙" : "⚗") + "<span>" + text + "</span>";
+      f.style.left = rect.left + rect.width / 2 - 18 + "px";
+      f.style.top = rect.top + "px";
+      document.body.appendChild(f);
+      setTimeout(function () { if (f.parentNode) f.parentNode.removeChild(f); }, 1050);
+    }, delay);
+  }
+
   function doDonate(reqId) {
     var CL = CLof();
     var r = CL.requests().filter(function (x) { return x.id === reqId; })[0];
@@ -5317,16 +5519,25 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     CL.donatableCards().forEach(function (c) { if (c.cardId === r.cardId) have = c.copies; });
     var n = Math.min(r.left, CL.sendQuota().left, have);
     if (n <= 0) n = 1;                              // bewusst in den Fehler laufen lassen —
+    // Start- und Zielpunkt VOR dem Buchen als KOORDINATEN sichern. Die
+    // Zeremonie haengt danach an Zahlen, nicht an DOM-Knoten — deshalb
+    // darf sofort neu gerendert werden und der Datenstand (Kontingent,
+    // Fortschrittsbalken, Gold) ist ohne Verzoegerung korrekt.
+    var pane = $("paneDonate");
+    var rowEl = pane && pane.querySelector('[data-req="' + reqId + '"]');
+    var btnEl = pane && pane.querySelector('[data-donate="' + reqId + '"]');
+    var from = btnEl ? btnEl.getBoundingClientRect() : null;
+    var tgt = rowEl && (rowEl.querySelector(".reqcard") || rowEl);
+    var to = tgt ? tgt.getBoundingClientRect() : null;
     try {                                           // die Modul-Meldung erklaert das Warum
       var res = CL.donateCards(reqId, n);
       track("donation_sent", { card: res.cardId, n: res.count });
       var DYd = DYof(); if (DYd) DYd.reportEvent("donate", res.count);
       setGold(gold() + res.reward.gold);            // Gold bucht der Hub
       UISfx.confirm();
-      toast(res.count + " × " + res.cardName + " gespendet · +" + res.reward.gold +
-        " Gold, +" + res.reward.material + " Material" +
-        (res.request.closed ? " · Anfrage erfüllt!" : ""));
-      renderClan(); renderTop();
+      toast(res.count + " × " + res.cardName + " gespendet");
+      renderClan(true); renderTop();
+      sendCeremony(reqId, from, to, res.cardId, res.reward, res.request.closed);
     } catch (e) { UISfx.deny(); toast(e.message); }
   }
   function openReqDlg() {
@@ -5409,7 +5620,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     html += wb.targets.map(function (g) {
       return '<div class="ghostrow tinted edge' + (g.attacked ? " hit" : "") +
         '" data-ghost="' + g.id + '" style="' + tintStyle(g.el) + '">' +
-        '<div class="gav">' + (EL_EMO[g.el] || "👤") + "</div>" +
+        '<div class="gav">' + elIco(g.el, EL_EMO[g.el] || "👤", "gavimg") + "</div>" +
         '<div class="gtx"><div class="gnm">' + g.name + "</div>" +
           '<div class="gsub">' + g.elName + " · " + fmt(g.trophies) +
           ' 🏆 · <span class="gt' + g.tier + '">' +
@@ -5554,13 +5765,15 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       if (p) p.style.display = x === k ? "" : "none";
     });
   }
-  function renderClan() {
+  /* justSent=true nach einer Spende: der zuletzt verbrauchte
+     Kontingent-Punkt blitzt einmal auf (§20.5, Punkt 4). */
+  function renderClan(justSent) {
     var CL = CLof();
     if (!CL) { $("clanNote").textContent = "arena_clan.js nicht geladen."; return; }
     seedClan();
     renderClanHead();
     renderClanQuests();
-    renderClanDonate();
+    renderClanDonate(justSent);
     renderClanWar();
     renderEmotes();
     renderClanFeed();

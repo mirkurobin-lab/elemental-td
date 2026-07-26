@@ -269,18 +269,20 @@
   "beschreibung": "Trophäen-Ikone: goldener Pokal aus geschliffenem Kristall. Ersetzt 🏆 in Topbar, Straße, Toren."
  },
  "cur_gem": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132708_f9dde68c-0307-479c-ad15-ca6f547df349.png",
-  "job": "f9dde68c-0307-479c-ad15-ca6f547df349",
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052852_3ecd5982-c573-4d8e-a549-2e408758481a.png",
+  "job": "3ecd5982-c573-4d8e-a549-2e408758481a",
   "type": "currency",
-  "batch": 2,
-  "beschreibung": "Gem: magentafarbener Kristall mit Facettenglanz. Ersetzt 💎 in Topbar und Shop-Preisen."
+  "size": "1024x1024",
+  "batch": 7,
+  "beschreibung": "Gem-Waehrung: SMARAGDGRUENER Hexagon-Kristall mit Goldfassung. Bewusste Abgrenzung von AAs blauen Gems. Ersetzt Emoji Diamant."
  },
  "cur_gold": {
-  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132711_78da253c-5269-46c7-9d6a-eb30eb27bb56.png",
-  "job": "78da253c-5269-46c7-9d6a-eb30eb27bb56",
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052849_03378697-c40c-40bc-a0fa-bf067fac65c0.png",
+  "job": "03378697-c40c-40bc-a0fa-bf067fac65c0",
   "type": "currency",
-  "batch": 2,
-  "beschreibung": "Goldmünze mit Filigran-Rand. Ersetzt 🪙 in allen Kostenzeilen (Upgrade, Shop, Festung)."
+  "size": "1024x1024",
+  "batch": 7,
+  "beschreibung": "Gold-Waehrung: dicke Goldmuenze mit Kristall-Relief. Ersetzt Emoji Muenze (22 Vorkommen)."
  },
  "ess_attack": {
   "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132812_0dd1e9db-ca2f-4d32-9132-8de9d1d1e9f6.png",
@@ -1249,5 +1251,133 @@
   "size": "1024x1024",
   "batch": 6,
   "beschreibung": "Bottom-Nav CLAN V2: silber-weißes Kristallschild mit Gold-Filigran, smaragdgrünem Hexagon-Wappenstein und gekreuzten Schwertern. Ersetzt nav_clan_v1."
+ },
+ "cur_material": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052854_33cca747-1fb8-47e6-b3c0-a7273684bded.png",
+  "job": "33cca747-1fb8-47e6-b3c0-a7273684bded",
+  "type": "currency",
+  "size": "1024x1024",
+  "batch": 7,
+  "beschreibung": "Material/Essenz: violettes Kristallfläschchen mit Goldkappe. Ersetzt Emoji Alembik (10 Vorkommen)."
+ },
+ "ic_trophy": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052859_9bd75b52-3056-4a40-91fd-9591adcdfe5d.png",
+  "job": "9bd75b52-3056-4a40-91fd-9591adcdfe5d",
+  "type": "icon",
+  "size": "1024x1024",
+  "batch": 7,
+  "beschreibung": "Trophaee: Goldpokal mit Smaragd. Ersetzt Emoji Trophaee — haeufigstes Icon der UI (33 Vorkommen)."
+ },
+ "el_feuer": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052900_8e4d3b7c-b3d9-47b8-8d9d-3a1f867a2832.png",
+  "job": "8e4d3b7c-b3d9-47b8-8d9d-3a1f867a2832",
+  "type": "element",
+  "size": "1024x1024",
+  "batch": 7,
+  "beschreibung": "Element FEUER: orange-roter Kristall mit Flamme."
+ },
+ "el_wasser": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052906_ecc26734-3e67-4f82-8045-eca084387316.png",
+  "job": "ecc26734-3e67-4f82-8045-eca084387316",
+  "type": "element",
+  "size": "1024x1024",
+  "batch": 7,
+  "beschreibung": "Element WASSER/EIS: cyanblauer Kristall mit Schneeflocke und Eiszapfen."
+ },
+ "el_erde": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052908_20f9637e-9ee6-429a-a89f-299d3fa5c1eb.png",
+  "job": "20f9637e-9ee6-429a-a89f-299d3fa5c1eb",
+  "type": "element",
+  "size": "1024x1024",
+  "batch": 7,
+  "beschreibung": "Element ERDE: braun-amberfarbener Kristall im gesprungenen Fels."
+ },
+ "el_natur": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052910_d0e69f59-eb8d-4439-be80-ecf5593633e5.png",
+  "job": "d0e69f59-eb8d-4439-be80-ecf5593633e5",
+  "type": "element",
+  "size": "1024x1024",
+  "batch": 7,
+  "beschreibung": "Element NATUR: blattgruener Kristall mit Ranke und Blaettern. ACHTUNG: nie direkt neben cur_gem platzieren (beide gruen) — Ranke ist das Unterscheidungsmerkmal."
+ },
+ "el_licht": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052912_37863c64-eac8-4c9f-9ba3-c103f6fea92e.png",
+  "job": "37863c64-eac8-4c9f-9ba3-c103f6fea92e",
+  "type": "element",
+  "size": "1024x1024",
+  "batch": 7,
+  "beschreibung": "Element LICHT: weissgoldener Kristall mit goldenem Strahlenkranz."
+ },
+ "el_dunkelheit": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052914_a2e7eacb-a8a4-4e5c-8a2c-eac576f5a690.png",
+  "job": "a2e7eacb-a8a4-4e5c-8a2c-eac576f5a690",
+  "type": "element",
+  "size": "1024x1024",
+  "batch": 7,
+  "beschreibung": "Element DUNKELHEIT: violett-schwarzer Kristall mit Blitzboegen."
+ },
+ "ic_lock": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052921_6a87019c-7525-40bf-b59f-6c974340fe53.png",
+  "job": "6a87019c-7525-40bf-b59f-6c974340fe53",
+  "type": "icon",
+  "size": "1024x1024",
+  "batch": 7,
+  "beschreibung": "Gesperrt: Kristall-Vorhaengeschloss, entsaettigt. Ersetzt Emoji Schloss."
+ },
+ "ic_shield": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052923_a55b0fb2-590a-4c0f-9b17-04e8c6a55076.png",
+  "job": "a55b0fb2-590a-4c0f-9b17-04e8c6a55076",
+  "type": "icon",
+  "size": "1024x1024",
+  "batch": 7,
+  "beschreibung": "Verteidigung: Kristallschild mit Goldbuckel. Ersetzt Emoji Schild."
+ },
+ "ic_speed": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052926_59ed62e7-2bb3-49ab-976a-4e0d29a5c1a6.png",
+  "job": "59ed62e7-2bb3-49ab-976a-4e0d29a5c1a6",
+  "type": "icon",
+  "size": "1024x1024",
+  "batch": 7,
+  "beschreibung": "Tempo: cyanfarbener Kristallblitz. Ersetzt Emoji Blitz."
+ },
+ "ic_donate": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_054429_a6875569-1c35-443a-8d54-ac80ccd048a4.png",
+  "job": "a6875569-1c35-443a-8d54-ac80ccd048a4",
+  "type": "icon",
+  "size": "1024x1024",
+  "batch": 7,
+  "beschreibung": "Spenden (Clan): goldene offene Hand mit aufsteigender Smaragd-Kristallkarte. V2 — V1 (Hand im Ring) verworfen, zu unruhig fuer kleine Groessen."
+ },
+ "ic_request": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052931_a1d94d5c-ee43-4d35-b8b5-8d1a9f88347b.png",
+  "job": "a1d94d5c-ee43-4d35-b8b5-8d1a9f88347b",
+  "type": "icon",
+  "size": "1024x1024",
+  "batch": 7,
+  "beschreibung": "Karten anfragen (Clan): goldene offene Handflaeche mit gruenem Leuchten. Ersetzt Emoji Eingang."
+ },
+ "rank_bronze": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052942_8ef33f1b-1803-4c89-864d-bf3a1be8be4b.png",
+  "job": "8ef33f1b-1803-4c89-864d-bf3a1be8be4b",
+  "type": "rank",
+  "size": "1024x1024",
+  "batch": 7,
+  "beschreibung": "Liga-Rang BRONZE: Bronzemedaille mit Amber-Stein und Band."
+ },
+ "rank_silber": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052943_00925509-375f-43fe-a393-93f252637407.png",
+  "job": "00925509-375f-43fe-a393-93f252637407",
+  "type": "rank",
+  "size": "1024x1024",
+  "batch": 7,
+  "beschreibung": "Liga-Rang SILBER: Silbermedaille mit hellblauem Stein und Band."
+ },
+ "rank_gold": {
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052945_ee96b1b3-1d0c-426f-ab2f-3192f13259f5.png",
+  "job": "ee96b1b3-1d0c-426f-ab2f-3192f13259f5",
+  "type": "rank",
+  "size": "1024x1024",
+  "batch": 7,
+  "beschreibung": "Liga-Rang GOLD: Goldmedaille mit Smaragd, leuchtend, mit Band."
  }
 }
