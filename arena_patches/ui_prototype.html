@@ -106,6 +106,63 @@ button{font-family:inherit;color:inherit;border:0;background:none;cursor:pointer
 /* ---------- Views ---------- */
 .view{display:none;flex:1 1 auto;overflow-y:auto;padding:12px 12px 88px}
 .view.active{display:block}
+
+/* ==================================================================
+ * FARBFLAECHEN JE VIEW (AA_UI_REFERENZ §20.3)
+ * ------------------------------------------------------------------
+ * Messergebnis aus Video 6 und 11: AA wirkt nicht deshalb lebendiger,
+ * weil dort mehr blinkt — die Meta-UI ist praktisch statisch (§20.2) —
+ * sondern weil JEDER Screen eine eigene grosse Farbwelt hat. Bei uns
+ * war ueberall dasselbe #0e1418.
+ *
+ * Jede View bekommt darum eine eigene, grossflaechige Toenung. Die
+ * Farbtoene sind die bei AA GEMESSENEN, aber auf unsere Kristall-Marke
+ * gezogen (kuehler, entsaettigter) und so gedeckelt, dass der Textkontrast
+ * ueberall erhalten bleibt.
+ *
+ * Technik: background-attachment:fixed haelt die Flaeche beim Scrollen
+ * ruhig, also eine echte Flaeche statt eines mitwanderndenen Verlaufs.
+ * Der Verlauf liegt UNTER allen Panels — die behalten ihre eigenen
+ * Hintergruende, es entsteht kein Kontrastverlust.
+ *
+ * Collection und Battle Deck bleiben BEWUSST dunkel: dort ist AA genauso
+ * dunkel wie wir (210°, s0.9, v0.1 gemessen), weil die Karten selbst die
+ * Farbe tragen. Eine Toenung wuerde die Raritaetsfarben verfaelschen.
+ * ================================================================== */
+.view{background-repeat:no-repeat;background-attachment:fixed;background-size:cover}
+
+/* Clan — bei AA der HELLSTE Screen (210°, s0.1, v0.9 auf 40-50 % der
+   Flaeche). Wir gehen nicht auf Weiss, sondern auf ein kuehles
+   Silberblau: helle Flaeche, aber die Marke bleibt dunkel gegruendet.
+   Das ist derselbe Ton wie der helle Kit-Banner. */
+#viewClan.view{background-image:
+  radial-gradient(125% 78% at 50% 0%,#3c536b 0%,#243646 34%,#131c25 72%,#0e1418 100%)}
+/* Burg/Festung — bei AA satt violett/magenta (270-290°, v0.6) auf
+   70-100 % der Flaeche. Der kraeftigste Screen im ganzen Spiel. */
+#viewFortress.view{background-image:
+  radial-gradient(120% 80% at 50% 8%,#4a2f6e 0%,#33224d 38%,#1a1626 74%,#0e1418 100%)}
+/* Rangliste — bei AA violett/indigo (250-270°, s1.1). */
+#viewBoard.view{background-image:
+  radial-gradient(120% 72% at 50% 0%,#33305f 0%,#232244 36%,#141726 74%,#0e1418 100%)}
+/* Schmiede/Merge — bei AA rot-braun getoente obere Haelfte (10°, s0.4). */
+#viewForge.view{background-image:
+  radial-gradient(115% 66% at 50% 0%,#5c3326 0%,#3a2320 34%,#1b1719 72%,#0e1418 100%)}
+/* Helden — bei AA dunkle Basis mit HELLEN Panels je Held. Die Flaeche
+   bleibt darum mittelhell, die Heldenkarten setzen sich darauf ab. */
+#viewHeroes.view{background-image:
+  radial-gradient(120% 74% at 50% 0%,#334a5e 0%,#20313f 36%,#121a22 74%,#0e1418 100%)}
+/* Season-Pass — bei AA gold/orange Keyart-Kopf ueber dunklem Track. */
+#viewPass.view{background-image:
+  radial-gradient(120% 58% at 50% 0%,#5a4423 0%,#33291a 34%,#171821 70%,#0e1418 100%)}
+/* Shop — die Produktkarten tragen die Farbe (orange Gems, gruen Gold),
+   die Flaeche darunter bleibt darum zurueckhaltend kuehl. */
+#viewShop.view{background-image:
+  radial-gradient(120% 62% at 50% 0%,#26364a 0%,#18222e 40%,#0e1418 100%)}
+/* Events und Post — magenta bzw. blau, wie AAs Nebenscreens. */
+#viewEvents.view{background-image:
+  radial-gradient(120% 66% at 50% 0%,#4a2a49 0%,#2c1e30 36%,#0e1418 100%)}
+#viewMail.view{background-image:
+  radial-gradient(120% 66% at 50% 0%,#243b52 0%,#182530 38%,#0e1418 100%)}
 h2.title{font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
   margin:2px 0 10px;font-weight:800}
 
@@ -1957,6 +2014,11 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .lbrow.top3{border-color:#c98a5277}
 .lbrow .lrk{flex:0 0 34px;text-align:center;font-size:12px;font-weight:900;color:#a9bccb}
 .lbrow.me .lrk{color:var(--gold)}
+/* Medaille auf den Plaetzen 1-3. Etwas ueber die Spaltenbreite hinaus,
+   damit sie wie bei AA aus der Zeile heraussticht. */
+.lbrow .lrk img.medal{width:30px;height:30px;object-fit:contain;
+  filter:drop-shadow(0 1px 3px #000a)}
+.lbrow .lrk span.medal{font-size:17px}
 .lbrow .lbg{flex:0 0 20px;width:20px;height:24px;display:flex;align-items:center;
   justify-content:center;font-size:11px;color:#fff;
   clip-path:polygon(0 0,100% 0,100% 74%,50% 100%,0 74%)}
@@ -5328,7 +5390,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   function renderClanQuests() {
     var CL = CLof(); if (!CL) return;
     var qs = CL.quests(), ch = CL.chestTier();
-    var html = qs.map(function (q) {
+    var html = secribbon("Wochenquests");
+    html += qs.map(function (q) {
       var minePct = q.total ? Math.min(1, q.mine / q.goal) : 0;
       var botPct = Math.max(0, q.pct - minePct);
       return '<div class="qcard tinted' + (q.done ? " done" : "") + '" data-quest="' + q.key +
@@ -5347,6 +5410,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
           (q.done ? "  ✅ geschafft" : "  · noch " + fmt(q.missing)) + "</div></div>";
     }).join("");
 
+    html += secribbon("Clantruhen", Math.round(ch.pct * 100) + " %");
     html += '<div class="chestrow">' + CL.CHEST_STEPS.map(function (s) {
       var reached = ch.pct >= s.at - 1e-9;
       return '<div class="chestcard ' + (reached ? "reached" : "locked") +
@@ -5370,6 +5434,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       "Am Wochenende zählen Matches für den <b>Krieg</b>, nicht mehr für die Quests.</div>";
 
     $("paneQuests").innerHTML = html;
+    hydrateRibbons($("paneQuests"));
     Array.prototype.forEach.call($("paneQuests").querySelectorAll(".chestcard"), function (el) {
       layer(el, "chest_bronze");
     });
@@ -5403,11 +5468,13 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       dots += '<span class="qd' + (used ? " on" : "") +
         (justSent && used && i === q.used - 1 ? " justused" : "") + '"></span>';
     }
-    var html = '<div class="quotabar"><span>Sendekontingent</span>' +
+    var html = secribbon("Sendekontingent");
+    html += '<div class="quotabar"><span>Sendekontingent</span>' +
       "<b>" + q.used + "/" + q.max + "</b>" +
       "<span>· " + (q.used ? "Reset in " + q.resetText : "voll verfügbar") + "</span>" +
       '<span class="qdots">' + dots + "</span></div>";
 
+    html += secribbon("Offene Anfragen", reqs.length ? String(reqs.length) : "keine");
     html += reqs.map(function (r) {
       var m = BY_ID[r.cardId] || { art: "❔", color: "#9aa3ad", name: r.cardName };
       var can = !r.mine && !r.closed && q.left > 0;
@@ -5443,6 +5510,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       " Material</b> je gespendeter Karte.</div>";
 
     $("paneDonate").innerHTML = html;
+    hydrateRibbons($("paneDonate"));
     hydrateFrames($("paneDonate"));
     Array.prototype.forEach.call($("paneDonate").querySelectorAll("[data-donate]"), function (b) {
       b.addEventListener("click", function () { doDonate(b.getAttribute("data-donate")); });
@@ -5617,6 +5685,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       wb.targets.length + ")</span>" +
       '<span class="left">Angriffe heute ' + wb.attacksLeftToday + "/" + wb.attacksPerDay +
       "</span></div>";
+    html += secribbon("Kriegsziele", wb.targets.length + " Gegner");
     html += wb.targets.map(function (g) {
       return '<div class="ghostrow tinted edge' + (g.attacked ? " hit" : "") +
         '" data-ghost="' + g.id + '" style="' + tintStyle(g.el) + '">' +
@@ -5637,6 +5706,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       "Bot-Lücke ist bewusst so gesetzt, dass <b>du</b> entscheidest.</div>";
 
     $("paneWar").innerHTML = html;
+    hydrateRibbons($("paneWar"));
     Array.prototype.forEach.call($("paneWar").querySelectorAll("[data-attack]"), function (b) {
       b.addEventListener("click", function () { doAttack(b.getAttribute("data-attack")); });
     });
@@ -5795,8 +5865,12 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       var top = r.rank <= 3 ? " top" + r.rank : "";
       return '<div class="lbrow' + (r.me ? " me" : "") + top + '" data-lbrank="' + r.rank + '"' +
         (r.me ? ' id="lbMe"' : "") + ">" +
-        '<div class="lrk">' + (r.rank <= 3 ? ["🥇", "🥈", "🥉"][r.rank - 1] : "#" + r.rank) +
-          "</div>" +
+        // Die ersten drei Plaetze tragen eine echte Medaille (Batch 7),
+        // ab Platz 4 die Zahl. Genau so staffelt AA die Spitze ab.
+        '<div class="lrk">' + (r.rank <= 3
+          ? ico(["rank_gold", "rank_silber", "rank_bronze"][r.rank - 1],
+                ["🥇", "🥈", "🥉"][r.rank - 1], "medal")
+          : "#" + r.rank) + "</div>" +
         '<div class="lbg" style="background:linear-gradient(160deg,' + r.badge.c1 + "," +
           r.badge.c2 + ')">' + r.badge.symChar + "</div>" +
         '<div class="lnm">' + r.name +
