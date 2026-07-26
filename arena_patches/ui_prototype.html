@@ -36,7 +36,15 @@
 :root{
   --bg:#0e1418; --panel:#16202a; --panel2:#1c2833; --line:#26343f;
   --txt:#e8eef3; --dim:#8fa0ad; --top:#01090b;
-  --up:#48e222; --gold:#f2c53d; --gem:#63b1ee; --danger:#ff5e7e;
+  --up:#48e222; --gold:#f2c53d; --danger:#ff5e7e;
+  /* ---------- GEM-IDENTITAET: SMARAGDGRUEN ----------
+     Bewusste Abgrenzung von AA (dort sind Gems magenta/blau). Gems sind
+     bei uns Smaragde — dieselbe Farbe traegt das Waehrungs-Icon, die
+     Zahl in der Top-Bar, jeder Gem-Preis und die Gem-Produktkarten.
+     Gold bleibt unangetastet gold, sonst kollidieren die beiden
+     Waehrungen. --gem bleibt als Alt-Name bestehen (Altcode liest ihn),
+     zeigt aber jetzt auf denselben Gruenton. */
+  --gemc:#2fd47a; --gemc-dk:#0d6b3a; --gemc-lt:#b6f7cd; --gem:#2fd47a;
   /* ================================================================
    * EINHEITLICHE BANNER-METRIK
    * ----------------------------------------------------------------
@@ -81,6 +89,16 @@ button{font-family:inherit;color:inherit;border:0;background:none;cursor:pointer
   border:1px solid #1d2a33;border-radius:20px;padding:4px 6px;font-size:11.5px;font-weight:700;
   white-space:nowrap;overflow:hidden}
 .cur i{font-style:normal;font-size:12px}
+/* Waehrungs-Pillen tragen die Identitaetsfarbe ihrer Waehrung: die Zahl
+   und der Rand, nicht die ganze Flaeche — sonst kippt die Lesbarkeit. */
+.cur.c-gem{border-color:#2fd47a5c;box-shadow:inset 0 0 12px -6px #2fd47a}
+.cur.c-gem span:not(.plus){color:var(--gemc)}
+.cur.c-gold{border-color:#f2c53d4a}
+.cur.c-gold span:not(.plus){color:var(--gold)}
+.cur.c-trophy span:not(.plus){color:#e8eef3}
+/* Plus-Knopf traegt jetzt ic_plus; das "+" bleibt als Fallback-Text. */
+.cur .plus{display:flex;align-items:center;justify-content:center;overflow:hidden}
+.cur .plus img.plusimg{width:100%;height:100%;object-fit:contain}
 .cur span:not(.plus){overflow:hidden;text-overflow:ellipsis}
 .cur .plus{margin-left:auto;background:#2b3b47;width:15px;height:15px;border-radius:50%;
   font-size:11px;line-height:15px;text-align:center;color:#9fb3c1;flex:0 0 auto}
@@ -145,9 +163,29 @@ nav.bottom{position:fixed;left:50%;transform:translateX(-50%);width:100%;max-wid
   bottom:0;background:var(--top);
   border-top:1px solid #1b262e;display:grid;grid-template-columns:repeat(4,1fr);
   padding:6px 0 10px;z-index:40}
-nav.bottom button{padding:5px 0;font-size:9.5px;color:#6d7f8c;font-weight:700;text-align:center}
+/* AA laesst die Nav-Illustrationen OBEN aus der Leiste herausragen; die
+   Mitte am weitesten. Deshalb overflow:visible auf der Leiste und ein
+   negativer margin-top auf den Popouts. */
+nav.bottom{overflow:visible}
+nav.bottom button{position:relative;padding:5px 0 0;font-size:9.5px;color:#6d7f8c;
+  font-weight:700;text-align:center}
 nav.bottom button i{display:block;font-style:normal;font-size:18px;margin-bottom:1px}
 nav.bottom button.on{color:#fff}
+/* Popout-Illustration. Bild als background (erster Layer) mit
+   Emoji-Fallback im Textknoten darunter — faellt das CDN aus, bleibt die
+   Nav vollstaendig benutzbar. */
+.navpop{display:flex;align-items:flex-end;justify-content:center;
+  margin:-18px auto 1px;width:44px;height:44px;font-size:22px;line-height:1;
+  filter:drop-shadow(0 3px 5px #000a) saturate(.9) brightness(.86);
+  transition:transform 140ms ease,filter 140ms ease}
+.navpop img.navimg{width:100%;height:100%;object-fit:contain}
+nav.bottom button.on .navpop{filter:drop-shadow(0 4px 8px #000c) saturate(1.15) brightness(1.12);
+  transform:translateY(-2px) scale(1.06)}
+/* Die Mitte (START) ist die groesste und ragt am weitesten heraus. */
+.nav-center .navpop{margin:-28px auto 1px;width:60px;height:60px;font-size:30px}
+nav.bottom button.on::after{content:"";position:absolute;left:26%;right:26%;bottom:-2px;
+  height:3px;border-radius:2px;background:linear-gradient(90deg,#f2c53d00,#f2c53d,#f2c53d00)}
+@media (prefers-reduced-motion:reduce){.navpop{transition:none}}
 nav.bottom .nb{display:inline-block;min-width:14px;height:14px;line-height:14px;border-radius:7px;
   background:var(--danger);color:#fff;font-size:9px;margin-left:3px;padding:0 3px}
 
@@ -807,6 +845,101 @@ span.ico{mix-blend-mode:normal;text-align:center}
 .gemcard.hasseal,.goldcard.hasseal{padding-top:20px}
 .iapnote{margin-top:var(--gap);font-size:10px;color:var(--dim);line-height:1.55;
   border-left:2px solid #a45ef266;padding-left:8px}
+
+/* ==================================================================
+ * PRODUKTKARTEN (AAA-Icon-Sweep, Konzept „Option A")
+ * ------------------------------------------------------------------
+ * AA codiert seine Shop-Kacheln ueber die RAHMENFARBE (IMG_3306-3308).
+ * Wir uebernehmen das Prinzip mit unseren eigenen Rahmen:
+ *     frame_card_orange  → Gems      frame_card_green → Gold
+ *     frame_card_light   → Angebote / Material / neutral
+ *
+ * ⚠ AUFBAU: Die Rahmen-PNGs haben eine LEERE MITTE. Deshalb drei Ebenen:
+ *     .pcart  (z 0)  das Produktbild, fuellt den Kartenkoerper
+ *     .pcfrm  (z 2)  der Rahmen als eigenes Element DARUEBER
+ *     Text/Button (z 3) sitzen ueber beidem.
+ * Ein einzelnes Element mit zwei Background-Layern kaeme nicht hin: der
+ * Rahmen muss die volle Kachel bedecken, das Produktbild aber nur den
+ * Innenraum — zwei verschiedene background-size-Werte.
+ * ================================================================== */
+.prodgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+.prodgrid.g3{grid-template-columns:1fr 1fr 1fr}
+.prodcard{position:relative;display:flex;flex-direction:column;align-items:center;
+  border-radius:var(--radius);overflow:hidden;padding:0;
+  background-image:linear-gradient(180deg,#1b2732,#0e1418);
+  border:1px solid var(--line);min-height:150px;text-align:center}
+.prodcard.wide{grid-column:1/-1;min-height:118px}
+/* Das Produktbild ist ein FLEX-ITEM, nicht absolut positioniert: So
+   reserviert es seinen Platz und kann den Text darunter nicht
+   ueberlappen. Der Rahmen bleibt absolut (er MUSS die ganze Kachel
+   bedecken), das Produktbild braucht nur den Innenraum. */
+.prodcard .pcart{position:relative;z-index:0;width:82%;height:92px;margin:9px auto 0;
+  display:flex;align-items:center;justify-content:center;font-size:36px;
+  filter:drop-shadow(0 4px 8px #000a)}
+.prodcard .pcart img.prodimg{width:100%;height:100%;object-fit:contain}
+.prodcard .pcart span.prodimg{line-height:1}
+.prodcard.wide{flex-direction:row;align-items:center;gap:var(--gap);padding:var(--pad)}
+.prodcard.wide .pcart{width:23%;height:74px;margin:0;flex:0 0 23%}
+.prodcard .pcfrm{position:absolute;inset:0;z-index:2;pointer-events:none;
+  background-repeat:no-repeat;background-position:center;background-size:100% 100%}
+/* Rahmen-Fallback: faellt das PNG aus, traegt ein farbiger Rand den
+   AA-Farbcode weiter — die Kachel bleibt lesbar und zugeordnet. */
+.prodcard.fr-orange{border-color:#f2a13d8f;box-shadow:inset 0 0 0 1px #f2a13d3d}
+.prodcard.fr-green{border-color:#58c26a8f;box-shadow:inset 0 0 0 1px #58c26a3d}
+.prodcard.fr-light{border-color:#c9d2da7a;box-shadow:inset 0 0 0 1px #c9d2da2e}
+.prodcard .pcbody{position:relative;z-index:3;width:100%;margin-top:auto;
+  padding:6px 8px 8px;display:flex;flex-direction:column;gap:1px}
+.prodcard.wide .pcbody{flex:1;min-width:0;margin-top:0;padding:0;
+  align-items:flex-start;text-align:left}
+.prodcard .pcnm{font-size:10.5px;font-weight:800;color:#dbe6ef;line-height:1.2;
+  text-shadow:0 1px 3px #000}
+.prodcard .pcamt{font-size:17px;font-weight:900;line-height:1.1;text-shadow:0 2px 4px #000}
+.prodcard.fr-orange .pcamt{color:var(--gemc)}
+.prodcard.fr-green .pcamt{color:var(--gold)}
+.prodcard.fr-light .pcamt{color:#e8eef3;font-size:12px}
+.prodcard .pcsub{font-size:8.5px;color:#a9bccb;line-height:1.3}
+.prodcard .pcbuy{margin-top:4px;width:100%;border-radius:var(--radius-sm);padding:7px 0;
+  font-size:12px;font-weight:900}
+.prodcard.wide .pcbuy{width:auto;min-width:118px;padding:8px 14px}
+.pcbuy.gemprice{background:linear-gradient(180deg,#b6f7cd,#22b866 55%,#0d6b3a);
+  -webkit-text-fill-color:#04240f;color:#04240f;box-shadow:0 3px 0 #064a26}
+.pcbuy.goldprice{background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);
+  -webkit-text-fill-color:#3a2b07;color:#3a2b07;box-shadow:0 3px 0 #6d551a}
+.pcbuy.freeprice{background:linear-gradient(180deg,#58fa1b,#3aad16);
+  -webkit-text-fill-color:#0a2404;color:#0a2404;box-shadow:0 3px 0 #1f6b09}
+.pcbuy[disabled]{background:linear-gradient(180deg,#3a4a58,#222e39);box-shadow:0 3px 0 #16202a;
+  -webkit-text-fill-color:#8fa0ad;color:#8fa0ad}
+.prodcard.sold{filter:grayscale(.7) brightness(.62)}
+.prodcard .seal{z-index:4}
+.prodcard.hasseal .pcart{margin-top:20px}
+.prodcard.wide.hasseal .pcart{margin-top:0}
+
+/* ==================================================================
+ * SEKTIONS-RIBBONS (ribbon_section_lg / _sm)
+ * ------------------------------------------------------------------
+ * Das Ribbon ist HELL-SILBER. Damit ist .goldtext hier VERBOTEN — der
+ * goldene Verlauf auf hellem Grund ist genau die Bug-Klasse, die im
+ * Projekt schon dreimal aufgetreten ist (.cerbtn, .okbtn, .battlebtn).
+ * Die Ueberschrift traegt deshalb eine dunkle Fuellfarbe.
+ * ================================================================== */
+.secribbon{position:relative;display:flex;align-items:center;justify-content:center;
+  min-height:34px;margin:var(--gap-lg) 0 var(--gap);padding:5px 46px;
+  background-repeat:no-repeat;background-position:center;background-size:100% 100%,100% 100%;
+  background-image:linear-gradient(180deg,#e9eef3,#b8c6d2 52%,#8fa2b3);
+  border-radius:var(--radius-sm);
+  filter:drop-shadow(0 3px 7px #0009)}
+.secribbon.sm{min-height:28px;padding:4px 40px;
+  background-image:linear-gradient(180deg,#dfe7ee,#aebdcb 52%,#8799aa)}
+.secribbon .srt{font-size:12px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;
+  /* dunkle Schrift auf hellem Ribbon — NIE .goldtext */
+  -webkit-text-fill-color:#1a2530;color:#1a2530;text-shadow:0 1px 0 #ffffff8c;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.secribbon.sm .srt{font-size:10.5px}
+/* Zusatzinfo (Timer, Pity-Stand) haengt RECHTS AUSSEN am Ribbon, nicht
+   darauf — auf dem hellen Band waere jede weitere Zeile Gedraengel. */
+.secribbon .srx{position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  font-size:9px;font-weight:800;color:#1a2530b8;max-width:44%;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
 .decorow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--gap);margin-top:var(--gap-lg)}
 .decotile{border-radius:var(--radius-sm);border:1px dashed #35485a;background:#111a21;padding:9px 6px;
   text-align:center;font-size:9.5px;color:var(--dim);font-weight:700}
@@ -1298,8 +1431,8 @@ span.ico{mix-blend-mode:normal;text-align:center}
   -webkit-text-fill-color:#8fa0ad;color:#8fa0ad}
 
 /* ---------- Einstellungen ---------- */
-.setgrp{margin-top:12px;border-radius:13px;border:1px solid var(--line);overflow:hidden;
-  background:linear-gradient(180deg,#1b2732,#131c25)}
+.setgrp{margin-top:0;border-radius:var(--radius);border:1px solid var(--line);
+  overflow:hidden;background:linear-gradient(180deg,#1b2732,#131c25)}
 .setgrp .sghd{padding:8px 11px;font-size:9.5px;letter-spacing:.14em;font-weight:800;
   color:var(--dim);background:#0b1116;border-bottom:1px solid var(--line)}
 .setrow{display:flex;align-items:center;gap:10px;padding:11px}
@@ -1547,6 +1680,9 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
  * ================================================================== */
 .viewhead{display:flex;align-items:center;gap:8px;margin:2px 0 8px}
 .viewhead h2.title{margin:0;flex:1}
+.headico{flex:0 0 24px;width:24px;height:24px;display:flex;align-items:center;
+  justify-content:center;font-size:17px}
+.headico .ico{width:24px;height:24px}
 .backbtn{width:30px;height:30px;flex:0 0 30px;border-radius:9px;font-size:19px;line-height:1;
   background:var(--panel);border:1px solid var(--line);color:#c2cfd9;font-weight:900}
 
@@ -2000,9 +2136,9 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
        (Feld 2 magenta #DC1DDB = Gem, Feld 3 goldgelb #F3B733 = Münze).
        Demo-Werte entsprechen dem Video-11-Account (1136 🏆 → Arena 4). -->
   <div class="topbar">
-    <div class="cur"><i data-ico="cur_trophy" data-emoji="🏆"></i><span id="curTrophies">0</span></div>
-    <div class="cur"><i data-ico="cur_gem" data-emoji="💎"></i><span id="curGems">0</span><span class="plus">+</span></div>
-    <div class="cur"><i data-ico="cur_gold" data-emoji="🪙"></i><span id="curGold">0</span><span class="plus">+</span></div>
+    <div class="cur c-trophy"><i data-ico="cur_trophy" data-emoji="🏆"></i><span id="curTrophies">0</span></div>
+    <div class="cur c-gem"><i data-ico="cur_gem" data-emoji="💚"></i><span id="curGems">0</span><span class="plus" data-plus>+</span></div>
+    <div class="cur c-gold"><i data-ico="cur_gold" data-emoji="🪙"></i><span id="curGold">0</span><span class="plus" data-plus>+</span></div>
   </div>
 
   <!-- ===== VIEW S: SHOP (§8) =====
@@ -2033,38 +2169,47 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     <!-- (2) Echtgeld-Angebote: erst die personalisierte Kette
              (arena_vault.js — erscheint nur nach einem Ereignis, nie
              „einfach so“), dann Arena-Pack und Starter-Pack. -->
-    <div class="shopsec" id="offerSec" style="display:none">
-      <span class="sh goldtext">Nur für dich</span></div>
+    <!-- Die Angebotskette gehoert inhaltlich zu AAs Slot 2 (Echtgeld-
+         Angebote) und traegt deshalb KEIN eigenes data-sec: Es bleiben
+         genau sieben markierte Sektionen. -->
+    <div class="secribbon" id="offerSec" data-ribbon="ribbon_section_lg"
+         style="display:none"><span class="srt">Nur für dich</span></div>
     <div id="offerSlot"></div>
 
-    <div class="shopsec" data-sec="2"><span class="sh goldtext">Arena-Pack &amp; Starter</span>
-      <span class="timer">Echtgeld · Platzhalter</span></div>
+    <div class="secribbon" data-sec="2" data-ribbon="ribbon_section_lg">
+      <span class="srt">Arena-Pack</span>
+      <span class="srx">Echtgeld · Platzhalter</span></div>
     <div class="iapgrid" id="arenaPackBox"></div>
 
     <!-- (3) Tagesangebote -->
-    <div class="shopsec" data-sec="3"><span class="sh goldtext">Tagesangebote</span>
-      <span class="timer" id="dealTimer">Neue Angebote in 6h 58m</span></div>
-    <div class="dealgrid" id="dealGrid"></div>
+    <div class="secribbon" data-sec="3" data-ribbon="ribbon_section_lg">
+      <span class="srt">Tagesangebote</span>
+      <span class="srx" id="dealTimer">Neu in 6h 58m</span></div>
+    <div class="prodgrid" id="dealGrid"></div>
 
     <!-- (4) Booster-Packs -->
-    <div class="shopsec" data-sec="4"><span class="sh goldtext">Booster-Packs</span>
-      <span class="timer" id="packPity">…</span></div>
+    <div class="secribbon" data-sec="4" data-ribbon="ribbon_section_lg">
+      <span class="srt">Booster-Packs</span>
+      <span class="srx" id="packPity">…</span></div>
     <div class="packshop" id="packShop"></div>
 
     <!-- (5) Kristalltresor — AAs Roulette-Platz -->
-    <div class="shopsec" data-sec="5"><span class="sh goldtext">Kristalltresor</span>
-      <span class="timer" id="vaultTier">—</span></div>
+    <div class="secribbon" data-sec="5" data-ribbon="ribbon_section_lg">
+      <span class="srt">Kristalltresor</span>
+      <span class="srx" id="vaultTier">—</span></div>
     <div class="vaultbox" id="vaultShop"></div>
 
-    <!-- (6) Gem-Pakete -->
-    <div class="shopsec" data-sec="6"><span class="sh goldtext">Gem-Pakete</span>
-      <span class="timer">Echtgeld · Platzhalter</span></div>
-    <div class="gemgrid" id="gemShop"></div>
+    <!-- (6) Gem-Pakete — ORANGE Rahmen (AA-Farbcode fuer Gems) -->
+    <div class="secribbon" data-sec="6" data-ribbon="ribbon_section_lg">
+      <span class="srt">Gem-Pakete</span>
+      <span class="srx">Echtgeld · Platzhalter</span></div>
+    <div class="prodgrid" id="gemShop"></div>
 
-    <!-- (7) Gold-Tausch -->
-    <div class="shopsec" data-sec="7"><span class="sh goldtext">Gold-Tausch</span>
-      <span class="timer">Gems → Gold</span></div>
-    <div class="goldgrid" id="goldShop"></div>
+    <!-- (7) Gold-Tausch — GRUENE Rahmen (AA-Farbcode fuer Gold) -->
+    <div class="secribbon" data-sec="7" data-ribbon="ribbon_section_lg">
+      <span class="srt">Gold-Tausch</span>
+      <span class="srx">Gems → Gold</span></div>
+    <div class="prodgrid" id="goldShop"></div>
 
     <p class="iapnote" id="iapNote">—</p>
     <p class="fortnote" id="shopNote">—</p>
@@ -2092,18 +2237,20 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
         <span class="px" id="profXp">Stufe 4 · 620/1000 XP</span></span>
       <span class="hubicons">
         <button class="hubicon pressable" id="icoDaily" title="Tagesziele &amp; Login">
-          <span data-ico="hub_challenges" data-emoji="🗓"></span>
+          <span data-ico="ic_calendar" data-emoji="🗓"></span>
           <i class="nb2" id="tileDailyBadge" style="display:none">0</i></button>
-        <button class="hubicon pressable" id="icoClan" title="Clan">
-          <span data-ico="hub_clan" data-emoji="🛡"></span>
-          <i class="nb2" id="tileClanBadge" style="display:none">0</i></button>
+        <!-- Der Clan hat jetzt einen Dauerplatz in der Bottom-Nav; dieser
+             Slot traegt deshalb die PACKS (vorher Bottom-Nav-Tab). -->
+        <button class="hubicon pressable" id="icoPack" title="Booster-Packs">
+          <span data-ico="ic_gift" data-emoji="🎁"></span>
+          <i class="nb2" id="badgePack" style="display:none">0</i></button>
         <button class="hubicon pressable" id="icoBoard" title="Rangliste">
-          <span data-ico="hub_leaderboard" data-emoji="🏅"></span></button>
+          <span data-ico="ic_rank" data-emoji="🏅"></span></button>
         <button class="hubicon pressable" id="icoMail" title="Post">
-          <span data-ico="hub_mail" data-emoji="✉"></span>
+          <span data-ico="ic_mail" data-emoji="✉"></span>
           <i class="nb2" id="tileMailBadge" style="display:none">0</i></button>
         <button class="hubicon pressable" id="icoSettings" title="Einstellungen">
-          <span data-ico="hub_settings" data-emoji="⚙"></span></button>
+          <span data-ico="ic_gear" data-emoji="⚙"></span></button>
       </span>
     </div>
 
@@ -2144,11 +2291,11 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
          (offene Aufgaben mit Belohnung) an derselben Stelle. -->
     <div class="homerow3">
       <button class="sidetile" id="tileEvents">
-        <span class="sti" data-ico="hub_events" data-emoji="🎪"></span>
+        <span class="sti" data-ico="ic_tent" data-emoji="🎪"></span>
         <span class="stn">EVENTS</span><i class="nb2" id="tileEventBadge">3</i></button>
       <button class="battlebtn" id="btnBattle"><span class="goldtext">Kampf</span></button>
       <button class="sidetile" id="tileGuide">
-        <span class="sti" data-ico="hub_challenges" data-emoji="🎯"></span>
+        <span class="sti" data-ico="ic_compass" data-emoji="🧭"></span>
         <span class="stn">GUIDE</span>
         <i class="nb2" id="tileGuideBadge" style="display:none">0</i></button>
     </div>
@@ -2220,7 +2367,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     <div class="passbar"><span>Stufe <b id="passLvl">0</b></span>
       <span class="pb"><i id="passFill" style="width:0%"></i></span>
       <span id="passXp">0/100 XP</span></div>
-    <button class="buypass pressable" id="btnBuyPass">Pass aktivieren · 950 💎</button>
+    <button class="buypass pressable" id="btnBuyPass">Pass aktivieren · 950 💚</button>
     <div class="passhead"><span>STUFE</span><span>GRATIS</span><span class="prem">PREMIUM</span></div>
     <div class="passlist" id="passList"></div>
     <p class="fortnote" id="passNote">—</p>
@@ -2229,6 +2376,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   <!-- ===== VIEW H: HELDEN ===== -->
   <section id="viewHeroes" class="view">
     <div class="viewhead"><button class="backbtn" id="heroBack">‹</button>
+      <span class="headico" data-ico="ic_helm" data-emoji="🪖"></span>
       <h2 class="title">Helden</h2></div>
     <div id="heroList"></div>
     <p class="fortnote" id="heroNote">—</p>
@@ -2255,7 +2403,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     <div class="viewhead"><button class="backbtn" id="setBack">‹</button>
       <h2 class="title">Einstellungen</h2></div>
 
-    <div class="setgrp"><div class="sghd">TON &amp; HAPTIK</div>
+    <div class="secribbon sm" data-ribbon="ribbon_section_sm"><span class="srt">TON &amp; HAPTIK</span></div>
+    <div class="setgrp">
       <div class="setrow"><span class="stx">Sound-Effekte<small>Klicks, Belohnungen, Kartendrehung</small></span>
         <button class="swch on" id="swSound" data-sw="sound"><i></i></button></div>
       <div class="setrow"><span class="stx">Musik<small>Hintergrundmusik im Hub</small></span>
@@ -2264,14 +2413,16 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
         <button class="swch on" id="swHaptic" data-sw="haptic"><i></i></button></div>
     </div>
 
-    <div class="setgrp"><div class="sghd">SPRACHE</div>
+    <div class="secribbon sm" data-ribbon="ribbon_section_sm"><span class="srt">SPRACHE</span></div>
+    <div class="setgrp">
       <div class="setrow"><span class="stx">Deutsch<small>Aktuell aktiv</small></span>
         <span class="sbadge" id="langDe">AKTIV</span></div>
       <div class="setrow"><span class="stx">English<small>Translation in progress</small></span>
         <span class="sbadge">BALD</span></div>
     </div>
 
-    <div class="setgrp"><div class="sghd">HILFE &amp; GUIDES</div>
+    <div class="secribbon sm" data-ribbon="ribbon_section_sm"><span class="srt">HILFE &amp; GUIDES</span></div>
+    <div class="setgrp">
       <div class="setrow"><span class="stx">Einsteiger-Guide<small>Kapitel mit Aufgaben und Belohnungen</small></span>
         <button class="setbtn pressable" id="btnSetGuide">Öffnen</button></div>
       <div class="setrow"><span class="stx">Spiel-Handbuch<small>Alle Systeme kurz erklärt</small></span>
@@ -2280,7 +2431,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
         <button class="setbtn pressable" id="btnSetLogin">Anzeigen</button></div>
     </div>
 
-    <div class="setgrp"><div class="sghd">SPIELSTAND</div>
+    <div class="secribbon sm" data-ribbon="ribbon_section_sm"><span class="srt">SPIELSTAND</span></div>
+    <div class="setgrp">
       <div class="setrow" style="display:block">
         <textarea class="savearea" id="saveArea" spellcheck="false"
           placeholder="Spielstand-JSON — Exportieren füllt das Feld, Importieren liest es ein."></textarea>
@@ -2456,12 +2608,19 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
        erhoeht, groesser) | Festung | Packs. Die Schmiede bleibt ueber den
        Forge-Button in der Sammlung erreichbar, die Turm-Detailkarte ueber
        jede Karte — genau wie AA es macht. -->
+  <!-- Reihenfolge nach User-Vorgabe: Shop | Sammlung | START | Clan | Burg.
+       START sitzt mittig und ist die groesste Illustration; alle fuenf
+       Popouts ragen oben aus der Leiste heraus (AA-Muster, §15.5).
+       Die PACKS sind in die Home-Iconleiste gewandert (ic_gift) — der
+       Clan braucht den Dauerplatz, weil er taeglich angefasst wird, das
+       Pack-Oeffnen passiert dagegen ereignisgetrieben (nach Sieg, aus
+       Truhe, aus dem Shop) und wird von dort ohnehin direkt angesprungen. -->
   <nav class="bottom" style="grid-template-columns:repeat(5,1fr)">
-    <button id="navShop"><i data-ico="hub_shop" data-emoji="🛒"></i>Shop<span id="badgeShop" class="nb" style="display:none">0</span></button>
-    <button id="navCollection"><i data-ico="nav_collection" data-emoji="🗂"></i>Sammlung<span id="navBadge" class="nb" style="display:none">0</span></button>
-    <button id="navHome" class="on nav-center"><i data-ico="nav_home" data-emoji="🏛"></i>Start</button>
-    <button id="navFortress"><i data-ico="nav_tower" data-emoji="🗼"></i>Festung</button>
-    <button id="navPack"><i data-ico="nav_packs" data-emoji="🎁"></i>Packs<span id="badgePack" class="nb" style="display:none">0</span></button>
+    <button id="navShop"><span class="navpop" data-pop="nav_shop">🛒</span>Shop<span id="badgeShop" class="nb" style="display:none">0</span></button>
+    <button id="navCollection"><span class="navpop" data-pop="nav_cards">🗂</span>Sammlung<span id="navBadge" class="nb" style="display:none">0</span></button>
+    <button id="navHome" class="on nav-center"><span class="navpop" data-pop="nav_start">🏛</span>Start</button>
+    <button id="navClan"><span class="navpop" data-pop="nav_clan">🛡</span>Clan<span id="badgeClan" class="nb" style="display:none">0</span></button>
+    <button id="navFortress"><span class="navpop" data-pop="nav_fortress">🗼</span>Burg</button>
   </nav>
 </div>
 
@@ -2834,6 +2993,52 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     emote_attack:     CDN + "hf_20260725_160720_ca1c0844-21b8-40c1-b714-22bb44895f47.png",
     emote_strong:     CDN + "hf_20260725_160722_700d087a-3ea5-4bb1-8178-7cf35e08d73f.png",
     emote_welcome:    CDN + "hf_20260725_160724_83a735e4-f6f7-4853-86b5-23ebe574f386.png",
+    /* ---- AAA-Icon-Sweep Batch 6 (39 Assets) ----
+       Produktkarten-Rahmen mit leerer Mitte, Shop-Produktbilder in
+       Eskalations-Ketten, Sektions-Ribbons, Bottom-Nav-Popouts und
+       Utility-Icons. Alle textfrei und im gleichen Brand-Stil.
+       ⚠ nav_clan_v1 ist die VERWORFENE erste Fassung (Herz-Wappen) —
+         verwendet wird nav_clan (V2, Kristallschild). Der Key bleibt
+         nur registriert, damit die Job-Historie nachvollziehbar ist. */
+    shop_gem_t1:           CDN + "hf_20260726_042629_77585abc-c36d-46c5-95ce-3e23e3603288.png",
+    shop_gem_t2:           CDN + "hf_20260726_042632_66f0328d-63ef-4342-920a-decd43a32581.png",
+    shop_gem_t3:           CDN + "hf_20260726_042633_440afa12-072a-46a7-a475-489a3e15f5fb.png",
+    shop_gem_t4:           CDN + "hf_20260726_042637_04bb7eef-58fe-4580-a996-5b3012162ad8.png",
+    shop_gem_t5:           CDN + "hf_20260726_042639_b265fd47-1240-4d0a-b6b6-8e23378a4552.png",
+    shop_gem_t6:           CDN + "hf_20260726_042640_6a3c2b75-4484-433a-8a6c-1cff66e9c902.png",
+    shop_gold_t1:          CDN + "hf_20260726_042648_458a4b84-a99e-4814-ae0b-00a3d5ec6b3a.png",
+    shop_gold_t2:          CDN + "hf_20260726_042650_ea5835fa-9147-4cf3-96dd-f9ec21af6088.png",
+    shop_gold_t3:          CDN + "hf_20260726_042652_01540da3-f1b1-4c67-9779-9ef8a0e88921.png",
+    shop_gold_t4:          CDN + "hf_20260726_042654_b954fa5e-5d6e-4ab2-a2fd-a05f1ba2933f.png",
+    shop_mat_attack:       CDN + "hf_20260726_042656_2ed86a73-0ba8-442c-8ce6-e3e28e870218.png",
+    shop_mat_speed:        CDN + "hf_20260726_042658_0e1c3c87-a56b-4948-a419-b8ca861c0493.png",
+    shop_mat_special:      CDN + "hf_20260726_042705_1892cf67-384b-41fe-8b0f-6ae8ec989f87.png",
+    offer_arena_pack:      CDN + "hf_20260726_042708_f26a5521-f28b-489d-b62f-01543a8facc6.png",
+    offer_starter:         CDN + "hf_20260726_042710_a70613fb-df46-48af-95a8-1d71ddae335e.png",
+    offer_vault_bank:      CDN + "hf_20260726_042712_609d781f-a276-4767-a257-dea71279049b.png",
+    frame_card_orange:     CDN + "hf_20260726_042716_5bf79216-8800-472c-ab73-d9f93ea05991.png",
+    frame_card_green:      CDN + "hf_20260726_042717_86ae6639-d698-4dfe-b5d0-6d042162c301.png",
+    frame_card_light:      CDN + "hf_20260726_042727_98b627aa-e2fa-4869-a7db-4ddc1dff974a.png",
+    ribbon_section_lg:     CDN + "hf_20260726_042730_8c38ed92-134a-440c-822d-e67c2d3f31d8.png",
+    ribbon_section_sm:     CDN + "hf_20260726_042732_68de7abf-33da-4465-8401-bc11d353a8b3.png",
+    nav_shop:              CDN + "hf_20260726_042736_4eff429b-94e3-4111-a941-b3f16335b644.png",
+    nav_cards:             CDN + "hf_20260726_042737_832db618-1425-486d-b83e-0897328ccf85.png",
+    nav_start:             CDN + "hf_20260726_042740_67eeb9a2-d790-432a-9781-6d80697b725c.png",
+    nav_clan:              CDN + "hf_20260726_050047_94ca1b29-24d0-4367-9d2f-a6b4d3f238e3.png",
+    nav_fortress:          CDN + "hf_20260726_042752_d69244e4-72b3-4c3a-84ad-5c2b3589d27c.png",
+    nav_clan_v1:           CDN + "hf_20260726_042750_5c90eeaa-0b17-435d-858f-3fef9010075a.png",
+    ic_calendar:           CDN + "hf_20260726_042754_13862811-306e-4424-a780-e6415bf7a5f0.png",
+    ic_mail:               CDN + "hf_20260726_042756_0ad1f893-014a-444b-87cb-b489d7667c38.png",
+    ic_gear:               CDN + "hf_20260726_042758_10f0b02d-0cc0-46b6-8c95-6e6132151d3f.png",
+    ic_tent:               CDN + "hf_20260726_042800_4deec3f9-1bb9-4738-8fb6-95da9ea9cd1a.png",
+    ic_compass:            CDN + "hf_20260726_042810_2d1a7716-4745-4feb-ac18-181ff41c5b82.png",
+    ic_rank:               CDN + "hf_20260726_042812_96d96875-0ad7-4b28-ac69-131f972f9fa0.png",
+    ic_helm:               CDN + "hf_20260726_042814_1e1d8383-da1d-4f44-a1a0-429e5d919143.png",
+    ic_quest:              CDN + "hf_20260726_042816_291cc3cc-0039-4df8-bbb1-84fa97250b3a.png",
+    ic_war:                CDN + "hf_20260726_042818_625922e2-1731-4af8-ba70-c819bbb8b615.png",
+    ic_hourglass:          CDN + "hf_20260726_042820_1e88ee2a-8d71-4f76-b884-0f814ab9f57e.png",
+    ic_plus:               CDN + "hf_20260726_043121_14d3e7f4-4aa6-4a17-b5e8-68ff66b6d7e1.png",
+    ic_gift:               CDN + "hf_20260726_043123_c176ec0e-f156-4ef4-8af1-a11d0878a39f.png",
     /* ---- Festungs-Layout Variante 2 „Banner-Stapel" (Batch 3) ---- */
     fort_banner_track: CDN + "hf_20260725_150531_224eab67-a74f-40dd-a293-3caf809eb8b9.png",
     fort_pip_full:     CDN + "hf_20260725_150534_85413c44-d6fc-41ea-a6ee-2b0589f1d5f7.png",
@@ -2855,6 +3060,19 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   window.UIIcon = {
     // Bild ausblenden — fuer Ebenen, unter denen bereits ein Fallback liegt.
     hide: function (img) { img.style.display = "none"; },
+    /* Aufraeum-Sweep. `onerror` kommt bei haengenden Verbindungen manchmal
+       gar nicht (Proxy antwortet nicht, Request laeuft ins Timeout) — dann
+       stuende dauerhaft ein LEERES Bildfeld im Layout. Der Sweep tauscht
+       alles, was nachweislich nicht geladen ist (`naturalWidth === 0`),
+       gegen sein Emoji. Keine Testkruecke, sondern die Absicherung fuer
+       schlechte Mobilverbindungen. */
+    sweep: function (root) {
+      Array.prototype.forEach.call(
+        (root || document).querySelectorAll("img.ico, img.prodimg, img.navimg, img.plusimg"),
+        function (img) {
+          if (!img.complete || img.naturalWidth === 0) window.UIIcon.fail(img);
+        });
+    },
     fail: function (img) {
       var sp = document.createElement("span");
       sp.className = img.className;
@@ -2941,6 +3159,39 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       el.removeAttribute("data-ico");
     });
   }
+  /* Popout-Illustrationen der Bottom-Nav und die Plus-Knoepfe der
+     Waehrungspillen. Beides sind BACKGROUND-Bilder, nicht <img>: Nur so
+     bleibt der Emoji-/Textinhalt als Fallback stehen, wenn das CDN nicht
+     antwortet. layer() setzt das Asset als ersten Layer, der Verlauf aus
+     dem Stylesheet bleibt dahinter. */
+  function hydrateBgIcons(root) {
+    var r = root || document;
+    Array.prototype.forEach.call(r.querySelectorAll("[data-pop]"), function (el) {
+      var k = el.getAttribute("data-pop");
+      if (!ASSETS[k] || el.getAttribute("data-popdone")) return;
+      el.innerHTML = ico(k, el.textContent.trim() || "•", "navimg");
+      el.setAttribute("data-popdone", "1");
+    });
+    Array.prototype.forEach.call(r.querySelectorAll("[data-plus]"), function (el) {
+      if (el.getAttribute("data-plusdone")) return;
+      el.innerHTML = ico("ic_plus", "+", "plusimg");
+      el.setAttribute("data-plusdone", "1");
+    });
+  }
+  /* secribbon(titel, extra, klein) — Sektions-Trenner im hellen
+     Kit-Banner-Stil. Das Ribbon ist HELL, der Text deshalb DUNKEL —
+     .goldtext ist hier verboten (Bug-Klasse, siehe CSS-Kommentar). */
+  function secribbon(title, extra, small) {
+    return '<div class="secribbon' + (small ? " sm" : "") + '" data-ribbon="' +
+      (small ? "ribbon_section_sm" : "ribbon_section_lg") + '">' +
+      '<span class="srt">' + title + "</span>" +
+      (extra ? '<span class="srx">' + extra + "</span>" : "") + "</div>";
+  }
+  function hydrateRibbons(root) {
+    Array.prototype.forEach.call((root || document).querySelectorAll("[data-ribbon]"), function (el) {
+      layer(el, el.getAttribute("data-ribbon"));
+    });
+  }
 
   /* ==================================================================
    * UISfx — kleine WebAudio-Blips
@@ -3017,7 +3268,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   /* UIBadge.set(navKey, n) — die roten Zaehler-Punkte der Bottom-Nav. */
   window.UIBadge = (function () {
     var MAP = { collection: "navBadge", shop: "badgeShop", pack: "badgePack",
-                clan: "tileClanBadge", mail: "tileMailBadge",
+                clan: "badgeClan", mail: "tileMailBadge",
                 daily: "tileDailyBadge", guide: "tileGuideBadge",
                 events: "tileEventBadge" };
     return {
@@ -4174,17 +4425,17 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
    * OFFEN auf den Packs — AAs Muster statt Prozent-Drop-Raten (§8.2).
    * ================================================================== */
   var DEALS = [
-    { id:"d1", art:"ess_attack",  emoji:"⚔", name:"Angriffs-Essenz ×20", cost:3000,  cur:"gold",
+    { id:"d1", art:"shop_mat_attack",  emoji:"⚔", name:"Angriffs-Essenz ×20", cost:3000,  cur:"gold",
       avail:3, give:function(){ AC.addMaterial(20, "attack"); } },
-    { id:"d2", art:"ess_speed",   emoji:"⚡", name:"Tempo-Essenz ×20",    cost:3000,  cur:"gold",
+    { id:"d2", art:"shop_mat_speed",   emoji:"⚡", name:"Tempo-Essenz ×20",    cost:3000,  cur:"gold",
       avail:3, give:function(){ AC.addMaterial(20, "speed"); } },
-    { id:"d3", art:"ess_special", emoji:"✨", name:"Spezial-Essenz ×15",  cost:4200,  cur:"gold",
+    { id:"d3", art:"shop_mat_special", emoji:"✨", name:"Spezial-Essenz ×15",  cost:4200,  cur:"gold",
       avail:2, give:function(){ AC.addMaterial(15, "special"); } },
     { id:"d4", art:"frame_common", emoji:"🃏", name:"3 gewöhnliche Karten", cost:5400, cur:"gold",
       avail:2, give:function(){ for (var i=0;i<3;i++) AC.addDrop(POOL_IDS[(Math.random()*6)|0], "common", 1); } },
     { id:"d5", art:"frame_good",  emoji:"🂡", name:"1 gute Karte",        cost:9000,  cur:"gold",
       avail:1, give:function(){ AC.addDrop(POOL_IDS[(Math.random()*6)|0], "good", 1); } },
-    { id:"d6", art:"cur_gem",     emoji:"💎", name:"Gem-Bündel ×25",      cost:0,     cur:"free",
+    { id:"d6", art:"shop_gem_t1", emoji:"💚", name:"Gem-Bündel ×25",      cost:0,     cur:"free",
       avail:1, give:function(){ setGems(gems() + 25); } },
   ];
   var dealUsed = {};
@@ -4202,13 +4453,13 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
      sondern sagt genau das. Eine Demo-Wallet mit Echtgeld zu fuettern
      waere die unehrlichere Variante. */
   var IAP_PACKS = [
-    { id:"arena", name:"Arena-Pack", sub:"Einmal pro Saison", art:"pack_gold", emoji:"🎁",
+    { id:"arena", name:"Arena-Pack", sub:"Einmal pro Saison", art:"offer_arena_pack", emoji:"🎁",
       price:"Fr. 3.–", value:"+180 % Wert",
-      items:[["cur_gold","🪙","5 000"],["cur_gem","💎","50"],["pack_silver","🎁","×3"],
+      items:[["cur_gold","🪙","5 000"],["cur_gem","💚","50"],["pack_silver","🎁","×3"],
              ["ess_attack","⚗","×25"]] },
     { id:"starter", name:"Starter-Pack", sub:"Nur für neue Beschwörer · einmalig",
-      art:"pack_arcane", emoji:"✨", price:"Fr. 9.–", value:"+320 % Wert",
-      items:[["cur_gold","🪙","20 000"],["cur_gem","💎","250"],["pack_gold","🎁","×2"],
+      art:"offer_starter", emoji:"✨", price:"Fr. 9.–", value:"+320 % Wert",
+      items:[["cur_gold","🪙","20 000"],["cur_gem","💚","250"],["pack_gold","🎁","×2"],
              ["frame_rare","🃏","1 Seltene"]] },
   ];
   /* ---------- (6) Gem-Pakete (AA §8.1 Pos. 6) ----------
@@ -4216,12 +4467,18 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
      und der billigsten Stufe: „Beliebt!" auf der Einstiegsstufe darueber
      (der Anker), „Bester Wert!" auf der zweitgroessten — genau das
      Muster, das AAs Staffelung benutzt. */
+  /* Sechs Staffeln — die Produktbilder sind eine ESKALATIONSKETTE
+     (Splitter → Haufen → Kissen → Truhe → Pokal → Tresor). Das Bild
+     erzaehlt die Menge, nicht die Zahl: AAs staerkster Store-Trick
+     (IMG_3306-3308). Reihenfolge = Preisreihenfolge, nie mischen. */
   var GEM_PACKS = [
-    { id:"g1", name:"Handvoll Gems",  amt:80,   price:"Fr. 3.–",  seal:null },
-    { id:"g2", name:"Beutel Gems",    amt:500,  price:"Fr. 9.–",  seal:"pop" },
-    { id:"g3", name:"Truhe Gems",     amt:1200, price:"Fr. 19.–", seal:null },
-    { id:"g4", name:"Hort der Gems",  amt:2500, price:"Fr. 39.–", seal:"best" },
-    { id:"g5", name:"Gem-Tresor",     amt:6500, price:"Fr. 89.–", seal:null, wide:true },
+    { id:"g1", name:"Handvoll Gems",  amt:80,   price:"Fr. 3.–",  art:"shop_gem_t1", seal:null },
+    { id:"g2", name:"Beutel Gems",    amt:500,  price:"Fr. 9.–",  art:"shop_gem_t2", seal:"pop" },
+    { id:"g3", name:"Kissen Gems",    amt:1200, price:"Fr. 19.–", art:"shop_gem_t3", seal:null },
+    { id:"g4", name:"Truhe Gems",     amt:2500, price:"Fr. 39.–", art:"shop_gem_t4", seal:"best" },
+    { id:"g5", name:"Pokal der Gems", amt:4000, price:"Fr. 59.–", art:"shop_gem_t5", seal:null },
+    { id:"g6", name:"Gem-Tresor",     amt:6500, price:"Fr. 89.–", art:"shop_gem_t6", seal:null,
+      wide:true },
   ];
   /* ---------- (7) Gold-Tausch (AA §8.1 Pos. 7) ----------
      Bei uns GEMS → GOLD statt Echtgeld → Gold: Gold ist die Waehrung,
@@ -4230,10 +4487,13 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
      AAs „ein Gold-Paket gratis per Werbevideo" wird bei uns zu einem
      werbefreien Tages-Gratispaket (§19.1: keine Ads). */
   var GOLD_PACKS = [
-    { id:"go1", name:"Beutel Gold",   amt:10500,  cost:80,  free:false },
-    { id:"go2", name:"Haufen Gold",   amt:31500,  cost:220, free:false, seal:"pop" },
-    { id:"go3", name:"Trophäe Gold",  amt:126000, cost:800, free:false, seal:"best", wide:true },
-    { id:"go0", name:"Tagesgold",     amt:2500,   cost:0,   free:true,  wide:true },
+    { id:"go1", name:"Münzstapel",  amt:10500,  cost:80,  free:false, art:"shop_gold_t1" },
+    { id:"go2", name:"Münzbeutel",  amt:31500,  cost:220, free:false, art:"shop_gold_t2",
+      seal:"pop" },
+    { id:"go3", name:"Goldschwall", amt:126000, cost:800, free:false, art:"shop_gold_t3",
+      seal:"best" },
+    { id:"go0", name:"Tagesgold",   amt:2500,   cost:0,   free:true,  art:"shop_gold_t4",
+      wide:true },
   ];
   var goldFreeTaken = false;
 
@@ -4244,23 +4504,25 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     var p = AC.getPityStatus();
     $("packPity").innerHTML = "Episch ≤" + p.epicIn + " · Legendär ≤" + p.legendaryIn;
 
+    // Tagesangebote: HELLE Rahmen (neutral), Material-Bundles mit den
+    // neuen Produktbildern.
     $("dealGrid").innerHTML = DEALS.map(function (d) {
       var left = d.avail - (dealUsed[d.id] | 0), sold = left <= 0;
       var price = d.cur === "free" ? "Gratis"
-        : (d.cur === "gold" ? ico("cur_gold", "🪙") : ico("cur_gem", "💎")) + " " + fmt(d.cost);
-      return '<div class="shopcard tinted' + (sold ? " sold" : "") + '" data-deal="' + d.id +
-        '" style="' + tintStyle(d.cur === "gems" ? "gems" : d.cur === "free" ? "free" : "gold") +
-        '">' +
-        '<span class="sart">' + ico(d.art, d.emoji, "xl") + "</span>" +
-        '<span class="snm">' + d.name + "</span>" +
-        '<span class="savail">Verfügbar: ' + Math.max(0, left) + "</span>" +
-        '<button class="sbuy' + (d.cur === "gems" ? " gems" : "") + '" data-buy="' + d.id + '"' +
-          (sold ? " disabled" : "") + ">" + (sold ? "Ausverkauft" : price) + "</button></div>";
+        : (d.cur === "gold" ? ico("cur_gold", "🪙") : ico("cur_gem", "💚")) + " " + fmt(d.cost);
+      return prodCard({
+        frame: "light", art: d.art, emoji: d.emoji,
+        name: d.name, sub: "Verfügbar: " + Math.max(0, left),
+        btn: sold ? "Ausverkauft" : price, sold: sold, disabled: sold,
+        btnCls: d.cur === "free" ? "freeprice" : (d.cur === "gems" ? "gemprice" : "goldprice"),
+        btnAttr: 'data-buy="' + d.id + '"', attr: 'data-deal="' + d.id + '"',
+      });
     }).join("");
+    hydrateProdCards($("dealGrid"));
 
     $("packShop").innerHTML = SHOP_PACKS.map(function (sp) {
       var pk = AC.PACKS[sp.key];
-      var price = (sp.cur === "gold" ? ico("cur_gold", "🪙") : ico("cur_gem", "💎")) + " " + fmt(sp.cost);
+      var price = (sp.cur === "gold" ? ico("cur_gold", "🪙") : ico("cur_gem", "💚")) + " " + fmt(sp.cost);
       return '<div class="shopcard tinted" data-pack="' + sp.key +
         '" style="position:relative;' + tintStyle("pack_" + sp.key) + '">' +
         '<span class="sart">' + ico("pack_" + sp.key, "🎁", "xl") + "</span>" +
@@ -4282,6 +4544,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     renderGemPacks();
     renderGoldPacks();
 
+    hydrateRibbons($("viewShop"));
     $("iapNote").innerHTML = "<b>Echtgeld ist im Prototyp ein Platzhalter.</b> Arena-Pack, " +
       "Starter-Pack und die Gem-Pakete zeigen Preise in Fr. wie AAs Store, lösen aber " +
       "keinen Kauf aus — der Gold-Tausch unten läuft dagegen echt gegen die Demo-Wallet.";
@@ -4298,6 +4561,56 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     markPressable($("viewShop"));
     UIBadge.set("shop", DEALS.filter(function (d) { return (d.avail - (dealUsed[d.id] | 0)) > 0; }).length);
   }
+  /* ==================================================================
+   * prodCard(o) — EINE Produktkarte, drei Ebenen (Konzept „Option A")
+   * ------------------------------------------------------------------
+   *   o.frame  "orange" (Gems) | "green" (Gold) | "light" (neutral)
+   *   o.art    Asset-Key des Produktbildes   o.emoji  Fallback
+   *   o.name/amt/sub/btn/btnCls/seal/wide/sold/attr
+   * Der Rahmen liegt als EIGENES Element ueber dem Produktbild (die
+   * Rahmen-PNGs haben eine leere Mitte), Text und Knopf darueber.
+   * ================================================================== */
+  var FRAME_ASSET = { orange: "frame_card_orange", green: "frame_card_green",
+                      light: "frame_card_light" };
+  function prodCard(o) {
+    var seal = o.seal
+      ? '<span class="seal ' + o.seal + '">' +
+        (o.seal === "pop" ? "BELIEBT!" : "BESTER WERT!") + "</span>" : "";
+    return '<div class="prodcard fr-' + o.frame + (o.wide ? " wide" : "") +
+      (o.seal ? " hasseal" : "") + (o.sold ? " sold" : "") + '" ' + (o.attr || "") + ">" +
+      seal +
+      '<span class="pcart">' + ico(o.art, o.emoji || "•", "prodimg") + "</span>" +
+      '<span class="pcfrm" data-prodfrm="' + FRAME_ASSET[o.frame] + '"></span>' +
+      '<span class="pcbody">' +
+        '<span class="pcnm">' + o.name + "</span>" +
+        (o.amt ? '<span class="pcamt">' + o.amt + "</span>" : "") +
+        (o.sub ? '<span class="pcsub">' + o.sub + "</span>" : "") +
+        '<button class="pcbuy ' + (o.btnCls || "") + '" ' + (o.btnAttr || "") +
+          (o.disabled ? " disabled" : "") + ">" + o.btn + "</button>" +
+      "</span></div>";
+  }
+  /* Nur der RAHMEN wird als Background gesetzt (er muss die ganze Kachel
+     bedecken). Das Produktbild laeuft ueber ico() und damit ueber den
+     bewaehrten <img onerror>-Fallback: schlaegt das Laden fehl, tauscht
+     UIIcon.fail() das Bild gegen das Emoji.
+     ⚠ Ein `new Image()`-Probe waere hier FALSCH gewesen: Die Instanz wird
+       von nichts gehalten und kann vor dem error-Event eingesammelt
+       werden — dann bleibt das Bildfeld dauerhaft leer. Genau das ist im
+       ersten Durchgang passiert. */
+  function hydrateProdCards(root) {
+    Array.prototype.forEach.call(root.querySelectorAll("[data-prodfrm]"), function (el) {
+      var k = el.getAttribute("data-prodfrm");
+      if (k && ASSETS[k]) el.style.backgroundImage = 'url("' + ASSETS[k] + '")';
+    });
+    sweepSoon(root);
+  }
+  /* Nachgerenderte Bereiche brauchen ihren eigenen Sweep — der Boot-Sweep
+     lief, bevor diese Karten existierten. */
+  function sweepSoon(root) {
+    setTimeout(function () { UIIcon.sweep(root); }, 900);
+    setTimeout(function () { UIIcon.sweep(root); }, 2200);
+  }
+
   /* (1) Promo-Banner. Zeigt den Season-Pass, solange er nicht aktiv
      ist — danach den naechsten erreichbaren Meilenstein. AAs Platz 1
      ist immer belegt, deshalb faellt der Banner nie weg. */
@@ -4324,51 +4637,47 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       return '<div class="iapcard tinted" data-iap="' + p.id + '" style="' +
         tintStyle(p.id === "arena" ? "pack_gold" : "pack_arcane") + '">' +
         '<span class="valbadge">' + p.value + "</span>" +
-        '<span class="iart">' + ico(p.art, p.emoji, "xl") + "</span>" +
+        '<span class="iart" data-prodart="' + p.art + '">' + p.emoji + "</span>" +
         '<span class="itx"><span class="inm goldtext">' + p.name + "</span>" +
           '<span class="isub">' + p.sub + "</span>" +
           '<span class="iapicons">' + items + "</span></span>" +
         '<button class="ibuy" data-iapbuy="' + p.id + '">' + p.price + "</button></div>";
     }).join("");
+    hydrateProdCards($("arenaPackBox"));
     Array.prototype.forEach.call($("arenaPackBox").querySelectorAll("[data-iapbuy]"), function (b) {
       b.addEventListener("click", function () { buyIap(b.getAttribute("data-iapbuy")); });
     });
   }
-  /* (6) Gem-Pakete. */
+  /* (6) Gem-Pakete — ORANGE Rahmen (AAs Farbcode fuer Gems). */
   function renderGemPacks() {
     $("gemShop").innerHTML = GEM_PACKS.map(function (g) {
-      var seal = g.seal
-        ? '<span class="seal ' + g.seal + '">' +
-          (g.seal === "pop" ? "BELIEBT!" : "BESTER WERT!") + "</span>" : "";
-      return '<div class="gemcard tinted' + (g.seal ? " hasseal" : "") + (g.wide ? " wide" : "") +
-        '" data-gem="' + g.id + '" style="' + tintStyle("gems") + '">' + seal +
-        '<span class="gart">' + ico("cur_gem", "💎", "big") + "</span>" +
-        '<span class="gnm">' + g.name + "</span>" +
-        '<span class="gamt">' + fmt(g.amt) + "</span>" +
-        '<button class="gbuy" data-gembuy="' + g.id + '">' + g.price + "</button></div>";
+      return prodCard({
+        frame: "orange", art: g.art, emoji: "💚", seal: g.seal, wide: g.wide,
+        name: g.name, amt: fmt(g.amt), sub: "Gems",
+        btn: g.price, btnCls: "gemprice", btnAttr: 'data-gembuy="' + g.id + '"',
+        attr: 'data-gem="' + g.id + '"',
+      });
     }).join("");
+    hydrateProdCards($("gemShop"));
     Array.prototype.forEach.call($("gemShop").querySelectorAll("[data-gembuy]"), function (b) {
       b.addEventListener("click", function () { buyIap(b.getAttribute("data-gembuy")); });
     });
   }
-  /* (7) Gold-Tausch — der EINZIGE Block hier, der echt bucht. */
+  /* (7) Gold-Tausch — GRUENE Rahmen; der EINZIGE Block, der echt bucht. */
   function renderGoldPacks() {
     $("goldShop").innerHTML = GOLD_PACKS.map(function (g) {
-      var seal = g.seal
-        ? '<span class="seal ' + g.seal + '">' +
-          (g.seal === "pop" ? "BELIEBT!" : "BESTER WERT!") + "</span>" : "";
       var taken = g.free && goldFreeTaken;
       var label = g.free
         ? (taken ? "Wieder morgen" : "GRATIS · 1× täglich")
-        : ico("cur_gem", "💎") + " " + fmt(g.cost);
-      return '<div class="goldcard tinted' + (g.seal ? " hasseal" : "") + (g.wide ? " wide" : "") +
-        '" data-gold="' + g.id + '" style="' + tintStyle("gold") + '">' + seal +
-        '<span class="gart">' + ico("cur_gold", "🪙", "big") + "</span>" +
-        '<span class="gnm">' + g.name + "</span>" +
-        '<span class="gamt">' + fmt(g.amt) + "</span>" +
-        '<button class="gbuy' + (g.free ? " free" : "") + '" data-goldbuy="' + g.id + '"' +
-          (taken ? " disabled" : "") + ">" + label + "</button></div>";
+        : ico("cur_gem", "💚") + " " + fmt(g.cost);
+      return prodCard({
+        frame: "green", art: g.art, emoji: "🪙", seal: g.seal, wide: g.wide,
+        name: g.name, amt: fmt(g.amt), sub: "Gold",
+        btn: label, btnCls: g.free ? "freeprice" : "goldprice", disabled: taken,
+        btnAttr: 'data-goldbuy="' + g.id + '"', attr: 'data-gold="' + g.id + '"',
+      });
     }).join("");
+    hydrateProdCards($("goldShop"));
     Array.prototype.forEach.call($("goldShop").querySelectorAll("[data-goldbuy]"), function (b) {
       b.addEventListener("click", function () { buyGold(b.getAttribute("data-goldbuy")); });
     });
@@ -4887,7 +5196,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       var botPct = Math.max(0, q.pct - minePct);
       return '<div class="qcard tinted' + (q.done ? " done" : "") + '" data-quest="' + q.key +
         '" style="' + tintStyle("q_" + q.key) + '">' +
-        '<div class="qtop"><span class="qsym">' + q.sym + "</span>" +
+        '<div class="qtop"><span class="qsym">' +
+          ico(q.key === "wins" ? "ic_war" : "ic_quest", q.sym, "xl") + "</span>" +
           '<span class="qtx"><span class="qnm">' + q.title + "</span>" +
           '<span class="qds">' + q.desc + "</span></span>" +
           '<span class="qval">' + fmt(q.total) + " / " + fmt(q.goal) + "</span></div>" +
@@ -5053,7 +5363,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     var wb = CL.warBoard();
     if (wb.phase.phase !== "war") {
       $("paneWar").innerHTML =
-        '<div class="warwait"><div class="wk">SAMMELPHASE — KRIEG STARTET IN</div>' +
+        '<div class="warwait"><div class="wk">' + ico("ic_hourglass", "⏳") +
+          " SAMMELPHASE — KRIEG STARTET IN</div>" +
         '<div class="wc">' + CL.hhmm(wb.phase.msLeft) + "</div>" +
         '<div class="wd">Samstag 00:00 tritt <b>' + wb.them.name + "</b> an " +
           "(Ø " + fmt(wb.them.avgTrophies) + " 🏆). Bis dahin zählen Siege, Packs und " +
@@ -5088,9 +5399,11 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       '<div class="warlead ' + (wb.leading ? "up" : "down") + '">' +
         (wb.leading ? "▲ " + fmt(wb.lead) + " Punkte Vorsprung" :
                       "▼ " + fmt(-wb.lead) + " Punkte Rückstand") +
-        " · Kriegsende in " + CL.hhmm(wb.phase.msLeft) + "</div></div>";
+        " · " + ico("ic_hourglass", "⏳") + " Kriegsende in " +
+        CL.hhmm(wb.phase.msLeft) + "</div></div>";
 
-    html += '<div class="atkhead"><span>Ghost-Gegner (' + wb.targets.length + ")</span>" +
+    html += '<div class="atkhead"><span>' + ico("ic_war", "⚔") + " Ghost-Gegner (" +
+      wb.targets.length + ")</span>" +
       '<span class="left">Angriffe heute ' + wb.attacksLeftToday + "/" + wb.attacksPerDay +
       "</span></div>";
     html += wb.targets.map(function (g) {
@@ -5462,7 +5775,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       var o = read();
       if (o.premium) throw new Error("Der Premium-Pass ist bereits aktiv.");
       if (gemsAvailable != null && gemsAvailable < PREMIUM_GEMS) {
-        throw new Error("Nicht genug Gems — der Pass kostet " + PREMIUM_GEMS + " 💎.");
+        throw new Error("Nicht genug Gems — der Pass kostet " + PREMIUM_GEMS + " 💚.");
       }
       o.premium = true;
       write(o);
@@ -5560,7 +5873,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     var bp = $("btnBuyPass");
     bp.disabled = !!st.premium;
     bp.textContent = st.premium ? "✔ Premium-Pass aktiv"
-      : "Pass aktivieren · " + st.premiumGems + " 💎";
+      : "Pass aktivieren · " + st.premiumGems + " 💚";
 
     var rows = "";
     for (var L = 1; L <= st.levels; L++) {
@@ -5911,9 +6224,10 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   }
   function renderSettings() {
     applySettings();
+    hydrateRibbons($("viewSettings"));
     $("credits").innerHTML = "Arcane Prism TD · " + APP_VERSION + "<br>" +
       "Logik: arena_cards.js · arena_fortress.js · arena_clan.js · arena_rivals.js<br>" +
-      "115 Assets im Stil „Edel &amp; Kristallin“ · alle Texte Deutsch<br>" +
+      "154 Assets im Stil „Edel &amp; Kristallin“ · alle Texte Deutsch<br>" +
       "Musik &amp; Klaenge: CC0 von OpenGameArt.org — siehe LIZENZEN.md";
     $("saveNote").textContent = "Der Export enthält ausschließlich die " + SAVE_KEYS.length +
       " Prototyp-Schlüssel aus dem localStorage — keine Konto- oder Gerätedaten.";
@@ -5938,7 +6252,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
    * ================================================================== */
   var TINTS = {
     gold:        ["#6b4f14", "#2a1e08"],
-    gems:        ["#2f4f8f", "#111c33"],
+    gems:        ["#12613c", "#072014"],   // Smaragd — Gem-Identitaet
     free:        ["#1f6b4a", "#0c2a1e"],
     attack:      ["#7a2a20", "#2a1210"],
     speed:       ["#12556e", "#0a2231"],
@@ -6031,9 +6345,9 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       ? '<button class="vaultbtn pressable" data-openvault="1">' + v.priceText +
         "<small>" + fmt(v.gems) + " Gems holen</small></button>"
       : '<div class="vaultbtn dim">leer<small>gewinne Matches</small></div>';
-    return '<div class="vaultjar">' +
+    return '<div class="vaultjar" data-vaultart="offer_vault_bank">' +
         '<span class="fill" style="height:' + (v.pct * 100).toFixed(1) + '%"></span>' +
-        '<span class="gem">' + ico("cur_gem", "💎") + "</span></div>" +
+        '<span class="gem">' + ico("cur_gem", "💚") + "</span></div>" +
       '<div class="vaultmeta"><div class="vnm">Kristalltresor</div>' +
         '<div class="vnum">' + fmt(v.gems) + " / " + fmt(v.cap) + "</div>" +
         '<div class="vsub">' + (v.full
@@ -6050,9 +6364,17 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     ["vaultBox", "vaultShop"].forEach(function (id) {
       var el = $(id); if (!el) return;
       el.className = "vaultbox tinted" + (v.full ? " full" : "");
-      el.style.setProperty("--t1", v.full ? "#6b4f14" : "#2f4f8f");
-      el.style.setProperty("--t2", v.full ? "#2a1e08" : "#111c33");
+      // Gem-Identitaet: Smaragd statt Blau (Abgrenzung von AA).
+      el.style.setProperty("--t1", v.full ? "#6b4f14" : "#12613c");
+      el.style.setProperty("--t2", v.full ? "#2a1e08" : "#072014");
       el.innerHTML = vaultHTML(v, id === "vaultShop");
+      /* Das Glaskugel-Artwork liegt UEBER der Fuellstands-Saeule: Die
+         Saeule zeigt den Stand, das Artwork gibt ihr das Gefaess. Faellt
+         das Bild aus, bleibt die reine CSS-Saeule sichtbar. */
+      Array.prototype.forEach.call(el.querySelectorAll("[data-vaultart]"), function (j) {
+        var k = j.getAttribute("data-vaultart");
+        if (ASSETS[k]) j.style.backgroundImage = 'url("' + ASSETS[k] + '")';
+      });
       ambient(el, v.full ? 8 : 4);
       Array.prototype.forEach.call(el.querySelectorAll("[data-openvault]"), function (b) {
         b.addEventListener("click", openVault);
@@ -6122,7 +6444,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     if (!o) { UISfx.deny(); toast("Dieses Angebot ist nicht mehr verfuegbar"); return; }
     V.markShown(key);                       // meldet offer_shown an die Telemetrie
     var items = [
-      { ico: "cur_gem", emo: "💎", t: fmt(o.content.gems) + " Gems" },
+      { ico: "cur_gem", emo: "💚", t: fmt(o.content.gems) + " Gems" },
       { ico: "cur_gold", emo: "🪙", t: fmt(o.content.gold) + " Gold" },
       { ico: "ess_special", emo: "⚗", t: o.content.material + " Material" },
       { ico: "pack_" + o.content.packs[0], emo: "🎁",
@@ -6188,7 +6510,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
           q.key + '">HOLEN</button>';
       return '<div class="dqrow tinted edge' + (q.done ? " done" : "") + '" data-dqrow="' +
         q.key + '" style="' + tintStyle("q_" + (q.key === "war" ? "war" : q.key)) + '">' +
-        '<span class="dqs">' + q.sym + "</span>" +
+        '<span class="dqs">' +
+          ico(q.key === "war" ? "ic_war" : "ic_quest", q.sym, "xl") + "</span>" +
         '<span class="dqt"><span class="dqn">' + q.title + "</span>" +
           '<span class="dqb"><i style="width:' + (q.pct * 100).toFixed(0) + '%"></i></span>' +
           '<span class="dqv">' + q.have + "/" + q.goal + "  ·  " + fmt(q.gold) +
@@ -6667,7 +6990,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
                navPass: "viewPass", navHeroes: "viewHeroes", navEvents: "viewEvents",
                navMail: "viewMail", navSettings: "viewSettings",
                navGuide: "viewGuide", navManual: "viewManual" };
-  var NAV_IDS = ["navShop", "navCollection", "navHome", "navFortress", "navPack",
+  var NAV_IDS = ["navShop", "navCollection", "navHome", "navClan", "navFortress", "navPack",
                  "navTower", "navForge", "navClan", "navBoard",
                  "navPass", "navHeroes", "navEvents", "navMail", "navSettings"];
   // navTower / navForge haben KEINEN eigenen Bottom-Nav-Knopf mehr (AA-
@@ -6741,7 +7064,9 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   // Clan + Rangliste haengen an den Home-Hub-Kacheln (siehe Kommentar
   // im Markup) und haben deshalb keinen eigenen Bottom-Nav-Knopf.
   // Icon-Leiste der Profilzeile + AA-Reihe EVENTS | BATTLE | CHALLENGES
-  onNav("icoClan", "navClan"); onNav("icoBoard", "navBoard");
+  // Clan hat jetzt einen Bottom-Nav-Tab; der frei gewordene Home-Slot
+  // fuehrt zu den Packs.
+  onNav("navClan"); onNav("icoPack", "navPack"); onNav("icoBoard", "navBoard");
   onNav("passBanner", "navPass"); onNav("icoMail", "navMail");
   // Promo-Banner an Shop-Position 1 fuehrt in den Season-Pass (§8.1).
   onNav("shopPromo", "navPass");
@@ -6896,7 +7221,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     tint($("tileEvents"), "nature");
     tint($("tileGuide"), "gold");
     tint($("icoDaily"), "pack_gold");
-    tint($("icoClan"), "special");
+    tint($("icoPack"), "pack_gold");
     tint($("icoBoard"), "gold");
     tint($("icoMail"), "speed");
     tint($("icoSettings"), "neutral");
@@ -6910,6 +7235,12 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   /* ================= Start ================= */
   setSort("level");
   hydrateIcons();          // <i data-ico> -> Kristall-Icon (Emoji-Fallback)
+  hydrateBgIcons();        // Bottom-Nav-Popouts + Plus-Knoepfe der Waehrungspillen
+  hydrateRibbons();        // Sektions-Trenner im hellen Kit-Banner-Stil
+  // Zweimal nachfassen: nach 1.2 s (normaler Ladeschluss) und nach 3 s
+  // (haengende Requests). Danach steht in keinem Bildfeld mehr ein Loch.
+  setTimeout(function () { UIIcon.sweep(); }, 1200);
+  setTimeout(function () { UIIcon.sweep(); }, 3000);
   applyAssets();
   renderCollection();
   renderShop();

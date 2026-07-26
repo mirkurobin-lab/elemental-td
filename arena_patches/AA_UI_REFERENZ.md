@@ -2016,3 +2016,113 @@ und was Entscheidung:
   mitgemacht, weil ein dritter Knopf ohne dahinterliegende Belohnungsspur nur Attrappe wäre.
 * **Echtgeld** (Arena-Pack, Starter-Pack, Gem-Pakete) ist im Prototyp ein **Platzhalter**:
   Der Klick sagt genau das und rührt keine Wallet an. Nur der Gold-Tausch bucht echt.
+
+---
+
+## 20. Farb- und Bewegungsmessung der AA-Meta-UI (2026-07-26)
+
+Anlass: Der Prototyp wirkte trotz aller Inhalte „leer/tot". Die Vermutung war, dass AA mehr
+**Bewegung** hat. Die Messung zeigt das Gegenteil — AA hat mehr **Farbfläche**.
+
+### 20.1 Methode
+
+Video 6 (komplette Menü-Tour, 264 s) und Video 11 (Shop/Helden/Turmkarten/Merge, 129 s) wurden
+Bild für Bild ausgewertet, nicht per Augenmaß:
+
+* **Farbe:** Jeder Screenshot wird in 14 waagerechte Bänder geschnitten. Pro Band wird der
+  Farbton-Sättigung-Helligkeit-Histogramm-Modus bestimmt, wobei fast schwarze und
+  entsättigt-dunkle Pixel verworfen werden. Ergebnis: der dominante *Farbeindruck* je
+  Bildschirmzone mit Flächenanteil in Prozent.
+* **Bewegung:** Aus 8–16 aufeinanderfolgenden Bildern (10–12 fps) wird die mittlere absolute
+  Pixeldifferenz gebildet — global und je Zelle eines 16 × 4-Rasters. Der **Rauschboden liegt
+  gemessen bei exakt 0,00**, jeder Wert darüber ist echte Bewegung. Zeitpunkte mit globaler
+  Bewegung > 3 sind Scroll-/Tippmomente und für die Animationsfrage unbrauchbar; deshalb wurde
+  das ganze Video zuerst nach **statischen Fenstern** durchsucht.
+
+### 20.2 Ergebnis Bewegung — AAs Meta-UI ist praktisch statisch
+
+Statische Fenster in Video 6: 90 / 94 / 98 / 190–218 / 226–242 s. Gemessene globale Bewegung
+dort: **0,00–0,05**. In Video 11 an den Turm-Detailkarten (63–97 s): **0,0–0,4**.
+
+| Screen | statisch gemessen | Bewegung |
+|---|---|---|
+| Season-Pass „Golden Fortune" | t=90 / 94 s | **0,03–0,05 → nichts bewegt sich** |
+| Festungs-Upgrades | t=230 / 242 s | **0,00–1,5**, und zwar nur ein kleines Feld in der Mitte |
+| Collection / Battle Deck | t=120 s (V11) | 0,0 |
+| Leaderboard / Champions Peak | t=190–218 s | 0,4–0,5 |
+| Helden | t=36 / 38 / 40 s | 0,0 |
+| **Turm-Detailkarte** | t=84 / 96 s | **lokal 1,5–5,9 in Zeile 6–9 von 16** |
+
+Damit ist §2.2 **bestätigt und präzisiert**: Der Turm wird animiert, aber nur in einem kleinen
+Ausschnitt in der senkrechten Bildmitte (etwa y 38–62 %), Amplitude bescheiden. Zusätzlich
+läuft dauerhaft ein **kleines Schimmer-Element** bei Zeile 5, Spalte 1 (Wert konstant 1,1–1,6)
+— vermutlich das Raritäts-/Level-Abzeichen.
+
+**Konsequenz für uns:** Wir haben bereits **8 Karten-Loop-Videos** und ein **animiertes
+Pass-Keyart**. Damit liegen wir über AAs Bewegungsniveau. Weitere Loop-Videos sind zur
+Angleichung **nicht nötig** und wären verbrannte Credits. Bewegung ist nicht die Lücke.
+
+### 20.3 Ergebnis Farbe — hier ist die Lücke
+
+Unsere Palette ist über alle Views hinweg dieselbe: `--bg:#0e1418`, `--panel:#16202a`,
+`--panel2:#1c2833` — ein einziges dunkles Grau-Blau. AA dagegen gibt **jedem Screen eine
+eigene, großflächige Farbwelt**:
+
+| Screen | AA (gemessen) | wir | Aktion |
+|---|---|---|---|
+| **Shop** | jede Karte eigener satter Ton: violett 270°, blau 210/229°, orange 30°, gold 50°, magenta 310°, cyan 190° | nur Gems orange + Gold grün (Batch 6) | restliche Sektionen einfärben |
+| **Festung/Burg** | **violett/magenta 270–290°, s 0,6–0,9, v 0,6 auf 70–100 % der Fläche** | dunkelgrau | große satte Farbfelder |
+| **Clan** | **hell/weiß 210°, s 0,1, v 0,9 auf 40–50 % der Fläche** | dunkelgrau | helle Panels — genau der Kit-Banner-Look |
+| **Leaderboard** | violett/indigo 270°/250°, s 1,1 | dunkelgrau | violette Grundfläche |
+| **Arena-Liste** | **pro Arena ein eigener Farbton**: orange 30°, grün 90°, violett 270°, cyan 170° | einheitlich | Farbton je Arena |
+| **Helden** | dunkle Basis + **helle Panels** je Held (s 0,1, v 0,9) + mittelblaue Statboxen (s 0,6, v 0,4–0,6) | dunkelgrau | helle Heldenpanels |
+| **Turm-Detailkarte** | blaue Basis + **grüne Statfläche** 70°, s 0,9, v 0,6 (Band 6–8) | dunkelgrau | grüne Statfläche |
+| **Merge / Schmiede** | **rot-braun getönte obere Hälfte** 10°, s 0,4 | dunkelgrau | Warmtönung oben |
+| **Season-Pass** | gold/orange Keyart-Header + Tier-Farben je Reihe | teils vorhanden | Tier-Reihen einfärben |
+| **Home** | mittelblaues Diorama 229°, s 0,6, v 0,4 + orange/gold Akzente | dunkelgrau | Dioramafläche aufhellen |
+| **Collection / Deck** | einheitlich dunkelblau 210°, s 0,9, v 0,1 — die **Karten** tragen die Farbe | dunkel ✓ | **passt, nicht anfassen** |
+
+Der Merksatz: AA ist nicht bunter, weil es blinkt, sondern weil **jeder Screen eine eigene
+große Farbfläche** hat. Nur Collection und Deck sind bei AA so dunkel wie bei uns überall —
+und genau dort ist unsere Optik deshalb schon richtig.
+
+### 20.4 Icon-Bestandsaufnahme des Prototyps
+
+Zählung über die Emoji-Unicode-Bereiche in `ui_prototype.html`: **356 Treffer, 98 verschiedene
+Zeichen**. Nach Abzug von Text-Pfeilen (`→` ×67) und Text-Markern (`⚠` ×16, `✓`/`✔` ×9) bleiben
+als echte Icon-Lücken:
+
+| Emoji | Vorkommen | Rolle | Ersatz |
+|---|---|---|---|
+| 🏆 | 33 | Trophäen — das häufigste Icon überhaupt | `ic_trophy` |
+| 🪙 | 22 | **Gold-Währung** | `cur_gold` |
+| 💎 | 4 | **Gem-Währung** | `cur_gem` (smaragdgrün) |
+| 🔥❄🪨🌿☀🌑 | 28 | die **sechs Elemente** | `el_feuer` … `el_dunkelheit` |
+| ⚗ | 10 | Material/Essenz | `cur_material` |
+| 🥇🥈🥉 | 11 | Liga-Ränge | `rank_gold/silber/bronze` |
+| 🔒 | 6 | gesperrt | `ic_lock` |
+| 🛡 | 4 | Verteidigung | `ic_shield` |
+| ⚡ | 4 | Tempo | `ic_speed` |
+| 📥 | 1 | „Karten anfragen" | `ic_request` |
+
+Die beiden **Währungs-Icons** sind die dringendsten: sie stehen in der Top-Bar und an jedem
+Preis, also auf praktisch jedem Screen.
+
+### 20.5 Clan-Kartenversand — was visuell fehlt
+
+`doDonate()` besteht heute aus **Sound + Toast + Neu-Rendern**. Der Moment, in dem ein Spieler
+einem Clankameraden hilft, ist damit visuell nicht vorhanden — obwohl er der emotionale Kern
+des Clans ist. Fehlend:
+
+1. **Sende-Zeremonie:** Die Karte muss sichtbar von der eigenen Sammlung zur Anfragezeile
+   fliegen (Flug + Funkenschweif + Einschlag), nicht nur eine Zeile weiterzählen.
+2. **Belohnungs-Einblendung:** `+Gold` und `+Material` als Icon-Zahl-Paare, die aus der
+   Einschlagstelle aufsteigen — nicht als Text im Toast.
+3. **Erfüllungs-Moment:** Wird eine Anfrage mit der Spende voll, braucht das eine eigene
+   Bestätigung („Anfrage erfüllt!") mit Aufleuchten der Zeile.
+4. **Kontingent-Feedback:** Die Punktreihe (`qdots`) muss den verbrauchten Punkt sichtbar
+   umschalten, damit die 10-pro-3-Stunden-Regel begreifbar wird.
+5. **Icons:** `ic_donate` für den Spenden-Knopf, `ic_request` statt 📥.
+6. **Helle Panels** nach §20.3, damit der Clan sich wie bei AA vom Rest abhebt.
+
+Punkte 1–4 sind reine CSS/JS-Choreografie und kosten kein Asset.

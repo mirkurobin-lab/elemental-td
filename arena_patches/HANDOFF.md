@@ -785,6 +785,50 @@ Arkan für Gems) plus **1 Gratis-Tagespack** mit Badge, jedes mit Garantietext u
 **offenem Pity-Stand**. Käufe laufen gegen die Demo-Wallet und `ArenaCards`; ein
 Pack-Kauf öffnet direkt die Pack-Ansicht (`openPackKey`).
 
+### AAA-Icon-Sweep (Batch 6, 39 Assets) — Konzept „Option A"
+
+**Bottom-Nav neu geordnet** (User-Vorgabe): **Shop | Sammlung | START | Clan | Burg**.
+Alle fünf Tabs tragen `.navpop`-Illustrationen (`nav_shop`, `nav_cards`, `nav_start`,
+`nav_clan` — **V2**, nicht `nav_clan_v1`, `nav_fortress`), die oben aus der Leiste
+herausragen (`overflow:visible` + negativer `margin-top`); die Mitte ist mit 60 px die
+größte. Nav bleibt `position:fixed`, Badges bleiben.
+
+> **Wo sind die Packs hin?** Die Packs hatten den fünften Nav-Platz und sind in die
+> Icon-Leiste der Profilzeile gewandert (`#icoPack`, `ic_gift`). Begründung: Der Clan wird
+> **täglich** angefasst (Spenden, Quests, Krieg) und braucht deshalb den Dauerplatz. Das
+> Pack-Öffnen ist dagegen **ereignisgetrieben** — nach einem Sieg, aus einer Truhe, aus dem
+> Shop — und wird von diesen Stellen ohnehin direkt angesprungen (`show("navPack")`).
+
+**Produktkarten im Shop** (`prodCard()`): AA codiert seine Store-Kacheln über die
+**Rahmenfarbe** (IMG_3306-3308). Übernommen mit unseren Rahmen:
+`frame_card_orange` = Gems · `frame_card_green` = Gold · `frame_card_light` = Angebote/Material.
+Die Rahmen-PNGs haben eine **leere Mitte**, deshalb drei Ebenen: `.pcart` (Produktbild,
+z 0) · `.pcfrm` (Rahmen, absolut, z 2) · `.pcbody` (Text + Knopf, z 3). Das Produktbild ist
+ein **Flex-Item**, kein absolutes Element — sonst überlappt es den Text. Gem- und
+Gold-Produktbilder sind **Eskalationsketten** (`shop_gem_t1…t6`, `shop_gold_t1…t4`):
+das Bild erzählt die Menge, nicht die Zahl.
+
+**Sektions-Ribbons**: alle Shop-Sektionen tragen `ribbon_section_lg` (`.secribbon`).
+Das Ribbon ist **hell-silber** — `.goldtext` ist dort **verboten**, der Titel hat dunkle
+Füllfarbe. Timer/Pity-Stand hängen rechts außen (`.srx`), nicht auf dem Band.
+
+**Gem-Identität smaragdgrün** (`--gemc: #2fd47a`), bewusste Abgrenzung von AA: Währungs-Icon,
+Zahl und Rand der Top-Bar-Pille, alle Gem-Preise, der Gems-Tint und der Kristalltresor.
+**Gold bleibt gold** — sonst kollidieren die beiden Währungen.
+
+**Utility-Icons**: `ic_calendar` · `ic_gift` · `ic_rank` · `ic_mail` · `ic_gear` (Profilzeile),
+`ic_tent` (Events), `ic_compass` (Guide), `ic_helm` (Helden), `ic_quest` / `ic_war` (Quests
+und Clankrieg), `ic_hourglass` (Countdowns), `ic_plus` (Plus-Knöpfe der Währungspillen).
+
+> **`UIIcon.sweep()` — neu und wichtig.** Alle Bilder laufen über
+> `<img … onerror="UIIcon.fail(this)">`. Bei hängenden Verbindungen kommt `onerror`
+> aber **gar nicht** (Request läuft ins Timeout) und es stünde dauerhaft ein **leeres
+> Bildfeld** im Layout. `UIIcon.sweep()` tauscht alles mit `naturalWidth === 0` gegen sein
+> Emoji; es läuft bei 1,2 s und 3 s nach dem Boot und nach jedem Nachrendern
+> (`sweepSoon()`). Ein `new Image()`-Probe wäre hier **falsch**: Die Instanz wird von nichts
+> gehalten und kann vor dem error-Event eingesammelt werden — genau das ist im ersten
+> Durchgang passiert und hat alle Produktbilder leer gelassen.
+
 **Shop** (`#viewShop`): Sektionsreihenfolge **1:1 nach AA §8.1** — Promo-Banner ·
 Arena-/Starter-Pack · Tagesangebote · Booster-Packs · Kristalltresor (AAs Roulette-Platz) ·
 Gem-Pakete · Gold-Tausch. Jede Sektion trägt `data-sec="1…7"`, die v7-Suite prüft die
