@@ -241,6 +241,69 @@ function helligkeit(farbe) {
         strasse.ticks.length > 0 && strasse.ticks.every(x => x >= 34),
         strasse.ticks.join("/"));
 
+  /* ---------- Hintergrundebenen stapeln sich nicht (§6b) ----------
+     Befund vom 26.07., gefunden beim Einspielen der Kulissenbanner:
+     `layer()` und `bgArt()` lasen den BERECHNETEN Hintergrund und legten
+     ihr Artwork davor. Beim zweiten Aufruf lasen sie damit ihren eigenen
+     Stapel — jedes Neuzeichnen der Startseite hängte eine weitere Kopie
+     an. Gemessen nach einem einzigen Shop→Home→Shop-Durchgang: `.progbar`
+     und `.battlebtn` trugen drei Ebenen statt zwei, `.promobanner` und
+     `.vaultbox` fünf statt drei.
+     Das ist nicht nur unsauber, sondern ein §6b-Bruch: `background-size`
+     nennt zwei bzw. drei Werte, CSS wiederholt sie zyklisch, und die
+     ÜBERZÄHLIGE Artwork-Kopie landet dadurch auf `100% 100%` — die
+     gestreckte Bannergrafik, die §6b verbietet. Beide Funktionen nehmen
+     jetzt zuerst ihren Inline-Stil zurück und lesen die Farbplatte wieder
+     aus dem Blatt.
+
+     ⚠ WARUM DIE PRÜFUNG HIER STEHT UND NICHT NUR IN run_v7.js: die
+     Suiten sehen nur die ERSTE Ebene an. Genau diese Annahme („layer()
+     setzt das Artwork vorne ein") war es, die den Fehler jahrelang
+     unsichtbar hielt — und seit `bgArt()` einen Abdunkelungs-Verlauf
+     davorlegt, stimmt sie ohnehin nicht mehr. Gezählt wird deshalb
+     NACH einem Rundgang durch die Ansichten, nicht beim ersten Zeichnen:
+     einmalig stapelt nichts, der Fehler entsteht erst beim Wiederholen. */
+  for (const v of ["navShop", "navHome", "navShop", "navHome"]) {
+    await go(v);
+    await seite.waitForTimeout(250);
+  }
+  const stapel = await seite.evaluate(() => {
+    /* Ebenen einer Mehrfach-Eigenschaft zählen. NICHT mit split(",") —
+       ein linear-gradient() trägt selbst Kommas. */
+    const zerlege = s => {
+      const teile = []; let tiefe = 0, akt = "";
+      for (const z of String(s || "")) {
+        if (z === "(") tiefe++;
+        if (z === ")") tiefe--;
+        if (z === "," && tiefe === 0) { teile.push(akt.trim()); akt = ""; continue; }
+        akt += z;
+      }
+      if (akt.trim()) teile.push(akt.trim());
+      return teile;
+    };
+    const schlecht = [];
+    document.querySelectorAll("#arenaProg,#btnBattle,#shopPromo,#vaultBox,#vaultShop," +
+                              "#clanHead,.iapcard,.offercard").forEach(e => {
+      const cs = getComputedStyle(e);
+      const bilder = zerlege(cs.backgroundImage);
+      const groessen = zerlege(cs.backgroundSize);
+      const artwork = bilder.filter(b => /url\(/.test(b)).length;
+      if (artwork > 1) {
+        schlecht.push((e.id || e.className.split(" ")[0]) + ": " + artwork + " Artwork-Ebenen");
+        return;
+      }
+      bilder.forEach((b, i) => {
+        if (!/url\(/.test(b)) return;
+        const g = groessen.length ? groessen[i % groessen.length] : "";
+        if (/^100% 100%$/.test(g))
+          schlecht.push((e.id || e.className.split(" ")[0]) + ": Artwork gestreckt");
+      });
+    });
+    return schlecht;
+  });
+  pruef("Hintergrundebenen stapeln sich beim Neuzeichnen nicht",
+        stapel.length === 0, stapel.slice(0, 4).join(" | ") || "sauber");
+
   await browser.close();
   console.log("\n" + ok + " ok, " + fehler + " Fehler");
   process.exit(fehler ? 1 : 0);

@@ -2141,6 +2141,19 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
   border-color:color-mix(in srgb,var(--t1,#243342) 55%,#ffffff 12%)}
 .tinted.glow{box-shadow:0 0 0 1px color-mix(in srgb,var(--t1,#243342) 70%,#fff 10%),
   0 0 18px -4px var(--t1,#243342)}
+/* ---------- Kulissen-Artwork unter Inhalt (§6b/§6c) ----------
+   Drei Ebenen, Reihenfolge ist nicht verhandelbar:
+     1. Abdunkelung  100% 100%  — dunkelt die TEXTSPALTE ab, nicht das Zier
+     2. Artwork      cover      — wird NIE gestreckt (§6b)
+     3. Farbplatte   100% 100%  — bleibt Textgrundlage, auch wenn das CDN
+                                  nicht antwortet (§6c, Lehre aus §7b)
+   ⚠ Klasse DOPPELT (.artbg.artbg) — aus demselben Grund wie bei
+   .tinted.tinted: .clanhead und .trackbanner bringen ein eigenes
+   background-size mit und stehen weiter unten im Blatt. Bei gleicher
+   Spezifitaet gewaenne der spaetere; 0,2,0 macht die Ebenenordnung
+   reihenfolgeunabhaengig. */
+.artbg.artbg{background-repeat:no-repeat;background-position:center;
+  background-size:100% 100%,cover,100% 100%}
 /* Seitliche Farbkante — der billigste Weg, eine Reihe „zugehörig" wirken
    zu lassen, ohne den Text zu bedrängen. */
 .tinted.edge{position:relative;overflow:hidden}
@@ -4962,6 +4975,26 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     fort_pip_full:     CDN + "hf_20260725_150534_85413c44-d6fc-41ea-a6ee-2b0589f1d5f7.png",
     fort_pip_empty:    CDN + "hf_20260725_150536_445edf7f-152a-42cd-81f2-b18060e68ced.png",
     fort_milestone:    CDN + "hf_20260725_150538_2ac9dd11-83f1-435b-8f5c-793e503b448b.png",
+    /* ---- Batch 9: HINTERGRUND-BANNER (§6b/§6c) ----
+       Sechs Flaechen, die bisher nur ein CSS-Verlauf waren, bekommen ein
+       Artwork in der Bildsprache der Arena-Dioramen und des Trophaeenpfads.
+       Alle 21:9 (1584x672), Style-Sheet-Job 22646ce4 wie der uebrige Satz.
+       ⚠ ROLLE = KULISSE, nicht Rahmen und nicht Icon. Deshalb:
+         • background-size ist cover (die Farbplatte bleibt darunter als
+           Textgrundlage — §6b, „cover,100% 100%", nie umgekehrt),
+         • §6h (Eckfeld < 0,20 / Motiv-p05 > 0,30) gilt hier NICHT: eine
+           Kulisse SOLL deckend sein. Geprueft: Alpha 255/255, 0,0 %
+           transparent — wie der ganze uebrige Satz.
+       Komposition ist Absicht und gemessen: Zier und Kristalle sitzen an
+       den AUSSENRAENDERN, die Mitte ist leer und dunkel gehalten, weil
+       dort weisse Schrift steht (§6c). Der Abdunkelungs-Verlauf in
+       bgArt() schliesst den Rest — Messwerte in patches/assets.md. */
+    bg_iap_arena:    CDN + "hf_20260726_184110_8b8b9cc5-2c1e-4983-9a3b-6283386368a6.png",
+    bg_iap_starter:  CDN + "hf_20260726_184126_97a9bd6e-e212-4152-a17b-6ace195d688e.png",
+    bg_promo_pass:   CDN + "hf_20260726_184201_cc48b768-4e95-4eb4-aead-8a4b73cabac8.png",
+    bg_vault:        CDN + "hf_20260726_184212_a0d966f0-f946-4f8c-bfa9-23d46ac4555f.png",
+    bg_offer:        CDN + "hf_20260726_185048_05f524ec-483b-4d76-a5fe-fc5ec620f184.png",
+    bg_clanhead:     CDN + "hf_20260726_185059_c87c68aa-65b4-49d7-a058-6df1255d7f86.png",
     /* ---- Pack-Zeremonie (Referenzvideo, §17) ---- */
     card_back:       CDN + "hf_20260725_144624_82b4b51d-f9d3-416d-8212-52e2f3c0c0a1.png",
     cinematic_legendary:
@@ -5307,9 +5340,70 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
      Stylesheet definierten Gradienten bleiben als Fallback dahinter. */
   function layer(el, key) {
     if (!el || !ASSETS[key]) return;
+    /* ⚠ NICHT AUS DEM PATCH, sondern ein Befund BEIM Einspielen (26.07.).
+       layer() war nicht wiederholbar: es las den berechneten Hintergrund
+       und legte das Artwork davor. Beim zweiten Aufruf las es damit den
+       eigenen Stapel und legte eine ZWEITE Kopie davor. renderHome()
+       zeichnet aber bei jedem Ansichtswechsel neu — gemessen nach einem
+       einzigen Shop→Home-Wechsel: #arenaProg und #btnBattle trugen drei
+       Ebenen statt zwei, und weil `background-size` nur zwei Werte nennt,
+       wiederholt CSS sie zyklisch: die zweite Artwork-Kopie landete auf
+       `100% 100%` — die gestreckte Bannergrafik, die §6b verbietet, und
+       sie wuchs mit jedem Wechsel weiter.
+       Die alte Fassung der Pruefung konnte das strukturell nicht sehen,
+       weil sie nur die ERSTE Ebene ansah (siehe run_v7.js, Banner-
+       Passung). Dieselbe Ruecknahme wie in bgArt(): erst den Inline-Stil
+       leeren, dann die Farbplatte aus dem BLATT lesen. */
+    el.style.backgroundImage = "";
     var cur = getComputedStyle(el).backgroundImage;
     if (!cur || cur === "none") cur = "linear-gradient(180deg,#243342,#141d26)";
     el.style.backgroundImage = 'url("' + ASSETS[key] + '"), ' + cur;
+  }
+
+  /* bgArt(el, key) — Kulissen-Artwork als FLAECHE unter Inhalt.
+     ------------------------------------------------------------------
+     Unterschied zu layer(): es legt zusaetzlich einen Abdunkelungs-
+     Verlauf UEBER das Artwork. Warum das kein Geschmack ist, sondern
+     eine Messung: die Textzone (x 25–85 %) der sechs Banner hat im
+     Mittel L 0,11–0,21 — gut unter der 0,35-Schranke aus §6c —, aber
+     einzelne Lichtspitzen erreichen bis 1,02:1 gegen weisse Schrift.
+     Das ist die Bugklasse aus §4, nur punktuell statt flaechig.
+     Der Verlauf ist ein BAND, kein Radialverlauf: er dunkelt genau die
+     Textspalte ab und laesst die Aussenraender in Ruhe, wo Zier und
+     Kristalle sitzen. Nachgemessen liegt danach KEIN Pixel der Textzone
+     mehr ueber L 0,45; das schlechteste Weiss-auf-Grund steht bei
+     7,23:1 statt 1,02:1, waehrend die Raender p95 bis 0,60 behalten.
+     ------------------------------------------------------------------
+     Der Verlauf sitzt bewusst im background-image-Stapel und NICHT in
+     einem ::before: ein absolut positioniertes Pseudoelement malt ueber
+     nicht-positionierte Kinder und wuerde den Text zudecken — derselbe
+     Fehler wie bei .frm/.pcfrm in §6c.
+     Die Farbplatte (der .tinted-Verlauf bzw. der Verlauf des Bausteins)
+     bleibt als unterste Ebene stehen. Faellt das CDN aus, sieht man
+     genau den Stand von vorher — nie eine helle Flaeche unter heller
+     Schrift (§7b). */
+  var ARTBG_SCRIM =
+    "linear-gradient(90deg,#0b111600 0%,#0b1116b3 22%,#0b1116b3 86%,#0b111600 100%)";
+  function bgArt(el, key) {
+    if (!el || !ASSETS[key]) return;
+    /* ⚠ ABWEICHUNG vom Patch (26.07.), gemessen statt vermutet.
+       Die Vorlage las die Farbplatte einfach aus dem berechneten Stil.
+       Das geht genau EINMAL gut. renderVault() und renderPromo() zeichnen
+       aber mehrfach (Gem-Aenderung, Shop- und Startseiten-Durchgang), und
+       beim zweiten Aufruf steht der eigene Stapel schon im Inline-Stil —
+       Verlauf und Artwork wurden ein zweites Mal davorgelegt. Gemessen:
+       .promobanner und .vaultbox trugen FUENF Ebenen statt drei. Damit
+       passte die Dreier-Ordnung aus `.artbg` nicht mehr zur Ebenenzahl,
+       CSS wiederholte sie zyklisch, und die zweite Artwork-Kopie stand
+       auf `100% 100%` — also genau die Streckung, die §6b verbietet.
+       Deshalb wird der Inline-Stil zuerst zurueckgenommen: danach liefert
+       getComputedStyle wieder die Farbplatte AUS DEM BLATT, und der
+       Aufruf ist beliebig oft wiederholbar. */
+    el.style.backgroundImage = "";
+    var cur = getComputedStyle(el).backgroundImage;
+    if (!cur || cur === "none") cur = "linear-gradient(180deg,#243342,#141d26)";
+    el.classList.add("artbg");
+    el.style.backgroundImage = ARTBG_SCRIM + ', url("' + ASSETS[key] + '"), ' + cur;
   }
 
   /* ==================================================================
@@ -6786,6 +6880,10 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
           (st ? st.levels : 50) + " Stufen.") + "</span></span>" +
       '<span class="prb">' + (active ? "ANSEHEN" : "ZUM PASS") + "</span>";
     tint(el, "pass");
+    /* Nach tint(): bgArt liest den .tinted-Verlauf aus und behaelt ihn
+       als Farbplatte unter dem Artwork. Umgekehrt wuerde tint() die
+       Ebenen wieder auf eine reduzieren. */
+    bgArt(el, "bg_promo_pass");
   }
   /* (2) Arena-/Starter-Pack. */
   function renderIapPacks() {
@@ -6794,7 +6892,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
         return "<span>" + ico(it[0], it[1]) + " " + it[2] + "</span>";
       }).join("");
       return '<div class="iapcard tinted" data-iap="' + p.id + '" style="' +
-        tintStyle(p.id === "arena" ? "pack_gold" : "pack_arcane") + '">' +
+        tintStyle(p.id === "arena" ? "iap_arena" : "pack_arcane") + '">' +
         '<span class="valbadge">' + p.value + "</span>" +
         '<span class="iart" data-prodart="' + p.art + '">' + p.emoji + "</span>" +
         '<span class="itx"><span class="inm goldtext">' + p.name + "</span>" +
@@ -6803,6 +6901,12 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
         '<button class="ibuy" data-iapbuy="' + p.id + '">' + p.price + "</button></div>";
     }).join("");
     hydrateProdCards($("arenaPackBox"));
+    /* Jedes der beiden Angebote traegt sein eigenes Diorama: Arena-Pack
+       eine Kristallarena in Gold/Bernstein, Starter-Pack ein Amethyst-
+       Sanktum. Gleiche Bildsprache wie arena1..arena8 und road_platform. */
+    Array.prototype.forEach.call($("arenaPackBox").querySelectorAll("[data-iap]"), function (el) {
+      bgArt(el, el.getAttribute("data-iap") === "arena" ? "bg_iap_arena" : "bg_iap_starter");
+    });
     Array.prototype.forEach.call($("arenaPackBox").querySelectorAll("[data-iapbuy]"), function (b) {
       b.addEventListener("click", function () { buyIap(b.getAttribute("data-iapbuy")); });
     });
@@ -7686,8 +7790,11 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
           '<span class="cchip">' + (ph.phase === "war" ? "⚔ Kriegsphase" : "🛠 Sammelphase") +
             " · " + CL.hhmm(ph.msLeft).replace(":", " h ") + " m</span>" +
         "</div></div>";
-    layer($("clanHead"), "panel");
     tint($("clanHead"), "special", "pulseglow");
+    /* Ersetzt layer(…,"panel"): die generische Plattengrafik hatte mit
+       dem Ort nichts zu tun (§6e — ein Asset hat eine Rolle). Jetzt eine
+       Wappenhalle in derselben Bildsprache wie die Arena-Dioramen. */
+    bgArt($("clanHead"), "bg_clanhead");
     ambient($("clanHead"), 7);
     $("clanDesc").textContent = inf.desc;
   }
@@ -9143,6 +9250,11 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     pack_silver: ["#4a5764", "#1c2228"],
     pack_gold:   ["#6e5714", "#2b2208"],
     pack_arcane: ["#54217a", "#1e0c2c"],
+    /* Nur fuer die Arena-Pack-Karte. Sie traegt als einzige goldene
+       Schrift (.inm.goldtext) auf goldener Platte: auf pack_gold sind
+       das 3,55:1, hier 5,81:1. Der Fall wird erst sichtbar, wenn das
+       Banner NICHT laedt — genau die blinde Stelle aus §7b. */
+    iap_arena:   ["#4a3a10", "#1c1606"],
     emote:       ["#1f6b2c", "#0c2413"],
     skin:        ["#7a2a5f", "#2c1024"],
     // Elementfarben fuer Karten-bezogene Reihen
@@ -9250,6 +9362,11 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
       el.style.setProperty("--t1", v.full ? "#6b4f14" : "#12613c");
       el.style.setProperty("--t2", v.full ? "#2a1e08" : "#072014");
       el.innerHTML = vaultHTML(v, id === "vaultShop");
+      /* Smaragd-Kulisse — dieselbe Gem-Identitaet wie --gemc und cur_gem
+         (§4: gruen, nicht violett wie bei AA). Der Verlauf aus dem
+         .tinted-Koerper bleibt darunter und traegt weiter den Zustand
+         „voll" (Gold statt Smaragd). */
+      bgArt(el, "bg_vault");
       /* Das Glaskugel-Artwork liegt UEBER der Fuellstands-Saeule: Die
          Saeule zeigt den Stand, das Artwork gibt ihr das Gefaess. Faellt
          das Bild aus, bleibt die reine CSS-Saeule sichtbar. */
@@ -9309,6 +9426,9 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     if (sec) sec.style.display = act.length ? "" : "none";
     if (!slot) return;
     slot.innerHTML = act.map(offerRowHTML).join("");
+    Array.prototype.forEach.call(slot.querySelectorAll(".offercard"), function (el) {
+      bgArt(el, "bg_offer");
+    });
     Array.prototype.forEach.call(slot.querySelectorAll("[data-buyoffer]"), function (b) {
       b.addEventListener("click", function () { showOfferPopup(b.getAttribute("data-buyoffer")); });
     });
