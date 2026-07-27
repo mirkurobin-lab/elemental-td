@@ -5,7 +5,7 @@
     "styleSheetJob": "22646ce4-8685-46af-ad73-9ec32482c2c2",
     "modell": "nano_banana_pro (Higgsfield), resolution 1k, Style-Sheet als Bild-Referenz",
     "erzeugt": "2026-07-25",
-    "credits": "Batch 1: 25 Generationen x 2 = 50 Credits. Batch 2: 52 Generationen x 2 = 104 Credits. Batch 3 (Pack-Zeremonie): 1 Bild x 2 + 1 Video (kling3_0_turbo) x 7,5 = 9,5 Credits. Batch 3 (Festungs-Layout Variante 2 „Banner-Stapel\"): 4 Bilder x 2 = 8 Credits. Batch 4 (Karten-Artworks, Breitbanner, Emote-Tokens): 17 Bilder x 2 = 34 Credits. Batch 5 (Pass-Keyart-Video, 8 Karten-Loops, 6 CC0-Audiodateien): 9 Videos x 7,5 = 67,5 Credits; Audio 0 Credits (CC0 von OpenGameArt, siehe LIZENZEN.md). Gesamt 115 Assets / 273 Credits, 0 Retakes. Batch 8 (Endscreen-Politur): 4 Bilder x 2 = 8 Credits.",
+    "credits": "Batch 1: 25 Generationen x 2 = 50 Credits. Batch 2: 52 Generationen x 2 = 104 Credits. Batch 3 (Pack-Zeremonie): 1 Bild x 2 + 1 Video (kling3_0_turbo) x 7,5 = 9,5 Credits. Batch 3 (Festungs-Layout Variante 2 „Banner-Stapel\"): 4 Bilder x 2 = 8 Credits. Batch 4 (Karten-Artworks, Breitbanner, Emote-Tokens): 17 Bilder x 2 = 34 Credits. Batch 5 (Pass-Keyart-Video, 8 Karten-Loops, 6 CC0-Audiodateien): 9 Videos x 7,5 = 67,5 Credits; Audio 0 Credits (CC0 von OpenGameArt, siehe LIZENZEN.md). Gesamt 115 Assets / 273 Credits, 0 Retakes. Batch 8 (Endscreen-Politur): 4 Bilder x 2 = 8 Credits. Batch 12 (Produktbilder + Gratis-Motive): 5 Bilder x 2 = 10 Credits, davon 1 Verwurf (Kristalltresor v1: Randleuchten und zu wenig Randabstand).",
     "palette": {
       "gold": "#e0b94a",
       "violett": "#7a4fd6",
@@ -27,7 +27,9 @@
       "CDN-URLs sind aus der Agent-Umgebung NICHT erreichbar (Proxy), im Browser des Users schon. Der Prototyp hat für jedes Asset einen CSS-Gradient-Fallback.",
       "Icons liegen auf #0e1418. Im Prototyp traegt .ico `mix-blend-mode:screen` — damit loest sich der dunkle Grund auf dunkler UI von selbst auf, ohne Freistellen.",
       "Jedes Icon im Markup ist <img class=\"ico\" alt=\"<Emoji>\" onerror=\"UIIcon.fail(this)\"> — schlaegt das Laden fehl, ersetzt UIIcon.fail das Bild durch das Emoji aus alt. Emojis sind also NUR noch Fallback, nie primaere Darstellung.",
-      "cinematic_legendary ist ein MP4, kein Bild — beim Kopieren nach public/assets/ die curl-Schleife nicht auf *.png filtern."
+      "cinematic_legendary ist ein MP4, kein Bild — beim Kopieren nach public/assets/ die curl-Schleife nicht auf *.png filtern.",
+      "Batch 12: Die acht `packart_arena1..8` sind die ACHT EIGENEN Arena-Pack-Artworks (Auftraggeber: „Die Arena packs muessen alle ein anderes artwork haben.\"). Sie ersetzen die Behelfsloesung aus Batch 11, in der sich acht Arenen drei Kulissen (pack_arena_klein/mittel/gross) geteilt haben und sich nur durch die CSS-Toenung unterschieden. Die Bilder stammen aus den bereits bezahlten Batch-11-Generationen — arena 1/3/5 lagen unter den generischen Schluesseln, arena 2/4/6/7/8 waren unbenutzte Reserve. Keine neuen Credits.",
+      "Batch 12: `packart_arena*` und `bg_gratis_gold` sind KULISSEN (cover, §6b) und duerfen NICHT freigestellt werden. `offer_starter`, `offer_vault_bank` und `badge_gratis` sind freistellbar: gemessener Randring L_max 7,5 / 5,2 / 5,5 bei L_mittel 0,64, Motiv beruehrt den Rand nicht (kleinster Abstand 133 / 120 / 48 px)."
     ],
     "cdnBase": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/",
     "batches": {
@@ -1055,20 +1057,28 @@
     "beschreibung": "Arena-Pack-Artwork: leuchtende Kristallkarte mit Runen-Emblem und Strahlenexplosion."
   },
   "offer_starter": {
-    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042710_a70613fb-df46-48af-95a8-1d71ddae335e.png",
-    "job": "a70613fb-df46-48af-95a8-1d71ddae335e",
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_115056_0dfab782-685e-4def-afa3-30913a3ab88a.png",
+    "min": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_115056_0dfab782-685e-4def-afa3-30913a3ab88a_min.webp",
+    "job": "0dfab782-685e-4def-afa3-30913a3ab88a",
     "type": "offer_art",
     "size": "1024x1024",
-    "batch": 6,
-    "beschreibung": "Starter-Angebot-Artwork: Karte + Goldmünzen + Smaragde auf Kristallpodest."
+    "batch": 12,
+    "beschreibung": "Starter-Pack-Produktbild (NEU): geöffnete Truhe aus violett-indigofarbenen Kristallplatten in Gold-Messing-Fassung, Fächer aus drei goldgerandeten Arkan-Karten, Goldmünzen und Smaragde davor. Freistehend, mittig, tiefschwarzer Grund ohne Randkontakt — für nachträgliches Freistellen geeignet.",
+    "_alt": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042710_a70613fb-df46-48af-95a8-1d71ddae335e.png",
+    "_alt_job": "a70613fb-df46-48af-95a8-1d71ddae335e",
+    "_alt_grund": "Ersetzt in Batch 12 (Auftraggeber: Startpaket ohne brauchbares Bild / Tresor sollte sauberer aussehen). Alte URL bleibt zur Sicherheit erhalten."
   },
   "offer_vault_bank": {
-    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042712_609d781f-a276-4767-a257-dea71279049b.png",
-    "job": "609d781f-a276-4767-a257-dea71279049b",
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_115444_f75634d9-6a96-4088-ac82-dedbc931f73c.png",
+    "min": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_115444_f75634d9-6a96-4088-ac82-dedbc931f73c_min.webp",
+    "job": "f75634d9-6a96-4088-ac82-dedbc931f73c",
     "type": "offer_art",
     "size": "1024x1024",
-    "batch": 6,
-    "beschreibung": "Kristalltresor-Artwork: Glaskugel-Sparbank randvoll mit Smaragden, Gold-Filigran."
+    "batch": 12,
+    "beschreibung": "Kristalltresor-Produktbild (NEU): symmetrisches Gefäß aus klarem Kristallglas auf schwerem Gold-Messing-Sockel mit Filigranwerk, zwei Goldbändern und Kronendeckel mit Smaragd-Knauf. Glaskörper bewusst LEER und durchsichtig, damit die CSS-Füllstandssäule darunter durchscheint. Freistehend, mittig, tiefschwarzer Grund ohne Randkontakt.",
+    "_alt": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042712_609d781f-a276-4767-a257-dea71279049b.png",
+    "_alt_job": "609d781f-a276-4767-a257-dea71279049b",
+    "_alt_grund": "Ersetzt in Batch 12 (Auftraggeber: Startpaket ohne brauchbares Bild / Tresor sollte sauberer aussehen). Alte URL bleibt zur Sicherheit erhalten."
   },
   "frame_card_orange": {
     "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042716_5bf79216-8800-472c-ab73-d9f93ea05991.png",
@@ -1487,5 +1497,111 @@
     "size": "1584x672",
     "batch": 11,
     "beschreibung": "Vorrats-Truhe (AAs „Arcane Supplies Chest\") — offene Kristalltruhe in Goldfassung, herausquellender Kartenfaecher und warmes Licht, ueberlaufende Muenzen und Gems. Goldanteil 19,66 %."
+  },
+  "packart_arena1": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093809_e5b4985d-37c1-4d18-b990-c2fda0c2a76a.png",
+    "min": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093809_e5b4985d-37c1-4d18-b990-c2fda0c2a76a_min.webp",
+    "job": "e5b4985d-37c1-4d18-b990-c2fda0c2a76a",
+    "type": "kulisse",
+    "size": "1584x672",
+    "batch": 12,
+    "name": "Kristallhof",
+    "tint": "arena1",
+    "beschreibung": "Pack-Artwork Arena 1 „Kristallhof“ — schlanker Obelisk aus blassgoldenem Kristall mit schwebendem Goldring über ruhigem Steinhof, erste Kristalle zwischen den Platten. Erdton, Morgengold."
+  },
+  "packart_arena2": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093813_443b9439-fc28-45a9-978a-09e1f0edaa7b.png",
+    "min": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093813_443b9439-fc28-45a9-978a-09e1f0edaa7b_min.webp",
+    "job": "443b9439-fc28-45a9-978a-09e1f0edaa7b",
+    "type": "kulisse",
+    "size": "1584x672",
+    "batch": 12,
+    "name": "Smaragdtal",
+    "tint": "arena2",
+    "beschreibung": "Pack-Artwork Arena 2 „Smaragdtal“ — Messing-Balliste in lebenden Dornranken, giftgrüner Kristallbolzen, terrassierte Smaragd-Kristallgärten. Naturton, Jade."
+  },
+  "packart_arena3": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093825_c05fb801-db27-4b80-8fee-28e1a06a3522.png",
+    "min": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093825_c05fb801-db27-4b80-8fee-28e1a06a3522_min.webp",
+    "job": "c05fb801-db27-4b80-8fee-28e1a06a3522",
+    "type": "kulisse",
+    "size": "1584x672",
+    "batch": 12,
+    "name": "Saphirfeste",
+    "tint": "arena3",
+    "beschreibung": "Pack-Artwork Arena 3 „Saphirfeste“ — Katapult aus Messing und Stein mit bernsteinfarbenem Gegengewicht auf saphirblauen Kristallzinnen. Wasserton, Abendlicht."
+  },
+  "packart_arena4": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093829_16f201ee-fe4c-4875-a460-00da55170706.png",
+    "min": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093829_16f201ee-fe4c-4875-a460-00da55170706_min.webp",
+    "job": "16f201ee-fe4c-4875-a460-00da55170706",
+    "type": "kulisse",
+    "size": "1584x672",
+    "batch": 12,
+    "name": "Sturmspitze",
+    "tint": "arena4",
+    "beschreibung": "Pack-Artwork Arena 4 „Sturmspitze“ — Obelisk aus schwarzem Kristall im Messingring, violette Blitzbögen, schwebende Felsen und Gewitterwolken. Lichtton, Sturmstahl."
+  },
+  "packart_arena5": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093832_fa45c953-24f8-4e15-8c4b-4bbd16b27545.png",
+    "min": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093832_fa45c953-24f8-4e15-8c4b-4bbd16b27545_min.webp",
+    "job": "fa45c953-24f8-4e15-8c4b-4bbd16b27545",
+    "type": "kulisse",
+    "size": "1584x672",
+    "batch": 12,
+    "name": "Obsidian-Thron",
+    "tint": "arena5",
+    "beschreibung": "Pack-Artwork Arena 5 „Obsidian-Thron“ — Magma-Titan aus geborstenem Obsidian mit glühenden Lavaadern in einer Halle aus schwarzem Glas mit violetten Runen. Dunkelheitston."
+  },
+  "packart_arena6": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093834_79cb77b4-1a90-4fce-9c75-facb08f2be8d.png",
+    "min": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093834_79cb77b4-1a90-4fce-9c75-facb08f2be8d_min.webp",
+    "job": "79cb77b4-1a90-4fce-9c75-facb08f2be8d",
+    "type": "kulisse",
+    "size": "1584x672",
+    "batch": 12,
+    "name": "Prisma-Zitadelle",
+    "tint": "arena6",
+    "beschreibung": "Pack-Artwork Arena 6 „Prisma-Zitadelle“ — Lichtheldin in weiß-goldener Kristallrüstung mit Sonnenscheiben-Halo vor der Zitadelle mit Regenbogen-Prismanaht. Prismaton."
+  },
+  "packart_arena7": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093842_62d00b86-d029-40fe-9713-7b0660248827.png",
+    "min": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093842_62d00b86-d029-40fe-9713-7b0660248827_min.webp",
+    "job": "62d00b86-d029-40fe-9713-7b0660248827",
+    "type": "kulisse",
+    "size": "1584x672",
+    "batch": 12,
+    "name": "Aschenmark",
+    "tint": "arena7",
+    "beschreibung": "Pack-Artwork Arena 7 „Aschenmark“ — gedrungener Messing-Lavamörser mit glühender Schale in der verbrannten Handelsstadt, verkohlte Fachwerke und Aschewehen. Feuerton."
+  },
+  "packart_arena8": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093845_133cdd59-0064-4148-bda5-4917705d9ba0.png",
+    "min": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093845_133cdd59-0064-4148-bda5-4917705d9ba0_min.webp",
+    "job": "133cdd59-0064-4148-bda5-4917705d9ba0",
+    "type": "kulisse",
+    "size": "1584x672",
+    "batch": 12,
+    "name": "Frostbastion",
+    "tint": "arena8",
+    "beschreibung": "Pack-Artwork Arena 8 „Frostbastion“ — Eisdrachenkopf-Kanone aus klarem Eis auf Messinglafette, Frostkristalle, blaue Kristallzinnen der Eisfestung. Eiston."
+  },
+  "bg_gratis_gold": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_115109_14514643-f0df-4a9c-a503-cfa52a74f641.png",
+    "min": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_115109_14514643-f0df-4a9c-a503-cfa52a74f641_min.webp",
+    "job": "14514643-f0df-4a9c-a503-cfa52a74f641",
+    "type": "kulisse",
+    "size": "1584x672",
+    "batch": 12,
+    "beschreibung": "Breitbanner „Gratis-Gold“ (Tagesgold) im Maß des Kristalltresor-Banners: Goldmünzhaufen und Goldbarren an linkem und rechtem Rand, bernsteinfarbene Kristalle dahinter, Gold-Messing-Filigranband oben und unten. Mittlere 60 % bewusst dunkel und leer für weißen Text (Mitte L 39,2 / p95 76,7 — vergleichbar mit bg_vault 31,5 / 45,7). ROLLE = KULISSE: cover, NICHT freistellen, niemals class=\"ico\"."
+  },
+  "badge_gratis": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_115114_b2133911-a404-482a-b01f-026fb1716e02.png",
+    "min": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_115114_b2133911-a404-482a-b01f-026fb1716e02_min.webp",
+    "job": "b2133911-a404-482a-b01f-026fb1716e02",
+    "type": "badge",
+    "size": "1024x1024",
+    "batch": 12,
+    "beschreibung": "Gratis-Abzeichen für das tägliche Bronze-Pack: Rosette mit rundem Smaragd-Siegel in goldenem Filigranring, gezackter Strahlenrand, zwei smaragdgrüne Bänder mit Goldkante. Textfrei — die Beschriftung „GRATIS“ bleibt HTML-Ebene (.freebadge). Freistehend, mittig, tiefschwarzer Grund ohne Randkontakt."
   }
 }
