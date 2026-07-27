@@ -26,6 +26,17 @@ direkt — kein Server, kein Build.
 | `login_kal.js` | 9 | Login-Kalender: drei pro Reihe, Tag 7 als Band |
 | `home_menue.js` | 17 | Keine doppelten Wege, Menü-Icons lesbar |
 | `splash.js` | 10 | Startbildschirm: Schriftzug, Ladebalken, Notausgang |
+| `assets_vollstaendig.py` | 3 | Jedes benutzte Asset ist verzeichnet UND gesichert |
+
+`assets_vollstaendig.py` ist die einzige Prüfung hier, die kein Playwright
+braucht (`python3 pruefungen/assets_vollstaendig.py` aus `arena_patches/`).
+Sie deckt eine Lücke ab, die keine der anderen sehen kann: ein Asset, das
+direkt in die `ASSETS`-Tabelle der HTML geschrieben wurde, ohne Eintrag in
+`ui_assets.json`. So etwas fällt aus **jedem** Werkzeug heraus, das über die
+Asset-Liste arbeitet — es wird nie gesichert und beim Freistellen als
+„unbekannt" übersprungen. Still, ohne Fehlermeldung. Genau so sind 17
+Bilder durchgerutscht, darunter vier Arena-Kulissen, die ein Werkzeug
+deshalb sogar zerschnitten hat.
 
 ## Die zwei Sonderfälle — und warum es sie gibt
 
