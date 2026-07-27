@@ -494,11 +494,32 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
 #tbMenuLayer{position:fixed;inset:0;z-index:55;background:#05090cb8;
   display:flex;justify-content:center;align-items:flex-start}
 #tbMenuLayer[hidden]{display:none}
-.tbmlist{width:100%;max-width:430px;padding:52px 12px 0;
-  display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+/* 52 -> 76 px oben: die erste Zeile ist jetzt eine Zwischenueberschrift
+   ohne eigene Flaeche. Bei 52 px stand sie neben dem Spielernamen und
+   las sich als Teil der Kopfzeile. Ein Balken vertraegt die Ueberlappung
+   (AA laesst sie zu), eine freistehende Schrift nicht. */
+.tbmlist{width:100%;max-width:430px;padding:76px 12px 0;
+  display:flex;flex-direction:column;align-items:flex-end;gap:6px}
 /* Die Eintraege laufen von oben herein, leicht versetzt — dieselbe
    Staffelung wie bei AA, wo die Liste nicht als Block erscheint. */
-.tbmi{width:210px;display:flex;align-items:center;gap:9px;
+/* ------------------------------------------------------------------
+   GLIEDERUNG STATT AUFZAEHLUNG (27.07.)
+   Sechs gleich laute Balken sind eine Liste, kein Menue: ohne Gewicht
+   muss das Auge jede Zeile einzeln lesen. Es gibt jetzt zwei Groessen —
+   ein grosses, zweizeiliges Ziel (.pri) und eine schmale, ruhige
+   Verwaltungszeile (.sec) — und dazwischen eine Zwischenueberschrift,
+   die ordnet, ohne mitzureden.
+   ------------------------------------------------------------------ */
+.tbmgrp{width:232px;display:flex;align-items:center;gap:8px;
+  margin:12px 0 3px;font-size:9px;font-weight:900;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--dim);
+  animation:tbmin var(--t-mid) var(--ease-out) backwards}
+/* Der Strich laeuft nach rechts aus: er trennt, ohne einen Kasten zu
+   bauen. Ein Rahmen um jede Gruppe waere lauter als die Eintraege. */
+.tbmgrp::after{content:"";flex:1;height:1px;border-radius:1px;
+  background:linear-gradient(90deg,#8fa0ad55,#8fa0ad00)}
+.tbmlist .tbmgrp:first-child{margin-top:0}
+.tbmi{width:232px;display:flex;align-items:center;gap:10px;
   padding:9px 12px;border-radius:12px;font-size:12.5px;font-weight:900;
   letter-spacing:.06em;text-transform:uppercase;
   background:linear-gradient(180deg,#3fa9e8,#1c6ea8);
@@ -508,8 +529,32 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
 .tbmi .ico{width:20px;height:20px;flex:0 0 20px;
   filter:var(--frei) drop-shadow(0 1px 2px #00000096)}
 .tbmi span.ico{font-size:16px;text-align:center}
+/* Primaer: die zwei Ziele, fuer die man das Menue ueberhaupt oeffnet. */
+.tbmi.pri{padding:11px 13px;font-size:14px;gap:11px}
+.tbmi.pri .ico{width:27px;height:27px;flex:0 0 27px}
+.tbmi.pri span.ico{font-size:21px}
+/* Sekundaer: dunkle Platte statt Blau. Verwaltung soll nicht so laut
+   rufen wie ein Ziel — dieselbe Platte wie die Schienen-Kacheln. */
+.tbmi.sec{padding:7px 12px;font-size:11.5px;
+  background:linear-gradient(180deg,#243342,#141d26);
+  -webkit-text-fill-color:var(--txt);color:var(--txt);
+  box-shadow:var(--mat-raised),0 3px 0 #0a1016}
+.tbmi.sec .ico{width:18px;height:18px;flex:0 0 18px}
+.tbmi.sec span.ico{font-size:15px}
+.tbmtx{display:flex;flex-direction:column;gap:2px;min-width:0;text-align:left}
+/* Der Untertitel steht auf dem MITTELBLAUEN Grund des Eintrags, nicht
+   auf einer hellen Flaeche (§4). Gemessen 6,4:1 gegen #1c6ea8. */
+.tbmsub{font-size:9px;font-weight:700;letter-spacing:.02em;text-transform:none;
+  color:#d3eafa;-webkit-text-fill-color:#d3eafa}
+.tbmi.sec .tbmsub{color:var(--dim);-webkit-text-fill-color:var(--dim)}
+/* Zaehler am Post-Eintrag — dieselbe Pille wie am Menue-Knopf selbst,
+   damit der rote Punkt oben und die Zahl hier dasselbe Ding sind. */
+.tbmn{margin-left:auto;min-width:18px;height:18px;line-height:18px;padding:0 5px;
+  border-radius:9px;background:var(--danger);color:#20060d;
+  -webkit-text-fill-color:#20060d;
+  font-size:10px;font-weight:900;text-align:center;box-shadow:var(--sh-1)}
 @keyframes tbmin{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.tbmi{animation:none}}
+@media (prefers-reduced-motion:reduce){.tbmi,.tbmgrp{animation:none}}
 
 /* ==================================================================
  * DEFENDERS GUIDE (Bestiarium) — nachgebaut nach AA
@@ -4055,6 +4100,52 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   border-left:2px solid #3fa9e866;padding-left:8px}
 
 /* ==================================================================
+ * LEERZUSTAND — nachgemessen an AAs Post-Fenster (IMG_3359, 1320x2868)
+ * ------------------------------------------------------------------
+ * AA laesst eine leere Ansicht nicht leer, sondern setzt EINE grosse
+ * eingesenkte Flaeche hinein und stellt Symbol und Satz mittig hinein.
+ * Gemessene Verhaeltnisse aus dem Bild:
+ *   Feld           1155 x 1334 px = 0,866 : 1, das sind 93,7 % der
+ *                  Fensterbreite und 46,5 % der Bildschirmhoehe
+ *   Seitenpolster  34-38 px = 2,8-3,1 % der Fensterbreite -> 12 px
+ *   Kreis          Durchmesser 336 px = 29,1 % der Feldbreite -> 118 px
+ *   Symbol         186 x 139 px = 55,4 % des Kreisdurchmessers -> 65 px
+ *   Kreis -> Text  38 px = 11,3 % des Kreises -> 13 px (--gap-lg)
+ *   Schriftgrad    ~71 px = 21,1 % des Kreises -> 25 px, gerundet 22 px
+ *                  (Versalhoehe gemessen 51 px)
+ *   Der Block aus Kreis und Text sitzt senkrecht MITTIG im Feld:
+ *   Blockmitte 1478 px gegen Feldmitte 1474 px, Abweichung 0,3 %.
+ * Die Hoehe steht in vh, nicht in px — 46,5 % der Bildschirmhoehe ist
+ * das, was gemessen wurde, und das haelt auf jeder Geraetehoehe.
+ * ================================================================== */
+.leerfeld{margin-top:var(--gap);padding:24px 16px;border-radius:var(--radius);
+  min-height:46vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:var(--gap-lg);
+  text-align:center;background:#0b1116;box-shadow:var(--mat-well)}
+/* Kompakt fuer Ansichten, die neben dem Leerfeld noch Reiter, Knoepfe
+   und eine Fussnote tragen — dort waere die volle Hoehe ein Loch. */
+.leerfeld.kompakt{min-height:26vh;padding:20px 16px;gap:10px}
+/* Der Kreis ist bei AA DUNKLER als das Feld, das Symbol HELLER als der
+   Kreis. Zwei Stufen tiefer, eine Stufe zurueck — Licht von oben (§1). */
+.leerkreis{width:118px;height:118px;flex:0 0 118px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(120% 120% at 50% 18%,#0a1017,#06090d);
+  box-shadow:var(--mat-well)}
+.leerfeld.kompakt .leerkreis{width:84px;height:84px;flex:0 0 84px}
+/* §6h: --frei steht ZUERST in der Filterkette. */
+.leerkreis .ico{width:65px;height:65px;
+  filter:var(--frei) drop-shadow(0 2px 3px #00000080);opacity:.74}
+.leerkreis span.ico{font-size:52px;line-height:1;opacity:.74}
+.leerfeld.kompakt .leerkreis .ico{width:46px;height:46px}
+.leerfeld.kompakt .leerkreis span.ico{font-size:37px}
+/* Heller Text auf dunklem Feld (#0b1116) — nie umgekehrt (§4). */
+.leertxt{font-size:22px;font-weight:900;letter-spacing:.01em;
+  color:var(--txt);-webkit-text-fill-color:var(--txt);line-height:1.15}
+.leerfeld.kompakt .leertxt{font-size:16px}
+.leersub{font-size:11px;line-height:1.55;color:var(--dim);max-width:280px;
+  margin-top:-4px}
+
+/* ==================================================================
  * PROFIL-FENSTER — AAs Spielerprofil, nachgemessen an IMG_3347/3348
  * ------------------------------------------------------------------
  * Oeffnet sich beim Tipp auf den eigenen Namen, auf eine Ranglisten-
@@ -4831,7 +4922,13 @@ button.pfplate{cursor:pointer}
   <section id="viewGuide" class="view">
     <div class="viewhead"><button class="backbtn" id="guideBack">‹</button>
       <h2 class="title">Guide</h2>
-      <button class="mini pressable" id="btnToManual">📖 Handbuch</button></div>
+      <button class="mini pressable" id="btnToManual">📖 Handbuch</button>
+      <!-- Der Gegner-Einstieg sass bis 27.07. als eigener Eintrag im
+           Aufklapp-Menue oben rechts. Er gehoert in den Guide — bei AA
+           sind GEGNER und BOSS Reiter DES Guides (IMG_3361/3362). Bis
+           der Guide-Umbau steht, haelt dieser Knopf das Bestiarium
+           erreichbar; danach ist er die Abkuerzung auf den Reiter. -->
+      <button class="mini pressable" id="btnToBestiary">👾 Gegner</button></div>
     <div class="gprog" id="guideProg"></div>
     <div id="guideChapters"></div>
     <p class="fortnote" id="guideNote">—</p>
@@ -5849,6 +5946,20 @@ button.pfplate{cursor:pointer}
     return '<img class="ico ' + (cls || "") + '" src="' + u + '" alt="' + emoji +
       '" loading="lazy" decoding="async" onerror="UIIcon.fail(this)">';
   }
+  /* Leerzustand nach AAs Machart (IMG_3359). EIN Baustein fuer alle
+     Ansichten: eine eingesenkte Flaeche, mittig ein runder Sockel mit
+     dem Symbol DIESER Ansicht, darunter ein Satz, der sagt, was hier
+     stehen wird — und, wo es einen gibt, wie man dorthin kommt.
+     Die Masse und ihre Herleitung stehen im Blatt bei `.leerfeld`.
+     Das Symbol kommt ueber die Fabrik, damit die Emoji-Rueckfallebene
+     auch hier greift (§6). */
+  function leerfeld(key, emo, titel, satz, kompakt) {
+    return '<div class="leerfeld' + (kompakt ? " kompakt" : "") + '">' +
+      '<div class="leerkreis">' + ico(key, emo) + "</div>" +
+      '<div class="leertxt">' + titel + "</div>" +
+      (satz ? '<div class="leersub">' + satz + "</div>" : "") + "</div>";
+  }
+
   // Platzhalter im Markup (<i data-ico="..." data-emoji="...">) aufloesen.
   function hydrateIcons(root) {
     Array.prototype.forEach.call((root || document).querySelectorAll("[data-ico]"), function (el) {
@@ -8548,7 +8659,11 @@ button.pfplate{cursor:pointer}
     } };
   }
 
-  var clanTab = "quests", lbTab = "global";
+  /* `lbLeer` ist der Schalter, mit dem der Leerzustand der Rangliste
+     ansteuerbar wird. Die Bot-Population ist immer gefuellt, der
+     Zustand waere sonst weder sichtbar noch pruefbar — und ein Zustand
+     ohne Pruefung rutscht zurueck. Erreichbar ueber __proto.lbLeer(). */
+  var clanTab = "quests", lbTab = "global", lbLeer = false;
 
   /* Demo-Clan einmalig anlegen und mit etwas Wochenfortschritt fuellen,
      damit die Balken nicht bei 0 stehen. */
@@ -9154,9 +9269,13 @@ button.pfplate{cursor:pointer}
     var FR = FRof(), rows = FR.list(), gift = {};
     FR.giftableFriends().forEach(function (g) { gift[g.id] = g; });
     var html = secribbon("Freundesliste", rows.length ? String(rows.length) : "leer");
+    /* War ein grauer Textkasten mit 10,5 px Schrift — richtig, aber
+       lieblos. Jetzt dieselbe Machart wie Post, Events und Rangliste,
+       kompakt, weil darunter noch Reiter und Fussnote stehen. */
     if (!rows.length) {
-      html += '<div class="frempty">Noch keine Freunde. Such unter „Suchen" nach ' +
-        "einem Namen oder gib einen Freundescode ein.</div>";
+      html += leerfeld("ic_friends", "👥", "Noch keine Freunde",
+        "Such unter „Suchen“ nach einem Namen oder gib einen Freundescode ein.",
+        true);
     }
     html += rows.map(function (f) {
       var g = gift[f.id] || { ok: false, reason: "Karten spenden" };
@@ -9379,7 +9498,11 @@ button.pfplate{cursor:pointer}
     if (!CL) { $("lbNote").textContent = "arena_clan.js nicht geladen."; return; }
     seedClan();
     var lb = CL.leaderboard(lbTab);
-    $("lbList").innerHTML = lb.rows.map(function (r, i) {
+    var lbRows = lbLeer ? [] : lb.rows;
+    $("lbList").innerHTML = !lbRows.length
+      ? leerfeld("hub_leaderboard", "🏅", "Noch keine Platzierung",
+          "Gewinn ein Match — ab der ersten Trophäe stehst du in der Liste.", true)
+      : lbRows.map(function (r, i) {
       var top = r.rank <= 3 ? " top" + r.rank : "";
       return '<div class="lbrow' + (r.me ? " me" : "") + top + '" data-lbrank="' + r.rank + '"' +
         (r.me ? ' id="lbMe"' : "") + ">" +
@@ -9396,6 +9519,9 @@ button.pfplate{cursor:pointer}
             : r.title ? "<small>" + r.title + "</small>" : "") + "</div>" +
         '<div class="ltr">' + ico("cur_trophy", "🏆") + " " + fmt(r.trophies) + "</div></div>";
     }).join("");
+    /* „Zu meiner Position" ohne Liste ist ein Knopf, der nichts tut.
+       Er verschwindet mit der Liste, statt tot dazustehen. */
+    $("lbJump").style.display = lbRows.length ? "" : "none";
     var txt;
     if (lbTab === "global") {
       txt = "Top " + CL.LB_GLOBAL + " von " + lb.total + " Spielern. Dein Rang: #" + lb.myRank +
@@ -9833,7 +9959,13 @@ button.pfplate{cursor:pointer}
   }
   function renderEvents() {
     var now = Date.now();
-    $("evList").innerHTML = EVENTS.map(function (ev) {
+    /* Dieselbe Machart wie im Postfach, nur kompakt: unter dem Feld
+       steht noch die Fussnote, die volle Hoehe waere hier ein Loch. */
+    $("evList").innerHTML = !EVENTS.length
+      ? leerfeld("hub_events", "📅", "Kein Event aktiv",
+          "Turniere und Bonus-Wochen kündigen sich hier an — meist läuft eines.",
+          true)
+      : EVENTS.map(function (ev) {
       var st = eventState(ev, now);
       var d = new Date(st.from);
       var start = ("0" + d.getUTCDate()).slice(-2) + "." + ("0" + (d.getUTCMonth() + 1)).slice(-2) +
@@ -9917,7 +10049,14 @@ button.pfplate{cursor:pointer}
   }
   function renderMail() {
     var o = mailState();
-    $("mailList").innerHTML = MAILS.map(function (m) {
+    /* Leerzustand nach AAs Post-Fenster (IMG_3359): eine grosse
+       eingesenkte Flaeche fuellt das Fenster, mittig ein runder Sockel
+       mit dem Briefsymbol, darunter der Satz. Vorher stand hier gar
+       nichts — ein leeres `#mailList` sah aus wie ein Ladefehler. */
+    $("mailList").innerHTML = !MAILS.length
+      ? leerfeld("hub_mail", "✉", "Keine Nachrichten",
+          "Belohnungen, Clan-Post und Saison-Nachrichten landen hier.")
+      : MAILS.map(function (m) {
       var unread = o.read.indexOf(m.id) < 0;
       var taken = o.claimed.indexOf(m.id) >= 0;
       var rew = "";
@@ -11438,35 +11577,71 @@ button.pfplate{cursor:pointer}
    * Belegt aus dem Screenrecording 13-09-58: bei t=1,9 s oeffnet der
    * Knopf oben rechts eine Liste mit LEADERBOARDS · COMMUNITY · MAIL ·
    * GUIDE · SETTINGS; der Defender's Guide haengt am vierten Eintrag.
-   * Reihenfolge und Ort uebernommen. Der einzige Zusatz ist ein eigener
-   * Eintrag fuers Bestiarium, weil bei uns Einsteiger-Guide und
-   * Gegner-Nachschlagewerk zwei Dinge sind (AA_UI_REFERENZ §18.2) —
-   * AA hat nur eines und fuehrt beides darunter.
+   * Ort und Reihenfolge sind uebernommen, die BESETZUNG nicht mehr —
+   * zwei Eintraege sind bei uns Doppelungen und einer war es immer:
+   *
+   * 1. COMMUNITY zeigte auf `navClan`. Der Clan hat bei uns seit dem
+   *    Bottom-Nav-Umbau einen eigenen, immer sichtbaren Tab in der
+   *    Hauptleiste unten. Ein Menuepunkt, der dorthin fuehrt, verdoppelt
+   *    einen Knopf, der ohnehin auf jedem Bildschirm steht. Bei AA ist
+   *    das anders, weil AA unten KEINEN Clan-Tab hat.
+   *    Dasselbe Argument haelt Freunde draussen: `#tbFriends` steht
+   *    direkt links neben dem Menue-Knopf, keine 8 px entfernt.
+   * 2. GEGNER (`navBestiary`) wird doppelt, sobald der Defenders Guide
+   *    AAs Aufbau hat: dort werden GEGNER und BOSS eigene Reiter IM
+   *    Guide (Belege IMG_3361, IMG_3362). Der Weg fuehrt jetzt ueber
+   *    den Guide-Eintrag — auch solange der Umbau noch nicht steht,
+   *    naemlich ueber `#btnToBestiary` im Guide-Kopf.
+   *
+   * Was bleibt, sind vier Ziele in zwei Gruppen und zwei Groessen.
+   * Die Gewichtung ist keine Geschmacksfrage: Rangliste und Guide sind
+   * ZIELE, fuer die man das Menue oeffnet; Post und Einstellungen sind
+   * Verwaltung. Ziele stehen oben und sind gross, Verwaltung steht
+   * unten und bleibt ruhig. Eine dritte Gruppe fuer einen einzigen
+   * Eintrag waere mehr Ueberschrift als Inhalt — deshalb sitzt Post
+   * bei den Einstellungen und nicht in einer eigenen Gruppe „Kontakt".
    * ================================================================== */
   var TB_MENU = [
-    { nav: "navBoard",    ico: "hub_leaderboard", emo: "🏅", txt: "Rangliste" },
-    { nav: "navClan",     ico: "hub_clan",        emo: "🛡", txt: "Community" },
-    { nav: "navMail",     ico: "hub_mail",        emo: "✉",  txt: "Post" },
-    { nav: "navGuide",    ico: "hub_challenges",  emo: "📖", txt: "Guide" },
-    { nav: "navBestiary", ico: "ic_shield",       emo: "👾", txt: "Gegner" },
-    { nav: "navSettings", ico: "hub_settings",    emo: "⚙",  txt: "Einstellungen" }
+    { grp: "Spielen" },
+    { nav: "navBoard", ico: "hub_leaderboard", emo: "🏅", txt: "Rangliste",
+      sub: "Global, Clan und Umgebung", pri: true },
+    { nav: "navGuide", ico: "hub_challenges", emo: "📖", txt: "Guide",
+      sub: "Kapitel, Handbuch und Gegner", pri: true },
+    { grp: "Konto" },
+    { nav: "navMail", ico: "hub_mail", emo: "✉", txt: "Post", zaehler: "mail" },
+    { nav: "navSettings", ico: "hub_settings", emo: "⚙", txt: "Einstellungen" }
   ];
   function tbMenuAuf() {
     var L = $("tbMenuLayer");
-    $("tbMenuList").innerHTML = TB_MENU.map(function (e, i) {
-      return '<button class="tbmi pressable" role="menuitem" data-nav="' + e.nav +
-        '" style="animation-delay:' + (i * 34) + 'ms">' +
-        ico(e.ico, e.emo) + e.txt + "</button>";
+    var n = 0;
+    $("tbMenuList").innerHTML = TB_MENU.map(function (e) {
+      /* Die Staffelung zaehlt Ueberschriften MIT: sonst laeuft eine
+         Gruppe zeitgleich mit ihrem ersten Eintrag herein und die
+         Ordnung ist in der Bewegung nicht zu sehen. */
+      var verz = ' style="animation-delay:' + (n++ * 30) + 'ms"';
+      /* Die Ueberschrift ist Struktur, kein Bedienelement — sie bleibt
+         darum aus der Menue-Semantik heraus (role="presentation"),
+         sonst zaehlt der Screenreader sie als Eintrag mit. */
+      if (e.grp) return '<div class="tbmgrp" role="presentation"' + verz + '>' +
+        e.grp + "</div>";
+      var z = "";
+      if (e.zaehler === "mail") {
+        var c = mailBadgeCount();
+        if (c > 0) z = '<span class="tbmn">' + (c > 99 ? "99+" : c) + "</span>";
+      }
+      return '<button class="tbmi pressable ' + (e.pri ? "pri" : "sec") +
+        '" role="menuitem" data-nav="' + e.nav + '"' +
+        ' aria-label="' + e.txt + (e.sub ? " — " + e.sub : "") + '"' + verz + ">" +
+        ico(e.ico, e.emo) +
+        '<span class="tbmtx">' + e.txt +
+        (e.sub ? '<span class="tbmsub">' + e.sub + "</span>" : "") + "</span>" +
+        z + "</button>";
     }).join("");
     Array.prototype.forEach.call($("tbMenuList").querySelectorAll("[data-nav]"), function (b) {
       b.addEventListener("click", function (ev) {
         ev.stopPropagation();
         UISfx.tap();
         var ziel = b.getAttribute("data-nav");
-        /* Das Bestiarium startet IMMER auf Seite 1. Ein Nachschlagewerk,
-           das dort wieder aufmacht, wo man zuletzt war, verwirrt beim
-           zweiten Besuch mehr als es hilft. */
-        if (ziel === "navBestiary") { bsSeite = 1; bsMob = null; bsLevel = 1; }
         tbMenuZu();
         show(ziel);
       });
@@ -11548,6 +11723,12 @@ button.pfplate{cursor:pointer}
   $("guideBack").addEventListener("click", function () { show("navHome"); });
   $("manBack").addEventListener("click", function () { show("navGuide"); });
   $("btnToManual").addEventListener("click", function () { show("navManual"); });
+  /* Das Bestiarium startet IMMER auf Seite 1. Ein Nachschlagewerk, das
+     dort wieder aufmacht, wo man zuletzt war, verwirrt beim zweiten
+     Besuch mehr als es hilft. (Stand vorher am Menue-Eintrag.) */
+  $("btnToBestiary").addEventListener("click", function () {
+    bsSeite = 1; bsMob = null; bsLevel = 1; show("navBestiary");
+  });
   $("btnSetGuide").addEventListener("click", function () { show("navGuide"); });
   $("btnSetManual").addEventListener("click", function () { show("navManual"); });
   $("btnSetLogin").addEventListener("click", openLogin);
@@ -12064,6 +12245,7 @@ button.pfplate{cursor:pointer}
                      toggleSetting: toggleSetting, exportSave: exportSave,
                      importSave: importSave, settings: settings,
                      gems: gems, setGems: setGems, mailBadgeCount: mailBadgeCount,
+                     lbLeer: function (v) { lbLeer = !!v; renderBoard(); },
                      cardArtHTML: cardArtHTML, CARD_ART: CARD_ART,
                      EVENTS: EVENTS, eventState: eventState, MAILS: MAILS,
                      renderVault: renderVault, renderOffers: renderOffers,
