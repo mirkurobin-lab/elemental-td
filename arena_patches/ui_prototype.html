@@ -3297,6 +3297,236 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
  * GOLDTEXT-REGEL: goldtext nur auf dunklem Grund. Die Abhol-Knoepfe
  * sind golden und setzen deshalb dunkle Fuellfarbe.
  * ================================================================== */
+/* ==================================================================
+ * BELOHNUNGS-FENSTER — LOGIN · TAEGLICH · WOECHENTLICH · LEBENSZEIT
+ * ------------------------------------------------------------------
+ * Ein Modal, vier Reiter. Logik: arena_rewards.js (window.ArenaRewards).
+ * Alle Groessen sind an AAs Screenshots IMG_3338-3341 GEMESSEN, nicht
+ * geschaetzt; die Umrechnung steht in patches/belohnungen.md.
+ *
+ * DREI HAUSREGELN, DIE HIER SICHTBAR SIND:
+ *  · §4  Die Kachelkoepfe sind HELL (gruen/gold) und tragen deshalb
+ *        DUNKLE Schrift. Genauso die beiden Knopfarten. Kein .goldtext
+ *        und kein Weiss auf einer hellen Flaeche — das ist die
+ *        Bugklasse, die im Projekt viermal zugeschlagen hat.
+ *  · §6c Jede Mengenangabe („x50") sitzt auf einem EIGENEN dunklen
+ *        Plaettchen (.rwqty), nicht direkt auf dem cremefarbenen
+ *        Kachelkoerper. Die Textgrundlage haengt damit nicht davon ab,
+ *        welches Artwork gerade geladen hat.
+ *  · §6h Icons kommen aus ico() und sind freigestellt. Auf den hellen
+ *        Flaechen fehlt ihnen dadurch der dunkle Rand — deshalb tragen
+ *        alle Icon-Regeln hier `filter:var(--frei) drop-shadow(...)`.
+ *        Die Reihenfolge ist Pflicht: Freistellung zuerst.
+ * ================================================================== */
+#rwLayer{position:fixed;inset:0;display:none;z-index:86;align-items:center;
+  justify-content:center;background:#05090ce0;padding:16px 14px}
+#rwLayer.open{display:flex}
+.rwpop{width:100%;max-width:398px;animation:offerpop .4s cubic-bezier(.2,1.4,.4,1)}
+
+/* Gemessen: Blatt 394 px breit (91,6 % der Bildschirmbreite), das Band
+   liegt mit seiner MITTE auf der Blattoberkante, die Reiterleiste
+   beginnt 49 px darunter. */
+.rwsheet{position:relative;margin-top:28px;border-radius:18px;padding:48px 12px 12px;
+  background:linear-gradient(180deg,#2b3d55,#1b2735 60%,#131c26);
+  box-shadow:var(--mat-raised-lg),0 24px 60px -20px #000;
+  --rw-panel:#2c3c50; --rw-row:#3a4c63; --rw-well:#16202c}
+
+/* Titelband: 9-SLICE (§6c), nie als deckende Bildflaeche. Die
+   Farbplatte bleibt als background-image liegen — faellt die Grafik
+   aus, traegt sie das Band allein. Randbreite = Bandhoehe. */
+.rwtitle{position:absolute;left:50%;top:-28px;transform:translateX(-50%);z-index:2;
+  width:62%;min-width:216px;height:var(--banner-h-sm);margin:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;font-weight:900;letter-spacing:.12em;
+  background-image:linear-gradient(180deg,#2f74d8,#1b4f9e 55%,#123a78);
+  background-size:cover,100% 100%;background-repeat:no-repeat;background-position:center;
+  border-radius:12px;box-shadow:var(--mat-raised-lg)}
+.rwtitle.band9{border-image-width:0 56px}
+
+.rwclose{position:absolute;right:0;top:-19px;z-index:3;width:30px;height:30px;
+  border-radius:9px;border:1px solid #ffffff30;font-size:15px;font-weight:900;
+  color:#fff;text-shadow:0 1px 2px #0009;
+  /* ⚠ Oberste Verlaufsstufe #ff6a72 -> #e85a63 (Abweichung vom Patch).
+     Die Glyphe steht mittig, dort sind es 5,81:1 — einwandfrei. Am
+     obersten Bildpunkt des Verlaufs waeren es aber 2,78:1 gewesen, und
+     damit HELLER als der bestehende Schliessknopf .stx (3,08:1), auf
+     den sich dieses Fenster sonst bezieht. Mit #e85a63 sind es 3,46:1;
+     der Knopf liest sich unveraendert rot. */
+  background:linear-gradient(180deg,#e85a63,#c4222f 60%,#8c1620);
+  box-shadow:var(--mat-raised),0 6px 14px -6px #000;
+  display:flex;align-items:center;justify-content:center}
+
+/* Reiterleiste. AA: der aktive Reiter ist HELLER, etwas HOEHER und hat
+   KEINE Trennkante zum Inhalt — er traegt denselben Farbwert wie die
+   Inhaltsflaeche (--rw-panel). Genau das macht die Fuge unsichtbar. */
+.rwtabs{display:flex;gap:2px;align-items:flex-end;height:41px}
+.rwtab{position:relative;flex:1 1 0;height:38px;border:0;border-radius:10px 10px 0 0;
+  font:inherit;font-size:11.5px;font-weight:900;letter-spacing:.03em;cursor:pointer;
+  color:#a9bdcd;background:linear-gradient(180deg,#243244,#1a242f);
+  box-shadow:var(--lit),var(--sh-1)}
+.rwtab.on{height:41px;color:#f2f8ff;
+  background:linear-gradient(180deg,#3d5470,var(--rw-panel));
+  box-shadow:var(--lit-2),0 -3px 8px -3px #0007}
+.rwtab .rwdot{position:absolute;right:2px;top:-6px;width:15px;height:15px;
+  border-radius:50%;font-style:normal;font-size:10px;font-weight:900;line-height:15px;
+  /* Gleiche Ruecknahme wie bei .rwclose: #ff5f6d waeren 2,95:1 am
+     obersten Bildpunkt, #e85062 sind 3,65:1. Unten stehen 6,05:1. */
+  color:#fff;background:linear-gradient(180deg,#e85062,#c31728);
+  box-shadow:var(--mat-raised)}
+
+/* Gemessen: die Inhaltsflaeche nimmt 61 % der Bildschirmhoehe ein. */
+.rwbody{background:var(--rw-panel);border-radius:0 0 12px 12px;padding:8px;
+  max-height:60vh;overflow-y:auto;box-shadow:var(--mat-well)}
+
+/* ---------- Schiene ----------
+   Der Nullpunkt liegt eine Schrittweite VOR der ersten Marke; die
+   Prozentwerte kommen fertig aus ArenaRewards.rail(). Rechts 24 px
+   Luft, damit die Marke bei 100 % nicht an der Kante abgeschnitten
+   wird. */
+.rwrail{display:flex;align-items:center;gap:8px;height:var(--banner-h);
+  padding:0 24px 0 10px;border-radius:var(--radius-sm);
+  background:var(--rw-well);box-shadow:var(--mat-well)}
+.rwtrack{position:relative;flex:1 1 auto;height:16px;border-radius:8px;
+  background:#0c141c;box-shadow:var(--mat-well)}
+.rwfill{height:100%;border-radius:8px;
+  background:linear-gradient(180deg,#ffd35e,#e09a12);
+  box-shadow:inset 0 1px 0 #ffffff66,0 0 8px #e0a41c55;
+  transition:width var(--t-slow) var(--ease-out)}
+.rwmark{position:absolute;top:50%;transform:translate(-50%,-50%);
+  width:40px;height:56px;padding:0;border:0;background:none;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.rwmark .ico{width:32px;height:26px;object-fit:contain;
+  filter:var(--frei) drop-shadow(0 2px 3px #0009)}
+.rwmark span.ico{font-size:22px;line-height:26px}
+.rwmark b{font-size:12px;font-weight:900;color:#e8eef3;text-shadow:0 1px 2px #000}
+.rwmark.locked .ico{filter:var(--frei) grayscale(.55) brightness(.72)}
+.rwmark.ready .ico{filter:var(--frei) drop-shadow(0 0 6px #ffd35eaa) drop-shadow(0 2px 3px #0009)}
+/* Die Prunktruhe der letzten Marke — AA setzt dort eine goldene Truhe.
+   Wir haben nur EIN Truhen-Artwork, also traegt die Fassung die
+   Auszeichnung, nicht ein zweites Asset (§6e: ein Asset hat eine
+   Rolle). */
+.rwmark.grand .ico{width:36px;height:30px;
+  filter:var(--frei) drop-shadow(0 0 7px #ffd35e) drop-shadow(0 2px 3px #0009)}
+.rwchip{position:absolute;right:1px;top:0;width:15px;height:15px;border-radius:5px;
+  background:#0f1720e0;border:1px solid #ffffff2b;box-shadow:var(--sh-1);
+  display:flex;align-items:center;justify-content:center}
+.rwchip .ico{width:10px;height:10px;filter:var(--frei)}
+.rwchip span.ico{font-size:9px;line-height:1}
+.rwchip.ok{background:#123a12e0;border-color:#7ad14f66}
+
+/* Wimpel (LOGIN) und Medaillen-Chip (TAEGLICH/WOECHENTLICH) — beide
+   HELL, deshalb beide mit DUNKLER Schrift (§4). */
+.rwpennant{position:relative;flex:0 0 41px;height:47px;
+  background:linear-gradient(180deg,#ffd869,#e0a41c 60%,#a97208);
+  clip-path:polygon(0 0,100% 0,100% 74%,50% 100%,0 74%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:#2a1c02;font-weight:900;font-size:14px;line-height:1;
+  text-shadow:0 1px 0 #ffe9ae}
+.rwpennant small{font-size:7.5px;letter-spacing:.1em;opacity:.78;margin-top:1px}
+.rwrhead{flex:0 0 41px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:1px}
+.rwrhead .ico{width:30px;height:32px;object-fit:contain;
+  filter:var(--frei) drop-shadow(0 2px 3px #0009)}
+.rwrhead span.ico{font-size:24px;line-height:32px}
+.rwrhead b{font-size:12.5px;font-weight:900;color:#fff;text-shadow:0 1px 2px #000}
+
+.rwtimer{text-align:center;font-size:11px;font-weight:800;color:#b9cbd9;
+  padding:7px 0 4px}
+.rwtimer b{color:var(--gold)}
+
+/* ---------- Tageskacheln ----------
+   Gemessen: 3 Spalten a 118 px, Kopf 29 px, Koerper 111 px, das
+   Icon-Feld nimmt 55 % der Kachelbreite ein. TAG 7 laeuft ueber die
+   volle Breite und traegt vier Plaetze. */
+.rwdays{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);margin-top:2px}
+.rwday{display:flex;flex-direction:column;padding:0;border:0;font:inherit;
+  border-radius:var(--radius);overflow:hidden;cursor:pointer;
+  box-shadow:var(--mat-raised)}
+.rwday.wide{grid-column:1 / -1}
+.rwdh{display:flex;align-items:center;justify-content:center;height:29px;
+  font-size:12px;font-weight:900;letter-spacing:.06em;
+  /* HELLER Kopf, DUNKLE Schrift (§4). */
+  color:#2a1c02;background:linear-gradient(180deg,#ffd15a,#e9a412);
+  text-shadow:0 1px 0 #ffe6ab;box-shadow:var(--lit),var(--unlit)}
+.rwday.done .rwdh{color:#0c2a05;background:linear-gradient(180deg,#8ce05f,#4fae20);
+  text-shadow:0 1px 0 #d3f5bd}
+.rwdb{position:relative;flex:1 1 auto;min-height:112px;display:flex;
+  align-items:center;justify-content:center;gap:20px;padding:8px 6px;
+  background:linear-gradient(180deg,#f7ead0,#e8d3a6);box-shadow:var(--sunk)}
+.rwday.done .rwdb{background:linear-gradient(180deg,#1e2c1d,#152014)}
+.rwday.locked{opacity:.82}
+.rwslot{position:relative;flex:0 0 auto;width:64px;height:64px;
+  border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,#2a3a52,#16202c);border:2px solid #3f5877;
+  box-shadow:var(--mat-raised)}
+.rwslot .ico{width:42px;height:42px;object-fit:contain;
+  filter:var(--frei) drop-shadow(0 2px 3px #0009)}
+.rwslot span.ico{font-size:32px;line-height:42px}
+/* Mengenangabe auf EIGENEM dunklem Plaettchen (§6c) — nie helle Schrift
+   direkt auf dem cremefarbenen Koerper. */
+.rwqty{position:absolute;right:-4px;bottom:-6px;padding:1px 5px;border-radius:7px;
+  font-style:normal;font-size:10.5px;font-weight:900;color:#f4f9ff;
+  background:#0b131be8;border:1px solid #ffffff2e;box-shadow:var(--sh-1)}
+.rwcheck{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:44px;height:44px;display:flex;align-items:center;justify-content:center}
+.rwcheck .ico{width:100%;height:100%;object-fit:contain;
+  filter:var(--frei) drop-shadow(0 2px 4px #000c)}
+.rwcheck span.ico{font-size:34px}
+.rwday.done .rwslot .ico{opacity:.4}
+
+/* ---------- Aufgabenzeilen (TAEGLICH / WOECHENTLICH / LEBENSZEIT) ----------
+   Gemessen 68 px hoch; die Hoehenleiter (§3) kennt an dieser Stelle
+   --banner-h (72) und keinen Zwischenwert. */
+.rwrows{display:flex;flex-direction:column;gap:var(--gap);margin-top:2px}
+.rwrow{display:flex;align-items:stretch;gap:8px;min-height:var(--banner-h);
+  padding:6px 8px 6px 0;border-radius:var(--radius-sm);overflow:hidden;
+  background:var(--rw-row);box-shadow:var(--mat-raised)}
+.rwlead{flex:0 0 57px;margin:-6px 0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;
+  background:#00000026;box-shadow:var(--sunk)}
+.rwlead .ico{width:30px;height:32px;object-fit:contain;
+  filter:var(--frei) drop-shadow(0 2px 3px #0009)}
+.rwlead span.ico{font-size:24px;line-height:32px}
+.rwlead b{font-size:12.5px;font-weight:900;color:#fff;text-shadow:0 1px 2px #000}
+.rwmain{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;
+  justify-content:center;gap:6px}
+.rwtt{font-size:12px;font-weight:800;color:#eaf2f8;line-height:1.25}
+.rwbar{position:relative;height:20px;border-radius:6px;overflow:hidden;
+  background:#0d1620;box-shadow:var(--mat-well)}
+.rwbarf{height:100%;border-radius:6px;
+  background:linear-gradient(180deg,#5fe03c,#27a30f);
+  box-shadow:inset 0 1px 0 #ffffff59;
+  transition:width var(--t-slow) var(--ease-out)}
+.rwbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:900;color:#fff;
+  /* Der dunkle Umriss IST hier das „eigene dunkle Plaettchen" aus §6c:
+     ohne ihn stuende helle Schrift auf einem hellgruenen Balken. */
+  text-shadow:0 1px 0 #06300a,0 0 4px #000c,0 0 2px #000}
+.rwact{flex:0 0 76px;display:flex;align-items:center;justify-content:center}
+.rwbtn{width:76px;height:36px;border:0;border-radius:9px;font:inherit;
+  font-size:12.5px;font-weight:900;letter-spacing:.04em;cursor:pointer;
+  box-shadow:var(--mat-raised)}
+/* Beide Knopfarten sind HELL und tragen deshalb DUNKLE Schrift (§4). */
+.rwbtn.claim{color:#0a2a04;text-shadow:0 1px 0 #c8f0ae;
+  background:linear-gradient(180deg,#8ce065,#3fa71f 55%,#2a7714)}
+.rwbtn.go{color:#33230a;text-shadow:0 1px 0 #ffeab0;
+  background:linear-gradient(180deg,#ffd869,#e5a51c 55%,#b87c0a)}
+.rwdone{width:40px;height:40px;display:flex;align-items:center;justify-content:center}
+.rwdone .ico{width:100%;height:100%;object-fit:contain;
+  filter:var(--frei) drop-shadow(0 2px 4px #000a)}
+.rwdone span.ico{font-size:30px}
+/* LEBENSZEIT: links keine Medaille, sondern die Belohnungskachel
+   (gemessen 44x43 px, goldene Fassung). */
+.rwrow.life .rwlead{flex:0 0 60px}
+.rwgift{position:relative;width:44px;height:43px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,#3a2d10,#1d1607);border:2px solid #e0a41c;
+  box-shadow:var(--mat-raised)}
+.rwgift .ico{width:30px;height:30px;object-fit:contain;
+  filter:var(--frei) drop-shadow(0 2px 3px #0009)}
+.rwgift span.ico{font-size:24px;line-height:30px}
+.rwgift .rwqty{right:-5px;bottom:-6px;font-size:9.5px;padding:1px 4px}
+
 #dailyLayer{position:fixed;inset:0;display:none;z-index:84;align-items:center;
   justify-content:center;background:#05090cd6;padding:16px}
 #dailyLayer.open{display:flex}
@@ -4628,6 +4858,24 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   <div class="loginpop" id="loginPop"></div>
 </div>
 
+<!-- ===== BELOHNUNGS-FENSTER =====
+     Ein Modal, vier Reiter (AA IMG_3338-3341). Alle drei Kacheln der
+     linken Startseiten-Schiene fuehren hierher und waehlen dabei ihren
+     Reiter vor; #icoDaily startet auf LOGIN, weil dort AAs
+     Login-Kalender haengt.
+     Der Inhalt wird komplett aus arena_rewards.js gerendert — im
+     Markup steht nur die Fassung. -->
+<div id="rwLayer">
+  <div class="rwpop">
+    <div class="rwsheet">
+      <h3 class="rwtitle" id="rwTitle"><span class="goldtext">LOGIN</span></h3>
+      <button class="rwclose pressable" id="rwClose" title="Schließen">✕</button>
+      <div class="rwtabs" id="rwTabs"></div>
+      <div class="rwbody" id="rwBody"></div>
+    </div>
+  </div>
+</div>
+
 <!-- ===== TAGESZIELE =====
      Lag frueher als Panel auf Home und war einer der Haupt-Gruende fuer
      den ueberladenen Startbildschirm. AA haelt den Start frei („Ein
@@ -4687,6 +4935,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 <script src="./arena_friends.js"></script>
 <script src="./arena_vault.js"></script>
 <script src="./arena_daily.js"></script>
+<script src="./arena_rewards.js"></script>
 <script src="./arena_guide.js"></script>
 <script src="./arena_avatars.js"></script>
 <script src="./arena_matchend.js"></script>
@@ -10620,12 +10869,12 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
      AAs Stelle, aber ihre eigenen Inhalte kommen erst, wenn der Nutzer
      die Belohnungs-Screenshots geschickt hat. Lieber ein ehrlicher
      Platzhalter als eine leere Kachel, die nichts tut. */
-  $("icoWeekly").addEventListener("click", function () {
-    UISfx.tap(); openDaily(); toast("Wochenziele — Aufbau folgt");
-  });
-  $("icoLifetime").addEventListener("click", function () {
-    UISfx.tap(); openDaily(); toast("Erfolge (Lifetime) — Aufbau folgt");
-  });
+  /* Alle drei Kacheln oeffnen DASSELBE Fenster und waehlen nur ihren
+     Reiter vor. #icoDaily startet auf LOGIN, weil dort — wie bei AA —
+     der Login-Kalender haengt; der Reiter TAEGLICH ist einen Tap
+     entfernt. */
+  $("icoWeekly").addEventListener("click", function () { openRewards("weekly"); });
+  $("icoLifetime").addEventListener("click", function () { openRewards("lifetime"); });
   $("icoVault").addEventListener("click", function () {
     UISfx.tap();
     if (window.ArenaVault) { show("navShop"); toast("Kristalltresor im Shop"); }
@@ -10718,7 +10967,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
      ist. Der alte Knopf `icoSettings` existiert nicht mehr; `onNav`
      wuerde darueber stolpern. */
   onNav("tileGuide", "navGuide");
-  $("icoDaily").addEventListener("click", openDaily);
+  $("icoDaily").addEventListener("click", function () { openRewards("login"); });
   $("dailyClose").addEventListener("click", closeDaily);
   $("dailyLayer").addEventListener("click", function (e) {
     if (e.target === $("dailyLayer")) closeDaily();
@@ -10761,7 +11010,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   $("btnSetGuide").addEventListener("click", function () { show("navGuide"); });
   $("btnSetManual").addEventListener("click", function () { show("navManual"); });
   $("btnSetLogin").addEventListener("click", openLogin);
-  $("icoDaily").addEventListener("click", openDaily);
+  $("icoDaily").addEventListener("click", function () { openRewards("login"); });
   $("dailyClose").addEventListener("click", closeDaily);
   $("loginLayer").addEventListener("click", function (e) {
     if (e.target === $("loginLayer")) closeLogin();
@@ -10904,6 +11153,10 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     tint($("icoDaily"), "pack_gold");
     tint($("icoWeekly"), "gems");
     tint($("icoLifetime"), "pack_arcane");
+    /* Muss NACH UIBadge.set("daily", …) weiter oben stehen: die drei
+       Punkte der linken Schiene kommen aus ArenaRewards und sollen die
+       Zahl aus ArenaDaily ueberschreiben, nicht umgekehrt. */
+    rwSyncBadges();
     tint($("icoPack"), "pack_gold");
     tint($("icoBoard"), "gold");
     tint($("icoMail"), "speed");
@@ -11087,6 +11340,236 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   window.startBattle = startBattle;
 
   /* ==================================================================
+   * BELOHNUNGS-FENSTER — Darstellung
+   * ------------------------------------------------------------------
+   * Rechnen tut hier NICHTS. Prozentwerte, Zustaende ("open" /
+   * "claimable" / "taken"), Zeittexte und selbst die Beschriftung „x50"
+   * kommen fertig aus arena_rewards.js. Dieser Block macht drei Dinge:
+   * Markup bauen, Klicks weiterreichen, Gold/Gems buchen.
+   *
+   * WARUM DIE BUCHUNG HIER LIEGT: dieselbe Arbeitsteilung wie ueberall
+   * im Projekt (arena_daily.js, arena_clan.js). Das Modul bucht nur
+   * Essenz ueber ArenaCards; Gold und Gems liegen in der Hub-Wallet,
+   * und die kennt nur diese Datei.
+   * ================================================================== */
+  var RW_TAB = "login";
+  function RWof() { return window.ArenaRewards || null; }
+
+  function openRewards(tab) {
+    var R = RWof();
+    if (!R) { toast("Belohnungen noch nicht geladen"); return; }
+    RW_TAB = R.TAB_TITEL[tab] ? tab : "login";
+    renderRewards();
+    $("rwLayer").classList.add("open");
+    UISfx.tap();
+  }
+  function closeRewards() {
+    $("rwLayer").classList.remove("open");
+    UISfx.tap();
+    rwSyncBadges();
+    renderHome();
+  }
+  function setRewardTab(tab) {
+    var R = RWof();
+    if (!R || !R.TAB_TITEL[tab] || tab === RW_TAB) return;
+    RW_TAB = tab; UISfx.tap(); renderRewards();
+  }
+
+  function renderRewards() {
+    var R = RWof(); if (!R) return;
+    /* Der Titel wechselt mit dem Reiter — bei AA steht im blauen Band
+       immer der Name des aktiven Reiters, nicht ein Fenstertitel. */
+    var t = $("rwTitle");
+    t.innerHTML = '<span class="goldtext">' + R.TAB_TITEL[RW_TAB] + "</span>";
+    band(t, "banner_title");
+    var b = R.badges();
+    $("rwTabs").innerHTML = R.TABS.map(function (k) {
+      return '<button class="rwtab pressable' + (k === RW_TAB ? " on" : "") +
+        '" data-rwtab="' + k + '">' + R.TAB_TITEL[k] +
+        (b[k] > 0 ? '<i class="rwdot">!</i>' : "") + "</button>";
+    }).join("");
+    var body = $("rwBody");
+    if (RW_TAB === "login") body.innerHTML = rwLoginHtml(R);
+    else if (RW_TAB === "lifetime") body.innerHTML = rwLifeHtml(R);
+    else body.innerHTML = rwTasksHtml(R, RW_TAB);
+    body.scrollTop = 0;
+    markPressable(body);
+  }
+
+  /* Eine Schiene, zwei Bauformen. Die Prozentwerte stehen fertig in
+     rail.fillPct / mark.pct — sie umzurechnen waere die zweite Stelle,
+     an der dieselbe Regel steht. */
+  function rwRailHtml(rail, headHtml, scope) {
+    var marks = rail.marks.map(function (m) {
+      var cls = m.taken ? "taken" : (m.claimable ? "ready" : "locked");
+      var chip = m.taken ? '<i class="rwchip ok">' + ico("icon_check", "✓") + "</i>"
+        : (m.locked ? '<i class="rwchip">' + ico("ic_lock", "🔒") + "</i>" : "");
+      return '<button class="rwmark ' + cls + (m.grand ? " grand" : "") +
+        '" data-rwchest="' + scope + ":" + m.at + '" style="left:' + m.pct + '%" title="' +
+        m.reward.long + '">' + ico("chest_bronze", "🎁") + chip +
+        "<b>" + m.at + "</b></button>";
+    }).join("");
+    return '<div class="rwrail">' + headHtml +
+      '<div class="rwtrack"><div class="rwfill" style="width:' + rail.fillPct + '%"></div>' +
+      marks + "</div></div>";
+  }
+
+  function rwSlotHtml(r, done) {
+    return '<span class="rwslot">' + ico(r.ico, r.emoji) +
+      '<i class="rwqty">' + r.text + "</i>" +
+      (done ? '<span class="rwcheck">' + ico("icon_check", "✅") + "</span>" : "") +
+      "</span>";
+  }
+
+  function rwLoginHtml(R) {
+    var lg = R.login();
+    var head = '<div class="rwpennant">' + lg.dayTotal + "<small>TAG</small></div>";
+    var out = rwRailHtml(lg.rail, head, "login");
+    out += '<div class="rwtimer">Nächste Belohnung in: <b>' + lg.nextText + "</b></div>";
+    out += '<div class="rwdays">' + lg.days.map(function (d) {
+      var cls = "rwday" + (d.wide ? " wide" : "") + (d.done ? " done" : "") +
+        (d.claimable ? " ready" : "") + (d.locked ? " locked" : "");
+      return '<button class="' + cls + '" data-rwday="' + d.day + '">' +
+        '<span class="rwdh">TAG ' + d.day + "</span>" +
+        '<span class="rwdb">' + d.rewards.map(function (r) {
+          return rwSlotHtml(r, d.done);
+        }).join("") + "</span></button>";
+    }).join("") + "</div>";
+    return out;
+  }
+
+  /* Drei Zustaende je Zeile, wortgleich zu AA:
+       claimable -> gruener „Abholen"-Knopf
+       open      -> goldener „LOS"-Knopf, springt in die passende View
+       taken     -> gruener Haken, KEIN Knopf */
+  function rwActionHtml(scope, q) {
+    if (q.taken) return '<span class="rwdone">' + ico("icon_check", "✅") + "</span>";
+    if (q.claimable) {
+      return '<button class="rwbtn claim" data-rwclaim="' + scope + ":" + q.key +
+        '">Abholen</button>';
+    }
+    return '<button class="rwbtn go" data-rwgo="' + q.go + '">LOS</button>';
+  }
+
+  function rwTasksHtml(R, scope) {
+    var t = R.tasks(scope);
+    var head = '<div class="rwrhead">' + ico("ic_crown", "🏅") + "<b>" + t.points + "</b></div>";
+    var out = rwRailHtml(t.rail, head, scope);
+    out += '<div class="rwtimer">Reset in: <b>' + t.resetText + "</b></div>";
+    out += '<div class="rwrows">' + t.quests.map(function (q) {
+      return '<div class="rwrow">' +
+        '<span class="rwlead">' + ico("ic_crown", "🏅") + "<b>" + q.pts + "</b></span>" +
+        '<span class="rwmain"><span class="rwtt">' + q.title + "</span>" +
+        '<span class="rwbar"><span class="rwbarf" style="width:' + q.pct + '%"></span>' +
+        '<span class="rwbl">' + q.label + "</span></span></span>" +
+        '<span class="rwact">' + rwActionHtml(scope, q) + "</span></div>";
+    }).join("") + "</div>";
+    return out;
+  }
+
+  /* LEBENSZEIT hat KEINE Schiene — das sind die Erfolge, sie haben
+     keine Frist und keine Zwischenstufen. */
+  function rwLifeHtml(R) {
+    var lf = R.lifetime();
+    return '<div class="rwrows">' + lf.rows.map(function (r) {
+      return '<div class="rwrow life">' +
+        '<span class="rwlead"><span class="rwgift">' + ico(r.reward.ico, r.reward.emoji) +
+        '<i class="rwqty">' + r.reward.text + "</i></span></span>" +
+        '<span class="rwmain"><span class="rwtt">' + r.title + "</span>" +
+        '<span class="rwbar"><span class="rwbarf" style="width:' + r.pct + '%"></span>' +
+        '<span class="rwbl">' + r.label + "</span></span></span>" +
+        '<span class="rwact">' + rwActionHtml("lifetime", r) + "</span></div>";
+    }).join("") + "</div>";
+  }
+
+  /* Gold und Gems bucht der Hub, Essenz hat das Modul schon gebucht,
+     Packs werden nur gemeldet — dieselbe Aufteilung wie in
+     doLoginClaim(). */
+  function rwGrant(res, was) {
+    var teile = [];
+    (res.rewards || []).forEach(function (r) {
+      if (r.kind === "gold") setGold(gold() + r.amount);
+      else if (r.kind === "gems") setGems(gems() + r.amount);
+      teile.push(r.long);
+    });
+    UISfx.reward();
+    toast(was + (teile.length ? ": " + teile.join(" · ") : " abgeholt"));
+    renderRewards();
+    rwSyncBadges();
+    renderHome();
+  }
+
+  /* Die roten Punkte an den drei Schienen-Kacheln der Startseite.
+     Bewusst DIREKT gesetzt statt ueber UIBadge: „daily" zeigt dort die
+     Summe aus LOGIN und TAEGLICH, weil #icoDaily beide Reiter oeffnet —
+     UIBadge kennt nur eine Quelle je Schluessel. */
+  function rwSyncBadges() {
+    var R = RWof(); if (!R) return;
+    var b = R.badges();
+    function setzen(id, n) {
+      var el = $(id); if (!el) return;
+      n = n | 0;
+      el.textContent = n > 99 ? "99+" : String(n);
+      el.style.display = n > 0 ? "" : "none";
+    }
+    setzen("tileDailyBadge", b.login + b.daily);
+    setzen("badgeWeekly", b.weekly);
+    setzen("badgeLifetime", b.lifetime);
+  }
+
+  /* EINE Bruecke statt acht Einzelmeldungen: jede Stelle, die heute
+     ArenaDaily.reportEvent() ruft, erreicht damit auch ArenaRewards.
+     Das ist bewusst KEIN Suchen-und-Ersetzen an acht Aufrufstellen —
+     eine davon wuerde beim naechsten Umbau vergessen (siehe §6d des
+     Design-Systems: zwei einzeln richtige Aenderungen, die zusammen
+     nicht mehr galten). */
+  (function bridgeRewards() {
+    var D = window.ArenaDaily, R = window.ArenaRewards;
+    if (!D || !R || D.__rwBridged) return;
+    var orig = D.reportEvent;
+    D.reportEvent = function () {
+      try { R.reportEvent(arguments[0], arguments[1]); } catch (e) {}
+      return orig.apply(D, arguments);
+    };
+    D.__rwBridged = true;
+  })();
+
+  $("rwClose").addEventListener("click", closeRewards);
+  $("rwLayer").addEventListener("click", function (e) {
+    if (e.target === $("rwLayer")) closeRewards();
+  });
+  $("rwTabs").addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("[data-rwtab]") : null;
+    if (b) setRewardTab(b.getAttribute("data-rwtab"));
+  });
+  $("rwBody").addEventListener("click", function (e) {
+    var R = RWof(); if (!R) return;
+    var el = e.target.closest
+      ? e.target.closest("[data-rwclaim],[data-rwgo],[data-rwchest],[data-rwday]") : null;
+    if (!el) return;
+    var v;
+    try {
+      if ((v = el.getAttribute("data-rwgo"))) { closeRewards(); show(v); return; }
+      if ((v = el.getAttribute("data-rwclaim"))) {
+        var p = v.split(":");
+        if (p[0] === "lifetime") rwGrant(R.claimLifetime(p[1]), "Erfolg");
+        else rwGrant(R.claimQuest(p[0], p[1]), "Aufgabe");
+        return;
+      }
+      if ((v = el.getAttribute("data-rwchest"))) {
+        var q = v.split(":");
+        if (q[0] === "login") rwGrant(R.claimLoginMilestone(+q[1]), "Meilenstein " + q[1]);
+        else rwGrant(R.claimChest(q[0], +q[1]), "Truhe " + q[1]);
+        return;
+      }
+      if ((v = el.getAttribute("data-rwday"))) {
+        rwGrant(R.claimLoginDay(), "Tag " + v);
+        return;
+      }
+    } catch (err) { UISfx.deny(); toast(err.message); }
+  });
+
+  /* ==================================================================
    * WISCHEN ZWISCHEN DEN HAUPT-VIEWS
    * ------------------------------------------------------------------
    * Die fuenf Bottom-Nav-Ziele sind eine REIHE. Nach links wischen geht
@@ -11106,7 +11589,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
    * ================================================================== */
   var SWIPE_ORDER = ["navShop", "navCollection", "navHome", "navClan", "navFortress"];
   var SWIPE_LAYERS = ["#detailModal", "#roadLayer", "#stLayer", "#dailyLayer",
-                      "#tbMenuLayer",
+                      "#tbMenuLayer", "#rwLayer",
                       "#loginLayer", "#offerLayer", "#avCerLayer", "#mmLayer"];
 
   (function installSwipe() {
