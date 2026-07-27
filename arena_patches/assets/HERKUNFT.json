@@ -1,0 +1,1428 @@
+{
+ "_bytes": 75929961,
+ "_dateien": 203,
+ "_hinweis": "Erzeugt von werkzeuge/assets_sichern.py. Schluessel, Quell-URL, Dateiname, Groesse und SHA-256 je Asset — der Nachweis, dass die Datei im Repo die Datei vom CDN ist.",
+ "assets": {
+  "arena1": {
+   "bytes": 43384,
+   "datei": "arena1.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095747_28a90d71-c3ab-4911-afd5-969483bfa22c_min.webp",
+   "sha256": "f8c633d4f53c6c3dc2a7598524af75967be49aaa731a1134d807afcdd9ebaac9"
+  },
+  "arena2": {
+   "bytes": 114868,
+   "datei": "arena2.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095757_8ddd3202-0a7c-4f43-82a7-1d9d6a06d038_min.webp",
+   "sha256": "532b273c965a67bc8d98f004305ecd973703439734e763a6a789d0aa7a604cdb"
+  },
+  "arena3": {
+   "bytes": 63926,
+   "datei": "arena3.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095801_d277827e-8704-485f-b0bb-b0f4498a2eba_min.webp",
+   "sha256": "74908aadf3795185b12cca82502d373432cb1e2c60c2f2a730fd7172b56ef049"
+  },
+  "arena4": {
+   "bytes": 78254,
+   "datei": "arena4.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095808_72fb7754-d381-4be7-b741-6ff63150bcfb_min.webp",
+   "sha256": "d859359de7d87970d2e1e2444826312f2e12529bab7cfe6edea1a8c70b1754a9"
+  },
+  "arena5": {
+   "bytes": 60238,
+   "datei": "arena5.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095811_7a6408ea-43bf-45d2-b9e3-e02d03d0f9c7_min.webp",
+   "sha256": "2ebd15f342c4fc1e5420825eed9ff641878ecf6836c38e41b0471c84b124b2d8"
+  },
+  "arena6": {
+   "bytes": 97658,
+   "datei": "arena6.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095815_26d38ce0-2889-4351-8b4c-ac50183d32ea_min.webp",
+   "sha256": "e03b44c0d9130637b142e55287a61092850cac3283e758a83a945402310eb45f"
+  },
+  "arena7": {
+   "bytes": 60040,
+   "datei": "arena7.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133735_eecfb0b0-d6ea-408d-8f43-f9337c9e35d6_min.webp",
+   "sha256": "ebfbc3c08378c6d090a1392aefec0b1567dfbd71f1dc3c4095e35046be5216e2"
+  },
+  "arena8": {
+   "bytes": 82024,
+   "datei": "arena8.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133755_444e1bf7-6dce-4a24-b511-31cc50d0b247_min.webp",
+   "sha256": "b2911c311511b9269c251dfefa3709b346aaaa29c6ce0bbc9e7094b8d78b9d4a"
+  },
+  "arena_crest": {
+   "bytes": 36450,
+   "datei": "arena_crest.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133315_995dd402-303e-4619-b57a-8ab08ab66483_min.webp",
+   "sha256": "470293d69cee0dcdf66915fdb4f23b608d8ccc5fb1d5d7da01e3662033c17166"
+  },
+  "audio_battle": {
+   "bytes": 1118084,
+   "datei": "audio_battle.mp3",
+   "kleinfassung": false,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/19b60a4b-d371-4164-99c2-954b88ce7287.mp3",
+   "sha256": "c80f0c5a920eceafe1fcd9d7781b4ced1e6fa0109bcd158646db65e058a85ac9"
+  },
+  "audio_defeat": {
+   "bytes": 161240,
+   "datei": "audio_defeat.mp3",
+   "kleinfassung": false,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/980ce9bc-9de9-4cc6-99aa-13754c1ad4c8.mp3",
+   "sha256": "ca36771ba02d4e3a5dbd0c9763460e7bf9fc2aa7cb87c1dec4b7605fae827245"
+  },
+  "audio_pack_fanfare": {
+   "bytes": 160941,
+   "datei": "audio_pack_fanfare.mp3",
+   "kleinfassung": false,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/fd1322fe-841d-4a37-aba7-8e51ea2a1be8.mp3",
+   "sha256": "f784baa00477dac4234952f5b1b17fc51b001b6ebf5c3b5aace4bedc0b0f7132"
+  },
+  "audio_theme": {
+   "bytes": 3068146,
+   "datei": "audio_theme.mp3",
+   "kleinfassung": false,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/a36fc476-2c77-4def-a786-ee6129650cb7.mp3",
+   "sha256": "df1f250b71a0dd1b7e194e4c32ca8e84994582c1041d2b871a2629654907232b"
+  },
+  "audio_victory": {
+   "bytes": 129521,
+   "datei": "audio_victory.mp3",
+   "kleinfassung": false,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/1aecb507-371c-4fa6-9415-255e9a68f422.mp3",
+   "sha256": "9c807d0ecb3d8e9f7e9631d92ad5862a9ebae91c5f99c98b7f30bfbb6237b90f"
+  },
+  "audio_war": {
+   "bytes": 1217469,
+   "datei": "audio_war.mp3",
+   "kleinfassung": false,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/724a9347-ebd1-4d3f-978f-1aa7a2517f63.mp3",
+   "sha256": "c6a35d714c37434769cb22c366e491a217284ed5b26c18223f8aa21b062ab8d8"
+  },
+  "av_held_magmor": {
+   "bytes": 34840,
+   "datei": "av_held_magmor.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_132908_00cb7c02-311d-44af-b1a8-a58ff7b42ac6_min.webp",
+   "sha256": "cf30110918cb7fd990412746fa6d4cde969644e9cce85364cf484c0cd3bacf5a"
+  },
+  "av_held_solara": {
+   "bytes": 39512,
+   "datei": "av_held_solara.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_134516_d19e4ee8-1aa7-4e7b-8642-11dd3be00ccd_min.webp",
+   "sha256": "125f9792166dee0ed91085654d4c749a981ed3ba44302d1adc6831593d8bc9f4"
+  },
+  "av_held_solara_alt": {
+   "bytes": 12290,
+   "datei": "av_held_solara_alt.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_132622_669bc14c-287f-491e-a324-3ed488d5b750_min.webp",
+   "sha256": "8eec08909bc3a302f624bb9ce0f2034e0813b11115052b2cc760fa782adcfb1a"
+  },
+  "av_novize": {
+   "bytes": 18674,
+   "datei": "av_novize.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_131731_de872a11-e46f-489d-a409-f2dcec214d34_min.webp",
+   "sha256": "35a5f7cceb8b05c1e67fd3bd3bda6489e5fd7e8a518b32ba1d3ee42a9148c56d"
+  },
+  "av_saphir": {
+   "bytes": 44032,
+   "datei": "av_saphir.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_131925_38fe62cd-7edc-43b4-92b1-328b148aa2bb_min.webp",
+   "sha256": "6d6edff2c55f50fc1a70a34c0ddf044de769fb5ef09561e81cf09ba436cfc31f"
+  },
+  "av_scherbe": {
+   "bytes": 42280,
+   "datei": "av_scherbe.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_132321_764f548c-047c-4b2e-9f6f-23a3e01eaf91_min.webp",
+   "sha256": "a2722e9953c89e95e86c1c918c9f461cb5096dade4ef82715ba16270593a024d"
+  },
+  "av_smaragd": {
+   "bytes": 607035,
+   "datei": "av_smaragd.png",
+   "kleinfassung": false,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/52352867-4607-4fb7-b3b1-6a4a81c43152.png",
+   "sha256": "7d12102c0d7c0e12411f77061649eaf9802769e7a962f9f265055a00dc99a0a7"
+  },
+  "av_smaragd_alt": {
+   "bytes": 30602,
+   "datei": "av_smaragd_alt.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_132900_464ca435-f99d-4a89-97fb-fb5565c847c7_min.webp",
+   "sha256": "a34b36e33595beb5606d0e66227cfe07a92ad1f57f7c91577b00dcb0904adb3a"
+  },
+  "av_sturm": {
+   "bytes": 39808,
+   "datei": "av_sturm.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_132334_32ea1801-8555-4ff9-b048-97f761bf40ba_min.webp",
+   "sha256": "b8bea8e1f0e50a0101a47ea4155184bfb16e7a85fbdf6e1062f51ba5bbb66e3d"
+  },
+  "badge_gratis": {
+   "bytes": 72044,
+   "datei": "badge_gratis.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_115114_b2133911-a404-482a-b01f-026fb1716e02_min.webp",
+   "sha256": "90c3539b14951847659c01bbf3937f710544347d15a0a19bd38e3c32758ab66a"
+  },
+  "banner_rarity": {
+   "bytes": 441874,
+   "datei": "banner_rarity.png",
+   "kleinfassung": false,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/52569a9a-4930-4364-b84c-7d6e20bb0e27.png",
+   "sha256": "50f5382c6fe1ce43294a6b757d79c7c1bca2104a1cdfaa47fdee817b14dde1f0"
+  },
+  "banner_rarity_v1": {
+   "bytes": 14856,
+   "datei": "banner_rarity_v1.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095716_6936452c-84d2-4fc4-ba15-4fa77ef8e6bd_min.webp",
+   "sha256": "557fe8c9437c6ffce44d366cfe85bed74c421ab488eebe6aed4896681da36c38"
+  },
+  "banner_title": {
+   "bytes": 874809,
+   "datei": "banner_title.png",
+   "kleinfassung": false,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/346f0446-686b-454e-a5af-0d81967dcde5.png",
+   "sha256": "30341c1ea8858605d6d5732fa70e047ad88085fe46e3f32da95b6dbed327d1bd"
+  },
+  "banner_title_v1": {
+   "bytes": 41932,
+   "datei": "banner_title_v1.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095720_71db8bf1-f9c9-4acd-9d17-8ce7462e384d_min.webp",
+   "sha256": "24e875db933d4aac2380ff3d97dba44bc3114c6b8fe5f26f473b09d3f8146241"
+  },
+  "bg_gratis_gold": {
+   "bytes": 46204,
+   "datei": "bg_gratis_gold.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_115109_14514643-f0df-4a9c-a503-cfa52a74f641_min.webp",
+   "sha256": "162d1821c983c1884a403d776eb34eab15be35c711752fabc2d1f2ee94400404"
+  },
+  "btn_danger": {
+   "bytes": 16600,
+   "datei": "btn_danger.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_094716_0dfb3958-3823-42a2-a67f-754b847e263d_min.webp",
+   "sha256": "222f891bbdd406a4d0489de8af4997b8c7d46c428ff1815fff58991d0a6e264a"
+  },
+  "btn_info": {
+   "bytes": 54658,
+   "datei": "btn_info.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133805_e56cd8c3-9817-47b0-8fce-7a555d6b44f2_min.webp",
+   "sha256": "a3d919d1f764830ffd197f8608335bc25374e796bf72b70f13fe16955b653897"
+  },
+  "btn_primary": {
+   "bytes": 24284,
+   "datei": "btn_primary.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_094652_c3235d59-6aa8-4e7b-bf6e-8a86ae45e738_min.webp",
+   "sha256": "6ad791b3930c0c51c1a04dc86351cb04c274a993398eefd57993634790263284"
+  },
+  "btn_secondary": {
+   "bytes": 17312,
+   "datei": "btn_secondary.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_094715_3b933e5e-6d2f-488b-8093-f545aa5af6c5_min.webp",
+   "sha256": "1f13bffbc5ab5803ea5076731af788c0cb00e43546659b2ca6e383e5bfee684a"
+  },
+  "card_back": {
+   "bytes": 85114,
+   "datei": "card_back.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_144624_82b4b51d-f9d3-416d-8212-52e2f3c0c0a1_min.webp",
+   "sha256": "8718310f2ce5c5b2f4fc6c233fac472555e6ce3e6c0ce5beb3f22cda2daee205"
+  },
+  "card_dawn": {
+   "bytes": 30808,
+   "datei": "card_dawn.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_163314_d5ceac1b-a0a4-489e-b084-a4b35afc5486_min.webp",
+   "sha256": "e1e20a7b2246f51f7f5ec0e838ca39845067d270d0c2b267cf2fb11da530e5b1"
+  },
+  "card_ember": {
+   "bytes": 53958,
+   "datei": "card_ember.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_163302_2030f3d4-06f9-481f-b9ff-68596f587fb9_min.webp",
+   "sha256": "1c1af39aae5272553879365913e5130e56734777cf14fc07c749384df95f52e8"
+  },
+  "card_frost": {
+   "bytes": 59692,
+   "datei": "card_frost.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_163306_f5f7b63e-a4ae-4473-bb89-2b7421051f16_min.webp",
+   "sha256": "d1ff2d182e2f0ff39e08e0e699fd668d6425bd543935f905d305ddc8126a3803"
+  },
+  "card_hollow": {
+   "bytes": 47592,
+   "datei": "card_hollow.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_163318_f95b1d45-da51-4ca8-ba40-1e8849ac1461_min.webp",
+   "sha256": "387cd85d9de009fb4229e250fbcf7aaf4d0017ccbd313b7e4e4e1ce4b3936add"
+  },
+  "card_magmor": {
+   "bytes": 75994,
+   "datei": "card_magmor.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_163323_2e544b8e-568c-4c59-967c-83424bf3e1c1_min.webp",
+   "sha256": "1064f9e5efbb45ec6a0b7189fd5652206a4ef88c19754e4882ec86737e2d083e"
+  },
+  "card_solara": {
+   "bytes": 76344,
+   "datei": "card_solara.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_163321_b8b3a10d-c9e7-48d1-a374-ad3c3ead8577_min.webp",
+   "sha256": "1a8be350bc2e56e9c2c4ff97befc802916b23443a235e488a93a70658afc2d9e"
+  },
+  "card_stone": {
+   "bytes": 58044,
+   "datei": "card_stone.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_163308_ec2dc5a4-5251-44e1-90c7-fd56a9309193_min.webp",
+   "sha256": "bd9db04a7305cf9f275abb7e7f8aed9398c40c72921fd1bc71de3b495f46f265"
+  },
+  "card_thorn": {
+   "bytes": 51938,
+   "datei": "card_thorn.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_163311_e6b29c3f-1e3b-44c5-8068-ed4be64f65e7_min.webp",
+   "sha256": "5ae23d1127c8b27d0432c7a73468033a2a703589b58d33e01642220325afa88f"
+  },
+  "chest_bronze": {
+   "bytes": 36500,
+   "datei": "chest_bronze.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133419_c6ce951d-516e-44ba-b8cc-149219299e48_min.webp",
+   "sha256": "46057af7c9d9c45b937a7c9321b5cc215d952c814ecd3101f4ac9d4c35dcbef5"
+  },
+  "cinematic_legendary": {
+   "bytes": 9232548,
+   "datei": "cinematic_legendary.mp4",
+   "kleinfassung": false,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_141315_94331286-780b-4b74-8ee1-c8a3e15b9dac.mp4",
+   "sha256": "1cbc55afda55805299053a3e081a8e5dd6d054d0147853399e70aef325666a71"
+  },
+  "cur_gem": {
+   "bytes": 23606,
+   "datei": "cur_gem.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052852_3ecd5982-c573-4d8e-a549-2e408758481a_min.webp",
+   "sha256": "dd5c894489c269963bf9fc41d1ee5eb92d9471646e9568a76580c6635159ad6d"
+  },
+  "cur_gold": {
+   "bytes": 23186,
+   "datei": "cur_gold.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_104310_f2790c69-df09-41cb-bfcf-a2bfcc46979c_min.webp",
+   "sha256": "d62bf6c1109d6fecc569a98793559c5e00253c3c3cf7c526ec8377b2eca96823"
+  },
+  "cur_gold_v2": {
+   "bytes": 31876,
+   "datei": "cur_gold_v2.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052849_03378697-c40c-40bc-a0fa-bf067fac65c0_min.webp",
+   "sha256": "aa26405bddb474a1eff2dc28cf661a7f12b779eb5fbaf975281d624f1974e833"
+  },
+  "cur_material": {
+   "bytes": 17826,
+   "datei": "cur_material.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052854_33cca747-1fb8-47e6-b3c0-a7273684bded_min.webp",
+   "sha256": "3bbb36854068b1db583e604b358c21a5ba57b6ff14b49566215efbe6386d4ac2"
+  },
+  "cur_trophy": {
+   "bytes": 49606,
+   "datei": "cur_trophy.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132705_cc44c539-2646-40d1-b0ff-6b81510c0307_min.webp",
+   "sha256": "87b3836916eac7243e44e4116e57da0f68b7de2d2a5ac4276d10b753e924901b"
+  },
+  "cur_xp": {
+   "bytes": 29506,
+   "datei": "cur_xp.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132815_3b34ad3b-cdf3-4b5d-be12-9cb6b0237543_min.webp",
+   "sha256": "e4e60cc06f9464f2a00a69d2df9dfb66196a4ba51ca1bd7781f8085a2c5f382a"
+  },
+  "el_dunkelheit": {
+   "bytes": 21630,
+   "datei": "el_dunkelheit.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052914_a2e7eacb-a8a4-4e5c-8a2c-eac576f5a690_min.webp",
+   "sha256": "6c0066449861d16714305353998edc5631eefd0580de48ec16d22c5ec5775c2e"
+  },
+  "el_erde": {
+   "bytes": 31418,
+   "datei": "el_erde.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052908_20f9637e-9ee6-429a-a89f-299d3fa5c1eb_min.webp",
+   "sha256": "68fdce636efd20584fd7e116063f4401c1774271e41024545cebcdba151f24ae"
+  },
+  "el_feuer": {
+   "bytes": 19076,
+   "datei": "el_feuer.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052900_8e4d3b7c-b3d9-47b8-8d9d-3a1f867a2832_min.webp",
+   "sha256": "bc6a41ce2ca9e152a5cd560f5170e8d69afbc71a856e640e99e7547693d5a3a9"
+  },
+  "el_licht": {
+   "bytes": 37126,
+   "datei": "el_licht.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052912_37863c64-eac8-4c9f-9ba3-c103f6fea92e_min.webp",
+   "sha256": "b17700a4321f4f67216157645b99fdad3dbe04a113098ad7a5779986758aac3c"
+  },
+  "el_natur": {
+   "bytes": 27360,
+   "datei": "el_natur.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052910_d0e69f59-eb8d-4439-be80-ecf5593633e5_min.webp",
+   "sha256": "bbd5a57e0eb2cb533c1570318b17ac2e32fb4e8c25bd1b45859eda7a6dca0c4f"
+  },
+  "el_wasser": {
+   "bytes": 35328,
+   "datei": "el_wasser.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052906_ecc26734-3e67-4f82-8045-eca084387316_min.webp",
+   "sha256": "792bb067249624fba77da65614bce2b0016558fea9b9034574264c95019f0568"
+  },
+  "emote_attack": {
+   "bytes": 44644,
+   "datei": "emote_attack.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160720_ca1c0844-21b8-40c1-b714-22bb44895f47_min.webp",
+   "sha256": "11cdec0ec07c2fd38e660204db8843a5df10890a4fdb443bf7397d1ee440ed14"
+  },
+  "emote_cards": {
+   "bytes": 60914,
+   "datei": "emote_cards.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160718_714b6f41-0b0f-4ebc-9284-e39af17401ea_min.webp",
+   "sha256": "0f58c254c3f82073f109914a0518447170027805c1f4d306e6916b217235a3de"
+  },
+  "emote_luck": {
+   "bytes": 42978,
+   "datei": "emote_luck.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160713_d2da4068-32da-4d1a-950e-a554f7a3ec11_min.webp",
+   "sha256": "561d07c31ddab07a5ec025a9dcb874f7165149ca4d5f5a2fdb004afd52f8377d"
+  },
+  "emote_strong": {
+   "bytes": 96964,
+   "datei": "emote_strong.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160722_700d087a-3ea5-4bb1-8178-7cf35e08d73f_min.webp",
+   "sha256": "ddb8425bf2c989a76050b14bf8ac757a65806125c1305478b91d7f8a082ff4ea"
+  },
+  "emote_thanks": {
+   "bytes": 53224,
+   "datei": "emote_thanks.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160715_3b9758a1-6ccd-46fe-887b-c87ff28579f0_min.webp",
+   "sha256": "253dac1d6a875f8fbfab94ca4dc5333b66be4895e84e272b5acc1e51987b2853"
+  },
+  "emote_welcome": {
+   "bytes": 31280,
+   "datei": "emote_welcome.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160724_83a735e4-f6f7-4853-86b5-23ebe574f386_min.webp",
+   "sha256": "60214534f92771d06cfa7696d8ed3c5c0e299ae402921d2dd4190ce80300f014"
+  },
+  "ess_attack": {
+   "bytes": 18056,
+   "datei": "ess_attack.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132812_0dd1e9db-ca2f-4d32-9132-8de9d1d1e9f6_min.webp",
+   "sha256": "f3a1b41833014f5b66171d68f53f900bd866458396b3221e14b0293235e6c6ca"
+  },
+  "ess_special": {
+   "bytes": 17496,
+   "datei": "ess_special.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132814_976ad394-6e0a-4f76-943e-298eebf93410_min.webp",
+   "sha256": "be96371df0054ef6e99b5a2f9ed766a297aaa1ca35bc8320c0f4a424d12436c8"
+  },
+  "ess_speed": {
+   "bytes": 20140,
+   "datei": "ess_speed.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132813_d75a56de-91cb-4f9a-a716-59ef4d75a649_min.webp",
+   "sha256": "0134f862adcf73ac162edddbb5a1d2db573f370ef568de05c4f9444c9a3a044c"
+  },
+  "event_essence": {
+   "bytes": 99850,
+   "datei": "event_essence.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160706_82a16544-3845-4947-8482-8104ab108bf6_min.webp",
+   "sha256": "9314d4ce1be30ddf32e58636071e2ba7fee93c325297e44e1c20f46abe656307"
+  },
+  "event_tournament": {
+   "bytes": 81410,
+   "datei": "event_tournament.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160704_9fb36583-0558-4407-a96c-83275fc4c95e_min.webp",
+   "sha256": "324c50d1bf8b829eaacfd9cce0af8f0065e42bed6b22536de3bac68c98e207fc"
+  },
+  "fort_banner_track": {
+   "bytes": 27308,
+   "datei": "fort_banner_track.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_150531_224eab67-a74f-40dd-a293-3caf809eb8b9_min.webp",
+   "sha256": "88b99c177e78b706e9f574cf688058af20c2c10fa94ae14a744574ae91d69c5d"
+  },
+  "fort_castle": {
+   "bytes": 24606,
+   "datei": "fort_castle.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_134052_5d6b036a-d610-45d0-ad32-6956fdb5808a_min.webp",
+   "sha256": "6b5fe105869be3be357ae4d75eb6c039b5c768c2fa56356df04c5595713b5ffa"
+  },
+  "fort_milestone": {
+   "bytes": 55818,
+   "datei": "fort_milestone.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_150538_2ac9dd11-83f1-435b-8f5c-793e503b448b_min.webp",
+   "sha256": "ecb78e19fdea9d0843e80bfd8e6c4c5926e617fe56e58875ca3ca1fd119d27ea"
+  },
+  "fort_pip_empty": {
+   "bytes": 34112,
+   "datei": "fort_pip_empty.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_150536_445edf7f-152a-42cd-81f2-b18060e68ced_min.webp",
+   "sha256": "97bb98428de97eb93f4d46e2d190e2cdbc8742ac9b0d1e0ef3b36cdbce2f4962"
+  },
+  "fort_pip_full": {
+   "bytes": 35312,
+   "datei": "fort_pip_full.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_150534_85413c44-d6fc-41ea-a6ee-2b0589f1d5f7_min.webp",
+   "sha256": "2f70d59a432d2db3e7666c1e10701ec76ac5cedd1bea1c74f75447ffe262d11b"
+  },
+  "frame_card_green": {
+   "bytes": 27338,
+   "datei": "frame_card_green.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042717_86ae6639-d698-4dfe-b5d0-6d042162c301_min.webp",
+   "sha256": "299efbed575e416fd0649fae047855005b679f0697e98d66cdcf925316c28f0f"
+  },
+  "frame_card_light": {
+   "bytes": 34058,
+   "datei": "frame_card_light.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042727_98b627aa-e2fa-4869-a7db-4ddc1dff974a_min.webp",
+   "sha256": "046870fc6f3b32bdfbe569d1f34cadec483b12d4bd7347ae302bf4c870f26c95"
+  },
+  "frame_card_orange": {
+   "bytes": 37562,
+   "datei": "frame_card_orange.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042716_5bf79216-8800-472c-ab73-d9f93ea05991_min.webp",
+   "sha256": "b3d2f6be9546293102252e06b980506eb9aa44ce744509a1842e20ea4764124b"
+  },
+  "frame_common": {
+   "bytes": 10538,
+   "datei": "frame_common.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095642_526164c7-6bb9-4c1f-93b2-ef48d8687b51_min.webp",
+   "sha256": "1184a75fc06f7902545618f96f3a580e945ba374aa1da35272b21e4bc828e9a2"
+  },
+  "frame_epic": {
+   "bytes": 43762,
+   "datei": "frame_epic.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095700_af4f1396-00ca-4392-baea-e034d09706d4_min.webp",
+   "sha256": "835a91e6db4579d5910ba29ceb5688aa3ae1c4ee86250710ecc29128d2a33756"
+  },
+  "frame_good": {
+   "bytes": 23136,
+   "datei": "frame_good.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095652_0e76b98e-5bc1-41d1-b7d6-1a7addd64c58_min.webp",
+   "sha256": "d3b5e6a300062e1a4beea3414993a70851a7dfc0c1c58b6655812dbe4769af49"
+  },
+  "frame_legendary": {
+   "bytes": 48632,
+   "datei": "frame_legendary.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095704_08f4478c-de30-4653-aecb-5c659d420821_min.webp",
+   "sha256": "321f09ae8a89c827ea9e0cee7e285017a1ca7544437128b82b9852a3be362e3b"
+  },
+  "frame_rare": {
+   "bytes": 45050,
+   "datei": "frame_rare.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095656_f9462654-444a-47fb-af6d-01e758b3d09e_min.webp",
+   "sha256": "7e151d965aab088598bda3849566e428e5cf45d5acda597542b36c82b01e8294"
+  },
+  "frame_supreme": {
+   "bytes": 51844,
+   "datei": "frame_supreme.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095707_1878e9e4-ecb1-4eb1-89bc-6f1c60238b2f_min.webp",
+   "sha256": "d1529eb2365c7d13fd61936632f65e3aadb39f1e2c4f15652cb568158a074376"
+  },
+  "fx_spark": {
+   "bytes": 75412,
+   "datei": "fx_spark.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133822_6d0be656-3486-496c-9c16-f6996e549dcf_min.webp",
+   "sha256": "7568a8c380462b2c67a3f26c2e6b20609e658ff30d76b9112691d8b794db63b3"
+  },
+  "gate_emblem": {
+   "bytes": 32654,
+   "datei": "gate_emblem.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133759_5e7df04b-9d20-4c79-833f-e5e0f12d2173_min.webp",
+   "sha256": "cbbb55ce7cdbffbd377f86ef6839a920790d84ac51c9d6f8ef7761b002848ac9"
+  },
+  "hex_slot": {
+   "bytes": 27020,
+   "datei": "hex_slot.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133314_61df2470-d52e-46b7-8d39-adbc96da66bf_min.webp",
+   "sha256": "844491074f54a2523fc7d1823cba40ea08bd1bf90d1dad4f870036e9cdea540f"
+  },
+  "hub_challenges": {
+   "bytes": 40544,
+   "datei": "hub_challenges.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133030_a6c88f92-fb28-4d0e-84ef-c1a44034ef79_min.webp",
+   "sha256": "096dec25310c4874ec6d14cd07c8f7d5aad2db74b228773bfcfd96199581ac69"
+  },
+  "hub_clan": {
+   "bytes": 29930,
+   "datei": "hub_clan.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133027_22a8d954-80b4-4d56-9043-6d90eb809856_min.webp",
+   "sha256": "71f3f31ce4f6febef1176894133962e758cd903f9e76411cdd296bdb3dce8883"
+  },
+  "hub_events": {
+   "bytes": 28152,
+   "datei": "hub_events.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133029_f8199f4f-c610-4639-891e-3dfb69d8bbb7_min.webp",
+   "sha256": "4d0db6a629d63032b454359b9c512db50121472fb3c457e0403d8a8d61fe2a39"
+  },
+  "hub_leaderboard": {
+   "bytes": 33826,
+   "datei": "hub_leaderboard.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133135_123fa2d4-5a7f-43d2-9fe4-2b9643a61a68_min.webp",
+   "sha256": "92d375d21a1050626b6ecb2c071239869fc8423fb0438b24d2ff5b2f9724c215"
+  },
+  "hub_mail": {
+   "bytes": 18470,
+   "datei": "hub_mail.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133026_25da2335-2caa-4a3c-9107-ada8980bf4f6_min.webp",
+   "sha256": "603122f2de6e719d46b8d16c789787505ca3f65e068fb3d3c87d96e0d41217ed"
+  },
+  "hub_pass": {
+   "bytes": 36444,
+   "datei": "hub_pass.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133025_671bafbb-8c27-4cff-8923-afab6d9f5c7b_min.webp",
+   "sha256": "398e205359e36060dbb419669a014e56908377df3e4dd651e08a15a1b1ab0f83"
+  },
+  "hub_settings": {
+   "bytes": 41086,
+   "datei": "hub_settings.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133135_db2d0a40-931f-439e-88d7-b6e5d7c7496d_min.webp",
+   "sha256": "ef726424d9b6b58042a6ecbb5b9a6c1e8d2be9eeb926cc8be47cf6e6ccf688ed"
+  },
+  "hub_shop": {
+   "bytes": 67848,
+   "datei": "hub_shop.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133134_c4dd57e8-7213-4769-b4c3-d2de067d6c26_min.webp",
+   "sha256": "3c47b007c520a42fc463bb547e35736005215745c940f940440489be68b423d0"
+  },
+  "ic_calendar": {
+   "bytes": 59248,
+   "datei": "ic_calendar.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042754_13862811-306e-4424-a780-e6415bf7a5f0_min.webp",
+   "sha256": "cfd0e241a89d9d1ff03eed67b50920a4a4772166f42cd5a3a2a9206dea2fe792"
+  },
+  "ic_chart": {
+   "bytes": 6104,
+   "datei": "ic_chart.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_104318_99e89ba7-6862-42c2-8ebd-ba218330c9c6_min.webp",
+   "sha256": "53a3c8b2887a48433ac285f4b2f94cc601b0927b66bff33886728f7b4827fdd5"
+  },
+  "ic_compass": {
+   "bytes": 67710,
+   "datei": "ic_compass.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042810_2d1a7716-4745-4feb-ac18-181ff41c5b82_min.webp",
+   "sha256": "e659f8bbc46428d88b64e5d47652308e4a558770403a29bdd72d5935040d2c70"
+  },
+  "ic_crown": {
+   "bytes": 23812,
+   "datei": "ic_crown.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_104303_90a36532-4afb-4313-9bf2-4c7c052c275a_min.webp",
+   "sha256": "672ef6b94f9e11b6f78dc2c4ce7fe35a990081b3b7605b1e29e85cd90218da4e"
+  },
+  "ic_donate": {
+   "bytes": 21584,
+   "datei": "ic_donate.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_054429_a6875569-1c35-443a-8d54-ac80ccd048a4_min.webp",
+   "sha256": "073a82dedd6c95d2c6c66feba4c79aa927ab7a68ca08e294402c9e2351dc1dc6"
+  },
+  "ic_gear": {
+   "bytes": 60730,
+   "datei": "ic_gear.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042758_10f0b02d-0cc0-46b6-8c95-6e6132151d3f_min.webp",
+   "sha256": "2392805ba4a45674769e518ad891a86169b05ee22c14fa63555688109e792d2c"
+  },
+  "ic_gift": {
+   "bytes": 52652,
+   "datei": "ic_gift.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_043123_c176ec0e-f156-4ef4-8af1-a11d0878a39f_min.webp",
+   "sha256": "10d8a042f65ffeda3b2f475c7530fe2d065e5343bd56999b7afa28416c1c5ab0"
+  },
+  "ic_helm": {
+   "bytes": 37556,
+   "datei": "ic_helm.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042814_1e1d8383-da1d-4f44-a1a0-429e5d919143_min.webp",
+   "sha256": "d00db25298d09654c67182b1d3c5b8874e6993a0fa73de4bb4c7b76be56815ca"
+  },
+  "ic_hourglass": {
+   "bytes": 42576,
+   "datei": "ic_hourglass.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042820_1e88ee2a-8d71-4f76-b884-0f814ab9f57e_min.webp",
+   "sha256": "d168f48143cfcfe1093798f46d458a87d84412e9f3383a8af0196c962d4c03af"
+  },
+  "ic_lock": {
+   "bytes": 35860,
+   "datei": "ic_lock.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052921_6a87019c-7525-40bf-b59f-6c974340fe53_min.webp",
+   "sha256": "212a038a45fbe09860e9e0330496c891b6af6ff402482a63a6a56a0e32ac4e75"
+  },
+  "ic_mail": {
+   "bytes": 37198,
+   "datei": "ic_mail.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042756_0ad1f893-014a-444b-87cb-b489d7667c38_min.webp",
+   "sha256": "0ed57595d9899c2da5c7488e2701f0d06526abd765be435c498ac943898c3dcb"
+  },
+  "ic_plus": {
+   "bytes": 50512,
+   "datei": "ic_plus.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_043121_14d3e7f4-4aa6-4a17-b5e8-68ff66b6d7e1_min.webp",
+   "sha256": "aa028c37b56244df63ffc7784f8844380af9e2cf681cec9efd1ec4bf3e65d304"
+  },
+  "ic_quest": {
+   "bytes": 34156,
+   "datei": "ic_quest.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042816_291cc3cc-0039-4df8-bbb1-84fa97250b3a_min.webp",
+   "sha256": "c0ba2013ddec63c87fb5ecbf6eed17c840673ebbe5647cb26a6badadf85b5ec6"
+  },
+  "ic_rank": {
+   "bytes": 31982,
+   "datei": "ic_rank.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042812_96d96875-0ad7-4b28-ac69-131f972f9fa0_min.webp",
+   "sha256": "3a33c390e2b992a4154f06957c1ba2cb98f8ccdb21e022514b5aba2d68e253f9"
+  },
+  "ic_request": {
+   "bytes": 22738,
+   "datei": "ic_request.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052931_a1d94d5c-ee43-4d35-b8b5-8d1a9f88347b_min.webp",
+   "sha256": "e011b77eabf22a05266b39cf822128b7e06887c95783ed2842d7b54c62291b93"
+  },
+  "ic_share": {
+   "bytes": 10206,
+   "datei": "ic_share.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_104326_6402593a-2a9d-447d-899a-0af123ddc15a_min.webp",
+   "sha256": "4d9b2dfb0071a01c24e7e2e0a9fa6c83d4b990979e26273217794285ffc132e7"
+  },
+  "ic_shield": {
+   "bytes": 51806,
+   "datei": "ic_shield.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052923_a55b0fb2-590a-4c0f-9b17-04e8c6a55076_min.webp",
+   "sha256": "fcec2f03679c6de0e398f485762478b340f607d40e4921916c41fe1524de9ba4"
+  },
+  "ic_speed": {
+   "bytes": 24524,
+   "datei": "ic_speed.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052926_59ed62e7-2bb3-49ab-976a-4e0d29a5c1a6_min.webp",
+   "sha256": "ef6293a4b1bbb334250a6d0cf8330ea6192e2619651791228d5bd0b8e2e1cad8"
+  },
+  "ic_tent": {
+   "bytes": 44636,
+   "datei": "ic_tent.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042800_4deec3f9-1bb9-4738-8fb6-95da9ea9cd1a_min.webp",
+   "sha256": "d99e94d75d3757e2407d51523f45d4183e54bfd446bfd73a6fd04be8ddeb2547"
+  },
+  "ic_trophy": {
+   "bytes": 39488,
+   "datei": "ic_trophy.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052859_9bd75b52-3056-4a40-91fd-9591adcdfe5d_min.webp",
+   "sha256": "58ea4b8c16816091413e5a9185b582bba4d8a084ce0367bd73a33c8fb52ccac7"
+  },
+  "ic_war": {
+   "bytes": 51702,
+   "datei": "ic_war.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042818_625922e2-1731-4af8-ba70-c819bbb8b615_min.webp",
+   "sha256": "099de572970548457b6a53bfe384e6f6ed9f46c1e931e623f2c17511032535e6"
+  },
+  "icon_check": {
+   "bytes": 38140,
+   "datei": "icon_check.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133811_e6757de3-c63b-4dad-8f20-21b9b05baea7_min.webp",
+   "sha256": "d2c11fb994a980549c55d67291b7a0e63607ff507fd07925efec701c7192cae5"
+  },
+  "icon_lock": {
+   "bytes": 28704,
+   "datei": "icon_lock.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133808_d02b91b1-7af1-4214-a44e-116017f314e5_min.webp",
+   "sha256": "950de61949debdcb736369403d24e1e203c19ea0032db6e2bdf5dd18094a4b89"
+  },
+  "loop_dawn": {
+   "bytes": 3698662,
+   "datei": "loop_dawn.mp4",
+   "kleinfassung": false,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_195242_95858f9b-afc7-4802-baac-f65ebe9321ef.mp4",
+   "sha256": "375a1ce555e0c025a03fe0adbc54a651fef49246cdb5f5f24dbc572e5e1d3ce6"
+  },
+  "loop_ember": {
+   "bytes": 5600456,
+   "datei": "loop_ember.mp4",
+   "kleinfassung": false,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_195220_4f55efc0-8b30-48ea-8d4d-ef2a05b60dc6.mp4",
+   "sha256": "d1f98184fc74144179463cce587af462069f40ec877ce6f8241e6ab99009a663"
+  },
+  "loop_frost": {
+   "bytes": 5303970,
+   "datei": "loop_frost.mp4",
+   "kleinfassung": false,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_195223_61b525c2-44b8-4034-b9a8-724b3b078fd0.mp4",
+   "sha256": "fc355386dc7f9a6789fe96d6a1c5cb68895add4d1401ac49ad5a96e4ebf7adfd"
+  },
+  "loop_hollow": {
+   "bytes": 6450181,
+   "datei": "loop_hollow.mp4",
+   "kleinfassung": false,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_195245_08274840-1ace-4097-8b73-e46fd3c93cb5.mp4",
+   "sha256": "a55af8830df65843db6696b7512c97845ed2d5ef5cf08ff6389efd4fbffaf4c5"
+  },
+  "loop_magmor": {
+   "bytes": 6386527,
+   "datei": "loop_magmor.mp4",
+   "kleinfassung": false,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_195257_05b3dbd0-8f5a-4790-88ed-4b3170bd0df6.mp4",
+   "sha256": "c5f97d88ff460cfb40d0123afbc51932490edec247d10c33800fd1a12abec287"
+  },
+  "loop_solara": {
+   "bytes": 6715003,
+   "datei": "loop_solara.mp4",
+   "kleinfassung": false,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_195248_f3a50c1a-b483-4c2c-8ac4-81dc14fc19fc.mp4",
+   "sha256": "603c16820093cdaaf058c8a4d535bc27cbe53ecf897057b3dd80d86e3b49f9ab"
+  },
+  "loop_stone": {
+   "bytes": 4770086,
+   "datei": "loop_stone.mp4",
+   "kleinfassung": false,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_195238_0d2ac0d2-dbcd-4590-8edc-4cfb75dcd9a5.mp4",
+   "sha256": "14375e662c15e639d67cd2b19fd53e6dce5309e6cde423603fe866fe6c1c64fe"
+  },
+  "loop_thorn": {
+   "bytes": 4535434,
+   "datei": "loop_thorn.mp4",
+   "kleinfassung": false,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_195228_6520b371-5cad-4054-8686-e548a33b3656.mp4",
+   "sha256": "7fefc0016f19bfd93f40fa7f5d89fcf37098aaaf9478a989fdd8e27b379bb5eb"
+  },
+  "nav_cards": {
+   "bytes": 65880,
+   "datei": "nav_cards.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042737_832db618-1425-486d-b83e-0897328ccf85_min.webp",
+   "sha256": "fa78395e676825274eec20ae58a1425ceeab321e5f0eb1c8da41104577a1300a"
+  },
+  "nav_clan": {
+   "bytes": 56134,
+   "datei": "nav_clan.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_050047_94ca1b29-24d0-4367-9d2f-a6b4d3f238e3_min.webp",
+   "sha256": "ed8ebd81d875977e115bc80a322bd33b540e50b87dd4fd281fa849182251dcd9"
+  },
+  "nav_clan_v1": {
+   "bytes": 36142,
+   "datei": "nav_clan_v1.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042750_5c90eeaa-0b17-435d-858f-3fef9010075a_min.webp",
+   "sha256": "2bc55ee16658bf99047eac689084644aa992da1dd3e07c9c67bb2578964ce63c"
+  },
+  "nav_collection": {
+   "bytes": 29220,
+   "datei": "nav_collection.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132918_511b5e7c-2c37-4f34-9d39-40b21155eac5_min.webp",
+   "sha256": "c63aef2fac105b5d15f206366fe6c017134a8326c11196ae3b04f22820145697"
+  },
+  "nav_forge": {
+   "bytes": 37612,
+   "datei": "nav_forge.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132919_8a81e259-5be8-43e2-b797-bb957dccebda_min.webp",
+   "sha256": "869aeff80a6ec1ca3a2db737e13238a7e0098b9bf50bc12e6ad87d382b919716"
+  },
+  "nav_fortress": {
+   "bytes": 44306,
+   "datei": "nav_fortress.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042752_d69244e4-72b3-4c3a-84ad-5c2b3589d27c_min.webp",
+   "sha256": "eea80a81a81636aaffcac600653be856f4d234a0f71487e849b0c891a26fb7be"
+  },
+  "nav_home": {
+   "bytes": 44960,
+   "datei": "nav_home.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132917_72f50976-9f2a-4278-891a-143342fda7c4_min.webp",
+   "sha256": "c1006cc95cdb1da5be886c2a4f3dbd9fe87ea7d999aacb4b544ba02b58ecce6f"
+  },
+  "nav_packs": {
+   "bytes": 21306,
+   "datei": "nav_packs.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132921_1a1ee40d-26a4-4e4f-bcad-53257fd22928_min.webp",
+   "sha256": "489503a98a2bb5351aed8cde3e0824d841d79e5aadbadca640f37cc96cd0f61a"
+  },
+  "nav_shop": {
+   "bytes": 37944,
+   "datei": "nav_shop.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042736_4eff429b-94e3-4111-a941-b3f16335b644_min.webp",
+   "sha256": "70d26516e2b1915a76e8ebbc4839427a173c345be8ed44eca92e53a1c862585f"
+  },
+  "nav_start": {
+   "bytes": 46464,
+   "datei": "nav_start.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042740_67eeb9a2-d790-432a-9781-6d80697b725c_min.webp",
+   "sha256": "3168ff794d01597904ea07354f31e7df212a36e2a5d0e7ce7ecbfdebc15744a2"
+  },
+  "nav_tower": {
+   "bytes": 34034,
+   "datei": "nav_tower.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132919_6cb19273-0d12-4073-8231-d2e56424d692_min.webp",
+   "sha256": "e274f8b617201bfaa090b5e4767a22ff98cfd79aa179bb0f29ed05ec22d3a247"
+  },
+  "offer_arena_pack": {
+   "bytes": 64908,
+   "datei": "offer_arena_pack.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042708_f26a5521-f28b-489d-b62f-01543a8facc6_min.webp",
+   "sha256": "590163193e85aff270bdbb0c59a56f66cc38827ec16a0315bc9ee3942d9a67b9"
+  },
+  "offer_starter": {
+   "bytes": 39980,
+   "datei": "offer_starter.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_115056_0dfab782-685e-4def-afa3-30913a3ab88a_min.webp",
+   "sha256": "8cc4d4707ec9e1a04e2f36419b2dd2f8cf45e4cc9bee1325a4906ad434b8991e"
+  },
+  "offer_vault_bank": {
+   "bytes": 38588,
+   "datei": "offer_vault_bank.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_115444_f75634d9-6a96-4088-ac82-dedbc931f73c_min.webp",
+   "sha256": "4610ebd7ecc8b99c2c388e80ab3b21db0637623d157e852677be945ac483dd13"
+  },
+  "pack_arcane": {
+   "bytes": 72072,
+   "datei": "pack_arcane.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095739_dad6b23f-bd87-42bb-934a-f0e05d24d4c3_min.webp",
+   "sha256": "f670978716e34611ae7821c403cc311cf6fd47cc25421c899dec6c115044cd7f"
+  },
+  "pack_arena_gross": {
+   "bytes": 58744,
+   "datei": "pack_arena_gross.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093832_fa45c953-24f8-4e15-8c4b-4bbd16b27545_min.webp",
+   "sha256": "cc4feaaac069daf5cb236591dd1f4489a6775c87d8442e4110e6d1d8bfc8266e"
+  },
+  "pack_arena_klein": {
+   "bytes": 44988,
+   "datei": "pack_arena_klein.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093825_c05fb801-db27-4b80-8fee-28e1a06a3522_min.webp",
+   "sha256": "719451d67c32f4ca8753f71d25f0b8e164d3f579393a914aebfaf272d885b091"
+  },
+  "pack_arena_mittel": {
+   "bytes": 32002,
+   "datei": "pack_arena_mittel.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093809_e5b4985d-37c1-4d18-b990-c2fda0c2a76a_min.webp",
+   "sha256": "f1710080f09a02adf4d007dafdfd900269cc5f41cb80578b210d6e3b8f186ab4"
+  },
+  "pack_bronze": {
+   "bytes": 42462,
+   "datei": "pack_bronze.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095725_5c0984d9-f669-49ec-82f2-81817f8eab56_min.webp",
+   "sha256": "c55bcad52ea8e5add8de29701eab9dea56e3a12308f0c8eb1ba4128f8ca0a12a"
+  },
+  "pack_gold": {
+   "bytes": 47598,
+   "datei": "pack_gold.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095735_28c01416-737f-414d-b8b6-0dd21a18e8a9_min.webp",
+   "sha256": "80dbf7d1f444cc66140ac07d9be6f7de956fe16238e28bac565dd4213f7e3065"
+  },
+  "pack_silver": {
+   "bytes": 50660,
+   "datei": "pack_silver.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095727_a48313e3-3fb7-4156-b276-9622a9f313a6_min.webp",
+   "sha256": "50a676c2ea7da7463463ea97e9323a6ca90d4a2032b1bfe56d75e64b2520666e"
+  },
+  "pack_vorrat": {
+   "bytes": 49862,
+   "datei": "pack_vorrat.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093851_f11ee134-dfd3-4798-9d63-74f8d764f6a9_min.webp",
+   "sha256": "ca5712edfaaa73d18ff94e308dc7ada85258d0b377aef9a82cb6960c139880a3"
+  },
+  "packart_arena1": {
+   "bytes": 32002,
+   "datei": "packart_arena1.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093809_e5b4985d-37c1-4d18-b990-c2fda0c2a76a_min.webp",
+   "sha256": "f1710080f09a02adf4d007dafdfd900269cc5f41cb80578b210d6e3b8f186ab4"
+  },
+  "packart_arena2": {
+   "bytes": 53140,
+   "datei": "packart_arena2.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093813_443b9439-fc28-45a9-978a-09e1f0edaa7b_min.webp",
+   "sha256": "559eaf9d52ff14599540a1d4ae05cc33063ee018edac3f57db5154da3f536137"
+  },
+  "packart_arena3": {
+   "bytes": 44988,
+   "datei": "packart_arena3.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093825_c05fb801-db27-4b80-8fee-28e1a06a3522_min.webp",
+   "sha256": "719451d67c32f4ca8753f71d25f0b8e164d3f579393a914aebfaf272d885b091"
+  },
+  "packart_arena4": {
+   "bytes": 39220,
+   "datei": "packart_arena4.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093829_16f201ee-fe4c-4875-a460-00da55170706_min.webp",
+   "sha256": "bdbc9f0246628a474fdd0042e88973f00f97fcdd28abe31aa486835e86e41ded"
+  },
+  "packart_arena5": {
+   "bytes": 58744,
+   "datei": "packart_arena5.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093832_fa45c953-24f8-4e15-8c4b-4bbd16b27545_min.webp",
+   "sha256": "cc4feaaac069daf5cb236591dd1f4489a6775c87d8442e4110e6d1d8bfc8266e"
+  },
+  "packart_arena6": {
+   "bytes": 49124,
+   "datei": "packart_arena6.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093834_79cb77b4-1a90-4fce-9c75-facb08f2be8d_min.webp",
+   "sha256": "c4e06728dd14b27e0fec6b69c47dd2000a7f91946e9ec235f1365e2eb9c5c745"
+  },
+  "packart_arena7": {
+   "bytes": 44772,
+   "datei": "packart_arena7.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093842_62d00b86-d029-40fe-9713-7b0660248827_min.webp",
+   "sha256": "5a2dc3bd334e6472b0e418cc3d47c58eca5fbec6958891c8d7035cbe58d6861d"
+  },
+  "packart_arena8": {
+   "bytes": 51936,
+   "datei": "packart_arena8.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093845_133cdd59-0064-4148-bda5-4917705d9ba0_min.webp",
+   "sha256": "2b6ecf0a7445d1a12f4d2e4e0dee61b98752c85ee2be059363d1c2fa4f0efdd4"
+  },
+  "panel": {
+   "bytes": 21532,
+   "datei": "panel.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095635_27685aa1-c11f-4320-a385-b859dd0914b5_min.webp",
+   "sha256": "87e5a1426263874441498e2dc8e66238b289de8bd60a509d950bdf19aaec018c"
+  },
+  "pass_keyart": {
+   "bytes": 90504,
+   "datei": "pass_keyart.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_160701_42a171b5-06f3-458d-a766-f4992e4210e5_min.webp",
+   "sha256": "d2d75f03ccabb5aa942115e2782c96fe3f0367dec1db372d3da150a66ea12b06"
+  },
+  "pass_keyart_anim": {
+   "bytes": 6458388,
+   "datei": "pass_keyart_anim.mp4",
+   "kleinfassung": false,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_200210_b61d062e-a080-4471-8bcf-b60155348539.mp4",
+   "sha256": "3fdb4ba0fa12333b7f329e3759e9e26e98b10fc40da929db57495931abcdf7d4"
+  },
+  "pill_topbar": {
+   "bytes": 17036,
+   "datei": "pill_topbar.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095631_56a56b7e-7e2e-454a-8ff2-b7ecb71bea8e_min.webp",
+   "sha256": "7e88fca0f8f053569ba54dcdf38932178728261172bd4ab35f01d58e77984bc5"
+  },
+  "progress_frame": {
+   "bytes": 9638,
+   "datei": "progress_frame.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095742_a6bc63f3-733e-416b-b018-8358ca597e98_min.webp",
+   "sha256": "4c4dfa0dcfc806b76be8b632044d921fdb6aa8452ad75afd74cea40a8594c13b"
+  },
+  "prop_fire": {
+   "bytes": 23920,
+   "datei": "prop_fire.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133137_7133f405-242a-4360-af65-7d0344f37d32_min.webp",
+   "sha256": "d4479ef23cd5b6d27f720f547aac0d1a20d21e64dcdd8172ee7cd2f90abe4718"
+  },
+  "prop_obelisk": {
+   "bytes": 11106,
+   "datei": "prop_obelisk.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133313_0543d8f8-218d-44cd-a48f-51691e0aa3a6_min.webp",
+   "sha256": "aa73528cdd6c58e54ef77f48bfd255003e5132323b3be2a6c759f540ebb9372a"
+  },
+  "prop_pouch": {
+   "bytes": 30656,
+   "datei": "prop_pouch.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133312_5c702ceb-1ca1-42d2-8753-bd3d6fc8bf4e_min.webp",
+   "sha256": "7941e12b7d945c384010b1172055e380e34c17a2f305c0ecac0022706bfca9f9"
+  },
+  "prop_rune": {
+   "bytes": 37912,
+   "datei": "prop_rune.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133312_cb122820-65dd-49b6-9047-c7f5ef253876_min.webp",
+   "sha256": "7d88c890066f839d3538950667095cd8fd0853fa2490b74a294917e3a6a45fc5"
+  },
+  "rank_bronze": {
+   "bytes": 49818,
+   "datei": "rank_bronze.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052942_8ef33f1b-1803-4c89-864d-bf3a1be8be4b_min.webp",
+   "sha256": "ecd5753b5cd5aaf5eda45132eb3e030448be6fbdeb53216ce9a118dabca1016f"
+  },
+  "rank_gold": {
+   "bytes": 50548,
+   "datei": "rank_gold.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052945_ee96b1b3-1d0c-426f-ab2f-3192f13259f5_min.webp",
+   "sha256": "68e9432b8ebc7b3a272b07e322c23e94e930c9172ec78f55d5decaafd8a0a99c"
+  },
+  "rank_silber": {
+   "bytes": 46298,
+   "datei": "rank_silber.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052943_00925509-375f-43fe-a393-93f252637407_min.webp",
+   "sha256": "028d6563cb9c50f00d257e28649ff9e28859b2fe0d7223d189063611df1461fa"
+  },
+  "ribbon_section_lg": {
+   "bytes": 488746,
+   "datei": "ribbon_section_lg.png",
+   "kleinfassung": false,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/9e9d3522-24e2-45af-a9e2-4aa4d3360c66.png",
+   "sha256": "88b4fd98532cf0c7ba95e47dcfaaafdff1212e72932a5ffd4667a8f4aa4ad5e9"
+  },
+  "ribbon_section_lg_v1": {
+   "bytes": 24940,
+   "datei": "ribbon_section_lg_v1.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042730_8c38ed92-134a-440c-822d-e67c2d3f31d8_min.webp",
+   "sha256": "f5c243334bd8dc4c1fd0f3f22fe5a998b01d502153aef15c9e817a90d00060c1"
+  },
+  "ribbon_section_sm": {
+   "bytes": 489505,
+   "datei": "ribbon_section_sm.png",
+   "kleinfassung": false,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/f66ace74-e877-41be-ace5-087ab6ed7829.png",
+   "sha256": "235c58ffb5c79dda5e2afb2a9e59dac7426a71edc2929e55b485c946fd2f1884"
+  },
+  "ribbon_section_sm_v1": {
+   "bytes": 24608,
+   "datei": "ribbon_section_sm_v1.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042732_68de7abf-33da-4465-8401-bc11d353a8b3_min.webp",
+   "sha256": "c0ff778e24c1f73baec0b9948e622780c6af7888b259caac043720cdd0b2c5d4"
+  },
+  "road_platform": {
+   "bytes": 24752,
+   "datei": "road_platform.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133136_11a05067-59c0-4049-a72a-9cdfc1afb81a_min.webp",
+   "sha256": "dce256074b52b51e0ddd38ad1e326033a25ba628016f0e5540fef9476ca19979"
+  },
+  "shop_gem_t1": {
+   "bytes": 23074,
+   "datei": "shop_gem_t1.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042629_77585abc-c36d-46c5-95ce-3e23e3603288_min.webp",
+   "sha256": "1c924b3978414aee00a6d584c3734bec2f59b7cac075aa9ea3c557afb75de222"
+  },
+  "shop_gem_t2": {
+   "bytes": 48428,
+   "datei": "shop_gem_t2.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042632_66f0328d-63ef-4342-920a-decd43a32581_min.webp",
+   "sha256": "09add1f76c0058aad0b8f488f46b468178b714baab6bf506ff5d23b1612f7e1a"
+  },
+  "shop_gem_t3": {
+   "bytes": 46988,
+   "datei": "shop_gem_t3.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042633_440afa12-072a-46a7-a475-489a3e15f5fb_min.webp",
+   "sha256": "82e8e8f77d6be8a7a0f857507a467960ed3e0e5dc02a3beba603465fed1f7b3b"
+  },
+  "shop_gem_t4": {
+   "bytes": 64964,
+   "datei": "shop_gem_t4.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042637_04bb7eef-58fe-4580-a996-5b3012162ad8_min.webp",
+   "sha256": "a94e7105e92988648fc15b3251f9d207b5297ad22b6ac22aae0fddd8cc128d85"
+  },
+  "shop_gem_t5": {
+   "bytes": 68062,
+   "datei": "shop_gem_t5.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042639_b265fd47-1240-4d0a-b6b6-8e23378a4552_min.webp",
+   "sha256": "a5517c926c774e4497e65c59d4cfaa68020aef75023c93e8598ce18a79dc5be3"
+  },
+  "shop_gem_t6": {
+   "bytes": 81030,
+   "datei": "shop_gem_t6.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042640_6a3c2b75-4484-433a-8a6c-1cff66e9c902_min.webp",
+   "sha256": "72cf6cc24dce79f97e75e188e764fce372e1abeb924aaee28d423d77e09769d0"
+  },
+  "shop_gold_t1": {
+   "bytes": 37572,
+   "datei": "shop_gold_t1.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042648_458a4b84-a99e-4814-ae0b-00a3d5ec6b3a_min.webp",
+   "sha256": "01937274ca7f86f094252ab85e39d174d25fa36c84747eeb03fb044c83cfb638"
+  },
+  "shop_gold_t2": {
+   "bytes": 34566,
+   "datei": "shop_gold_t2.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042650_ea5835fa-9147-4cf3-96dd-f9ec21af6088_min.webp",
+   "sha256": "17ef83bbd8cfe6780317943b87137c465f62ae32056a3467a4738dc9aa103b3c"
+  },
+  "shop_gold_t3": {
+   "bytes": 56590,
+   "datei": "shop_gold_t3.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042652_01540da3-f1b1-4c67-9779-9ef8a0e88921_min.webp",
+   "sha256": "3898e5c55369c94e3029cb060c8965c04fd0acd3f2dfcb0d69da1b2f4cbfce15"
+  },
+  "shop_gold_t4": {
+   "bytes": 88096,
+   "datei": "shop_gold_t4.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042654_b954fa5e-5d6e-4ab2-a2fd-a05f1ba2933f_min.webp",
+   "sha256": "fd888f927ecb5db95326e3328b15ede327236fddb162493d83bc773971d7503b"
+  },
+  "shop_mat_attack": {
+   "bytes": 39742,
+   "datei": "shop_mat_attack.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042656_2ed86a73-0ba8-442c-8ce6-e3e28e870218_min.webp",
+   "sha256": "f7e62d4f70765876a0b0634b4a9104ca61851da3639df3c859cbf9dfe7d10cd6"
+  },
+  "shop_mat_special": {
+   "bytes": 34022,
+   "datei": "shop_mat_special.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042705_1892cf67-384b-41fe-8b0f-6ae8ec989f87_min.webp",
+   "sha256": "657b40ab057ff6ba8e1c83aac90503fc5c77e39f86ddcb9f2cef7e61e37adf24"
+  },
+  "shop_mat_speed": {
+   "bytes": 48304,
+   "datei": "shop_mat_speed.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042658_0e1c3c87-a56b-4948-a419-b8ca861c0493_min.webp",
+   "sha256": "25b1d84876050b7e262441e868e0808016ccd5999d142ec2176d11aa86278d4e"
+  },
+  "splash_key": {
+   "bytes": 31472,
+   "datei": "splash_key.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_125553_fd16ccae-0396-4d5a-8cf1-bd4f3e7f2ac3_min.webp",
+   "sha256": "0efcd3812c8163c618681849e7282d1ec682124f2fc97fee78fda765c818038e"
+  },
+  "splash_key_alt": {
+   "bytes": 35054,
+   "datei": "splash_key_alt.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_125535_bdba08a5-85ea-4b9b-9220-8d24ce4f7d38_min.webp",
+   "sha256": "8bcdf53df6060ea2b58973fffb1e1397f92ee10891095637fffad8ff49937979"
+  },
+  "summit_emblem": {
+   "bytes": 50688,
+   "datei": "summit_emblem.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133802_c77dc4bd-420f-4d14-bc20-4da0a3dec1e2_min.webp",
+   "sha256": "a6e143245e77c6b5d947289c94cb8fc85b3382fe1de3b2ddaff4485a57293d24"
+  },
+  "tab": {
+   "bytes": 13208,
+   "datei": "tab.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095638_48493952-a47a-4ed8-acc8-1f47a65a5da0_min.webp",
+   "sha256": "14c86c3ff37023cb4fcd490db51563e1e095f289ff097edb7b563e1571575e7b"
+  },
+  "tk_cart": {
+   "bytes": 47988,
+   "datei": "tk_cart.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133712_f9839e7a-e4da-430d-956f-4d07f3fd79d7_min.webp",
+   "sha256": "4aa1cbf49f0cf30596adaec85090f50bf5f7449b880af8c6cd8622f55acd9a20"
+  },
+  "tk_chains": {
+   "bytes": 65866,
+   "datei": "tk_chains.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133705_21ce5677-8a42-4d81-ad8d-061d76c788ed_min.webp",
+   "sha256": "e74646ec5dfb78de810ba5b8005eaf224208341fd4a78108e8400e983d01b96b"
+  },
+  "tk_silence": {
+   "bytes": 59126,
+   "datei": "tk_silence.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133718_0244095d-7454-4b78-84d7-2aadd4e2ec5c_min.webp",
+   "sha256": "5d84a57bc03858b86f024539d6ef2e29cb67b5f9eda08408021b6c03aaa5d434"
+  },
+  "tk_starfall": {
+   "bytes": 66540,
+   "datei": "tk_starfall.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133726_de1c1e9d-c9f8-4b2e-8b4b-1089857f0828_min.webp",
+   "sha256": "4d95a9fabfb349d4f4f54359e1ffa769311d30b23d1c4328b18851e535dadafd"
+  },
+  "tk_weakness": {
+   "bytes": 48266,
+   "datei": "tk_weakness.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133709_18ac6ac6-cbd2-4591-849d-06509a3a88ce_min.webp",
+   "sha256": "d59e539bc16f94a886f5e69cf05943708743d14a9372684f36fb472f28027b92"
+  },
+  "tk_wisp": {
+   "bytes": 49246,
+   "datei": "tk_wisp.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133730_f073465e-305a-4ea9-ae5d-6c3cf8383ac4_min.webp",
+   "sha256": "61c8948b341411bfb872ffc36d88c4d50d7ab28f187dd112598723a91d28067a"
+  },
+  "track_dmg": {
+   "bytes": 49800,
+   "datei": "track_dmg.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_135832_3232967e-3798-473d-81fd-cf24183c75e1_min.webp",
+   "sha256": "519042c1da38ba8d5b72df3f439c011ea6e7faed95f90e93d3edcb2b850d7550"
+  },
+  "track_hp": {
+   "bytes": 60386,
+   "datei": "track_hp.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_135828_29edbcf2-e256-4c35-b3a7-5fceb1ea7adc_min.webp",
+   "sha256": "4424184ee0c011a17db224f1ad3c0e0c9156482a8874af4c7236f3f929f376d5"
+  },
+  "track_rate": {
+   "bytes": 70002,
+   "datei": "track_rate.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_135837_d4de036f-acc4-40f7-95e6-e667d2dec6fe_min.webp",
+   "sha256": "231d208f03d433d315bfe34e04bd189d2403f3f546dfe1ebe718cc8f7f937ea8"
+  },
+  "tz_blind": {
+   "bytes": 72088,
+   "datei": "tz_blind.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133425_877bd158-0a80-49ef-9398-2cc2c38fce84_min.webp",
+   "sha256": "0e1ccb713a33446af7b689baf6abd404f581610c8dad9f544256c8620a3d00d0"
+  },
+  "tz_bounty": {
+   "bytes": 85652,
+   "datei": "tz_bounty.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133423_95e3a49d-8dd5-4ee5-b93f-3ad894e0c1eb_min.webp",
+   "sha256": "f0b103fa3c941e5c30b9ce08c39c36119f7aa893ba87cfc80157bc172fbc15b8"
+  },
+  "tz_frenzy": {
+   "bytes": 78718,
+   "datei": "tz_frenzy.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133422_9f9d2b66-9df7-4f29-8ae3-b0201f5a96d7_min.webp",
+   "sha256": "6cc8a5b7ce0e85c825e9db37c8e8f0949095370394fa2d72777c5b2bb839f1c3"
+  },
+  "tz_starborn": {
+   "bytes": 54388,
+   "datei": "tz_starborn.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133658_1b2c3d86-bbdb-4749-9d02-dd8322838d00_min.webp",
+   "sha256": "04299cd1af0acad663ccbf3cf5d59380799f32355dc730697e7d37994cf4f7d3"
+  },
+  "tz_straight": {
+   "bytes": 44846,
+   "datei": "tz_straight.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133424_8974903a-c02c-420f-b32a-d3fb048cfaff_min.webp",
+   "sha256": "a7d6b0d8907f22650893b53b61c54af52f5f646ba64d2cf4af04611cf6359db8"
+  },
+  "tz_swift": {
+   "bytes": 52164,
+   "datei": "tz_swift.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133702_949e2b93-321e-4d5f-b64f-c09d5ba099a5_min.webp",
+   "sha256": "7ca082527741fe22d3701de0cc6091a3f8387908a8d280f231b0528983cfba59"
+  }
+ }
+}
