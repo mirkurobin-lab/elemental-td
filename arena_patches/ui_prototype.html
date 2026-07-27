@@ -1067,7 +1067,15 @@ footer{padding:6px 12px 14px;text-align:center}
 .mergepreview .free{margin-top:6px;color:var(--up);font-weight:800;font-size:10.5px;
   letter-spacing:.04em}
 #mergeCeremony .cersheet{background:#05090ceb;align-items:center;justify-content:center;
-  padding:24px 18px;gap:14px}
+  padding:24px 18px;gap:14px;transition:background var(--t-mid) var(--ease-out)}
+/* AA nimmt den Hintergrund im Moment des Umschlags ein zweites Mal zurueck.
+   Gemessen am Screenrecording (07-27-2026, 60 fps, 1320x2868): die Helligkeit
+   einer inhaltsfreien Ecke faellt beim Klick von 90,9 auf 25,6 und beim
+   Rahmenwechsel noch einmal auf 22,0 — also um weitere 14 %. Das ist AAs
+   eigentliches Signal fuer „jetzt ist es passiert"; einen Weissblitz gibt es
+   dort nicht (Bildmittelwert und Zahl der sehr hellen Pixel fallen ueber den
+   Umschlag hinweg monoton). #eb -> #ee entspricht denselben 14 %. */
+#mergeCeremony .cersheet.tiefer{background:#05090cee}
 .certitle{font-size:27px;text-align:center;line-height:1.1}
 
 /* ---------- Fusions-Choreografie (Nutzer-Vorgabe) ----------
@@ -1082,6 +1090,23 @@ footer{padding:6px 12px 14px;text-align:center}
    CSS-Variable im Keyframe braucht @property — das trägt Safari erst
    spät. Die Bühne hat feste Höhe, damit beim Phasenwechsel nichts
    springt. */
+/* Auftakt, an AA gemessen. Ueber den linken Rand der Karte und ueber die
+   Breite der Titelzeile verfolgt, laeuft die ganze Gruppe in 283 ms von
+   Maßstab 0,47 auf 1,067 hoch und faellt auf 1,00 zurueck — ein Ueberschwung
+   von +6,7 %, Spitze bei 133-167 ms, danach kein Nachfedern. Der Titel kommt
+   dabei von unten herein (Unterkante 153 px -> 103 px).
+   Die Zahlen stehen als Keyframes und nicht als eigene Bezier-Kurve:
+   --ease-overshoot schiesst mit rund +14 % doppelt so weit wie AA. Die
+   Zwischenkurve bleibt --ease-out, damit die Bewegung im Token-System bleibt. */
+#mergeCeremony.open .certitle,#mergeCeremony.open .cerstage{
+  animation:cerpop .28s var(--ease-out) both}
+@keyframes cerpop{
+  0%{opacity:0;transform:scale(.47) translateY(15px)}
+  20%{opacity:1;transform:scale(.83) translateY(8px)}
+  40%{opacity:1;transform:scale(1.03) translateY(2px)}
+  52%{opacity:1;transform:scale(1.067) translateY(0)}
+  72%{opacity:1;transform:scale(1.03) translateY(0)}
+  100%{opacity:1;transform:scale(1) translateY(0)}}
 .cerstage{position:relative;width:100%;height:236px;display:flex;
   align-items:center;justify-content:center}
 .cerring{position:absolute;inset:0;pointer-events:none}
@@ -1095,14 +1120,25 @@ footer{padding:6px 12px 14px;text-align:center}
 .cerflash{position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;
   border-radius:50%;opacity:0;pointer-events:none;
   background:radial-gradient(circle,#fff 0%,#ffe9a8 26%,#e0b94a55 52%,#e0b94a00 72%)}
-.cerflash.go{animation:cerflash .62s var(--ease-out) forwards}
+/* AA hat an dieser Stelle GAR keinen Blitz — der Rahmen wechselt in einem
+   einzigen Bild (16,7 ms) von Silber auf Gruen, waehrend der Funkenkranz in
+   den 100 ms davor nach innen zusammenfaellt. Wir behalten einen Lichtpunkt,
+   weil unser Umschlag ein Farbwechsel auf dunklem Grund ist und weniger
+   Kontrast hat als AAs Silber->Gruen. Aber 620 ms und Maßstab 30 waren
+   Ueberschuss: jetzt 180 ms und Maßstab 12, damit der Blitz die Enthuellung
+   begleitet, statt sie zuzudecken. */
+.cerflash.go{animation:cerflash .18s var(--ease-out) forwards}
 @keyframes cerflash{0%{opacity:0;transform:scale(1)}
-  18%{opacity:1;transform:scale(15)}100%{opacity:0;transform:scale(30)}}
+  22%{opacity:.9;transform:scale(8)}100%{opacity:0;transform:scale(12)}}
 /* Vor der Enthüllung ist die Ergebniskarte nicht da — sonst stünde sie
    die ganze Kreisbewegung über schon im Bild und die Fusion hätte kein
    Ergebnis mehr zu zeigen. */
 .cercard.warten{opacity:0;pointer-events:none}
-.cercard.zeigen{animation:cerreveal .78s var(--ease-overshoot) both}
+/* AA laesst die Restbewegung nach dem Umschlag in 200 ms auslaufen
+   (Bild-zu-Bild-Differenz 24749 -> 0 zwischen 7,8167 s und 8,0167 s). 780 ms
+   waren mehr als das Dreifache; die Pause danach kam deshalb gar nicht mehr
+   zum Tragen. */
+.cercard.zeigen{animation:cerreveal .26s var(--ease-overshoot) both}
 @keyframes cerreveal{0%{opacity:0;transform:scale(.55) rotate(-10deg)}
   55%{opacity:1;transform:scale(1.12) rotate(3deg)}
   100%{opacity:1;transform:scale(1) rotate(0)}}
@@ -1111,15 +1147,22 @@ footer{padding:6px 12px 14px;text-align:center}
 .cercard.zeigen::before{content:"";position:absolute;inset:-3px;border-radius:14px;
   pointer-events:none;z-index:4;
   box-shadow:0 0 0 2px var(--tierfarbe,#e0b94a),0 0 26px 4px var(--tierfarbe,#e0b94a);
-  animation:cerrahmen 1.1s var(--ease-out) .16s both}
+  animation:cerrahmen .24s var(--ease-out) .04s both}
 @keyframes cerrahmen{0%{opacity:0;transform:scale(1.28)}
   40%{opacity:1;transform:scale(1)}100%{opacity:.34;transform:scale(1)}}
 /* Die Wertzeilen kommen nacheinander, nicht als Block — sonst liest man
    sie nicht, sondern sieht nur „da steht jetzt was". */
+/* AAs Werttafel steht nach 233 ms vollstaendig (Breite 33 -> 168 px, leichter
+   Ueberschwung). Sie skaliert als Block aus ihrer Mitte auf; wir bleiben bei
+   der Zeilenstaffel, weil sie die Zeilen lesbar macht statt sie nur erscheinen
+   zu lassen — aber die Staffel wird von 90 auf 40 ms gekuerzt und die Zeile
+   auf --t-fast, damit die Tafel wie bei AA nach rund 280 ms steht. */
 .certable .row2{opacity:0;transform:translateY(7px);
-  animation:cerrow .34s var(--ease-out) forwards}
+  animation:cerrow var(--t-fast) var(--ease-out) forwards}
 @media (prefers-reduced-motion:reduce){
-  .cerflash.go,.cercard.zeigen,.cercard.zeigen::before,.certable .row2{animation:none}
+  .cerflash.go,.cercard.zeigen,.cercard.zeigen::before,.certable .row2,
+  #mergeCeremony.open .certitle,#mergeCeremony.open .cerstage{animation:none}
+  #mergeCeremony.open .certitle,#mergeCeremony.open .cerstage{opacity:1;transform:none}
   .cercard.zeigen{opacity:1;transform:none}
   .certable .row2{opacity:1;transform:none}
 }
@@ -1132,8 +1175,18 @@ footer{padding:6px 12px 14px;text-align:center}
   box-shadow:0 0 26px #e0b94a66;z-index:2}
 .cercard .cerlvl{position:absolute;left:0;right:0;bottom:0;background:#000b;font-size:11px;
   text-align:center;font-weight:900;padding:3px 0;letter-spacing:.06em}
+/* AAs Titel steht ueber die ganze Zeremonie auf demselben Pixel — die
+   Bounding-Box aendert sich ueber 114 Bilder nicht. Bei uns sprang die ganze
+   Spalte um 51 px nach oben, sobald die Werttafel ihre Zeilen bekam: das
+   Sheet ist senkrecht zentriert, und die wachsende Tafel hat alles darueber
+   hochgeschoben — ein Ruck genau im ruhigsten Moment der Zeremonie. Gemessen
+   im Browser, nicht geschaetzt: 231 px statt 282 px.
+   Die Tafel haelt ihren Platz deshalb von Anfang an frei (5 Zeilen a 20 px
+   + 20 px Innenabstand + 2 px Rahmen = 124 px, border-box) und ist nur
+   unsichtbar, solange sie leer ist. */
 .certable{width:100%;max-width:300px;background:#0e1418cc;border:1px solid #2b3b47;
-  border-radius:12px;padding:10px 12px;font-size:12px;line-height:1.7}
+  border-radius:12px;padding:10px 12px;font-size:12px;line-height:1.7;min-height:124px}
+.certable:empty{visibility:hidden}
 .certable .row2{display:flex;justify-content:space-between;gap:10px}
 .certable .k2{color:var(--dim);font-size:10px;letter-spacing:.09em;text-transform:uppercase;
   font-weight:800}
@@ -5496,7 +5549,7 @@ button.pfplate{cursor:pointer}
      Tafel (MAX LEVEL / zwei Stats), Abschluss unten erst "CONTINUE",
      danach "TAP TO CLOSE". Dauer ≈ 7 s. -->
 <div class="modal" id="mergeCeremony">
-  <div class="sheet cersheet">
+  <div class="sheet cersheet" id="cerSheet">
     <div class="certitle goldtext" id="cerTitle">Perfekte Verschmelzung!</div>
     <!-- Bühne für die vier Phasen: kreisen · verschmelzen · enthüllen ·
          Werte. Alle Ebenen liegen übereinander, die Choreografie schaltet
@@ -7185,13 +7238,27 @@ button.pfplate{cursor:pointer}
     if (window.__cerTimer) { clearInterval(window.__cerTimer); window.__cerTimer = null; }
   }
 
-  /* Fusions-Zeremonie in vier Phasen (Nutzer-Vorgabe):
-       1. drei identische Karten kreisen  0 → 1150 ms
-       2. sie fahren zusammen, Blitz      1150 → 1780 ms
-       3. dieselbe Karte, ein Rahmen höher 1780 → 2560 ms
-       4. Wertverbesserungen zählen hoch   ab 2360 ms
-     Die Phasen 1 und 2 laufen über requestAnimationFrame, weil der Radius
-     von 66 px auf 0 muss — das ist in Keyframes ohne @property nicht
+  /* Fusions-Zeremonie, Zeitachse an AA gemessen (Screenrecording
+     07-27-2026, 60 fps, 1320×2868; Klick bei 6,550 s, Stillstand bei
+     8,583 s — 2033 ms):
+
+       Auftakt      0 →  280 ms  Bühne zieht auf, Überschwung +6,7 %
+       Kreisen    280 → 1130 ms  drei Kopien, r = 66 px, zwei Umläufe
+       Einsaugen 1130 → 1260 ms  Radius → 0, Karten richten sich auf
+       Umschlag        1260 ms   Rahmen eine Stufe höher, zweite Verdunklung
+       Enthüllen 1260 → 1520 ms  Ergebniskarte fährt ein, Lichtsaum
+       Halten    1520 → 1800 ms  NICHTS passiert — AAs 283 ms Stillstand
+       Werte     1800 → 2080 ms  Zeilen gestaffelt (40 ms), Zahlen zählen
+
+     Was davon woher kommt: AA hält seine zwei Quellkarten 683 ms still und
+     saugt sie dann in 117 ms ein. Wir kreisen in dieser Zeit — das ist die
+     Vorgabe des Nutzers und bleibt —, aber der Kreis beschleunigt jetzt
+     (Winkel ∝ q^1,5), damit das Einsaugen wie bei AA aus einem Aufziehen
+     kommt statt aus konstanter Fahrt. Die 283-ms-Pause vor der Werttafel
+     ist bei AA messbar (Bild-zu-Bild-Differenz exakt 0 über 17 Bilder) und
+     hat bei uns bisher gefehlt.
+     Die Phasen laufen über requestAnimationFrame, weil der Radius von
+     66 px auf 0 muss — das ist in Keyframes ohne @property nicht
      zuverlässig zu machen. */
   function playCeremony(id, fromTierKey, newTierKey, lvl, copyOnly) {
     var from = tierOf(fromTierKey), to = tierOf(newTierKey), m = BY_ID[id];
@@ -7229,6 +7296,10 @@ button.pfplate{cursor:pointer}
     karte.classList.remove("zeigen");
     karte.classList.add("warten");
     flash.classList.remove("go");
+    // Die zweite Verdunklungsstufe gehoert zum Umschlag. Beim zweiten Merge
+    // in derselben Sitzung muss sie zurueck, sonst startet die Zeremonie
+    // schon im Endzustand.
+    $("cerSheet").classList.remove("tiefer");
 
     function enthuellen() {
       ring.innerHTML = "";
@@ -7240,7 +7311,12 @@ button.pfplate{cursor:pointer}
       // UISfx hat kein play(name) — die Blips heißen einzeln. Der Stufen-
       // aufstieg bekommt das Crescendo, eine reine Kopie den Reward-Akkord.
       if (window.UISfx) (copyOnly ? UISfx.reward : UISfx.legend)();
-      CER.timer = setTimeout(function () { werte(); }, ruhig ? 0 : 580);
+      // Zweite Verdunklungsstufe genau im Moment des Umschlags (AA: -14 %).
+      $("cerSheet").classList.add("tiefer");
+      // 260 ms Enthuellung + 280 ms Stillstand. Die Pause ist der Punkt, an
+      // dem AA den Blick auf der neuen Karte laesst; ohne sie laeuft die
+      // Werttafel der Enthuellung in die Bewegung hinein.
+      CER.timer = setTimeout(function () { werte(); }, ruhig ? 0 : 540);
     }
 
     function werte() {
@@ -7260,7 +7336,7 @@ button.pfplate{cursor:pointer}
                             : '<s>' + z.vor + '</s> → <em>' + z.nach + '</em>')
           : '<s>' + f(z.vor) + '</s> → <em data-von="' + z.vor + '" data-bis="' + z.nach +
             '"' + (z.ganz ? ' data-ganz="1"' : '') + '>' + f(z.vor) + "</em>";
-        return '<div class="row2" style="animation-delay:' + (ruhig ? 0 : i * 90) +
+        return '<div class="row2" style="animation-delay:' + (ruhig ? 0 : i * 40) +
           'ms"><span class="k2">' + z.k + '</span><span class="v2">' + wert + "</span></div>";
       }).join("");
       // Die Zahlen laufen hoch, statt fertig dazustehen — 212 → 242 ist die
@@ -7271,13 +7347,18 @@ button.pfplate{cursor:pointer}
         var fmt = em.getAttribute("data-ganz")
           ? function (n) { return String(Math.round(n)); } : r1;
         if (ruhig) { em.textContent = fmt(bis); return; }
-        var t0 = 0, schritte = 18;
+        // AA zaehlt gar nicht hoch — die Werte stehen sofort (nach 8,583 s
+        // aendert sich bis zum Schliessen kein einziges Pixel). Wir behalten
+        // den Zaehler, weil „64 → 74,2" die Aussage ist und nicht „74,2",
+        // kuerzen ihn aber von 612 auf 312 ms, damit die Werte-Phase in AAs
+        // Fenster passt.
+        var t0 = 0, schritte = 12;
         var iv = setInterval(function () {
           t0++;
           var q = t0 / schritte;
           em.textContent = fmt(von + (bis - von) * (q < 1 ? 1 - Math.pow(1 - q, 3) : 1));
           if (t0 >= schritte) { clearInterval(iv); em.textContent = fmt(bis); }
-        }, 34);
+        }, 26);
         CER.zaehler.push(iv);
       });
       $("cerBtn").textContent = "Tippen zum Schließen";
@@ -7285,22 +7366,31 @@ button.pfplate{cursor:pointer}
 
     if (ruhig) { enthuellen(); return; }
 
-    var R = 66, T1 = 1150, T2 = 1780, start = 0;
+    /* AUF = Auftakt, KRS = Kreisen, SAU = Einsaugen. AA: Overlay auf 67 ms
+       nach dem Klick, aufgezogen nach 283 ms, Quellkarten 683 ms in Ruhe,
+       Einsaugen 117 ms, Umschlag bei 1267 ms. */
+    var R = 66, T_AUF = 280, T_KRS = 850, T_SAU = 130;
+    var T1 = T_AUF + T_KRS;              // 1130 — Ende des Kreisens
+    var T2 = T1 + T_SAU, start = 0;      // 1260 — Umschlag (AA: 1267 ms)
     function schritt(ts) {
       if (!start) start = ts;
       var t = ts - start;
-      var kreisen = Math.min(t, T1) / T1;
-      var winkel = kreisen * 2 * Math.PI * 2;           // zwei volle Runden
-      var q = t <= T1 ? 0 : Math.min(1, (t - T1) / (T2 - T1));
+      // Waehrend die Buehne aufzieht, stehen die Karten — wie bei AA. Danach
+      // beschleunigt der Kreis (q^1,5) aus dem Stand in zwei volle Runden.
+      var kreisen = t <= T_AUF ? 0 : Math.min(1, (t - T_AUF) / T_KRS);
+      var winkel = Math.pow(kreisen, 1.5) * 2 * Math.PI * 2;
+      var q = t <= T1 ? 0 : Math.min(1, (t - T1) / T_SAU);
       var rad = R * (1 - q * q);                         // easeIn nach innen
-      var sk = 1 - 0.3 * q;
+      var sk = 1 - 0.38 * q;
       for (var i = 0; i < 3; i++) {
         var a = winkel + i * (2 * Math.PI / 3);
         var x = Math.cos(a - Math.PI / 2) * rad;
         var y = Math.sin(a - Math.PI / 2) * rad;
+        // Die Neigung laeuft beim Einsaugen auf 0 zurueck: AAs Quellkarten
+        // richten sich auf dem Weg nach innen auf, statt schraeg zu bleiben.
         karten[i].style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) +
-          "px) rotate(" + (a * 12).toFixed(1) + "deg) scale(" + sk.toFixed(3) + ")";
-        karten[i].style.opacity = q > 0.72 ? String(Math.max(0, (1 - q) / 0.28)) : "1";
+          "px) rotate(" + (a * 12 * (1 - q)).toFixed(1) + "deg) scale(" + sk.toFixed(3) + ")";
+        karten[i].style.opacity = q > 0.6 ? String(Math.max(0, (1 - q) / 0.4)) : "1";
       }
       if (t < T2) { CER.raf = requestAnimationFrame(schritt); return; }
       CER.raf = 0;
