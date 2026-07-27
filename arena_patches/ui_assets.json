@@ -1451,5 +1451,41 @@
     "beschreibung": "Breites Titel-/Wave-Banner, Goldfiligran mit Schnörkeln, leer. Für Screen-Titel und Wellen-Ankündigung.",
     "batch": 1,
     "ersetzt_durch": "banner_title (v2, zugeschnitten)"
+  },
+  "pack_arena_klein": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093825_c05fb801-db27-4b80-8fee-28e1a06a3522.png",
+    "min": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093825_c05fb801-db27-4b80-8fee-28e1a06a3522_min.webp",
+    "job": "c05fb801-db27-4b80-8fee-28e1a06a3522",
+    "type": "kulisse",
+    "size": "1584x672",
+    "batch": 11,
+    "beschreibung": "Pack-Kulisse Stufe 1 (Arenen 1-3) — Katapult-Turm auf saphirblauen Kristallzinnen, kleiner Haufen Gems und Goldmuenzen im unteren Viertel. Schatzanteil 5,07 %, Motivbreite 13,2 %."
+  },
+  "pack_arena_mittel": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093809_e5b4985d-37c1-4d18-b990-c2fda0c2a76a.png",
+    "min": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093809_e5b4985d-37c1-4d18-b990-c2fda0c2a76a_min.webp",
+    "job": "e5b4985d-37c1-4d18-b990-c2fda0c2a76a",
+    "type": "kulisse",
+    "size": "1584x672",
+    "batch": 11,
+    "beschreibung": "Pack-Kulisse Stufe 2 (Arenen 4-6) — Licht-Obelisk mit goldenem Halo auf Steinsockel, reicher Kristall- und Muenzhaufen. Schatzanteil 20,66 %, Motivbreite 24,2 %."
+  },
+  "pack_arena_gross": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093832_fa45c953-24f8-4e15-8c4b-4bbd16b27545.png",
+    "min": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093832_fa45c953-24f8-4e15-8c4b-4bbd16b27545_min.webp",
+    "job": "fa45c953-24f8-4e15-8c4b-4bbd16b27545",
+    "type": "kulisse",
+    "size": "1584x672",
+    "batch": 11,
+    "beschreibung": "Pack-Kulisse Stufe 3 (Arenen 7-8) — Magma-Titan aus Obsidian mit gluehenden Adern in der Glashalle, praechtiger Schatzhaufen. Schatzanteil 19,78 %, Motivbreite 38,3 %."
+  },
+  "pack_vorrat": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093851_f11ee134-dfd3-4798-9d63-74f8d764f6a9.png",
+    "min": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093851_f11ee134-dfd3-4798-9d63-74f8d764f6a9_min.webp",
+    "job": "f11ee134-dfd3-4798-9d63-74f8d764f6a9",
+    "type": "kulisse",
+    "size": "1584x672",
+    "batch": 11,
+    "beschreibung": "Vorrats-Truhe (AAs „Arcane Supplies Chest\") — offene Kristalltruhe in Goldfassung, herausquellender Kartenfaecher und warmes Licht, ueberlaufende Muenzen und Gems. Goldanteil 19,66 %."
   }
 }

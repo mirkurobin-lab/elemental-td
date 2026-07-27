@@ -1582,6 +1582,37 @@ span.ico{text-align:center}
    kostet null Bytes und laeuft nur auf der Karte, die gerade im Bild
    ist (Klasse .an, von JS gesetzt), damit acht Schleifen nicht
    gleichzeitig Fuellrate fressen. */
+/* ---------- Kulissen-Ebene der Pack-Karte (Batch 11, §6c) ----------
+   ZWEI Verlaeufe in EINEM Pseudoelement, Reihenfolge nicht verhandelbar:
+     1. Textband   90deg, bleibt rechts stehen  — Textgrundlage
+     2. Element-Toenung 90deg, nur links        — Arena-Identitaet
+   Warum ein ::before und nicht der background-image-Stapel wie in
+   bgArt(): die Toenung muss `var(--t1)` lesen, das tint() erst zur
+   Laufzeit setzt — im Inline-Stapel wuerde jeder erneute bgArt()-Aufruf
+   sie wieder ueberschreiben (die Wiederholbarkeitsfalle aus bgArt()).
+   Warum das hier den Text NICHT zudeckt (§6c warnt zu Recht davor):
+   jedes Kind der Karte ist positioniert und traegt eine hoehere Ebene —
+   .apktx z2, ::after z3, .apkval z4, .apkzu z5. Das ::before liegt auf
+   z1, also ueber der Kulisse und unter allem Inhalt.
+   Das Band ist ein BAND, kein Radialverlauf (der liesse die Raender
+   stehen). Es laeuft rechts NICHT aus wie ARTBG_SCRIM: .apktx reicht bis
+   right:10px, also bis 97 % — mit auslaufendem Band misst die Textzone
+   ein Kontrast-Minimum von 2,81:1 gegen Weiss. Mit diesem Band 6,39:1,
+   gemessen ueber alle vier Kulissen mal acht Arena-Toenungen.
+   Messreihen (auch die verworfenen Staerken): patches/packarts.md §1a/§1b. */
+.apkcard::before,.vrtcard::before{content:"";position:absolute;inset:0;z-index:1;
+  pointer-events:none;border-radius:inherit;
+  background:
+    linear-gradient(90deg,#0b111600 0%,#0b111600 20%,#0b11169e 34%,
+                          #0b1116b8 55%,#0b1116b8 100%),
+    linear-gradient(90deg,color-mix(in srgb,var(--t1,#2b3b47) 46%,transparent) 0%,
+                          color-mix(in srgb,var(--t1,#2b3b47) 25%,transparent) 26%,
+                          transparent 50%)}
+/* Zwei Ebenen im Stapel, also zwei Groessen — Artwork deckt, Farbplatte
+   fuellt (§6b, „cover,100% 100%", nie umgekehrt). Zweiklassig, damit die
+   Regel die einklassige .apkcard-Regel darueber gewinnt. */
+.apkcard.apkcard,.vrtcard.vrtcard{background-size:cover,100% 100%;
+  background-repeat:no-repeat;background-position:center}
 .apkcard::after{content:"";position:absolute;top:-40%;bottom:-40%;width:38%;
   left:-45%;pointer-events:none;z-index:3;transform:skewX(-18deg);
   background:linear-gradient(90deg,#fff0,#ffffff2e 45%,#fff0)}
@@ -6001,6 +6032,24 @@ button.pfplate{cursor:pointer}
     soc_instagram:     CDN + "hf_20260727_065749_8ccf8708-1c5b-4697-808e-2e43512903f1.png",
     soc_reddit:        CDN + "hf_20260727_065758_e7cd530b-d3da-4779-bdbb-026685306791.png",
     soc_facebook:      CDN + "hf_20260727_065805_2c66e610-eaef-46c2-8d8d-ee2badf40fc0.png",
+    /* ---- Batch 11: KULISSEN fuer das Arena-Pack-Karussell und die
+       Vorrats-Truhe. Alle 21:9 (1584x672), Style-Sheet-Job 22646ce4.
+       ROLLE = KULISSE (§6b): background-size cover, nie 100% 100%.
+       §6h gilt hier NICHT — eine Kulisse SOLL decken. Sie duerfen
+       deshalb niemals class="ico" tragen; der Freistell-Filter aus §6h
+       wuerde die dunkle rechte Bildhaelfte aufloesen.
+       DREI Wertigkeitsstufen statt acht Arena-Bildern: die Elementfarbe
+       kommt per tint() aus TINTS.arena1..8 (siehe unten) als CSS-Ebene
+       obendrauf. Kommt eine neunte Arena dazu, braucht sie kein Bild.
+       Gemessen auf der Zielflaeche 363x182 (93,4 vw, aspect-ratio 2/1):
+       das Kontrast-MINIMUM in der Textzone (x 36..100 %) liegt roh bei
+       1,00-1,04:1 gegen Weiss — die Mittelwerte (11-16:1) sehen harmlos
+       aus und sind es nicht (§6c). Das Band in .apkcard::before hebt es
+       auf 6,39:1; Messreihe in patches/packarts.md §1a. */
+    pack_arena_klein:  CDN + "hf_20260727_093825_c05fb801-db27-4b80-8fee-28e1a06a3522.png",
+    pack_arena_mittel: CDN + "hf_20260727_093809_e5b4985d-37c1-4d18-b990-c2fda0c2a76a.png",
+    pack_arena_gross:  CDN + "hf_20260727_093832_fa45c953-24f8-4e15-8c4b-4bbd16b27545.png",
+    pack_vorrat:       CDN + "hf_20260727_093851_f11ee134-dfd3-4798-9d63-74f8d764f6a9.png",
     /* ---- Pack-Zeremonie (Referenzvideo, §17) ---- */
     card_back:       CDN + "hf_20260725_144624_82b4b51d-f9d3-416d-8212-52e2f3c0c0a1.png",
     cinematic_legendary:
@@ -8187,7 +8236,13 @@ button.pfplate{cursor:pointer}
     hydrateIcons(rail);
     Array.prototype.forEach.call(rail.querySelectorAll(".apkcard"), function (el, i) {
       var p = ARENA_PACKS[i];
-      bgArt(el, p.kulisse);
+      /* layer(), NICHT bgArt(): die Abdunkelung liegt in .apkcard::before
+         (H3) und ist dort gemessen. bgArt() wuerde ARTBG_SCRIM ein
+         zweites Mal darueberlegen — zusammen Alpha 0,89, die Kulisse
+         waere in der Textzone weg. Umgekehrt reicht ARTBG_SCRIM allein
+         nicht: es laeuft rechts auf 0 aus, gemessenes Minimum 2,81:1
+         gegen Weiss (patches/packarts.md §1a). */
+      layer(el, p.kulisse);
       /* Die Elementfarbe der Arena toent die Kulisse — dadurch sehen die
          acht Packs verschieden aus, obwohl sich drei Bilder die Arbeit
          teilen. Kommt eine neunte Arena dazu, braucht sie kein Bild. */
@@ -10693,6 +10748,31 @@ button.pfplate{cursor:pointer}
     mail_system: ["#2b4152", "#101a22"],
     // Season-Pass — dieselbe Amethyst-Signatur wie das Home-Banner
     pass:        ["#4a2a7a", "#2a1b46"],
+    /* Arena-Toenungen fuer das Pack-Karussell (Batch 11).
+       Sechs davon sind woertlich die Elementfarben oben — die Arena
+       bekommt die Farbe ihres Elements, hergeleitet aus den
+       Arena-Beschreibungen in ui_assets.json (Tabelle in
+       patches/packarts.md §3).
+       ZWEI Ausnahmen, beide benannt statt stillschweigend:
+       - arena6 „Prisma-Zitadelle" ist das einzige Asset mit
+         Prisma-Signatur; sie traegt die Amethyst-Signatur des Passes
+         statt ein zweites Mal `light`, sonst waere sie von arena4
+         nicht zu unterscheiden (gleiche Kulisse, gleiche Toenung).
+       - arena8 „Frostbastion" ist Wasser wie arena3, aber kuehler
+         (Eis statt Saphir) — sonst waeren zwei Karten identisch. */
+    arena1:      ["#6e5220", "#291d0b"],   // Erde      — Kristallhof
+    arena2:      ["#22662f", "#0b2412"],   // Natur     — Smaragdtal
+    arena3:      ["#14567a", "#08222f"],   // Wasser    — Saphirfeste
+    /* ⚠ Abgedunkelt gegenueber dem Elementton. Die Pruefung „Alle Tints
+       sind dunkel genug fuer weissen Text" misst Luminanz < 90; Licht,
+       Prisma und Eis lagen mit 94, 107 und 90 darueber. Der Farbton
+       bleibt, die Helligkeit sinkt — auf einer Karte mit weisser
+       Schrift ist das keine Geschmacksfrage. */
+    arena4:      ["#5c5219", "#22200a"],   // Licht     — Sturmspitze  L 79
+    arena5:      ["#4a2a7a", "#1a0f2c"],   // Dunkelheit— Obsidian-Thron
+    arena6:      ["#5d38a8", "#241638"],   // Prisma    — Prisma-Zitadelle L 78
+    arena7:      ["#7a3418", "#2a1208"],   // Feuer     — Aschenmark
+    arena8:      ["#175c74", "#06202a"],   // Eis       — Frostbastion  L 75
     neutral:     ["#2b3b47", "#131c25"],
   };
   function tint(el, key, extra) {
