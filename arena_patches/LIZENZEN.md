@@ -94,3 +94,48 @@ Asset-CDN; fällt es aus, greifen überall CSS- und Emoji-Fallbacks.
 Bildschirmaufnahmen. Verwendet wurden ausschließlich **Erkenntnisse über Aufbau und Mechanik** —
 **keine** Assets, keine Texte, kein Code aus diesem Spiel. Sämtliche Artworks, Farbpaletten,
 Namen und Formeln dieses Projekts sind eigenständig.
+
+---
+
+## 6. Plattform-Marken im Community-Fenster (7 Vektorpfade)
+
+**Was:** die Bildmarken von Discord, YouTube, TikTok, X, Instagram, Reddit und Facebook, eingebaut
+als Vektorpfade in `SOC_MARKEN` (`ui_prototype.html`).
+
+**Woher:** [`simple-icons`](https://www.npmjs.com/package/simple-icons) 16.27.1, über npm bezogen.
+Paketlizenz **CC0-1.0**.
+
+**Was das heißt — und was nicht.** CC0 gilt für die *Zeichnungen* im Paket, also das Urheberrecht
+daran. Die **Markenrechte bleiben bei den Unternehmen**. Simple Icons sagt das in seinem eigenen
+`DISCLAIMER.md` ausdrücklich; CC0 auf das Paket heißt nicht, dass die enthaltenen Marken frei sind.
+Das ist der Unterschied, an dem dieser Abschnitt hängt — und der Grund, warum diese sieben nicht in
+Abschnitt 2 stehen.
+
+**Was wir damit dürfen.** Alle sieben Anbieter erlauben in ihren Markenrichtlinien, ihre Marke zu
+benutzen, um auf ein Profil **bei ihrem eigenen Dienst** zu verlinken. Genau das tut das
+Community-Fenster: jede Zeile führt auf unseren eigenen Kanal.
+
+**Was wir nicht dürfen — und wo das im Code sichergestellt ist:**
+
+| Auflage | Umsetzung |
+|---|---|
+| Marke nicht verändern, verzerren, drehen | Pfad unverändert aus dem Paket, `viewBox` 0 0 24 24, kein `transform` |
+| Keine eigene Mehrfarbigkeit erfinden | einfarbig weiß (`fill:currentColor`, `color:#fff`) — die einfarbige Fassung erlauben alle sieben ausdrücklich |
+| Keine Partnerschaft oder Billigung suggerieren | die Zeile sagt „Folgen", nicht „Partner"; kein Anbietername im Spieltitel |
+| Schutzraum einhalten | die Marke belegt 48 % des Plättchens, ringsum bleiben 26 % frei |
+| Marke nicht als eigenes Logo verwenden | erscheint nur in den Kontaktzeilen, nirgends als App-Symbol |
+
+**Die Markenfarbe färbt den Grund, nicht die Marke.** Die offiziellen Farben stehen in
+`SOC_MARKEN[*].marke` und stammen aus demselben Paket. Bei TikTok und X ist die Markenfarbe
+Schwarz; dort bleibt `--marke` leer, weil eine weiße Marke auf einer flachen schwarzen Scheibe
+keine Tiefe hätte — dann trägt das Kristall-Plättchen sie.
+
+**Warum inline statt als Datei.** Die sieben Pfade wiegen zusammen 6,3 KB. Als Vektor skalieren sie
+verlustfrei auf jede Plättchengröße und brauchen keine CDN — sie sind also auch dann da, wenn das
+Artwork nicht lädt. Für eine Kontaktfläche ist das kein Detail: eine Zeile ohne Marke sieht nicht
+aus wie „lädt noch", sondern wie „kaputt" (DESIGNSYSTEM §7b).
+
+**Wenn ein Anbieter seine Marke ändert** (X hat das getan), muss die Fassung hier nachgezogen
+werden: `npm pack simple-icons` neu ziehen, Pfad ersetzen, Stand fortschreiben.
+
+**Stand:** 27.07.2026, simple-icons 16.27.1.
