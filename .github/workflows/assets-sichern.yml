@@ -1,0 +1,98 @@
+# Holt alle Assets vom CDN ins Repository.
+#
+# Warum hier und nicht in der Entwicklungsumgebung: die erreicht das CDN
+# nicht, ihre Netzrichtlinie beantwortet CONNECT mit 403. GitHub Actions
+# hat diese Sperre nicht.
+#
+# Der Lauf startet NUR von Hand (workflow_dispatch). Ein Automatismus
+# waere hier falsch: das Skript schreibt 76 MB und pusht auf den Zweig,
+# und das soll niemand versehentlich ausloesen.
+#
+# Der Lauf ist wiederholbar — vorhandene Dateien werden uebersprungen.
+# Ein zweiter Durchgang holt also nur, was seit dem letzten dazugekommen
+# ist, und committet nichts, wenn sich nichts geaendert hat.
+name: Assets sichern
+
+on:
+  workflow_dispatch:
+    inputs:
+      zweig:
+        description: "Zweig, auf dem gesichert wird"
+        required: true
+        default: claude/arcane-arena-optimization-zi8vxb
+
+permissions:
+  contents: write
+
+jobs:
+  sichern:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Zweig auschecken
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.zweig }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # ⚠ `|| true`, und der Fehlschlag wird erst GANZ AM ENDE gemeldet.
+      # Ohne das bricht der Schritt bei EINER unerreichbaren Datei ab und
+      # die anderen 202 werden nie committet — ein Teilbestand ist aber
+      # unendlich viel besser als keiner. Der Lauf faellt trotzdem rot
+      # aus (letzter Schritt), damit niemand ihn fuer vollstaendig haelt.
+      - name: Assets vom CDN holen
+        run: |
+          set +e
+          python3 arena_patches/werkzeuge/assets_sichern.py \
+                  arena_patches/ui_assets.json \
+                  arena_patches/assets
+          echo "HOLFEHLER=$?" >> "$GITHUB_ENV"
+          exit 0
+
+      - name: Umfang zeigen
+        run: |
+          echo "Dateien: $(find arena_patches/assets -type f | wc -l)"
+          du -sh arena_patches/assets
+          echo "--- die groessten fuenf ---"
+          du -h arena_patches/assets/* | sort -rh | head -5
+
+      - name: Committen und pushen
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add arena_patches/assets
+          # Ohne Aenderung kein leerer Commit — der Lauf ist wiederholbar
+          # und soll die Historie nicht mit Rauschen fuellen.
+          if git diff --cached --quiet; then
+            echo "Nichts zu sichern, alle Assets liegen bereits im Repo."
+            exit 0
+          fi
+          N=$(git diff --cached --name-only | wc -l)
+          git commit -m "Assets gesichert: ${N} Dateien vom CDN ins Repository
+
+          Bis hierher lagen alle Bilder, Videos und Tondateien
+          ausschliesslich als CDN-URL vor. Damit hing die gesamte
+          Bildarbeit an einem fremden Konto — geht es verloren,
+          beschreibt ui_assets.json nur noch, was es einmal gab.
+
+          Bei PNGs die _min.webp-Fassung: volle Aufloesung bei rund 3 %
+          der Groesse (44 KB statt 1,4 MB, PSNR 37,7 dB). Videos und Ton
+          im Original, dort gibt es keine Kleinfassung.
+
+          assets/HERKUNFT.json haelt je Datei Quell-URL, Groesse und
+          SHA-256 fest — der Nachweis, dass die Datei im Repo die Datei
+          vom CDN ist.
+
+          Erzeugt von werkzeuge/assets_sichern.py ueber
+          .github/workflows/assets-sichern.yml."
+          git push origin HEAD:${{ inputs.zweig }}
+
+      # Erst jetzt scheitern — nachdem das Geholte gesichert ist.
+      - name: Unvollstaendigen Bestand melden
+        if: env.HOLFEHLER != '0'
+        run: |
+          echo "::error::Mindestens ein Asset konnte nicht geholt werden."
+          echo "Der Rest ist committet; die Liste steht im Protokoll des Hol-Schritts."
+          exit 1
