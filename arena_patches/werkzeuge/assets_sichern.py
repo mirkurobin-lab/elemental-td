@@ -63,14 +63,35 @@ import os
 import re
 import sys
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 
-ZEITLIMIT = 120
+ZEITLIMIT = 30          # je Verbindung; 120 war zu lang, siehe unten
 VERSUCHE = 3
+PARALLEL = 8
+
+# ⚠ ZWEI FEHLER AUS DEM ERSTEN LAUF, beide teuer:
+#
+# 1. SERIELL. 203 Dateien nacheinander, jede mit eigenem TLS-Handschlag —
+#    der Lauf stand nach 22 Minuten immer noch im Hol-Schritt und musste
+#    abgebrochen werden. Jetzt acht gleichzeitig.
+# 2. STUMM. Das Skript gab bis zum Schluss nichts aus. Als der Lauf hing,
+#    war im Protokoll deshalb NICHT zu sehen, an welcher Datei — und ohne
+#    das kann man einen Hänger nicht einmal benennen, geschweige denn
+#    beheben. Ein Stapellauf über 203 Dateien muss unterwegs sagen, wo er
+#    steht. Jetzt eine Zeile je Datei, ungepuffert.
+#
+# Das Zeitlimit gilt je Verbindungsversuch, nicht für den ganzen Abruf:
+# ein Server, der langsam tröpfelt, läuft nie hinein. Deshalb kurz halten
+# und lieber dreimal versuchen.
+
+
+def melde(text):
+    print(text, flush=True)
 
 
 def hole(url):
     letzter = None
-    for versuch in range(VERSUCHE):
+    for _ in range(VERSUCHE):
         try:
             with urllib.request.urlopen(url, timeout=ZEITLIMIT) as r:
                 if r.status != 200:
@@ -87,55 +108,74 @@ def kleinfassung(url):
     return re.sub(r"\.(png|jpg|jpeg)$", "_min.webp", url, flags=re.I)
 
 
+def eine(k, url, ziel, i, n):
+    """Ein Asset holen. Gibt (schluessel, eintrag, zustand, fehler) zurueck."""
+    kandidaten = []
+    if re.search(r"\.(png|jpg|jpeg)$", url, re.I):
+        kandidaten.append(kleinfassung(url))
+    kandidaten.append(url)
+
+    letzter = "unbekannt"
+    for nr, kand in enumerate(kandidaten):
+        endung = os.path.splitext(kand.split("?")[0])[1].lower() or ".bin"
+        name = k + endung
+        pfad = os.path.join(ziel, name)
+        zustand = "schon"
+        if os.path.exists(pfad):                    # wiederholbar
+            roh = open(pfad, "rb").read()
+        else:
+            try:
+                roh = hole(kand)
+            except Exception as e:                  # noqa: BLE001
+                letzter = str(e)
+                continue
+            open(pfad, "wb").write(roh)
+            zustand = "neu"
+        melde("[%3d/%d] %-9s %-28s %7.1f KB  %s"
+              % (i, n, zustand, k[:28], len(roh) / 1000,
+                 "min" if nr == 0 and len(kandidaten) > 1 else "orig"))
+        return k, {
+            "quelle": kand,
+            "datei": name,
+            "bytes": len(roh),
+            "sha256": hashlib.sha256(roh).hexdigest(),
+            "kleinfassung": kand != url,
+        }, zustand, None
+    melde("[%3d/%d] FEHLER    %-28s %s" % (i, n, k[:28], letzter[:60]))
+    return k, None, "fehler", letzter
+
+
 def lauf(pfad_json, ziel):
     d = json.load(open(pfad_json, encoding="utf-8"))
     os.makedirs(ziel, exist_ok=True)
     herkunft, fehler, neu, schon, summe = {}, [], 0, 0, 0
 
+    aufgaben = []
     for k in sorted(d):
         if k.startswith("_"):
             continue
         v = d[k]
         url = v.get("url") if isinstance(v, dict) else v
-        if not isinstance(url, str) or not url.startswith("http"):
-            continue
+        if isinstance(url, str) and url.startswith("http"):
+            aufgaben.append((k, url))
 
-        kandidaten = []
-        if re.search(r"\.(png|jpg|jpeg)$", url, re.I):
-            kandidaten.append(kleinfassung(url))
-        kandidaten.append(url)
+    n = len(aufgaben)
+    melde("%d Assets, %d gleichzeitig" % (n, PARALLEL))
+    with ThreadPoolExecutor(max_workers=PARALLEL) as pool:
+        ergebnisse = list(pool.map(
+            lambda x: eine(x[1][0], x[1][1], ziel, x[0] + 1, n),
+            enumerate(aufgaben)))
 
-        gespeichert = None
-        for kand in kandidaten:
-            endung = os.path.splitext(kand.split("?")[0])[1].lower() or ".bin"
-            name = k + endung
-            pfad = os.path.join(ziel, name)
-            if os.path.exists(pfad):                # wiederholbar
-                roh = open(pfad, "rb").read()
-                gespeichert = (kand, name, roh)
-                schon += 1
-                break
-            try:
-                roh = hole(kand)
-            except Exception as e:                  # noqa: BLE001
-                if kand is kandidaten[-1]:
-                    fehler.append((k, str(e)))
-                continue
-            open(pfad, "wb").write(roh)
-            gespeichert = (kand, name, roh)
+    for k, eintrag, zustand, e in ergebnisse:
+        if zustand == "neu":
             neu += 1
-            break
-
-        if gespeichert:
-            quelle, name, roh = gespeichert
-            summe += len(roh)
-            herkunft[k] = {
-                "quelle": quelle,
-                "datei": name,
-                "bytes": len(roh),
-                "sha256": hashlib.sha256(roh).hexdigest(),
-                "kleinfassung": quelle != url,
-            }
+        elif zustand == "schon":
+            schon += 1
+        if eintrag:
+            herkunft[k] = eintrag
+            summe += eintrag["bytes"]
+        if e:
+            fehler.append((k, e))
 
     with open(os.path.join(ziel, "HERKUNFT.json"), "w", encoding="utf-8") as f:
         json.dump({
