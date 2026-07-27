@@ -4207,15 +4207,37 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .loginhead{padding:14px 16px 10px;text-align:center}
 .loginhead .lgt{font-size:20px;line-height:1.1}
 .loginhead .lgs{font-size:10.5px;color:#a9bccb;margin-top:4px;line-height:1.45}
-.logingrid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gap);padding:0 14px}
-.logincell{position:relative;min-height:var(--tile);border-radius:var(--radius-sm);
-  border:1px solid var(--line);padding:7px 4px 6px;text-align:center;
-  background:linear-gradient(180deg,#1b2732,#131c25);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
-.logincell .lgd{font-size:8.5px;font-weight:900;letter-spacing:.08em;color:#8fa0ad}
-.logincell .lgi{font-size:23px;line-height:1}
-.logincell .lgi .ico{width:26px;height:26px}
-.logincell .lgn{font-size:8.5px;font-weight:800;color:#cfe0ec;line-height:1.25}
+/* ⚠ DREI SPALTEN, nicht vier — und die Kachel ist in derselben Bauart
+   gebaut wie die Shop-Produktkarte (.prodcard/.pcart).
+   Vorher standen hier vier schmale Felder, die Tage 5 und 6 fielen in
+   eine zweite Reihe und liessen zwei Luecken; das Bild schwebte frei auf
+   der Kachel statt in einem Kasten zu liegen. Der Auftraggeber: „Das
+   kannst du auch wie im Shop bauen von der Banner Groesse usw 3 pro
+   Reihe und einen laenglichen Banner darunter fuer Tag 7."
+   Drei Spalten teilen die sechs Vortage sauber in 2x3 auf — keine
+   Luecke, und Tag 7 bekommt die volle Breite fuer sich. */
+.logingrid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);padding:0 14px}
+.logincell{position:relative;border-radius:var(--radius);overflow:hidden;
+  border:1px solid var(--line);padding:0 0 7px;text-align:center;aspect-ratio:.78;
+  background-image:linear-gradient(180deg,#1b2732,#0e1418);
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  box-shadow:var(--mat-raised)}
+.logincell .lgd{font-size:8.5px;font-weight:900;letter-spacing:.08em;color:#8fa0ad;
+  margin-top:7px}
+/* Derselbe eingesenkte Bildkasten wie .pcart: das Bild LIEGT darin,
+   statt auf der Kachel zu kleben. Er ist ein Flex-Kind und reserviert
+   damit seinen Platz — er kann den Text darunter nicht ueberlappen. */
+.logincell .lgi{position:relative;width:63%;aspect-ratio:1;height:auto;
+  margin:4% auto 0;flex:0 0 auto;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  font-size:23px;line-height:1;
+  border-radius:10px;border:1px solid #2b3b47;
+  background:linear-gradient(180deg,#16202a,#0a1017);
+  box-shadow:var(--mat-well)}
+.logincell .lgi .ico{width:82%;height:82%;object-fit:contain;
+  filter:var(--frei) drop-shadow(0 3px 6px #000c)}
+.logincell .lgn{font-size:9px;font-weight:800;color:#cfe0ec;line-height:1.25;
+  margin-top:auto;padding:0 4px}
 .logincell.done{opacity:.5}
 .logincell.done::after{content:"✓";position:absolute;right:5px;top:4px;font-size:12px;
   color:#7ad14f;font-weight:900;text-shadow:0 0 6px #7ad14f88}
@@ -4224,15 +4246,19 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .logincell.today .lgd{color:var(--gold)}
 .logincell.locked{opacity:.62}
 .logincell.locked .lgi{filter:var(--frei) grayscale(.7)}
-/* Tag 7 ist das Finale: volle Breite, festlicher Rahmen. */
-.logincell.finale{grid-column:span 4;min-height:74px;flex-direction:row;gap:10px;
+/* Tag 7 ist das Finale: volle Breite, festlicher Rahmen. Dieselbe
+   Bauform wie ein Shop-Breitband (.prodcard.wide) — Bildkasten links,
+   Text daneben. `aspect-ratio` muss hier wieder weg, sonst waere das
+   Band bei voller Breite 470 px hoch. */
+.logincell.finale{grid-column:span 3;aspect-ratio:auto;min-height:74px;
+  flex-direction:row;gap:10px;align-items:center;
   justify-content:flex-start;padding:9px 12px;text-align:left;
-  border-color:#a45ef2aa;background:linear-gradient(120deg,#3a1c66,#221436 55%,#141d2b);
-  box-shadow:inset 0 0 26px -6px #a45ef255}
-.logincell.finale .lgi{font-size:31px}
-.logincell.finale .lgi .ico{width:34px;height:34px}
-.logincell.finale .lgn{font-size:12px;color:#fff}
-.logincell.finale .lgd{font-size:9px}
+  border-color:#a45ef2aa;background-image:linear-gradient(120deg,#3a1c66,#221436 55%,#141d2b);
+  box-shadow:var(--mat-raised),inset 0 0 26px -6px #a45ef255}
+.logincell.finale .lgi{width:56px;aspect-ratio:1;margin:0;font-size:31px}
+.logincell.finale .lgi .ico{width:82%;height:82%}
+.logincell.finale .lgn{font-size:12px;color:#fff;margin-top:0;padding:0}
+.logincell.finale .lgd{font-size:9px;margin-top:0}
 .logincell.finale .lgtx{flex:1;min-width:0;text-align:left}
 .logincell.finale .lgtx .lgd,.logincell.finale .lgtx .lgn{display:block}
 .loginfoot{padding:12px 14px 14px}
@@ -5188,16 +5214,23 @@ button.pfplate{cursor:pointer}
          das hat der Nutzer als „der Banner ist zu gross" gemeldet.
          ================================================================== -->
     <div class="hubband">
+      <!-- EINE Kachel, nicht drei. Hier standen zusaetzlich „Wochenziele"
+           und „Erfolge" — und alle drei oeffneten DASSELBE Fenster
+           (openRewards), nur mit einem anderen Reiter vorgewaehlt. Der
+           Auftraggeber hat es sofort gesehen: „Links auf dem
+           hauptbildschirm ist 3x das gleiche".
+           Drei Tueren in denselben Raum sind keine drei Angebote. Der
+           Kalender oeffnet das Fenster auf LOGIN, die uebrigen Reiter
+           (Taeglich, Wochenziele, Erfolge) stehen dort oben — einen Tap
+           entfernt, so wie AA es auch macht.
+           Der Zaehler muss deshalb ALLE vier Reiter zusammenfassen,
+           sonst verschwindet mit den Kacheln auch der Hinweis darauf,
+           dass es woanders etwas abzuholen gibt. -->
       <div class="hubrail left">
-        <button class="railtile pressable" id="icoDaily" title="Tagesziele &amp; Login">
+        <button class="railtile pressable" id="icoDaily"
+                title="Belohnungen: Login, Täglich, Wochenziele, Erfolge">
           <span class="rti" data-ico="ic_calendar" data-emoji="🗓"></span>
           <i class="nb2" id="tileDailyBadge" style="display:none">0</i></button>
-        <button class="railtile pressable" id="icoWeekly" title="Wochenziele">
-          <span class="rti" data-ico="ic_quest" data-emoji="📜"></span>
-          <i class="nb2" id="badgeWeekly" style="display:none">0</i></button>
-        <button class="railtile pressable" id="icoLifetime" title="Erfolge">
-          <span class="rti" data-ico="ic_trophy" data-emoji="🎖"></span>
-          <i class="nb2" id="badgeLifetime" style="display:none">0</i></button>
       </div>
       <div class="hubmid">
 
@@ -13014,8 +13047,6 @@ button.pfplate{cursor:pointer}
      Reiter vor. #icoDaily startet auf LOGIN, weil dort — wie bei AA —
      der Login-Kalender haengt; der Reiter TAEGLICH ist einen Tap
      entfernt. */
-  $("icoWeekly").addEventListener("click", function () { openRewards("weekly"); });
-  $("icoLifetime").addEventListener("click", function () { openRewards("lifetime"); });
   /* Freundesliste: der Knopf oben rechts fuehrt in die View. KEIN
      Bottom-Nav-Tab und kein Eintrag in SWIPE_ORDER — sie ist, wie
      Rangliste und Post, ein Ziel aus der Kopfzeile. */
@@ -13643,8 +13674,6 @@ button.pfplate{cursor:pointer}
        Lebenszeit. Sie steigt in der Wertigkeit, also steigt auch die
        Farbe: Gold -> Smaragd -> Arkan. */
     tint($("icoDaily"), "pack_gold");
-    tint($("icoWeekly"), "gems");
-    tint($("icoLifetime"), "pack_arcane");
     /* Muss NACH UIBadge.set("daily", …) weiter oben stehen: die drei
        Punkte der linken Schiene kommen aus ArenaRewards und sollen die
        Zahl aus ArenaDaily ueberschreiben, nicht umgekehrt. */
@@ -14018,9 +14047,13 @@ button.pfplate{cursor:pointer}
       el.textContent = n > 99 ? "99+" : String(n);
       el.style.display = n > 0 ? "" : "none";
     }
-    setzen("tileDailyBadge", b.login + b.daily);
-    setzen("badgeWeekly", b.weekly);
-    setzen("badgeLifetime", b.lifetime);
+    /* ALLE VIER Reiter zaehlen auf die eine Kachel. Vorher trug jede
+       Kachel ihren eigenen Punkt; seit es nur noch eine gibt, muss sie
+       auch fuer die anderen sprechen. Wuerde hier weiter nur
+       `login + daily` stehen, verschwaende ein fertiges Wochenziel
+       lautlos — der Nutzer haette keinen Anlass, das Fenster zu oeffnen
+       und den Reiter zu wechseln. */
+    setzen("tileDailyBadge", b.login + b.daily + b.weekly + b.lifetime);
   }
 
   /* EINE Bruecke statt acht Einzelmeldungen: jede Stelle, die heute
