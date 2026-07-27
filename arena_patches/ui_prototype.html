@@ -2418,6 +2418,66 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
 .keyart .kend{font-size:10.5px;color:#dbe6ef;margin-top:5px;font-weight:700}
 .keyart .kend b{color:var(--gold)}
 
+/* ---------- Guide-Kopfbild (Batch 10) ----------
+   Feststehendes Keyart oben im Defenders Guide, volle Breite. Hoehe ist die
+   vierte Stufe der Leiter (--keyart-h, §3) — dabei bleiben, keine Zwischen-
+   werte. Die Quelle ist 21:9 (2,357), die Flaeche 390/172 = 2,267; `cover`
+   schneidet 3,8 % Breite weg, und die Komposition haelt genau diesen Rand
+   dunkel. NIE `100% 100%` (§6b).
+   Die drei Ebenen kommen aus .artbg (Abdunkelung / Artwork / Farbplatte);
+   eingesetzt werden sie von bgArtV() in H3. Der Verlauf hier ist nur der
+   Rueckfall, wenn das CDN nicht antwortet — die Textgrundlage darf nie davon
+   abhaengen, welches Artwork gerade laedt (§6c, Lehre aus §7b). */
+.gkeyart{position:relative;height:var(--keyart-h);overflow:hidden;
+  border-radius:var(--radius);border:1px solid #e0b94a3d;
+  background:linear-gradient(160deg,#1b2a3a,#0e1418);
+  box-shadow:var(--mat-raised)}
+/* Vollbreite-Variante: hebt das Polster von .view (12px) auf, damit das Bild
+   bis an beide Bildschirmkanten laeuft — so steht es bei AA. */
+.gkeyart.bleed{margin:-12px -12px var(--gap);border-radius:0;
+  border-left:0;border-right:0;border-top:0}
+/* Text auf dem Kopfbild sitzt UNTEN, im Bereich, den das Bodenband abdunkelt. */
+.gkeyart .gktx{position:absolute;left:14px;right:14px;bottom:11px;z-index:3}
+
+/* ---------- Community-Figur (Batch 10) ----------
+   Steht oben im Community-Sheet und ragt ueber die Fensterkante hinaus.
+   ⚠ Bewusst KEIN class="ico": der Freistell-Filter aus §6h wuerde die
+   dunkelblaue Kristallfigur zerlegen (Motiv-p05 0,013). Gebraucht wird er
+   auch nicht — die Plattenfarbe der Datei liegt DeltaRGB (4,1,1) neben --bg,
+   das Rechteck ist auf .sheet unsichtbar.
+   Ebenfalls bewusst KEIN drop-shadow: auf einer deckenden Datei zeichnet es
+   den Schatten des Rechtecks, nicht den der Figur.
+   Das Bild ist 4:5; 200x250 haelt das Verhaeltnis exakt, `cover` schneidet
+   also nichts weg. Das oberste Fuenftel der Datei ist leer (gemessen
+   Lmean 0,0063) — das ist der freie Rand, der die Figur ueber die Kante
+   heben laesst. */
+.commfig{display:block;margin:0 auto;width:200px;height:250px;
+  object-fit:cover;object-position:center top;pointer-events:none}
+/* Soll die Figur ueber die Kante eines eigenen PANELS ragen statt nur oben im
+   Sheet zu stehen, bekommt das Panel `margin-top:-64px` und die Figur
+   `position:relative;z-index:1`. NICHT vermessen — das Panel gibt es noch
+   nicht. */
+
+/* ---------- Plattform-Marken (Batch 10) ----------
+   Rundes Kristall-Plaettchen in der Markenfarbe. Das ECHTE Logo ist eine
+   geschuetzte Marke, wird nicht generiert und liegt als eigenes <img>
+   darueber (.socchip > .soclogo).
+   Warum border-radius statt Freistell-Filter: die Markenfarben sind selbst
+   dunkler als die 0,24-Schwelle aus §6h (Discord-Blurple L 0,179,
+   Facebook-Blau L 0,197) — ein Chip in Markenfarbe KANN §6h nicht bestehen.
+   Eine runde Maske auf einer runden Scheibe loest dasselbe Problem exakt und
+   ohne Motivverlust. Die Chips laufen deshalb nicht ueber ico().
+   --dz gleicht aus, dass der Scheibendurchmesser je Datei zwischen 75,9 %
+   und 84,1 % der Leinwand streut; ohne das saesse TikTok sichtbar kleiner in
+   seiner Reihe als X. Werte in H3. */
+.socchip{position:relative;flex:0 0 44px;width:44px;height:44px;
+  border-radius:50%;overflow:hidden;background:#0e1418;
+  background-repeat:no-repeat;background-position:center;
+  background-size:var(--dz,124%);
+  box-shadow:var(--mat-raised)}
+.socchip .soclogo{position:absolute;left:24%;top:24%;width:52%;height:52%;
+  object-fit:contain;filter:drop-shadow(0 1px 2px #000c)}
+
 /* ---------- Season-Pass ---------- */
 .passbar{display:flex;align-items:center;gap:var(--gap);margin-top:var(--gap);padding:var(--pad);
   border-radius:12px;background:#0b1116;border:1px solid var(--line);font-size:10.5px;
@@ -5609,6 +5669,38 @@ button.pfplate{cursor:pointer}
     bg_vault:        CDN + "hf_20260726_184212_a0d966f0-f946-4f8c-bfa9-23d46ac4555f.png",
     bg_offer:        CDN + "hf_20260726_185048_05f524ec-483b-4d76-a5fe-fc5ec620f184.png",
     bg_clanhead:     CDN + "hf_20260726_185059_c87c68aa-65b4-49d7-a058-6df1255d7f86.png",
+    /* ---- Batch 10: KEYARTS fuer Defenders Guide und Community ----
+       guide_keyart      21:9 (1584x672) — Kopfbild des Guide, volle Breite,
+                         Hoehe --keyart-h. ROLLE = KULISSE: background-size
+                         cover (§6b), §6h gilt hier NICHT.
+                         ⚠ Der Titel steht UNTEN darauf. Ohne Abdunkelung
+                         misst die Textzone gegen Weiss ein Minimum von
+                         1,05:1 — Mittelwert 14,97:1 sieht harmlos aus und
+                         ist es nicht (§6c). bgArtV() legt darum ein
+                         BODENBAND (180deg) darueber, nicht das
+                         Spaltenband aus bgArt(): danach 10,09:1.
+       community_keyart  4:5 (928x1152) — Kristallwesen mit Prisma-Telefon,
+                         steht oben im Community-Sheet. Der Grund der Datei
+                         misst rgb(10,19,25) gegen --bg rgb(14,20,24), also
+                         DeltaRGB (4,1,1): das Rechteck ist auf .sheet
+                         unsichtbar. Kein Freistellen noetig.
+                         ⚠ NIEMALS mit class="ico" einbauen — der Filter
+                         aus §6h (Rampe 0,24) frisst die dunkelblaue
+                         Kristallfigur; Motiv-p05 der Kernscheibe: 0,013.
+       soc_*             sieben runde Kristall-Plaettchen in Markenfarbe,
+                         MOTIVFREI. Das echte Plattform-Logo ist eine
+                         geschuetzte Marke und wird NICHT generiert — es
+                         liegt als eigenes <img> obendrauf (siehe .socchip
+                         in H2 und patches/keyarts.md §4). */
+    guide_keyart:      CDN + "hf_20260727_065610_2c263397-46ab-4aaf-b2b1-81d196cf1b0a.png",
+    community_keyart:  CDN + "hf_20260727_065626_f7931d05-e285-4f34-a764-e5c5ef96fe7a.png",
+    soc_discord:       CDN + "hf_20260727_071549_cae05d17-c1b1-42b3-bc11-eadcf07f74c5.png",
+    soc_youtube:       CDN + "hf_20260727_065720_d1663b7f-00b5-45b2-9b25-9bc119d208c2.png",
+    soc_tiktok:        CDN + "hf_20260727_065731_3c77e786-974c-472c-b4a6-0ff2fd9a6dc5.png",
+    soc_x:             CDN + "hf_20260727_065740_1167539f-58d8-402f-8824-a22a0c224b7e.png",
+    soc_instagram:     CDN + "hf_20260727_065749_8ccf8708-1c5b-4697-808e-2e43512903f1.png",
+    soc_reddit:        CDN + "hf_20260727_065758_e7cd530b-d3da-4779-bdbb-026685306791.png",
+    soc_facebook:      CDN + "hf_20260727_065805_2c66e610-eaef-46c2-8d8d-ee2badf40fc0.png",
     /* ---- Pack-Zeremonie (Referenzvideo, §17) ---- */
     card_back:       CDN + "hf_20260725_144624_82b4b51d-f9d3-416d-8212-52e2f3c0c0a1.png",
     cinematic_legendary:
@@ -6033,6 +6125,81 @@ button.pfplate{cursor:pointer}
     if (!cur || cur === "none") cur = "linear-gradient(180deg,#243342,#141d26)";
     el.classList.add("artbg");
     el.style.backgroundImage = ARTBG_SCRIM + ', url("' + ASSETS[key] + '"), ' + cur;
+  }
+
+  /* ==================================================================
+   * bgArtV() — dieselbe Ebenenordnung, aber mit BODENBAND
+   * ------------------------------------------------------------------
+   * ARTBG_SCRIM ist ein 90deg-Band und dunkelt die linke Textspalte ab.
+   * Richtig ueberall dort, wo der Text neben dem Motiv steht. Auf einem
+   * Keyart mit MITTIGEM Motiv und Text am unteren Rand hilft es kaum:
+   * gemessen an guide_keyart hebt es das Kontrastminimum in der Textzone
+   * nur von 1,05:1 auf 1,28:1, weil die Lichtspitzen ueber die ganze
+   * Breite verteilt liegen.
+   * Das Band laeuft hier deshalb senkrecht — immer noch ein BAND, kein
+   * Radialverlauf (der wuerde die Raender stehen lassen, §6c). Gemessen
+   * danach: Textzone (x 14..376, y 100..160 auf 390x172) Lmean 0,007,
+   * kein Pixel ueber L 0,45, Kontrast gegen Weiss MINIMUM 10,09:1.
+   * Preis: die obere Bildhaelfte faellt von p95 0,600 auf 0,555 — der
+   * Lichtschacht und die Flakonwaende bleiben also stehen.
+   * ================================================================== */
+  var ARTBG_SCRIM_V =
+    "linear-gradient(180deg,#0b111600 0%,#0b111600 34%,#0b1116db 62%,#0b1116f7 100%)";
+  function bgArtV(el, key) {
+    if (!el || !ASSETS[key]) return;
+    el.style.backgroundImage = "";
+    var cur = getComputedStyle(el).backgroundImage;
+    if (!cur || cur === "none") cur = "linear-gradient(160deg,#1b2a3a,#0e1418)";
+    el.classList.add("artbg");
+    el.style.backgroundImage = ARTBG_SCRIM_V + ', url("' + ASSETS[key] + '"), ' + cur;
+  }
+
+  /* ==================================================================
+   * SOC_PLATFORMS — die sieben Plattform-Reihen des Community-Fensters
+   * ------------------------------------------------------------------
+   * `chip`  Kristall-Plaettchen in Markenfarbe, MOTIVFREI (Batch 10).
+   * `dz`    background-size, damit alle sieben Scheiben gleich gross auf
+   *         der Kante sitzen. Der Wert ist 100 / gemessener Durchmesser:
+   *         Discord 83,1 % -> 120 %, YouTube 76,2 % -> 131 %, TikTok
+   *         75,9 % -> 132 %, X 84,1 % -> 119 %, Instagram 83,3 % -> 120 %,
+   *         Reddit 80,1 % -> 125 %, Facebook 81,2 % -> 123 %.
+   * `logo`  ⚠ NOCH ZU ERGAENZEN. Das echte Plattform-Logo ist eine
+   *         eingetragene Marke und darf nicht nachgezeichnet oder
+   *         generiert werden. Es kommt aus dem offiziellen Brand-Kit des
+   *         jeweiligen Anbieters (Quellen in patches/keyarts.md §4) und
+   *         wird als SVG/PNG unter public/assets/soc/ abgelegt. Solange
+   *         `logo` leer ist, steht das Emoji als Rueckfall.
+   * ================================================================== */
+  var SOC_PLATFORMS = [
+    { id:"discord",   name:"Discord",   chip:"soc_discord",   dz:"120%", logo:"", emo:"💬" },
+    { id:"youtube",   name:"YouTube",   chip:"soc_youtube",   dz:"131%", logo:"", emo:"▶️" },
+    { id:"tiktok",    name:"TikTok",    chip:"soc_tiktok",    dz:"132%", logo:"", emo:"🎵" },
+    { id:"x",         name:"X",         chip:"soc_x",         dz:"119%", logo:"", emo:"✕" },
+    { id:"instagram", name:"Instagram", chip:"soc_instagram", dz:"120%", logo:"", emo:"📷" },
+    { id:"reddit",    name:"Reddit",    chip:"soc_reddit",    dz:"125%", logo:"", emo:"👽" },
+    { id:"facebook",  name:"Facebook",  chip:"soc_facebook",  dz:"123%", logo:"", emo:"👍" },
+  ];
+
+  /* Liefert das fertige Chip-Element fuer eine Plattform-Reihe.
+     Die Kristallscheibe ist der HINTERGRUND des runden Elements — die
+     runde Maske schneidet den flachen dunklen Grund exakt weg, ohne den
+     Freistell-Filter aus §6h zu brauchen (und der koennte es hier auch
+     nicht, siehe Kommentar an SOC_PLATFORMS). */
+  function socChip(p) {
+    var d = document.createElement("div");
+    d.className = "socchip";
+    d.style.setProperty("--dz", p.dz);
+    if (ASSETS[p.chip]) d.style.backgroundImage = 'url("' + ASSETS[p.chip] + '")';
+    if (p.logo) {
+      var img = document.createElement("img");
+      img.className = "soclogo";
+      img.src = p.logo;
+      img.alt = p.emo;
+      img.loading = "lazy"; img.decoding = "async";
+      img.onerror = function () { UIIcon.fail(this); };
+      d.appendChild(img);
+    }
+    return d;
   }
 
   /* ==================================================================
@@ -10737,6 +10904,11 @@ button.pfplate{cursor:pointer}
   }
 
   function renderGuide() {
+    /* Kopfbild. bgArtV statt bgArt: Text steht UNTEN auf dem Bild, das
+       Abdunkelungsband muss deshalb senkrecht laufen (§6c, Messwerte in
+       patches/keyarts.md §0a). Der Aufruf ist wiederholbar — bgArtV nimmt
+       den eigenen Inline-Stil zuerst zurueck. */
+    bgArtV($("guideKeyart"), "guide_keyart");
     var G = GDof();
     if (!G) { $("guideNote").textContent = "arena_guide.js nicht geladen."; return; }
     var pr = G.progress(), cs = G.chapters();
