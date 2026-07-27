@@ -891,7 +891,10 @@ footer{padding:6px 12px 14px;text-align:center}
  * ================================================================== */
 #viewHome{padding:0 0 88px;position:relative}
 #viewHome.view{display:none}
-#viewHome.view.active{display:flex;flex-direction:column}
+/* Auf kurzen Geraeten (740 px) ist der Stapel hoeher als das Band
+   zwischen Kopf und Bottom-Nav. Ohne Scroll liefe die Kampfreihe unter
+   die Leiste. Der Deckel auf dem Diorama allein reicht dort nicht. */
+#viewHome.view.active{display:flex;flex-direction:column;overflow-y:auto}
 #viewHome .arenahero{flex:1 1 auto}
 #viewHome .arenahero .progwrap{margin-top:auto}
 #viewHome .homerow3{padding-bottom:10px}
@@ -1120,7 +1123,11 @@ footer{padding:6px 12px 14px;text-align:center}
    Mittelspalte ist 58,5 % breit, also braucht das Diorama 93 % davon —
    nicht 90 %, und der 260-px-Deckel wuerde auf breiten Geraeten wieder
    binden. */
-.diorama{margin-top:0;width:92%;max-width:300px;aspect-ratio:4/3;border-radius:18px;
+/* max-height in vh: auf einem 740-px-Geraet war der Inhalt 764 px hoch
+   und lief in die Bottom-Nav. AAs Diorama misst 19 % der Hoehe — als
+   Deckel geschrieben schrumpft es auf kurzen Geraeten mit, statt zu
+   ueberlaufen. */
+.diorama{margin-top:0;width:92%;max-width:300px;aspect-ratio:4/3;max-height:19.5vh;border-radius:18px;
   background-repeat:no-repeat;background-position:center;background-size:cover,cover;
   background-image:linear-gradient(160deg,#2c3a4b,#131c25);
   border:1px solid #ffffff1f;
@@ -3226,7 +3233,15 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
    Deshalb waechst hier nichts mehr; der Rest sammelt sich unter der
    Kampfreihe. */
 #viewHome .arenahero{flex:0 0 auto;justify-content:flex-start}
-#viewHome .homerow3{flex:0 0 auto;margin-bottom:auto}
+/* Nutzerbefund am Nebeneinander-Vergleich (IMG_3356): „unserer muss
+   bisschen tiefer". Nachgemessen als Anteil am Band zwischen
+   Kopf-Unterkante und Nav-Oberkante — die einzige vergleichbare Zahl,
+   weil AAs Screenshot 4,4 % iOS-Statusleiste enthaelt und unsere Seite
+   nicht: AA 74,5 %, wir 73,2 %.
+   Der ganze freie Platz sammelte sich UNTER der Reihe. Ein Teil davon
+   gehoert darueber. In vh statt px, damit der Anteil auf anderen
+   Geraetehoehen haelt. */
+#viewHome .homerow3{flex:0 0 auto;margin-top:2.6vh;margin-bottom:auto}
 .hubrail{flex:0 0 17%;display:flex;flex-direction:column;gap:var(--gap)}
 .hubmid{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--gap)}
 /* Die Arena-Buehne hat ihren eigenen Aussenabstand verloren: sie sitzt
