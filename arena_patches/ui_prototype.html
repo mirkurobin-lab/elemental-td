@@ -174,22 +174,84 @@ body.nur-waehrung .apphead .headcol{padding:6px 0}
    ihr Inhalt, der Rest der Leiste blieb leer. AA teilt die Leiste in
    drei GLEICHE Drittel (gemessen an IMG_3380: 32 % je Gruppe, zusammen
    96 % der Breite) und setzt das Icon links an die Kante, halb ueber
-   die Pille. Die Zahl steht danach, linksbuendig — nicht zentriert, das
-   waere bei „1 136" gegen „30 272" ein Springen. */
-.cur{flex:1 1 0;min-width:0;display:flex;align-items:center;gap:6px;
-  background:none;border:0;border-radius:0;padding:0 4px 0 0;
+   die Pille.
+   NACHGEMESSEN (430 px, body.nur-waehrung): die Leiste steht bei 414 px
+   = 96,3 % der Breite. Der Balken ist also gefuellt — der Befund ist
+   erledigt und die Pruefung in run_v7.js haelt ihn fest. */
+/* ==================================================================
+ * ⚠ BEFUND ZU IMG_3386 — zwei getrennte Ursachen, beide GEMESSEN
+ * ------------------------------------------------------------------
+ * Wortlaut: „Oben bei den Ressourcen Ressourcen Icon nicht schoen im
+ * Kreis. Ressourcen Anzahl nicht mittig im Banner muss zentriert sein."
+ *
+ * (a) Das Symbol hatte GAR KEINE Fassung. `.cur i` war ein Kasten
+ *     23x23 mit `border-radius:0`. Rund wirkte allein, was das jeweilige
+ *     Quellbild selbst mitbrachte — und die drei Icon-PNGs haben
+ *     verschieden viel Luft am Rand. Genau daher „unrund und
+ *     unterschiedlich gross": gleicher Kasten, ungleiches Motiv.
+ *     Jetzt sitzt jedes Symbol in EINEM festen runden Medaillon
+ *     (26 px, border-radius 50 %), das Motiv fuellt es zu 73 %. Damit
+ *     sind Groesse, optische Mitte und Rand bei allen drei identisch,
+ *     unabhaengig davon, wie das Bild beschnitten ist. Der oertliche
+ *     Emoji-Rueckfall erbt dieselbe Fassung.
+ *
+ * (b) Die Zahl lief nach links. `flex:1 1 auto` OHNE `text-align`
+ *     heisst: das Feld fuellt die Gruppe, der Text klebt links am
+ *     Symbol. Gemessen (Shop, 430 px, Textmitte gegen Feldmitte):
+ *       Trophaeen -28,9 px · Kristalle -18,5 px · Gold -14,5 px
+ *     Jetzt `text-align:center`. Der alte Kommentar begruendete
+ *     linksbuendig mit „sonst springt die Zahl" — das ist mit
+ *     TABELLENZIFFERN geloest und nicht laenger ein Grund. Ohne sie
+ *     unterscheiden sich „111 111" und „999 999" um 3,1 px.
+ * ================================================================== */
+/* Die Masse sind nicht frei gewaehlt, sondern der engste Fall: auf der
+   STARTSEITE bleiben neben dem Portrait nur 330 px Leiste, also 104,8 px
+   je Drittel. Davon gehen Innenabstand (2x4), Trenner (1), Medaillon (24),
+   zwei Abstaende (2x5) und der Plus-Knopf (14) ab — es bleiben 47,8 px
+   fuer die Zahl. „12 500" misst 43,7 px, „111 111" 48,5 px. Wer hier
+   Medaillon oder Abstaende vergroessert, schneidet die Zahl ab (genau das
+   war der alte Befund „1 136 wurde zu 1…"). */
+.cur{flex:1 1 0;min-width:0;display:flex;align-items:center;gap:5px;
+  background:none;border:0;border-left:1px solid transparent;border-radius:0;
+  padding:0 4px;
   font-size:14px;font-weight:800;
   white-space:nowrap;overflow:visible}
-.cur + .cur{border-left:1px solid #1d2a35;padding-left:8px}
+/* Der Trenner ist nur die FARBE eines Randes, den alle drei Gruppen
+   tragen. Vorher hatte ihn nur `.cur + .cur` — zusammen mit dem
+   ungleichen Innenabstand war die erste Gruppe dadurch 9 px schmaler
+   als die beiden anderen (98,8 / 107,8 / 107,8 px). Jetzt teilt sich
+   die Leiste in exakte Drittel. */
+.cur + .cur{border-left-color:#1d2a35}
 /* Die Zahl nimmt den Rest der Gruppe ein — dadurch ist die Leiste
-   tatsaechlich gefuellt und der Plus-Knopf sitzt immer rechts aussen. */
+   tatsaechlich gefuellt und der Plus-Knopf sitzt immer rechts aussen.
+   ZENTRIERT im Feld (Befund IMG_3386, siehe oben). */
 .cur span:not(.plus){flex:1 1 auto;min-width:0;overflow:hidden;
-  text-overflow:ellipsis}
-.cur i{font-style:normal;font-size:17px;display:flex;align-items:center;
-  flex:0 0 auto}
-.cur .ico{width:23px;height:23px}
-/* Die Zahl bekommt Luft nach rechts, damit der Plus-Knopf nicht klebt. */
-.cur span:not(.plus){letter-spacing:.01em}
+  text-overflow:ellipsis;text-align:center;letter-spacing:.01em;
+  font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+/* Trophaeen haben kein „+" (AA, IMG_3380). Ohne Ausgleich saesse ihre
+   Zahl um Knopf + Abstand weiter rechts als die der beiden anderen —
+   drei Zahlen, drei verschiedene Mitten.
+   Der Ausgleich ist ein leeres Flex-Kind, KEIN padding-right: die drei
+   Gruppen laufen auf `flex-basis:0`, da schlaegt Innenabstand voll auf
+   die Aussenbreite durch (mit padding gemessen: 146,7 gegen 125,7 px).
+   Ein Pseudo-Element liegt dagegen im Inhalt und laesst die Drittel
+   gleich. */
+.cur.c-trophy::after{content:"";flex:0 0 14px;height:14px}
+/* Rundes Medaillon (Befund IMG_3386a). Licht kommt von oben: das Symbol
+   liegt in einer Senke, deshalb --mat-sunken und ein Verlauf, der oben
+   dunkler anfaengt. Feste Groesse statt `flex:0 0 auto` — nur so sind
+   Kasten, optische Mitte und Rand bei allen drei dieselben, egal wie
+   das jeweilige Quellbild beschnitten ist. */
+.cur i{font-style:normal;flex:0 0 24px;width:24px;height:24px;
+  border-radius:50%;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;line-height:1;
+  background:radial-gradient(circle at 50% 34%,#233442 0%,#0c141c 78%);
+  box-shadow:var(--mat-sunken)}
+/* 18 von 24 px = 75 %. Darueber stoesst das Motiv an die Rundung,
+   darunter schwimmt es in der Fassung. */
+.cur .ico{width:18px;height:18px}
+.cur span.ico{font-size:14px;line-height:18px}
 /* Waehrungs-Pillen tragen die Identitaetsfarbe ihrer Waehrung: die Zahl
    und der Rand, nicht die ganze Flaeche — sonst kippt die Lesbarkeit. */
 /* Die Randfarbe ist mit den Pillen entfallen; die Identitaet traegt jetzt
@@ -203,9 +265,12 @@ body.nur-waehrung .apphead .headcol{padding:6px 0}
 /* Plus-Knopf traegt jetzt ic_plus; das "+" bleibt als Fallback-Text. */
 .cur .plus{display:flex;align-items:center;justify-content:center;overflow:hidden}
 .cur .plus img.plusimg{width:100%;height:100%;object-fit:contain}
-.cur span:not(.plus){overflow:hidden;text-overflow:ellipsis}
-.cur .plus{margin-left:auto;background:#2b3b47;width:15px;height:15px;border-radius:50%;
-  font-size:11px;line-height:15px;text-align:center;color:#9fb3c1;flex:0 0 auto}
+/* (Die doppelte overflow/ellipsis-Regel, die hier stand, ist entfallen —
+   sie steht vollstaendig oben bei der zentrierten Zahl.) */
+/* 14 px, dieselbe Breite wie der Platzhalter bei den Trophaeen — daran
+   haengt, dass alle drei Zahlen dieselbe Mitte haben. */
+.cur .plus{margin-left:auto;background:#2b3b47;width:14px;height:14px;border-radius:50%;
+  font-size:10px;line-height:14px;text-align:center;color:#9fb3c1;flex:0 0 14px}
 
 /* ---------- Views ---------- */
 .view{display:none;flex:1 1 auto;overflow-y:auto;padding:12px 12px 88px}
@@ -1548,9 +1613,17 @@ span.ico{text-align:center}
 .shopcard .sbuy.gems{background:linear-gradient(180deg,#f5a7f7,#dc1ddb 55%,#8d1c78);color:#fff;
   box-shadow:0 2px 0 #5e1152;text-shadow:0 1px 2px #0008}
 .shopcard.sold{filter:grayscale(.7) brightness(.6)}
-.packshop{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
-.packshop .shopcard.wide{grid-column:1/-1}
-.packshop .shopcard .sart{font-size:34px}
+/* ⚠ DREI SPALTEN, NICHT ZWEI — und das ist eine Anforderung, keine
+   Vorliebe: kaufbar sind seit dem Befund zu IMG_3386 nur noch Silber,
+   Gold und Arkan, und die sollen „alle 3 nebeneinander" stehen. Bei
+   zwei Spalten waere die dritte Karte in eine eigene Reihe gerutscht
+   und haette dort ein halbes Raster leer stehen lassen — genau das
+   Loch, das im Gold- und im Gem-Block schon einmal beanstandet wurde.
+   Bronze ist aus dem Raster raus; es lebt als Gratis-Tagespack im
+   `.tagesband` unter dem Raster weiter (eigener Container
+   #packFreeBox, damit es NICHT als vierte Rasterzelle zaehlt). */
+.packshop{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap)}
+.packshop .shopcard .sart{font-size:30px}
 /* ⚠ DIE PREISKNOEPFE MUESSEN AUF EINER LINIE SITZEN, EGAL WIE LANG DER
    TEXT IST. Befund vom Telefon: der Arkan-Knopf stand hoeher als der
    Gold-Knopf. Ursache gemessen — die Beschreibung ist bei „Gold-Pack"
@@ -1563,19 +1636,25 @@ span.ico{text-align:center}
      `min-height:2.6em` reserviert zwei Zeilen — das richtet die Kacheln
        auch ZWISCHEN den Reihen auf dieselbe Hoehe aus. Ohne das waere
        Reihe 2 elf Pixel flacher als Reihe 1.
-   Die volle Breite unten (Tages-Bronze-Pack) ist davon ausgenommen: sie
-   steht allein in ihrer Reihe, dort gibt es nichts auszurichten. */
+   Seit das Gratis-Pack ein `.tagesband` unter dem Raster ist, gilt die
+   Regel fuer ALLE drei Rasterkacheln ohne Ausnahme. */
 .packshop .promise{font-size:8.5px;color:#a9bccb;line-height:1.3;
   display:flex;align-items:flex-start;justify-content:center;text-align:center;
-  flex:1 0 auto}
-.packshop .shopcard:not(.wide) .promise{min-height:2.6em}
+  flex:1 0 auto;min-height:2.6em}
+/* Das GRATIS-Zeichen. Auf dem Band sitzt es INNEN (das Band hat
+   `overflow:hidden`, aussen haengende Ecken waeren abgeschnitten),
+   auf einer Kachel weiterhin an der Aussenecke. Helle Flaeche ⇒
+   dunkle Schrift, wie bei allen Siegeln. */
 .freebadge{position:absolute;right:-4px;top:-6px;background:var(--up);color:#06280a;
-  font-size:8.5px;font-weight:900;border-radius:8px;padding:1px 5px}
+  font-size:8.5px;font-weight:900;border-radius:8px;padding:1px 5px;z-index:4}
+.tagesband .freebadge{right:8px;top:8px;
+  box-shadow:var(--lit),var(--sh-2);letter-spacing:.06em;padding:2px 7px}
 /* ==================================================================
  * SHOP — AA-SEKTIONSREIHENFOLGE (§8.1)
  * ------------------------------------------------------------------
  * 1 Promo-Banner · 2 Arena-/Starter-Pack · 3 Tagesangebote · 4 Packs ·
- * 5 Kristalltresor (AAs Roulette-Platz) · 6 Gem-Pakete · 7 Gold-Tausch
+ * 5 Vorrats-Truhe (AAs Arcane Supplies Chest, §8.2) ·
+ * 6 Kristalltresor (AAs Roulette-Platz) · 7 Gem-Pakete · 8 Gold-Tausch
  * Alle Hoehen/Radien/Abstaende aus der Metrik (§19.2) — die Sektionen
  * unterscheiden sich in der FARBE und im Inhalt, nie in der Geometrie.
  * ================================================================== */
@@ -2581,37 +2660,210 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
  * golden bzw. magenta — dort ausnahmslos dunkle bzw. weisse
  * Fuellfarbe, nie .goldtext.
  * ================================================================== */
+/* ==================================================================
+ * TAGESBAND — EINE Bauform fuer alle breiten Shop-Banner
+ * ------------------------------------------------------------------
+ * Der Auftraggeber zum Gratis-Gold: „In der Groesse des Banners wie
+ * den Kristalltresor. Kommt schoener." Das ist woertlich genommen die
+ * Ansage, dass es hier nur EINE Bauform geben darf. Drei Stellen
+ * benutzen sie:
+ *     Kristalltresor  ·  Gratis-Tagespack (Bronze)  ·  Gratis-Gold
+ * Aufbau immer gleich, von links nach rechts:
+ *     .bandart   quadratischer Bildkasten (EINGESENKT — er ist ein
+ *                Behaelter, Licht kommt von oben)
+ *     .bandtx    Name, grosse Zahl, Unterzeile
+ *     .bandbtn   der Knopf, rechts, erhaben
+ *
+ * ⚠ `position:relative` UND `overflow:hidden` stehen auf BEIDEN
+ * Behaeltern (Band und Bildkasten). Der Grund ist in diesem Projekt
+ * teuer bezahlt: ein Artwork ohne beides sprengt das Layout und hat
+ * schon einmal einen Knopf verdeckt. Das Band traegt zusaetzlich
+ * Kulissen-Artwork ueber bgArt() — ohne `overflow:hidden` liefe das
+ * ueber die gerundete Ecke hinaus.
+ *
+ * MASS: `min-height:var(--banner-h)` — dieselbe Reihenhoehe wie
+ * Pass-Banner, Quests, Post und Events (§19.2). Der Bildkasten ist
+ * 64 px, damit er innerhalb der 72 px Reihe mit 11 px Polster
+ * aufgeht und das Motiv bei dieser Groesse noch liest (>= 20 px ist
+ * die Untergrenze, hier also mit Reserve).
+ * ================================================================== */
+.tagesband,.vaultbox{position:relative;display:flex;align-items:center;
+  gap:11px;padding:11px;min-height:var(--banner-h);
+  border-radius:var(--radius);overflow:hidden;
+  box-shadow:var(--mat-raised-lg)}
+.tagesband{border:1px solid var(--line);
+  background:linear-gradient(150deg,#243342,#141d26 60%,#0e1418)}
+/* Der Bildkasten. Eingesenkt wie der Produktbild-Kasten der
+   Produktkachel — beides sind Behaelter fuer ein Bild, also dieselbe
+   Materialsprache. */
+.bandart{position:relative;overflow:hidden;flex:0 0 64px;width:64px;height:64px;
+  display:flex;align-items:center;justify-content:center;font-size:30px;
+  border-radius:12px;border:1px solid #2b3b47;
+  background:linear-gradient(180deg,#16202a,#0a1017);
+  box-shadow:var(--mat-well)}
+.bandart img.ico,.bandart span.ico{width:100%;height:100%;object-fit:contain;
+  filter:var(--frei) drop-shadow(0 3px 6px #000c)}
+.bandart span.ico{display:flex;align-items:center;justify-content:center;line-height:1}
+/* ⚠ `display:block` ist hier PFLICHT, nicht Kosmetik. Name, Menge und
+   Unterzeile sind <span> (ein <div> im Flex-Item waere formal auch
+   moeglich, aber die Bausteine des Projekts setzen durchgehend Spans).
+   Ohne die Umschaltung laufen alle drei in EINE Zeile — gemessen stand
+   „Bronze-Pack · TagespackEnthaelt mindestens eine Gute Karte" als ein
+   Wurm im Band. Dieselbe Falle wie bei `.pcbody` und `.itx`. */
+.bandtx{flex:1;min-width:0}
+.bandtx .bnm,.bandtx .bamt,.bandtx .bsub{display:block}
+.bandtx .bnm{font-size:13px;font-weight:900;color:#e8eef3;line-height:1.2}
+.bandtx .bamt{font-size:19px;font-weight:900;line-height:1.15;margin-top:1px;
+  color:var(--gold);text-shadow:0 2px 4px #000}
+.bandtx .bsub{font-size:9.5px;color:var(--dim);margin-top:3px;line-height:1.4}
+.bandbtn,.vaultbtn{flex:0 0 auto;border-radius:var(--radius-sm);padding:10px 12px;
+  font-size:12px;font-weight:900;text-align:center;line-height:1.2;
+  background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);
+  box-shadow:var(--lit),var(--sh-2),0 3px 0 #6d551a;
+  -webkit-text-fill-color:#3a2b07;color:#3a2b07;
+  transition:transform var(--t-fast) var(--ease-out)}
+.bandbtn small,.vaultbtn small{display:block;font-size:8.5px;font-weight:800;
+  opacity:.75;margin-top:1px;-webkit-text-fill-color:#3a2b07}
+/* GRATIS-Knopf: gruen wie .pcbuy.freeprice, damit „umsonst" ueberall
+   dieselbe Farbe hat. Helle Flaeche ⇒ dunkle Schrift. */
+.bandbtn.frei{background:linear-gradient(180deg,#58fa1b,#3aad16);
+  box-shadow:var(--lit),var(--sh-2),0 3px 0 #1f6b09;
+  -webkit-text-fill-color:#0a2404;color:#0a2404}
+.bandbtn.frei small{-webkit-text-fill-color:#0a2404}
+.bandbtn[disabled],.bandbtn.dim,.vaultbtn.dim{
+  background:linear-gradient(180deg,#3a4a58,#222e39);
+  box-shadow:var(--unlit),0 3px 0 #16202a;
+  -webkit-text-fill-color:#8fa0ad;color:#8fa0ad}
+.bandbtn[disabled] small,.bandbtn.dim small{-webkit-text-fill-color:#8fa0ad}
+
 /* ---------- Kristalltresor ---------- */
-.vaultbox{position:relative;display:flex;align-items:center;gap:11px;padding:11px;
-  border-radius:15px;border:1px solid #a45ef23d;overflow:hidden;
+/* Baut auf dem Tagesband auf und ergaenzt nur, was der Tresor eigenes
+   hat: die Fuellstands-Saeule, den Fortschrittsbalken und den
+   „voll"-Zustand. */
+.vaultbox{border:1px solid #a45ef23d;
   background:linear-gradient(150deg,#2a1c4a,#161028 60%,#0e1418)}
-.vaultbox.full{border-color:#f2c53d;box-shadow:var(--mat-raised),0 0 0 1px #f2c53d55,0 0 22px #f2c53d3d;
-  animation:vaultglow 2s ease-in-out infinite}
-@keyframes vaultglow{50%{box-shadow:0 0 0 1px #f2c53d99,0 0 34px #f2c53d66}}
-.vaultjar{position:relative;flex:0 0 58px;width:58px;height:70px;display:flex;
-  align-items:flex-end;justify-content:center;overflow:hidden;
-  clip-path:polygon(22% 0,78% 0,100% 26%,100% 88%,80% 100%,20% 100%,0 88%,0 26%);
-  background:linear-gradient(180deg,#1b2436,#0b1116);border:0}
-.vaultjar .fill{position:absolute;left:0;right:0;bottom:0;
+.vaultbox.full{border-color:#f2c53d;
+  box-shadow:var(--mat-raised-lg),0 0 0 1px #f2c53d55,0 0 22px #f2c53d3d;
+  animation:vaultglow 2s var(--ease-in-out) infinite}
+@keyframes vaultglow{50%{box-shadow:var(--mat-raised-lg),0 0 0 1px #f2c53d99,0 0 34px #f2c53d66}}
+/* ⚠ DER TRESOR-KRUG WAR DER EIGENTLICHE SCHOENHEITSFEHLER.
+   Vorher: 58x70 px, mit `clip-path` zu einem Achteck geschnitten, und
+   darauf das Artwork `offer_vault_bank` als background-image. Ein
+   clip-path schneidet aber AUCH das Artwork — von einem 1:1-Motiv
+   blieben oben und unten Ecken weg, und weil der Kasten 58x70 war,
+   wurde das Quadrat zusaetzlich hochkant gequetscht. Genau das meinte
+   „muss aber schoener aussehen, braucht ein sauberes Bild".
+   Jetzt: derselbe quadratische, eingesenkte Bildkasten wie ueberall
+   (.bandart), das Artwork ungeschnitten und mittig darin, die
+   Fuellstands-Saeule als Ebene DAHINTER (z 0) — sie zeigt weiterhin
+   den Stand, auch wenn das CDN ausfaellt. */
+.vaultjar{position:relative;overflow:hidden;flex:0 0 64px;width:64px;height:64px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:12px;border:1px solid #43307a;
+  background:linear-gradient(180deg,#16202a,#0a1017);
+  box-shadow:var(--mat-well);
+  background-repeat:no-repeat;background-position:center;background-size:contain}
+.vaultjar .fill{position:absolute;left:0;right:0;bottom:0;z-index:0;
   background:linear-gradient(180deg,#7fd8ff,#3fa9e8 45%,#1c6ea8);
-  box-shadow:0 0 16px #63b1eeaa;transition:height .4s ease}
-.vaultjar .gem{position:relative;z-index:2;font-size:23px;margin-bottom:16px;
-  filter:drop-shadow(0 2px 4px #000a)}
-.vaultbox.full .vaultjar .fill{background:linear-gradient(180deg,#fff7d6,#f2c53d 45%,#a8842a);
-  box-shadow:var(--mat-raised),0 0 22px #f2c53dcc}
+  opacity:.5;transition:height var(--t-slow) var(--ease-out)}
+.vaultjar .gem{position:relative;z-index:2;font-size:26px;
+  filter:drop-shadow(0 2px 5px #000c)}
+.vaultbox.full .vaultjar .fill{background:linear-gradient(180deg,#fff7d6,#f2c53d 45%,#a8842a)}
 .vaultmeta{flex:1;min-width:0}
-.vaultmeta .vnm{font-size:13px;font-weight:900;color:#e8eef3}
-.vaultmeta .vnum{font-size:19px;font-weight:900;color:#7fd8ff;line-height:1.15;margin-top:1px}
+.vaultmeta .vnm{font-size:13px;font-weight:900;color:#e8eef3;line-height:1.2}
+.vaultmeta .vnum{font-size:19px;font-weight:900;color:#7fd8ff;line-height:1.15;margin-top:1px;
+  text-shadow:0 2px 4px #000}
 .vaultbox.full .vaultmeta .vnum{color:var(--gold)}
 .vaultmeta .vsub{font-size:9.5px;color:var(--dim);margin-top:3px;line-height:1.4}
-.vaultbtn{flex:0 0 auto;border-radius:11px;padding:10px 12px;font-size:12px;font-weight:900;
-  text-align:center;line-height:1.2;
-  background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);box-shadow:0 3px 0 #6d551a;
-  -webkit-text-fill-color:#3a2b07;color:#3a2b07}
-.vaultbtn small{display:block;font-size:8.5px;font-weight:800;opacity:.75;margin-top:1px;
-  -webkit-text-fill-color:#3a2b07}
-.vaultbtn.dim{background:linear-gradient(180deg,#3a4a58,#222e39);box-shadow:0 3px 0 #16202a;
-  -webkit-text-fill-color:#8fa0ad;color:#8fa0ad}
+/* Der Fuellstand noch einmal als Balken — die Saeule im Bildkasten ist
+   klein und liegt hinter dem Motiv; der Balken sagt auf einen Blick,
+   wie weit es noch ist. Eingesenkte Rinne, erhabene Fuellung. */
+.vaultmeta .vbar{position:relative;height:6px;border-radius:4px;margin-top:5px;
+  overflow:hidden;background:#0b1116;box-shadow:var(--mat-sunken)}
+.vaultmeta .vbar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;
+  background:linear-gradient(180deg,#a9e8ff,#3fa9e8 55%,#1c6ea8);
+  box-shadow:var(--lit);transition:width var(--t-slow) var(--ease-out)}
+.vaultbox.full .vaultmeta .vbar i{
+  background:linear-gradient(180deg,#fff7d6,#f2c53d 55%,#a8842a)}
+
+/* ==================================================================
+ * VORRATS-TRUHE — AAs „Arcane Supplies Chest" (§8.2)
+ * ------------------------------------------------------------------
+ * AAs Aufbau, an Video 6 (t=10-18) abgelesen:
+ *       ARCANE SUPPLIES CHEST
+ *       „Get Good, Rare, Epic, or Legendary cards"
+ *       „Get [Legendary] in <N> opens"        ← Mitleidszeile
+ *       [ OPEN x1 ] 300 Gems  [ OPEN x10 ] 2680 Gems
+ * Wir uebernehmen genau diese vier Zeilen und haengen EINE Klappe
+ * darunter: „Chancen".
+ *
+ * ⚠ WARUM DIE KLAPPE KEIN WIDERSPRUCH ZU §8.3 IST. AA blendet
+ * NIRGENDS Prozente ein — es kommuniziert ueber Raritaetsspanne und
+ * offenen Mitleidszaehler. Genau das steht bei uns auch im
+ * SICHTBAREN Teil. Die Prozente liegen HINTER einer Klappe, sind also
+ * eine Auskunft auf Nachfrage, keine Verkaufsflaeche. Damit bleibt
+ * AAs Lesart oben und der Spieler, der es genau wissen will, bekommt
+ * die Zahl statt eines Gefuehls.
+ *
+ * Die Kulisse ist `pack_vorrat` (21:9, Kulissen-Rolle §6b): sie liegt
+ * per bgArt() als FLAECHE unter dem Inhalt, mit Abdunkelungsband —
+ * niemals als class="ico", der Freistell-Filter wuerde sie aufloesen.
+ * Deshalb braucht der Behaelter `position:relative` + `overflow:hidden`.
+ * ================================================================== */
+.vorratbox{position:relative;overflow:hidden;border-radius:var(--radius);
+  border:1px solid #a45ef24d;padding:var(--pad);
+  background:linear-gradient(150deg,#3a2a5e,#1a1230 58%,#0e1418);
+  box-shadow:var(--mat-raised-lg)}
+.vorrathead{display:flex;align-items:center;gap:11px}
+.vorratbox .bandart{flex:0 0 72px;width:72px;height:72px;border-color:#43307a}
+/* Auch hier: Spans im Flex-Item MUESSEN Bloecke sein, sonst kleben
+   Name und Versprechen aneinander (siehe `.bandtx`). */
+.vorratbox .vrnm,.vorratbox .vrpr{display:block}
+.vorratbox .vrnm{font-size:14px;font-weight:900;color:#f0e6ff;line-height:1.2}
+.vorratbox .vrpr{font-size:9.5px;color:#c6b4ee;margin-top:3px;line-height:1.4}
+/* Mitleidszeile. Eingesenkte Rinne — sie ist eine Anzeige, kein Knopf.
+   Die Zahl kommt aus ArenaCards.getPityStatus(), nie aus dem Markup. */
+.vorratpity{display:flex;align-items:center;gap:7px;margin-top:9px;padding:7px 9px;
+  border-radius:var(--radius-sm);background:#0b1116a6;
+  box-shadow:var(--mat-sunken);font-size:10px;font-weight:800;color:#dbe6ef;
+  line-height:1.35}
+.vorratpity .ico{width:14px;height:14px;flex:0 0 auto}
+.vorratpity b{color:#c8a4ff}
+.vorratpity .leg{color:var(--gold)}
+/* Zwei Oeffnen-Knoepfe nebeneinander, gleich hoch. Der x10 ist der
+   Held der Reihe (er traegt den Mengenrabatt) und darf breiter sein. */
+.vorratbtns{display:grid;grid-template-columns:1fr 1.25fr;gap:var(--gap);margin-top:9px}
+.vrbtn{position:relative;border-radius:var(--radius-sm);padding:10px 6px;
+  font-size:12.5px;font-weight:900;line-height:1.2;text-align:center;
+  background:linear-gradient(180deg,#c8a4ff,#8d4ae0 55%,#4a217a);
+  box-shadow:var(--lit),var(--sh-2),0 3px 0 #33165a;color:#fff;
+  text-shadow:0 1px 2px #0009}
+.vrbtn small{display:block;font-size:9px;font-weight:800;opacity:.9;margin-top:2px}
+.vrbtn .vrsave{position:absolute;right:-3px;top:-7px;background:var(--up);
+  color:#06280a;-webkit-text-fill-color:#06280a;font-size:8.5px;font-weight:900;
+  border-radius:8px;padding:1px 5px;text-shadow:none;
+  box-shadow:var(--lit),var(--sh-2)}
+.vrbtn[disabled]{background:linear-gradient(180deg,#3a4a58,#222e39);
+  box-shadow:var(--unlit),0 3px 0 #16202a;color:#8fa0ad;text-shadow:none}
+/* Die Chancen-Klappe. Zu = nur der Griff, offen = Tabelle. */
+.vorratmore{width:100%;display:flex;align-items:center;justify-content:center;gap:6px;
+  margin-top:9px;padding:7px 0;font-size:10.5px;font-weight:800;color:#c6b4ee}
+.vorratmore .ch{font-size:9px;transition:transform var(--t-mid) var(--ease-out)}
+.vorratbox.open .vorratmore .ch{transform:rotate(180deg)}
+.vorratodds{display:none;margin-top:5px;padding:9px 10px;border-radius:var(--radius-sm);
+  background:#0b1116cc;box-shadow:var(--mat-sunken)}
+.vorratbox.open .vorratodds{display:block}
+.vorratodds .orow{display:flex;align-items:center;gap:8px;padding:3px 0;
+  font-size:10.5px;font-weight:800;color:#dbe6ef}
+.vorratodds .odot{flex:0 0 8px;width:8px;height:8px;border-radius:50%;
+  box-shadow:var(--lit),var(--sh-1)}
+.vorratodds .onm{flex:1;min-width:0}
+.vorratodds .oval{font-variant-numeric:tabular-nums;color:#fff}
+.vorratodds .obar{height:5px;border-radius:3px;margin-top:6px;overflow:hidden;
+  background:#05090c;box-shadow:var(--mat-sunken);display:flex}
+.vorratodds .obar i{height:100%}
+.vorratodds .onote{font-size:9px;color:var(--dim);line-height:1.5;margin-top:8px;
+  border-top:1px solid #ffffff14;padding-top:7px}
 
 /* ---------- Angebote ---------- */
 .offercard{position:relative;display:flex;align-items:center;gap:10px;margin-top:9px;
@@ -4792,14 +5044,21 @@ button.pfplate{cursor:pointer}
   <!-- ===== VIEW S: SHOP — AA-SEKTIONSREIHENFOLGE (§8.1) =====
        AAs Store laeuft von oben nach unten:
          1 Werbe-Entfernen-Banner · 2 ARENA PACK / Starter Pack ·
-         3 DAILY DEALS · 4 Truhen/Packs · 5 ENDLESS ROULETTE ·
-         6 Gem-Bundles · 7 Gold-Bundles
+         3 DAILY DEALS · 4 Truhen/Packs (darin die ARCANE SUPPLIES
+         CHEST, §8.2) · 5 ENDLESS ROULETTE · 6 Gem-Bundles ·
+         7 Gold-Bundles
        Wir uebernehmen die REIHENFOLGE 1:1 und ersetzen nur dort, wo wir
        ein anderes System haben:
          Platz 1 — wir haben KEINE Werbung (§19.1), der Platz traegt
                    deshalb den Season-Pass als staerkstes Dauerangebot,
                    darunter die personalisierte Angebotskette.
-         Platz 5 — statt Glücksrad der KRISTALLTRESOR (arena_vault.js):
+         Platz 4 — AAs Truhenblock ist bei uns AUFGETEILT: die
+                   Booster-Packs (Platz 4) und die Vorrats-Truhe
+                   (Platz 5) bekommen je ein eigenes Band, weil die
+                   Truhe eine ganz andere Bedienung hat (x1/x10,
+                   Mitleidszeile, Chancen-Klappe) als eine Pack-Kachel.
+                   Aus AAs sieben Sektionen werden dadurch ACHT.
+         Platz 6 — statt Glücksrad der KRISTALLTRESOR (arena_vault.js):
                    dieselbe Rolle (Sammel-Zufallsbelohnung), aber ohne
                    Glücksspiel-Optik.
        Alle Abstaende/Radien/Hoehen aus der Metrik (§19.2). -->
@@ -4832,35 +5091,52 @@ button.pfplate{cursor:pointer}
     <div class="apkdots" id="apkDots"></div>
     <div class="iapgrid" id="arenaPackBox"></div>
 
-    <!-- (3) Tagesangebote -->
+    <!-- (3) Tagesangebote — deterministisch aus dem Tagesdatum gezogen,
+             siehe zieheTagesangebote(). Der Timer laeuft echt gegen die
+             naechste UTC-Tagesgrenze, er ist kein Text mehr. -->
     <div class="secribbon" data-sec="3" data-ribbon="ribbon_section_lg">
       <span class="srt">Tagesangebote</span>
-      <span class="srx" id="dealTimer">Neu in 6h 58m</span></div>
+      <span class="srx" id="dealTimer">—</span></div>
     <div class="prodgrid" id="dealGrid"></div>
 
-    <!-- (4) Booster-Packs -->
+    <!-- (4) Booster-Packs — kaufbar sind NUR Silber, Gold, Arkan; alle
+             drei nebeneinander in EINER Reihe. Bronze ist aus dem
+             kaufbaren Angebot raus und lebt als Gratis-Tagespack im
+             Band darunter weiter. -->
     <div class="secribbon" data-sec="4" data-ribbon="ribbon_section_lg">
       <span class="srt">Booster-Packs</span>
       <span class="srx" id="packPity">…</span></div>
     <div class="packshop" id="packShop"></div>
+    <div id="packFreeBox"></div>
 
-    <!-- (5) Kristalltresor — AAs Roulette-Platz -->
+    <!-- (5) Vorrats-Truhe — AAs „Arcane Supplies Chest" (§8.2).
+             Sie sitzt bei AA MIT den Truhen, also direkt hinter den
+             Packs, nicht am Ende des Shops. -->
     <div class="secribbon" data-sec="5" data-ribbon="ribbon_section_lg">
+      <span class="srt">Vorrats-Truhe</span>
+      <span class="srx" id="vorratPity">—</span></div>
+    <div class="vorratbox" id="vorratShop"></div>
+
+    <!-- (6) Kristalltresor — AAs Roulette-Platz -->
+    <div class="secribbon" data-sec="6" data-ribbon="ribbon_section_lg">
       <span class="srt">Kristalltresor</span>
       <span class="srx" id="vaultTier">—</span></div>
     <div class="vaultbox" id="vaultShop"></div>
 
-    <!-- (6) Gem-Pakete — ORANGE Rahmen (AA-Farbcode fuer Gems) -->
-    <div class="secribbon" data-sec="6" data-ribbon="ribbon_section_lg">
+    <!-- (7) Gem-Pakete — ORANGE Rahmen (AA-Farbcode fuer Gems) -->
+    <div class="secribbon" data-sec="7" data-ribbon="ribbon_section_lg">
       <span class="srt">Gem-Pakete</span>
       <span class="srx">Echtgeld · Platzhalter</span></div>
     <div class="prodgrid" id="gemShop"></div>
 
-    <!-- (7) Gold-Tausch — GRUENE Rahmen (AA-Farbcode fuer Gold) -->
-    <div class="secribbon" data-sec="7" data-ribbon="ribbon_section_lg">
+    <!-- (8) Gold-Tausch — GRUENE Rahmen (AA-Farbcode fuer Gold).
+             Drei kaufbare Staffeln im Raster, das Tagesgold als BAND
+             darunter (Bauform des Kristalltresors). -->
+    <div class="secribbon" data-sec="8" data-ribbon="ribbon_section_lg">
       <span class="srt">Gold-Tausch</span>
       <span class="srx">Gems → Gold</span></div>
     <div class="prodgrid" id="goldShop"></div>
+    <div id="goldFreeBox"></div>
 
     <p class="iapnote" id="iapNote">—</p>
     <p class="fortnote" id="shopNote">—</p>
@@ -5953,8 +6229,13 @@ button.pfplate{cursor:pointer}
     shop_mat_speed:        CDN + "hf_20260726_042658_0e1c3c87-a56b-4948-a419-b8ca861c0493.png",
     shop_mat_special:      CDN + "hf_20260726_042705_1892cf67-384b-41fe-8b0f-6ae8ec989f87.png",
     offer_arena_pack:      CDN + "hf_20260726_042708_f26a5521-f28b-489d-b62f-01543a8facc6.png",
-    offer_starter:         CDN + "hf_20260726_042710_a70613fb-df46-48af-95a8-1d71ddae335e.png",
-    offer_vault_bank:      CDN + "hf_20260726_042712_609d781f-a276-4767-a257-dea71279049b.png",
+    /* Beide ersetzt (Batch 12). Der Starter hatte kein brauchbares
+       Produktbild — „das startet pack hat kein Bild bzw Icon sieht
+       schlecht aus". Beim Tresor ist das Glasgefaess ABSICHTLICH leer und
+       durchsichtig: die Fuellstandssaeule ist CSS und muss darunter
+       durchscheinen, ein gefuelltes Glas im Bild wuerde sie verdecken. */
+    offer_starter:         CDN + "hf_20260727_115056_0dfab782-685e-4def-afa3-30913a3ab88a.png",
+    offer_vault_bank:      CDN + "hf_20260727_115444_f75634d9-6a96-4088-ac82-dedbc931f73c.png",
     frame_card_orange:     CDN + "hf_20260726_042716_5bf79216-8800-472c-ab73-d9f93ea05991.png",
     frame_card_green:      CDN + "hf_20260726_042717_86ae6639-d698-4dfe-b5d0-6d042162c301.png",
     frame_card_light:      CDN + "hf_20260726_042727_98b627aa-e2fa-4869-a7db-4ddc1dff974a.png",
@@ -6099,10 +6380,30 @@ button.pfplate{cursor:pointer}
        1,00-1,04:1 gegen Weiss — die Mittelwerte (11-16:1) sehen harmlos
        aus und sind es nicht (§6c). Das Band in .apkcard::before hebt es
        auf 6,39:1; Messreihe in patches/packarts.md §1a. */
+    /* NACHTRAG: der Absatz darueber beschreibt den alten Zustand — drei
+       Sammelkulissen fuer acht Arenen. Er stimmte nie ganz: Batch 11 hat
+       ACHT Keyarts erzeugt, eins je Arena, aber nur drei davon wurden
+       eingetragen. Die restlichen fuenf lagen unbenutzt herum, waehrend
+       auf acht Karten dasselbe Bild in drei Toenungen stand. Jetzt haengt
+       jede Arena an ihrem eigenen Motiv; die drei Sammelschluessel
+       bleiben als Rueckfall stehen. */
+    packart_arena1:    CDN + "hf_20260727_093809_e5b4985d-37c1-4d18-b990-c2fda0c2a76a.png",
+    packart_arena2:    CDN + "hf_20260727_093813_443b9439-fc28-45a9-978a-09e1f0edaa7b.png",
+    packart_arena3:    CDN + "hf_20260727_093825_c05fb801-db27-4b80-8fee-28e1a06a3522.png",
+    packart_arena4:    CDN + "hf_20260727_093829_16f201ee-fe4c-4875-a460-00da55170706.png",
+    packart_arena5:    CDN + "hf_20260727_093832_fa45c953-24f8-4e15-8c4b-4bbd16b27545.png",
+    packart_arena6:    CDN + "hf_20260727_093834_79cb77b4-1a90-4fce-9c75-facb08f2be8d.png",
+    packart_arena7:    CDN + "hf_20260727_093842_62d00b86-d029-40fe-9713-7b0660248827.png",
+    packart_arena8:    CDN + "hf_20260727_093845_133cdd59-0064-4148-bda5-4917705d9ba0.png",
     pack_arena_klein:  CDN + "hf_20260727_093825_c05fb801-db27-4b80-8fee-28e1a06a3522.png",
     pack_arena_mittel: CDN + "hf_20260727_093809_e5b4985d-37c1-4d18-b990-c2fda0c2a76a.png",
     pack_arena_gross:  CDN + "hf_20260727_093832_fa45c953-24f8-4e15-8c4b-4bbd16b27545.png",
     pack_vorrat:       CDN + "hf_20260727_093851_f11ee134-dfd3-4798-9d63-74f8d764f6a9.png",
+    /* Gratis-Bereiche: Breitbanner fuer das Gratis-Gold, Rosette fuers
+       taegliche Bronze-Pack. Beide textfrei — die Schrift kommt aus CSS,
+       sonst ist sie nicht uebersetzbar. */
+    bg_gratis_gold:    CDN + "hf_20260727_115109_14514643-f0df-4a9c-a503-cfa52a74f641.png",
+    badge_gratis:      CDN + "hf_20260727_115114_b2133911-a404-482a-b01f-026fb1716e02.png",
     /* ---- Pack-Zeremonie (Referenzvideo, §17) ---- */
     card_back:       CDN + "hf_20260725_144624_82b4b51d-f9d3-416d-8212-52e2f3c0c0a1.png",
     cinematic_legendary:
@@ -7984,28 +8285,215 @@ button.pfplate{cursor:pointer}
    * die Demo-Wallet (Gold/Gems) und ArenaCards. Der Pity-Stand steht
    * OFFEN auf den Packs — AAs Muster statt Prozent-Drop-Raten (§8.2).
    * ================================================================== */
-  var DEALS = [
-    { id:"d1", art:"shop_mat_attack",  emoji:"⚔", name:"Angriffs-Essenz ×20", cost:3000,  cur:"gold",
-      avail:3, give:function(){ AC.addMaterial(20, "attack"); } },
-    { id:"d2", art:"shop_mat_speed",   emoji:"⚡", name:"Tempo-Essenz ×20",    cost:3000,  cur:"gold",
-      avail:3, give:function(){ AC.addMaterial(20, "speed"); } },
-    { id:"d3", art:"shop_mat_special", emoji:"✨", name:"Spezial-Essenz ×15",  cost:4200,  cur:"gold",
-      avail:2, give:function(){ AC.addMaterial(15, "special"); } },
-    { id:"d4", art:"card_back", emoji:"🃏", name:"3 gewöhnliche Karten", cost:5400, cur:"gold",
-      avail:2, give:function(){ for (var i=0;i<3;i++) AC.addDrop(TOWER_IDS[(Math.random()*TOWER_IDS.length)|0], "common", 1); } },
-    { id:"d5", art:"card_back",    emoji:"🂡", name:"1 gute Karte",        cost:9000,  cur:"gold",
-      avail:1, give:function(){ AC.addDrop(TOWER_IDS[(Math.random()*TOWER_IDS.length)|0], "good", 1); } },
-    { id:"d6", art:"shop_gem_t1", emoji:"💚", name:"Gem-Bündel ×25",      cost:0,     cur:"free",
-      avail:1, give:function(){ setGems(gems() + 25); } },
+  /* ==================================================================
+   * TAGESANGEBOTE — deterministisch aus dem Tagesdatum gezogen
+   * ------------------------------------------------------------------
+   * Befund zu IMG_3386, woertlich: „Angriffs Essenz Tempo Essenz usw
+   * weis ich nichtmal was das ist vermutlich Platzhalter mach das
+   * System der tagesangebote fertig fuege tower gems gold usw ein."
+   * Er hatte recht: die alte Liste war eine feste Reihe aus drei
+   * Essenz-Sorten und zwei Kartenposten — jeden Tag dieselbe. Ein
+   * Tagesangebot, das sich nie aendert, ist kein Tagesangebot.
+   *
+   * WAS SICH AENDERT UND WAS NICHT
+   * Gezogen wird WELCHE Ware erscheint und in welcher Waehrung sie
+   * bezahlt wird. Preis und Stueckzahl je Ware stehen fest — AA
+   * skaliert sie mit dem Fortschritt (§8.4), nicht mit dem Zufall.
+   * Ein Preis, der taeglich wuerfelt, macht jeden Kauf zur Wette.
+   *
+   * DIE ZIEHUNG IST REPRODUZIERBAR. Grundlage ist derselbe FNV-1a mit
+   * murmur3-Finalisierung wie in arena_daily.js / arena_clan.js /
+   * arena_friends.js, gespeist mit dem UTC-Tagesindex. Damit gilt:
+   *   · innerhalb eines Tages springt nichts, egal wie oft gerendert
+   *     wird (kein Math.random in der Ziehung);
+   *   · dieselbe Ziehung auf jedem Geraet, ohne Server;
+   *   · um 00:00 UTC wechselt der ganze Block auf einmal — dieselbe
+   *     Tagesgrenze wie Quests, Clan und Login (§3.4).
+   *
+   * WAEHRUNGSREGEL, und die ist keine Geschmacksfrage:
+   *   Turm/Karte  → Gold ODER Gems
+   *   Material    → Gold ODER Gems
+   *   Gold        → NUR Gems (der Tageskurs des Gold-Tauschs)
+   *   Gems        → NIE kaeuflich, weder fuer Gold noch fuer Material.
+   * Waeren Gems fuer Gold zu haben, liesse sich der Gold-Tausch
+   * rueckwaerts befahren (Gems → Gold → Gems) und die Premium-Waehrung
+   * waere aus Spielwaehrung herstellbar. Gems erscheinen hier deshalb
+   * ausschliesslich als der EINE Gratis-Posten des Tages.
+   * ================================================================== */
+  /* FNV-1a mit murmur3-Finalisierung. Zeichengleich mit arena_daily.js
+     §hash() — die Finalisierung ist KEINE Kosmetik: reines FNV-1a mischt
+     die zuletzt eingespeisten Bytes kaum, und genau die (der Tagesindex)
+     variieren hier. Ohne sie waeren aufeinanderfolgende Tage korreliert
+     und die Angebote rotierten nicht wirklich. */
+  function shopHash() {
+    var s = Array.prototype.join.call(arguments, "|");
+    var h = 2166136261 >>> 0;
+    for (var i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619) >>> 0;
+    }
+    h ^= h >>> 16; h = Math.imul(h, 2246822507) >>> 0;
+    h ^= h >>> 13; h = Math.imul(h, 3266489909) >>> 0;
+    h ^= h >>> 16;
+    return h >>> 0;
+  }
+  var TAG_MS = 86400000;
+  // Tagesgrenze 00:00 UTC — dieselbe wie arena_daily.js/arena_clan.js.
+  function shopTagBeginn(ts) {
+    var d = new Date(ts);
+    return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  }
+  function shopTagIndex(ts) { return Math.floor(shopTagBeginn(ts) / TAG_MS); }
+  function shopTagRest(ts) { return shopTagBeginn(ts) + TAG_MS - ts; }
+  function restText(ms) {
+    if (ms <= 0) return "jetzt";
+    var m = Math.floor(ms / 60000), h = Math.floor(m / 60);
+    return h > 0 ? h + "h " + (m % 60) + "m" : (m + 1) + "m";
+  }
+
+  /* ---------- Tages-Merker ----------
+     EIN Eintrag fuer alles, was „einmal pro Tag" ist: Stueckzahlen der
+     Angebote, der Gratis-Posten, das Gratis-Pack und das Tagesgold.
+     Der Eintrag traegt den Tagesindex; bei Tageswechsel wird er
+     verworfen statt aufgeraeumt — es gibt keinen Reset-Pfad, der
+     vergessen werden koennte. Vorher lagen die drei Merker als
+     JS-Variablen im Modul und waren nach jedem Reload wieder frisch. */
+  var SHOP_TAG_KEY = "arenaShopTag";
+  function tagStand() {
+    var tag = shopTagIndex(Date.now()), s = null;
+    try { s = JSON.parse(localStorage.getItem(SHOP_TAG_KEY) || "null"); } catch (e) {}
+    if (!s || typeof s !== "object" || s.tag !== tag) {
+      s = { tag: tag, benutzt: {}, gratis: false, packGratis: false, goldGratis: false };
+    }
+    if (!s.benutzt || typeof s.benutzt !== "object") s.benutzt = {};
+    return s;
+  }
+  function tagSpeichern(s) {
+    try { localStorage.setItem(SHOP_TAG_KEY, JSON.stringify(s)); } catch (e) {}
+  }
+
+  /* ---------- Der Warenkorb, aus dem gezogen wird ----------
+     `zahl` ist die Stueckzahl, `gold`/`gems` die beiden moeglichen
+     Preise (0 = in dieser Waehrung nicht zu haben), `stueck` die
+     Tagesmenge im Sinne von AAs „Available: N".
+     `geben()` bucht — Material und Karten ueber ArenaCards, Gold ueber
+     den Hub. Keine Ware bucht Gems: siehe Waehrungsregel oben. */
+  function zufallsTurm(h) { return TOWER_IDS[h % TOWER_IDS.length]; }
+  var DEAL_WAREN = [
+    { id:"ess_att", art:"shop_mat_attack", emoji:"⚔", name:"Angriffs-Essenz",
+      zahl:20, gold:3000, gems:120, stueck:3,
+      geben:function(){ AC.addMaterial(20, "attack"); } },
+    { id:"ess_tmp", art:"shop_mat_speed", emoji:"⚡", name:"Tempo-Essenz",
+      zahl:20, gold:3000, gems:120, stueck:3,
+      geben:function(){ AC.addMaterial(20, "speed"); } },
+    { id:"ess_spz", art:"shop_mat_special", emoji:"✨", name:"Spezial-Essenz",
+      zahl:15, gold:4200, gems:160, stueck:2,
+      geben:function(){ AC.addMaterial(15, "special"); } },
+    /* Turm-Posten. Das Bild ist das Artwork DES TURMS, der heute
+       drankommt — auch der wird gezogen. „Fuege tower ein" heisst
+       genau das: man sieht, WELCHE Karte im Angebot ist. */
+    { id:"turm_gew", turm:true, stufe:"common", name:"Karten", zahl:3,
+      gold:5400, gems:200, stueck:2 },
+    { id:"turm_gut", turm:true, stufe:"good", name:"Karte", zahl:1,
+      gold:9000, gems:320, stueck:1 },
+    { id:"turm_sel", turm:true, stufe:"rare", name:"Karte", zahl:1,
+      gold:0, gems:640, stueck:1 },
+    /* Gold zum Tageskurs. Nur gegen Gems — die Richtung des
+       Gold-Tauschs, nie die Gegenrichtung. */
+    { id:"gold_kl", art:"shop_gold_t1", emoji:"🪙", name:"Münzstapel",
+      zahl:12000, gold:0, gems:85, stueck:2,
+      geben:function(){ setGold(gold() + 12000); } },
+    { id:"gold_gr", art:"shop_gold_t2", emoji:"🪙", name:"Münzbeutel",
+      zahl:34000, gold:0, gems:230, stueck:1,
+      geben:function(){ setGold(gold() + 34000); } },
   ];
-  var dealUsed = {};
+  /* ---------- Der eine Gratis-Posten des Tages ----------
+     „es kann Gold oder gems auch mal kostenlos geben nur 1x pro Tag und
+     nicht viel." Genau so: EIN Posten, klein bemessen, einmalig
+     abholbar. Die Groessenordnung ist bewusst unter allem, was man
+     kaufen kann — 10 Gems sind ein Achtel der kleinsten Gem-Staffel,
+     600 Gold ein Viertel des Tagesgold-Bands. Der Posten ist ein
+     Grund vorbeizuschauen, keine Einnahmequelle. */
+  var DEAL_GRATIS = [
+    { id:"fr_gold", art:"shop_gold_t4", emoji:"🪙", name:"Gold", zahl:600,
+      geben:function(){ setGold(gold() + 600); } },
+    { id:"fr_gems", art:"shop_gem_t1", emoji:"💚", name:"Kristalle", zahl:10,
+      geben:function(){ setGems(gems() + 10); } },
+    { id:"fr_att", art:"shop_mat_attack", emoji:"⚔", name:"Angriffs-Essenz", zahl:8,
+      geben:function(){ AC.addMaterial(8, "attack"); } },
+    { id:"fr_tmp", art:"shop_mat_speed", emoji:"⚡", name:"Tempo-Essenz", zahl:8,
+      geben:function(){ AC.addMaterial(8, "speed"); } },
+    { id:"fr_spz", art:"shop_mat_special", emoji:"✨", name:"Spezial-Essenz", zahl:6,
+      geben:function(){ AC.addMaterial(6, "special"); } },
+  ];
+  var DEAL_BEZAHLT = 5;   // so viele bezahlte Posten neben dem Gratis-Posten
+
+  /* zieheTagesangebote() → [{id, art, emoji, name, zahl, cur, cost,
+   *                          stueck, gratis, geben}]
+   * Der Gratis-Posten steht VORNE: er ist der taegliche Anlass, ueber-
+   * haupt in die Sektion zu schauen (dieselbe Begruendung wie beim
+   * Tagesgold, nur dort in Bandform).
+   * Gemischt wird mit Fisher-Yates, dessen Wuerfel der Tageshash ist —
+   * kein Math.random, sonst waere die Reihe bei jedem Render anders. */
+  function zieheTagesangebote(tag) {
+    if (tag == null) tag = shopTagIndex(Date.now());
+    var korb = DEAL_WAREN.slice(), i, j, t;
+    for (i = korb.length - 1; i > 0; i--) {
+      j = shopHash("deal", tag, i) % (i + 1);
+      t = korb[i]; korb[i] = korb[j]; korb[j] = t;
+    }
+    var raus = [];
+    // Gratis-Posten des Tages
+    var g = DEAL_GRATIS[shopHash("gratis", tag) % DEAL_GRATIS.length];
+    raus.push({ id: g.id, art: g.art, emoji: g.emoji, name: g.name, zahl: g.zahl,
+                cur: "free", cost: 0, stueck: 1, gratis: true, geben: g.geben });
+    for (i = 0; i < korb.length && raus.length <= DEAL_BEZAHLT; i++) {
+      var w = korb[i];
+      /* Waehrung des Tages. Kann die Ware nur eine, ist die Wahl
+         getroffen; kann sie beide, entscheidet der Hash. */
+      var cur = w.gold > 0 && w.gems > 0
+        ? (shopHash("cur", tag, w.id) % 2 ? "gems" : "gold")
+        : (w.gold > 0 ? "gold" : "gems");
+      var d = { id: w.id, art: w.art, emoji: w.emoji, name: w.name, zahl: w.zahl,
+                cur: cur, cost: cur === "gold" ? w.gold : w.gems,
+                stueck: w.stueck, gratis: false, geben: w.geben };
+      if (w.turm) {
+        /* Welcher Turm heute im Angebot ist, haengt am Tag UND an der
+           Warenkennung — sonst waeren „3 gewoehnliche" und „1 gute"
+           immer derselbe Turm. */
+        var id = zufallsTurm(shopHash("turm", tag, w.id));
+        var m = BY_ID[id] || {};
+        d.turmId = id;
+        d.art = CARD_ART[id];
+        d.emoji = m.art || "🃏";
+        d.name = (m.name || "Turm") + " · " + tierOf(w.stufe).name;
+        d.geben = (function (cid, st, n) {
+          return function () { for (var k = 0; k < n; k++) AC.addDrop(cid, st, 1); };
+        })(id, w.stufe, w.zahl);
+      }
+      raus.push(d);
+    }
+    return raus;
+  }
+  /* DEALS ist der Stand DES HEUTIGEN Tages. dealsHeute() zieht neu, wenn
+     die Tagesgrenze waehrend einer laufenden Sitzung faellt — ohne den
+     Aufruf haette ein Geraet, das ueber Mitternacht offen liegt, bis zum
+     Neustart die Angebote von gestern. */
+  var DEALS = zieheTagesangebote(), DEALS_TAG = shopTagIndex(Date.now());
+  function dealsHeute() {
+    var tag = shopTagIndex(Date.now());
+    if (tag !== DEALS_TAG) { DEALS_TAG = tag; DEALS = zieheTagesangebote(tag); }
+    return DEALS;
+  }
+
+  /* Kaufbar sind NUR Silber, Gold und Arkan — alle drei in EINER Reihe.
+     Bronze ist raus („bronze fliegt raus brauchen wir nicht") und lebt
+     als Gratis-Tagespack im Band unter dem Raster weiter. */
   var SHOP_PACKS = [
-    { key:"bronze", cost:2000, cur:"gold" },
     { key:"silver", cost:80,   cur:"gems" },
     { key:"gold",   cost:300,  cur:"gems" },
     { key:"arcane", cost:800,  cur:"gems" },
   ];
-  var freeDailyTaken = false;
 
   /* ---------- (2) Echtgeld-Bundles (AA §8.1 Pos. 2) ----------
      Preise in Fr. wie in AAs Store (Store-Waehrung des Users). Im
@@ -8028,14 +8516,20 @@ button.pfplate{cursor:pointer}
    * Behauptung; so ist sie eine Rechnung.
    * ================================================================== */
   var ARENA_PACKS = [
-    { n:1, preis:3,  gold:2500,  gems:80,   packs:1, ess:10, kulisse:"pack_arena_klein"  },
-    { n:2, preis:5,  gold:5000,  gems:150,  packs:2, ess:20, kulisse:"pack_arena_klein"  },
-    { n:3, preis:9,  gold:9000,  gems:300,  packs:3, ess:35, kulisse:"pack_arena_klein"  },
-    { n:4, preis:14, gold:16000, gems:500,  packs:4, ess:50, kulisse:"pack_arena_mittel" },
-    { n:5, preis:19, gold:24000, gems:750,  packs:5, ess:70, kulisse:"pack_arena_mittel" },
-    { n:6, preis:29, gold:38000, gems:1200, packs:6, ess:95, kulisse:"pack_arena_mittel" },
-    { n:7, preis:44, gold:60000, gems:1900, packs:8, ess:130, kulisse:"pack_arena_gross" },
-    { n:8, preis:69, gold:95000, gems:3000, packs:10, ess:180, kulisse:"pack_arena_gross" },
+    /* Jede Arena hat ihr EIGENES Keyart. Vorher lagen hier drei
+       Sammelkulissen (klein/mittel/gross) auf acht Karten, unterschieden
+       nur durch die CSS-Toenung — und genau das hat der Auftraggeber
+       gesehen: „Die Arena packs muessen alle ein anderes artwork haben.
+       Nicht alle gleich." Die acht Bilder waren dabei laengst erzeugt,
+       nur nie verdrahtet. Eine Toenung ist kein Motiv. */
+    { n:1, preis:3,  gold:2500,  gems:80,   packs:1, ess:10, kulisse:"packart_arena1" },
+    { n:2, preis:5,  gold:5000,  gems:150,  packs:2, ess:20, kulisse:"packart_arena2" },
+    { n:3, preis:9,  gold:9000,  gems:300,  packs:3, ess:35, kulisse:"packart_arena3" },
+    { n:4, preis:14, gold:16000, gems:500,  packs:4, ess:50, kulisse:"packart_arena4" },
+    { n:5, preis:19, gold:24000, gems:750,  packs:5, ess:70, kulisse:"packart_arena5" },
+    { n:6, preis:29, gold:38000, gems:1200, packs:6, ess:95, kulisse:"packart_arena6" },
+    { n:7, preis:44, gold:60000, gems:1900, packs:8, ess:130, kulisse:"packart_arena7" },
+    { n:8, preis:69, gold:95000, gems:3000, packs:10, ess:180, kulisse:"packart_arena8" },
   ];
 
   /* Der Wert eines Packs, gerechnet statt behauptet.
@@ -8109,20 +8603,28 @@ button.pfplate{cursor:pointer}
        Reihen, kein Rest. */
     { id:"g6", name:"Gem-Tresor",     amt:6500, price:"Fr. 89.–", art:"shop_gem_t6", seal:null },
   ];
-  /* ---------- (7) Gold-Tausch (AA §8.1 Pos. 7) ----------
+  /* ---------- (8) Gold-Tausch (AA §8.1 Pos. 7) ----------
      Bei uns GEMS → GOLD statt Echtgeld → Gold: Gold ist die Waehrung,
      die der Spieler ohnehin erspielt (DESIGN_PROGRESSION §B), und der
      Tausch ist die Bruecke aus der Premium- in die Spielwaehrung.
      AAs „ein Gold-Paket gratis per Werbevideo" wird bei uns zu einem
      werbefreien Tages-Gratispaket (§19.1: keine Ads). */
-  /* REIHENFOLGE: Tagesgold zuerst, links oben, rechts daneben der
-     Muenzstapel — danach aufsteigend. Vorher stand das Gratispaket als
-     volle Breite ganz unten und liess in der zweiten Reihe rechts ein
-     Loch von 179 x 227 px offen. Vier Kacheln in zwei vollen Reihen
-     schliessen es.
-     Das ist bewusst NICHT die reine Preisreihenfolge wie bei den Gems:
-     das Gratispaket ist der taegliche Anlass, ueberhaupt in diese
-     Sektion zu schauen — es gehoert nach oben, nicht ans Ende. */
+  /* ⚠ REIHENFOLGE GEAENDERT (Befund IMG_3386): „Mach das free Gold
+     unter die 3 kaufbaren Gold Sachen. In der Groesse des Banners wie
+     den Kristalltresor."
+     Vorher stand das Tagesgold als erste Rasterkachel oben links —
+     Begruendung damals: es sei der taegliche Anlass, in die Sektion zu
+     schauen. Das Argument stimmt weiter, nur die Schlussfolgerung war
+     falsch. Als Kachel unter Kacheln sah das Gratisstueck aus wie eine
+     vierte Preisstufe; als BAND unter dem Raster ist es sofort als
+     etwas anderes erkennbar, und die drei kaufbaren Staffeln bilden
+     endlich eine saubere volle Reihe (vorher: zwei Reihen, in der
+     zweiten rechts ein Loch).
+     Das Tagesgold bleibt trotzdem IN dieser Liste. gemsJeGold() sucht
+     die erste BEZAHLTE Staffel als Massstab fuer packWert(); haette man
+     den Posten herausgeloest, waere die Wertrechnung des Arena-Pack-
+     Karussells still auf ihren Notwert gefallen. Getrennt wird beim
+     Rendern, nicht in den Daten. */
   var GOLD_PACKS = [
     { id:"go0", name:"Tagesgold",   amt:2500,   cost:0,   free:true,  art:"shop_gold_t4" },
     { id:"go1", name:"Münzstapel",  amt:10500,  cost:80,  free:false, art:"shop_gold_t1" },
@@ -8131,7 +8633,38 @@ button.pfplate{cursor:pointer}
     { id:"go3", name:"Goldschwall", amt:126000, cost:800, free:false, art:"shop_gold_t3",
       seal:"best" },
   ];
-  var goldFreeTaken = false;
+
+  /* ==================================================================
+   * VORRATS-TRUHE — AAs „Arcane Supplies Chest" (§8.2)
+   * ------------------------------------------------------------------
+   * DIE ZAHLEN KOMMEN ALLE VON WOANDERS HER, und das ist der Punkt:
+   *   Wahrscheinlichkeiten  ArenaCards.PACKS[pack].weights
+   *   Garantie              ArenaCards.PACKS[pack].guarantee
+   *   Mitleidsmechanik      ArenaCards.getPityStatus() /
+   *                         PITY_EPIC / PITY_LEGENDARY
+   * In dieser Datei steht KEINE zweite Wahrscheinlichkeit. Wer an der
+   * Ziehung dreht, dreht in arena_cards.js — und die Truhe zeigt sofort
+   * die neuen Werte an, ohne dass hier etwas nachgezogen werden muss.
+   *
+   * WAS DIE TRUHE OEFFNET: ein Gold-Pack. AAs Supplies Chest kostet
+   * 300 Gems fuer x1 und verspricht „Good, Rare, Epic, or Legendary" —
+   * das ist Zeile fuer Zeile unser Gold-Pack (300 Gems, guarantee 3 =
+   * „mindestens eine Epische Karte oder besser").
+   * ⚠ Ja, dasselbe Pack steht auch als Kachel im Booster-Block. Das ist
+   * ABSICHT und in AA genauso: der Einzelkauf steht bei den Packs, die
+   * Truhe ist der Weg fuer die MENGE. Sie ist der einzige Ort mit x10 —
+   * und nur dort gibt es den Mengenrabatt.
+   *
+   * MENGENRABATT: AA nimmt fuer x10 nicht 3000, sondern 2680 Gems
+   * (Video 6, t=10-18) — 10,7 %. Wir uebernehmen beide Zahlen
+   * unveraendert; der Prozentsatz auf dem Knopf wird daraus GERECHNET,
+   * damit er nicht auseinanderlaufen kann.
+   * ================================================================== */
+  var VORRAT = { pack: "gold", preis1: 300, preis10: 2680, menge10: 10 };
+  function vorratRabatt() {
+    return Math.round((1 - VORRAT.preis10 / (VORRAT.preis1 * VORRAT.menge10)) * 1000) / 10;
+  }
+  var vorratOffen = false;   // Zustand der Chancen-Klappe
 
   function renderShop() {
     renderVault();
@@ -8142,27 +8675,39 @@ button.pfplate{cursor:pointer}
 
     // Tagesangebote: HELLE Rahmen (neutral), Material-Bundles mit den
     // neuen Produktbildern.
-    $("dealGrid").innerHTML = DEALS.map(function (d) {
-      var left = d.avail - (dealUsed[d.id] | 0), sold = left <= 0;
-      var price = d.cur === "free" ? "Gratis"
+    var st = tagStand(), heute = dealsHeute();
+    /* Der Timer ist keine Zierzeile mehr: er zaehlt echt gegen 00:00 UTC,
+       also gegen genau die Grenze, an der zieheTagesangebote() neu zieht.
+       Vorher stand hier fest „Neu in 6h 58m" — AAs Screenshot-Wert. */
+    $("dealTimer").textContent = "Neu in " + restText(shopTagRest(Date.now()));
+
+    $("dealGrid").innerHTML = heute.map(function (d) {
+      var left = d.stueck - (st.benutzt[d.id] | 0);
+      if (d.gratis && st.gratis) left = 0;
+      var weg = left <= 0;
+      var price = d.gratis ? "GRATIS"
         : (d.cur === "gold" ? ico("cur_gold", "🪙") : ico("cur_gem", "💚")) + " " + fmt(d.cost);
       /* AA trennt Name und Menge: der Name steht oben, die Menge sitzt
          als „x20" in der unteren rechten Ecke des Bildkastens
-         (IMG_3375). Bei uns steckte sie im Namen — „Angriffs-Essenz x20"
-         — und liess ihn auf der schmalen Karte zweizeilig werden. */
-      var mng = /\s[x×]\s?(\d+)$/i.exec(d.name);
+         (IMG_3375). Seit die Angebote gezogen werden, kommt die Menge
+         als eigenes Feld aus der Ware — es gibt nichts mehr aus dem
+         Namen herauszuschneiden. */
       return prodCard({
         frame: "light", art: d.art, emoji: d.emoji,
-        name: mng ? d.name.slice(0, mng.index) : d.name,
-        qty: mng ? "×" + mng[1] : "",
-        sub: "Verfügbar: " + Math.max(0, left),
-        btn: sold ? "Ausverkauft" : price, sold: sold, disabled: sold,
-        btnCls: d.cur === "free" ? "freeprice" : (d.cur === "gems" ? "gemprice" : "goldprice"),
-        btnAttr: 'data-buy="' + d.id + '"', attr: 'data-deal="' + d.id + '"',
+        name: d.name, qty: "×" + fmt(d.zahl),
+        sub: d.gratis ? (weg ? "Morgen wieder" : "1× pro Tag")
+                      : "Verfügbar: " + Math.max(0, left),
+        btn: weg ? (d.gratis ? "Abgeholt" : "Ausverkauft") : price,
+        sold: weg, disabled: weg,
+        btnCls: d.gratis ? "freeprice" : (d.cur === "gems" ? "gemprice" : "goldprice"),
+        btnAttr: 'data-buy="' + d.id + '"',
+        attr: 'data-deal="' + d.id + '"' + (d.gratis ? ' data-gratis="1"' : ""),
       });
     }).join("");
     hydrateProdCards($("dealGrid"));
 
+    /* Drei kaufbare Packs, eine Reihe. Bronze steht NICHT hier — es ist
+       das Gratis-Tagespack im Band darunter. */
     $("packShop").innerHTML = SHOP_PACKS.map(function (sp) {
       var pk = AC.PACKS[sp.key];
       var price = (sp.cur === "gold" ? ico("cur_gold", "🪙") : ico("cur_gem", "💚")) + " " + fmt(sp.cost);
@@ -8173,18 +8718,13 @@ button.pfplate{cursor:pointer}
         '<span class="promise">' + pk.promise + "</span>" +
         '<button class="sbuy' + (sp.cur === "gems" ? " gems" : "") + '" data-buypack="' + sp.key +
           '">' + price + "</button></div>";
-    }).join("") +
-      '<div class="shopcard wide" style="position:relative">' +
-        (freeDailyTaken ? "" : '<span class="freebadge">GRATIS</span>') +
-        '<span class="sart">' + ico("chest_bronze", "🥉", "xl") + "</span>" +
-        '<span class="snm">Tages-Bronze-Pack</span>' +
-        '<span class="promise">' + AC.PACKS.bronze.promise + "</span>" +
-        '<button class="sbuy" data-buypack="free"' + (freeDailyTaken ? " disabled" : "") + ">" +
-          (freeDailyTaken ? "Wieder in 3h 41m" : "Abholen") + "</button></div>";
+    }).join("");
+    renderFreiPack(st);
 
     renderShopPromo();
     renderArenaPacks();
     renderIapPacks();
+    renderVorrat();
     renderGemPacks();
     renderGoldPacks();
 
@@ -8192,8 +8732,10 @@ button.pfplate{cursor:pointer}
     $("iapNote").innerHTML = "<b>Echtgeld ist im Prototyp ein Platzhalter.</b> Arena-Pack, " +
       "Starter-Pack und die Gem-Pakete zeigen Preise in Fr. wie AAs Store, lösen aber " +
       "keinen Kauf aus — der Gold-Tausch unten läuft dagegen echt gegen die Demo-Wallet.";
-    $("shopNote").innerHTML = "Sektionsreihenfolge 1:1 nach AA (§8.1): Promo · Arena-Pack · " +
-      "Tagesangebote · Packs · Kristalltresor · Gems · Gold. Alle Preise und Stückzahlen " +
+    $("shopNote").innerHTML = "Sektionsreihenfolge nach AA (§8.1): Promo · Arena-Pack · " +
+      "Tagesangebote · Packs · Vorrats-Truhe · Kristalltresor · Gems · Gold. Die " +
+      "Tagesangebote werden deterministisch aus dem Datum gezogen (FNV-1a wie in " +
+      "arena_daily.js) und wechseln um 00:00 UTC. Alle Preise und Stückzahlen " +
       "skalieren im echten Spiel mit dem Fortschritt (§8.4).";
 
     Array.prototype.forEach.call($("dealGrid").querySelectorAll("[data-buy]"), function (b) {
@@ -8203,7 +8745,55 @@ button.pfplate{cursor:pointer}
       b.addEventListener("click", function () { buyPack(b.getAttribute("data-buypack")); });
     });
     markPressable($("viewShop"));
-    UIBadge.set("shop", DEALS.filter(function (d) { return (d.avail - (dealUsed[d.id] | 0)) > 0; }).length);
+    UIBadge.set("shop", heute.filter(function (d) {
+      var frei = d.gratis ? (st.gratis ? 0 : 1) : d.stueck - (st.benutzt[d.id] | 0);
+      return frei > 0;
+    }).length);
+  }
+
+  /* ==================================================================
+   * tagesband(o) — der EINE breite Shop-Banner
+   * ------------------------------------------------------------------
+   *   o.art/emoji  Bild im eingesenkten Kasten (>= 20 px lesbar, hier 64)
+   *   o.name/amt/sub  Text in der Mitte
+   *   o.btn/btnAttr/disabled/frei/gratis  der Knopf rechts
+   * Bauform und Begruendung stehen im Blatt bei `.tagesband`.
+   * ================================================================== */
+  function tagesband(o) {
+    return '<div class="tagesband' + (o.cls ? " " + o.cls : "") + '" ' + (o.attr || "") + ">" +
+      (o.gratis ? '<span class="freebadge">GRATIS</span>' : "") +
+      '<span class="bandart">' + ico(o.art, o.emoji || "•") + "</span>" +
+      '<span class="bandtx"><span class="bnm">' + o.name + "</span>" +
+        (o.amt ? '<span class="bamt">' + o.amt + "</span>" : "") +
+        (o.sub ? '<span class="bsub">' + o.sub + "</span>" : "") + "</span>" +
+      '<button class="bandbtn' + (o.frei ? " frei" : "") + '" ' + (o.btnAttr || "") +
+        (o.disabled ? " disabled" : "") + ">" + o.btn +
+        (o.btnSub ? "<small>" + o.btnSub + "</small>" : "") + "</button></div>";
+  }
+
+  /* Gratis-Tagespack (Bronze). „tages bronze pack braucht ein free
+     Zeichen mit Bild" — das Zeichen ist `.freebadge`, das Bild ist
+     `pack_bronze`, also die Pack-Grafik selbst und nicht mehr die
+     generische Truhe (`chest_bronze`), die auf 64 px kaum als Bronze
+     zu erkennen war. */
+  function renderFreiPack(st) {
+    var box = $("packFreeBox"); if (!box) return;
+    st = st || tagStand();
+    var weg = !!st.packGratis;
+    box.innerHTML = tagesband({
+      cls: "tinted", attr: 'data-freepack="1" style="' + tintStyle("pack_bronze") + '"',
+      gratis: !weg, art: "pack_bronze", emoji: "🥉",
+      name: AC.PACKS.bronze.name + " · Tagespack",
+      sub: AC.PACKS.bronze.promise,
+      btn: weg ? "Wieder in " + restText(shopTagRest(Date.now())) : "ABHOLEN",
+      btnSub: weg ? "" : "1× pro Tag", frei: !weg, disabled: weg,
+      btnAttr: 'data-buypack="free"',
+    });
+    Array.prototype.forEach.call(box.querySelectorAll("[data-buypack]"), function (b) {
+      b.addEventListener("click", function () { buyPack("free"); });
+    });
+    markPressable(box);
+    sweepSoon(box);
   }
   /* ==================================================================
    * prodCard(o) — EINE Produktkarte, drei Ebenen (Konzept „Option A")
@@ -8431,25 +9021,196 @@ button.pfplate{cursor:pointer}
   }
   /* (7) Gold-Tausch — GRUENE Rahmen; der EINZIGE Block, der echt bucht. */
   function renderGoldPacks() {
-    $("goldShop").innerHTML = GOLD_PACKS.map(function (g) {
-      var taken = g.free && goldFreeTaken;
-      /* Kuerzeres Label: die Kachel ist jetzt halb so breit wie vorher
-         (179 statt 366 px). „GRATIS · 1× täglich" passte quer, im
-         Raster bricht es um. */
-      var label = g.free
-        ? (taken ? "Morgen wieder" : "GRATIS · täglich")
-        : ico("cur_gem", "💚") + " " + fmt(g.cost);
-      return prodCard({
-        frame: "green", art: g.art, emoji: "🪙", seal: g.seal, wide: g.wide,
-        name: g.name, amt: fmt(g.amt), sub: "Gold",
-        btn: label, btnCls: g.free ? "freeprice" : "goldprice", disabled: taken,
-        btnAttr: 'data-goldbuy="' + g.id + '"', attr: 'data-gold="' + g.id + '"',
-      });
-    }).join("");
+    var st = tagStand();
+    /* Nur die BEZAHLTEN Staffeln ins Raster — drei Kacheln, eine volle
+       Reihe, kein Rest. Das Tagesgold kommt als Band darunter. */
+    $("goldShop").innerHTML = GOLD_PACKS.filter(function (g) { return !g.free; })
+      .map(function (g) {
+        return prodCard({
+          frame: "green", art: g.art, emoji: "🪙", seal: g.seal, wide: g.wide,
+          name: g.name, amt: fmt(g.amt), sub: "Gold",
+          btn: ico("cur_gem", "💚") + " " + fmt(g.cost), btnCls: "goldprice",
+          btnAttr: 'data-goldbuy="' + g.id + '"', attr: 'data-gold="' + g.id + '"',
+        });
+      }).join("");
     hydrateProdCards($("goldShop"));
-    Array.prototype.forEach.call($("goldShop").querySelectorAll("[data-goldbuy]"), function (b) {
-      b.addEventListener("click", function () { buyGold(b.getAttribute("data-goldbuy")); });
+
+    /* Tagesgold als BAND — dieselbe Bauform wie der Kristalltresor.
+       ⚠ .goldtext waere hier ein Verstoss: das Band ist getoent, der
+       Knopf gruen. Beide Flaechen tragen dunkle bzw. weisse Fuellfarbe
+       aus dem Blatt, keine goldene Schrift. */
+    var box = $("goldFreeBox");
+    var g0 = null;
+    GOLD_PACKS.forEach(function (x) { if (x.free) g0 = x; });
+    if (box && g0) {
+      var weg = !!st.goldGratis;
+      box.innerHTML = tagesband({
+        cls: "tinted", attr: 'data-goldfree="1" style="' + tintStyle("gold") + '"',
+        gratis: !weg, art: g0.art, emoji: "🪙",
+        name: g0.name, amt: fmt(g0.amt) + " Gold",
+        sub: weg ? "Heute abgeholt — morgen wieder."
+                 : "Einmal am Tag, ohne Werbung (§19.1).",
+        btn: weg ? "Wieder in " + restText(shopTagRest(Date.now())) : "ABHOLEN",
+        btnSub: weg ? "" : "1× pro Tag", frei: !weg, disabled: weg,
+        btnAttr: 'data-goldbuy="' + g0.id + '"',
+      });
+      markPressable(box);
+      sweepSoon(box);
+    }
+    Array.prototype.forEach.call(
+      $("viewShop").querySelectorAll("[data-goldbuy]"), function (b) {
+        b.addEventListener("click", function () { buyGold(b.getAttribute("data-goldbuy")); });
+      });
+  }
+
+  /* ==================================================================
+   * VORRATS-TRUHE — Rendern
+   * ------------------------------------------------------------------
+   * Vier Zeilen wie bei AA (§8.2), darunter EINE Klappe. Jede Zahl in
+   * dieser Funktion stammt aus ArenaCards; hier steht keine eigene.
+   * ================================================================== */
+  function renderVorrat() {
+    var box = $("vorratShop"); if (!box) return;
+    var pk = AC.PACKS[VORRAT.pack];
+    var p = AC.getPityStatus();
+    var rab = vorratRabatt();
+
+    /* Chancen-Tabelle. `weights` sind Prozente je Kartenslot und stehen
+       in derselben Reihenfolge wie TIERS[0..4]. Suprem droppt nie — es
+       taucht deshalb auch in der Tabelle nicht auf, statt mit 0 % dazu
+       stehen und wie ein Fehler zu wirken. */
+    // Dezimalkomma, nicht -punkt: die ganze UI ist deutsch (§Sprache).
+    function proz(w) {
+      return (w >= 1 ? w.toFixed(w % 1 ? 1 : 0) : w.toFixed(2)).replace(".", ",");
+    }
+    var reihen = pk.weights.map(function (w, i) {
+      var t = AC.TIERS[i];
+      return '<div class="orow"><i class="odot" style="background:' + t.color + '"></i>' +
+        '<span class="onm">' + t.name + "</span>" +
+        '<span class="oval">' + proz(w) + " %</span></div>";
+    }).join("");
+    var balken = pk.weights.map(function (w, i) {
+      return '<i style="flex:' + w + ';background:' + AC.TIERS[i].color + '"></i>';
+    }).join("");
+
+    box.className = "vorratbox" + (vorratOffen ? " open" : "");
+    box.innerHTML =
+      '<div class="vorrathead">' +
+        '<span class="bandart">' + ico("pack_vorrat", "📦") + "</span>" +
+        '<span class="bandtx"><span class="vrnm">Vorrats-Truhe</span>' +
+          '<span class="vrpr">' + pk.promise + " · " + pk.cardSlots + " Karten, " +
+            pk.materialSlots + " Essenz-Posten und Gold je Öffnung.</span></span></div>" +
+      /* Mitleidszeile — AAs „Get Legendary in N opens", offen und ohne
+         Prozente. Die Zahl ist getPityStatus(), nicht geschaetzt. */
+      '<div class="vorratpity">' + ico("frame_epic", "🛟") +
+        "<span><b>Garantiert episch</b> in ≤ " + p.epicIn + " Öffnungen · " +
+        '<span class="leg">Legendär</span> in ≤ ' + p.legendaryIn + "</span></div>" +
+      '<div class="vorratbtns">' +
+        '<button class="vrbtn" data-vorrat="1">ÖFFNEN ×1' +
+          "<small>" + ico("cur_gem", "💚") + " " + fmt(VORRAT.preis1) + "</small></button>" +
+        '<button class="vrbtn" data-vorrat="' + VORRAT.menge10 + '">' +
+          '<span class="vrsave">−' + String(rab).replace(".", ",") + " %</span>" +
+          "ÖFFNEN ×" + VORRAT.menge10 +
+          "<small>" + ico("cur_gem", "💚") + " " + fmt(VORRAT.preis10) +
+          " statt " + fmt(VORRAT.preis1 * VORRAT.menge10) + "</small></button>" +
+      "</div>" +
+      '<button class="vorratmore" data-vorratmore="1">Chancen' +
+        '<span class="ch">▼</span></button>' +
+      '<div class="vorratodds">' + reihen +
+        '<div class="obar">' + balken + "</div>" +
+        '<div class="onote">Je Kartenslot, ' + pk.cardSlots + " Slots pro Öffnung. " +
+          "Mindestens ein Slot erreicht <b>" + AC.TIERS[pk.guarantee].name +
+          "</b> oder besser. Spätestens nach " + p.epicThreshold +
+          " Öffnungen ohne Episch bzw. " + p.legendaryThreshold +
+          " ohne Legendär greift die Garantie. Helden-Karten sind " +
+          Math.round(1 / AC.HERO_WEIGHT) + "× seltener als Türme. " +
+          "Alle Werte aus <b>arena_cards.js</b> — diese Ansicht rechnet nichts nach." +
+        "</div></div>";
+
+    /* Kulisse: 21:9-Artwork als FLAECHE unter dem Inhalt, mit dem
+       Abdunkelungsband aus bgArt(). Nie als class="ico" — der
+       Freistell-Filter (§6h) wuerde die dunkle Bildhaelfte aufloesen. */
+    bgArt(box, "pack_vorrat");
+    var pity = $("vorratPity");
+    if (pity) pity.textContent = "Episch ≤" + p.epicIn + " · Legendär ≤" + p.legendaryIn;
+
+    Array.prototype.forEach.call(box.querySelectorAll("[data-vorrat]"), function (b) {
+      b.addEventListener("click", function () {
+        oeffneVorrat(parseInt(b.getAttribute("data-vorrat"), 10) || 1);
+      });
     });
+    var more = box.querySelector("[data-vorratmore]");
+    if (more) more.addEventListener("click", function () {
+      vorratOffen = !vorratOffen;
+      box.classList.toggle("open", vorratOffen);
+      UISfx.tap();
+      track("shop_vorrat_chancen", { offen: vorratOffen });
+    });
+    markPressable(box);
+    sweepSoon(box);
+  }
+
+  /* oeffneVorrat(n)
+   * ------------------------------------------------------------------
+   * ×1 spielt die volle Pack-Zeremonie — der Moment, in dem die Karte
+   * auffaellt, ist das Beste, was die App hat, und den nimmt man
+   * niemandem weg.
+   * ×10 kann das nicht: zehn Zeremonien hintereinander sind vier
+   * Minuten Wischen. Die zehn Packs werden deshalb SOFORT gebucht und
+   * als Bilanz gezeigt — genau der Handel, den Sammelspiele mit ihrem
+   * „x10" anbieten. Gebucht wird ueber dieselben Wege wie beim
+   * Aufdecken (AC.addDrop / AC.addMaterial / setGold), damit es keinen
+   * zweiten Buchungspfad gibt, der auseinanderlaufen kann.
+   */
+  function oeffneVorrat(n) {
+    var preis = n > 1 ? VORRAT.preis10 : VORRAT.preis1;
+    if (gems() < preis) {
+      UISfx.deny();
+      toast("Nicht genug Kristalle (" + fmt(preis) + ")");
+      return;
+    }
+    setGems(gems() - preis);
+    track("shop_vorrat_open", { n: n, gems: preis });
+    if (n <= 1) { openPackKey(VORRAT.pack); show("navPack"); return; }
+
+    var proTier = {}, mat = {}, goldSum = 0, pityTreffer = 0, best = 0, i;
+    for (i = 0; i < n; i++) {
+      var r = AC.openPack(VORRAT.pack, POOL_IDS, HERO_IDS);
+      r.cards.forEach(function (c) {
+        AC.addDrop(c.cardId, c.tier, 1);
+        proTier[c.tier] = (proTier[c.tier] | 0) + 1;
+        if (c.tierIndex > best) best = c.tierIndex;
+      });
+      r.materialSlots.forEach(function (s) {
+        AC.addMaterial(s.amount, s.type);
+        mat[s.type] = (mat[s.type] | 0) + s.amount;
+      });
+      goldSum += r.gold;
+      if (r.pity) pityTreffer++;
+      // Dieselbe Ereignis-Naht wie openPackKey(), einmal je Pack.
+      var CLv = CLof(); if (CLv) CLv.reportEvent("pack", 1);
+      if (window.ArenaPass) window.ArenaPass.reportEvent("pack", 1);
+      var DYv = DYof(); if (DYv) DYv.reportEvent("pack", 1);
+    }
+    setGold(gold() + goldSum);
+    UISfx.reward();
+
+    var kartenZ = AC.TIERS.filter(function (t) { return proTier[t.key]; })
+      .map(function (t) {
+        return '<b style="color:' + t.color + '">' + proTier[t.key] + "×</b> " + t.name;
+      }).join(" · ");
+    var matZ = AC.MATERIALS.filter(function (m) { return mat[m.key]; })
+      .map(function (m) { return "<b>+" + mat[m.key] + "</b> " + m.sym + " " + m.name; })
+      .join(" · ");
+    askConfirm("Vorrats-Truhe ×" + n + " geöffnet",
+      "<b>Karten</b><br>" + (kartenZ || "—") + "<br><br>" +
+      "<b>Essenz</b><br>" + (matZ || "—") + "<br><br>" +
+      "<b>+" + fmt(goldSum) + " Gold</b>" +
+      (pityTreffer ? "<br>🛟 Mitleids-Garantie " + pityTreffer + "× ausgelöst" : "") +
+      "<br><br><i>Die Karten liegen in der Sammlung. Beste Stufe: " +
+      AC.TIERS[best].name + ".</i>",
+      "Weiter", function () { renderShop(); renderTop(); });
+    renderShop(); renderTop();
   }
   // Echtgeld: bewusst KEIN Wallet-Effekt, nur die ehrliche Ansage.
   function buyIap(id) {
@@ -8461,9 +9222,10 @@ button.pfplate{cursor:pointer}
     var g = null;
     GOLD_PACKS.forEach(function (x) { if (x.id === id) g = x; });
     if (!g) return;
+    var st = tagStand();
     if (g.free) {
-      if (goldFreeTaken) { UISfx.deny(); toast("Heute schon abgeholt"); return; }
-      goldFreeTaken = true;
+      if (st.goldGratis) { UISfx.deny(); toast("Heute schon abgeholt"); return; }
+      st.goldGratis = true; tagSpeichern(st);
     } else {
       if (gems() < g.cost) { UISfx.deny(); toast("Nicht genug Gems (" + fmt(g.cost) + ")"); return; }
       setGems(gems() - g.cost);
@@ -8477,23 +9239,40 @@ button.pfplate{cursor:pointer}
 
   function buyDeal(id) {
     var d = null;
-    DEALS.forEach(function (x) { if (x.id === id) d = x; });
+    dealsHeute().forEach(function (x) { if (x.id === id) d = x; });
     if (!d) return;
-    if ((d.avail - (dealUsed[d.id] | 0)) <= 0) { UISfx.deny(); toast("Ausverkauft"); return; }
+    var st = tagStand();
+    if (d.gratis) {
+      /* Genau EIN Gratis-Posten pro Tag, und genau EINMAL. Der Merker
+         liegt im Tagesstand, nicht in einer Modulvariablen — nach einem
+         Reload waere er sonst wieder frisch. */
+      if (st.gratis) { UISfx.deny(); toast("Heute schon abgeholt"); return; }
+      d.geben();
+      st.gratis = true; tagSpeichern(st);
+      UISfx.reward();
+      toast("Gratis abgeholt: " + fmt(d.zahl) + " " + d.name);
+      track("shop_deal_free", { id: id, amount: d.zahl });
+      renderShop(); renderTop();
+      return;
+    }
+    if ((d.stueck - (st.benutzt[d.id] | 0)) <= 0) { UISfx.deny(); toast("Ausverkauft"); return; }
     if (d.cur === "gold" && gold() < d.cost) { UISfx.deny(); toast("Nicht genug Gold"); return; }
     if (d.cur === "gems" && gems() < d.cost) { UISfx.deny(); toast("Nicht genug Gems"); return; }
     if (d.cur === "gold") setGold(gold() - d.cost);
     if (d.cur === "gems") setGems(gems() - d.cost);
-    d.give();
-    dealUsed[d.id] = (dealUsed[d.id] | 0) + 1;
+    d.geben();
+    st.benutzt[d.id] = (st.benutzt[d.id] | 0) + 1;
+    tagSpeichern(st);
     UISfx.confirm();
     toast("Gekauft: " + d.name);
-    renderShop();
+    track("shop_deal_buy", { id: id, cur: d.cur, cost: d.cost });
+    renderShop(); renderTop();
   }
   function buyPack(key) {
     if (key === "free") {
-      if (freeDailyTaken) { UISfx.deny(); toast("Heute schon abgeholt"); return; }
-      freeDailyTaken = true; UISfx.reward();
+      var stp = tagStand();
+      if (stp.packGratis) { UISfx.deny(); toast("Heute schon abgeholt"); return; }
+      stp.packGratis = true; tagSpeichern(stp); UISfx.reward();
       openPackKey("bronze"); show("navPack"); return;
     }
     var sp = null;
@@ -10734,7 +11513,12 @@ button.pfplate{cursor:pointer}
   var SAVE_KEYS = ["arenaCards", "arenaHubGold", "arenaHubGems", "arenaFortress", "arenaSkins",
     "arenaFortLayout", "arenaClan", "arenaPass", "arenaMail", "arenaSettings",
     "arenaVault", "arenaDaily", "arenaTelemetry", "arenaDailyOpen",
-    "arenaProtoSeed", "arenaClanProtoSeed", "arenaPassProtoSeed", "arenaLoopProtoSeed"];
+    "arenaProtoSeed", "arenaClanProtoSeed", "arenaPassProtoSeed", "arenaLoopProtoSeed",
+    /* Tagesstand des Shops: welche Angebote heute schon gekauft, ob der
+       Gratis-Posten, das Gratis-Pack und das Tagesgold abgeholt sind.
+       Gehoert in Export UND Wipe — sonst wandert der „schon abgeholt"-
+       Zustand nicht mit dem Spielstand mit bzw. ueberlebt ein Zuruecksetzen. */
+    "arenaShopTag"];
   function exportSave() {
     var out = { _app: "arcane-prism-td", _v: 1, _ts: Date.now(), data: {} };
     SAVE_KEYS.forEach(function (k) {
@@ -10920,16 +11704,23 @@ button.pfplate{cursor:pointer}
   }
 
   /* ---------- Kristalltresor ---------- */
+  /* Der Tresor in der Bauform des Tagesbands (siehe `.tagesband`):
+     eingesenkter Bildkasten links, Text mit Fortschrittsbalken in der
+     Mitte, Knopf rechts. Der Balken ist neu — die Fuellstands-Saeule im
+     Bildkasten liegt HINTER dem Artwork und ist klein; „wie weit noch?"
+     muss man ohne Rechnen sehen koennen. */
   function vaultHTML(v, forShop) {
     var btn = v.gems > 0
       ? '<button class="vaultbtn pressable" data-openvault="1">' + v.priceText +
         "<small>" + fmt(v.gems) + " Gems holen</small></button>"
       : '<div class="vaultbtn dim">leer<small>gewinne Matches</small></div>';
+    var pct = Math.max(0, Math.min(100, v.pct * 100));
     return '<div class="vaultjar" data-vaultart="offer_vault_bank">' +
-        '<span class="fill" style="height:' + (v.pct * 100).toFixed(1) + '%"></span>' +
+        '<span class="fill" style="height:' + pct.toFixed(1) + '%"></span>' +
         '<span class="gem">' + ico("cur_gem", "💚") + "</span></div>" +
       '<div class="vaultmeta"><div class="vnm">Kristalltresor</div>' +
         '<div class="vnum">' + fmt(v.gems) + " / " + fmt(v.cap) + "</div>" +
+        '<div class="vbar"><i style="width:' + pct.toFixed(1) + '%"></i></div>' +
         '<div class="vsub">' + (v.full
           ? "VOLL — jeder weitere Sieg verpufft."
           : "+" + v.perWin + " Gems je Sieg · noch " + v.winsLeft + " Siege") +
@@ -10953,9 +11744,13 @@ button.pfplate{cursor:pointer}
          .tinted-Koerper bleibt darunter und traegt weiter den Zustand
          „voll" (Gold statt Smaragd). */
       bgArt(el, "bg_vault");
-      /* Das Glaskugel-Artwork liegt UEBER der Fuellstands-Saeule: Die
+      /* Das Tresor-Artwork liegt UEBER der Fuellstands-Saeule: Die
          Saeule zeigt den Stand, das Artwork gibt ihr das Gefaess. Faellt
-         das Bild aus, bleibt die reine CSS-Saeule sichtbar. */
+         das Bild aus, bleibt die reine CSS-Saeule sichtbar.
+         ⚠ `background-size:contain` steht im Blatt bei `.vaultjar` und
+         ist Teil des Fixes: das Motiv ist 1:1, der Kasten ist es jetzt
+         auch, also wird nichts mehr gequetscht und nichts mehr von einer
+         clip-path-Kante abgeschnitten. */
       Array.prototype.forEach.call(el.querySelectorAll("[data-vaultart]"), function (j) {
         var k = j.getAttribute("data-vaultart");
         if (ASSETS[k]) j.style.backgroundImage = 'url("' + ASSETS[k] + '")';
@@ -12865,6 +13660,17 @@ button.pfplate{cursor:pointer}
                      ASSETS: ASSETS, ARENA_TIERS: ARENA_TIERS, renderHome: renderHome,
                      openRoad: openRoad, closeRoad: closeRoad, nodeList: nodeList,
                      LEAGUE_GATES: LEAGUE_GATES, renderShop: renderShop,
+                     /* Shop-Tagessystem — fuer Pruefungen offengelegt:
+                        die Ziehung muss von aussen mit einem festen
+                        Tagesindex nachgerechnet werden koennen. */
+                     zieheTagesangebote: zieheTagesangebote,
+                     dealsHeute: dealsHeute, shopHash: shopHash,
+                     shopTagIndex: shopTagIndex, tagStand: tagStand,
+                     tagSpeichern: tagSpeichern, DEAL_WAREN: DEAL_WAREN,
+                     DEAL_GRATIS: DEAL_GRATIS, SHOP_PACKS: SHOP_PACKS,
+                     GOLD_PACKS: GOLD_PACKS, VORRAT: VORRAT,
+                     vorratRabatt: vorratRabatt, renderVorrat: renderVorrat,
+                     oeffneVorrat: oeffneVorrat, buyPack: buyPack,
                      renderFortress: renderFortress, buyDeal: buyDeal, buyFort: buyFort,
                      setFortLayout: setFortLayout, renderBanners: renderBanners,
                      fortLayout: function () { return fortLayout; },
