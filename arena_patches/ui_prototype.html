@@ -142,6 +142,13 @@ button{font-family:inherit;color:inherit;border:0;background:none;cursor:pointer
   min-height:74px;overflow:visible;z-index:6}
 .apphead .headcol{flex:1;min-width:0;display:flex;flex-direction:column;
   justify-content:center;gap:4px;padding:7px 0}
+/* Ausserhalb der Startseite bleibt oben nur die Waehrungsleiste stehen
+   (AA, IMG_3380). Sie rueckt dann an den linken Rand, weil das Portrait
+   den Platz nicht mehr belegt. */
+body.nur-waehrung .apphead .avatar,
+body.nur-waehrung .apphead .profrow{display:none}
+body.nur-waehrung .apphead{padding-inline:8px;min-height:0}
+body.nur-waehrung .apphead .headcol{padding:6px 0}
 .topbar{background:linear-gradient(180deg,#101922,#0a1017);border:1px solid #1d2a35;
   border-radius:11px;padding:4px 7px;display:flex;gap:0;align-items:center;
   justify-content:space-between;flex:0 0 auto;box-shadow:var(--mat-well)}
@@ -162,12 +169,25 @@ button{font-family:inherit;color:inherit;border:0;background:none;cursor:pointer
    noch hat. „1 136" wurde dadurch zu „1…".
    Die Platte traegt jetzt der .topbar, die Waehrungen sind nur noch
    Gruppen mit einem duennen Trenner dazwischen. */
-.cur{flex:0 1 auto;min-width:0;display:flex;align-items:center;gap:4px;
-  background:none;border:0;border-radius:0;padding:0 6px;font-size:14px;font-weight:800;
+/* ⚠ „Unser Gold-/Kristalle-Balken ist nicht komplett gefuellt." Stimmt,
+   und die Ursache war `flex:0 1 auto`: jede Gruppe war nur so breit wie
+   ihr Inhalt, der Rest der Leiste blieb leer. AA teilt die Leiste in
+   drei GLEICHE Drittel (gemessen an IMG_3380: 32 % je Gruppe, zusammen
+   96 % der Breite) und setzt das Icon links an die Kante, halb ueber
+   die Pille. Die Zahl steht danach, linksbuendig — nicht zentriert, das
+   waere bei „1 136" gegen „30 272" ein Springen. */
+.cur{flex:1 1 0;min-width:0;display:flex;align-items:center;gap:6px;
+  background:none;border:0;border-radius:0;padding:0 4px 0 0;
+  font-size:14px;font-weight:800;
   white-space:nowrap;overflow:visible}
-.cur + .cur{border-left:1px solid #1d2a35}
-.cur i{font-style:normal;font-size:17px;display:flex;align-items:center}
-.cur .ico{width:21px;height:21px}
+.cur + .cur{border-left:1px solid #1d2a35;padding-left:8px}
+/* Die Zahl nimmt den Rest der Gruppe ein — dadurch ist die Leiste
+   tatsaechlich gefuellt und der Plus-Knopf sitzt immer rechts aussen. */
+.cur span:not(.plus){flex:1 1 auto;min-width:0;overflow:hidden;
+  text-overflow:ellipsis}
+.cur i{font-style:normal;font-size:17px;display:flex;align-items:center;
+  flex:0 0 auto}
+.cur .ico{width:23px;height:23px}
 /* Die Zahl bekommt Luft nach rechts, damit der Plus-Knopf nicht klebt. */
 .cur span:not(.plus){letter-spacing:.01em}
 /* Waehrungs-Pillen tragen die Identitaetsfarbe ihrer Waehrung: die Zahl
@@ -11531,6 +11551,15 @@ button.pfplate{cursor:pointer}
     $("detailModal").classList.remove("open");
     // Match-Ende blendet die Bottom-Nav aus (siehe CSS body.me-open).
     document.body.classList.toggle("me-open", navId === "navMatchEnd");
+    /* ⚠ KORREKTUR meiner eigenen Entscheidung. Ich hatte die Namenszeile
+       global gemacht mit der Begruendung, AA zeige sie „auch hinter dem
+       Profil- und dem Belohnungsfenster" (IMG_3347, IMG_3338). Das
+       stimmt — aber das sind MODALS UEBER DER STARTSEITE. AAs Shop
+       (IMG_3380) traegt oben nur die Waehrungsleiste: kein Portrait,
+       kein Name, kein Menue.
+       Der Kopf gehoert also zur Startseite, die Waehrungsleiste ist
+       global. Genau so steht es jetzt im Code. */
+    document.body.classList.toggle("nur-waehrung", navId !== "navHome");
     for (var k in NAVS) {
       var vw = $(NAVS[k]); if (vw) vw.classList.toggle("active", k === navId);
     }
