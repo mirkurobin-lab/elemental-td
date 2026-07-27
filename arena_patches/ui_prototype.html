@@ -3837,6 +3837,18 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .qbar,.artbox,.reqslot,.emotok,.castlestage,.mnb,.mmbar{box-shadow:var(--mat-well)}
 /* Der Fuellstand liegt IM Behaelter, also erhaben mit Oberkante. */
 .qfill,.mnb i,.mmbar i{box-shadow:var(--lit),var(--unlit)}
+/* --- CLAN: mit 29 % war die Clan-Ansicht die schwaechste einzelne View
+   und damit ueber der 25-%-Grenze. Gemessen waren die groessten flachen
+   Flaechen dort .tab (Reiter), .cbanner (Wappen), .qmine (eigener
+   Quest-Anteil) und die Bandschrift. Reiter und Wappen sind Koerper,
+   die man anfasst — sie gehoeren erhaben; der eigene Anteil liegt IM
+   Balken und bekommt deshalb dieselbe Oberkante wie .qfill. --- */
+.tab,.cbanner,.cmrow,.ctab{box-shadow:var(--mat-raised)}
+/* .warwait ist die grosse Wartetafel im Kriegsreiter — sie fuellt fast
+   die halbe Ansicht und war die eigentliche Ursache der 29 %. Sie ist
+   ein Behaelter, kein Knopf: eingesenkt, nicht erhaben. */
+.warwait,.warboard,.warslot{box-shadow:var(--mat-well)}
+.qmine{box-shadow:var(--lit),var(--unlit)}
 /* --- STARTSEITE: der erste Screen war mit 64 % ohne Tiefe der
    schwaechste von allen, und der Mittelwert ueber 12 Views hatte das
    verdeckt. Wer die App oeffnet, sieht genau diese Flaechen zuerst. --- */
