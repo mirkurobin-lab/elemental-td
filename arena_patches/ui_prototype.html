@@ -3967,6 +3967,281 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .frnote{margin-top:var(--gap-lg);font-size:10px;color:var(--dim);line-height:1.55;
   border-left:2px solid #3fa9e866;padding-left:8px}
 
+/* ==================================================================
+ * PROFIL-FENSTER — AAs Spielerprofil, nachgemessen an IMG_3347/3348
+ * ------------------------------------------------------------------
+ * Oeffnet sich beim Tipp auf den eigenen Namen, auf eine Ranglisten-
+ * Zeile und auf einen Eintrag der Freundesliste. EIN Renderpfad fuer
+ * das eigene und fuer ein fremdes Profil; der Unterschied ist genau
+ * zweimal `eigen` (Stift-Knopf, Spieler-ID) und sonst nichts.
+ *
+ * FENSTERRAHMEN WIRD NICHT NEU ERFUNDEN. AAs Fensterform — helle Platte,
+ * blaues Titelband mit Pfeilenden, roter Schliessknopf — steht bereits
+ * als .stlayer/.stbox/.sthead/.stx im Blatt (Werte-Fenster des
+ * Endscreens). Dieses Fenster benutzt dieselben Klassen und aendert nur
+ * die Breite. Zwei Fensterchrome fuer dieselbe Fensterart waeren genau
+ * die Unregelmaessigkeit, die §3 verbietet.
+ *
+ * DREI FLAECHENSTUFEN, gemessen an AA und auf unsere Palette gelegt:
+ *   Fensterinnenflaeche  #4e6076  (eingesenkt, AA #5A79AE)
+ *   Block/Unterplatte    #5f7590  (erhaben,    AA #6A8CC3, = .stcard)
+ *   Zelle                #33465e  (eingesenkt, AA #3E5170)
+ *   Icon-Sockel          #22303f  (eingesenkt, AA #233145)
+ * DIE KONTRASTREGEL (§4): weisse und hellblaue Schrift steht
+ * AUSSCHLIESSLICH auf den beiden dunklen Stufen. Auf der hellen Platte
+ * stehen nur die Sektionstitel (18 px, fett — Grossschrift) und die
+ * Spieler-ID, und die traegt DUNKLE Schrift. Keine Ausnahme.
+ * ================================================================== */
+#pfLayer .stbox{max-width:430px}
+.pfbody{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  /* 12 px = AAs Rahmenstaerke 39/1320 = 2,95 % der Bildbreite */
+  margin:var(--gap-lg) var(--gap) var(--gap);padding:var(--pad);
+  border-radius:var(--radius);background:#4e6076;box-shadow:var(--mat-well);
+  display:flex;flex-direction:column;gap:var(--gap-lg)}
+.pfblock{border-radius:var(--radius);padding:var(--pad);background:#5f7590;
+  box-shadow:var(--mat-raised)}
+
+/* ---------- Kopfblock ----------
+   AA setzt Portrait und Textspalte auf dieselbe UNTERkante, nicht auf
+   dieselbe Oberkante: das Portrait beginnt 59 px hoeher (gemessen
+   555 gegen 614) und endet mit dem Status-Streifen. `flex-end` bildet
+   genau das ab, ohne eine Hoehe zu raten. */
+.pfhead{display:flex;align-items:flex-end;gap:var(--gap)}
+/* 104 px = 27,8 % der Inhaltsflaeche (AA 320 von 1153). KEIN
+   overflow:hidden — der Rahmenring liegt mit negativem inset aussen,
+   dieselbe Falle wie bei .avpvpic. */
+.pfpic{position:relative;flex:0 0 104px;width:104px;height:104px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:44px;
+  background:radial-gradient(circle at 50% 35%,#33475c,#0d151c 72%);
+  box-shadow:var(--sh-3)}
+.pfpic img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.pfpic .avemo{font-size:44px;line-height:1}
+/* Fremde Profile tragen kein Portrait-Asset — dort steht das ELEMENT
+   des Spielers. Ohne diese Zeile bliebe das Element-Icon bei seiner
+   Grundgroesse (1,25 em) und schwaemme klein im 104-px-Kreis. */
+.pfpic .pfelav{width:58%;height:58%;object-fit:contain}
+.pfpic span.pfelav{font-size:44px;line-height:1;width:auto;height:auto}
+.pfring{position:absolute;inset:-5%;pointer-events:none;border-radius:50%;
+  background-repeat:no-repeat;background-position:center;background-size:contain;
+  box-shadow:inset 0 0 0 3px var(--avring,#9aa3ad),0 0 14px -4px var(--avring,#9aa3ad)}
+/* Der Online-Punkt sitzt bei AA unten rechts am Portrait. */
+.pfdot{position:absolute;right:4%;bottom:8%;width:18px;height:18px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#5d6f7d,#26333d);
+  box-shadow:var(--lit),var(--unlit),var(--sh-1)}
+.pfdot.on{background:radial-gradient(circle at 35% 30%,#9dff7a,#2aa312)}
+.pfmeta{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+/* 34 px = AAs Zeilenhoehe 98..120 von 1320 (7,4..9,1 %). */
+.pfrow{display:flex;align-items:stretch;gap:5px;height:34px}
+.pffield{flex:1;min-width:0;display:flex;align-items:center;gap:7px;
+  padding:0 9px;border-radius:var(--radius-sm);
+  background:#33465e;box-shadow:var(--mat-well)}
+.pffield .pfnm{flex:1;min-width:0;font-size:15px;font-weight:900;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Zweite Zeile: derselbe Feldtyp, aber neben dem Rang-Chip bleibt
+   weniger Platz. 13 px statt 15 px halten „Prisma-Orden" ohne Ellipse. */
+.pffield.sm .pfnm{font-size:13px}
+/* Eingabefeld beim Umbenennen — eine Vertiefung, kein Knopf (wie .frinput). */
+.pffield input.pfnmedit{flex:1;min-width:0;font-family:inherit;font-size:14px;
+  font-weight:900;color:#fff;background:#0b1116;border:1px solid #6f8cab;
+  border-radius:8px;padding:4px 7px;box-shadow:var(--mat-well)}
+/* Quadratisches Plaettchen links (AA: 128 von 515 = 24,9 % der Zeile). */
+.pfplate{flex:0 0 38px;display:flex;align-items:center;justify-content:center;
+  border-radius:var(--radius-sm);background:#22303f;box-shadow:var(--mat-well)}
+.pfplate .ico{width:22px;height:22px}
+.pfplate span.ico{font-size:17px;line-height:1}
+button.pfplate{cursor:pointer}
+/* Clan-Wappen: EXAKT die Schildform aus der Rangliste (.lbrow .lbg) —
+   dieselbe Zugehoerigkeit wird nicht an zwei Stellen verschieden
+   gezeichnet. `filter:drop-shadow` statt box-shadow, weil ein
+   box-shadow an einem clip-path wirkungslos ist.
+   Das Wappen kann eine HELLE Farbe tragen; der Doppelschatten unter dem
+   Zeichen haelt es auch dort lesbar (§4). */
+.pfbadge{flex:0 0 38px;align-self:center;height:32px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;color:#fff;text-shadow:0 1px 2px #000c,0 0 4px #000a;
+  clip-path:polygon(0 0,100% 0,100% 74%,50% 100%,0 74%);
+  filter:drop-shadow(0 2px 3px #0009)}
+/* Stift-Knopf: GOLDENE Flaeche, deshalb DUNKLE Glyphe (§4). Dieselbe
+   Farbfolge wie .avtab.on und .passprog .ppn. */
+.pfedit{flex:0 0 32px;display:flex;align-items:center;justify-content:center;
+  border-radius:var(--radius-sm);font-size:15px;color:#2a1d00;
+  background:linear-gradient(180deg,#f4e3a6,#e0b94a 58%,#a8842a);
+  box-shadow:var(--mat-raised);transition:transform var(--t-fast) var(--ease-out)}
+.pfedit .ico{width:18px;height:18px}
+/* Weltrang-Chip rechts in Zeile 2 (AA: Zahl mit Emblem). */
+.pfrank{flex:0 0 auto;display:flex;align-items:center;gap:5px;padding:0 9px;
+  border-radius:var(--radius-sm);background:#22303f;box-shadow:var(--mat-well);
+  font-size:13px;font-weight:900;color:#fff}
+.pfrank .ico{width:18px;height:18px}
+.pfrank span.ico{font-size:14px;line-height:1}
+/* 13 px = AAs 40 von 1320 (3,0 %). */
+.pfstatus{height:13px;display:flex;align-items:center;padding:0 9px;
+  border-radius:7px;background:#33465e;box-shadow:var(--mat-well);
+  font-size:9px;font-weight:900;letter-spacing:.06em;color:#9fb3c1}
+.pfstatus.on{color:#7ef25e}
+
+/* ---------- Kennzahl- und Statistik-Raster ----------
+   Zwei gleiche Spalten, Zellenhoehe 39 px = AAs 121 von 1320 (9,2 %). */
+.pfgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);
+  margin-top:var(--gap-lg)}
+.pfcell{display:flex;align-items:center;gap:8px;min-height:39px;padding:0 9px;
+  border-radius:var(--radius-sm);background:#33465e;box-shadow:var(--mat-well)}
+.pfcell.ico0{padding-left:0}
+/* Icon-Sockel: 34 px = 24,9 % der Zellenbreite (AA 128 von 515). */
+.pfci{flex:0 0 34px;align-self:stretch;display:flex;align-items:center;
+  justify-content:center;border-radius:var(--radius-sm) 0 0 var(--radius-sm);
+  background:#22303f;box-shadow:var(--sunk)}
+.pfci .ico{width:24px;height:24px;filter:var(--frei) drop-shadow(0 1px 2px #0009)}
+.pfci span.ico{font-size:19px;line-height:1}
+.pfct{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
+/* Beschriftung hellblau auf DUNKLER Zelle — die erlaubte Richtung.
+   #57c8ee steht schon im Blatt (.sttab.me), keine neue Farbe. */
+.pfcl{font-size:10px;font-weight:900;letter-spacing:.02em;color:#57c8ee;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pfcv{font-size:17px;font-weight:900;line-height:1.1;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  text-shadow:0 1px 2px #0007}
+/* Geteilte Zelle „1. Platz | Top 10" — ein senkrechter Strich, zwei Werte. */
+.pfcell.split{padding:0}
+/* Beschriftung ueber Wert — dieselbe Stapelung wie in .pfct. Ohne
+   flex-direction stehen Label und Zahl nebeneinander („1. Platz0"). */
+.pfhalf{flex:1;min-width:0;display:flex;flex-direction:column;
+  justify-content:center;padding:2px 9px}
+.pfhalf + .pfhalf{border-left:1px solid #ffffff26}
+/* Arena-Zelle: das Wappen sitzt bei AA AUSSERHALB der Zelle und
+   ueberlappt sie um 6 % — dadurch ist die Zelle schmaler als die
+   uebrigen. Genau so, nicht als weiteres Icon-Plaettchen. */
+/* Gemessen an AA (Spalte 128..642): das Wappen liegt 89..280, die Zelle
+   287..642. Es ragt also 39 px NACH LINKS aus der Rasterspalte heraus
+   (7,6 % der Spaltenbreite) und ist 37 % breit; die Zelle bekommt den
+   Rest. Genau daher ist AAs Arena-Zelle schmaler als die uebrigen fuenf
+   — nicht weil sie weniger Text traegt. */
+.pfarena{display:flex;align-items:center;min-height:39px}
+.pfcrest{position:relative;flex:0 0 37%;margin-left:-7.6%;margin-right:1.4%;
+  height:49px;z-index:2;display:flex;align-items:center;justify-content:center}
+.pfcrest .ico{width:100%;height:100%;object-fit:contain;
+  filter:var(--frei) drop-shadow(0 2px 4px #000a)}
+.pfcrest span.ico{font-size:30px;line-height:1}
+/* Die Zahl steht auf einem EIGENEN dunklen Plaettchen, nicht direkt auf
+   dem Wappen: welche Helligkeit dessen Mitte hat, haengt davon ab, ob
+   das Artwork geladen ist (Lehre aus §6c). */
+.pfcrest b{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);
+  min-width:17px;padding:0 4px;border-radius:6px;background:#0b1116e0;
+  font-size:11px;font-weight:900;line-height:16px;text-align:center;color:#fff}
+.pfarena .pfcell{flex:1;min-width:0;padding-left:10px}
+/* Der Arenaname ist der einzige LANGE Wert im Raster („Prisma-Zitadelle"
+   = 16 Zeichen). AA setzt ihn deshalb kleiner als die Zahlen — gemessen
+   32 px Versalhoehe gegen 36 px bei „1204". Dieselbe Staffelung hier,
+   sonst steht dort dauerhaft eine Ellipse. */
+.pfarena .pfcv{font-size:13px;letter-spacing:-.015em}
+
+/* ---------- Sektionstrenner ----------
+   AA: duenne Linie links und rechts, je eine Raute nach innen, in der
+   Mitte Emblem und Text. Bewusst NICHT .secribbon: das helle Kit-Band
+   ist ein Kopfzeilen-Element und wuerde hier — dreimal im selben
+   Fenster, auf ohnehin heller Platte — die Blockstruktur zerschlagen.
+   Gemessen: Linie 83..419 und 900..1237, Rauten bei 422 und 863,
+   Emblem 96 px (7,3 % der Bildbreite). */
+.pfsec{display:flex;align-items:center;gap:8px;margin-bottom:var(--gap-lg)}
+.pfsecline{flex:1;height:3px;border-radius:2px}
+.pfsecline.l{background:linear-gradient(90deg,#ffffff14,#ffffff59)}
+.pfsecline.r{background:linear-gradient(90deg,#ffffff59,#ffffff14)}
+.pfsecdia{flex:0 0 11px;width:11px;height:11px;transform:rotate(45deg);
+  border-radius:2px;background:#dbe6ef;box-shadow:var(--sh-1)}
+.pfsectitle{flex:0 0 auto;display:flex;align-items:center;gap:8px;
+  font-size:18px;font-weight:900;letter-spacing:.02em;color:#fff;
+  text-shadow:0 2px 0 #2a3a52,0 3px 8px #0009}
+.pfsectitle .ico{width:31px;height:31px;filter:var(--frei) drop-shadow(0 2px 3px #0009)}
+.pfsectitle span.ico{font-size:24px;line-height:1}
+
+/* ---------- Kampfdeck ----------
+   38,6 % Held : 57,7 % Turmraster, dazwischen 3,8 % — gemessen an AA
+   (405 / 605 / 40 von 1049). Beide Kartenarten sind 3:4 (AA 0,735). */
+.pfdeck{display:grid;grid-template-columns:38.6% 1fr;gap:var(--gap-lg);
+  align-items:start}
+.pfhero,.pfcard{position:relative;aspect-ratio:3/4;border-radius:var(--radius-sm);
+  border:2px solid #6f8cab;background:linear-gradient(180deg,#4f86d8,#2f5c9e);
+  overflow:visible;box-shadow:var(--mat-raised)}
+.pfhero{font-size:44px}
+.pfcard{font-size:22px}
+/* Die gruen umrandete Karte ist bei AA die hervorgehobene. Bei uns
+   markiert sie die STAERKSTE Karte des Decks (hoechste Stufe) — ein
+   abgeleiteter, nachpruefbarer Zustand statt einer Zufallsmarkierung. */
+.pfcard.top{border-color:#8bd14a;box-shadow:var(--mat-raised),0 0 0 2px #8bd14a66}
+/* Elementchip oben links: 31 % der Kartenbreite (AA 57 von 184). */
+.pfchip{position:absolute;left:5%;top:4%;z-index:4;width:31%;aspect-ratio:1;
+  display:flex;align-items:center;justify-content:center}
+.pfchip .ico{width:100%;height:100%;object-fit:contain;
+  filter:var(--frei) drop-shadow(0 2px 3px #000b)}
+.pfchip span.ico{font-size:13px;line-height:1}
+.pfhero .pfchip span.ico{font-size:18px}
+/* Raritaets-Chip oben rechts. AA setzt dort den Skill der Heldenkarte;
+   wir haben keinen Heldenskill, aber die Raritaet ist die zweite
+   Aussage, die zu einer Karte gehoert — und sie hat bereits eine Farbe. */
+.pftier{position:absolute;right:5%;top:4%;z-index:4;padding:2px 6px;
+  border-radius:7px;font-size:8px;font-weight:900;letter-spacing:.04em;
+  color:#0b1116;background:var(--pftier,#9aa3ad);box-shadow:var(--mat-raised)}
+/* „LvL xx"-Band: 74 % breit, 18 % hoch, unten zentriert (AA 137x44
+   von 184x249). Beim Helden sitzt es bei 66 % Hoehe und ist 62 % breit,
+   weil darunter die beiden Sockel stehen. */
+.pflvl{position:absolute;left:13%;right:13%;bottom:4%;z-index:4;
+  border-radius:7px;text-align:center;font-size:10px;font-weight:900;
+  letter-spacing:.03em;color:#fff;line-height:18px;
+  background:#0b1116cc;box-shadow:var(--lit),var(--unlit)}
+.pfhero .pflvl{left:19%;right:19%;bottom:auto;top:64%;font-size:13px;line-height:24px}
+/* Zwei sechseckige Sockel unter der Heldenkarte (AA 36 % der Kartenbreite,
+   ueberlappen die Unterkante). Inhalt: die MERGE-BONI der Karte, Zahl =
+   ihr Prozentwert. Leerer Sockel = kein Bonus, keine erfundene Zahl. */
+.pfhex{position:absolute;left:9%;right:9%;bottom:-9%;z-index:5;
+  display:flex;justify-content:space-between}
+/* 40 % Breite je Sockel — AA misst 146 von 405 (36 %), die Sockel sitzen
+   bei 9,6 % und 54 % der Kartenbreite. */
+.pfhexs{position:relative;flex:0 0 40%;aspect-ratio:1;display:flex;
+  align-items:center;justify-content:center;
+  clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
+  background:linear-gradient(180deg,#3a4c63,#141d26)}
+.pfhexs.voll{background:linear-gradient(180deg,#5a6f8c,#1d2836)}
+.pfhexs .ico{width:64%;height:64%;object-fit:contain;
+  filter:var(--frei) drop-shadow(0 1px 2px #000a)}
+.pfhexs span.ico{font-size:17px;line-height:1}
+.pfhexs b{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);
+  min-width:18px;padding:0 4px;border-radius:6px;background:#0b1116e0;
+  font-size:10px;font-weight:900;line-height:15px;text-align:center;color:#fff}
+.pftowers{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap)}
+/* Seitenpunkte Deck 1 / Deck 2. */
+.pfdots{display:flex;justify-content:center;gap:8px;margin-top:22px}
+.pfdot2{width:13px;height:13px;border-radius:50%;background:#2c3a4a;
+  box-shadow:var(--mat-well);transition:background var(--t-fast) var(--ease-out)}
+.pfdot2.on{background:linear-gradient(180deg,#f4e3a6,#e0b94a 58%,#a8842a);
+  box-shadow:var(--mat-raised)}
+
+/* ---------- Wochenend-Herausforderung ---------- */
+.pfweek{margin-top:var(--gap-lg);text-align:center}
+/* 53 px = AAs 160 von 1153 (13,9 % der Inhaltsflaeche). */
+.pfweek .pfwico{width:53px;height:53px;object-fit:contain;
+  filter:var(--frei) drop-shadow(0 3px 6px #000a)}
+.pfweek span.pfwico{display:inline-block;font-size:42px;line-height:53px}
+.pfweek .pfwt{margin-top:4px;font-size:18px;font-weight:900;color:#fff;
+  text-shadow:0 2px 0 #2a3a52,0 3px 8px #0009}
+/* AA setzt die beiden Wochenend-Zellen auf EINE Rasterspalte, mittig. */
+.pfweekcells{width:calc(50% - var(--gap) / 2);margin:var(--gap-lg) auto 0;
+  display:flex;flex-direction:column;gap:var(--gap)}
+.pfweekcells .pfcell{text-align:left}
+
+/* ---------- Spieler-ID ----------
+   Dunkle Schrift auf der hellen Platte — die Richtung, die §4 verlangt. */
+.pfid{display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-top:var(--gap-lg);font-size:12px;font-weight:900;letter-spacing:.03em;
+  color:#1b2531;text-shadow:0 1px 0 #ffffff40}
+.pfcopy{flex:0 0 26px;width:26px;height:26px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  background:#33465e;box-shadow:var(--mat-raised);color:#dbe6ef;font-size:13px}
+.pfcopy .ico{width:15px;height:15px}
+/* Der Hinweisstreifen unten benennt, woher die Zahlen kommen — dieselbe
+   Rolle wie .frnote in der Freundesliste. */
+.pfnote{margin-top:var(--gap-lg);font-size:10px;line-height:1.55;color:#1b2531cc;
+  border-left:2px solid #1b253159;padding-left:8px;text-align:left}
+
 </style>
 </head>
 <body>
@@ -4906,6 +5181,22 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   <div class="avcer" id="avCer"></div>
 </div>
 
+<!-- ===== PROFIL-FENSTER =====
+     Oeffnet beim Tipp auf den eigenen Namen (Profilzeile im globalen
+     Kopf), auf eine Ranglisten-Zeile und auf einen Eintrag der
+     Freundesliste. Das FENSTERCHROME ist geliehen:
+     .stlayer/.stbox/.sthead/.stx sind AAs Fensterform und stehen bereits
+     fuer das Werte-Fenster im Blatt — ein zweites Chrome fuer dieselbe
+     Fensterart waere Wildwuchs.
+     Der Inhalt wird komplett von renderProfil() erzeugt. -->
+<div class="stlayer" id="pfLayer">
+  <div class="stbox">
+    <button class="stx pressable" id="pfClose" aria-label="Schließen">✕</button>
+    <div class="sthead"><span class="stt">PROFIL</span></div>
+    <div class="pfbody" id="pfBody"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- ===== Karten-Wahl fuer die eigene Clan-Anfrage =====
@@ -4933,6 +5224,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 <script src="./arena_rivals.js"></script>
 <script src="./arena_clan.js"></script>
 <script src="./arena_friends.js"></script>
+<script src="./arena_profil.js"></script>
 <script src="./arena_vault.js"></script>
 <script src="./arena_daily.js"></script>
 <script src="./arena_rewards.js"></script>
@@ -8687,6 +8979,21 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     hydrateRibbons($("frPaneList"));
     frBind($("frPaneList"), "data-duel", frDuel);
     frBind($("frPaneList"), "data-gift", frGift);
+    /* Avatar und Namensfeld oeffnen das Profil; DUELL und Spende sind
+       eigene Knoepfe und bleiben davon unberuehrt, weil hier bewusst
+       nicht die ganze Zeile gebunden wird. */
+    Array.prototype.forEach.call($("frPaneList").querySelectorAll("[data-friend]"),
+      function (el) {
+        var id = el.getAttribute("data-friend");
+        Array.prototype.forEach.call(el.querySelectorAll(".frmeta,.fravatar"),
+          function (z) {
+            z.style.cursor = "pointer";
+            z.addEventListener("click", function () {
+              var f = FR.friend(id);
+              if (f) openProfilFreund(f);
+            });
+          });
+      });
     markPressable($("frPaneList"));
     sweepSoon($("frPaneList"));
   }
@@ -8908,6 +9215,18 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     }
     $("lbNote").textContent = txt + " Die 12 benannten Rivalen aus arena_rivals.js sind " +
       "in dieselbe Population einsortiert — keine zweite Bot-Welt.";
+    /* Jede Zeile oeffnet das Profil DIESES Spielers. Die eigene Zeile
+       oeffnet das eigene Profil — das entscheidet das Modul, nicht das
+       UI (ausRanglistenZeile prueft `row.me`). */
+    Array.prototype.forEach.call($("lbList").querySelectorAll("[data-lbrank]"),
+      function (el) {
+        el.addEventListener("click", function () {
+          var r = Number(el.getAttribute("data-lbrank"));
+          var row = null;
+          lb.rows.forEach(function (x) { if (x.rank === r) row = x; });
+          if (row) openProfilRang(row);
+        });
+      });
     markPressable($("lbList"));
   }
   function setLbTab(k) {
@@ -10568,7 +10887,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     $("avPreview").innerHTML =
       avPicHTML(act.avatar, "avpvpic", "avpvring", act.ringUrl, act.avatar.tierColor) +
       '<span class="avpvtxt">' +
-        '<span class="avpvn">Prisma-Magier</span>' +
+        '<span class="avpvn">' + (window.ArenaProfil
+          ? ArenaProfil.name() : "Prisma-Magier") + "</span>" +
         '<span class="avpvr">' + act.avatar.tierName.toUpperCase() + "</span>" +
         '<span class="avpvs">' + act.avatar.name + " · Rahmen <b>" + act.frame.name + "</b><br>" +
           "Stufe 4 · Arena " + arena.n + " " + arena.name + " · " +
@@ -10785,6 +11105,28 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
      Druck-Klasse hier von Hand gesetzt. */
   $("profAvatar").classList.add("pressable");
   $("profAvatar").addEventListener("click", function () { show("navEditProfile"); });
+  /* Der NAME oeffnet das Profil-Fenster, das PORTRAIT den Avatar-Editor.
+     Getrennte Flaechen, genau wie AA: dort fuehrt das Portrait in die
+     Avatarwahl und der Name ins Profil.
+     ⚠ ANGEPASST an den Kopf-Umbau (f99c5d2): der Patch beschrieb beide
+     als „zwei Ziele in EINER Zeile" — das galt, solange .profrow und der
+     Avatar zusammen in #viewHome standen. Der Avatar ist jetzt ein
+     Geschwister von .topbar/.profrow im globalen <header>, die beiden
+     liegen also gar nicht mehr in derselben Zeile. Die Aufteilung selbst
+     bleibt dieselbe, und weil der Kopf global ist, ist der Name
+     folgerichtig aus JEDER Ansicht heraus antippbar — genau das zeigt AA
+     auch, wenn es den Kopf hinter dem Profilfenster stehen laesst
+     (IMG_3347).
+     #profName ist seit dem Umbau das .pn-Element INNERHALB von
+     .profname; es traegt `flex:1`, ist also die Flaeche des Namens und
+     nicht die des XP-Rings daneben. */
+  $("profName").classList.add("pressable");
+  $("profName").title = "Profil ansehen";
+  $("profName").addEventListener("click", function () { openProfilEigen(); });
+  $("pfClose").addEventListener("click", closeProfil);
+  $("pfLayer").addEventListener("click", function (e) {
+    if (e.target === $("pfLayer")) closeProfil();
+  });
   $("avBack").addEventListener("click", function () { show("navHome"); });
   Array.prototype.forEach.call(document.querySelectorAll("[data-avtab]"), function (b) {
     b.addEventListener("click", function () {
@@ -11082,10 +11424,300 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 
   /* Hub-Kacheln auf Home mit Live-Zahlen fuellen. */
   /* Profilzeile + Season-Pass-Banner (AAs Positionen 12 % und 21 %). */
+  /* ==================================================================
+   * PROFIL-FENSTER — ein Renderpfad fuer eigenes UND fremdes Profil
+   * ------------------------------------------------------------------
+   * Dieser Block RECHNET NICHT. Jede Zahl, jede Beschriftung und jede
+   * Kartenstufe kommt fertig formatiert aus window.ArenaProfil
+   * (arena_profil.js); hier steht nur, wo sie hingehoert. Deshalb ist
+   * der Unterschied zwischen eigenem und fremdem Profil auch genau
+   * zwei `if (M.eigen)` — Stift-Knopf und Spieler-ID — und keine
+   * zweite Renderfunktion.
+   *
+   * ⚠ renderProfile() (englisch) ist die PROFILZEILE im Kopf.
+   *   renderProfil() (deutsch) ist DIESES Fenster. Die beiden Namen
+   *   liegen dicht beieinander; sie zu vertauschen faellt sofort auf,
+   *   weil die eine kein Argument nimmt und die andere ohne Modell
+   *   nichts zeichnet.
+   * ================================================================== */
+  function PFof() { return window.ArenaProfil || null; }
+  var pfM = null;        // aktuelles Profil-Modell
+  var pfDeck = 0;        // sichtbares Deck (Seitenpunkte)
+  var pfEdit = false;    // Umbenennen gerade aktiv?
+
+  /* Eine Karte des Decks. Artwork und Raritaetsrahmen kommen aus
+     artBox() — derselben Funktion, die Sammlung, Schmiede und Pack
+     benutzen. Kein rohes <img>, kein eigener Rahmen. */
+  function pfKarte(k, cls) {
+    var t = '<span class="pftier" style="--pftier:' + k.tierColor + '">' +
+      k.tierName.toUpperCase() + "</span>";
+    var titel = k.name + " · " + k.elName + " · " + k.tierName + " · " + k.lvlText +
+      ((cls || "").indexOf("top") >= 0 ? " — stärkste Karte des Decks" : "");
+    return '<div class="' + (cls || "pfcard") + '" title="' + titel +
+      '" data-karte="' + k.id + '">' +
+      artBox(k.id, k.tier) +
+      '<span class="pfchip">' + elIco(k.el, k.elEmoji) + "</span>" +
+      (k.held ? t : "") +
+      '<div class="pflvl">' + k.lvlText + "</div>" +
+      (k.held ? pfHexe(k) : "") +
+      "</div>";
+  }
+  /* Die beiden sechseckigen Sockel unter der Heldenkarte. Ein leerer
+     Sockel ist eine Aussage („dieser Bonus ist noch nicht gewaehlt");
+     eine Zahl hineinzuschreiben, die es nicht gibt, waere keine. */
+  function pfHexe(k) {
+    return '<div class="pfhex">' + (k.boni || [null, null]).map(function (b) {
+      if (!b) return '<span class="pfhexs" title="Noch kein Merge-Bonus"></span>';
+      return '<span class="pfhexs voll" title="' + b.txt + '">' +
+        elIco(b.el, "◆") + "<b>" + b.zahl + "</b></span>";
+    }).join("") + "</div>";
+  }
+  function pfZelle(z) {
+    var text = '<span class="pfct"><span class="pfcl">' + z.label + "</span>" +
+      '<span class="pfcv">' + z.wert + "</span></span>";
+    if (!z.wappen) {
+      return '<div class="pfcell ico0"><span class="pfci">' + ico(z.ico, z.emoji) +
+        "</span>" + text + "</div>";
+    }
+    // Arena: Wappen aussen, Zelle dadurch schmaler — AAs Anordnung.
+    return '<div class="pfarena"><span class="pfcrest">' + ico(z.ico, z.emoji) +
+      "<b>" + (z.arenaNr || "") + "</b></span>" +
+      '<div class="pfcell">' + text + "</div></div>";
+  }
+  function pfStatZelle(z) {
+    if (!z.geteilt) {
+      return '<div class="pfcell"><span class="pfct">' +
+        '<span class="pfcl">' + z.label + '</span>' +
+        '<span class="pfcv">' + z.wert + "</span></span></div>";
+    }
+    return '<div class="pfcell split">' +
+      '<span class="pfhalf"><span class="pfcl">' + z.labelA + "</span>" +
+        '<span class="pfcv">' + z.wertA + "</span></span>" +
+      '<span class="pfhalf"><span class="pfcl">' + z.labelB + "</span>" +
+        '<span class="pfcv">' + z.wertB + "</span></span></div>";
+  }
+  function pfSec(titel, icoKey, emoji) {
+    return '<div class="pfsec"><i class="pfsecline l"></i><i class="pfsecdia"></i>' +
+      '<span class="pfsectitle">' + (icoKey ? ico(icoKey, emoji) : "") +
+      titel + "</span>" +
+      '<i class="pfsecdia"></i><i class="pfsecline r"></i></div>';
+  }
+
+  function renderProfil() {
+    var M = pfM;
+    if (!M) return;
+    var d = M.decks[pfDeck] || M.decks[0];
+
+    /* Portrait: eigenes Profil traegt Avatar + Rahmen aus ArenaAvatars,
+       ein fremdes traegt sein Element — Bots haben kein Portrait-Asset,
+       und ein leerer Kreis waere schlechter als ein ehrliches Zeichen. */
+    var pic;
+    if (M.avatar) {
+      pic = avPicHTML(
+        { emoji: M.avatar.emoji, portraitUrl: M.avatar.portraitUrl },
+        "pfpic", "pfring", M.avatar.ringUrl, M.avatar.ringFarbe);
+    } else {
+      pic = '<span class="pfpic" style="--avring:#6f8cab">' +
+        elIco(M.el, M.elEmoji, "pfelav") + '<span class="pfring"></span></span>';
+    }
+    pic = pic.replace("</span>", '<span class="pfdot' + (M.online ? " on" : "") +
+      '"></span></span>');
+
+    /* Zeile 1: Plaettchen, Name, Stift. Das Plaettchen ist beim eigenen
+       Profil der Postfach-Knopf (AA hat dort ein Briefsymbol); bei
+       einem fremden Profil steht dort das Element des Spielers, weil
+       wir keine Spieler-zu-Spieler-Nachrichten haben und ein toter
+       Knopf schlechter ist als gar keiner. */
+    var plate = M.eigen
+      ? '<button class="pfplate pressable" id="pfMail" title="Postfach">' +
+        ico("ic_mail", "✉") + "</button>"
+      : '<span class="pfplate">' + elIco(M.el, M.elEmoji) + "</span>";
+    var nameFeld = pfEdit
+      ? '<input class="pfnmedit" id="pfNameEdit" maxlength="' + PFof().NAME_MAX +
+        '" value="' + M.name.replace(/"/g, "&quot;") + '">'
+      : '<span class="pfnm">' + M.name + "</span>";
+    var stift = M.eigen
+      ? '<button class="pfedit pressable" id="pfRename" title="Namen ändern">' +
+        (pfEdit ? ico("icon_check", "✓") : "✎") + "</button>"
+      : "";
+
+    /* Ein Wappen OHNE Clan waere eine falsche Aussage: die Ranglisten-
+       Zeile liefert immer eine Wappenfarbe mit, auch fuer clanlose
+       Spieler. Es steht deshalb nur, wenn auch ein Clanname steht. */
+    var clan = M.clanName || "Kein Clan";
+    var badge = (M.clanName && M.clanBadge)
+      ? '<span class="pfbadge" style="background:linear-gradient(160deg,' +
+        M.clanBadge.c1 + "," + M.clanBadge.c2 + ')">' + M.clanBadge.symChar + "</span>"
+      : '<span class="pfbadge" style="background:linear-gradient(160deg,#4a5f78,#101820)">·</span>';
+
+    var h = "";
+    /* ---- Block 1: Kopf + Kennzahlen ---- */
+    h += '<div class="pfblock">' +
+      '<div class="pfhead">' + pic +
+        '<div class="pfmeta">' +
+          '<div class="pfrow">' + plate +
+            '<div class="pffield">' + nameFeld + "</div>" + stift + "</div>" +
+          '<div class="pfrow">' + badge +
+            '<div class="pffield sm"><span class="pfnm">' + clan + "</span></div>" +
+            '<span class="pfrank">' + ico("ic_rank", "🏅") + M.rangText + "</span></div>" +
+          '<div class="pfstatus' + (M.online ? " on" : "") + '">' + M.statusText + "</div>" +
+        "</div>" +
+      "</div>" +
+      '<div class="pfgrid">' + M.kennzahlen.map(pfZelle).join("") + "</div></div>";
+
+    /* ---- Block 2: Kampfdeck ---- */
+    /* AAs Kampfdeck-Trenner traegt KEIN Emblem — nur Linie, Rauten und
+       Text. Erst der Statistik-Trenner hat eins (runde Medaille). */
+    h += '<div class="pfblock">' + pfSec("Kampfdeck") +
+      '<div class="pfdeck">' + pfKarte(d.held, "pfhero") +
+        '<div class="pftowers">' + (function () {
+          /* GENAU EINE Karte traegt die gruene Kante. Bei einem Spieler
+             mit durchgaengig gleicher Stufe (die Spitze der Rangliste
+             ist voll ausgebaut) wuerde ein reiner Vergleich alle sechs
+             markieren — dann sagt die Markierung nichts mehr. */
+          var besteI = 0;
+          d.tuerme.forEach(function (x, i) { if (x.lvl > d.tuerme[besteI].lvl) besteI = i; });
+          return d.tuerme.map(function (k, i) {
+            return pfKarte(k, "pfcard" + (i === besteI ? " top" : ""));
+          }).join("");
+        })() + "</div></div>" +
+      '<div class="pfdots">' + M.decks.map(function (_, i) {
+        return '<i class="pfdot2' + (i === pfDeck ? " on" : "") +
+          '" data-pfdeck="' + i + '"></i>';
+      }).join("") + "</div></div>";
+
+    /* ---- Block 3: Statistik + Wochenende + Spieler-ID ---- */
+    var w = M.wochenende;
+    h += '<div class="pfblock">' + pfSec("Statistik", "rank_gold", "🎖") +
+      '<div class="pfgrid" style="margin-top:0">' +
+        M.statistik.map(pfStatZelle).join("") + "</div>" +
+      '<div class="pfweek">' + ico(w.ico, w.emoji, "pfwico") +
+        '<div class="pfwt">' + w.titel + "</div>" +
+        '<div class="pfweekcells">' +
+          pfStatZelle({ geteilt: true, labelA: "1. Platz", wertA: w.erster,
+                        labelB: "Top 10", wertB: w.top10 }) +
+          pfStatZelle({ geteilt: false, label: "Teilgenommen", wert: w.teilgenommen }) +
+        "</div></div>" +
+      (M.eigen && M.spielerId
+        ? '<div class="pfid">Spieler-ID : ' + M.spielerId +
+          '<button class="pfcopy pressable" id="pfCopy" title="Kopieren">' +
+          ico("ic_share", "⧉") + "</button></div>"
+        : "") +
+      '<p class="pfnote">' + (M.eigen
+        ? "Alle Werte kommen aus deinem echten Spielstand — Karten, Clan, " +
+          "Matches, Avatar. Es gibt keinen zweiten Zähler."
+        : "Fremde Profile zeigen, was die Rangliste, der Clan und die " +
+          "Freundesliste hergeben; der Rest kommt deterministisch aus der " +
+          "Spieler-Id (arena_profil.js, Sim).") + "</p></div>";
+
+    $("pfBody").innerHTML = h;
+
+    /* Nachbereitung in genau der Reihenfolge, die der Rest des Prototyps
+       auch benutzt: erst Rahmen aufloesen, dann Druckverhalten, dann der
+       weiche Icon-Sweep. */
+    hydrateFrames($("pfBody"));
+    // Bewegte Fassung NUR auf der grossen Heldenkarte (§ CARD_LOOP).
+    var heroBox = $("pfBody").querySelector(".pfhero .artbox");
+    if (heroBox) attachLoop(heroBox, d.held.id);
+    markPressable($("pfBody"));
+    sweepSoon($("pfBody"));
+
+    Array.prototype.forEach.call($("pfBody").querySelectorAll("[data-pfdeck]"), function (el) {
+      el.addEventListener("click", function () {
+        pfDeck = Number(el.getAttribute("data-pfdeck")) || 0;
+        UISfx.tap();
+        renderProfil();
+      });
+    });
+    var mail = $("pfMail");
+    if (mail) mail.addEventListener("click", function () {
+      closeProfil(); show("navMail");
+    });
+    var ren = $("pfRename");
+    if (ren) ren.addEventListener("click", pfRename);
+    var inp = $("pfNameEdit");
+    if (inp) {
+      inp.focus();
+      try { inp.setSelectionRange(inp.value.length, inp.value.length); } catch (e) {}
+      inp.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") pfRename();
+        if (e.key === "Escape") { pfEdit = false; renderProfil(); }
+      });
+    }
+    var cp = $("pfCopy");
+    if (cp) cp.addEventListener("click", function () {
+      UISfx.tap();
+      try { if (navigator.clipboard) navigator.clipboard.writeText(M.spielerId); } catch (e) {}
+      toast("Spieler-ID " + M.spielerId + " kopiert.");
+    });
+  }
+
+  /* Umbenennen. Erster Tipp oeffnet das Feld, zweiter speichert. Die
+     PRUEFUNG liegt im Modul (Laenge, erlaubte Zeichen) — hier steht nur
+     die Rueckmeldung. */
+  function pfRename() {
+    var PF = PFof(); if (!PF) return;
+    if (!pfEdit) { pfEdit = true; renderProfil(); return; }
+    var inp = $("pfNameEdit");
+    var wert = inp ? inp.value : "";
+    try {
+      var neu = PF.setName(wert);
+      pfEdit = false;
+      pfM = PF.eigenes();
+      UISfx.confirm();
+      track("profil_umbenannt", { laenge: neu.length });
+      renderProfil();
+      renderProfile();                 // Profilzeile im Kopf zieht mit
+      if (typeof renderBoard === "function" && $("lbList")) renderBoard();
+      toast("Du heißt jetzt " + neu + ".");
+    } catch (e) {
+      UISfx.deny();
+      toast(e && e.message ? e.message : "Der Name geht nicht.");
+    }
+  }
+
+  function openProfil(modell) {
+    if (!modell) return;
+    pfM = modell;
+    pfDeck = modell.aktivesDeck || 0;
+    pfEdit = false;
+    renderProfil();
+    $("pfLayer").classList.add("open");
+    $("pfBody").scrollTop = 0;
+    UISfx.tap();
+    track("profil_geoeffnet", { eigen: !!modell.eigen });
+  }
+  function closeProfil() {
+    $("pfLayer").classList.remove("open");
+    pfEdit = false;
+    UISfx.tap();
+  }
+  /* Die drei Einstiege. Jeder gibt dem Modul das, was er hat; das Modul
+     holt sich den Rest. Deshalb steht hier keine Zeile Datenaufbereitung. */
+  function openProfilEigen() {
+    var PF = PFof();
+    if (!PF) { toast("arena_profil.js nicht geladen."); return; }
+    openProfil(PF.eigenes());
+  }
+  function openProfilRang(row) {
+    var PF = PFof(); if (!PF) return;
+    try { openProfil(PF.ausRanglistenZeile(row)); }
+    catch (e) { UISfx.deny(); toast(e.message); }
+  }
+  function openProfilFreund(f) {
+    var PF = PFof(); if (!PF) return;
+    try { openProfil(PF.ausFreund(f)); }
+    catch (e) { UISfx.deny(); toast(e.message); }
+  }
+
   function renderProfile() {
     var xpPct = 62;                            // Demo-XP-Ring
     $("profAvatar").style.setProperty("--xp", xpPct + "%");
-    $("profName").textContent = "Prisma-Magier";
+    /* Der Name gehoert ArenaProfil (setName/name), nicht dem Markup.
+       Ohne diese Zeile bliebe die Profilzeile nach dem Umbenennen auf
+       der alten Konstante stehen. */
+    $("profName").textContent = window.ArenaProfil
+      ? ArenaProfil.name() : "Prisma-Magier";
     $("profXp").textContent = "Stufe 4";
     // Der Ring zeigt, was der Fliesstext vorher ausgeschrieben hat.
     $("profXpRing").style.setProperty("--xp", xpPct + "%");
@@ -11298,7 +11930,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
     L.classList.remove("found");
     $("mmTitle").textContent = "Gegner wird gesucht";
     $("mmNote").textContent = "Arena wird vorbereitet …";
-    mmSeite($("mmMe"), "Prisma-Magier", DEMO_TROPHIES,
+    mmSeite($("mmMe"), window.ArenaProfil ? ArenaProfil.name() : "Prisma-Magier",
+      DEMO_TROPHIES,
             av && av.portraitUrl, (av && av.emoji) || "🧙");
     // Solange gesucht wird, steht auf der Gegnerseite ein Fragezeichen.
     mmSeite($("mmOpp"), "…", 0, null, "❓");
@@ -11588,7 +12221,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
    *      Geste ohne Antwort liest sich als Fehler.
    * ================================================================== */
   var SWIPE_ORDER = ["navShop", "navCollection", "navHome", "navClan", "navFortress"];
-  var SWIPE_LAYERS = ["#detailModal", "#roadLayer", "#stLayer", "#dailyLayer",
+  var SWIPE_LAYERS = ["#detailModal", "#roadLayer", "#stLayer", "#pfLayer", "#dailyLayer",
                       "#tbMenuLayer", "#rwLayer",
                       "#loginLayer", "#offerLayer", "#avCerLayer", "#mmLayer"];
 
