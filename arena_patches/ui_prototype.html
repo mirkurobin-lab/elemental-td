@@ -1547,7 +1547,10 @@ span.ico{text-align:center}
   background:linear-gradient(180deg,#ffd9a0,#f2a13d 60%,#a8621a);
   -webkit-text-fill-color:#3a2107;color:#3a2107}
 /* 6) Gem-Pakete + 7) Gold-Tausch — gleiche Geometrie, andere Farbe. */
-.gemgrid,.goldgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+/* Dieselbe Messung wie oben. AA stellt sechs Gem-Staffeln in zwei
+   Reihen zu dritt; wir hatten sechs in drei Reihen zu zweit und
+   brauchten dafuer 23 % Bildschirmhoehe je Reihe. */
+.gemgrid,.goldgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap)}
 .gemcard,.goldcard{position:relative;display:flex;flex-direction:column;align-items:center;
   gap:3px;padding:var(--pad) 8px 8px;border-radius:var(--radius);border:1px solid var(--line);
   text-align:center;overflow:hidden}
@@ -1609,12 +1612,34 @@ span.ico{text-align:center}
  * Rahmen muss die volle Kachel bedecken, das Produktbild aber nur den
  * Innenraum — zwei verschiedene background-size-Werte.
  * ================================================================== */
-.prodgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
-.prodgrid.g3{grid-template-columns:1fr 1fr 1fr}
+/* ==================================================================
+ * KARTENMASS — an AAs Screenshots nachgemessen (IMG_3375 Tagesangebote,
+ * IMG_3376 Gems/Gold, je 1320x2868, hier auf 921x2000 abgelesen)
+ * ------------------------------------------------------------------
+ *                      AA          wir (vorher)
+ *   Karten je Reihe      3            2
+ *   Kartenbreite      29,2 %       45,0 %
+ *   Kartenhoehe       20,6 %       23,0 %
+ *   Verhaeltnis        0,66         0,90
+ *
+ * Unsere Karten waren also gut die Haelfte zu breit und dabei fast
+ * quadratisch, wo AA hochkant baut. Der Nutzer: „Mach die Flaechen
+ * kleiner." Drei Spalten statt zwei ist dabei nicht Geschmack, sondern
+ * die Ursache: bei zwei Spalten MUSS jede Karte 45 % nehmen.
+ *
+ * `aspect-ratio` statt `min-height`: eine Mindesthoehe in Pixeln haelt
+ * das Verhaeltnis nur auf genau einer Geraetebreite. AAs 0,66 gilt auf
+ * jeder.
+ * ================================================================== */
+.prodgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap)}
+/* .g2 gibt es fuer die wenigen Stellen, an denen zwei Karten die Zeile
+   fuellen sollen (Paare ohne dritten Partner). */
+.prodgrid.g2{grid-template-columns:1fr 1fr}
+.prodgrid.g3{grid-template-columns:repeat(3,1fr)}
 .prodcard{position:relative;display:flex;flex-direction:column;align-items:center;
   border-radius:var(--radius);overflow:hidden;padding:0;
   background-image:linear-gradient(180deg,#1b2732,#0e1418);
-  border:1px solid var(--line);min-height:150px;text-align:center}
+  border:1px solid var(--line);aspect-ratio:.66;min-height:0;text-align:center}
 .prodcard.wide{grid-column:1/-1;min-height:118px}
 /* Das Produktbild ist ein FLEX-ITEM, nicht absolut positioniert: So
    reserviert es seinen Platz und kann den Text darunter nicht
@@ -1622,9 +1647,30 @@ span.ico{text-align:center}
    bedecken), das Produktbild braucht nur den Innenraum. */
 /* Groesser als vorher: ohne Rahmenbild ist das Produktbild der Held der
    Kachel. 82 % Breite / 92 px waren fuer eine Kachel MIT Rahmen bemessen. */
-.prodcard .pcart{position:relative;z-index:0;width:92%;height:108px;margin:10px auto 0;
-  display:flex;align-items:center;justify-content:center;font-size:36px;
-  filter:drop-shadow(0 4px 8px #000a)}
+/* AAs Bildkasten in den Tagesangeboten misst 170 x 165 px auf einer
+   269 px breiten Karte — also 63 % der Kartenbreite und praktisch
+   quadratisch, mittig, mit der Menge in seiner unteren rechten Ecke.
+   Unsere 92 % x 108 px waren fuer die doppelt so breite Karte bemessen. */
+/* AA gibt dem Produktbild einen EIGENEN Kasten: gerundetes Feld mit
+   Rand und dunklerem Grund, das Bild mittig darin, die Menge in der
+   unteren rechten Ecke DES KASTENS. Bei uns schwebte das Bild frei auf
+   der Karte — „es muss sauber aussehen" war genau das.
+   Der Kasten ist eingesenkt (--mat-well), weil er ein Behaelter ist;
+   das Bild darin traegt den Schlagschatten, damit es darin liegt und
+   nicht daraufklebt. */
+.prodcard .pcart{position:relative;z-index:0;width:63%;aspect-ratio:1;height:auto;
+  margin:9% auto 0;flex:0 0 auto;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+  border-radius:10px;border:1px solid #2b3b47;
+  background:linear-gradient(180deg,#16202a,#0a1017);
+  box-shadow:var(--mat-well)}
+.prodcard .pcart img.prodimg,.prodcard .pcart span.prodimg{
+  filter:var(--frei) drop-shadow(0 3px 6px #000c)}
+/* Die Menge sitzt IM Kasten, nicht darunter — sonst kostet sie eine
+   eigene Zeile und die Karte waechst wieder. */
+.prodcard .pcqty{position:absolute;right:4px;bottom:3px;z-index:2;
+  font-style:normal;font-size:10px;font-weight:900;letter-spacing:.02em;
+  color:#fff;text-shadow:0 1px 0 #000,0 0 5px #000c}
 .prodcard .pcart img.prodimg{width:100%;height:100%;object-fit:contain}
 /* Die Gold-Produktbilder sind gemessen stumpf: Farbton 35 Grad, aber nur
    0,32-0,39 Saettigung gegen 0,58 beim Waehrungs-Icon. Bei 108 px liest
@@ -1760,15 +1806,20 @@ span.ico{text-align:center}
   width:100%;max-width:100%;margin-inline:auto;
   min-height:44px;margin-block:var(--gap-lg) var(--gap);padding:6px 50px;
   background-repeat:no-repeat;background-position:center;background-size:100% 100%;
-  /* Dunkle Platte, passend zum Titelband — Rueckfall bei CDN-Ausfall. */
-  background-image:linear-gradient(180deg,#3b2668,#26174a 52%,#160e2c);
-  border-radius:var(--radius-sm);
+  /* KEINE Platte im Normalfall — die Bandgrafik ist der Grund. Sie kommt
+     nur zurueck, wenn das Bild nachweislich nicht laedt (.bandfehlt,
+     gesetzt von band()). Vorher stand sie immer da und ragte rings 7 px
+     ueber die Grafik hinaus: der „leicht schwarze Hintergrund". */
+  background-image:none;
+  border-radius:0;
   filter:drop-shadow(0 3px 7px #0009)}
+.secribbon.bandfehlt{background-image:linear-gradient(180deg,#3b2668,#26174a 52%,#160e2c);
+  border-radius:var(--radius-sm)}
+.secribbon.sm.bandfehlt{background-image:linear-gradient(180deg,#33215c,#211441 52%,#140c28)}
 /* Randbreite = Bandhoehe, wie bei h2.title.band9 (§6c). */
 .secribbon.band9{border-image-width:0 44px}
 .secribbon.sm.band9{border-image-width:0 34px}
-.secribbon.sm{min-height:34px;padding:5px 38px;
-  background-image:linear-gradient(180deg,#33215c,#211441 52%,#140c28)}
+.secribbon.sm{min-height:34px;padding:5px 38px}
 /* Der Grund ist jetzt DUNKEL — damit gilt hier dieselbe Behandlung wie
    beim Screen-Titel: heller Goldverlauf mit Schlagschatten. Die Regel
    des Projekts lautet nicht „auf Baendern steht dunkle Schrift", sondern
@@ -6054,7 +6105,22 @@ button.pfplate{cursor:pointer}
        Grund ⇒ dunkle Schrift, dunkler Grund ⇒ helle Schrift) statt gegen
        eine fest verdrahtete Annahme. */
     el.setAttribute("data-band", key);
-    if (ASSETS[key]) el.style.borderImageSource = 'url("' + ASSETS[key] + '")';
+    if (!ASSETS[key]) { el.classList.add("bandfehlt"); return; }
+    el.style.borderImageSource = 'url("' + ASSETS[key] + '")';
+    /* ⚠ Der Rueckfall stand vorher IMMER da — eine dunkle Platte als
+       `background-image`, zusaetzlich zur Bandgrafik. Beides zusammen
+       ergibt genau den Befund des Nutzers: „die Banner sind noch immer
+       mit leicht schwarzem Hintergrund, dieser sollte transparent sein."
+       Die Platte ragte rings 7 px ueber die Grafik hinaus, weil das Band
+       9-Slice ist und der Elementradius nicht dazu passt.
+       Der Rueckfall ist trotzdem noetig (§7b: faellt das CDN aus, waere
+       das Band sonst spurlos weg und die Ueberschrift stuende im Nichts).
+       Also wird er jetzt daran gebunden, was er behauptet: er erscheint,
+       WENN das Bild wirklich nicht laedt — nicht vorsorglich. */
+    var probe = new Image();
+    probe.onload = function () { el.classList.remove("bandfehlt"); };
+    probe.onerror = function () { el.classList.add("bandfehlt"); };
+    probe.src = ASSETS[key];
   }
 
   /* ==================================================================
@@ -7741,9 +7807,16 @@ button.pfplate{cursor:pointer}
       var left = d.avail - (dealUsed[d.id] | 0), sold = left <= 0;
       var price = d.cur === "free" ? "Gratis"
         : (d.cur === "gold" ? ico("cur_gold", "🪙") : ico("cur_gem", "💚")) + " " + fmt(d.cost);
+      /* AA trennt Name und Menge: der Name steht oben, die Menge sitzt
+         als „x20" in der unteren rechten Ecke des Bildkastens
+         (IMG_3375). Bei uns steckte sie im Namen — „Angriffs-Essenz x20"
+         — und liess ihn auf der schmalen Karte zweizeilig werden. */
+      var mng = /\s[x×]\s?(\d+)$/i.exec(d.name);
       return prodCard({
         frame: "light", art: d.art, emoji: d.emoji,
-        name: d.name, sub: "Verfügbar: " + Math.max(0, left),
+        name: mng ? d.name.slice(0, mng.index) : d.name,
+        qty: mng ? "×" + mng[1] : "",
+        sub: "Verfügbar: " + Math.max(0, left),
         btn: sold ? "Ausverkauft" : price, sold: sold, disabled: sold,
         btnCls: d.cur === "free" ? "freeprice" : (d.cur === "gems" ? "gemprice" : "goldprice"),
         btnAttr: 'data-buy="' + d.id + '"', attr: 'data-deal="' + d.id + '"',
@@ -7810,7 +7883,8 @@ button.pfplate{cursor:pointer}
     return '<div class="prodcard fr-' + o.frame + (o.wide ? " wide" : "") +
       (o.seal ? " hasseal" : "") + (o.sold ? " sold" : "") + '" ' + (o.attr || "") + ">" +
       seal +
-      '<span class="pcart">' + ico(o.art, o.emoji || "•", "prodimg") + "</span>" +
+      '<span class="pcart">' + ico(o.art, o.emoji || "•", "prodimg") +
+        (o.qty ? '<i class="pcqty">' + o.qty + "</i>" : "") + "</span>" +
       '<span class="pcfrm" data-prodfrm="' + FRAME_ASSET[o.frame] + '"></span>' +
       '<span class="pcbody">' +
         '<span class="pcnm">' + o.name + "</span>" +
