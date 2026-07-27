@@ -1,6 +1,6 @@
 {
- "_bytes": 75929961,
- "_dateien": 203,
+ "_bytes": 76582039,
+ "_dateien": 220,
  "_hinweis": "Erzeugt von werkzeuge/assets_sichern.py. Schluessel, Quell-URL, Dateiname, Groesse und SHA-256 je Asset — der Nachweis, dass die Datei im Repo die Datei vom CDN ist.",
  "assets": {
   "arena1": {
@@ -206,12 +206,54 @@
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095720_71db8bf1-f9c9-4acd-9d17-8ce7462e384d_min.webp",
    "sha256": "24e875db933d4aac2380ff3d97dba44bc3114c6b8fe5f26f473b09d3f8146241"
   },
+  "bg_clanhead": {
+   "bytes": 34612,
+   "datei": "bg_clanhead.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_185059_c87c68aa-65b4-49d7-a058-6df1255d7f86_min.webp",
+   "sha256": "0d6ad2dfce4f139692b7aa8935bc80cbd766a33222a6bc6c94949b4f149423d6"
+  },
   "bg_gratis_gold": {
    "bytes": 46204,
    "datei": "bg_gratis_gold.webp",
    "kleinfassung": true,
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_115109_14514643-f0df-4a9c-a503-cfa52a74f641_min.webp",
    "sha256": "162d1821c983c1884a403d776eb34eab15be35c711752fabc2d1f2ee94400404"
+  },
+  "bg_iap_arena": {
+   "bytes": 54298,
+   "datei": "bg_iap_arena.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_184110_8b8b9cc5-2c1e-4983-9a3b-6283386368a6_min.webp",
+   "sha256": "f1c4c7240268194e9d9044a8083325c1474ec463ca80e400ad31e1e845859fe1"
+  },
+  "bg_iap_starter": {
+   "bytes": 37232,
+   "datei": "bg_iap_starter.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_184126_97a9bd6e-e212-4152-a17b-6ace195d688e_min.webp",
+   "sha256": "c9f6439a04696ba02a1c64555c6ffc249d7285e49714a6ed15563dca65f52c9a"
+  },
+  "bg_offer": {
+   "bytes": 37784,
+   "datei": "bg_offer.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_185048_05f524ec-483b-4d76-a5fe-fc5ec620f184_min.webp",
+   "sha256": "4b9c73284ab44ea3992536cd27e6fc4e3c0189e75a561e7993c9b17e71a6ed3b"
+  },
+  "bg_promo_pass": {
+   "bytes": 32476,
+   "datei": "bg_promo_pass.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_184201_cc48b768-4e95-4eb4-aead-8a4b73cabac8_min.webp",
+   "sha256": "d45fbf5181b5bdce6bd7cb07716351065a38e4a5062b9278cd651c18bc2aba3e"
+  },
+  "bg_vault": {
+   "bytes": 43694,
+   "datei": "bg_vault.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_184212_a0d966f0-f946-4f8c-bfa9-23d46ac4555f_min.webp",
+   "sha256": "579ca47ea626643050f18a6aca5e5731658435a830e3d43ae50617dae8a88701"
   },
   "btn_danger": {
    "bytes": 16600,
@@ -318,6 +360,13 @@
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_141315_94331286-780b-4b74-8ee1-c8a3e15b9dac.mp4",
    "sha256": "1cbc55afda55805299053a3e081a8e5dd6d054d0147853399e70aef325666a71"
   },
+  "community_keyart": {
+   "bytes": 42482,
+   "datei": "community_keyart.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_065626_f7931d05-e285-4f34-a764-e5c5ef96fe7a_min.webp",
+   "sha256": "9aba1fa9158319067b304a251f0a985e6ccacd9f3fdf83b4b4ed5e25a387db1c"
+  },
   "cur_gem": {
    "bytes": 23606,
    "datei": "cur_gem.webp",
@@ -325,12 +374,26 @@
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_052852_3ecd5982-c573-4d8e-a549-2e408758481a_min.webp",
    "sha256": "dd5c894489c269963bf9fc41d1ee5eb92d9471646e9568a76580c6635159ad6d"
   },
+  "cur_gem_v1": {
+   "bytes": 30698,
+   "datei": "cur_gem_v1.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132708_f9dde68c-0307-479c-ad15-ca6f547df349_min.webp",
+   "sha256": "536d8ebef123fc9287c205f802c0905eaacaa4d3651038e735dd2b0cf69c6976"
+  },
   "cur_gold": {
    "bytes": 23186,
    "datei": "cur_gold.webp",
    "kleinfassung": true,
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_104310_f2790c69-df09-41cb-bfcf-a2bfcc46979c_min.webp",
    "sha256": "d62bf6c1109d6fecc569a98793559c5e00253c3c3cf7c526ec8377b2eca96823"
+  },
+  "cur_gold_v1": {
+   "bytes": 34838,
+   "datei": "cur_gold_v1.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132711_78da253c-5269-46c7-9d6a-eb30eb27bb56_min.webp",
+   "sha256": "72d92b9bd7e56d71cdb199d8f142ec5aa4fc950fe54e003e67751e6eaaef5fe4"
   },
   "cur_gold_v2": {
    "bytes": 31876,
@@ -590,6 +653,13 @@
    "kleinfassung": true,
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133759_5e7df04b-9d20-4c79-833f-e5e0f12d2173_min.webp",
    "sha256": "cbbb55ce7cdbffbd377f86ef6839a920790d84ac51c9d6f8ef7761b002848ac9"
+  },
+  "guide_keyart": {
+   "bytes": 79948,
+   "datei": "guide_keyart.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_065610_2c263397-46ab-4aaf-b2b1-81d196cf1b0a_min.webp",
+   "sha256": "ec5a00b5d5fb932cf65b8fe646a0aa2e929619b471994d2c13efcf2aa1a02462"
   },
   "hex_slot": {
    "bytes": 27020,
@@ -1290,6 +1360,55 @@
    "kleinfassung": true,
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042658_0e1c3c87-a56b-4948-a419-b8ca861c0493_min.webp",
    "sha256": "25b1d84876050b7e262441e868e0808016ccd5999d142ec2176d11aa86278d4e"
+  },
+  "soc_discord": {
+   "bytes": 34834,
+   "datei": "soc_discord.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_071549_cae05d17-c1b1-42b3-bc11-eadcf07f74c5_min.webp",
+   "sha256": "fa420d982c01d49f8dc8dfb374d0e714dd11d2ad04889ad35cdc81f945c0e37e"
+  },
+  "soc_facebook": {
+   "bytes": 34024,
+   "datei": "soc_facebook.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_065805_2c66e610-eaef-46c2-8d8d-ee2badf40fc0_min.webp",
+   "sha256": "22dd5a2a89b8ab6262921dcaa491e23b1839a1eb90a184c073c0324acacbef61"
+  },
+  "soc_instagram": {
+   "bytes": 33800,
+   "datei": "soc_instagram.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_065749_8ccf8708-1c5b-4697-808e-2e43512903f1_min.webp",
+   "sha256": "0ee6f08430e181b70477b6fd45896d7674ed18738656b4b51dbbdddd56d1b3a5"
+  },
+  "soc_reddit": {
+   "bytes": 30026,
+   "datei": "soc_reddit.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_065758_e7cd530b-d3da-4779-bdbb-026685306791_min.webp",
+   "sha256": "ad5c65d2ce76c20b07e9637f55a82ae18263b94ed3038dd0ba1b7be095b5b9f7"
+  },
+  "soc_tiktok": {
+   "bytes": 33022,
+   "datei": "soc_tiktok.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_065731_3c77e786-974c-472c-b4a6-0ff2fd9a6dc5_min.webp",
+   "sha256": "1c1213f4e2f5572b7c6ed3c399675cb4bdf10994dca3e8646b30dc173e1678b9"
+  },
+  "soc_x": {
+   "bytes": 33128,
+   "datei": "soc_x.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_065740_1167539f-58d8-402f-8824-a22a0c224b7e_min.webp",
+   "sha256": "2f08e57ac4caff876edc68819dd741b26c7b5c5b3d5514ad9a6b9ac56c4d88d3"
+  },
+  "soc_youtube": {
+   "bytes": 25182,
+   "datei": "soc_youtube.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_065720_d1663b7f-00b5-45b2-9b25-9bc119d208c2_min.webp",
+   "sha256": "74f561ed3f5545c79a59e4ce0fb449799afbf407c61206849cf0f7658c1ee044"
   },
   "splash_key": {
    "bytes": 31472,
