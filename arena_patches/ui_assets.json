@@ -5,7 +5,7 @@
     "styleSheetJob": "22646ce4-8685-46af-ad73-9ec32482c2c2",
     "modell": "nano_banana_pro (Higgsfield), resolution 1k, Style-Sheet als Bild-Referenz",
     "erzeugt": "2026-07-25",
-    "credits": "Batch 1: 25 Generationen x 2 = 50 Credits. Batch 2: 52 Generationen x 2 = 104 Credits. Batch 3 (Pack-Zeremonie): 1 Bild x 2 + 1 Video (kling3_0_turbo) x 7,5 = 9,5 Credits. Batch 3 (Festungs-Layout Variante 2 „Banner-Stapel\"): 4 Bilder x 2 = 8 Credits. Batch 4 (Karten-Artworks, Breitbanner, Emote-Tokens): 17 Bilder x 2 = 34 Credits. Batch 5 (Pass-Keyart-Video, 8 Karten-Loops, 6 CC0-Audiodateien): 9 Videos x 7,5 = 67,5 Credits; Audio 0 Credits (CC0 von OpenGameArt, siehe LIZENZEN.md). Gesamt 115 Assets / 273 Credits, 0 Retakes. Batch 8 (Endscreen-Politur): 4 Bilder x 2 = 8 Credits. Batch 12 (Produktbilder + Gratis-Motive): 5 Bilder x 2 = 10 Credits, davon 1 Verwurf (Kristalltresor v1: Randleuchten und zu wenig Randabstand).",
+    "credits": "Batch 1: 25 Generationen x 2 = 50 Credits. Batch 2: 52 Generationen x 2 = 104 Credits. Batch 3 (Pack-Zeremonie): 1 Bild x 2 + 1 Video (kling3_0_turbo) x 7,5 = 9,5 Credits. Batch 3 (Festungs-Layout Variante 2 „Banner-Stapel\"): 4 Bilder x 2 = 8 Credits. Batch 4 (Karten-Artworks, Breitbanner, Emote-Tokens): 17 Bilder x 2 = 34 Credits. Batch 5 (Pass-Keyart-Video, 8 Karten-Loops, 6 CC0-Audiodateien): 9 Videos x 7,5 = 67,5 Credits; Audio 0 Credits (CC0 von OpenGameArt, siehe LIZENZEN.md). Gesamt 115 Assets / 273 Credits, 0 Retakes. Batch 8 (Endscreen-Politur): 4 Bilder x 2 = 8 Credits. Batch 12 (Produktbilder + Gratis-Motive): 5 Bilder x 2 = 10 Credits, davon 1 Verwurf (Kristalltresor v1: Randleuchten und zu wenig Randabstand). Batch 13 (Startbildschirm/Splash): 4 Bilder x 2 = 8 Credits, 0 Retakes; 2 uebernommen (splash_key, splash_key_alt), 2 Schwestervarianten unbenutzt.",
     "palette": {
       "gold": "#e0b94a",
       "violett": "#7a4fd6",
@@ -1603,5 +1603,45 @@
     "size": "1024x1024",
     "batch": 12,
     "beschreibung": "Gratis-Abzeichen für das tägliche Bronze-Pack: Rosette mit rundem Smaragd-Siegel in goldenem Filigranring, gezackter Strahlenrand, zwei smaragdgrüne Bänder mit Goldkante. Textfrei — die Beschriftung „GRATIS“ bleibt HTML-Ebene (.freebadge). Freistehend, mittig, tiefschwarzer Grund ohne Randkontakt."
+  },
+  "splash_key": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_125553_fd16ccae-0396-4d5a-8cf1-bd4f3e7f2ac3.png",
+    "min": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_125553_fd16ccae-0396-4d5a-8cf1-bd4f3e7f2ac3_min.webp",
+    "job": "fd16ccae-0396-4d5a-8cf1-bd4f3e7f2ac3",
+    "type": "kulisse",
+    "size": "768x1376",
+    "seitenverhaeltnis": "9:16",
+    "batch": 13,
+    "titelzone": {
+      "bereich": "y 8–30 % der Bildhöhe",
+      "L_mittel": 16.8,
+      "L_p95": 31.5,
+      "L_max": 44.6,
+      "lokale_stdabw_mittel": 1.0,
+      "lokale_stdabw_p95": 2.1,
+      "beschnitt_6prozent": "L_mittel 17,9 / p95 32,1 / Stdabw 1,2 — bleibt auch bei 6 % Beschnitt oben und unten gültig",
+      "grenzwerte": "gefordert L_mittel < 60 und p95 < 110 — beide Werte weit darunter, weißer Titel trägt sicher"
+    },
+    "beschreibung": "STARTBILDSCHIRM (Splash, erscheint beim Öffnen der App) — Hauptkandidat „Prisma-Kammer“: ein großer geschliffener Prisma-Kristall schwebt über einem gold-eingelegten Obsidian-Podest und bricht einen von oben fallenden Lichtstrahl in einen Spektralfächer, der über den polierten Boden läuft; dahinter drei schlanke Kristalltürme mit Goldfiligran-Kronen, umherschwebende Gem-Splitter. Oberes Drittel ist dunkles Gewölbe — bewusst leer als ruhige Zone für den typografischen Schriftzug „ARCANE PRISM TD“. Licht kommt strikt von oben (Designsystem-Regel). TEXTFREI (Tesseract-OCR ohne Wortfund, nur Kantenrauschen). ROLLE = KULISSE: cover, NICHT freistellen."
+  },
+  "splash_key_alt": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_125535_bdba08a5-85ea-4b9b-9220-8d24ce4f7d38.png",
+    "min": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_125535_bdba08a5-85ea-4b9b-9220-8d24ce4f7d38_min.webp",
+    "job": "bdba08a5-85ea-4b9b-9220-8d24ce4f7d38",
+    "type": "kulisse",
+    "size": "768x1376",
+    "seitenverhaeltnis": "9:16",
+    "batch": 13,
+    "titelzone": {
+      "bereich": "y 8–30 % der Bildhöhe",
+      "L_mittel": 19.7,
+      "L_p95": 24.5,
+      "L_max": 28.0,
+      "lokale_stdabw_mittel": 0.8,
+      "lokale_stdabw_p95": 1.2,
+      "beschnitt_6prozent": "L_mittel 21,4 / p95 25,7 / Stdabw 0,8 — bleibt auch bei 6 % Beschnitt oben und unten gültig",
+      "grenzwerte": "gefordert L_mittel < 60 und p95 < 110 — beide Werte weit darunter, ruhigste Titelzone der Serie"
+    },
+    "beschreibung": "STARTBILDSCHIRM, Zweitkandidat „Prisma-Zitadelle bei Nacht“: kolossale Kristallfestung über einer Schlucht, Amethyst- und Saphirspitzen mit Gold-Filigranringen, ein schwebendes Prisma über dem Hauptturm bricht einen Lichtstrahl in einen weichen Regenbogenfächer; dunkle Kristallfelsen rahmen den Vordergrund. Oberes Drittel ist glatter Nachthimmel — ruhige Zone für den Schriftzug. Licht von oben. TEXTFREI (OCR-geprüft). ROLLE = KULISSE: cover, NICHT freistellen."
   }
 }

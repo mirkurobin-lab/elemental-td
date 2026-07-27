@@ -8074,6 +8074,12 @@ button.pfplate{cursor:pointer}
       "</b> Gold" + (packResult.pity ? "<br>🛟 Pity-Garantie ausgelöst (" + packResult.pity + ")" : "");
     renderPity();
     updateNavBadge();
+    /* Ein Pack kann einen HELDEN enthalten — und daran haengt sein
+       Avatar. Ohne diese Zeile bekaeme der Spieler die Heldenkarte
+       sofort, den Avatar aber erst nach dem naechsten Match, weil
+       syncAvatarUnlocks() sonst nur dort steht. Der Abgleich ist
+       idempotent: hat sich nichts geaendert, feiert er nichts. */
+    if (typeof syncAvatarUnlocks === "function") syncAvatarUnlocks();
   }
   function updateNavBadge() {
     var n = mergeableCount(), b = $("navBadge");
@@ -12830,10 +12836,25 @@ button.pfplate{cursor:pointer}
   /* syncAvatarUnlocks(trophaeen) — die EINE Naht zwischen Fortschritt
      und Avataren. Im Spiel steht sie nach dem Match-Ergebnis; im
      Prototyp hinter dem Demo-Knopf. */
+  /* besesseneHelden() — die Ids der Heldenkarten, die der Spieler
+     WIRKLICH hat. Sie entscheiden ueber die Helden-Avatare: „jeder Held
+     den wir haben einen Avatar bekommen den man als Profil Avatar
+     waehlen kann wenn man den Held besitzt."
+     Quelle ist die Kartenbank, nicht eine zweite Liste — sonst koennten
+     Besitz und Avatar auseinanderlaufen. */
+  function besesseneHelden() {
+    if (!window.ArenaCards) return [];
+    return CARDS.filter(function (c) { return c.hero; })
+      .map(function (c) { return c.id; })
+      .filter(function (id) {
+        try { return !!AC.view(id).owned; } catch (e) { return false; }
+      });
+  }
   function syncAvatarUnlocks(trophaeen) {
     var A = AVof(); if (!A) return null;
     var t = trophaeen == null ? DEMO_TROPHIES : trophaeen;
-    var r = A.syncUnlocks({ trophaeen: t, arena: A.arenaFor(t) });
+    var r = A.syncUnlocks({ trophaeen: t, arena: A.arenaFor(t),
+                            helden: besesseneHelden() });
     if (r.neu.length) showAvatarCeremony(r.neu);
     return r;
   }
@@ -12845,7 +12866,8 @@ button.pfplate{cursor:pointer}
   function seedAvatars() {
     var A = AVof(); if (!A) return;
     if (localStorage.getItem(AV_SEED_KEY)) return;
-    A.syncUnlocks({ trophaeen: DEMO_TROPHIES, arena: A.arenaFor(DEMO_TROPHIES) });
+    A.syncUnlocks({ trophaeen: DEMO_TROPHIES, arena: A.arenaFor(DEMO_TROPHIES),
+                    helden: besesseneHelden() });
     localStorage.setItem(AV_SEED_KEY, "1");
   }
 
@@ -12969,11 +12991,24 @@ button.pfplate{cursor:pointer}
   });
   // Zeremonie: Tap auf die GANZE Flaeche schaltet weiter (AA-Verhalten).
   $("avCerLayer").addEventListener("click", function () { UISfx.tap(); avCerStep(); });
+  /* Der Knopf hiess „Demo: Arena 5 erreichen" und schaltete den
+     Solara-Avatar frei. Seit Helden-Avatare am BESITZ haengen und das
+     Demo-Profil Solara ohnehin hat, war bei Arena 5 nichts mehr zu
+     feiern — der Knopf zeigte die Zeremonie nicht mehr, obwohl sie
+     funktioniert. Er schaltet jetzt den naechsten noch gesperrten
+     Eintrag frei, egal welchen: das ist genau das, was er vorfuehren
+     soll, und es bleibt richtig, wenn der Katalog sich wieder aendert. */
   $("avDemo").addEventListener("click", function () {
-    // 1 200 🏆 = Arena 5 (Obsidian-Thron) — der Fall aus AA.
-    var r = syncAvatarUnlocks(1200);
+    var A = AVof(); if (!A) return;
+    var offen = A.list().filter(function (a) { return a.locked; });
+    if (!offen.length) { toast("Alle Avatare sind schon frei."); return; }
+    /* grant() bucht nur; die Zeremonie kommt aus dem folgenden Abgleich.
+       Das ist Absicht: es gibt genau EINEN Weg, wie ein Avatar gefeiert
+       wird, egal ob er ueber Arena, Held oder Buchung kam. */
+    A.grant("avatar", offen[0].key);
+    var r = syncAvatarUnlocks();
     renderEditProfile();
-    if (r && !r.neu.length) toast("Arena 5 ist schon abgeglichen.");
+    if (!r || !r.neu.length) toast("Freigeschaltet: " + offen[0].name);
   });
   /* Match-Ende: Fussleiste, Werte-Fenster und die zwei Demo-Einstiege.
      Der Schadenszaehler liegt — wie bei AA — hinter dem Knopf unten

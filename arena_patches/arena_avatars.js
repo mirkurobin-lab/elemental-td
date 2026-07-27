@@ -127,26 +127,39 @@
    * bewusst NEBEN der Leiter, sonst wären die Belohnungen zwischen
    * Arena 5 und 6 zu weit auseinander. */
   var AVATARS = [
+    /* DIE FÜNF ZUR WAHL. Sie standen früher gestaffelt hinter Trophäen
+       und Arenen — der Auftraggeber wollte ausdrücklich eine WAHL zum
+       Start: „Bau ein das der Spieler unter den 5 wählen kann."
+       Eine Auswahl mit genau einem freigeschalteten Eintrag ist keine
+       Auswahl, sondern eine Ankündigung. Die Staffelung lebt in den
+       Einträgen darunter weiter; dort verschenkt sie nichts, weil man
+       die fünf hier schon hat. */
     { key: "novize",   name: "Prisma-Novize",         tier: "common",
       unlock: { typ: "start" },                 emoji: "🜂",
-      portrait: null, portraitWunsch: "av_novize" },
+      portrait: "av_novize" },
     { key: "scherbe",  name: "Scherbenschmiedin",     tier: "common",
-      unlock: { typ: "trophaeen", wert: 150 },  emoji: "🔨",
-      portrait: null, portraitWunsch: "av_scherbe" },
+      unlock: { typ: "start" },                 emoji: "🔨",
+      portrait: "av_scherbe" },
     { key: "smaragd",  name: "Smaragd-Wächter",       tier: "good",
-      unlock: { typ: "arena", wert: 2 },        emoji: "🛡",
-      portrait: null, portraitWunsch: "av_smaragd" },
+      unlock: { typ: "start" },                 emoji: "🛡",
+      portrait: "av_smaragd" },
     { key: "saphir",   name: "Saphir-Kanonier",       tier: "good",
-      unlock: { typ: "arena", wert: 3 },        emoji: "💧",
-      portrait: null, portraitWunsch: "av_saphir" },
+      unlock: { typ: "start" },                 emoji: "💧",
+      portrait: "av_saphir" },
     { key: "sturm",    name: "Sturmruferin",          tier: "rare",
-      unlock: { typ: "arena", wert: 4 },        emoji: "🌩",
-      portrait: null, portraitWunsch: "av_sturm" },
-    /* Der Avatar, um den es ging: AA schaltet bei Arena 5 frei, wir auch.
-       Porträt vorhanden — Helden-Artwork aus Batch 4. */
+      unlock: { typ: "start" },                 emoji: "🌩",
+      portrait: "av_sturm" },
+    /* HELDEN-AVATARE. Bedingung ist der BESITZ der Heldenkarte, nicht
+       ein Trophäenstand: „jeder Held den wir haben einen Avatar bekommen
+       den man als Profil Avatar wählen kann wenn man den Held besitzt."
+       Das ist die bessere Kopplung — der Avatar zeigt dann etwas, das
+       man wirklich hat, statt etwas, an dem man vorbeigelaufen ist.
+       Eigenes Porträt statt des Kartenbilds: die Karte ist 896x1200 und
+       zeigt die Figur in voller Gestalt; im Kreis von 32 px bliebe davon
+       ein Ausschnitt der Hüfte. */
     { key: "solara",   name: "Solara, Lichtherrin",   tier: "epic",
-      unlock: { typ: "arena", wert: 5 },        emoji: "☀",
-      portrait: "card_solara" },
+      unlock: { typ: "held", wert: "solara" },  emoji: "☀",
+      portrait: "av_held_solara" },
     { key: "obsidian", name: "Obsidian-Fürst",        tier: "epic",
       unlock: { typ: "trophaeen", wert: 1350 }, emoji: "⬛",
       portrait: null, portraitWunsch: "av_obsidian" },
@@ -159,10 +172,9 @@
     { key: "frost",    name: "Frostbastion-Hüterin",  tier: "legendary",
       unlock: { typ: "arena", wert: 8 },        emoji: "❄",
       portrait: null, portraitWunsch: "av_frost" },
-    /* Porträt vorhanden — Helden-Artwork aus Batch 4. */
     { key: "magmor",   name: "Magmor, Glutkoloss",    tier: "supreme",
-      unlock: { typ: "liga", wert: 1 },         emoji: "🌋",
-      portrait: "card_magmor" },
+      unlock: { typ: "held", wert: "magmor" },  emoji: "🌋",
+      portrait: "av_held_magmor" },
     { key: "fortuna",  name: "Fortunas Erbin",        tier: "supreme",
       unlock: { typ: "pass", wert: 30 },        emoji: "🎟",
       portrait: null, portraitWunsch: "av_fortuna" },
@@ -245,6 +257,11 @@
     return CLOCK ? CLOCK() : Date.now();
   }
 
+  function startKeys(liste) {
+    var out = [];
+    liste.forEach(function (e) { if (e.unlock.typ === "start") out.push(e.key); });
+    return out;
+  }
   function fresh() {
     return {
       v: STATE_VERSION,
@@ -252,10 +269,15 @@
          getrennt. `gewaehlt` ist die Anzeige-Auswahl, `bekannt` das
          Zeremonie-Gedächtnis, `gewaehrt` die Liste der von außen
          gebuchten Einträge (Pass/Shop). */
-      avatar: { gewaehlt: AV_START, bekannt: [AV_START], gewaehrt: [], ts: 0 },
-      frame:  { gewaehlt: FR_START, bekannt: [FR_START], gewaehrt: [], ts: 0 },
+      /* `bekannt` startet mit ALLEN Start-Einträgen, nicht nur mit dem
+         gewählten. Sonst feiert der allererste syncUnlocks() die vier
+         übrigen Start-Porträts als frisch freigeschaltet — eine
+         Zeremonie für etwas, das der Spieler nie verdient hat. Solange
+         es nur EIN Start-Porträt gab, fiel das nicht auf. */
+      avatar: { gewaehlt: AV_START, bekannt: startKeys(AVATARS), gewaehrt: [], ts: 0 },
+      frame:  { gewaehlt: FR_START, bekannt: startKeys(FRAMES), gewaehrt: [], ts: 0 },
       // Höchststand, gegen den gesperrt/frei entschieden wird.
-      stand: { trophaeen: 0, arena: 1, liga: 0 },
+      stand: { trophaeen: 0, arena: 1, liga: 0, helden: [] },
     };
   }
 
@@ -298,6 +320,13 @@
       trophaeen: n0(st.trophaeen),
       arena: Math.max(1, Math.min(ARENAS.length, n0(st.arena) || 1)),
       liga: Math.max(0, Math.min(LEAGUE_GATES.length, n0(st.liga))),
+      /* Auch ein Spielstand aus der Zeit VOR den Helden-Avataren muss
+         hier ein Feld bekommen — sonst greift jeder spaetere Leser ins
+         Leere. Unbekannte Helden-Ids fallen raus, damit ein manipulierter
+         Spielstand keinen Avatar oeffnet, den es nicht gibt. */
+      helden: (Array.isArray(st.helden) ? st.helden : []).filter(function (id, i, a) {
+        return typeof id === "string" && HELDEN_NAME[id] && a.indexOf(id) === i;
+      }),
     };
     // Höchststand darf der Arena nie widersprechen.
     var abyT = arenaFor(s.stand.trophaeen);
@@ -308,10 +337,12 @@
   }
 
   function healBranch(b, byKey, startK) {
-    var out = { gewaehlt: startK, bekannt: [startK], gewaehrt: [], ts: 0 };
+    var alleStart = startKeys(byKey === AV_BY_KEY ? AVATARS : FRAMES);
+    var out = { gewaehlt: startK, bekannt: alleStart.slice(), gewaehrt: [], ts: 0 };
     if (!b || typeof b !== "object") return out;
     out.ts = ts0(b.ts);
     var seen = {};
+    alleStart.forEach(function (k) { seen[k] = 1; });
     (Array.isArray(b.bekannt) ? b.bekannt : []).forEach(function (k) {
       if (byKey[k] && !seen[k]) { seen[k] = 1; out.bekannt.push(k); }
     });
@@ -361,6 +392,24 @@
    * Arena und Liga werden aus den Trophäen abgeleitet, wenn sie nicht
    * mitkommen; eine MITGELIEFERTE höhere Arena gewinnt (der Aufrufer
    * kennt seinen Stand besser als unsere Schwellentabelle). */
+  /* `helden` ist die Liste der BESESSENEN Heldenkarten-Ids. Sie steht im
+     Stand und nicht in einem eigenen Zweig, weil sie dieselbe
+     Eigenschaft hat wie Trophäen-Höchststand und Arena: sie wächst nur.
+     Eine Heldenkarte verliert man nicht — und selbst wenn eine
+     Aufrufstelle sie einmal nicht mitliefert, darf der Avatar nicht
+     verschwinden. maxStand() vereinigt deshalb, es ersetzt nicht. */
+  function normHelden(x) {
+    var q = x && typeof x === "object"
+      ? (x.helden || x.heroes || x.besitzt || null) : null;
+    if (!q) return [];
+    var out = [];
+    for (var i = 0; i < q.length; i++) {
+      var v = q[i];
+      var id = (v && typeof v === "object") ? (v.id || v.cardId) : v;
+      if (typeof id === "string" && id && out.indexOf(id) < 0) out.push(id);
+    }
+    return out;
+  }
   function normStand(x) {
     var t = 0, a = 0, l = 0;
     if (typeof x === "number" && isFinite(x)) {
@@ -370,16 +419,20 @@
       a = Math.max(n0(x.arena), n0(x.arenaNr));
       l = Math.max(n0(x.liga), n0(x.league), n0(x.gate));
     }
-    var out = { trophaeen: t, arena: Math.max(1, a, arenaFor(t)), liga: Math.max(0, l, ligaFor(t)) };
+    var out = { trophaeen: t, arena: Math.max(1, a, arenaFor(t)), liga: Math.max(0, l, ligaFor(t)),
+                helden: normHelden(x) };
     if (out.arena > ARENAS.length) out.arena = ARENAS.length;
     if (out.liga > LEAGUE_GATES.length) out.liga = LEAGUE_GATES.length;
     return out;
   }
   // Der jeweils größere von zwei Ständen, Feld für Feld.
   function maxStand(a, b) {
+    var h = (a.helden || []).slice();
+    (b.helden || []).forEach(function (id) { if (h.indexOf(id) < 0) h.push(id); });
     return { trophaeen: Math.max(n0(a.trophaeen), n0(b.trophaeen)),
              arena: Math.max(1, n0(a.arena), n0(b.arena)),
-             liga: Math.max(0, n0(a.liga), n0(b.liga)) };
+             liga: Math.max(0, n0(a.liga), n0(b.liga)),
+             helden: h };
   }
 
   /* isUnlocked(eintrag, state) — der EINE Entscheider. Alles, was
@@ -394,6 +447,7 @@
       case "arena":     return n0(st.arena) >= n0(u.wert);
       case "trophaeen": return n0(st.trophaeen) >= n0(u.wert);
       case "liga":      return n0(st.liga) >= n0(u.wert);
+      case "held":      return (st.helden || []).indexOf(u.wert) >= 0;
       case "pass":      return false;   // nur über grant()
       default:          return false;
     }
@@ -406,6 +460,13 @@
     for (var i = 0; i < ARENAS.length; i++) if (ARENAS[i].n === n) return ARENAS[i].name;
     return "";
   }
+  /* Die Anzeigenamen der Helden. Bewusst hier gespiegelt statt aus dem
+     Prototyp gezogen: das Modul muss DOM-frei laufen (Ladebildschirm,
+     Match-Prozess). Kommt ein dritter Held dazu, gehört er hierher UND
+     in den Katalog — der Selbsttest unten prüft, dass beide Listen
+     zusammenpassen. */
+  var HELDEN_NAME = { solara: "Solara", magmor: "Magmor" };
+  function heldName(id) { return HELDEN_NAME[id] || id; }
   function gateName(n) {
     for (var i = 0; i < LEAGUE_GATES.length; i++) if (LEAGUE_GATES[i].n === n) return LEAGUE_GATES[i].name;
     return "";
@@ -420,6 +481,7 @@
       case "arena":     return "Arena " + u.wert + " · " + arenaName(u.wert);
       case "trophaeen": return num(u.wert) + " Trophäen";
       case "liga":      return LEAGUE_NAME + " · " + gateName(u.wert);
+      case "held":      return "Held " + heldName(u.wert) + " im Besitz";
       case "pass":      return "Season-Pass · Stufe " + u.wert;
       default:          return "";
     }
@@ -675,21 +737,46 @@
       TIERS.every(function (t) {
         return AVATARS.some(function (a) { return a.tier === t.key; });
       }));
-    check("genau EIN Start-Porträt und EIN Start-Rahmen",
-      AVATARS.filter(function (a) { return a.unlock.typ === "start"; }).length === 1 &&
-      FRAMES.filter(function (f) { return f.unlock.typ === "start"; }).length === 1);
+    /* UMGESCHRIEBEN: waren 1 und 1. Der Auftraggeber wollte eine WAHL
+       zum Start — eine Auswahl mit einem Eintrag ist keine. Fünf
+       Porträts stehen jetzt offen, der Start-Rahmen bleibt bei einem
+       (der Rahmen ist die Staffelung, das Porträt die Wahl). */
+    check("fünf Start-Porträts und EIN Start-Rahmen",
+      AVATARS.filter(function (a) { return a.unlock.typ === "start"; }).length === 5 &&
+      FRAMES.filter(function (f) { return f.unlock.typ === "start"; }).length === 1,
+      AVATARS.filter(function (a) { return a.unlock.typ === "start"; })
+        .map(function (a) { return a.key; }).join(","));
     check("jeder Rahmen hat ein vorhandenes frame_*-Asset",
       FRAMES.every(function (f) { return /^frame_(common|good|rare|epic|legendary|supreme)$/.test(f.ring); }));
-    check("Arena 5 schaltet Solara frei (der Fall aus AA)",
-      AV_BY_KEY.solara.unlock.typ === "arena" && AV_BY_KEY.solara.unlock.wert === 5);
+    /* UMGESCHRIEBEN: Solara hing an Arena 5. Helden-Avatare haengen
+       jetzt am BESITZ der Heldenkarte — „wenn man den Held besitzt".
+       Und jeder Held braucht auch wirklich einen: die zweite Zeile
+       prueft, dass Katalog und Heldenliste zusammenpassen, damit ein
+       dritter Held nicht stillschweigend ohne Avatar bleibt. */
+    check("Helden-Avatare haengen am Besitz der Heldenkarte",
+      AV_BY_KEY.solara.unlock.typ === "held" && AV_BY_KEY.solara.unlock.wert === "solara" &&
+      AV_BY_KEY.magmor.unlock.typ === "held" && AV_BY_KEY.magmor.unlock.wert === "magmor");
+    check("jeder Held aus HELDEN_NAME hat genau einen Avatar",
+      Object.keys(HELDEN_NAME).every(function (id) {
+        return AVATARS.filter(function (a) {
+          return a.unlock.typ === "held" && a.unlock.wert === id; }).length === 1;
+      }), Object.keys(HELDEN_NAME).join(","));
 
     /* Porträt-Bestand: 2 vorhanden, 10 offen. */
     var haben = AVATARS.filter(function (a) { return !!a.portrait; });
-    check("zwei Porträts sind vorhanden (card_solara, card_magmor)",
-      haben.length === 2 && haben.map(function (a) { return a.portrait; }).sort().join(",") ===
-      "card_magmor,card_solara", haben.map(function (a) { return a.portrait; }).join(","));
+    /* UMGESCHRIEBEN: waren 2 vorhanden / 10 offen, und die zwei waren
+       KARTENbilder. Ein Kartenbild ist 896x1200 und zeigt die Figur in
+       voller Gestalt — im Kreis von 32 px bliebe ein Ausschnitt der
+       Huefte. Die sieben neuen sind eigene Brustbilder. */
+    check("sieben Porträts sind vorhanden (5 zur Wahl + 2 Helden)",
+      haben.length === 7 &&
+      haben.every(function (a) { return /^av_/.test(a.portrait); }),
+      haben.map(function (a) { return a.portrait; }).join(","));
+    check("kein Porträt benutzt ein KARTENbild",
+      AVATARS.every(function (a) { return !/^card_/.test(a.portrait || ""); }));
     var offen = missingPortraits();
-    check("zehn Porträts fehlen noch", offen.length === 10, offen.length);
+    check("fünf Porträts fehlen noch (die Staffelung oberhalb der Wahl)",
+      offen.length === 5, offen.length);
     check("jedes fehlende Porträt hat einen av_*-Wunschschlüssel",
       offen.every(function (o) { return /^av_[a-z]+$/.test(o.assetKey); }),
       offen.map(function (o) { return o.assetKey; }).join(" "));
@@ -705,8 +792,10 @@
     check("Höchststand steht auf 0 Trophäen / Arena 1",
       s0.stand.trophaeen === 0 && s0.stand.arena === 1 && s0.stand.liga === 0);
     var l0 = list();
-    check("bei Stand 0 ist genau EIN Porträt frei",
-      l0.filter(function (a) { return !a.locked; }).length === 1,
+    /* UMGESCHRIEBEN: war 1. Genau das ist der Punkt der Änderung — der
+       Spieler soll ohne Vorleistung unter fünf waehlen koennen. */
+    check("bei Stand 0 stehen FÜNF Porträts zur Wahl",
+      l0.filter(function (a) { return !a.locked; }).length === 5,
       l0.filter(function (a) { return !a.locked; }).map(function (a) { return a.key; }).join(","));
     check("bei Stand 0 ist genau EIN Rahmen frei",
       listFrames().filter(function (f) { return !f.locked; }).length === 1);
@@ -724,16 +813,23 @@
       ligaFor(2899) === 0 && ligaFor(2900) === 1);
 
     var u5 = unlockedFor(1200);
-    check("unlockedFor(1200) enthält Solara", u5.avatare.indexOf("solara") >= 0,
-      u5.avatare.join(","));
+    check("unlockedFor(1200) enthält die fünf zur Wahl",
+      ["novize","scherbe","smaragd","saphir","sturm"]
+        .every(function (k) { return u5.avatare.indexOf(k) >= 0; }), u5.avatare.join(","));
     check("unlockedFor(1200) enthält Prisma-Erzmagier NOCH NICHT",
       u5.avatare.indexOf("prisma") < 0);
+    /* Trophäen allein oeffnen KEINEN Helden-Avatar — sonst waere die
+       Kopplung an den Besitz nur behauptet. */
+    check("ohne Heldenbesitz kein Helden-Avatar, egal wie viele Trophäen",
+      unlockedFor(99999).avatare.indexOf("solara") < 0 &&
+      unlockedFor(99999).avatare.indexOf("magmor") < 0);
+    check("mit Heldenbesitz ist der Helden-Avatar frei",
+      unlockedFor({ helden: ["solara"] }).avatare.indexOf("solara") >= 0 &&
+      unlockedFor({ helden: ["solara"] }).avatare.indexOf("magmor") < 0);
     check("unlockedFor akzeptiert auch ein Objekt mit Arena-Nummer",
-      unlockedFor({ arena: 5 }).avatare.indexOf("solara") >= 0);
+      unlockedFor({ arena: 6 }).avatare.indexOf("prisma") >= 0);
     check("unlockedFor akzeptiert ArenaProfile-Felder (trophies/best)",
-      unlockedFor({ trophies: 100, best: 1200 }).avatare.indexOf("solara") >= 0);
-    check("unlockedFor(150) schaltet die Scherbenschmiedin frei",
-      unlockedFor(150).avatare.indexOf("scherbe") >= 0);
+      unlockedFor({ trophies: 100, best: 1500 }).avatare.indexOf("prisma") >= 0);
     check("unlockedFor schreibt NICHTS (Zustand unverändert)",
       get().stand.trophaeen === 0);
     check("Pass-Einträge tauchen in unlockedFor NIE auf",
@@ -744,12 +840,15 @@
     console.log("\nZeremonie (syncUnlocks):");
     reset();
     var r0 = syncUnlocks(0);
-    check("erster Aufruf bei Stand 0 feiert NICHTS (Start ist bekannt)",
+    check("erster Aufruf bei Stand 0 feiert NICHTS (alle fünf sind bekannt)",
       r0.neu.length === 0, r0.neu.length);
-    var r1 = syncUnlocks({ arena: 5, trophaeen: 1200 });
-    check("Sprung auf Arena 5 schaltet neue Einträge frei", r1.neu.length > 0, r1.neu.length);
+    var r1 = syncUnlocks({ arena: 6, trophaeen: 1500, helden: ["solara"] });
+    check("Sprung auf Arena 6 schaltet neue Einträge frei", r1.neu.length > 0, r1.neu.length);
+    /* Der neu erworbene Held wird MITGEFEIERT — er ist genauso ein
+       Freischalten wie eine erreichte Arena. */
     check("Solara ist dabei und als Porträt markiert",
-      r1.avatare.some(function (e) { return e.key === "solara" && e.art === "avatar"; }));
+      r1.avatare.some(function (e) { return e.key === "solara" && e.art === "avatar"; }),
+      r1.avatare.map(function (e) { return e.key; }).join(","));
     check("Rahmen kommen getrennt zurück",
       r1.rahmen.length > 0 && r1.rahmen.every(function (e) { return e.art === "frame"; }),
       r1.rahmen.map(function (e) { return e.key; }).join(","));
@@ -760,22 +859,29 @@
       r1.neu.every(function (e) {
         return e.name && e.tierName && e.tierColor && (e.emoji || e.portraitUrl) && !e.locked;
       }));
-    var r2 = syncUnlocks({ arena: 5, trophaeen: 1200 });
+    var r2 = syncUnlocks({ arena: 6, trophaeen: 1500, helden: ["solara"] });
     check("zweiter Aufruf mit demselben Stand feiert NICHTS mehr",
       r2.neu.length === 0, r2.neu.length);
     check("Höchststand ist fortgeschrieben",
-      get().stand.arena === 5 && get().stand.trophaeen === 1200);
+      get().stand.arena === 6 && get().stand.trophaeen === 1500);
+    /* Ein Aufruf OHNE die Heldenliste darf den Helden-Avatar nicht
+       wieder entziehen — maxStand() vereinigt, es ersetzt nicht. */
+    var rH = syncUnlocks({ arena: 6, trophaeen: 1500 });
+    check("Held ohne Nennung bleibt freigeschaltet",
+      rH.neu.length === 0 && get().stand.helden.indexOf("solara") >= 0,
+      get().stand.helden.join(","));
     var r3 = syncUnlocks(0);
     check("RÜCKSCHRITT sperrt nichts wieder (Höchststand gewinnt)",
-      r3.neu.length === 0 && get().stand.arena === 5 &&
+      r3.neu.length === 0 && get().stand.arena === 6 &&
       list().filter(function (a) { return !a.locked; }).length ===
-      u5.avatare.length, get().stand.arena + " / " +
+      unlockedFor({ arena: 6, trophaeen: 1500, helden: ["solara"] }).avatare.length,
+      get().stand.arena + " / " +
       list().filter(function (a) { return !a.locked; }).length + " frei");
 
     /* ---------------- 5. Auswahl, getrennt ---------------- */
     console.log("\nAuswahl (Porträt und Rahmen unabhängig):");
     var sel = select("solara");
-    check("freigeschaltetes Porträt lässt sich wählen", sel.ok === true);
+    check("freigeschaltetes Helden-Porträt lässt sich wählen", sel.ok === true, sel.meldung);
     check("Auswahl übersteht das Neuladen", get().avatar.gewaehlt === "solara");
     check("die Rahmen-Auswahl blieb dabei UNBERÜHRT",
       get().frame.gewaehlt === "schlicht", get().frame.gewaehlt);
@@ -819,16 +925,21 @@
       act.portraitUrl === null && act.ringUrl === null);
     check("das Emoji ist trotzdem da (Fallback für fehlende Bilder)",
       act.emoji === "☀" && !!act.ringEmoji);
-    assets({ card_solara: "https://cdn/solara.png", frame_rare: "https://cdn/rare.png" });
+    /* Der Schlüssel heisst jetzt av_held_solara, nicht mehr card_solara:
+       der Avatar ist ein eigenes Brustbild, kein Kartenausschnitt. */
+    assets({ av_held_solara: "https://cdn/solara.png", frame_rare: "https://cdn/rare.png" });
     var act2 = active();
     check("mit Asset-Tabelle liefert active() fertige URLs",
       act2.portraitUrl === "https://cdn/solara.png" && act2.ringUrl === "https://cdn/rare.png");
     check("Raritätsfarbe kommt mit (epische Solara = Lila)",
       act2.tierColor === "#a45ef2", act2.tierColor);
-    select("novize");
+    /* novize HAT jetzt ein Porträt — für diesen Fall braucht es einen
+       Eintrag, dessen Bild noch aussteht. `prisma` ist einer davon. */
+    grant("prisma"); select("prisma");
     var act3 = active();
     check("Porträt ohne Asset: URL null, portraitFehlt gesetzt, Emoji da",
-      act3.portraitUrl === null && act3.avatar.portraitFehlt === true && act3.emoji === "🜂");
+      act3.portraitUrl === null && act3.avatar.portraitFehlt === true && act3.emoji === "✦",
+      act3.portraitUrl + " / " + act3.avatar.portraitFehlt + " / " + act3.emoji);
     check("der Rahmen behält seine URL, obwohl das Porträt fehlt",
       act3.ringUrl === "https://cdn/rare.png");
     assets(null);
