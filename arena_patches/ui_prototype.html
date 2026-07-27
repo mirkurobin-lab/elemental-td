@@ -1543,6 +1543,113 @@ span.ico{text-align:center}
   background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);box-shadow:0 3px 0 #6d551a;
   -webkit-text-fill-color:#3a2b07;color:#3a2b07}
 /* 2) Arena-/Starter-Pack — Echtgeld, Preis in Fr. wie in AAs Store. */
+/* ==================================================================
+ * ARENA-PACK-KARUSSELL — an IMG_3382 nachgemessen (1320x2868)
+ * ------------------------------------------------------------------
+ *   Karte           93,4 % breit, Verhaeltnis 2,0
+ *   Artwork links   36 % der Karte, laeuft ueber die Kante
+ *   4 Belohnungen   je 10,5 % der Kartenbreite, Menge in der Ecke
+ *   Preis           Altpreis durchgestrichen, darunter gross der neue
+ *   Siegel          115 px, ueberlappt die rechte obere Ecke, gedreht
+ *   Pfeile          ausserhalb der Karte, auf halber Hoehe
+ *
+ * Die Schiene scrollt mit `scroll-snap`, nicht mit einem Transform-
+ * Karussell: damit funktioniert Wischen ohne eine einzige Zeile
+ * Gestencode, das Betriebssystem macht die Traegheit, und ein
+ * abgebrochener Wisch federt von selbst zurueck. Die Pfeile setzen nur
+ * `scrollLeft`.
+ * ⚠ Der senkrechte Wisch darf davon unberuehrt bleiben — deshalb
+ * `overscroll-behavior-x:contain`, sonst zieht die Schiene am Rand die
+ * View-Geste mit (DESIGNSYSTEM §6l).
+ * ================================================================== */
+/* Die Schiene laeuft bis an beide Bildschirmkanten — nur so kann die
+   Karte AAs 93,4 % der BILDSCHIRMbreite einnehmen. Innerhalb des
+   View-Polsters waeren es 93,4 % von 366 px, also nur 87,7 % des
+   Bildschirms; die Nachbarkarte lugte dann zu weit herein. */
+.apkwrap{position:relative;margin:var(--gap) -12px 0}
+.apkrail{display:flex;gap:var(--gap);overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;overscroll-behavior-x:contain;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  padding:6px 12px 8px}
+.apkrail::-webkit-scrollbar{display:none}
+.apkcard{position:relative;flex:0 0 93.4vw;max-width:520px;scroll-snap-align:center;
+  aspect-ratio:2/1;border-radius:var(--radius);overflow:hidden;
+  border:2px solid var(--pk,#e0b94a);
+  background:linear-gradient(160deg,#1b2a3a,#0e1418);
+  background-repeat:no-repeat;background-position:center;background-size:cover;
+  box-shadow:var(--mat-raised-lg);display:block;text-align:left;padding:0}
+/* Der Lichtstreif — das ist die „Animation" statt eines Videos. Er
+   kostet null Bytes und laeuft nur auf der Karte, die gerade im Bild
+   ist (Klasse .an, von JS gesetzt), damit acht Schleifen nicht
+   gleichzeitig Fuellrate fressen. */
+.apkcard::after{content:"";position:absolute;top:-40%;bottom:-40%;width:38%;
+  left:-45%;pointer-events:none;z-index:3;transform:skewX(-18deg);
+  background:linear-gradient(90deg,#fff0,#ffffff2e 45%,#fff0)}
+.apkcard.an::after{animation:apksheen 4.6s var(--ease-in-out) 1.2s infinite}
+@keyframes apksheen{0%{left:-45%}55%{left:118%}100%{left:118%}}
+.apkcard .apktx{position:absolute;left:36%;right:10px;top:9%;bottom:6%;z-index:2;
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between}
+/* Rechts Platz lassen: das Wert-Siegel ragt in die Ecke und hat den
+   Arenanamen sonst angeschnitten („Arena 1 · Kristallho…"). */
+.apkcard .apknm{font-family:Cinzel,Georgia,serif;font-size:14px;font-weight:900;
+  letter-spacing:.02em;color:#f6e6b4;text-shadow:0 2px 0 #000,0 0 10px #000a;
+  padding-right:58px;text-align:center;line-height:1.2}
+.apkcard .apkrow{display:flex;gap:5px;justify-content:center;width:100%}
+.apkcard .apkit{position:relative;flex:0 0 10.5%;aspect-ratio:1;border-radius:7px;
+  border:1px solid var(--itc,#3a4c5c);background:linear-gradient(180deg,#16202ad9,#0a1017e6);
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+  box-shadow:var(--mat-well)}
+.apkcard .apkit .ico{width:70%;height:70%}
+.apkcard .apkit i{position:absolute;right:2px;bottom:0;font-style:normal;
+  font-size:8.5px;font-weight:900;color:#fff;text-shadow:0 1px 0 #000,0 0 4px #000}
+.apkcard .apkpr{display:flex;flex-direction:column;align-items:center;gap:0}
+.apkcard .apkalt{font-size:10px;font-weight:800;color:#c9d6e0;position:relative;
+  text-decoration:line-through;text-decoration-color:#ff5e7e;text-decoration-thickness:2px}
+.apkcard .apkneu{font-size:21px;font-weight:900;color:#fff;line-height:1.05;
+  text-shadow:0 2px 0 #000,0 0 10px #000c}
+/* Das Wert-Siegel. Die Zahl ist gerechnet (packWert), nicht gesetzt. */
+.apkcard .apkval{position:absolute;right:-2px;top:-2px;z-index:4;
+  min-width:58px;padding:7px 6px 8px;text-align:center;
+  transform:rotate(9deg);transform-origin:100% 0;
+  clip-path:polygon(50% 0,62% 9%,76% 4%,82% 17%,96% 19%,94% 33%,100% 44%,90% 54%,
+    94% 68%,80% 74%,76% 88%,62% 85%,50% 96%,38% 85%,24% 88%,20% 74%,6% 68%,10% 54%,
+    0 44%,6% 33%,4% 19%,18% 17%,24% 4%,38% 9%);
+  background:radial-gradient(circle at 50% 34%,#ff8fa3,#e0243f 62%,#8d0f22);
+  font-size:9px;font-weight:900;line-height:1.15;color:#fff;
+  text-shadow:0 1px 0 #00000090}
+.apkcard .apkval b{display:block;font-size:13px}
+.apkcard.an .apkval{animation:apkwip 3.4s var(--ease-in-out) infinite}
+@keyframes apkwip{0%,100%{transform:rotate(9deg) scale(1)}
+  50%{transform:rotate(6deg) scale(1.055)}}
+/* Gesperrt: sichtbar, aber unmissverstaendlich zu. Die Sperre ist echt
+   und der Spieler kann sie durch Spielen aufloesen — deshalb wird sie
+   gezeigt und nicht versteckt. */
+.apkcard.zu{filter:grayscale(.72) brightness(.62)}
+.apkcard .apkzu{position:absolute;inset:0;z-index:5;display:none;
+  flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  background:#05090cb0;font-size:11px;font-weight:900;letter-spacing:.05em;
+  color:#e8eef3;text-shadow:0 1px 3px #000}
+.apkcard.zu .apkzu{display:flex}
+.apkcard .apkzu span{font-size:26px;line-height:1}
+.apkcard .apkzu em{font-style:normal;font-size:9px;color:#a9bccb;letter-spacing:.03em}
+/* Pfeile und Punkte */
+.apknav{position:absolute;top:50%;transform:translateY(-50%);z-index:6;
+  width:26px;height:44px;border-radius:8px;font-size:20px;font-weight:900;
+  color:#e8eef3;background:linear-gradient(180deg,#22303ce0,#101922e0);
+  border:1px solid #33455480;box-shadow:var(--mat-raised);
+  display:flex;align-items:center;justify-content:center}
+.apknav.l{left:-4px}
+.apknav.r{right:-4px}
+.apknav[disabled]{opacity:.28;pointer-events:none}
+.apkdots{display:flex;gap:6px;justify-content:center;margin-top:2px}
+.apkdots i{width:6px;height:6px;border-radius:50%;background:#33455e;
+  transition:all var(--t-mid) var(--ease-out)}
+.apkdots i.on{width:16px;border-radius:4px;background:var(--gold)}
+@media (prefers-reduced-motion:reduce){
+  .apkcard.an::after,.apkcard.an .apkval{animation:none}
+  .apkrail{scroll-behavior:auto}
+}
+
 .iapgrid{display:grid;grid-template-columns:1fr;gap:var(--gap)}
 .iapcard{position:relative;display:flex;align-items:center;gap:10px;
   min-height:var(--banner-h-lg);padding:var(--pad);border-radius:var(--radius);
@@ -4629,8 +4736,16 @@ button.pfplate{cursor:pointer}
     <div id="offerSlot"></div>
 
     <div class="secribbon" data-sec="2" data-ribbon="ribbon_section_lg">
-      <span class="srt">Arena-Pack</span>
+      <span class="srt">Arena-Packs</span>
       <span class="srx">Echtgeld · Platzhalter</span></div>
+    <!-- AAs Karussell (IMG_3382): EINE Karte im Bild, Pfeile links und
+         rechts ausserhalb, Punktleiste darunter. Waagerecht wischbar. -->
+    <div class="apkwrap">
+      <button class="apknav l pressable" id="apkPrev" aria-label="Vorheriges Angebot">‹</button>
+      <div class="apkrail" id="apkRail"></div>
+      <button class="apknav r pressable" id="apkNext" aria-label="Nächstes Angebot">›</button>
+    </div>
+    <div class="apkdots" id="apkDots"></div>
     <div class="iapgrid" id="arenaPackBox"></div>
 
     <!-- (3) Tagesangebote -->
@@ -7758,6 +7873,71 @@ button.pfplate{cursor:pointer}
      Prototyp sind das PLATZHALTER: ein Klick oeffnet keinen Kauf,
      sondern sagt genau das. Eine Demo-Wallet mit Echtgeld zu fuettern
      waere die unehrlichere Variante. */
+  /* ==================================================================
+   * ARENA-PACKS — AAs Karussell (IMG_3382/3383 nachgemessen)
+   * ------------------------------------------------------------------
+   * Acht Angebote, eins je Arena, waagerecht wischbar. Freigeschaltet
+   * wird ein Pack, sobald der Spieler seine Arena erreicht hat; die
+   * gesperrten bleiben SICHTBAR. Das ist der eigentliche Zug: wer in
+   * Arena 2 steht, wischt an Arena 5 vorbei und sieht, was ihn dort
+   * erwartet. Eine Sperre, die man aufloesen kann, indem man spielt, ist
+   * ehrliche Verknappung — anders als ein Zaehler, der neu startet.
+   *
+   * `wert` steht hier NICHT. Er wird gerechnet (packWert unten): Inhalt
+   * zu unseren eigenen Einzelpreisen gegen den Packpreis. Eine Zahl auf
+   * die Karte zu schreiben, die niemand nachrechnen kann, waere eine
+   * Behauptung; so ist sie eine Rechnung.
+   * ================================================================== */
+  var ARENA_PACKS = [
+    { n:1, preis:3,  gold:2500,  gems:80,   packs:1, ess:10, kulisse:"pack_arena_klein"  },
+    { n:2, preis:5,  gold:5000,  gems:150,  packs:2, ess:20, kulisse:"pack_arena_klein"  },
+    { n:3, preis:9,  gold:9000,  gems:300,  packs:3, ess:35, kulisse:"pack_arena_klein"  },
+    { n:4, preis:14, gold:16000, gems:500,  packs:4, ess:50, kulisse:"pack_arena_mittel" },
+    { n:5, preis:19, gold:24000, gems:750,  packs:5, ess:70, kulisse:"pack_arena_mittel" },
+    { n:6, preis:29, gold:38000, gems:1200, packs:6, ess:95, kulisse:"pack_arena_mittel" },
+    { n:7, preis:44, gold:60000, gems:1900, packs:8, ess:130, kulisse:"pack_arena_gross" },
+    { n:8, preis:69, gold:95000, gems:3000, packs:10, ess:180, kulisse:"pack_arena_gross" },
+  ];
+
+  /* Der Wert eines Packs, gerechnet statt behauptet.
+     Grundlage sind unsere EIGENEN Einzelpreise: die guenstigste
+     Gem-Staffel gibt den Franken-Preis je Gem, der Gold-Tausch den
+     Gem-Preis je Gold. Ein Booster-Pack und eine Essenz haben keinen
+     Direktpreis — sie werden ueber ihren Gem-Gegenwert im Tagesangebot
+     bewertet. Kommt eine Staffel dazu, rechnet sich der Wert von selbst
+     neu; es gibt keine Zahl, die man vergessen kann nachzuziehen. */
+  var WERT_PACK_GEMS = 90;      // ein Booster-Pack, Gegenwert in Gems
+  var WERT_ESS_GEMS  = 6;       // eine Essenz, Gegenwert in Gems
+  function frankenJeGem() {
+    var g = GEM_PACKS[0];
+    /* ⚠ Nicht Zeichen wegstreichen, sondern die Zahl SUCHEN. „Fr. 3.–"
+       verliert beim Wegstreichen aller Nicht-Ziffern zwar Buchstaben und
+       Strich, behaelt aber den Punkt aus „Fr." — heraus kommt „.3." und
+       parseFloat liest 0,3. Der Wert war dadurch zehnfach zu klein und
+       jedes Siegel zeigte „+0 %". */
+    var m = String(g.price).replace(",", ".").match(/\d+(?:\.\d+)?/);
+    return (m ? parseFloat(m[0]) : 0) / g.amt;
+  }
+  function gemsJeGold() {
+    /* Der Gold-Tausch ist der einzige Ort, an dem Gold einen Preis in
+       Gems hat. Er ist damit die Bruecke zwischen beiden Waehrungen. */
+    /* Die erste Staffel ist das Tagesgold und kostet nichts — sie taugt
+       nicht als Massstab. Genommen wird die erste BEZAHLTE. */
+    var t = null;
+    if (typeof GOLD_PACKS !== "undefined") {
+      for (var i = 0; i < GOLD_PACKS.length; i++) {
+        if (GOLD_PACKS[i].cost > 0) { t = GOLD_PACKS[i]; break; }
+      }
+    }
+    return t ? t.cost / t.amt : 1 / 150;
+  }
+  function packWert(p) {
+    var gems = p.gems + p.gold * gemsJeGold() +
+               p.packs * WERT_PACK_GEMS + p.ess * WERT_ESS_GEMS;
+    var franken = gems * frankenJeGem();
+    return Math.max(0, Math.round(franken / p.preis * 100) - 100);
+  }
+
   var IAP_PACKS = [
     { id:"arena", name:"Arena-Pack", sub:"Einmal pro Saison", art:"offer_arena_pack", emoji:"🎁",
       price:"Fr. 3.–", value:"+180 % Wert",
@@ -7864,6 +8044,7 @@ button.pfplate{cursor:pointer}
           (freeDailyTaken ? "Wieder in 3h 41m" : "Abholen") + "</button></div>";
 
     renderShopPromo();
+    renderArenaPacks();
     renderIapPacks();
     renderGemPacks();
     renderGoldPacks();
@@ -7965,6 +8146,104 @@ button.pfplate{cursor:pointer}
     bgArt(el, "bg_promo_pass");
   }
   /* (2) Arena-/Starter-Pack. */
+  /* ==================================================================
+   * Das Arena-Pack-Karussell
+   * ------------------------------------------------------------------
+   * Freigeschaltet ist ein Pack, sobald der Spieler seine Arena erreicht
+   * hat. Die gesperrten bleiben stehen — sie sind der Ausblick.
+   * ================================================================== */
+  function renderArenaPacks() {
+    var rail = $("apkRail"), dots = $("apkDots");
+    if (!rail) return;
+    var offen = arenaIndexFor(AC.get().trophies || 0) + 1;
+    rail.innerHTML = ARENA_PACKS.map(function (p) {
+      var t = ARENA_TIERS[p.n - 1] || { name: "Arena " + p.n };
+      var zu = p.n > offen;
+      var wert = packWert(p);
+      var alt = (p.preis * (100 + wert) / 100);
+      function feld(key, emo, txt, farbe) {
+        return '<span class="apkit" style="--itc:' + farbe + '">' +
+          ico(key, emo) + "<i>" + txt + "</i></span>";
+      }
+      return '<button class="apkcard pressable' + (zu ? " zu" : "") +
+        '" data-apk="' + p.n + '" style="--pk:' + (t.color || "#e0b94a") + '">' +
+        '<span class="apkval">+<b>' + wert + " %</b>Wert</span>" +
+        '<span class="apktx">' +
+          '<span class="apknm">Arena ' + p.n + " · " + t.name + "</span>" +
+          '<span class="apkrow">' +
+            feld("cur_gold", "🪙", fmt(p.gold), "#e0b94a") +
+            feld("cur_gem", "💚", fmt(p.gems), "#2fd47a") +
+            feld("pack_gold", "🎁", "×" + p.packs, "#a06ee0") +
+            feld("ess_attack", "⚗", "×" + p.ess, "#ff8a5c") +
+          "</span>" +
+          '<span class="apkpr"><span class="apkalt">Fr. ' + alt.toFixed(0) + ".–</span>" +
+            '<span class="apkneu">Fr. ' + p.preis + '.–</span></span>' +
+        "</span>" +
+        '<span class="apkzu"><span>🔒</span>Ab Arena ' + p.n +
+          "<em>" + fmt(ARENA_TIERS[p.n - 1] ? ARENA_TIERS[p.n - 1].at : 0) +
+          " Trophäen</em></span>" +
+        "</button>";
+    }).join("");
+    hydrateIcons(rail);
+    Array.prototype.forEach.call(rail.querySelectorAll(".apkcard"), function (el, i) {
+      var p = ARENA_PACKS[i];
+      bgArt(el, p.kulisse);
+      /* Die Elementfarbe der Arena toent die Kulisse — dadurch sehen die
+         acht Packs verschieden aus, obwohl sich drei Bilder die Arbeit
+         teilen. Kommt eine neunte Arena dazu, braucht sie kein Bild. */
+      var t = ARENA_TIERS[i];
+      if (t && t.key) tint(el, t.key);
+      el.addEventListener("click", function () {
+        if (el.classList.contains("zu")) {
+          toast("Erst ab Arena " + p.n + " — noch " +
+            fmt(Math.max(0, (ARENA_TIERS[p.n - 1].at || 0) - (AC.get().trophies || 0))) +
+            " Trophäen");
+          return;
+        }
+        buyIap("apk" + p.n);
+      });
+    });
+    dots.innerHTML = ARENA_PACKS.map(function () { return "<i></i>"; }).join("");
+    /* Startposition: das Pack der AKTUELLEN Arena. Nicht das erste — wer
+       in Arena 5 steht, will nicht viermal wischen, um sein Angebot zu
+       sehen. */
+    apkZuIndex(Math.max(0, Math.min(ARENA_PACKS.length - 1, offen - 1)), false);
+    apkStand();
+  }
+  function apkKarten() {
+    return Array.prototype.slice.call($("apkRail").querySelectorAll(".apkcard"));
+  }
+  function apkIndex() {
+    var rail = $("apkRail"), k = apkKarten();
+    if (!k.length) return 0;
+    var mitte = rail.scrollLeft + rail.clientWidth / 2;
+    var best = 0, dmin = Infinity;
+    k.forEach(function (el, i) {
+      var d = Math.abs(el.offsetLeft + el.offsetWidth / 2 - mitte);
+      if (d < dmin) { dmin = d; best = i; }
+    });
+    return best;
+  }
+  function apkZuIndex(i, weich) {
+    var rail = $("apkRail"), k = apkKarten();
+    if (!k[i]) return;
+    rail.scrollTo({ left: k[i].offsetLeft - (rail.clientWidth - k[i].offsetWidth) / 2,
+                    behavior: weich === false ? "auto" : "smooth" });
+  }
+  /* Punktleiste, Pfeile und die Laufanimation folgen der Karte, die
+     gerade im Bild ist. Die Animation laeuft NUR dort — acht gleichzeitig
+     laufende Lichtstreifen kosten Fuellrate und bringen nichts, weil man
+     immer nur einen sieht. */
+  function apkStand() {
+    var i = apkIndex(), k = apkKarten();
+    k.forEach(function (el, j) { el.classList.toggle("an", j === i); });
+    Array.prototype.forEach.call($("apkDots").children, function (d, j) {
+      d.classList.toggle("on", j === i);
+    });
+    $("apkPrev").disabled = i <= 0;
+    $("apkNext").disabled = i >= k.length - 1;
+  }
+
   function renderIapPacks() {
     $("arenaPackBox").innerHTML = IAP_PACKS.map(function (p) {
       var items = p.items.map(function (it) {
@@ -11740,6 +12019,22 @@ button.pfplate{cursor:pointer}
   });
   updateFriendsBadge();
   // Promo-Banner an Shop-Position 1 fuehrt in den Season-Pass (§8.1).
+  /* Karussell: Pfeile, Punktleiste und der Lauf der Animation haengen am
+     SCROLL-Ereignis der Schiene, nicht an einem eigenen Gestenzustand.
+     Dadurch stimmt der Stand auch nach einem Wisch, einem Tastendruck
+     oder einem abgebrochenen Zug — es gibt nur eine Wahrheit. */
+  (function () {
+    var rail = $("apkRail");
+    if (!rail) return;
+    var t = 0;
+    rail.addEventListener("scroll", function () {
+      if (t) return;
+      t = requestAnimationFrame(function () { t = 0; apkStand(); });
+    }, { passive: true });
+    $("apkPrev").addEventListener("click", function () { apkZuIndex(apkIndex() - 1); });
+    $("apkNext").addEventListener("click", function () { apkZuIndex(apkIndex() + 1); });
+  })();
+
   onNav("shopPromo", "navPass");
   /* ==================================================================
    * AUFKLAPP-MENUE OBEN RECHTS — AAs Ort fuer den Guide
