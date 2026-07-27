@@ -611,21 +611,28 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
   -webkit-text-fill-color:#eaf6ff;color:#eaf6ff;
   box-shadow:var(--mat-raised),0 3px 0 #12496f;
   animation:tbmin var(--t-mid) var(--ease-overshoot) backwards}
-.tbmi .ico{width:20px;height:20px;flex:0 0 20px;
+/* ⚠ 24 px, nicht 20. Das Projekt hat eine gemessene Untergrenze: Artwork
+   muss bei ≥20 px noch lesbar sein — und „lesbar bei 20" heisst nicht
+   „gut bei 20". Die sekundaeren Eintraege standen sogar auf 18 px, also
+   UNTER der eigenen Grenze; darum sahen Post und Einstellungen aus wie
+   Flecken. Seit die vier Hub-Kacheln weg sind, ist dieses Menue der
+   einzige Weg zu seinen vier Zielen; dann darf sein Bild nicht das
+   kleinste der ganzen Oberflaeche sein. */
+.tbmi .ico{width:24px;height:24px;flex:0 0 24px;
   filter:var(--frei) drop-shadow(0 1px 2px #00000096)}
-.tbmi span.ico{font-size:16px;text-align:center}
+.tbmi span.ico{font-size:19px;text-align:center}
 /* Primaer: die zwei Ziele, fuer die man das Menue ueberhaupt oeffnet. */
 .tbmi.pri{padding:11px 13px;font-size:14px;gap:11px}
-.tbmi.pri .ico{width:27px;height:27px;flex:0 0 27px}
-.tbmi.pri span.ico{font-size:21px}
+.tbmi.pri .ico{width:30px;height:30px;flex:0 0 30px}
+.tbmi.pri span.ico{font-size:23px}
 /* Sekundaer: dunkle Platte statt Blau. Verwaltung soll nicht so laut
    rufen wie ein Ziel — dieselbe Platte wie die Schienen-Kacheln. */
 .tbmi.sec{padding:7px 12px;font-size:11.5px;
   background:linear-gradient(180deg,#243342,#141d26);
   -webkit-text-fill-color:var(--txt);color:var(--txt);
   box-shadow:var(--mat-raised),0 3px 0 #0a1016}
-.tbmi.sec .ico{width:18px;height:18px;flex:0 0 18px}
-.tbmi.sec span.ico{font-size:15px}
+.tbmi.sec .ico{width:24px;height:24px;flex:0 0 24px}
+.tbmi.sec span.ico{font-size:19px}
 .tbmtx{display:flex;flex-direction:column;gap:2px;min-width:0;text-align:left}
 /* Der Untertitel steht auf dem MITTELBLAUEN Grund des Eintrags, nicht
    auf einer hellen Flaeche (§4). Gemessen 6,4:1 gegen #1c6ea8. */
@@ -3939,6 +3946,11 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   line-height:16px;border-radius:8px;background:var(--danger);color:#fff;font-size:9px;
   font-weight:900;text-align:center;padding:0 4px}
 .homerow3 .battlebtn{flex:1 1 55%}
+/* Der Platzhalter, der den KAMPF-Knopf in der Mitte haelt, nachdem die
+   GUIDE-Kachel weg ist. Er ist bewusst KEIN leerer .sidetile mit
+   Rahmen — sonst steht dort ein sichtbarer leerer Kasten und die
+   Loeschung sieht aus wie ein Ladefehler. */
+.homerow3 .sidetile.leer{border:0;background:none;box-shadow:none;pointer-events:none}
 
 /* ==================================================================
  * DAILY-LOGIN-KALENDER, EINSTEIGER-GUIDE, HANDBUCH
@@ -5025,7 +5037,10 @@ button.pfplate{cursor:pointer}
           <i class="nb2" id="badgeFriends" style="display:none">0</i></button>
         <button class="tbmenu pressable" id="tbMenu" aria-label="Menü"
                 aria-haspopup="true" aria-expanded="false">
-          <span></span><span></span><span></span></button>
+          <span></span><span></span><span></span>
+          <!-- Sammelzaehler fuer Post und Guide: beide Ziele sitzen jetzt
+               nur noch hinter diesem Knopf (UIBadge). -->
+          <i class="nb2" id="badgeMenu" style="display:none">0</i></button>
       </span>
     </div>
     </div>
@@ -5234,19 +5249,22 @@ button.pfplate{cursor:pointer}
       <div class="slotrow" id="packSlots"></div>
     </div>
       </div>
-      <div class="hubrail right">
-        <button class="railtile pressable" id="icoPack" title="Booster-Packs">
-          <span class="rti" data-ico="ic_gift" data-emoji="🎁"></span>
-          <i class="nb2" id="badgePack" style="display:none">0</i></button>
-        <button class="railtile pressable" id="icoBoard" title="Rangliste">
-          <span class="rti" data-ico="ic_rank" data-emoji="🏅"></span></button>
-        <button class="railtile pressable" id="icoMail" title="Post">
-          <span class="rti" data-ico="ic_mail" data-emoji="✉"></span>
-          <i class="nb2" id="tileMailBadge" style="display:none">0</i></button>
-        <button class="railtile pressable" id="icoVault" title="Kristalltresor">
-          <span class="rti" data-ico="ic_gear" data-emoji="🔮"></span>
-          <i class="nb2" id="badgeVault" style="display:none">0</i></button>
-      </div>
+      <!-- Hier standen vier weitere Kacheln: Rangliste, Post, Kristalltresor
+           und Booster-Packs. Alle vier fuehrten an Orte, die von der
+           Startseite aus ohnehin einen Tap entfernt sind:
+             Rangliste, Post -> Aufklapp-Menue (TB_MENU)
+             Kristalltresor  -> Shop, und der steht in der Bottom-Nav
+             Booster-Packs   -> die vier Truhen-Slots in der Mitte oeffnen
+                                die Pack-Ansicht bereits selbst (SLOTS)
+           Ein zweiter Weg zum selben Ziel ist kein Komfort, sondern
+           Rauschen: er kostet Platz auf dem wichtigsten Bildschirm und
+           laesst den Nutzer raten, ob die beiden Wege dasselbe tun.
+           Der Auftraggeber hat es so benannt: „diese sind aber laengst
+           oben im Reiter den man aufklappen kann. Loesche sie von
+           Bildschirm wir brauchen sie nur dort oben im Menue."
+           Die LINKE Spalte bleibt: Login/Taeglich, Wochenziele und
+           Erfolge stehen NIRGENDS sonst. -->
+      <div class="hubrail right" aria-hidden="true"></div>
     </div>
 
     <!-- 74-83 %: EVENTS | BATTLE (55 % Breite) | CHALLENGES (§14.3).
@@ -5257,10 +5275,12 @@ button.pfplate{cursor:pointer}
         <span class="sti" data-ico="ic_tent" data-emoji="🎪"></span>
         <span class="stn">EVENTS</span><i class="nb2" id="tileEventBadge">3</i></button>
       <button class="battlebtn" id="btnBattle"><span class="goldtext">Kampf</span></button>
-      <button class="sidetile" id="tileGuide">
-        <span class="sti" data-ico="ic_compass" data-emoji="🧭"></span>
-        <span class="stn">GUIDE</span>
-        <i class="nb2" id="tileGuideBadge" style="display:none">0</i></button>
+      <!-- GUIDE stand hier als dritte Kachel und ist ebenfalls ein
+           Menue-Ziel (TB_MENU). Der leere Platzhalter bleibt, damit der
+           KAMPF-Knopf in der Bildschirmmitte stehen bleibt — er ist der
+           wichtigste Knopf des Spiels, und eine um 20 % verschobene Mitte
+           faellt sofort auf. -->
+      <span class="sidetile leer" aria-hidden="true"></span>
     </div>
   </section>
 
@@ -6735,20 +6755,37 @@ button.pfplate{cursor:pointer}
 
   /* UIBadge.set(navKey, n) — die roten Zaehler-Punkte der Bottom-Nav. */
   window.UIBadge = (function () {
-    var MAP = { collection: "navBadge", shop: "badgeShop", pack: "badgePack",
-                clan: "badgeClan", mail: "tileMailBadge",
-                friends: "badgeFriends",
-                daily: "tileDailyBadge", guide: "tileGuideBadge",
-                events: "tileEventBadge" };
+    var MAP = { collection: "navBadge", shop: "badgeShop",
+                clan: "badgeClan", friends: "badgeFriends",
+                daily: "tileDailyBadge", events: "tileEventBadge" };
+    /* Post und Guide haben ihre Kacheln auf der Startseite verloren —
+       ihre Ziele stehen jetzt nur noch im Aufklapp-Menue. Ein Zaehler,
+       den man erst sieht, wenn man das Menue oeffnet, ist keiner:
+       niemand oeffnet ein Menue auf Verdacht. Beide zaehlen deshalb
+       zusammen auf den Menueknopf. Eine Kachel zu loeschen darf ihre
+       Benachrichtigung nicht stillschweigend mitloeschen. */
+    var imMenue = { mail: 0, guide: 0 };
+    function menueZaehler() {
+      var el = document.getElementById("badgeMenu"); if (!el) return;
+      var n = imMenue.mail + imMenue.guide;
+      el.textContent = n > 99 ? "99+" : String(n);
+      el.style.display = n > 0 ? "" : "none";
+    }
+    /* `pack` steht bewusst in keiner der beiden Tabellen: die Zahl der
+       wartenden Packs steht als Ziffer auf den vier Truhen-Slots in der
+       Bildschirmmitte, deutlicher als jeder rote Punkt es koennte. */
     return {
       set: function (navKey, n) {
+        n = n | 0;
+        if (Object.prototype.hasOwnProperty.call(imMenue, navKey)) {
+          imMenue[navKey] = n; menueZaehler(); return;
+        }
         var id = MAP[navKey]; if (!id) return;
         var el = document.getElementById(id); if (!el) return;
-        n = n | 0;
         el.textContent = n > 99 ? "99+" : String(n);
         el.style.display = n > 0 ? "" : "none";
       },
-      keys: function () { return Object.keys(MAP); }
+      keys: function () { return Object.keys(MAP).concat(Object.keys(imMenue)); }
     };
   })();
 
@@ -9096,7 +9133,19 @@ button.pfplate{cursor:pointer}
     box.className = "vorratbox" + (vorratOffen ? " open" : "");
     box.innerHTML =
       '<div class="vorrathead">' +
-        '<span class="bandart">' + ico("pack_vorrat", "📦") + "</span>" +
+        /* ⚠ HIER DARF `pack_vorrat` NICHT STEHEN. Das Asset ist eine
+           KULISSE (21:9, §6b) und traegt laut eigener Notiz niemals
+           class="ico" — der Freistell-Filter aus §6h wuerde seine dunkle
+           Bildhaelfte aufloesen, und in einem 1:1-Kasten mit `contain`
+           bliebe von 21:9 ein Briefschlitz uebrig. Die Kulisse liegt
+           unten per bgArt(), wo sie hingehoert.
+           Der Kasten braucht ein EIGENES, quadratisches, freistellbares
+           Truhen-Motiv. Solange der Schluessel `pack_vorrat_icon` nicht
+           in ASSETS steht, liefert ico() sauber das Emoji — die Kachel
+           ist vollstaendig lesbar, nur eben ohne Grafik. Bewusst KEIN
+           Ersatz-Schluessel aus einer anderen Rolle: ein Bronze-Truhen-
+           bild auf der Vorrats-Truhe waere eine Falschaussage. */
+        '<span class="bandart">' + ico("pack_vorrat_icon", "📦") + "</span>" +
         '<span class="bandtx"><span class="vrnm">Vorrats-Truhe</span>' +
           '<span class="vrpr">' + pk.promise + " · " + pk.cardSlots + " Karten, " +
             pk.materialSlots + " Essenz-Posten und Gold je Öffnung.</span></span></div>" +
@@ -12951,13 +13000,11 @@ button.pfplate{cursor:pointer}
   }
   onNav("navCollection"); onNav("navTower"); onNav("navForge");
   onNav("navPack"); onNav("navShop"); onNav("navFortress");
-  // Clan + Rangliste haengen an den Home-Hub-Kacheln (siehe Kommentar
-  // im Markup) und haben deshalb keinen eigenen Bottom-Nav-Knopf.
-  // Icon-Leiste der Profilzeile + AA-Reihe EVENTS | BATTLE | CHALLENGES
-  // Clan hat jetzt einen Bottom-Nav-Tab; der frei gewordene Home-Slot
-  // fuehrt zu den Packs.
-  onNav("navClan"); onNav("icoPack", "navPack"); onNav("icoBoard", "navBoard");
-  onNav("passBanner", "navPass"); onNav("icoMail", "navMail");
+  // Rangliste und Post fuehren ueber das Aufklapp-Menue (TB_MENU), die
+  // Pack-Ansicht ueber die Truhen-Slots, der Shop ueber die Bottom-Nav.
+  // Die vier Hub-Kacheln, die dieselben Ziele doppelt angeboten haben,
+  // sind entfernt; ihre onNav-Zeilen mit ihnen.
+  onNav("navClan"); onNav("passBanner", "navPass");
   /* Die neuen Schienen-Kacheln. Wochenziele und Erfolge zeigen vorerst
      denselben Tagesziel-Bildschirm mit einem Hinweis — sie stehen an
      AAs Stelle, aber ihre eigenen Inhalte kommen erst, wenn der Nutzer
@@ -12969,11 +13016,6 @@ button.pfplate{cursor:pointer}
      entfernt. */
   $("icoWeekly").addEventListener("click", function () { openRewards("weekly"); });
   $("icoLifetime").addEventListener("click", function () { openRewards("lifetime"); });
-  $("icoVault").addEventListener("click", function () {
-    UISfx.tap();
-    if (window.ArenaVault) { show("navShop"); toast("Kristalltresor im Shop"); }
-    else toast("Tresor noch nicht geladen");
-  });
   /* Freundesliste: der Knopf oben rechts fuehrt in die View. KEIN
      Bottom-Nav-Tab und kein Eintrag in SWIPE_ORDER — sie ist, wie
      Rangliste und Post, ein Ziel aus der Kopfzeile. */
@@ -13031,15 +13073,25 @@ button.pfplate{cursor:pointer}
    * Eintrag waere mehr Ueberschrift als Inhalt — deshalb sitzt Post
    * bei den Einstellungen und nicht in einer eigenen Gruppe „Kontakt".
    * ================================================================== */
+  /* Die Bildwahl ist nachgezogen worden, nachdem die vier Hub-Kacheln von
+     der Startseite verschwunden sind: dieses Menue ist jetzt der EINZIGE
+     Weg zu Rangliste, Guide, Post und Einstellungen, also muss jede Zeile
+     auf einen Blick sagen, wohin sie fuehrt.
+     `hub_leaderboard` zeigt ein Podest, das bei 24 px wie eine Kiste
+     aussieht; `ic_rank` zeigt den Pokal, der auch klein noch Rangliste
+     heisst. Dasselbe bei Post: `hub_mail` verliert bei dieser Groesse
+     seine Form, `ic_mail` hat den Siegel-Umschlag. Beide Bilder standen
+     bis eben auf den geloeschten Kacheln — sie sind nicht neu, sie waren
+     nur an der falschen Stelle. */
   var TB_MENU = [
     { grp: "Spielen" },
-    { nav: "navBoard", ico: "hub_leaderboard", emo: "🏅", txt: "Rangliste",
+    { nav: "navBoard", ico: "ic_rank", emo: "🏅", txt: "Rangliste",
       sub: "Global, Clan und Umgebung", pri: true },
     { nav: "navGuide", ico: "hub_challenges", emo: "📖", txt: "Guide",
       sub: "Kapitel, Handbuch und Gegner", pri: true },
     { grp: "Konto" },
-    { nav: "navMail", ico: "hub_mail", emo: "✉", txt: "Post", zaehler: "mail" },
-    { nav: "navSettings", ico: "hub_settings", emo: "⚙", txt: "Einstellungen" }
+    { nav: "navMail", ico: "ic_mail", emo: "✉", txt: "Post", zaehler: "mail" },
+    { nav: "navSettings", ico: "ic_gear", emo: "⚙", txt: "Einstellungen" }
   ];
   function tbMenuAuf() {
     var L = $("tbMenuLayer");
@@ -13112,7 +13164,6 @@ button.pfplate{cursor:pointer}
      gewandert — genau wie bei AA, wo SETTINGS der fuenfte Menue-Eintrag
      ist. Der alte Knopf `icoSettings` existiert nicht mehr; `onNav`
      wuerde darueber stolpern. */
-  onNav("tileGuide", "navGuide");
   $("icoDaily").addEventListener("click", function () { openRewards("login"); });
   $("dailyClose").addEventListener("click", closeDaily);
   $("dailyLayer").addEventListener("click", function (e) {
@@ -13588,7 +13639,6 @@ button.pfplate{cursor:pointer}
     /* Farbkoerper statt grauer Flaechen — jede Kachel und jedes Icon der
        Profilzeile bekommt seine Farbfamilie (Konsistenz-Sweep). */
     tint($("tileEvents"), "nature");
-    tint($("tileGuide"), "gold");
     /* Die linke Schiene traegt AAs Belohnungsstaffel — Tag, Woche,
        Lebenszeit. Sie steigt in der Wertigkeit, also steigt auch die
        Farbe: Gold -> Smaragd -> Arkan. */
@@ -13599,15 +13649,10 @@ button.pfplate{cursor:pointer}
        Punkte der linken Schiene kommen aus ArenaRewards und sollen die
        Zahl aus ArenaDaily ueberschreiben, nicht umgekehrt. */
     rwSyncBadges();
-    tint($("icoPack"), "pack_gold");
-    tint($("icoBoard"), "gold");
-    tint($("icoMail"), "speed");
     /* icoSettings gibt es nicht mehr (siehe oben) — der Tresor-Knopf der
        rechten Schiene sitzt jetzt an seiner Stelle. */
-    tint($("icoVault"), "neutral");
     tint($("passBanner"), "special");
     layer($("tileEvents"), "hub_events");
-    layer($("tileGuide"), "hub_challenges");
     renderProfile();
   }
 
