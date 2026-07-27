@@ -5,7 +5,7 @@
     "styleSheetJob": "22646ce4-8685-46af-ad73-9ec32482c2c2",
     "modell": "nano_banana_pro (Higgsfield), resolution 1k, Style-Sheet als Bild-Referenz",
     "erzeugt": "2026-07-25",
-    "credits": "Batch 1: 25 Generationen x 2 = 50 Credits. Batch 2: 52 Generationen x 2 = 104 Credits. Batch 3 (Pack-Zeremonie): 1 Bild x 2 + 1 Video (kling3_0_turbo) x 7,5 = 9,5 Credits. Batch 3 (Festungs-Layout Variante 2 „Banner-Stapel\"): 4 Bilder x 2 = 8 Credits. Batch 4 (Karten-Artworks, Breitbanner, Emote-Tokens): 17 Bilder x 2 = 34 Credits. Batch 5 (Pass-Keyart-Video, 8 Karten-Loops, 6 CC0-Audiodateien): 9 Videos x 7,5 = 67,5 Credits; Audio 0 Credits (CC0 von OpenGameArt, siehe LIZENZEN.md). Gesamt 115 Assets / 273 Credits, 0 Retakes. Batch 8 (Endscreen-Politur): 4 Bilder x 2 = 8 Credits. Batch 12 (Produktbilder + Gratis-Motive): 5 Bilder x 2 = 10 Credits, davon 1 Verwurf (Kristalltresor v1: Randleuchten und zu wenig Randabstand). Batch 13 (Startbildschirm/Splash): 4 Bilder x 2 = 8 Credits, 0 Retakes; 2 uebernommen (splash_key, splash_key_alt), 2 Schwestervarianten unbenutzt. Batch 14 (Profil-Avatare, 7 Porträts): 20 Bilder x 2 = 40 Credits, davon 13 Verwürfe — 5x weisser statt schwarzer Grund (Randring L > 93; die hellen Referenzbilder faerben den Hintergrund ein), 7x zu wenig Randabstand oder Motiv ausserhalb der Kreismaske, 1x helle Pixel im Randring (L_max 92,9). Gegenmittel, das zuverlaessig half: die Hintergrundregel als ERSTEN Absatz des Prompts, woertlich „PURE SOLID BLACK, RGB 0,0,0 ... the background receives no light at all\".",
+    "credits": "Batch 1: 25 Generationen x 2 = 50 Credits. Batch 2: 52 Generationen x 2 = 104 Credits. Batch 3 (Pack-Zeremonie): 1 Bild x 2 + 1 Video (kling3_0_turbo) x 7,5 = 9,5 Credits. Batch 3 (Festungs-Layout Variante 2 „Banner-Stapel\"): 4 Bilder x 2 = 8 Credits. Batch 4 (Karten-Artworks, Breitbanner, Emote-Tokens): 17 Bilder x 2 = 34 Credits. Batch 5 (Pass-Keyart-Video, 8 Karten-Loops, 6 CC0-Audiodateien): 9 Videos x 7,5 = 67,5 Credits; Audio 0 Credits (CC0 von OpenGameArt, siehe LIZENZEN.md). Gesamt 115 Assets / 273 Credits, 0 Retakes. Batch 8 (Endscreen-Politur): 4 Bilder x 2 = 8 Credits. Batch 12 (Produktbilder + Gratis-Motive): 5 Bilder x 2 = 10 Credits, davon 1 Verwurf (Kristalltresor v1: Randleuchten und zu wenig Randabstand). Batch 13 (Startbildschirm/Splash): 4 Bilder x 2 = 8 Credits, 0 Retakes; 2 uebernommen (splash_key, splash_key_alt), 2 Schwestervarianten unbenutzt. Batch 14 (Profil-Avatare, 7 Porträts): 20 Bilder x 2 = 40 Credits, davon 13 Verwürfe — 5x weisser statt schwarzer Grund (Randring L > 93; die hellen Referenzbilder faerben den Hintergrund ein), 7x zu wenig Randabstand oder Motiv ausserhalb der Kreismaske, 1x helle Pixel im Randring (L_max 92,9). Gegenmittel, das zuverlaessig half: die Hintergrundregel als ERSTEN Absatz des Prompts, woertlich „PURE SOLID BLACK, RGB 0,0,0 ... the background receives no light at all\". Batch 14b (Nachzieher Solara + Smaragd): 10 Bilder x 2 = 20 Credits. Solara geloest (9 Verwuerfe), Smaragd NICHT geloest (2 Verwuerfe, beide schlechter als der Bestand).",
     "palette": {
       "gold": "#e0b94a",
       "violett": "#7a4fd6",
@@ -30,7 +30,8 @@
       "cinematic_legendary ist ein MP4, kein Bild — beim Kopieren nach public/assets/ die curl-Schleife nicht auf *.png filtern.",
       "Batch 12: Die acht `packart_arena1..8` sind die ACHT EIGENEN Arena-Pack-Artworks (Auftraggeber: „Die Arena packs muessen alle ein anderes artwork haben.\"). Sie ersetzen die Behelfsloesung aus Batch 11, in der sich acht Arenen drei Kulissen (pack_arena_klein/mittel/gross) geteilt haben und sich nur durch die CSS-Toenung unterschieden. Die Bilder stammen aus den bereits bezahlten Batch-11-Generationen — arena 1/3/5 lagen unter den generischen Schluesseln, arena 2/4/6/7/8 waren unbenutzte Reserve. Keine neuen Credits.",
       "Batch 12: `packart_arena*` und `bg_gratis_gold` sind KULISSEN (cover, §6b) und duerfen NICHT freigestellt werden. `offer_starter`, `offer_vault_bank` und `badge_gratis` sind freistellbar: gemessener Randring L_max 7,5 / 5,2 / 5,5 bei L_mittel 0,64, Motiv beruehrt den Rand nicht (kleinster Abstand 133 / 120 / 48 px).",
-      "Profil-Avatare (av_*): quadratisch 1024x1024, Brustbild vor tiefschwarzem Grund, fuer die KREISMASKE gebaut — jedes Motiv liegt vollstaendig innerhalb des einbeschriebenen Kreises (r_max < 1,0) und haelt mindestens 8 % Randabstand. Die beiden Helden-Avatare wurden mit card_solara bzw. card_magmor als Bildreferenz erzeugt, damit Gesicht, Ruestung und Farben mit den Kartenbildern uebereinstimmen."
+      "Profil-Avatare (av_*): quadratisch 1024x1024, Brustbild vor tiefschwarzem Grund, fuer die KREISMASKE gebaut — jedes Motiv liegt vollstaendig innerhalb des einbeschriebenen Kreises (r_max < 1,0) und haelt mindestens 8 % Randabstand. Die beiden Helden-Avatare wurden mit card_solara bzw. card_magmor als Bildreferenz erzeugt, damit Gesicht, Ruestung und Farben mit den Kartenbildern uebereinstimmen.",
+      "PRUEFREGEL, teuer gelernt: „Kopf vollstaendig im Kreis“ ist NUR aussagekraeftig, wenn der Kopf separat lokalisiert wird. Die Bounding-Box des Motivs sagt darueber nichts. Verfahren: Zeilenbreite der Motivmaske bilden, die BREITESTE Zeile ist die Schulter, die SCHMALSTE Zeile darueber der Hals; das Kopfband reicht vom obersten Motivpixel bis zum Hals. Daraus Kopfmitte in % der Bildhoehe messen (Sollwert 38–45 %). Eine erste Fassung, die den Breitensprung von oben suchte, scheiterte an Haarspitzen und Kronzacken. ZWEITE REGEL: bei leuchtenden Figuren den Strahlenkranz im Prompt ausdruecklich verbieten — sonst zaehlt die Freistell-Maske das Licht als Motiv und jede Randabstands-Messung wird unbrauchbar."
     ],
     "cdnBase": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/",
     "batches": {
@@ -1681,8 +1682,8 @@
     "batch": 14,
     "name": "Smaragd-Wächter",
     "tier": "good",
-    "beschreibung": "Profil-Avatar „Smaragd-Wächter\" (Gut, zu AVATARS.smaragd). Wächter in smaragdgrünem Kristallpanzer mit goldgefassten Schulterstücken und grossem facettiertem Smaragd im Brustpanzer, ohne Helm, kurzer dunkler Bart. Farbakzent tiefes Smaragdgrün.",
-    "messwerte": "Randring 2 px L 0,29 (max 1,78) · Randabstand 18,26 % · Kreisprobe: 0,000 % ausserhalb, r_max 0,634, Kopf r_max 0,634 · 32-px-Standardabweichung 41,27 · Motivanteil 16,5 % · OCR 0 Zeichen"
+    "beschreibung": "Profil-Avatar „Smaragd-Wächter\" (Gut, zu AVATARS.smaragd). Wächter in smaragdgrünem Kristallpanzer mit goldgefassten Schulterstücken und grossem facettiertem Smaragd im Brustpanzer, ohne Helm, kurzer dunkler Bart. Farbakzent tiefes Smaragdgrün. OFFEN: mit 16,5 % Motivflaeche das zweitkleinste Portraet des Satzes, und die Kopfmitte sitzt bei 24,8 % der Bildhoehe statt der angestrebten 38–45 % — in der Kreismaske wirkt der Kopf dadurch zu hoch. Zwei Nachzieh-Versuche (302be256, 09740e71) fielen SCHLECHTER aus (Randabstand 2,83 % bzw. 4,20 %, r_max 1,021 bzw. 1,009, Motiv 35,4 % bzw. 39,0 %) und wurden verworfen; dieses Bild bleibt deshalb vorerst stehen. Nachzieher empfohlen.",
+    "messwerte": "Randring 2 px L 0,29 · Randabstand 18,26 % · Kreisprobe: 0,000 % ausserhalb, r_max 0,634 · Motivanteil 16,5 % · Kopf: Mitte 24,8 % der Bildhoehe, Hoehe 13,0 %, r_max 0,634 · 32-px-Standardabweichung 41,27 · OCR 0 Zeichen"
   },
   "av_saphir": {
     "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_131925_38fe62cd-7edc-43b4-92b1-328b148aa2bb.png",
@@ -1711,17 +1712,17 @@
     "messwerte": "Randring 2 px L 0,25 (max 1,70) · Randabstand 11,52 % · Kreisprobe: 0,000 % ausserhalb, r_max 0,881, Kopf r_max 0,762 · 32-px-Standardabweichung 46,01 · Motivanteil 29,5 % · OCR 0 Zeichen"
   },
   "av_held_solara": {
-    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_132622_669bc14c-287f-491e-a324-3ed488d5b750.png",
-    "min": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_132622_669bc14c-287f-491e-a324-3ed488d5b750_min.webp",
-    "job": "669bc14c-287f-491e-a324-3ed488d5b750",
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_134516_d19e4ee8-1aa7-4e7b-8642-11dd3be00ccd.png",
+    "min": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_134516_d19e4ee8-1aa7-4e7b-8642-11dd3be00ccd_min.webp",
+    "job": "d19e4ee8-1aa7-4e7b-8642-11dd3be00ccd",
     "type": "avatar",
     "subtype": "portrait",
     "size": "1024x1024",
     "batch": 14,
     "name": "Solara, Lichtherrin",
     "tier": "epic",
-    "beschreibung": "Helden-Avatar SOLARA (Episch, zu AVATARS.solara) — Brustbild derselben Figur wie card_solara, erzeugt MIT card_solara als Bildreferenz, damit Gesicht, Frisur und goldweisse Rüstung übereinstimmen. Farbdeckung gegen die Kartenfigur 57,5 % (Histogramm-Überschneidung). ACHTUNG: erfüllt alle Prüfpunkte, ist aber das schwächste Bild des Satzes — die Figur füllt nur 4,4 % der Fläche und wirkt in der Kopfleiste sehr klein. Nachzieher empfohlen.",
-    "messwerte": "Randring 2 px L 0,26 (max 1,37) · Randabstand 33,59 % · Kreisprobe: 0,000 % ausserhalb, r_max 0,327, Kopf r_max 0,327 · 32-px-Standardabweichung 30,03 · Motivanteil 4,4 % · OCR 0 Zeichen"
+    "beschreibung": "Helden-Avatar SOLARA (Episch, zu AVATARS.solara) — Brustbild derselben Figur wie card_solara, erzeugt MIT card_solara als Bildreferenz. VISUELL GEPRUEFT (Kartenausschnitt und Avatar nebeneinander): gleicher goldener Stirnreif mit Mittelgemme, gleiches blondes Haar, gleicher hoher Ruestungskragen mit blauen Kristallakzenten — dieselbe Figur. Das Avatargesicht ist etwas runder und die Augen etwas groesser als auf der Karte, uebliche Avatar-Stilisierung, kein Bruch. ENTSCHEIDEND WAR: der Strahlenkranz musste im Prompt ausdruecklich verboten werden („no halo, no aura, no god rays, no bloom, no rim glow“). Solange sie leuchtete, zaehlte die Freistell-Maske ihr Licht als Motiv mit — nicht ihr Koerper beruehrte den Rand, sondern ihre Strahlung. Farbdeckung gegen die Kartenfigur 57,5 % gesamt, 42,1 % im reinen Kopfbereich.",
+    "messwerte": "Randring 2 px L 0,28 · Randabstand 11,33 % · Kreisprobe: 0,000 % ausserhalb, r_max 0,831 · Motivanteil 30,7 % · Kopf: Mitte 22,9 % der Bildhoehe, Hoehe 18,8 %, r_max 0,732 · 32-px-Standardabweichung 73,42 · OCR 0 Zeichen"
   },
   "av_held_magmor": {
     "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_132908_00cb7c02-311d-44af-b1a8-a58ff7b42ac6.png",
@@ -1735,5 +1736,19 @@
     "tier": "supreme",
     "beschreibung": "Helden-Avatar MAGMOR (Suprem, zu AVATARS.magmor) — Brustbild derselben Figur wie card_magmor, erzeugt MIT card_magmor als Bildreferenz. Obsidianschwarzbrauner Körper (#3a292a) mit glühenden Magmarissen (#df7739), facettiertes Vulkangestein. Farbdeckung gegen die Kartenfigur 76,9 % (Histogramm-Überschneidung) — der belastbarste Identitätsnachweis im Satz.",
     "messwerte": "Randring 2 px L 0,28 (max 1,51) · Randabstand 9,47 % · Kreisprobe: 0,000 % ausserhalb, r_max 0,845, Kopf r_max 0,608 · 32-px-Standardabweichung 29,11 · Motivanteil 21,4 % · OCR 0 Zeichen"
+  },
+  "av_held_solara_alt": {
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_132622_669bc14c-287f-491e-a324-3ed488d5b750.png",
+    "min": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_132622_669bc14c-287f-491e-a324-3ed488d5b750_min.webp",
+    "job": "669bc14c-287f-491e-a324-3ed488d5b750",
+    "type": "avatar",
+    "subtype": "portrait",
+    "size": "1024x1024",
+    "batch": 14,
+    "name": "Solara, Lichtherrin",
+    "tier": "epic",
+    "beschreibung": "VERWORFEN, nur zur Nachvollziehbarkeit aufbewahrt. Erste eingetragene Fassung des Solara-Avatars. Erfuellte formal jede Pruefbedingung, war als Kopfleisten-Avatar aber unbrauchbar: die Figur fuellte nur 4,4 % der Flaeche (r_max 0,327), bei 32 px blieb ein Fleck von rund 10 px. Ersetzt durch die Fassung mit unterdruecktem Strahlenkranz.",
+    "messwerte": "Randring 2 px L 0,26 (max 1,37) · Randabstand 33,59 % · Kreisprobe: 0,000 % ausserhalb, r_max 0,327, Kopf r_max 0,327 · 32-px-Standardabweichung 30,03 · Motivanteil 4,4 % · OCR 0 Zeichen",
+    "ersetztDurch": "av_held_solara"
   }
 }

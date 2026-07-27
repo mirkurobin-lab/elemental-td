@@ -924,6 +924,66 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
  * .fallback: ein reiner CSS-Lichtausbruch. Der Reveal laeuft in BEIDEN
  * Faellen identisch weiter — die Zeremonie darf nie haengen bleiben.
  * ================================================================== */
+/* ==================================================================
+ * STARTBILDSCHIRM
+ * ------------------------------------------------------------------
+ * Der Schriftzug ist Schrift, kein Bild (Begruendung im Markup).
+ * Gesetzt ist er in derselben Familie wie alle Gold-Ueberschriften des
+ * Spiels (Cinzel/Georgia) — der Startbildschirm soll aussehen wie das
+ * Spiel und nicht wie ein Plakat davor.
+ *
+ * DER SCHRIFTZUG STEHT NICHT MITTIG, sondern im oberen Drittel. Das ist
+ * gemessen, nicht Geschmack: die ruhige dunkle Zone des Keyarts liegt
+ * bei y 8-30 % (L-Mittel 16,8), der Motivschwerpunkt bei y 62,6 %. Ein
+ * mittig gesetzter Titel laege genau auf dem hellsten Teil des
+ * Lichtfaechers.
+ * ================================================================== */
+#splashLayer{position:fixed;inset:0;z-index:300;background:#05070b;
+  display:flex;flex-direction:column;align-items:center;
+  opacity:1;transition:opacity .5s var(--ease-out)}
+#splashLayer.weg{opacity:0;pointer-events:none}
+.splashart{position:absolute;inset:0;background-position:center;background-size:cover;
+  background-repeat:no-repeat;
+  /* Rueckfall, falls das Keyart nicht laedt: derselbe Farbraum, damit
+     der Schriftzug in JEDEM Fall auf dunklem Grund steht. Ein
+     Startbildschirm ohne Bild darf nicht wie ein Fehler aussehen. */
+  background-image:radial-gradient(120% 80% at 50% 30%,#241a4a,#0b0a18 62%,#05070b)}
+/* Ein Hauch Abdunkelung genau ueber der Titelzone. Ohne sie traegt
+   Weiss bei p95 31,5 zwar, aber ohne Reserve — und die Reserve ist
+   das, was auf einem hellen Telefon im Sonnenlicht uebrig bleibt. */
+.splashart::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,#05070bcc 0%,#05070b66 26%,transparent 44%,
+    transparent 72%,#05070bd9 100%)}
+.splashtitel{position:relative;z-index:2;margin-top:11vh;text-align:center;
+  animation:sptitel 900ms var(--ease-overshoot) backwards}
+.sptop,.spmid{font-family:Cinzel,Georgia,"Times New Roman",serif;font-weight:900;
+  line-height:.94;letter-spacing:.13em;
+  background-image:linear-gradient(180deg,#fff8dd 0%,#f6e5ac 30%,#e3bd4e 62%,#8a6a1f 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.9)) drop-shadow(0 0 22px rgba(224,185,74,.42))}
+.sptop{font-size:min(13.2vw,58px)}
+.spmid{font-size:min(17.4vw,76px);letter-spacing:.09em}
+/* „TOWER DEFENSE" statt „TD": ausgeschrieben sagt der Startbildschirm,
+   was das Spiel IST. Die Abkuerzung steht im App-Namen, sie muss nicht
+   auch noch hier stehen. */
+.spsub{margin-top:10px;font-size:min(3.4vw,14px);font-weight:800;letter-spacing:.42em;
+  text-indent:.42em;color:#cfe0ec;text-shadow:0 1px 3px #000}
+.splashfuss{position:relative;z-index:2;margin-top:auto;
+  margin-bottom:calc(6vh + env(safe-area-inset-bottom,0px));
+  width:62%;max-width:280px;text-align:center}
+.splbar{height:5px;border-radius:3px;overflow:hidden;
+  background:#0a1017;box-shadow:var(--mat-well)}
+.splbar i{display:block;height:100%;width:0%;border-radius:3px;
+  background:linear-gradient(90deg,#8a6a1f,#e3bd4e 55%,#fff8dd);
+  box-shadow:0 0 10px #e3bd4e88;transition:width .35s var(--ease-out)}
+.spltxt{margin-top:9px;font-size:10.5px;font-weight:700;letter-spacing:.06em;
+  color:#8fa0ad}
+@keyframes sptitel{from{opacity:0;transform:translateY(-14px) scale(.96)}
+  to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.splashtitel{animation:none}
+  #splashLayer,.splbar i{transition:none}}
+
 #cineLayer{position:fixed;inset:0;z-index:260;display:none;background:#000;
   align-items:center;justify-content:center;overflow:hidden}
 #cineLayer.on{display:flex;animation:cinefade 260ms ease-out}
@@ -5012,6 +5072,34 @@ button.pfplate{cursor:pointer}
   </filter>
 </svg>
 
+<!-- ===== STARTBILDSCHIRM =====
+     Der erste Bildschirm beim Oeffnen der App. Das Keyart ist
+     ABSICHTLICH textfrei erzeugt (`splash_key`, Batch 13) — der
+     Schriftzug steht als Schrift darueber, nicht im Bild:
+       · ein eingebrannter Schriftzug ist bei 390 px unscharf, weil er
+         mitskaliert statt neu gesetzt zu werden
+       · Bildgeneratoren verdrehen Buchstaben; „ARCANE PRISM TD" haette
+         mit hoher Wahrscheinlichkeit einen Fehler enthalten, den man
+         nicht mehr korrigieren kann, ohne das Bild neu zu erzeugen
+       · Schrift im Bild ist nicht uebersetzbar und fuer Screenreader
+         nicht vorhanden
+     Die Titelzone (y 8-30 %) ist am Keyart gemessen: L-Mittel 16,8,
+     p95 31,5, oertliche Streuung 1,0 — dunkel und ruhig genug, dass
+     weisse Schrift darauf traegt, auch nach 6 % Beschnitt oben und
+     unten fuer andere Geraetehoehen. -->
+<div id="splashLayer" aria-hidden="true">
+  <div class="splashart" id="splashArt"></div>
+  <div class="splashtitel">
+    <div class="sptop">ARCANE</div>
+    <div class="spmid">PRISM</div>
+    <div class="spsub">TOWER DEFENSE</div>
+  </div>
+  <div class="splashfuss">
+    <div class="splbar"><i id="splFill"></i></div>
+    <div class="spltxt" id="splTxt">Kristalle werden geschliffen…</div>
+  </div>
+</div>
+
 <div id="app">
 
   <!-- ===== Top-Bar (§1) =====
@@ -6469,7 +6557,7 @@ button.pfplate{cursor:pointer}
     av_smaragd:      CDN + "hf_20260727_132900_464ca435-f99d-4a89-97fb-fb5565c847c7.png",
     av_saphir:       CDN + "hf_20260727_131925_38fe62cd-7edc-43b4-92b1-328b148aa2bb.png",
     av_sturm:        CDN + "hf_20260727_132334_32ea1801-8555-4ff9-b048-97f761bf40ba.png",
-    av_held_solara:  CDN + "hf_20260727_132622_669bc14c-287f-491e-a324-3ed488d5b750.png",
+    av_held_solara:  CDN + "hf_20260727_134516_d19e4ee8-1aa7-4e7b-8642-11dd3be00ccd.png",
     av_held_magmor:  CDN + "hf_20260727_132908_00cb7c02-311d-44af-b1a8-a58ff7b42ac6.png",
     /* Startbildschirm (Batch 13). Textfrei erzeugt — der Schriftzug ist
        eine typografische Ebene darueber, damit er scharf, aenderbar und
@@ -13758,6 +13846,60 @@ button.pfplate{cursor:pointer}
     sweepTakt = setTimeout(function () { sweepTakt = null; UIIcon.sweep(); }, 700);
   }, true);
   applyAssets();
+  /* ============ STARTBILDSCHIRM ============
+     Er liegt schon im Markup und ist von der ersten Zeile an sichtbar —
+     kein Aufblitzen der leeren App davor. Hier bekommt er nur sein Bild
+     und seinen Ablauf.
+
+     Der Balken zeigt den ECHTEN Ladefortschritt der Bilder, nicht eine
+     abgespielte Animation. Ein Balken, der immer gleich lang laeuft,
+     ist eine Luege mit Fortschrittsbalken-Optik; dieser haengt an
+     `document.images`. Zwei Sicherungen: er faellt nie zurueck (sonst
+     wirkt die App, als verliere sie Fortschritt), und nach 6 Sekunden
+     geht der Bildschirm auf jeden Fall weg — ein haengendes Bild darf
+     niemanden aussperren. */
+  (function startbildschirm() {
+    var L = $("splashLayer"); if (!L) return;
+    if (ASSETS.splash_key) {
+      $("splashArt").style.backgroundImage =
+        'url("' + ASSETS.splash_key + '"), ' +
+        getComputedStyle($("splashArt")).backgroundImage;
+    }
+    var fuell = $("splFill"), txt = $("splTxt"), hoechst = 0, fertig = false;
+    var STUFEN = ["Kristalle werden geschliffen…", "Arenen werden aufgebaut…",
+                  "Türme nehmen Aufstellung…"];
+    function tick() {
+      if (fertig) return;
+      var b = document.images.length || 1, da = 0;
+      for (var i = 0; i < document.images.length; i++) if (document.images[i].complete) da++;
+      var p = Math.max(hoechst, Math.round(da / b * 100));
+      hoechst = p;
+      fuell.style.width = p + "%";
+      txt.textContent = STUFEN[Math.min(STUFEN.length - 1, Math.floor(p / 34))];
+      if (p >= 100) return schliessen();
+      requestAnimationFrame(tick);
+    }
+    function schliessen() {
+      if (fertig) return;
+      fertig = true;
+      fuell.style.width = "100%";
+      setTimeout(function () {
+        L.classList.add("weg");
+        setTimeout(function () { L.style.display = "none"; }, 520);
+      }, 260);
+    }
+    requestAnimationFrame(tick);
+    /* `load` ist das ehrlichste Fertig-Signal: es feuert, wenn ALLE
+       Ressourcen durch sind — auch die fehlgeschlagenen. Ohne diese
+       Zeile stand der Bildschirm bis zum Notausgang, wenn ein einzelnes
+       Bild weder laedt noch sauber scheitert. Aufgefallen an einer
+       fremden Pruefung, die per elementFromPoint einen Shop-Knopf
+       suchte und statt seiner den Startbildschirm fand: er verdeckte
+       die App laenger, als er gebraucht wurde. */
+    if (document.readyState === "complete") setTimeout(schliessen, 400);
+    else window.addEventListener("load", function () { setTimeout(schliessen, 400); });
+    setTimeout(schliessen, 6000);   // Notausgang
+  })();
   /* Asset-Tabelle beim Avatar-Modul anmelden, BEVOR irgendwas rendert:
      ohne sie liefert active() nur Emoji-Fallbacks. */
   if (window.ArenaAvatars) { ArenaAvatars.assets(ASSETS); seedAvatars(); }
