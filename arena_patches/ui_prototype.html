@@ -211,7 +211,13 @@ body.nur-waehrung .apphead .headcol{padding:6px 0}
    fuer die Zahl. „12 500" misst 43,7 px, „111 111" 48,5 px. Wer hier
    Medaillon oder Abstaende vergroessert, schneidet die Zahl ab (genau das
    war der alte Befund „1 136 wurde zu 1…"). */
-.cur{flex:1 1 0;min-width:0;display:flex;align-items:center;gap:5px;
+/* ⚠ `flex:1 1 0` teilte die Leiste in drei GLEICHE Felder. Auf der
+   Startseite nimmt das Portrait links Platz weg, die Leiste ist dort
+   nur 316 statt 396 px breit — und „12 500" wurde zu „12 5…"
+   abgeschnitten. Ein Waehrungsstand, den man falsch liest, ist
+   schlimmer als einer, der schmaler steht. `1 1 auto` laesst die
+   Felder nach Inhalt wachsen; der Shop verkauft Posten bis 126 000. */
+.cur{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:5px;
   background:none;border:0;border-left:1px solid transparent;border-radius:0;
   padding:0 4px;
   font-size:14px;font-weight:800;
@@ -433,14 +439,16 @@ select.sel{font-family:inherit;border:1px solid var(--line);appearance:none;
 select.sel option{background:var(--panel);color:var(--txt)}
 #matCount b{color:var(--txt);font-weight:800}
 /* ---------- Essenz-Vorrat (eine Sorte je Karte, 29.07.2026) ----------
-   Vier Spalten, zwei Reihen — bei acht Karten genau voll, bei zehn
-   waechst es nach unten statt in die Breite. Die Kachel ist bewusst
-   flach: sie ist eine Zahl mit Bild, kein Knopf. */
+   ⚠ Drei Spalten seit dem 30.07.2026, vorher vier. Mit der neunten
+   Sorte (Arkan) ging die Rechnung nicht mehr auf: 4 × 2 voll, dann eine
+   einzelne Kachel links in einer dritten Reihe und drei leere Plaetze
+   daneben. Bei DREI Spalten sind neun Sorten exakt 3 × 3.
+   Die Kachel ist bewusst flach: sie ist eine Zahl mit Bild, kein Knopf. */
 .matchip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;
   border:1px solid #ffffff1f;background:#ffffff0d;cursor:pointer}
 .matchip[aria-expanded="true"]{border-color:var(--gold);background:#f2a13d1f}
 .matchip .essauf{font-size:9px;color:var(--dim);margin-left:1px}
-.essbank{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0 0}
+.essbank{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0 0}
 .essbank[hidden]{display:none}
 .esscell{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px 5px;
   border-radius:9px;background:var(--panel2);border:1px solid #ffffff14;min-width:0}
@@ -2294,7 +2302,11 @@ span.ico{text-align:center}
    dort verdeckt es den Preis nicht und wird beim Kaufen nicht versehent-
    lich getroffen. 26 px, also über der 24-px-Trefferschwelle — es ist
    eine Pflichtangabe und darf kein Nadelöhr sein.                     */
-.oddsi{position:absolute;top:5px;right:5px;z-index:3;
+/* ⚠ z-index 6, nicht 3: darunter liegen das Wert-Siegel (4) und die
+   Sperrschicht `.apkzu` (5). Mit 3 war das Pflicht-ⓘ auf einer
+   gesperrten Karte zu NULL Prozent tippbar und auf einer offenen nur zu
+   26 % — der Rest der Flaeche fuehrte in den Kauf. */
+.oddsi{position:absolute;top:5px;right:5px;z-index:6;
   width:26px;height:26px;border-radius:50%;padding:0;
   display:flex;align-items:center;justify-content:center;
   font-size:13px;font-weight:900;font-style:italic;line-height:1;
@@ -2418,7 +2430,8 @@ span.ico{text-align:center}
    dunkle Schrift, wie bei allen Siegeln. */
 .freebadge{position:absolute;right:-4px;top:-6px;background:var(--up);color:#06280a;
   font-size:8.5px;font-weight:900;border-radius:8px;padding:1px 5px;z-index:4}
-.tagesband .freebadge{right:8px;top:8px;
+/* Rueckt nach links, damit es das ⓘ daneben nicht mehr ueberdeckt. */
+.tagesband .freebadge{right:40px;top:8px;pointer-events:none;
   box-shadow:var(--lit),var(--sh-2);letter-spacing:.06em;padding:2px 7px}
 /* ==================================================================
  * SHOP — AA-SEKTIONSREIHENFOLGE (§8.1)
@@ -2542,7 +2555,13 @@ span.ico{text-align:center}
 .apkcard .apkneu{font-size:21px;font-weight:900;color:#fff;line-height:1.05;
   text-shadow:0 2px 0 #000,0 0 10px #000c}
 /* Das Wert-Siegel. Die Zahl ist gerechnet (packWert), nicht gesetzt. */
-.apkcard .apkval{position:absolute;right:-2px;top:-2px;z-index:4;
+/* ⚠ `pointer-events:none` ist hier kein Feinschliff, sondern die
+   Reparatur eines Fehlgriffs: das Wert-Siegel lag mit z-index 4 ueber
+   dem ⓘ (z-index 3), und ein Tipp auf das ⓘ loeste damit den KAUFWEG
+   aus statt die Drop-Raten zu oeffnen. Das Siegel ist Deko und darf
+   keine Treffer schlucken; die Quotenangabe ist eine Auflage
+   (Apple 3.1.1 / Google Play) und muss erreichbar sein. */
+.apkcard .apkval{pointer-events:none;position:absolute;right:-2px;top:-2px;z-index:4;
   min-width:58px;padding:7px 6px 8px;text-align:center;
   transform:rotate(9deg);transform-origin:100% 0;
   clip-path:polygon(50% 0,62% 9%,76% 4%,82% 17%,96% 19%,94% 33%,100% 44%,90% 54%,
@@ -4062,8 +4081,18 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
   color:var(--dim);background:#0b1116;border-bottom:1px solid var(--line)}
 .setrow{display:flex;align-items:center;gap:10px;padding:11px}
 .setrow+.setrow{border-top:1px solid #1f2b35}
-.setrow .stx{flex:1;min-width:0;font-size:12px;font-weight:800;color:#dbe6ef}
-.setrow .stx small{display:block;font-size:9.5px;color:var(--dim);font-weight:700;margin-top:2px}
+/* ⚠ Hiess bis zum 30.07.2026 `.stx` — derselbe Name wie der rote
+   Schliessknopf (Zeile ~3134). Der traegt `position:absolute;
+   top:-13px; right:-9px; width:40px; height:40px`, und diese Regel hier
+   ueberschrieb davon NUR Schrift und Flex. Ergebnis: alle acht
+   Beschriftungen der Einstellungen lagen absolut positioniert
+   uebereinander in der rechten oberen Ecke, halb ausserhalb des
+   Fensters, und `#app{overflow:hidden}` schnitt sie weg. Die Seite
+   bestand aus nackten Schaltern ohne ein Wort dazu, wofuer sie sind.
+   Zwei gleich benannte Klassen mit unvereinbarer Bauart sind eine
+   Zeitbombe — deshalb ein eigener Name statt einer Gegenregel. */
+.setrow .settx{flex:1;min-width:0;font-size:12px;font-weight:800;color:#dbe6ef}
+.setrow .settx small{display:block;font-size:9.5px;color:var(--dim);font-weight:700;margin-top:2px}
 .swch{flex:0 0 46px;width:46px;height:26px;border-radius:14px;position:relative;
   background:#2b3b47;border:1px solid #35485a;transition:background .18s}
 .swch i{position:absolute;left:2px;top:2px;width:20px;height:20px;border-radius:50%;
@@ -6450,29 +6479,29 @@ button.pfplate{cursor:pointer}
 
     <div class="secribbon sm" data-ribbon="ribbon_section_sm"><span class="srt">TON &amp; HAPTIK</span></div>
     <div class="setgrp">
-      <div class="setrow"><span class="stx">Sound-Effekte<small>Klicks, Belohnungen, Kartendrehung</small></span>
+      <div class="setrow"><span class="settx">Sound-Effekte<small>Klicks, Belohnungen, Kartendrehung</small></span>
         <button class="swch on" id="swSound" data-sw="sound"><i></i></button></div>
-      <div class="setrow"><span class="stx">Musik<small>Hintergrundmusik im Hub</small></span>
+      <div class="setrow"><span class="settx">Musik<small>Hintergrundmusik im Hub</small></span>
         <button class="swch on" id="swMusic" data-sw="music"><i></i></button></div>
-      <div class="setrow"><span class="stx">Haptik<small>Vibration bei Treffern und Käufen</small></span>
+      <div class="setrow"><span class="settx">Haptik<small>Vibration bei Treffern und Käufen</small></span>
         <button class="swch on" id="swHaptic" data-sw="haptic"><i></i></button></div>
     </div>
 
     <div class="secribbon sm" data-ribbon="ribbon_section_sm"><span class="srt">SPRACHE</span></div>
     <div class="setgrp">
-      <div class="setrow"><span class="stx">Deutsch<small>Aktuell aktiv</small></span>
+      <div class="setrow"><span class="settx">Deutsch<small>Aktuell aktiv</small></span>
         <span class="sbadge" id="langDe">AKTIV</span></div>
-      <div class="setrow"><span class="stx">English<small>Translation in progress</small></span>
+      <div class="setrow"><span class="settx">English<small>Translation in progress</small></span>
         <span class="sbadge">BALD</span></div>
     </div>
 
     <div class="secribbon sm" data-ribbon="ribbon_section_sm"><span class="srt">HILFE &amp; GUIDES</span></div>
     <div class="setgrp">
-      <div class="setrow"><span class="stx">Einsteiger-Guide<small>Kapitel mit Aufgaben und Belohnungen</small></span>
+      <div class="setrow"><span class="settx">Einsteiger-Guide<small>Kapitel mit Aufgaben und Belohnungen</small></span>
         <button class="setbtn pressable" id="btnSetGuide">Öffnen</button></div>
-      <div class="setrow"><span class="stx">Spiel-Handbuch<small>Alle Systeme kurz erklärt</small></span>
+      <div class="setrow"><span class="settx">Spiel-Handbuch<small>Alle Systeme kurz erklärt</small></span>
         <button class="setbtn pressable" id="btnSetManual">Öffnen</button></div>
-      <div class="setrow"><span class="stx">Login-Kalender<small>7 Tage, Anker sind Booster-Packs</small></span>
+      <div class="setrow"><span class="settx">Login-Kalender<small>7 Tage, Anker sind Booster-Packs</small></span>
         <button class="setbtn pressable" id="btnSetLogin">Anzeigen</button></div>
     </div>
 
@@ -7371,6 +7400,33 @@ button.pfplate{cursor:pointer}
      NICHT genug für DAWN Lv44 (18 000). Das ist der dokumentierte
      Gold-Bottleneck, im Prototyp bewusst sichtbar. */
   var DEMO_TROPHIES = 1136, DEMO_GEMS = 1250, DEMO_GOLD = 12500;
+
+  /* ==================================================================
+   * TESTMODUS — Kristalle und Gold laufen nicht leer (?test=1)
+   * ------------------------------------------------------------------
+   * Zweck: Pack-Oeffnungen am Stueck ansehen, ohne nach dem sechsten
+   * Kauf am leeren Beutel zu haengen. NUR dafuer.
+   *
+   * ⚠ DREI ENTSCHEIDUNGEN, DIE ZUSAMMENGEHOEREN:
+   *
+   * 1. AUS PER VORGABE. Ohne `?test=1` in der Adresse aendert sich
+   *    nichts — die normale Fassung behaelt exakt ihre Wirtschaft.
+   *    Ein Testmodus, der versehentlich anspringt, macht jede
+   *    Beobachtung ueber Preise und Knappheit wertlos.
+   *
+   * 2. NACHFUELLEN STATT UNENDLICH. Der Kauf zieht ganz normal ab und
+   *    prueft ganz normal, ob es reicht; erst danach wird der Beutel
+   *    still wieder aufgefuellt. Damit laeuft der ECHTE Kaufweg durch
+   *    — inklusive „nicht genug"-Pruefung, Buchung und Toast. Haette
+   *    ich die Pruefung ausgehebelt, wuerde der Test einen Weg
+   *    zeigen, den es im Spiel nicht gibt.
+   *
+   * 3. SICHTBAR. Oben links steht ein Band „TESTMODUS". Eine Fassung
+   *    mit unbegrenzter Waehrung, die aussieht wie die echte, wandert
+   *    sonst irgendwann als Beleg durch eine Diskussion.
+   * ================================================================== */
+  var TESTMODUS = /[?&](test|unlim)=1\b/.test(location.search);
+  var TEST_GEMS = 999999, TEST_GOLD = 99999999;
 
   /* ==================================================================
    * ASSET-MANIFEST (Spiegel von arena_patches/ui_assets.json)
@@ -8736,8 +8792,16 @@ button.pfplate{cursor:pointer}
        bei der Umstellung geht: dass man fuer JEDEN Turm getrennt sammelt.
        EMBER und FROST (Deck-Tuerme) liegen vorn, die Helden hinten. */
     var st = { v: AC.STATE_VERSION, cards: {},
+               /* ⚠ `arkan` fehlte hier bis zum 30.07.2026 — mit der Folge,
+                  dass der neue Spell-Reiter als EINZIGER einen toten
+                  Stand zeigte: vier Karten auf Lv 1, Vorrat 0, waehrend
+                  jeder andere Reiter ein gelebtes Konto zeigt. 24 ist
+                  bewusst knapp: es reicht fuer ein paar Level-Ups und
+                  laesst den Spell-Slot der Packs trotzdem noch etwas
+                  bedeuten. */
                materials: { fire: 19, water: 14, nature: 11, earth: 8,
-                            light: 12, darkness: 5, solara: 3, magmor: 2 },
+                            light: 12, darkness: 5, solara: 3, magmor: 2,
+                            arkan: 24 },
                matRR: 0, gold: null,
                /* Joker-Demobestand. Ungleich verteilt, aus demselben
                   Grund wie bei den Essenzen: ueberall dieselbe Zahl
@@ -8766,6 +8830,15 @@ button.pfplate{cursor:pointer}
     st.cards.darkness = mk("common", 6, { common: 1 });
     st.cards.solara   = mk("good", 22, { good: 2, common: 3 }, ["solara_good_ult"]);
     st.cards.magmor   = mk("common", 4, { common: 1 });
+    /* Spells, gemischt wie die Tuerme — einer fusionsbereit (BANN hat
+       drei graue Kopien), einer schon eine Stufe hoeher, zwei am
+       Anfang. Ohne diese vier Zeilen zeigte der Spell-Reiter als
+       einziger einen Nullstand, und man konnte weder Fusion noch
+       Level-Up ausprobieren, ohne vorher Packs zu kaufen. */
+    st.cards.splitter = mk("good", 9, { good: 1, common: 2 }, ["splitter_good_radius"]);
+    st.cards.bann     = mk("common", 5, { common: 3 });
+    st.cards.bollwerk = mk("common", 3, { common: 1 });
+    st.cards.fokus    = mk("common", 1, { common: 1 });
     /* SPENDEN-VORRAT (DESIGN_CLAN.md §4): Die Clan-Spende zieht
        ausschliesslich GRAUE Basis-Kopien ab. Ohne Ueberschuss waere der
        Spenden-Tab im Prototyp tot, deshalb bekommt jeder der sechs
@@ -8774,8 +8847,8 @@ button.pfplate{cursor:pointer}
     var GIFT = { fire: 10, water: 7, nature: 8, earth: 7, light: 7, darkness: 7 };
     for (var gk in GIFT) st.cards[gk].copies.common += GIFT[gk];
     AC._write(st);
-    setGold(DEMO_GOLD);
-    setGems(DEMO_GEMS);
+    setGold(TESTMODUS ? TEST_GOLD : DEMO_GOLD);
+    setGems(TESTMODUS ? TEST_GEMS : DEMO_GEMS);
     // Demo-Festung: passend zum 1 136-🏆-Account. Das Trophäen-Tor bei
     // 900 🏆 gibt 80 Gesamtstufen frei — 30/24/18 = 72 liegen bewusst
     // darunter, damit alle drei Äste noch einen aktiven Kaufknopf haben
@@ -8842,8 +8915,11 @@ button.pfplate{cursor:pointer}
 
   /* ================= Collection (§7) ================= */
   var sortMode = "level";
-  function sortedIds() {
-    var ids = TOWER_IDS.slice();
+  /* `sortedIds(liste)` sortiert eine beliebige Kartenliste. Ohne
+     Argument bleibt es beim Turmraster — das ist der alte Aufruf und
+     alle bestehenden Stellen behalten ihr Verhalten. */
+  function sortedIds(liste) {
+    var ids = (liste || TOWER_IDS).slice();
     ids.sort(function (a, b) {
       var va = AC.view(a), vb = AC.view(b);
       if (sortMode === "level") return (vb.lvl - va.lvl) || (vb.tierIndex - va.tierIndex);
@@ -8856,7 +8932,9 @@ button.pfplate{cursor:pointer}
      dem Ziel-Screen nicht findet, ist schlimmer als keine Marke. */
   function mergeableCount() {
     var n = 0;
-    TOWER_IDS.forEach(function (id) { if (AC.progressToNextMerge(id).ready) n++; });
+    TOWER_IDS.concat(SPELL_IDS).forEach(function (id) {
+      if (AC.progressToNextMerge(id).ready) n++;
+    });
     return n;
   }
   /* Dasselbe fuer Helden — die Marke gehoert an den Helden-Reiter. */
@@ -9027,11 +9105,23 @@ button.pfplate{cursor:pointer}
     var vor = gold(); _setGold(v);
     var d = gold() - vor;
     if (d > 0) UIFlug.flug("gold", d);
+    if (TESTMODUS && gold() < TEST_GOLD) {
+      _setGold(TEST_GOLD);
+      var pd = $("curGold"); if (pd) pd.textContent = fmt(TEST_GOLD);
+    }
   };
   setGems = function (v) {
     var vor = gems(); _setGems(v);
     var d = gems() - vor;
     if (d > 0) UIFlug.flug("gems", d);
+    /* Nachfuellen NACH dem Abzug und OHNE Flugzahl: der Kauf soll sich
+       anfuehlen wie ein Kauf, nur eben nie am leeren Beutel enden.
+       Eine fliegende +999.999 waere jedes Mal ein Ereignis, das es im
+       Spiel nicht gibt. */
+    if (TESTMODUS && gems() < TEST_GEMS) {
+      _setGems(TEST_GEMS);
+      var pg = $("curGems"); if (pg) pg.textContent = fmt(TEST_GEMS);
+    }
   };
   (function () {
     if (!AC || typeof AC.addMaterial !== "function") return;
@@ -9050,7 +9140,26 @@ button.pfplate{cursor:pointer}
     };
   })();
 
+  /* Das Band. Es sitzt fest oben links ueber allem, ist nicht
+     wegklickbar und traegt den Grund mit — wer den Bildschirm
+     abfotografiert, fotografiert die Warnung mit ab. */
+  function testBand() {
+    if (!TESTMODUS || document.getElementById("testBand")) return;
+    var d = document.createElement("div");
+    d.id = "testBand";
+    d.textContent = "TESTMODUS · Kristalle & Gold unbegrenzt";
+    d.style.cssText = "position:fixed;left:0;top:0;z-index:9999;pointer-events:none;" +
+      "background:#b3261e;color:#fff;font-size:9px;font-weight:900;letter-spacing:.06em;" +
+      "padding:3px 8px;border-bottom-right-radius:8px;box-shadow:0 2px 6px #0008";
+    document.body.appendChild(d);
+  }
+
   function renderTop() {
+    if (TESTMODUS) {
+      testBand();
+      if (gems() < TEST_GEMS) _setGems(TEST_GEMS);
+      if (gold() < TEST_GOLD) _setGold(TEST_GOLD);
+    }
     $("curTrophies").textContent = fmt(DEMO_TROPHIES);
     $("curGems").textContent = fmt(gems());
     $("curGold").textContent = fmt(gold());
@@ -9156,7 +9265,14 @@ button.pfplate{cursor:pointer}
   function closeDetail() {
     $("detailModal").classList.remove("open");
     setNav("navCollection");
-    renderCollection();
+    /* ⚠ Hier stand nur `renderCollection()`. Wer aus dem Spell-Reiter
+       eine Karte oeffnete und wieder schloss, sah danach das Turmraster
+       — waehrend der Reiter „Spells" weiter markiert blieb. Vorher
+       konnte das niemandem auffallen: „Items" hat gar kein Raster und
+       „Helden" fuehrt in einen eigenen View. */
+    var sp = $("tabSpells");
+    if (sp && sp.classList.contains("on")) renderSpells();
+    else renderCollection();
   }
   function renderDetail() {
     var m = BY_ID[curId], v = AC.view(curId), t = tierOf(v.tier);
@@ -9497,7 +9613,13 @@ button.pfplate{cursor:pointer}
   }
   function forgeEntries() {
     var out = [], st = AC.get();
-    sortedIds().forEach(function (id) {
+    /* ⚠ Spells fusionieren genau wie Tuerme (3 gleiche → naechste
+       Stufe). Die Schmiede lief aber ueber `sortedIds()` und damit nur
+       ueber TOWER_IDS — der Hinweis im Spell-Reiter schickte den
+       Spieler an einen Ort, der Spells gar nicht kannte. Entweder der
+       Hinweis luegt oder die Schmiede ist unvollstaendig; unvollstaendig
+       war sie. */
+    sortedIds(TOWER_IDS.concat(SPELL_IDS)).forEach(function (id) {
       var c = st.cards[id];
       if (!c) return;
       AC.TIER_KEYS.forEach(function (tk) {
@@ -10479,7 +10601,12 @@ button.pfplate{cursor:pointer}
       .map(function (m) { return "<b>+" + mengen[m.key] + "</b> " +
         matIco(m.key) + " " + m.name; });
     $("packSummary").style.display = "";
-    $("packSummary").innerHTML = "<b>+" + packResult.cards.length + " Karten</b> (" + parts.join(", ") +
+    /* ⚠ `cards.length` allein ist seit den Spell-Slots zu wenig: ein
+       Gold-Pack meldete „+9 Karten", aufgedeckt wurden 11. Die
+       Essenz-Zeile darunter rechnet Arkan laengst dazu — die
+       Kartenzeile war die vergessene Haelfte. */
+    var kartenZahl = packResult.cards.length + (packResult.spells || []).length;
+    $("packSummary").innerHTML = "<b>+" + kartenZahl + " Karten</b> (" + parts.join(", ") +
       ")<br>" + matParts.join(" · ") + "<br><b>+" + fmt(packResult.gold) +
       "</b> Gold" + (packResult.pity ? "<br>🛟 Pity-Garantie ausgelöst (" + packResult.pity + ")" : "");
     renderPity();
@@ -11748,7 +11875,7 @@ button.pfplate{cursor:pointer}
     track("shop_vorrat_open", { n: n, gems: preis });
     if (n <= 1) { openPackKey(VORRAT.pack); show("navPack"); return; }
 
-    var proTier = {}, mat = {}, goldSum = 0, pityTreffer = 0, best = 0, i;
+    var proTier = {}, mat = {}, spellZ = {}, goldSum = 0, pityTreffer = 0, best = 0, i;
     for (i = 0; i < n; i++) {
       var r = AC.openPack(VORRAT.pack, POOL_IDS, HERO_IDS);
       r.cards.forEach(function (c) {
@@ -11760,6 +11887,25 @@ button.pfplate{cursor:pointer}
         AC.addMaterial(s.amount, s.type);
         mat[s.type] = (mat[s.type] | 0) + s.amount;
       });
+      /* ⚠ Diese sechs Zeilen fehlten (gefunden 30.07.2026). Der ×10-Weg
+         buchte Karten, Essenz und Gold — aber weder die Spell-Karten
+         noch die Arkan-Essenz aus den Spell-Slots. Bei einem
+         Gold-Vorratspack sind das je Zehnerkauf 20 Spell-Karten und
+         rund 70 Arkan, die spurlos verschwanden. Der Kommentar ueber
+         dieser Funktion verspricht ausdruecklich, dass es KEINEN
+         zweiten Buchungspfad gibt, der auseinanderlaeuft — genau das
+         war hier passiert, weil beim Spell-Einbau nur der ×1-Weg
+         angefasst wurde. */
+      (r.spells || []).forEach(function (sp) {
+        AC.addDrop(sp.cardId, sp.tier, 1);
+        proTier[sp.tier] = (proTier[sp.tier] | 0) + 1;
+        if (sp.tierIndex > best) best = sp.tierIndex;
+        spellZ[sp.cardId] = (spellZ[sp.cardId] | 0) + 1;
+      });
+      if (r.arkan) {
+        AC.addMaterial(r.arkan, AC.SPELL_MATERIAL);
+        mat[AC.SPELL_MATERIAL] = (mat[AC.SPELL_MATERIAL] | 0) + r.arkan;
+      }
       goldSum += r.gold;
       if (r.pity) pityTreffer++;
       // Dieselbe Ereignis-Naht wie openPackKey(), einmal je Pack.
@@ -11777,8 +11923,13 @@ button.pfplate{cursor:pointer}
     var matZ = AC.MATERIALS.filter(function (m) { return mat[m.key]; })
       .map(function (m) { return "<b>+" + mat[m.key] + "</b> " + matIco(m.key) + " " + m.name; })
       .join(" · ");
+    var spZ = Object.keys(spellZ).map(function (k) {
+      var d = AC.spellInfoOf(k);
+      return "<b>" + spellZ[k] + "×</b> " + (d ? d.name : k);
+    }).join(" · ");
     askConfirm("Vorrats-Pack ×" + n + " geöffnet",
       "<b>Karten</b><br>" + (kartenZ || "—") + "<br><br>" +
+      (spZ ? "<b>Spells</b><br>" + spZ + "<br><br>" : "") +
       "<b>Essenz</b><br>" + (matZ || "—") + "<br><br>" +
       "<b>+" + fmt(goldSum) + " Gold</b>" +
       (pityTreffer ? "<br>🛟 Mitleids-Garantie " + pityTreffer + "× ausgelöst" : "") +
