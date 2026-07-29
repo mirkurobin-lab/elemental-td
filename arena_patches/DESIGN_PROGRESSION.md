@@ -182,11 +182,16 @@ bis zur **ersten** Suprem-Karte:
 | Gold | ≥ Episch | 96 | 0,090 |
 | Arcane | ≥ Legendär | **8,1** | **1,079** |
 
-⚠ **Offener Punkt.** Das Arcane-Pack umgeht die Droptabelle: seine Garantie hebt es von 0,44 auf
-1,08 Legendäre je Pack und macht die Spitze in acht Packs erreichbar — gegen 96 über Gold. Mit
-Garantie **Episch** statt Legendär wären es **20,2 Packs** bei 0,435 Legendären je Pack. Die
-Änderung ist nicht vorgenommen: sie hängt an einem 800-Kristall-Kauf und braucht eine
-ausdrückliche Entscheidung.
+**Erledigt 29.07.2026.** Das Arcane-Pack umging die Droptabelle: seine Garantie hob es von 0,44
+auf 1,08 Legendäre je Pack und machte die Spitze in acht Packs erreichbar — gegen 96 über Gold.
+
+> „Es soll nicht aus jedem Booster eine legendäre kommen. Du kannst arcane auf 36 % machen."
+> — Auftraggeber
+
+Die Garantie steht jetzt auf **Episch**, die Gewichte sind **unverändert**: 4 % je Slot, über
+11 Slots **36,2 %** je Pack. Gemessen sind es damit **20,2 Packs** bis zur ersten Suprem-Karte
+statt 8,1. Zwei Nebenwirkungen fallen mit weg: die große Legendär-Sequenz lief bei *jedem*
+Arcane-Kauf, und der Pity-Zähler feuerte für Arcane-Käufer nie.
 
 ### Merge
 

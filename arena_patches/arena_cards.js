@@ -183,8 +183,19 @@
     arcane: { key: "arcane", name: "Arkan-Pack",  color: "#a45ef2",
               source: "Season-Pass-Premium, Events",
               cardSlots: 11, materialSlots: 6, gold: [12000, 25000],
-              weights: [18, 34, 29, 15, 4], guarantee: 4,
-              promise: "Enthält mindestens eine Legendäre Karte" },
+              /* ⚠ 29.07.2026: Garantie von Legendär (4) auf Episch (3)
+                 gesenkt. Vorher lieferte JEDES Arkan-Pack ein Legendäres,
+                 gemessen 1,079 statt 0,435 je Pack — die Spitze war damit
+                 in 8,1 Packs erreichbar statt in 20,2. Zwei Nebenwirkungen
+                 derselben Zahl: die grosse Legendär-Sequenz lief bei jedem
+                 Kauf und war ab dem dritten Mal Wartezeit statt Ereignis,
+                 und der Pity-Zähler feuerte für Arkan-Käufer nie.
+                 Die Gewichte sind UNVERÄNDERT — 4 % je Slot, über 11 Slots
+                 36,2 % je Pack. Auftraggeber: „Es soll nicht aus jedem
+                 Booster eine legendäre kommen. Du kannst arcane auf 36 %
+                 machen." */
+              weights: [18, 34, 29, 15, 4], guarantee: 3,
+              promise: "Enthält mindestens eine Epische Karte · 36 % Chance auf Legendär" },
   };
   var PACK_ALIAS = { silber: "silver", arkan: "arcane", arcan: "arcane", bronce: "bronze" };
 
@@ -778,6 +789,72 @@
     };
   }
 
+  /* =====================================================================
+   * oddsFor(type) — die Drop-Raten, so wie sie im Laden stehen müssen.
+   *
+   * WARUM ES DIESE FUNKTION GIBT (29.07.2026)
+   * Apple und Google verlangen die Offenlegung, nicht wir:
+   *
+   *   Apple, App Store Review Guidelines 3.1.1 — „Apps offering ‚loot
+   *   boxes' or other mechanisms that provide randomized virtual items
+   *   for purchase must disclose the odds of receiving each type of item
+   *   to customers PRIOR TO PURCHASE."
+   *
+   *   Google Play (seit Mai 2019) — „…must clearly disclose the odds of
+   *   receiving those items IN ADVANCE OF PURCHASE."
+   *
+   * Das ersetzt unsere bisherige AA-Nachahmung „Raritätsspannen statt
+   * Prozente" (DESIGN_PROGRESSION §C). AAs Zurückhaltung war eine
+   * Designentscheidung; die Offenlegung ist eine Auflage. Die Spanne
+   * („Enthält mindestens…") bleibt als Aufmacher, die Prozente kommen
+   * hinter das ⓘ.
+   *
+   * ZWEI ZAHLEN, WEIL EINE ALLEIN IRREFÜHRT
+   *   perSlot  Wahrscheinlichkeit je gezogener Karte — die ehrliche
+   *            Grundgröße, aber niemand kauft einen Kartenslot.
+   *   perPack  Wahrscheinlichkeit, im Pack MINDESTENS EINE dieser Stufe
+   *            zu finden — das, was der Käufer eigentlich wissen will.
+   *
+   * ⚠ Die Garantie ist eingerechnet, sonst wäre die Angabe FALSCH — und
+   * eine falsche Offenlegung ist schlimmer als keine. Wirkung exakt:
+   * bis einschließlich der garantierten Stufe ist perPack = 100 %; jede
+   * Stufe DARÜBER bleibt unberührt, weil die Garantie nur dann eingreift,
+   * wenn ohnehin nichts Besseres im Pack liegt, und dann einen Slot
+   * überschreibt, der unter ihr lag.
+   *
+   * Das Pity liegt bewusst NICHT in dieser Zahl: es zählt über Packs
+   * hinweg und ist damit keine Eigenschaft eines einzelnen Kaufs. Es
+   * steht separat daneben (getPityStatus), so wie AA es auf die Truhe
+   * schreibt.
+   * =================================================================== */
+  function oddsFor(type) {
+    var def = PACKS[normType(type)];
+    var n = def.cardSlots, w = def.weights, i, j;
+    var summe = w.reduce(function (a, b) { return a + b; }, 0);
+    var perSlot = [], perPack = [];
+    for (i = 0; i < w.length; i++) {
+      var p = w[i] / summe;
+      /* Anteil „diese Stufe ODER besser" für die Pack-Rechnung. */
+      var abHier = 0;
+      for (j = i; j < w.length; j++) abHier += w[j] / summe;
+      var mind1 = i <= def.guarantee ? 1 : 1 - Math.pow(1 - abHier, n);
+      perSlot.push({ key: TIERS[i].key, name: TIERS[i].name, color: TIERS[i].color,
+                     pct: p * 100 });
+      perPack.push({ key: TIERS[i].key, name: TIERS[i].name, color: TIERS[i].color,
+                     pct: mind1 * 100, garantiert: i <= def.guarantee });
+    }
+    return {
+      key: def.key, name: def.name, cardSlots: n,
+      guarantee: def.guarantee, guaranteeName: TIERS[def.guarantee].name,
+      perSlot: perSlot, perPack: perPack,
+      /* Suprem taucht bewusst mit 0 auf statt zu fehlen: „kommt nicht vor"
+         ist eine Aussage, die der Käufer sehen soll, kein Weglassen. */
+      supreme: { key: "supreme", name: TIERS[TIERS.length - 1].name,
+                 color: TIERS[TIERS.length - 1].color, pct: 0,
+                 hinweis: "Nur durch Verschmelzen von 3 Legendären" },
+    };
+  }
+
   /* openPack(type, poolIds, heroIds, rng)
    *   → {packType, name, promise, cards:[{cardId, tier, …}],
    *      materialSlots:[{type, amount, name, sym}], materialByType, material,
@@ -946,7 +1023,7 @@
     totalMaterialTo: totalMaterialTo,
     // Material-Sorten
     materialTypeOf: materialTypeOf, materialInfoOf: materialInfoOf,
-    getMaterials: getMaterials, getPityStatus: getPityStatus,
+    getMaterials: getMaterials, getPityStatus: getPityStatus, oddsFor: oddsFor,
     // Bank
     get: get, addDrop: addDrop, addMaterial: addMaterial, owned: owned, view: view,
     canMerge: canMerge, merge: merge, mergeAll: mergeAll,

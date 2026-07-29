@@ -1,6 +1,6 @@
 # Prüfungen
 
-Vierzehn Playwright-Suiten mit zusammen **1 026 Schritten**, plus zwei
+Fünfzehn Playwright-Suiten mit zusammen **1 064 Schritten**, plus zwei
 Sonderprüfungen, die nur mit tatsächlich geladenen Bildern laufen.
 
 ## Aufruf
@@ -37,6 +37,7 @@ direkt — kein Server, kein Build.
 | `flug.js` | 12 | Sammel-Animation — aus JEDEM Fenster, nicht nur aus dem Shop |
 | `community.js` | 89 | Community-Reiter: Marken, echte Ziele |
 | `packoeffnung.js` | 36 | Pack-Öffnung: gemessene Zeitkurve, Abbruch, Neustart |
+| `quoten.js` | 38 | Drop-Raten hinter dem ⓘ — Auflage nach Apple 3.1.1 / Google Play |
 | `guide.js` | 36 | Defenders Guide: bewegbare Reiterleiste, großes Icon am offenen Reiter, Gegner/Boss als eigene Reiter, kein Booster-Reiter |
 | `assets_vollstaendig.py` | 4 | Jedes benutzte Asset ist verzeichnet, gesichert UND aktuell |
 

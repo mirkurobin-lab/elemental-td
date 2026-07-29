@@ -1956,6 +1956,49 @@ span.ico{text-align:center}
    Bronze ist aus dem Raster raus; es lebt als Gratis-Tagespack im
    `.tagesband` unter dem Raster weiter (eigener Container
    #packFreeBox, damit es NICHT als vierte Rasterzelle zaehlt). */
+/* =====================================================================
+   ⓘ DROP-RATEN — Auflage, nicht Geschmack
+   =====================================================================
+   Apple, App Store Review Guidelines 3.1.1: „Apps offering ‚loot boxes'
+   … must disclose the odds of receiving each type of item to customers
+   PRIOR TO PURCHASE." Google Play verlangt seit Mai 2019 dasselbe.
+
+   Damit ist unsere bisherige AA-Nachahmung („Raritätsspannen statt
+   Prozente", DESIGN_PROGRESSION §C) nur noch der Aufmacher: die Spanne
+   steht auf der Kachel, die Prozente liegen ein Tippen entfernt.
+
+   Das ⓘ sitzt OBEN RECHTS auf der Kachel und nicht neben dem Kaufknopf:
+   dort verdeckt es den Preis nicht und wird beim Kaufen nicht versehent-
+   lich getroffen. 26 px, also über der 24-px-Trefferschwelle — es ist
+   eine Pflichtangabe und darf kein Nadelöhr sein.                     */
+.oddsi{position:absolute;top:5px;right:5px;z-index:3;
+  width:26px;height:26px;border-radius:50%;padding:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:900;font-style:italic;line-height:1;
+  color:#cfe0ee;background:#0b1116cc;border:1px solid #ffffff2e;
+  box-shadow:var(--sh-1)}
+.oddsi:active{background:#0b1116}
+#oddsLayer{position:fixed;inset:0;z-index:285;display:none;
+  background:#04070ab8;align-items:center;justify-content:center;padding:18px}
+#oddsLayer.on{display:flex}
+.oddsbox{width:100%;max-width:340px;max-height:82vh;overflow:auto;
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--mat-raised-lg);padding:14px}
+.oddsbox h3{margin:0 0 2px;font-size:15px;letter-spacing:.4px}
+.oddsbox .oddssub{font-size:10.5px;color:var(--dim);line-height:1.45;margin-bottom:10px}
+.oddstab{width:100%;border-collapse:collapse;font-size:11.5px}
+.oddstab th{text-align:right;font-size:9px;color:var(--dim);font-weight:800;
+  padding:0 0 5px;text-transform:uppercase;letter-spacing:.5px}
+.oddstab th:first-child{text-align:left}
+.oddstab td{padding:5px 0;border-top:1px solid #ffffff12;text-align:right}
+.oddstab td:first-child{text-align:left;font-weight:800}
+.oddstab .pkt{display:inline-block;width:8px;height:8px;border-radius:2px;
+  margin-right:6px;vertical-align:middle}
+.oddstab .gar{font-size:8.5px;color:#8fd8a0;font-weight:800}
+.oddsnote{margin-top:10px;font-size:10px;color:var(--dim);line-height:1.5}
+.oddsbox .oddsclose{margin-top:12px;width:100%;min-height:38px;border-radius:10px;
+  font-weight:900;font-size:12.5px;background:linear-gradient(180deg,#2c3d4d,#1a2530);
+  color:#dbe6ef;border:1px solid #ffffff24}
 .packshop{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap)}
 .packshop .shopcard .sart{font-size:30px}
 /* ⚠ DIE PREISKNOEPFE MUESSEN AUF EINER LINIE SITZEN, EGAL WIE LANG DER
@@ -6326,7 +6369,13 @@ button.pfplate{cursor:pointer}
       <small id="bronzePromise">…</small></button>
     <!-- AA zeigt den Pity-Stand OFFEN auf der Truhe ("Get Legendary in ~50
          opens", §8.2) statt Prozent-Drop-Raten — wir machen es genauso. -->
-    <div class="pity" id="pityLine">…</div>
+    <!-- Das ⓘ auch hier, nicht nur im Shop: das Bronze-Pack ist gratis
+         und damit kein Kauf, aber es ist das Pack, das am häufigsten
+         geöffnet wird. Wer die Quoten einmal gesehen hat, sucht sie beim
+         zweiten Mal dort, wo er geöffnet hat. -->
+    <!-- ⚠ Der ⓘ-Knopf steht NICHT hier: renderPity() setzt innerHTML und
+         würde ihn bei jedem Aufruf wegwerfen. Er wird dort mit erzeugt. -->
+    <div class="pity" id="pityLine" style="position:relative;padding-right:34px">…</div>
     <div class="tabs">
       <span class="mini" id="packStat">Geöffnet: 0</span>
       <span class="spacer"></span>
@@ -6596,6 +6645,15 @@ button.pfplate{cursor:pointer}
     <div class="pkwave"></div>
   </div>
   <button class="pkskip pressable" id="pkSkip">Überspringen</button>
+</div>
+<!-- ===== DROP-RATEN (ⓘ) =====
+     Pflichtangabe nach Apple 3.1.1 und Google Play — die Quoten müssen
+     VOR dem Kauf einsehbar sein. Inhalt kommt aus ArenaCards.oddsFor(),
+     nicht aus einer zweiten Tabelle hier: eine abgeschriebene Quote
+     wäre irgendwann eine falsche Quote, und eine falsche Offenlegung
+     ist schlimmer als gar keine. -->
+<div id="oddsLayer" aria-hidden="true">
+  <div class="oddsbox" id="oddsBox" role="dialog" aria-modal="true"></div>
 </div>
 <div id="fxLayer"></div>
 
@@ -8919,7 +8977,12 @@ button.pfplate{cursor:pointer}
      besser als eine Wahrscheinlichkeit. */
   function renderPity() {
     var p = AC.getPityStatus();
-    $("pityLine").innerHTML = ico("frame_epic", "🛟") + " <b>Episch</b> garantiert in ≤" + p.epicIn +
+    /* Das ⓘ wird hier mit erzeugt, weil diese Zeile ihr innerHTML bei
+       jedem Aufruf neu setzt — ein Knopf aus dem statischen Markup wäre
+       nach dem ersten Rendern weg. */
+    $("pityLine").innerHTML = '<button class="oddsi pressable" data-odds="bronze" ' +
+      'style="top:50%;transform:translateY(-50%)" aria-label="Drop-Raten anzeigen">i</button>' +
+      ico("frame_epic", "🛟") + " <b>Episch</b> garantiert in ≤" + p.epicIn +
       " Packs · <span class=\"leg\">Legendär</span> in ≤" + p.legendaryIn;
   }
   /* ===================================================================
@@ -9071,6 +9134,68 @@ button.pfplate{cursor:pointer}
     }
 
     return { spiele: spiele, GLUT: GLUT };
+  })();
+
+  /* ===================================================================
+   * UIQuoten — die Drop-Raten hinter dem ⓘ.
+   *
+   * Auflage, nicht Geschmack: Apple 3.1.1 und Google Play verlangen die
+   * Offenlegung VOR dem Kauf. Unsere bisherige AA-Nachahmung
+   * („Raritätsspannen statt Prozente") bleibt der Aufmacher auf der
+   * Kachel; die Zahlen liegen ein Tippen entfernt.
+   *
+   * DIE ZAHLEN WERDEN NICHT HIER GEPFLEGT. Sie kommen aus
+   * ArenaCards.oddsFor() — dieselbe Quelle, aus der auch gewürfelt wird.
+   * Eine abgeschriebene Quote ist irgendwann eine falsche Quote, und
+   * eine falsche Offenlegung ist schlimmer als gar keine.
+   * ================================================================= */
+  var UIQuoten = (function () {
+    function zeile(t, jePack) {
+      return "<tr><td><span class=\"pkt\" style=\"background:" + t.color + "\"></span>" +
+        t.name + "</td><td>" + t.pct.toFixed(2).replace(".", ",") + " %</td><td>" +
+        (jePack.garantiert
+          ? "<span class=\"gar\">garantiert</span>"
+          : jePack.pct.toFixed(1).replace(".", ",") + " %") + "</td></tr>";
+    }
+    function zeige(key) {
+      var o = AC.oddsFor(key), pity = AC.getPityStatus();
+      var box = $("oddsBox"), lay = $("oddsLayer");
+      if (!box || !lay) return;
+      box.innerHTML =
+        "<h3 class=\"goldtext\">" + o.name + " · Drop-Raten</h3>" +
+        "<div class=\"oddssub\">" + o.cardSlots + " Karten je Pack. Jede Karte wird " +
+          "einzeln und unabhängig gezogen.</div>" +
+        "<table class=\"oddstab\"><thead><tr><th>Stufe</th><th>je Karte</th>" +
+          "<th>mind. 1 je Pack</th></tr></thead><tbody>" +
+        o.perSlot.map(function (t, i) { return zeile(t, o.perPack[i]); }).join("") +
+        "<tr><td><span class=\"pkt\" style=\"background:" + o.supreme.color + "\"></span>" +
+          o.supreme.name + "</td><td>0,00 %</td><td>—</td></tr>" +
+        "</tbody></table>" +
+        "<div class=\"oddsnote\">" +
+          o.supreme.name + " kommt aus keinem Pack. " + o.supreme.hinweis + ".<br>" +
+          "Zusätzlich garantiert: spätestens im " + pity.epicIn + ". Pack eine Epische, " +
+          "spätestens im " + pity.legendaryIn + ". eine Legendäre Karte — über alle " +
+          "Packs hinweg gezählt." +
+        "</div>" +
+        "<button class=\"oddsclose pressable\" id=\"oddsClose\">Schliessen</button>";
+      lay.classList.add("on");
+      lay.setAttribute("aria-hidden", "false");
+      markPressableLater();
+    }
+    function schliesse() {
+      var lay = $("oddsLayer"); if (!lay) return;
+      lay.classList.remove("on");
+      lay.setAttribute("aria-hidden", "true");
+    }
+    /* Ein Zuhörer am Dokument statt einer je Kachel: die Kacheln werden
+       bei jedem Shop-Rendern neu gebaut, einzeln gebundene Zuhörer wären
+       danach tot. */
+    document.addEventListener("click", function (e) {
+      var b = e.target.closest && e.target.closest("[data-odds]");
+      if (b) { e.preventDefault(); e.stopPropagation(); zeige(b.getAttribute("data-odds")); return; }
+      if (e.target.id === "oddsClose" || e.target.id === "oddsLayer") schliesse();
+    });
+    return { zeige: zeige, schliesse: schliesse };
   })();
 
   function openBronze() { openPackKey("bronze"); }
@@ -9991,6 +10116,8 @@ button.pfplate{cursor:pointer}
       var price = (sp.cur === "gold" ? ico("cur_gold", "🪙") : ico("cur_gem", "💚")) + " " + fmt(sp.cost);
       return '<div class="shopcard tinted" data-pack="' + sp.key +
         '" style="position:relative;' + tintStyle("pack_" + sp.key) + '">' +
+        '<button class="oddsi pressable" data-odds="' + sp.key +
+          '" aria-label="Drop-Raten anzeigen">i</button>' +
         '<span class="sart">' + ico("pack_" + sp.key, "🎁", "xl") + "</span>" +
         '<span class="snm">' + pk.name + "</span>" +
         '<span class="promise">' + pk.promise + "</span>" +
@@ -15159,7 +15286,12 @@ button.pfplate{cursor:pointer}
      danach ist der Startbildschirm frei (AAs „ein Bildschirm = ein
      Ziel"). Erst wenn er geschlossen ist, darf die Angebotskette. */
   setTimeout(function () { maybeShowLogin(); }, 260);
+  /* renderPity ist exportiert, damit `pruefungen/quoten.js` das erneute
+     Rendern der Pity-Zeile wirklich ausloesen kann. Ohne den Export lief
+     der Aufruf dort ins Leere (`&&`-Kurzschluss) und der Schritt bestand,
+     ohne etwas zu messen — ein hohler gruener Balken. */
   window.__proto = { AC: AC, openDetail: openDetail, show: show, seed: seed,
+    renderPity: renderPity, UIQuoten: UIQuoten,
                      /* Fuer den Pruefstand: die Marken-Fabrik und die Tabelle.
                         Ohne sie liesse sich nicht messen, ob die sieben Pfade
                         tatsaechlich zeichnen — genau die Frage, die ein
