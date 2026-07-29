@@ -2037,7 +2037,7 @@ span.ico{text-align:center}
    ausserdem die Kante zurueck, die sie auf dunklem Grund braucht.
    ⚠ Das ist eine ZWISCHENLOESUNG, kein Ersatz fuer richtige Assets —
    vermerkt in DESIGNSYSTEM.md §8. */
-.prodcard.fr-green .pcart img.prodimg{filter:var(--frei) saturate(1.45) contrast(1.08)
+.prodcard.fr-gold .pcart img.prodimg{filter:var(--frei) saturate(1.45) contrast(1.08)
   drop-shadow(0 2px 6px #000a)}
 .prodcard .pcart span.prodimg{line-height:1}
 .prodcard.wide{flex-direction:row;align-items:center;gap:var(--gap);padding:var(--pad)}
@@ -2053,7 +2053,7 @@ span.ico{text-align:center}
    zu sehen gewesen. Kein Schnittwert repariert das; der Rahmen gehoert
    schlicht nicht auf diese Kachel.
    Die Farbcodierung, um die es AA hier geht (IMG_3306-3308), traegt die
-   KANTE der Kachel: `.prodcard.fr-orange/green/light` weiter unten. Die
+   KANTE der Kachel: `.prodcard.fr-kristall/gold/light` weiter unten. Die
    ist bei jedem Seitenverhaeltnis richtig, kostet kein Byte und laesst
    dem Produktbild die ganze Flaeche.
    Das Element bleibt im Markup, damit die Kachel eine Ebene fuer Glanz
@@ -2068,10 +2068,19 @@ span.ico{text-align:center}
    Farbe, ein Innenlicht oben und ein Schimmer nach aussen — das liest
    auf 180 px Kachelbreite und bleibt bei jedem Seitenverhaeltnis richtig. */
 .prodcard{border-width:2px}
-.prodcard.fr-orange{border-color:#f2a13d;
-  box-shadow:var(--mat-raised),inset 0 1px 0 #ffd9a3aa,0 0 0 1px #f2a13d33,0 0 16px -6px #f2a13d}
-.prodcard.fr-green{border-color:#58c26a;
+/* ⚠ DIE KLASSEN HIESSEN `fr-orange` UND `fr-green` — nach ihrer FARBE.
+   Genau daran ist es schiefgegangen: die Kristall-Kacheln trugen
+   `fr-orange` (goldener Rand), die Gold-Kacheln `fr-green` (gruener
+   Rand). Beides exakt vertauscht, und beim Lesen des Codes faellt es
+   nicht auf, weil „orange" nichts darueber sagt, was auf der Kachel
+   liegt. Der Auftraggeber hat es am Bildschirm sofort gesehen.
+   Jetzt heissen sie nach ihrer ROLLE. `fr-kristall` KANN gar nicht mehr
+   golden werden, ohne dass es beim Lesen auffaellt — der Rand sagt,
+   was drin ist. */
+.prodcard.fr-kristall{border-color:#58c26a;
   box-shadow:var(--mat-raised),inset 0 1px 0 #b6f7cdaa,0 0 0 1px #58c26a33,0 0 16px -6px #58c26a}
+.prodcard.fr-gold{border-color:#f2a13d;
+  box-shadow:var(--mat-raised),inset 0 1px 0 #ffd9a3aa,0 0 0 1px #f2a13d33,0 0 16px -6px #f2a13d}
 .prodcard.fr-light{border-color:#c9d2da;
   box-shadow:var(--mat-raised),inset 0 1px 0 #ffffffaa,0 0 0 1px #c9d2da2e,0 0 16px -6px #c9d2da}
 .prodcard .pcbody{position:relative;z-index:3;width:100%;margin-top:auto;
@@ -2081,8 +2090,8 @@ span.ico{text-align:center}
 .prodcard .pcnm{font-size:10.5px;font-weight:800;color:#dbe6ef;line-height:1.2;
   text-shadow:0 1px 3px #000}
 .prodcard .pcamt{font-size:17px;font-weight:900;line-height:1.1;text-shadow:0 2px 4px #000}
-.prodcard.fr-orange .pcamt{color:var(--gemc)}
-.prodcard.fr-green .pcamt{color:var(--gold)}
+.prodcard.fr-kristall .pcamt{color:var(--gemc)}
+.prodcard.fr-gold .pcamt{color:var(--gold)}
 .prodcard.fr-light .pcamt{color:#e8eef3;font-size:12px}
 .prodcard .pcsub{font-size:8.5px;color:#a9bccb;line-height:1.3}
 /* Gleiche Panne, gleiche Loesung wie bei .shopcard .sbuy: mit Icon war
@@ -2763,6 +2772,31 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
 /* Der Bildkasten. Eingesenkt wie der Produktbild-Kasten der
    Produktkachel — beides sind Behaelter fuer ein Bild, also dieselbe
    Materialsprache. */
+/* ==================================================================
+ * RANDFARBEN DER SHOP-FLAECHEN
+ * ------------------------------------------------------------------
+ * Eine Regel, zwei Bedeutungen — und die Unterscheidung ist der Punkt:
+ *
+ *   Rand nach INHALT       Kristalle gruen, Gold golden.
+ *                          Was drin ist, steht aussen dran.
+ *   Rand nach PRODUKTFAMILIE  alle Booster-Packs blau, egal was sie
+ *                          enthalten. Hier ist der Rand kein Hinweis
+ *                          auf den Inhalt, sondern auf die Warengruppe
+ *                          — deshalb bei allen vieren derselbe, auch
+ *                          beim Gratis-Bronze.
+ *
+ * Ein Rand, den man nicht sieht, ist keiner: alle drei Farben liegen
+ * gemessen ueber 3:1 gegen den Kachelgrund (#1b2732 bis #0e1418).
+ * Blau ist #3d9df2 — dieselbe Farbe wie die Raritaet „Selten" in
+ * arena_cards.js, damit die Oberflaeche nicht zwei Blaus kennt.
+ * ================================================================== */
+.packshop .shopcard{border-color:#3d9df2;
+  box-shadow:var(--mat-raised),inset 0 1px 0 #b8dcffaa,0 0 0 1px #3d9df233,0 0 16px -6px #3d9df2}
+#packFreeBox .tagesband{border-color:#3d9df2;
+  box-shadow:var(--mat-raised-lg),0 0 0 1px #3d9df233,0 0 18px -6px #3d9df2}
+#goldFreeBox .tagesband{border-color:#f2a13d;
+  box-shadow:var(--mat-raised-lg),0 0 0 1px #f2a13d33,0 0 18px -6px #f2a13d}
+
 .bandart{position:relative;overflow:hidden;flex:0 0 64px;width:64px;height:64px;
   display:flex;align-items:center;justify-content:center;font-size:30px;
   border-radius:12px;border:1px solid #2b3b47;
@@ -2878,9 +2912,12 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
  * Deshalb braucht der Behaelter `position:relative` + `overflow:hidden`.
  * ================================================================== */
 .vorratbox{position:relative;overflow:hidden;border-radius:var(--radius);
-  border:1px solid #a45ef24d;padding:var(--pad);
+  /* Goldener Rand statt violett — die Truhe ist die teuerste Flaeche des
+     Shops und soll das auch aussen tragen. Der violette Grund bleibt,
+     er ist ihre Kulisse. */
+  border:1px solid #f2a13d;padding:var(--pad);
   background:linear-gradient(150deg,#3a2a5e,#1a1230 58%,#0e1418);
-  box-shadow:var(--mat-raised-lg)}
+  box-shadow:var(--mat-raised-lg),0 0 0 1px #f2a13d33,0 0 20px -6px #f2a13d}
 .vorrathead{display:flex;align-items:center;gap:11px}
 .vorratbox .bandart{flex:0 0 72px;width:72px;height:72px;border-color:#43307a}
 /* Auch hier: Spans im Flex-Item MUESSEN Bloecke sein, sonst kleben
@@ -9199,7 +9236,7 @@ button.pfplate{cursor:pointer}
   function renderGemPacks() {
     $("gemShop").innerHTML = GEM_PACKS.map(function (g) {
       return prodCard({
-        frame: "orange", art: g.art, emoji: "💚", seal: g.seal, wide: g.wide,
+        frame: "kristall", art: g.art, emoji: "💚", seal: g.seal, wide: g.wide,
         name: g.name, amt: fmt(g.amt), sub: "Gems",
         btn: g.price, btnCls: "gemprice", btnAttr: 'data-gembuy="' + g.id + '"',
         attr: 'data-gem="' + g.id + '"',
@@ -9218,7 +9255,7 @@ button.pfplate{cursor:pointer}
     $("goldShop").innerHTML = GOLD_PACKS.filter(function (g) { return !g.free; })
       .map(function (g) {
         return prodCard({
-          frame: "green", art: g.art, emoji: "🪙", seal: g.seal, wide: g.wide,
+          frame: "gold", art: g.art, emoji: "🪙", seal: g.seal, wide: g.wide,
           name: g.name, amt: fmt(g.amt), sub: "Gold",
           btn: ico("cur_gem", "💚") + " " + fmt(g.cost), btnCls: "goldprice",
           btnAttr: 'data-goldbuy="' + g.id + '"', attr: 'data-gold="' + g.id + '"',

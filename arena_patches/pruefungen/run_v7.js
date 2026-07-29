@@ -565,8 +565,8 @@ function step(name, ok, info) {
     gems: document.querySelectorAll('#gemShop .prodcard').length,
     golds: document.querySelectorAll('#goldShop .prodcard').length,
     goldFrei: document.querySelectorAll('#goldFreeBox .tagesband').length,
-    gemFrames: document.querySelectorAll('#gemShop .prodcard.fr-orange').length,
-    goldFrames: document.querySelectorAll('#goldShop .prodcard.fr-green').length,
+    gemFrames: document.querySelectorAll('#gemShop .prodcard.fr-kristall').length,
+    goldFrames: document.querySelectorAll('#goldShop .prodcard.fr-gold').length,
     dealFrames: document.querySelectorAll('#dealGrid .prodcard.fr-light').length,
     frameLayers: document.querySelectorAll('#viewShop .prodcard .pcfrm').length,
     ribbons: document.querySelectorAll('#viewShop .secribbon').length,
@@ -605,11 +605,19 @@ function step(name, ok, info) {
   step('(8) Gold-Tausch: 3 kaufbare Staffeln + Gratis-Gold als Band',
     shopBlocks.golds === 3 && shopBlocks.goldFrei === 1,
     shopBlocks.golds + ' Kacheln / ' + shopBlocks.goldFrei + ' Band');
-  /* AA codiert seine Shop-Kacheln ueber die RAHMENFARBE (IMG_3306-3308):
-     Gems orange, Gold gruen, Angebote neutral. */
-  step('Farbcode-Rahmen: Gems orange, Gold gruen, Angebote hell',
+  /* ⚠ UMGESCHRIEBEN 27.07. — und diese Pruefung ist der Grund, warum
+     der Fehler so lange stand. Sie hiess „Gems orange, Gold gruen" und
+     hat damit genau die Vertauschung FESTGESCHRIEBEN, die der
+     Auftraggeber am Bildschirm sofort sah: die Kristall-Kacheln trugen
+     einen goldenen Rand, die Gold-Kacheln einen gruenen. Die Pruefung
+     lief gruen, weil sie das Falsche verlangte.
+     Sie zaehlt jetzt Rollen-Klassen statt Farbnamen. Ob die Rolle auch
+     die richtige FARBE zeichnet, misst pruefungen/shop_raender.js am
+     tatsaechlich gerenderten Rand — Klassenzaehlen allein kann das
+     nicht, und genau diese Luecke war das Problem. */
+  step('Farbcode-Rahmen: Kristalle, Gold, Angebote je eigene Rolle',
     shopBlocks.gemFrames === 6 && shopBlocks.goldFrames === 3 && shopBlocks.dealFrames === 6,
-    shopBlocks.gemFrames + ' orange / ' + shopBlocks.goldFrames + ' gruen / ' +
+    shopBlocks.gemFrames + ' Kristall / ' + shopBlocks.goldFrames + ' Gold / ' +
     shopBlocks.dealFrames + ' hell');
   step('Jede Produktkarte hat eine eigene Rahmen-Ebene ueber dem Produktbild',
     shopBlocks.frameLayers === shopBlocks.gems + shopBlocks.golds + shopBlocks.deals,
