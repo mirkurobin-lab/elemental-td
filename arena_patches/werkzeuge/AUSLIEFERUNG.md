@@ -40,7 +40,12 @@ Behandlung. Die Umstellung gehört zur Auslieferung, nicht zur Quelle.
 ## Ablauf
 
 1. Vorschau-Repo klonen (`website_repo_access` liefert URL, Zweig und Token).
-2. `ui_prototype.html` vom GitHub-Zweig in `app/public/` legen; `CDN + "….png"`
+2. `ui_prototype.html` vom GitHub-Zweig holen und als **`app/public/ui.html`**
+   ablegen. ⚠ **`ui.html` ist die ausgelieferte Datei, nicht
+   `ui_prototype.html`** — `/ui` liefert `ui.html`. Am 29.07.2026 lag eine
+   fertige Fassung eine Runde lang in `ui_prototype.html`: Push ging durch,
+   Deploy meldete Erfolg, live lag weiter der alte Stand, und kein Schritt
+   schlug fehl. Dann `CDN + "….png"`
    und `CDNA + "….png"` auf `IMG + "….webp"` umschreiben und `var IMG = "/img/";`
    vor `var CDN` einfügen.
 3. Fehlende Bilder nach `app/public/img/` holen — bevorzugt die `_min.webp`

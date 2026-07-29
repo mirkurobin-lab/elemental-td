@@ -2063,7 +2063,12 @@ span.ico{text-align:center}
   border:1px solid var(--line);overflow:hidden}
 .iapcard .iart{flex:0 0 var(--tile);width:var(--tile);height:var(--tile);border-radius:var(--radius-sm);
   display:flex;align-items:center;justify-content:center;font-size:34px;
-  background:#0b1116a6;border:1px solid #ffffff1f}
+  background:#0b1116a6;border:1px solid #ffffff1f;overflow:hidden}
+/* Das Produktbild in der IAP-Kachel. `contain`, nicht `cover`: die Packs
+   sind hochformatig, und `cover` würde oben und unten anschneiden — genau
+   dort sitzt bei ihnen die gebrochene Kante, also das Merkmal, an dem man
+   sie erkennt. Lieber Luft an den Seiten als eine glatte Kante. */
+.iapcard .iart img.prodimg{width:100%;height:100%;object-fit:contain;display:block}
 .iapcard .itx{flex:1;min-width:0}
 .iapcard .inm{display:block;font-size:14px;line-height:1.15}
 .iapcard .isub{display:block;font-size:9px;color:#a9bccb;margin-top:3px}
@@ -9971,6 +9976,22 @@ button.pfplate{cursor:pointer}
        damit kein toter Marker im DOM stehen bleibt. */
     Array.prototype.forEach.call(root.querySelectorAll("[data-prodfrm]"), function (el) {
       el.removeAttribute("data-prodfrm");
+    });
+    /* ⚠ 29.07.2026: `data-prodart` wurde gesetzt und von NIEMANDEM
+       ausgewertet. Die beiden IAP-Kacheln (Arena-Pack, Starter-Pack)
+       zeigten deshalb seit jeher ihr Emoji — 🎁 und ✨ — obwohl beide
+       ein eigenes Produktbild haben, das erzeugt, verzeichnet, gesichert
+       und freigestellt wurde.
+       Aufgefallen ist es erst beim Ansehen eines Screenshots der
+       Auslieferung, nicht durch eine Kennzahl: oertlich faellt ohnehin
+       jedes Icon auf sein Emoji zurueck (DESIGNSYSTEM §7b), ein Emoji an
+       dieser Stelle ist dort also der Normalzustand und kein Hinweis.
+       Ein totes Attribut ist die stillste Art, ein Bild zu verlieren. */
+    Array.prototype.forEach.call(root.querySelectorAll("[data-prodart]"), function (el) {
+      var key = el.getAttribute("data-prodart");
+      el.removeAttribute("data-prodart");
+      if (!ASSETS[key]) return;                 // Emoji bleibt stehen
+      el.innerHTML = ico(key, el.textContent.trim() || "•", "prodimg");
     });
     sweepSoon(root);
   }

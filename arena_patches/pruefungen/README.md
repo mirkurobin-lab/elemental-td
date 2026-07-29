@@ -1,6 +1,6 @@
 # Prüfungen
 
-Vierzehn Playwright-Suiten mit zusammen **1 011 Schritten**, plus zwei
+Vierzehn Playwright-Suiten mit zusammen **1 013 Schritten**, plus zwei
 Sonderprüfungen, die nur mit tatsächlich geladenen Bildern laufen.
 
 ## Aufruf
@@ -28,7 +28,7 @@ direkt — kein Server, kein Build.
 | `run_v6.js` | 281 | Clan, Ghost-Clankrieg, Spenden, Rangliste, Post |
 | `run_v7.js` | 334 | Startseite, Banner-Metrik, Pass, Guide, Profil, Avatare, Shop-Maße |
 | `run_friends.js` | 25 | Freundesliste, Anfragen, Suche |
-| `run_shop.js` | 32 | Tagesangebote, Booster-Packs, Gold, Tresor, Vorrats-Truhe |
+| `run_shop.js` | 34 | Tagesangebote, Booster-Packs, Gold, Tresor, Vorrats-Truhe |
 | `avatare.js` | 12 | Fünf zur Wahl, Helden am Besitz, Auswahl im Raster |
 | `login_kal.js` | 9 | Login-Kalender: drei pro Reihe, Tag 7 als Band |
 | `home_menue.js` | 20 | Keine doppelten Wege, Menü-Icons lesbar |

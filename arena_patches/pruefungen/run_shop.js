@@ -401,6 +401,40 @@ function step(name, ok, info) {
   step('.goldtext steht auf keiner hellen/goldenen Flaeche im Shop',
     goldAufHell === 0, String(goldAufHell));
 
+  /* ---------------------------------------------------------------
+     TOTE PLATZHALTER-ATTRIBUTE
+     ---------------------------------------------------------------
+     `data-prodart` wurde beim Rendern gesetzt und von niemandem
+     ausgewertet. Die beiden IAP-Kacheln zeigten deshalb ueber Wochen ihr
+     Emoji, obwohl beide ein eigenes Produktbild haben — erzeugt,
+     verzeichnet, gesichert, freigestellt und nie sichtbar.
+
+     Warum keine Pruefung das gefunden hat: oertlich ist das CDN nicht
+     erreichbar, jedes Icon faellt auf sein Emoji zurueck (DESIGNSYSTEM
+     §7b). Ein Emoji an dieser Stelle ist hier der Normalzustand und
+     taugt deshalb nicht als Hinweis.
+
+     Was sich PRUEFEN laesst, ist der Marker selbst: ein `data-prod*`,
+     das die Hydrierung ueberlebt, ist per Definition unbenutzt. Das
+     misst nicht das Bild, aber genau den Fehler, der das Bild gekostet
+     hat — und zwar auch dann, wenn kein einziges Bild laedt. */
+  const tote = await page.evaluate(() =>
+    [...document.querySelectorAll('#viewShop [data-prodart],#viewShop [data-prodfrm]')]
+      .map(e => e.className + '[' + (e.getAttribute('data-prodart') ||
+                                     e.getAttribute('data-prodfrm')) + ']'));
+  step('kein unausgewertetes data-prodart/-prodfrm bleibt im Shop stehen',
+    tote.length === 0, tote.slice(0, 3).join(' · '));
+
+  /* Und die Gegenprobe: die IAP-Kacheln tragen ueberhaupt eine Bildhuelle,
+     nicht nur nackten Text. Ohne sie waere der Marker zwar weg, das Bild
+     aber immer noch nicht da. */
+  const iap = await page.evaluate(() =>
+    [...document.querySelectorAll('#arenaPackBox .iart')]
+      .map(e => e.querySelector('img,span.ico') ? 'huelle' : 'nur-text'));
+  step('jede IAP-Kachel traegt eine Bildhuelle',
+    iap.length > 0 && iap.every(x => x === 'huelle'),
+    iap.join(', '));
+
 
   /* ============ ZUSAMMENFASSUNG ============ */
   const bad = steps.filter(s => !s.ok);
