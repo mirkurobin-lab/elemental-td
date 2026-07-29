@@ -1297,6 +1297,57 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
   margin:-18% 0 0 -18%;border-radius:50%;pointer-events:none;
   background:radial-gradient(circle,#fff 0%,currentColor 42%,transparent 70%);
   opacity:0;mix-blend-mode:screen}
+/* ==================================================================
+ * DIE FARBIGE AUSSTROeMUNG (Feinschliff 29.07.2026)
+ * ------------------------------------------------------------------
+ * Sechs Strahlen in den sechs ELEMENTFARBEN. Das ist kein Schmuck,
+ * sondern eine Aussage: der Pack gibt die Farben von dem her, was drin
+ * liegt. Einzelne Partikel waeren huebscher, kosten auf einem 412-px-
+ * Schirm bei 60 fps aber mehr, als sie zeigen — und sie tragen keine
+ * Bedeutung.
+ *
+ * Zwei Ebenen, gegenlaeufig gedreht und um 30 Grad versetzt: eine
+ * einzelne rotierende Scheibe liest sich als sich drehendes Rad, zwei
+ * gegenlaeufige als Ausstroemung.
+ * ================================================================== */
+/* ⚠ ZWEITE FASSUNG (29.07.2026). Die erste hatte harte Keile
+   (`#ff6b3d 0deg 20deg`) und ein breites Maskenband bis 40 %. Auf dem
+   Schirm war das ein Windrad, das am Ende den ganzen Bildschirm
+   ausfuellte — die Zahlen sahen gut aus, das Bild nicht. Die Messung
+   allein haette den Fehler nie gefunden; erst der Blick auf den
+   Einzelbild-Auszug bei 3200 ms hat ihn gezeigt.
+   Drei Aenderungen: weiche Keilkanten (Farbe faedelt ueber 9 Grad ein
+   und wieder aus), `blur` obendrauf, und eine Maske, die nach aussen
+   ausduennt statt hart aufzuhoeren. Damit ist es ein Strahlen HINTER
+   dem Pack und keine Tapete. */
+.pkfarben{position:absolute;left:50%;top:50%;width:165%;aspect-ratio:1;
+  margin:-82.5% 0 0 -82.5%;pointer-events:none;opacity:0;mix-blend-mode:screen;
+  filter:blur(4px);
+  background:conic-gradient(from 0deg,
+    /* ⚠ Ungleiche Keilbreiten mit Absicht. Sechs gleich breite Strahlen
+       im gleichen Abstand lesen sich als WINDRAD — ein Rad dreht sich,
+       Licht stroemt. Die Breiten wechseln deshalb zwischen 10 und 26
+       Grad, und die zweite Ebene setzt ihre Betonungen woanders. */
+    #0000 0deg, #ff6b3d 8deg, #ff6b3d 30deg, #0000 38deg,
+    #0000 60deg, #3dc8ff 70deg, #3dc8ff 82deg, #0000 90deg,
+    #0000 120deg, #46c46a 126deg, #46c46a 152deg, #0000 160deg,
+    #0000 180deg, #e0a43c 190deg, #e0a43c 204deg, #0000 212deg,
+    #0000 240deg, #ffe36b 246deg, #ffe36b 270deg, #0000 278deg,
+    #0000 300deg, #9b6bff 311deg, #9b6bff 322deg, #0000 330deg,
+    #0000 360deg);
+  /* Die Maske duennt aus: voll bei 16 %, halb bei 30 %, weg bei 46 %.
+     So sind die Strahlen am Pack am hellsten und verlaufen nach aussen
+     — statt als Scheibe mit Kante ueber den Rand zu schieben. */
+  -webkit-mask-image:radial-gradient(circle,#0000 4%,#000 12%,#000 34%,#0006 44%,#0000 56%);
+          mask-image:radial-gradient(circle,#0000 4%,#000 12%,#000 34%,#0006 44%,#0000 56%)}
+.pkfarben.zwei{filter:blur(7px);background:conic-gradient(from 30deg,
+    #0000 0deg, #ffb03d 7deg, #ffb03d 19deg, #0000 26deg,
+    #0000 60deg, #6bf0ff 66deg, #6bf0ff 90deg, #0000 98deg,
+    #0000 120deg, #8ce46a 131deg, #8ce46a 143deg, #0000 150deg,
+    #0000 180deg, #ff8a5c 186deg, #ff8a5c 210deg, #0000 218deg,
+    #0000 240deg, #fff3a6 251deg, #fff3a6 263deg, #0000 270deg,
+    #0000 300deg, #c39bff 306deg, #c39bff 328deg, #0000 336deg,
+    #0000 360deg)}
 .pkart{position:relative;width:58%;filter:drop-shadow(0 12px 22px #000000aa)}
 /* Weißblitz und Druckwelle liegen ÜBER dem Pack. */
 .pkflash{position:absolute;inset:0;border-radius:50%;pointer-events:none;
@@ -1308,42 +1359,129 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
 /* Die Glutkurve: opacity folgt der gemessenen Helligkeit,
    normiert als (Mittel − 26) / (192 − 26). */
 /* Der SCHEIN folgt der Spalte „Mittel", normiert (m−26)/169. */
-#packLayer.spielt .pkglow{animation:pkglut 3000ms linear forwards}
+/* ==================================================================
+ * NEUE ZEITTABELLE — 4000 ms statt 3000 (Feinschliff 29.07.2026)
+ * ------------------------------------------------------------------
+ * Nachgemessen: Referenzvideo gegen unsere Fassung, gleiche Metrik
+ * (Huebuckets mit Saettigung > 0,35, Helligkeit > 0,25):
+ *
+ *                    Referenz         wir (alt)
+ *   Farben ab          1,60 s          1,80 s
+ *   Hoehepunkt         2,20-2,40 s     1,80 s  (EIN Frame)
+ *   Farbkanaele        4               2
+ *   bunte Flaeche      15 %            18 %, aber nur einen Frame
+ *   Helligkeit         41              76  (weiss ausgebrannt)
+ *   zurueck auf Ruhe   4,00 s          2,10 s
+ *   Dauer Ausstroemung 2,40 s          0,30 s
+ *
+ * Der Ausbruch war also nicht nur zu schnell — er war die falsche Sorte
+ * Ereignis: ein Blitz statt einer Ausstroemung. Und weil Weiss keinen
+ * Farbton hat, hat der grelle Blitz die Farben selbst weggefressen: je
+ * heller, desto weniger Kanaele misst man.
+ *
+ * Die VORLADUNG behaelt ihre gemessenen Millisekunden (217, 583, 750,
+ * 1033, 1117, 1350, 1417) — die stammen aus dem Video und waren nie das
+ * Problem. Nur die Prozentzahlen aendern sich, weil der Nenner von 3000
+ * auf 4000 geht. Gestreckt wird ausschliesslich der Ausbruch:
+ *
+ *   1600 ms = 40,0 %   Farben setzen ein
+ *   2200 ms = 55,0 %   Hoehepunkt
+ *   2400 ms = 60,0 %   Karten fliegen los
+ *   3800 ms = 95,0 %   zurueck auf Ruhe
+ * ================================================================== */
+#packLayer.spielt .pkglow{animation:pkglut 4000ms linear forwards}
 @keyframes pkglut{
-  0%{opacity:0;transform:scale(.72)}
-  7.23%{opacity:0;transform:scale(.72)}      /*  217 Ruhe endet      */
-  19.43%{opacity:.176;transform:scale(.92)}  /*  583 Puls 1          */
-  25.00%{opacity:.054;transform:scale(.80)}  /*  750 Rückfall 1      */
-  34.43%{opacity:.076;transform:scale(.84)}  /* 1033 Puls 2          */
-  37.23%{opacity:.060;transform:scale(.82)}  /* 1117 Rückfall 2      */
-  45.00%{opacity:.194;transform:scale(.96)}  /* 1350 Puls 3          */
-  47.23%{opacity:.176;transform:scale(.94)}  /* 1417 Rückfall 3      */
-  55.00%{opacity:.391;transform:scale(1.04)} /* 1650 Hauptladung     */
-  59.43%{opacity:.981;transform:scale(1.42)} /* 1783 BRUCH           */
-  62.23%{opacity:1;transform:scale(1.55)}    /* 1867 Plateau-Spitze  */
-  63.33%{opacity:.910;transform:scale(1.58)} /* 1900 Flackern        */
-  64.43%{opacity:.758;transform:scale(1.62)} /* 1933 Druckwelle      */
-  65.00%{opacity:.464;transform:scale(1.50)} /* 1950 Abfall          */
-  70.00%{opacity:.138;transform:scale(1.16)} /* 2100 Karten fliegen  */
-  80.00%{opacity:.129;transform:scale(1.10)} /* 2400 Karten liegen   */
-  100%{opacity:.126;transform:scale(1.08)}}  /* 3000 Ruhe            */
-/* Der KERN folgt der Spalte „Kern %", normiert auf 85,69. Er atmet NICHT
-   mit zurück — nach Puls 1 bleibt er stehen. */
-#packLayer.spielt .pkkern{animation:pkkernglut 3000ms linear forwards}
+  /* `filter` steht schon hier, obwohl es erst ab 40 % etwas tut: sonst
+     interpoliert der Browser vom Ausgangswert ueber die GANZE Animation
+     dorthin — dieselbe stille Rampe, die `pkbeben` schon einmal hatte. */
+  0%{opacity:0;transform:scale(.72);filter:brightness(1)}
+  5.43%{opacity:0;transform:scale(.72);filter:brightness(1)}  /* 217 Ruhe endet */
+  14.58%{opacity:.176;transform:scale(.92)}   /*  583 Puls 1       */
+  18.75%{opacity:.054;transform:scale(.80)}   /*  750 Rueckfall 1  */
+  25.83%{opacity:.076;transform:scale(.84)}   /* 1033 Puls 2       */
+  27.93%{opacity:.060;transform:scale(.82)}   /* 1117 Rueckfall 2  */
+  33.75%{opacity:.194;transform:scale(.96)}   /* 1350 Puls 3       */
+  35.43%{opacity:.176;transform:scale(.94)}   /* 1417 Rueckfall 3  */
+  40.00%{opacity:.38;transform:scale(1.00);filter:brightness(1.2)}   /* 1600 */
+  /* ⚠ Hier stand 0,34 — UNTER dem Wert bei 40 %. Damit fiel der Schein
+     mitten in der Hauptladung zurueck: ein vierter Rueckfall, wo nur
+     drei hingehoeren. Entstanden ist er beim Daempfen, weil ich den
+     Stop einzeln gesenkt und nicht gegen seinen Nachbarn geprueft habe.
+     Die Pruefung hat ihn gefunden, das Auge nicht. */
+  47.50%{opacity:.52;transform:scale(1.06);filter:brightness(1.05)}  /* 1900 */
+  55.00%{opacity:.62;transform:scale(1.12);filter:brightness(1.1)}   /* 2200 */
+  60.00%{opacity:.50;transform:scale(1.22);filter:brightness(1.1)}   /* 2400 */
+  67.50%{opacity:.36;transform:scale(1.36);filter:brightness(1.08)}  /* 2700 */
+  75.00%{opacity:.26;transform:scale(1.46);filter:brightness(1.05)}  /* 3000 */
+  85.00%{opacity:.14;transform:scale(1.56);filter:brightness(1.02)}  /* 3400 */
+  95.00%{opacity:0;transform:scale(1.62);filter:brightness(1)}       /* 3800 */
+  100%{opacity:0;transform:scale(1.62)}}
+/* Die farbige Ausstroemung — das eigentlich Fehlende. An dieser Stelle
+   war in der alten Fassung gar nichts; die Farbe kam allein aus dem
+   Glutschein in EINER Packfarbe. Sie setzt bei 1600 ms ein wie im
+   Video, steht bei 2200 im Hoehepunkt und braucht bis 3800, um zu
+   vergehen. Die Drehung laeuft ueber den ganzen Bogen weiter, damit
+   das Abklingen nicht wie ein langsam ausgeblendetes Standbild wirkt. */
+#packLayer.spielt .pkfarben{animation:pkstroemen 4000ms cubic-bezier(.16,.7,.3,1) forwards}
+#packLayer.spielt .pkfarben.zwei{animation:pkstroemen2 4000ms cubic-bezier(.16,.7,.3,1) forwards}
+@keyframes pkstroemen{
+  0%,40.00%{opacity:0;transform:rotate(0deg) scale(.35)}
+  47.50%{opacity:.45;transform:rotate(26deg) scale(.72)}
+  52.50%{opacity:.85;transform:rotate(40deg) scale(.92)}
+  /* Der Hoehepunkt liegt auf 2200 — dem Bruch. Danach faellt die
+     Ausstroemung zuegig ab: ab hier fliegen die Karten, und die
+     Strahlen sollen HINTER ihnen liegen, nicht vor ihnen. Die erste
+     Fassung hielt hier noch 0,95 und 0,80 — auf dem Bild war das ein
+     Farbrad ohne Pack davor. */
+  55.00%{opacity:1;transform:rotate(46deg) scale(1.00)}
+  60.00%{opacity:.82;transform:rotate(58deg) scale(1.10)}
+  /* ⚠ Der Zuwachs ist ab hier absichtlich klein. Die erste Fassung
+     wuchs bis scale(2,10) — die Strahlen flogen aus dem Bild und die
+     Farbe war bei 2,7 s verschwunden, obwohl die Deckkraft noch stand.
+     Gemessen im Video haelt die Farbe bis 3,8 s. */
+  67.50%{opacity:.72;transform:rotate(74deg) scale(1.18)}
+  75.00%{opacity:.58;transform:rotate(88deg) scale(1.24)}
+  /* Der Schwanz haelt absichtlich lange hoch und faellt erst kurz vor
+     dem Ende. Grund ist die Mischung: `screen` auf dunklem Grund macht
+     aus 34 % Deckkraft ein Grau, das die Messung gar nicht mehr als
+     Farbe zaehlt — die Farben waren bei 3,4 s weg statt bei 3,9 s. */
+  85.00%{opacity:.36;transform:rotate(104deg) scale(1.30)}
+  92.00%{opacity:.16;transform:rotate(112deg) scale(1.33)}
+  97.00%{opacity:.03;transform:rotate(116deg) scale(1.35)}
+  100%{opacity:0;transform:rotate(118deg) scale(1.36)}}
+@keyframes pkstroemen2{
+  0%,42.00%{opacity:0;transform:rotate(30deg) scale(.30)}
+  49.00%{opacity:.42;transform:rotate(8deg) scale(.66)}
+  55.00%{opacity:.85;transform:rotate(-12deg) scale(.94)}
+  60.00%{opacity:.70;transform:rotate(-26deg) scale(1.06)}
+  67.50%{opacity:.62;transform:rotate(-44deg) scale(1.14)}
+  75.00%{opacity:.50;transform:rotate(-58deg) scale(1.20)}
+  85.00%{opacity:.30;transform:rotate(-74deg) scale(1.26)}
+  92.00%{opacity:.14;transform:rotate(-82deg) scale(1.29)}
+  97.00%{opacity:.03;transform:rotate(-86deg) scale(1.30)}
+  100%{opacity:0;transform:rotate(-88deg) scale(1.31)}}
+#packLayer.spielt .pkkern{animation:pkkernglut 4000ms linear forwards}
 @keyframes pkkernglut{
-  0%,7.23%{opacity:.007;transform:scale(.5)}
-  19.43%{opacity:.076;transform:scale(.9)}   /*  583 */
-  25.00%{opacity:.054;transform:scale(.8)}   /*  750 — faellt nur wenig */
-  34.43%{opacity:.061;transform:scale(.85)}  /* 1033 */
-  37.23%{opacity:.049;transform:scale(.8)}   /* 1117 */
-  45.00%{opacity:.181;transform:scale(1.1)}  /* 1350 — Sprung */
-  47.23%{opacity:.162;transform:scale(1.05)} /* 1417 */
-  55.00%{opacity:.355;transform:scale(1.4)}  /* 1650 */
-  59.43%{opacity:1;transform:scale(3.2)}     /* 1783 — 30 % auf 86 % */
-  62.23%{opacity:.969;transform:scale(3.4)}
-  64.43%{opacity:.887;transform:scale(3.6)}
-  65.00%{opacity:.429;transform:scale(2.6)}
-  70.00%{opacity:.133;transform:scale(1.2)}
+  0%,5.43%{opacity:.007;transform:scale(.5)}
+  14.58%{opacity:.076;transform:scale(.9)}   /*  583 */
+  18.75%{opacity:.054;transform:scale(.8)}   /*  750 — faellt nur wenig */
+  25.83%{opacity:.061;transform:scale(.85)}  /* 1033 */
+  27.93%{opacity:.049;transform:scale(.8)}   /* 1117 */
+  33.75%{opacity:.181;transform:scale(1.1)}  /* 1350 — Sprung */
+  35.43%{opacity:.162;transform:scale(1.05)} /* 1417 */
+  40.00%{opacity:.30;transform:scale(1.3)}   /* 1600 */
+  47.50%{opacity:.52;transform:scale(1.9)}   /* 1900 */
+  55.00%{opacity:.28;transform:scale(2.2)}   /* 2200 — gedaempft von 1,0/3,2:
+                                                ein weissgluehender Kern in
+                                                voller Staerke frisst genau
+                                                die Farben, die jetzt da sind.
+                                                ⚠ Zweite Daempfung 29.07.2026
+                                                (0,82 → 0,42): die Messung gab
+                                                Helligkeit 74 gegen 41. */
+  60.00%{opacity:.22;transform:scale(2.4)}   /* 2400 */
+  67.50%{opacity:.15;transform:scale(2.0)}   /* 2700 */
+  75.00%{opacity:.10;transform:scale(1.6)}   /* 3000 */
+  95.00%{opacity:.13;transform:scale(1.15)}  /* 3800 */
   100%{opacity:.124;transform:scale(1.1)}}
 /* Der Pack selbst. ⚠ `opacity:1` steht an JEDEM Stop bis zum Bruch —
    ohne das interpoliert der Browser vom Ausgangswert durch, und der Pack
@@ -1352,62 +1490,81 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
    Das Zittern wächst in drei Wellen, passend zu den drei Pulsen: bei
    Puls 1 hebt er sich nur, bei Puls 3 zittert er, ab der Hauptladung
    schlägt er aus. */
-#packLayer.spielt .pkart{animation:pkbeben 3000ms linear forwards}
+#packLayer.spielt .pkart{animation:pkbeben 4000ms linear forwards}
 @keyframes pkbeben{
   0%{opacity:1;transform:translate(0,0) scale(1);filter:brightness(1)}
-  7.23%{opacity:1;transform:translate(0,0) scale(1);filter:brightness(1)}
-  19.43%{opacity:1;transform:translate(0,-3px) scale(1.02);filter:brightness(1.18)}
-  25.00%{opacity:1;transform:translate(0,0) scale(1);filter:brightness(1)}
-  34.43%{opacity:1;transform:translate(0,-2px) scale(1.01);filter:brightness(1.08)}
-  37.23%{opacity:1;transform:translate(0,0) scale(1);filter:brightness(1.02)}
-  41%{opacity:1;transform:translate(-2px,1px) scale(1.02);filter:brightness(1.2)}
-  43%{opacity:1;transform:translate(2px,-1px) scale(1.03)}
-  45.00%{opacity:1;transform:translate(-2px,0) scale(1.04);filter:brightness(1.45)}
-  47.23%{opacity:1;transform:translate(1px,1px) scale(1.02);filter:brightness(1.3)}
-  49%{opacity:1;transform:translate(-3px,0) scale(1.03)}
-  51%{opacity:1;transform:translate(3px,-1px) scale(1.04)}
-  53%{opacity:1;transform:translate(-3px,1px) scale(1.05)}
-  55.00%{opacity:1;transform:translate(0,0) scale(1.07);filter:brightness(1.9)}
-  57%{opacity:1;transform:translate(2px,-2px) scale(1.09);filter:brightness(2.4)}
-  59.43%{opacity:.55;transform:scale(1.34);filter:brightness(3.6)}
-  62.23%{opacity:0;transform:scale(1.62);filter:brightness(4)}
-  100%{opacity:0;transform:scale(1.62)}}
-/* Der Blitz FLACKERT im Plateau — 191,7 → 186,1 → 188,5 → 195,1 → 179,8
-   in 117 ms. Glatt gehalten wirkt er wie ein Standbild. */
-#packLayer.spielt .pkflash{animation:pkblitz 3000ms linear forwards}
+  5.43%{opacity:1;transform:translate(0,0) scale(1);filter:brightness(1)}
+  14.58%{opacity:1;transform:translate(0,-3px) scale(1.02);filter:brightness(1.18)}
+  18.75%{opacity:1;transform:translate(0,0) scale(1);filter:brightness(1)}
+  25.83%{opacity:1;transform:translate(0,-2px) scale(1.01);filter:brightness(1.08)}
+  27.93%{opacity:1;transform:translate(0,0) scale(1);filter:brightness(1.02)}
+  30.75%{opacity:1;transform:translate(-2px,1px) scale(1.02);filter:brightness(1.2)}
+  32.25%{opacity:1;transform:translate(2px,-1px) scale(1.03)}
+  33.75%{opacity:1;transform:translate(-2px,0) scale(1.04);filter:brightness(1.45)}
+  35.43%{opacity:1;transform:translate(1px,1px) scale(1.02);filter:brightness(1.3)}
+  36.75%{opacity:1;transform:translate(-3px,0) scale(1.03)}
+  38.25%{opacity:1;transform:translate(3px,-1px) scale(1.04)}
+  39.00%{opacity:1;transform:translate(-3px,1px) scale(1.05)}
+  40.00%{opacity:1;transform:translate(0,0) scale(1.07);filter:brightness(1.6)}
+  /* Ab hier laedt der Pack sichtbar durch, statt sofort zu bersten —
+     das sind die 600 ms, die im Video zwischen Farbeinsatz und
+     Hoehepunkt liegen und bei uns gefehlt haben. */
+  44.00%{opacity:1;transform:translate(-2px,0) scale(1.09);filter:brightness(1.9)}
+  47.50%{opacity:1;transform:translate(2px,-1px) scale(1.11);filter:brightness(2.2)}
+  51.00%{opacity:1;transform:translate(-3px,1px) scale(1.13);filter:brightness(2.6)}
+  53.50%{opacity:1;transform:translate(3px,0) scale(1.15);filter:brightness(3.0)}
+  55.00%{opacity:.9;transform:translate(0,0) scale(1.20);filter:brightness(3.6)}
+  57.50%{opacity:.45;transform:scale(1.42);filter:brightness(4)}
+  60.00%{opacity:0;transform:scale(1.66);filter:brightness(4)}
+  100%{opacity:0;transform:scale(1.66)}}
+/* Der Blitz FLACKERT im Plateau (191,7 → 186,1 → 188,5 → 195,1 → 179,8
+   im Video). Glatt gehalten wirkt er wie ein Standbild.
+   ⚠ Spitze auf 0,62 gedaempft statt 1,0: die Messung hat gezeigt, dass
+   unser Blitz mit Helligkeit 76 gegen 41 im Video die Farben
+   entsaettigt hat. Der Blitz soll den Hoehepunkt MARKIEREN, nicht die
+   Ausstroemung ersetzen. */
+#packLayer.spielt .pkflash{animation:pkblitz 4000ms linear forwards}
 @keyframes pkblitz{
-  0%,55.00%{opacity:0;transform:scale(.2)}
-  59.43%{opacity:.94;transform:scale(1.6)}   /* 1783 — 133 ms hinauf */
-  60.00%{opacity:.88;transform:scale(1.8)}   /* 1800 */
-  61.10%{opacity:.91;transform:scale(1.9)}   /* 1833 */
-  62.23%{opacity:1;transform:scale(2.0)}     /* 1867 */
-  63.33%{opacity:.86;transform:scale(2.1)}   /* 1900 */
-  64.43%{opacity:.70;transform:scale(2.2)}   /* 1933 */
-  65.00%{opacity:.42;transform:scale(2.3)}   /* 1950 */
-  70.00%{opacity:0;transform:scale(2.5)}     /* 2100 */
+  0%,47.50%{opacity:0;transform:scale(.2)}
+  52.00%{opacity:.13;transform:scale(1.2)}   /* 2080 */
+  55.00%{opacity:.20;transform:scale(1.6)}   /* 2200 — Hoehepunkt */
+  56.25%{opacity:.18;transform:scale(1.75)}  /* 2250 — Flackern */
+  57.50%{opacity:.19;transform:scale(1.85)}  /* 2300 */
+  58.75%{opacity:.16;transform:scale(1.95)}  /* 2350 */
+  60.00%{opacity:.11;transform:scale(2.1)}   /* 2400 */
+  65.00%{opacity:.06;transform:scale(2.3)}   /* 2600 */
+  70.00%{opacity:0;transform:scale(2.5)}     /* 2800 */
   100%{opacity:0;transform:scale(2.5)}}
-#packLayer.spielt .pkwave{animation:pkwelle 3000ms linear forwards}
+#packLayer.spielt .pkwave{animation:pkwelle 4000ms linear forwards}
 @keyframes pkwelle{
-  0%,59.43%{opacity:0;width:12px;height:12px;margin:-6px 0 0 -6px}
-  62.23%{opacity:.9;width:40%;height:40%;margin:-20% 0 0 -20%}
-  64.43%{opacity:.75;width:118%;height:118%;margin:-59% 0 0 -59%}
+  0%,47.50%{opacity:0;width:12px;height:12px;margin:-6px 0 0 -6px}
+  55.00%{opacity:.9;width:40%;height:40%;margin:-20% 0 0 -20%}
+  60.00%{opacity:.75;width:118%;height:118%;margin:-59% 0 0 -59%}
   70.00%{opacity:0;width:172%;height:172%;margin:-86% 0 0 -86%}
   100%{opacity:0}}
-/* Die fünf Karten fliegen ab 1933 ms (64,43 %) aus dem Blitz heraus,
-   liegen bei 2400 ms (80 %) und ruhen dann bis zum Schluss — im Video
+/* Die Karten fliegen ab 2400 ms (60 %) aus dem Hoehepunkt heraus,
+   liegen bei 3000 ms (75 %) und ruhen dann bis zum Schluss — im Video
    3 oben, 2 unten. Die Ruhephase ist kein Leerlauf: sie ist der Moment,
-   in dem man sieht, WAS man bekommen hat. */
+   in dem man sieht, WAS man bekommen hat. Sie ist jetzt 1000 ms lang
+   statt 600, weil die Farben bis 3800 nachklingen und die Karten
+   waehrenddessen schon dastehen sollen. */
+/* ⚠ Diese Grundregel war beim Umbau auf 4000 ms verschwunden — ein
+   Ersetzungslauf hatte den Block mitgenommen. Ohne sie ist .pkcard ein
+   Div ohne Position, ohne Groesse und ohne Hintergrund: die Karten
+   fliegen zwar, aber man sieht keine einzige. Gemerkt habe ich es erst,
+   als ich die Einzelbilder ANGESEHEN habe statt sie nur zu messen —
+   die Messung war ueber den Fehler hinweggelaufen. */
 .pkcard{position:absolute;left:50%;top:50%;width:19%;aspect-ratio:.72;
   margin:0;border-radius:7px;opacity:0;
   background:linear-gradient(160deg,#2f4f86,#16233d);
   border:2px solid #c9a24a;box-shadow:0 6px 14px #000000aa;
   transform:translate(-50%,-50%) scale(.3)}
-#packLayer.spielt .pkcard{animation:pkkarte 3000ms cubic-bezier(.2,.9,.25,1) forwards}
+#packLayer.spielt .pkcard{animation:pkkarte 4000ms cubic-bezier(.2,.9,.25,1) forwards}
 @keyframes pkkarte{
-  0%,64.43%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(0)}
-  70.00%{opacity:1;transform:translate(calc(-50% + var(--zx)*.62),calc(-50% + var(--zy)*.62))
+  0%,60.00%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(0)}
+  66.00%{opacity:1;transform:translate(calc(-50% + var(--zx)*.62),calc(-50% + var(--zy)*.62))
         scale(.88) rotate(calc(var(--zr)*1.8))}
-  80.00%{opacity:1;transform:translate(calc(-50% + var(--zx)),calc(-50% + var(--zy)))
+  75.00%{opacity:1;transform:translate(calc(-50% + var(--zx)),calc(-50% + var(--zy)))
         scale(1) rotate(var(--zr))}
   100%{opacity:1;transform:translate(calc(-50% + var(--zx)),calc(-50% + var(--zy)))
         scale(1) rotate(var(--zr))}}
@@ -1419,7 +1576,8 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
 @media (prefers-reduced-motion:reduce){
   #packLayer.spielt .pkglow,#packLayer.spielt .pkart,
   #packLayer.spielt .pkkern,#packLayer.spielt .pkflash,
-  #packLayer.spielt .pkwave,#packLayer.spielt .pkcard{animation-duration:250ms}
+  #packLayer.spielt .pkwave,#packLayer.spielt .pkcard,
+  #packLayer.spielt .pkfarben{animation-duration:250ms}
   .pkring{animation:none}}
 
 /* Nachglühen der aufgedeckten Legendär-Karte */
@@ -6904,6 +7062,11 @@ button.pfplate{cursor:pointer}
     <div class="pkdisc"></div>
     <div class="pkring"></div>
     <div class="pkglow"></div>
+    <!-- Die Farbstrahlen liegen UNTER dem Pack (vor dem <img>), damit sie
+         hinter ihm hervorkommen. Ueber ihm wuerden sie ihn zudecken —
+         und der Pack ist bis zum Bruch das, was man ansehen soll. -->
+    <div class="pkfarben"></div>
+    <div class="pkfarben zwei"></div>
     <div class="pkkern"></div>
     <!-- ⚠ ABSICHTLICH OHNE loading="lazy" (data-eager sagt das der
          Prüfung). Die Bremse gilt für Bilder in Views, die man vielleicht
@@ -9662,8 +9825,10 @@ button.pfplate{cursor:pointer}
    * und zwar genau dann, wenn es das auch sein soll.
    *
    * DAS ÜBERSPRINGEN IST PFLICHT, NICHT KOMFORT
-   * 2,35 s sind beim ersten Mal ein Ereignis und beim fünfzigsten eine
-   * Wartezeit. Ein Tipp irgendwohin bricht ab und springt ans Ende.
+   * 4,0 s sind beim ersten Mal ein Ereignis und beim fünfzigsten eine
+   * Wartezeit — seit dem Umbau auf die gemessene Dauer des Vorbilds gilt
+   * das noch mehr als vorher. Ein Tipp irgendwohin bricht ab und springt
+   * ans Ende.
    * ================================================================= */
   var UIPackOpen = (function () {
     /* Glutfarbe je Pack. Sie muss zur Siegelfarbe IM BILD passen —
@@ -9729,7 +9894,13 @@ button.pfplate{cursor:pointer}
       }
       return raus;
     }
-    var DAUER = 3000, laufend = null;
+    /* 4000 statt 3000 (29.07.2026). Der Grund steht im Blatt bei der
+       Zeittabelle: gemessen am Referenzvideo dauert die Ausstroemung
+       dort 2,40 s und endet bei 4,00 s. Bei 3000 ms war sie nach
+       0,30 s vorbei. Die Zahl steht hier UND im Blatt — deshalb misst
+       die Pruefung sie gegen beide, nicht gegen eine eingefrorene
+       Konstante. */
+    var DAUER = 4000, laufend = null;
 
     function raeumen() {
       var st = $("pkStage"); if (!st) return;

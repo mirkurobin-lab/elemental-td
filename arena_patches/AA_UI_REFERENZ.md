@@ -2617,3 +2617,86 @@ Ansicht) und die Fenster der zweiten Hälfte sind **noch nicht in lesbarer
 Auflösung ausgewertet**. Die Zeitmarken stehen fest, der Weg ist
 eingespielt; es fehlt nur die Übertragung. Bis dahin ist zum Deck-Aufbau
 **nichts belegt** — und deshalb steht hier auch nichts dazu.
+
+---
+
+## 23. Pack-Öffnung: unsere Fassung gegen das Referenzvideo (29.07.2026)
+
+**Anlass.** Rückmeldung des Auftraggebers: *„das Referenz Video hat paar
+mehr Farben die aus dem boosterpack strömen und ist langsamer als unsere,
+unsere braucht dort definitiv einen Feinschliff."* Beides ließ sich
+nachmessen, und beides stimmte.
+
+### 23.1 Wie gemessen wurde
+
+Dieselbe Metrik auf beiden Seiten, sonst vergleicht man nichts:
+Bild auf 108 × 234 verkleinern, je Pixel `colorsys.rgb_to_hls`, alle
+Pixel mit `s > 0,35` **und** `l > 0,25` in **12 Farbtöpfe** einsortieren.
+Ein Topf zählt als **Farbkanal**, sobald er über 0,4 % der Bildfläche
+hält. Dazu die mittlere Helligkeit über das ganze Bild.
+
+Unsere Seite wird **angehalten** aufgenommen, nicht in Echtzeit
+abgeknipst: alle Ebenen bekommen `animation-play-state:paused` und ein
+negatives `animation-delay`. Damit sitzt jedes Bild exakt auf seiner
+Millisekunde und die Messung ist wiederholbar — in Echtzeit trifft man
+den Höhepunkt nur zufällig.
+
+⚠ **Die Karten brauchen im Messstand einen Platzhalter.** `.pkcard` trägt
+im Betrieb nur das Kartenbild vom CDN; örtlich ist das CDN gesperrt
+(DESIGNSYSTEM §7b), die Karten sind dann unsichtbar. Wer so ein Bild
+beurteilt, beurteilt eine Szene ohne ihren Gegenstand — genau das ist mir
+zwischendurch passiert und hat zu einer falschen Korrektur geführt.
+
+### 23.2 Der Vergleich
+
+| | Referenz | wir, vorher | wir, jetzt |
+|---|---|---|---|
+| Farben setzen ein | 1,60 s | 1,80 s | 1,70 s |
+| Höhepunkt | 2,20 – 2,40 s | 1,80 s (**ein** Einzelbild) | 2,20 – 2,40 s |
+| Farbkanäle im Höhepunkt | 4 | 2 | **5** |
+| bunte Fläche | 15 % | 18 %, nur ein Bild | 8,4 % |
+| mittlere Helligkeit | 41 | **76** (weiß ausgebrannt) | 48,9 |
+| zurück auf Ruhe | 4,00 s | 2,10 s | 3,90 s |
+| Dauer der Ausströmung | 2,40 s | 0,30 s | 1,70 s |
+
+**Was geändert wurde:** Gesamtdauer 3000 → 4000 ms; eine eigene
+Farbebene `.pkfarben` (zwei gegenläufig gedrehte Kegelverläufe mit je
+sechs Elementtönen, weiche Kanten, `blur`, nach außen ausdünnende Maske);
+Weißblitz, Kernglut und Schein gedämpft.
+
+**Wo wir noch abweichen:** die bunte Fläche liegt bei 8,4 % statt 15 %.
+Der Rest steckt vermutlich in der Vorlage selbst — deren Spielfläche ist
+schon im Ruhezustand bunter als unsere (unser Ruhewert liegt bei 13,2
+Helligkeit). Weiter aufdrehen ging auf Kosten des Bildes: bei mehr
+Deckkraft und größerem Radius wurde aus dem Strahlen ein **Windrad**, das
+am Ende den ganzen Schirm füllte. Die Zahl allein hätte das durchgewinkt.
+
+### 23.3 Zwei Fehler, die nur der Blick gefunden hat
+
+1. **Die Grundregel `.pkcard{position:absolute;…}` war verschwunden.**
+   Ein Ersetzungslauf beim Umbau auf 4000 ms hatte sie mitgenommen;
+   übrig blieb nur die Animationszeile. Fünf Divs ohne Position, ohne
+   Größe und ohne Fläche fliegen dann unsichtbar durchs Bild — **die
+   Öffnung zeigte keine einzige Karte**, und alle bestehenden Schritte
+   der Prüfung blieben grün, weil sie die Klasse zählen, nicht das Bild.
+   Gefunden habe ich es erst, als ich die Einzelbilder **angesehen** habe.
+   Die Prüfung legt jetzt eine `.pkcard` an und misst nach, ob sie
+   überhaupt eine Fläche hat.
+2. **Der Schein fiel mitten in der Hauptladung zurück** (47,5 % lag unter
+   40 %) — ein vierter Rückfall, wo nur drei hingehören. Entstanden beim
+   Dämpfen, weil ich einen Stop einzeln gesenkt und nicht gegen seinen
+   Nachbarn geprüft habe. **Das hat umgekehrt die Prüfung gefunden und
+   das Auge nicht.** Beide Wege werden gebraucht.
+
+### 23.4 Offen: haben die Pack-Bilder einen Alphakanal?
+
+Im Messbild liegt hinter dem Pack ein **schwarzer Kasten**. Die
+archivierte Fassung (`assets/pack_gold.webp`) hat nachweislich keinen
+Alphakanal — Ecken `(0,0,0)`, Modus `RGB`. Das Archiv holt die
+`_min.webp`-Fassung vom CDN, und die ist flachgerechnet; ob das **PNG**,
+das der Prototyp lädt, Alpha trägt, **ist von hier aus nicht prüfbar**
+(CONNECT auf `*.cloudfront.net` ist gesperrt, siehe
+`assets/NICHT_ERREICHBAR.json`). Falls nicht, zeigt auch die Live-Fassung
+den Kasten und die Bilder müssen durch `remove_background`. **Zu prüfen,
+sobald die Live-Vorschau wieder erreichbar ist** — vorher ist jede
+Änderung daran geraten.

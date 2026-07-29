@@ -1,6 +1,6 @@
 # Prüfungen
 
-Sechzehn Playwright-Suiten mit zusammen **1 120 Schritten**, plus zwei
+Sechzehn Playwright-Suiten mit zusammen **1 133 Schritten**, plus zwei
 Sonderprüfungen, die nur mit tatsächlich geladenen Bildern laufen.
 
 ## Aufruf
@@ -36,7 +36,7 @@ direkt — kein Server, kein Build.
 | `shop_raender.js` | 20 | Randfarben: Inhalt (Kristall/Gold) und Produktfamilie (Packs) |
 | `flug.js` | 12 | Sammel-Animation — aus JEDEM Fenster, nicht nur aus dem Shop |
 | `community.js` | 89 | Community-Reiter: Marken, echte Ziele |
-| `packoeffnung.js` | 47 | Pack-Öffnung: gemessene Zeitkurve, Abbruch, Neustart, **Raritäts-Leiter der Aufdeckung** |
+| `packoeffnung.js` | 60 | Pack-Öffnung: Zeitkurve **gekoppelt statt eingefroren**, Farbausströmung, sichtbare Karten, Abbruch, Neustart, **Raritäts-Leiter der Aufdeckung** |
 | `quoten.js` | 48 | Drop-Raten hinter dem ⓘ — Auflage nach Apple 3.1.1 / Google Play |
 | `essenzen.js` | 33 | Eine Essenz je Karte: Sortenliste == Kartenliste, Ankündigung == Buchung, Fach/Detail/Shop/Pass |
 | `guide.js` | 36 | Defenders Guide: bewegbare Reiterleiste, großes Icon am offenen Reiter, Gegner/Boss als eigene Reiter, kein Booster-Reiter |
@@ -94,6 +94,51 @@ wird nicht gegen eine feste Prozentzahl geprüft, sondern gegen die
 `HERO_WEIGHT` stillschweigend überschrieben. Und weil sich die beiden
 Kurven ohnehin ähneln, prüft ein eigener Schritt die Kopplung direkt:
 *jeder Essenz-Posten gehört zu einer Karte aus DIESEM Pack.*
+
+## Eine eingefrorene Zahl sagt „falsch" zur richtigen Änderung
+
+`packoeffnung.js` hatte die Gesamtdauer der Öffnungsszene als `ms / 30`
+eingebaut — 3 000 ms, hart. Als die Szene am 29.07.2026 auf 4 000 ms
+verlangsamt wurde (**weil** die Messung gegen das Referenzvideo genau das
+verlangte), meldete die Prüfung Fehler. Nicht weil etwas kaputt war,
+sondern weil sie eine Zahl festhielt statt einer Aussage.
+
+Sie liest die Dauer jetzt dort, wo sie steht, und prüft die **Kopplung**:
+alle `pk`-Ebenen laufen auf **einer** Dauer, und das CSS trägt dieselbe
+wie die JS-Konstante `DAUER`. Laufen die beiden auseinander, fällt der
+Vorhang mitten in der Bewegung — das ist der Fehler, der wirklich weh
+tut, und den hätte keine Zahl gefunden.
+
+Ebenso ersetzt sind die absoluten Schwellen der Glutkurve („springt auf
+über 0,9"). Die wurden falsch, als der Schein **gedämpft** wurde — er war
+mit 0,9 so hell, dass er die Farben ausbrannte (Helligkeit 76 gegen 41 im
+Vorbild). Geprüft wird jetzt das Verhältnis: *der Hauptschlag liegt
+mindestens doppelt über dem stärksten Puls davor*. Wie hell er absolut
+ist, entscheidet die Messung gegen das Video — nicht die Prüfdatei.
+
+## Messen und Ansehen finden verschiedene Fehler
+
+Am selben Nachmittag, an derselben Szene, zwei Fehler:
+
+* **Nur das Auge fand ihn:** die Grundregel `.pkcard{position:absolute;…}`
+  war bei einem Ersetzungslauf verschwunden. Die Karten flogen unsichtbar
+  durchs Bild — **die Öffnung zeigte keine einzige Karte**. Alle Schritte
+  blieben grün, denn sie zählen die Klasse, nicht die Fläche. Jetzt legt
+  die Prüfung eine `.pkcard` an und misst nach, ob sie eine hat.
+* **Nur die Messung fand ihn:** der Schein fiel bei 47,5 % unter seinen
+  Wert bei 40 % zurück — ein vierter Rückfall, wo nur drei hingehören.
+  Auf dem Schirm ist das nicht zu sehen; die Zählung der Täler meldete es
+  sofort.
+
+Beide Wege werden gebraucht. Eine Suite, die nur misst, übersieht ein
+leeres Bild; ein Blick, der nur schaut, übersieht eine Delle in einer
+Kurve.
+
+⚠ Und für Bildurteile gilt DESIGNSYSTEM §7b doppelt: örtlich ist das CDN
+gesperrt, `.pkcard` trägt **nur** das Kartenbild. Wer so ein Messbild
+beurteilt, beurteilt eine Szene ohne ihren Gegenstand. Der Messstand
+setzt deshalb einen Platzhalter ein — sonst führt der Blick in die Irre,
+und zwar überzeugend.
 
 ## Keine Prüfung darf an ihrer eigenen Laufzeit hängen
 

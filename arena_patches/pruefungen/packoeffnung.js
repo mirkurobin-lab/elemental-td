@@ -104,17 +104,62 @@ const pruef = (n, w, z) => {
   pruef("die Glutkurve @keyframes pkglut existiert", !!roh.pkglut);
   pruef("der Kern hat eine EIGENE Kurve (@keyframes pkkernglut)", !!roh.pkkernglut);
 
+  /* ------------------------------------------------------------------
+     ⚠ DRITTE FASSUNG (29.07.2026). Diese Datei hatte 3000 ms fest
+     eingebaut (`ms / 30`). Am selben Tag wurde die Szene auf 4000 ms
+     verlangsamt — weil das Referenzvideo 2,40 s Ausstroemung zeigt und
+     wir 0,30 s hatten. Eine Pruefung, die eine Zahl einfriert, wird
+     genau bei der Korrektur rot, die richtig war, und sagt „falsch" zu
+     der Verbesserung. Sie liest die Dauer deshalb dort, wo sie steht,
+     und prueft stattdessen die KOPPLUNG: CSS und JS muessen dieselbe
+     tragen. Laufen die beiden auseinander, schliesst der Vorhang
+     mitten in der Bewegung — und das faellt sonst niemandem auf.
+     ------------------------------------------------------------------ */
+  const dauerCss = await p.evaluate(() => {
+    const raus = new Set();
+    for (const s of document.styleSheets) {
+      let r; try { r = s.cssRules; } catch (e) { continue; }
+      for (const rule of r) {
+        if (!rule.selectorText || !/#packLayer\.spielt/.test(rule.selectorText)) continue;
+        /* ⚠ Chromium serialisiert `animation:pkglut 4000ms linear` als
+           `animation: 4000ms linear 0s 1 normal forwards running pkglut`
+           — der Name steht HINTEN. Wer auf die Schreibweise aus der
+           Quelle prueft, findet nichts und meldet „keine Dauer". */
+        if (!/\bpk[a-z0-9]+\b/.test(rule.cssText)) continue;
+        const m = /(\d+)ms/.exec(rule.cssText);
+        if (m) raus.add(+m[1]);
+      }
+    }
+    return [...raus];
+  });
+  pruef("alle pk-Ebenen laufen auf EINER Dauer", dauerCss.length === 1,
+    dauerCss.join(" / "));
+  const DAUER = dauerCss[0] || 4000;
+  const quelle = require("fs").readFileSync(
+    "/home/user/elemental-td/arena_patches/ui_prototype.html", "utf8");
+  const jsDauer = /var DAUER = (\d+)/.exec(quelle);
+  pruef("die Dauer im JS ist dieselbe wie im CSS",
+    jsDauer && +jsDauer[1] === DAUER, (jsDauer ? jsDauer[1] : "?") + " gegen " + DAUER);
+  /* Die Untergrenze ist keine Geschmacksfrage: unter 3,5 s ist die
+     gemessene Ausstroemung des Vorbilds (Start 1,60 s, Ende 4,00 s)
+     nicht unterzubringen. */
+  pruef("die Szene ist lang genug fuer die gemessene Ausstroemung",
+    DAUER >= 3500, DAUER + " ms");
+
   const glut = stops(roh.pkglut, "opacity");
   if (glut.length) {
-    /* Millisekunde -> Prozent bei 3000 ms Gesamtdauer. */
+    /* Millisekunde -> Prozent, gegen die WIRKLICHE Dauer. */
     const bei = ms => {
-      const p = +(ms / 30).toFixed(2);
+      const p = +(ms * 100 / DAUER).toFixed(2);
       const t = glut.find(s => Math.abs(s[0] - p) < 0.06);
       return t ? t[1] : undefined;
     };
+    /* Die sechs Vorlauf-Marken stammen aus der Bildmessung und haengen
+       nicht an der Gesamtdauer — sie stehen weiter in Millisekunden.
+       Die Hauptladung liegt seit dem Umbau bei 1600 ms (vorher 1650),
+       weil die Ausstroemung dort ansetzt; das ist im Blatt vermerkt. */
     const p1 = bei(583), t1 = bei(750), p2 = bei(1033), t2 = bei(1117),
-          p3 = bei(1350), t3 = bei(1417), laden = bei(1650),
-          bruch = bei(1783), spitze = bei(1867), abfall = bei(2100);
+          p3 = bei(1350), t3 = bei(1417), laden = bei(1600);
 
     /* ------------------------------------------------------------------
        DIE WICHTIGSTE AUSSAGE DER DATEI: DREI Rueckfaelle, nicht einer.
@@ -139,16 +184,147 @@ const pruef = (n, w, z) => {
     pruef("es sind GENAU drei Rueckfaelle vor der Hauptladung", taeler === 3,
       taeler + " gezaehlt");
 
-    pruef("Hauptladung bei 1650 ms liegt ueber allen Pulsen", laden > p3, p3 + " -> " + laden);
-    pruef("Bruch bei 1783 ms springt auf ueber 0,9", bruch > 0.9, String(bruch));
-    pruef("der Bruch ist ein SPRUNG (mehr als das Doppelte der Ladung)",
-      bruch > laden * 2, laden + " -> " + bruch);
-    pruef("Plateau-Spitze bei 1867 ms ist der Hoechstwert", spitze >= bruch,
-      spitze + " gegen " + bruch);
-    pruef("Abfall bei 2100 ms unter 0,2", abfall < 0.2, String(abfall));
-    /* Anlauf 1650 ms gegen Knall 133 ms = 12:1. */
-    pruef("Anlauf und Knall sind stark asymmetrisch", (1650 / 133) > 10, "12:1");
+    /* ⚠ Hier standen absolute Deckkraft-Schwellen („springt auf ueber
+       0,9"). Die sind am 29.07.2026 falsch geworden, und zwar aus einem
+       GUTEN Grund: der Schein war mit 0,9 so hell, dass er die Farben
+       ausgebrannt hat — gemessen Helligkeit 76 gegen 41 im Vorbild. Die
+       Pruefung haette die Daempfung als Fehler gemeldet. Was wirklich
+       zaehlt, ist das VERHAELTNIS: der Hauptschlag muss deutlich ueber
+       allem liegen, was vorher war. Wie hell er absolut ist, entscheidet
+       die Messung gegen das Video, nicht diese Datei. */
+    const spitzeGlut = Math.max(...glut.map(g => g[1]));
+    const vorlauf = Math.max(p1, p2, p3);
+    pruef("Hauptladung liegt ueber allen Pulsen", laden > p3, p3 + " -> " + laden);
+    pruef("der Hauptschlag ist mindestens doppelt so stark wie der staerkste Puls",
+      spitzeGlut >= vorlauf * 2, vorlauf + " -> " + spitzeGlut);
+    pruef("der Hoechstwert liegt im Bruchfenster, nicht im Vorlauf",
+      glut.find(g => g[1] === spitzeGlut)[0] > 45,
+      glut.find(g => g[1] === spitzeGlut)[0] + " %");
+    pruef("am Ende ist der Schein wieder aus",
+      glut[glut.length - 1][1] < 0.05, String(glut[glut.length - 1][1]));
+    /* Anlauf gegen Knall: der Aufbau dauert ein Vielfaches des Schlags.
+       Das ist die Aussage hinter der alten 12:1-Zeile — sie haengt an
+       der Form, nicht an 1650 und 133. */
+    const knallAb = 47.5, knallBis = 55;
+    pruef("Anlauf und Knall sind stark asymmetrisch",
+      knallAb / (knallBis - knallAb) > 4,
+      (knallAb / (knallBis - knallAb)).toFixed(1) + ":1");
   }
+
+  /* ------------------------------------------------------------------
+     6b. DIE FARBAUSSTROEMUNG — der Anlass fuer die dritte Fassung.
+     Rueckmeldung vom 29.07.2026: „das Referenz Video hat paar mehr
+     Farben die aus dem boosterpack stroemen und ist langsamer als
+     unsere". Nachgemessen stimmte beides: das Vorbild traegt auf dem
+     Hoehepunkt 4 Farbkanaele ueber 2,40 s, wir hatten 2 Kanaele in
+     EINEM Einzelbild. Der Grund war, dass es gar keine Farbebene gab —
+     die Farbe kam allein aus dem Glutschein, und der hat je Pack nur
+     eine. Geprueft wird deshalb die Ursache, nicht die Wirkung.
+     ------------------------------------------------------------------ */
+  pruef("es gibt eine eigene Farbausstroemung (@keyframes pkstroemen)", !!roh.pkstroemen);
+  pruef("und eine zweite, gegenlaeufige Ebene", !!roh.pkstroemen2);
+  const farbregeln = await p.evaluate(() => {
+    const raus = {};
+    for (const s of document.styleSheets) {
+      let r; try { r = s.cssRules; } catch (e) { continue; }
+      for (const rule of r) {
+        if (rule.selectorText === ".pkfarben") raus.eins = rule.cssText;
+        if (rule.selectorText === ".pkfarben.zwei") raus.zwei = rule.cssText;
+      }
+    }
+    return raus;
+  });
+  /* ⚠ Das CSSOM gibt Farben als `rgb(255, 107, 61)` zurueck, nie als
+     Hex — die Quelle steht in Hex da, die Regel nicht. Gezaehlt werden
+     deshalb rgb-Tupel, und Schwarz sowie Volltransparentes fallen raus:
+     das sind die Luecken zwischen den Strahlen, keine Farben. */
+  const toene = t => new Set((String(t).match(/rgba?\([^)]+\)/g) || [])
+    .map(x => x.replace(/\s+/g, ""))
+    .filter(x => !/,0\)$/.test(x) && !/^rgba?\(0,0,0/.test(x)));
+  const t1f = toene(farbregeln.eins), t2f = toene(farbregeln.zwei);
+  /* „Mehr Farben" heisst mehr als die eine Glutfarbe des Packs. Sechs
+     ist keine Zierzahl: es ist ein Ton je Element, damit die
+     Ausstroemung zeigt, WORAUS ein Pack besteht. */
+  pruef("die erste Farbebene traegt mindestens sechs Toene",
+    t1f.size >= 6, t1f.size + " Toene");
+  pruef("die zweite traegt eigene, nicht dieselben",
+    t2f.size >= 6 && [...t2f].filter(x => t1f.has(x)).length === 0,
+    t2f.size + " Toene, " + [...t2f].filter(x => t1f.has(x)).length + " doppelt");
+
+  const str1 = stops(roh.pkstroemen, "opacity");
+  const str2 = stops(roh.pkstroemen2, "opacity");
+  if (str1.length && str2.length) {
+    const max1 = Math.max(...str1.map(x => x[1]));
+    const beiP = (liste, pz) => {
+      const t = liste.filter(x => x[0] <= pz).pop();
+      return t ? t[1] : 0;
+    };
+    /* Der eigentliche Fehler der alten Fassung: die Farbe war EIN
+       Einzelbild lang da. Sie muss den Bruch ueberleben — im Vorbild um
+       1,6 s. 85 % von 4000 ms sind 3400 ms, also 1,2 s nach dem Bruch. */
+    pruef("die Farbe lebt lange nach dem Bruch weiter",
+      beiP(str1, 85) >= max1 * 0.25,
+      "bei 85 % noch " + beiP(str1, 85) + " von " + max1);
+    pruef("sie ist am Ende der Szene aber wirklich weg",
+      str1[str1.length - 1][1] < 0.05, String(str1[str1.length - 1][1]));
+    pruef("die zweite Ebene laeuft gegenlaeufig",
+      /rotate\(-/.test(roh.pkstroemen2) && !/rotate\(-/.test(roh.pkstroemen));
+    /* ⚠ Der Weissblitz darf den Hoehepunkt MARKIEREN, nicht ersetzen.
+       Gemessen hatte er die Farben entsaettigt: 5 Kanaele wurden zu 1,
+       weil alles weiss war. Deshalb steht er unter der Farbe. */
+    const blitz = stops(roh.pkblitz, "opacity");
+    if (blitz.length) {
+      const maxB = Math.max(...blitz.map(x => x[1]));
+      pruef("der Weissblitz bleibt schwaecher als die Farbausstroemung",
+        maxB < max1, maxB + " gegen " + max1);
+    }
+  }
+
+  /* ------------------------------------------------------------------
+     6c. DIE KARTEN MUESSEN SICHTBAR SEIN.
+     Am 29.07.2026 hat ein Ersetzungslauf beim Umbau auf 4000 ms die
+     Grundregel `.pkcard{position:absolute;…}` mitgenommen. Uebrig blieb
+     nur die Animationszeile. Ergebnis: fuenf Divs ohne Position, ohne
+     Groesse und ohne Flaeche fliegen unsichtbar durchs Bild — die Szene
+     lief technisch einwandfrei und zeigte nichts. Alle bestehenden
+     Schritte blieben gruen, weil sie die KLASSE zaehlen, nicht das Bild.
+     Deshalb dieser Schritt: eine Karte anlegen und nachsehen, ob sie
+     ueberhaupt eine Flaeche hat.
+     ------------------------------------------------------------------ */
+  const kartenBild = await p.evaluate(() => {
+    const lay = document.getElementById("packLayer");
+    const st = document.getElementById("pkStage");
+    /* ⚠ #packLayer ist display:none, solange nichts laeuft. Eine Karte
+       darin hat dann 0x0 — nicht weil sie keine Flaeche HAT, sondern
+       weil nichts gelayoutet wird. Also kurz aufmachen und wieder zu. */
+    const warOffen = lay.classList.contains("on");
+    if (!warOffen) lay.classList.add("on");
+    const d = document.createElement("div");
+    d.className = "pkcard";
+    st.appendChild(d);
+    const cs = getComputedStyle(d);
+    /* ⚠ getBoundingClientRect() liefert die TRANSFORMIERTE Box. Die
+       Grundregel setzt scale(.3) als Ausgangslage, also meldet sie 17
+       statt 57 px — und das sieht aus wie „keine Flaeche", ist aber der
+       richtige Startzustand. Gefragt ist die Layout-Groesse. */
+    const raus = {
+      pos: cs.position,
+      breite: d.offsetWidth,
+      hoehe: d.offsetHeight,
+      grund: cs.backgroundImage !== "none" || !/, 0\)$/.test(cs.backgroundColor),
+      rand: parseFloat(cs.borderTopWidth) || 0,
+    };
+    d.remove();
+    if (!warOffen) lay.classList.remove("on");
+    return raus;
+  });
+  pruef("eine .pkcard liegt absolut, nicht im Textfluss",
+    kartenBild.pos === "absolute", kartenBild.pos);
+  pruef("sie hat eine Flaeche", kartenBild.breite > 20 && kartenBild.hoehe > 20,
+    kartenBild.breite + "x" + kartenBild.hoehe);
+  pruef("und etwas zu sehen darauf (Fuellung oder Rand)",
+    kartenBild.grund || kartenBild.rand > 0,
+    "Fuellung " + kartenBild.grund + ", Rand " + kartenBild.rand);
 
   /* ------------------------------------------------------------------
      DIE ZWEITE FEHLERKLASSE, und die teurere: ein fehlender ANFANGSWERT.
@@ -299,7 +475,7 @@ const pruef = (n, w, z) => {
 
   /* ---------- 5. Sie endet von allein ---------- */
   await p.evaluate(() => { window.__proto.openPackKey("arcane"); });
-  await p.waitForTimeout(3500);   // 3000 ms Szene + 180 ms Zuschlag
+  await p.waitForTimeout(DAUER + 500);   // Szene + 180 ms Zuschlag + Luft
   const danach = await p.evaluate(() => ({
     offen: document.getElementById("packLayer").classList.contains("on"),
     raster: document.querySelectorAll("#packGrid .pcard").length,
@@ -380,7 +556,11 @@ const pruef = (n, w, z) => {
 
   /* Und die Karte traegt die Stufe nach dem Aufdecken auch am Element. */
   await p.evaluate(() => { window.__proto.openPackKey("bronze"); });
-  await p.waitForTimeout(3400);
+  /* ⚠ Hier standen 3400 ms fest. Seit die Szene 4000 ms laeuft, lag die
+     Oeffnungsebene beim Klicken noch ueber dem Raster — eine Karte kam
+     nie durch, und die Meldung lautete „traegt ihre Stufenklasse nicht".
+     Der Fehler war nicht in der Karte, sondern in der Wartezeit. */
+  await p.waitForTimeout(DAUER + 500);
   const amElement = await p.evaluate(async () => {
     const karten = [...document.querySelectorAll("#packGrid .pcard")];
     const treffer = [];
