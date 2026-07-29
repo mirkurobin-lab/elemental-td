@@ -75,7 +75,16 @@ import numpy as np
 from PIL import Image
 
 # Randlos gedachte Bilder: hier waere ein Schnitt immer falsch.
-AUSNAHME = re.compile(r"^(arena\d+|card_|tk_|tz_|event_|kulisse|pack_arena|packart_|bg_|fort_castle)")
+#
+# ⚠ Das Muster greift nur PRAEFIXE — und genau daran ist es vorbeigelaufen:
+# `guide_keyart` und `community_keyart` sind Kulissen, heissen aber nicht
+# `bg_*`. Sie wurden freigestellt und verloren dabei zwei Drittel ihrer
+# Flaeche. Ein Namensmuster ist eine Vermutung ueber die Rolle eines
+# Bildes; das Verzeichnis WEISS sie. Deshalb entscheidet jetzt zuerst das
+# Feld `typ` aus ui_assets.json, und der Namensvergleich ist nur noch der
+# Rueckfall fuer Eintraege ohne Typ.
+AUSNAHME = re.compile(r"^(arena\d+|card_|tk_|tz_|event_|kulisse|pack_arena|packart_|bg_|fort_castle)"
+                      r"|_keyart$")
 
 MIND_DECKEND = 0.10   # bleibt weniger uebrig, ist der Schnitt falsch
 MIND_GRUND = 0.03     # darunter lohnt der Eingriff nicht
@@ -161,7 +170,9 @@ def lauf(ordner, pfad_json):
         if k is None:
             unbekannt.append(stamm)
             continue
-        if AUSNAHME.match(k):
+        # `search`, NICHT `match`: die Endung `_keyart$` in AUSNAHME kann
+        # ein am Anfang verankerter Vergleich gar nicht finden.
+        if AUSNAHME.search(k):
             ausn.append(k)
             continue
         try:
