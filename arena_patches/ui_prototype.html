@@ -1036,6 +1036,137 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
 #cineLayer .cineskip{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);
   border-radius:11px;padding:9px 20px;font-size:12px;font-weight:900;
   background:#0e1418c4;border:1px solid #e0b94a66;color:#f4e3a6}
+/* =====================================================================
+   PACK-ÖFFNUNG — die Kurve stammt aus dem Video, nicht aus dem Gefühl
+   =====================================================================
+   Vorbild ist das Drive-Video vom 29.07.2026 (Hearthstone „Rise of
+   Shadows"-Pack). Ausgewertet wurden ALLE 180 Einzelbilder: je Bild die
+   mittlere Helligkeit der Spielfläche und der Magenta-Anteil. Daraus
+   die Zeitpunkte unten — sie sind gemessen, nicht geschätzt.
+
+     0–220 ms    Ruhe            Mittel 26, Magenta 0,3 %
+     220–550     erster Puls     26 → 54,  Magenta → 13 %
+     550–800     Atemzug zurück  54 → 35,  Magenta → 4 %
+     800–1150    zweiter Anstieg 35 → 40
+     1150–1680   Hauptladung     41 → 92,  Magenta 10 → 29 %
+     1680–1790   BRUCH           92 → 192 in 110 ms
+     1790–1930   Halten + Welle  Plateau 186–195, Magenta-Spitze 72 %
+     1950–2050   Abfall          192 → 58 in 120 ms
+     2050–2350   Karten legen    Mittel ~48, Magenta 1 %
+
+   ZWEI SACHEN TRAGEN DEN GANZEN EFFEKT, und beide sieht man erst beim
+   Nachmessen:
+
+   1. Der RÜCKFALL bei 550–800 ms. Ohne dieses Zurückatmen wirkt der
+      Knall billig. Nachbauten lassen ihn fast immer weg, weil er sich
+      beim Ansehen wie eine Panne anfühlt.
+   2. Aufbau und Abbau sind ASYMMETRISCH: 530 ms hinauf, 120 ms hinunter,
+      Verhältnis 4,4:1. Symmetrisch gebaut wirkt die Explosion weich.
+
+   Die Prozentmarken unten sind 220/2350, 550/2350 usw. — deshalb die
+   krummen Zahlen. Wer die Dauer ändert, muss sie neu ausrechnen; die
+   Millisekunden oben sind die Wahrheit, nicht die Prozente.
+
+   Warum CSS und kein Video: örtlich ist das CDN nicht erreichbar
+   (DESIGNSYSTEM §7b). Ein Video wäre genau in der Umgebung schwarz, in
+   der wir prüfen.                                                      */
+#packLayer{position:fixed;inset:0;z-index:275;display:none;
+  background:radial-gradient(120% 90% at 50% 42%,#141020,#05070b 70%);
+  align-items:center;justify-content:center;overflow:hidden}
+#packLayer.on{display:flex}
+/* Die Bühne: dunkle Steinscheibe HINTER dem Pack. Sie gehört nicht zum
+   Pack — im Shop-Ikon taucht sie deshalb nicht auf. */
+.pkstage{position:relative;width:min(78vw,300px);aspect-ratio:1;
+  display:flex;align-items:center;justify-content:center}
+.pkdisc{position:absolute;inset:6%;border-radius:50%;
+  background:radial-gradient(circle at 50% 44%,#1b2230,#0a0e15 68%,#070a10);
+  box-shadow:inset 0 2px 0 #ffffff10,inset 0 -12px 26px #00000090,0 0 0 1px #ffffff08}
+.pkring{position:absolute;inset:2%;border-radius:50%;
+  border:2px solid currentColor;opacity:.16;
+  animation:pkspin 5.2s linear infinite}
+@keyframes pkspin{to{transform:rotate(360deg)}}
+/* Der Schein. `currentColor` ist die Glutfarbe des jeweiligen Packs —
+   gesetzt von JS über style.color, damit Bronze bernstein glüht und
+   nur Arcane magenta. */
+.pkglow{position:absolute;inset:-30%;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,currentColor 0%,transparent 62%);
+  opacity:0;mix-blend-mode:screen}
+.pkart{position:relative;width:58%;filter:drop-shadow(0 12px 22px #000000aa)}
+/* Weißblitz und Druckwelle liegen ÜBER dem Pack. */
+.pkflash{position:absolute;inset:0;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,#fff 0%,#fff 18%,transparent 60%);
+  opacity:0;mix-blend-mode:screen}
+.pkwave{position:absolute;left:50%;top:50%;width:12px;height:12px;
+  margin:-6px 0 0 -6px;border-radius:50%;pointer-events:none;
+  border:3px solid currentColor;opacity:0}
+/* Die Glutkurve: opacity folgt der gemessenen Helligkeit,
+   normiert als (Mittel − 26) / (192 − 26). */
+#packLayer.spielt .pkglow{animation:pkglut 2350ms linear forwards}
+@keyframes pkglut{
+  0%{opacity:0;transform:scale(.72)}
+  9.4%{opacity:0;transform:scale(.72)}
+  23.4%{opacity:.169;transform:scale(.90)}   /* erster Puls */
+  34.0%{opacity:.054;transform:scale(.80)}   /* Atemzug zurück */
+  48.9%{opacity:.084;transform:scale(.84)}
+  71.5%{opacity:.398;transform:scale(1.02)}  /* Hauptladung */
+  76.2%{opacity:.892;transform:scale(1.35)}  /* Bruch */
+  82.1%{opacity:1;transform:scale(1.55)}
+  87.2%{opacity:.193;transform:scale(1.20)}  /* Abfall, 120 ms */
+  100%{opacity:.13;transform:scale(1.05)}}
+/* Der Pack selbst: leichtes Atmen, dann Zittern, dann weg. Das Zittern
+   beginnt erst mit der Hauptladung (1150 ms = 48,9 %). */
+#packLayer.spielt .pkart{animation:pkbeben 2350ms linear forwards}
+@keyframes pkbeben{
+  0%{transform:translate(0,0) scale(1);filter:brightness(1)}
+  23.4%{transform:translate(0,-2px) scale(1.02);filter:brightness(1.15)}
+  34.0%{transform:translate(0,0) scale(1);filter:brightness(1)}
+  50%{transform:translate(-1px,1px) scale(1.01);filter:brightness(1.1)}
+  56%{transform:translate(2px,-1px) scale(1.02)}
+  62%{transform:translate(-2px,0) scale(1.03)}
+  68%{transform:translate(2px,1px) scale(1.04);filter:brightness(1.5)}
+  71.5%{transform:translate(0,0) scale(1.06);filter:brightness(1.9)}
+  76.2%{transform:scale(1.30);filter:brightness(3.4);opacity:.55}
+  82.1%{transform:scale(1.6);filter:brightness(4);opacity:0}
+  100%{transform:scale(1.6);opacity:0}}
+#packLayer.spielt .pkflash{animation:pkblitz 2350ms linear forwards}
+@keyframes pkblitz{
+  0%,71.5%{opacity:0;transform:scale(.2)}
+  76.2%{opacity:.85;transform:scale(1.5)}   /* 110 ms hinauf */
+  82.1%{opacity:1;transform:scale(2.1)}
+  87.2%{opacity:.12;transform:scale(2.4)}   /* 120 ms hinunter */
+  100%{opacity:0;transform:scale(2.6)}}
+#packLayer.spielt .pkwave{animation:pkwelle 2350ms linear forwards}
+@keyframes pkwelle{
+  0%,71.5%{opacity:0;width:12px;height:12px;margin:-6px 0 0 -6px}
+  76.2%{opacity:.9}
+  82.1%{opacity:.55;width:118%;height:118%;margin:-59% 0 0 -59%}
+  90%{opacity:0;width:160%;height:160%;margin:-80% 0 0 -80%}
+  100%{opacity:0}}
+/* Die fünf Karten fliegen ab 2050 ms (87,2 %) aus der Mitte an ihren
+   Platz — im Video 3 oben, 2 unten. */
+.pkcard{position:absolute;left:50%;top:50%;width:19%;aspect-ratio:.72;
+  margin:0;border-radius:7px;opacity:0;
+  background:linear-gradient(160deg,#2f4f86,#16233d);
+  border:2px solid #c9a24a;box-shadow:0 6px 14px #000000aa;
+  transform:translate(-50%,-50%) scale(.3)}
+#packLayer.spielt .pkcard{animation:pkkarte 2350ms cubic-bezier(.2,.9,.25,1) forwards}
+@keyframes pkkarte{
+  0%,82.1%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(0)}
+  87.2%{opacity:1;transform:translate(calc(-50% + var(--zx)*.55),calc(-50% + var(--zy)*.55))
+        scale(.9) rotate(calc(var(--zr)*1.6))}
+  100%{opacity:1;transform:translate(calc(-50% + var(--zx)),calc(-50% + var(--zy)))
+        scale(1) rotate(var(--zr))}}
+.pkskip{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);
+  border-radius:11px;padding:9px 20px;font-size:12px;font-weight:900;
+  background:#0e1418c4;border:1px solid #e0b94a66;color:#f4e3a6}
+/* Wer Bewegung reduziert hat, bekommt die Aussage ohne die Show:
+   der Bruch ist dann ein kurzer Blitz, kein 2,3-Sekunden-Bogen. */
+@media (prefers-reduced-motion:reduce){
+  #packLayer.spielt .pkglow,#packLayer.spielt .pkart,
+  #packLayer.spielt .pkflash,#packLayer.spielt .pkwave,
+  #packLayer.spielt .pkcard{animation-duration:250ms}
+  .pkring{animation:none}}
+
 /* Nachglühen der aufgedeckten Legendär-Karte */
 .pcard.legend .pcfront{box-shadow:inset 0 0 0 2px #fff7d6,0 0 22px 4px currentColor}
 .pcard.legend{animation:legendafter 1.6s ease-out}
@@ -6347,6 +6478,29 @@ button.pfplate{cursor:pointer}
   <div class="cinefall"></div>
   <button class="cineskip pressable" id="cineSkip">Weiter</button>
 </div>
+
+<!-- ===== PACK-ÖFFNUNG =====
+     Der Ablauf steht als Zeittabelle im CSS bei #packLayer; er ist aus
+     allen 180 Einzelbildern des Drive-Videos gemessen. Hier nur der
+     Aufbau: Scheibe, Ring, Schein, Pack, Blitz, Welle, fünf Karten.
+     Die Karten liegen ÜBER dem Blitz, damit sie aus ihm herauskommen
+     und nicht hinter ihm. -->
+<div id="packLayer" aria-hidden="true">
+  <div class="pkstage" id="pkStage">
+    <div class="pkdisc"></div>
+    <div class="pkring"></div>
+    <div class="pkglow"></div>
+    <!-- ⚠ ABSICHTLICH OHNE loading="lazy" (data-eager sagt das der
+         Prüfung). Die Bremse gilt für Bilder in Views, die man vielleicht
+         nie sieht — hier ist das Gegenteil der Fall: das Bild IST die
+         Szene, und die beginnt in dem Moment, in dem getippt wird.
+         Verzögert geladen käme der Pack erst, wenn er schon glüht. -->
+    <img class="pkart" id="pkArt" alt="" decoding="async" data-eager="Oeffnungsszene">
+    <div class="pkflash"></div>
+    <div class="pkwave"></div>
+  </div>
+  <button class="pkskip pressable" id="pkSkip">Überspringen</button>
+</div>
 <div id="fxLayer"></div>
 
 <!-- ===== Angebots-Popup =====
@@ -8672,6 +8826,108 @@ button.pfplate{cursor:pointer}
     $("pityLine").innerHTML = ico("frame_epic", "🛟") + " <b>Episch</b> garantiert in ≤" + p.epicIn +
       " Packs · <span class=\"leg\">Legendär</span> in ≤" + p.legendaryIn;
   }
+  /* ===================================================================
+   * UIPackOpen — die Öffnungsszene.
+   *
+   * Die Zeitkurve liegt im CSS (@keyframes bei #packLayer) und ist aus
+   * dem Drive-Video gemessen. Dieses Modul macht nur drei Dinge:
+   * das richtige Packbild einsetzen, die Glutfarbe setzen, die Karten
+   * an ihre Endplätze rechnen — und danach aus dem Weg gehen.
+   *
+   * WARUM DIE GLUT JE PACK EINE ANDERE FARBE HAT
+   * Im Vorbild glüht der Pack magenta. Acht Packs, die alle identisch
+   * magenta explodieren, verschenken aber genau das, was den Moment
+   * wertvoll macht: die Stufe. Deshalb glüht jeder Pack in der Farbe
+   * seines eigenen Siegels, und Magenta bleibt dem Arcane-Pack — dem
+   * teuersten — vorbehalten. Es ist damit das stärkste Bild im Spiel,
+   * und zwar genau dann, wenn es das auch sein soll.
+   *
+   * DAS ÜBERSPRINGEN IST PFLICHT, NICHT KOMFORT
+   * 2,35 s sind beim ersten Mal ein Ereignis und beim fünfzigsten eine
+   * Wartezeit. Ein Tipp irgendwohin bricht ab und springt ans Ende.
+   * ================================================================= */
+  var UIPackOpen = (function () {
+    /* Glutfarbe je Pack. Sie muss zur Siegelfarbe IM BILD passen —
+       steht eine Farbe hier anders als im Artwork, sieht es aus wie ein
+       Fehler in der Beleuchtung, nicht wie eine Entscheidung. */
+    var GLUT = {
+      bronze: "#f0a23c", silver: "#7fc4f2", gold: "#f2c53d",
+      arcane: "#e34fd4", starter: "#5ec46e", arena: "#e2543f",
+      vorrat: "#f0a23c", tresor: "#58c26a"
+    };
+    var BILD = {
+      bronze: "pack_bronze", silver: "pack_silver", gold: "pack_gold",
+      arcane: "pack_arcane", starter: "offer_starter",
+      arena: "icon_arena_pack", vorrat: "pack_vorrat_icon",
+      tresor: "offer_vault_bank"
+    };
+    /* Endplätze der fünf Karten: drei oben, zwei unten — die Anordnung
+       aus dem Video. Werte sind Anteile der Bühnenbreite. */
+    var PLATZ = [
+      { x: -.30, y: -.22, r: -6 }, { x: 0, y: -.26, r: 2 }, { x: .30, y: -.22, r: 7 },
+      { x: -.16, y: .20, r: -3 }, { x: .16, y: .20, r: 5 }
+    ];
+    var DAUER = 2350, laufend = null;
+
+    function raeumen() {
+      var st = $("pkStage"); if (!st) return;
+      [].slice.call(st.querySelectorAll(".pkcard")).forEach(function (c) { c.remove(); });
+    }
+
+    function spiele(key, anzahl, fertig) {
+      var lay = $("packLayer"), st = $("pkStage"), art = $("pkArt");
+      if (!lay || !st || !art) { fertig(); return; }
+      if (laufend) { clearTimeout(laufend); laufend = null; }
+      raeumen();
+
+      var farbe = GLUT[key] || GLUT.bronze;
+      st.style.color = farbe;
+      var quelle = ASSETS[BILD[key] || "pack_bronze"];
+      /* Ohne CDN bleibt das Bild leer. Die Szene läuft trotzdem — der
+         Schein, der Blitz und die Karten sind alle CSS. Genau deshalb
+         ist sie nicht als Video gebaut. */
+      art.src = quelle || "";
+      art.style.visibility = quelle ? "" : "hidden";
+
+      var breite = st.getBoundingClientRect().width || 300;
+      var n = Math.max(1, Math.min(PLATZ.length, anzahl || 5));
+      for (var i = 0; i < n; i++) {
+        var p = PLATZ[i], c = document.createElement("div");
+        c.className = "pkcard";
+        c.style.setProperty("--zx", Math.round(p.x * breite) + "px");
+        c.style.setProperty("--zy", Math.round(p.y * breite) + "px");
+        c.style.setProperty("--zr", p.r + "deg");
+        st.appendChild(c);
+      }
+
+      lay.classList.add("on");
+      lay.setAttribute("aria-hidden", "false");
+      /* Ein erzwungenes Neuzeichnen, sonst startet die Animation beim
+         zweiten Pack nicht neu — die Klasse wäre schon gesetzt gewesen. */
+      void lay.offsetWidth;
+      lay.classList.add("spielt");
+
+      var beendet = false;
+      function schliessen() {
+        if (beendet) return;
+        beendet = true;
+        if (laufend) { clearTimeout(laufend); laufend = null; }
+        lay.classList.remove("spielt", "on");
+        lay.setAttribute("aria-hidden", "true");
+        lay.removeEventListener("pointerdown", schliessen);
+        raeumen();
+        fertig();
+      }
+      lay.addEventListener("pointerdown", schliessen);
+      /* +180 ms, damit die letzte Karte wirklich liegt, bevor der
+         Vorhang fällt. Ohne den Zuschlag schneidet der Wechsel die
+         Landung ab — und die Landung ist die Auflösung. */
+      laufend = setTimeout(schliessen, DAUER + 180);
+    }
+
+    return { spiele: spiele, GLUT: GLUT };
+  })();
+
   function openBronze() { openPackKey("bronze"); }
   function openPackKey(key) {
     packResult = AC.openPack(key, POOL_IDS, HERO_IDS);
@@ -8687,10 +8943,15 @@ button.pfplate{cursor:pointer}
     packResult.materialSlots.forEach(function (s) { packState.push({ kind: "mat", m: s, done: false }); });
     packState.push({ kind: "gold", n: packResult.gold, done: false });
     $("packSummary").style.display = "none";
-    renderPack();
-    renderPackHeader();
-    UISfx.reward();
-    toast(packResult.name + " geöffnet — tippe die Karten an");
+    /* Erst die Szene, dann das Raster. Die Reihenfolge ist die ganze
+       Absicht: der Bruch ist der Moment, das Raster ist die Quittung.
+       Wer das Raster vorher zeigt, hat den Moment schon verschenkt. */
+    UIPackOpen.spiele(key, packResult.cards.length, function () {
+      renderPack();
+      renderPackHeader();
+      UISfx.reward();
+      toast(packResult.name + " geöffnet — tippe die Karten an");
+    });
   }
   function renderPack() {
     markPressableLater();

@@ -2639,18 +2639,34 @@ function step(name, ok, info) {
   /* 17 Views liegen gleichzeitig im DOM. Ohne loading="lazy" laedt das
      Telefon auch die Bilder der Views, die es nie sieht — gemessen waren
      das 82,78 MB pro Seitenladung. Der Check haelt fest, dass die Bremse
-     an JEDEM Bild sitzt, nicht nur an den neuen. */
+     an JEDEM Bild sitzt, nicht nur an den neuen.
+
+     29.07.2026 — EINE Ausnahme, und sie braucht einen Grund im Markup:
+     Bilder mit `data-eager` sind absichtlich nicht verzoegert. Der Fall,
+     der dazu gefuehrt hat, ist `#pkArt`, der Pack in der Oeffnungsszene:
+     die Bremse gilt fuer Bilder in Views, die man vielleicht nie sieht —
+     dieses Bild IST die Szene und wird in dem Moment gebraucht, in dem
+     getippt wird. Verzoegert geladen kaeme der Pack erst, wenn er schon
+     glueht.
+
+     Die Ausnahme haengt bewusst am ATTRIBUT und nicht an einer Liste von
+     IDs hier in der Pruefung: so steht die Begruendung dort, wo sie
+     jemand liest, naemlich neben dem Bild. Wer `data-eager` ohne Grund
+     setzt, faellt beim Lesen des Markups auf; eine Ausnahmeliste in der
+     Pruefung liest nie jemand. */
   await clearLayers();
   await go('navHome');
   await page.waitForTimeout(300);
   const lade = await page.evaluate(() => {
     const alle = [...document.querySelectorAll('img')];
-    return { n: alle.length,
-             ohneLazy: alle.filter(i => i.getAttribute('loading') !== 'lazy').length,
+    const gebremst = alle.filter(i => !i.hasAttribute('data-eager'));
+    return { n: alle.length, eager: alle.length - gebremst.length,
+             ohneLazy: gebremst.filter(i => i.getAttribute('loading') !== 'lazy').length,
              ohneAsync: alle.filter(i => i.getAttribute('decoding') !== 'async').length };
   });
-  step('Jedes Bild traegt loading="lazy"', lade.ohneLazy === 0,
-    lade.ohneLazy + ' ohne, von ' + lade.n);
+  step('Jedes Bild traegt loading="lazy" (ausser begruendeten data-eager)',
+    lade.ohneLazy === 0,
+    lade.ohneLazy + ' ohne, von ' + lade.n + ' · ' + lade.eager + ' begruendete Ausnahme(n)');
   step('Jedes Bild traegt decoding="async"', lade.ohneAsync === 0,
     lade.ohneAsync + ' ohne, von ' + lade.n);
 

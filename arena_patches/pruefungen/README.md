@@ -1,45 +1,48 @@
 # Prüfungen
 
-Zehn Playwright-Suiten mit zusammen **849 Schritten**, plus zwei Sonderprüfungen,
-die nur mit tatsächlich geladenen Bildern laufen.
+Vierzehn Playwright-Suiten mit zusammen **1 011 Schritten**, plus zwei
+Sonderprüfungen, die nur mit tatsächlich geladenen Bildern laufen.
 
 ## Aufruf
 
-Örtlich (Chromium liegt unter `/opt/pw-browsers`, `playwright-core` muss im
-Aufrufverzeichnis auffindbar sein):
+Örtlich (Chromium liegt unter `/opt/pw-browsers`):
 
 ```
-PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers node run_v7.js
+export NODE_PATH=/opt/node22/lib/node_modules/playwright/node_modules
+export PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
+node run_v7.js
 ```
+
+Das `NODE_PATH` ist nötig, weil `playwright` global installiert ist und
+`playwright-core` deshalb unter ihm liegt, nicht im Aufrufverzeichnis. In
+einem frisch gestarteten Container gibt es kein lokales `node_modules` —
+ohne die Zeile scheitert **jede** Suite sofort mit `MODULE_NOT_FOUND`, und
+das sieht aus wie ein kaputter Prototyp statt einer fehlenden Umgebung.
 
 Die Suiten laden `file:///home/user/elemental-td/arena_patches/ui_prototype.html`
 direkt — kein Server, kein Build.
 
 | Datei | Schritte | Gegenstand |
 |---|---:|---|
-| `run_v5.js` | 107 | Grundgerüst, Navigation, Sammlung, Festung, Packs |
+| `run_v5.js` | 108 | Grundgerüst, Navigation, Sammlung, Festung, Packs |
 | `run_v6.js` | 281 | Clan, Ghost-Clankrieg, Spenden, Rangliste, Post |
-| `run_v7.js` | 333 | Startseite, Banner-Metrik, Pass, Guide, Profil, Avatare, Shop-Maße |
+| `run_v7.js` | 334 | Startseite, Banner-Metrik, Pass, Guide, Profil, Avatare, Shop-Maße |
 | `run_friends.js` | 25 | Freundesliste, Anfragen, Suche |
 | `run_shop.js` | 32 | Tagesangebote, Booster-Packs, Gold, Tresor, Vorrats-Truhe |
 | `avatare.js` | 12 | Fünf zur Wahl, Helden am Besitz, Auswahl im Raster |
 | `login_kal.js` | 9 | Login-Kalender: drei pro Reihe, Tag 7 als Band |
-| `home_menue.js` | 17 | Keine doppelten Wege, Menü-Icons lesbar |
+| `home_menue.js` | 20 | Keine doppelten Wege, Menü-Icons lesbar |
 | `splash.js` | 10 | Startbildschirm: Schriftzug, Ladebalken, Notausgang |
 | `shop_raender.js` | 20 | Randfarben: Inhalt (Kristall/Gold) und Produktfamilie (Packs) |
 | `flug.js` | 12 | Sammel-Animation — aus JEDEM Fenster, nicht nur aus dem Shop |
+| `community.js` | 89 | Community-Reiter: Marken, echte Ziele |
+| `packoeffnung.js` | 23 | Pack-Öffnung: gemessene Zeitkurve, Abbruch, Neustart |
 | `guide.js` | 36 | Defenders Guide: bewegbare Reiterleiste, großes Icon am offenen Reiter, Gegner/Boss als eigene Reiter, kein Booster-Reiter |
 | `assets_vollstaendig.py` | 4 | Jedes benutzte Asset ist verzeichnet, gesichert UND aktuell |
 
 `assets_vollstaendig.py` ist die einzige Prüfung hier, die kein Playwright
 braucht (`python3 pruefungen/assets_vollstaendig.py` aus `arena_patches/`).
 
-Am 29.07.2026 kam eine vierte Frage dazu: **zeigt die gesicherte Datei noch
-auf dieselbe Quelle?** Die acht Pack-Bilder wurden gegen eine neue Fassung
-getauscht — neuer URL, gleicher Schlüssel. Die drei Prüfungen davor meldeten
-weiter grün, weil sie nur nach dem *Schlüssel* fragen; auf der Platte lagen
-noch die alten Bilder. Ein grüner Balken, der eine veraltete Datei
-durchwinkt, ist schlimmer als gar keine Prüfung: er beendet das Nachschauen.
 Sie deckt eine Lücke ab, die keine der anderen sehen kann: ein Asset, das
 direkt in die `ASSETS`-Tabelle der HTML geschrieben wurde, ohne Eintrag in
 `ui_assets.json`. So etwas fällt aus **jedem** Werkzeug heraus, das über die
@@ -47,6 +50,13 @@ Asset-Liste arbeitet — es wird nie gesichert und beim Freistellen als
 „unbekannt" übersprungen. Still, ohne Fehlermeldung. Genau so sind 17
 Bilder durchgerutscht, darunter vier Arena-Kulissen, die ein Werkzeug
 deshalb sogar zerschnitten hat.
+
+Am 29.07.2026 kam eine vierte Frage dazu: **zeigt die gesicherte Datei noch
+auf dieselbe Quelle?** Die acht Pack-Bilder wurden gegen eine neue Fassung
+getauscht — neuer URL, gleicher Schlüssel. Die drei Prüfungen davor meldeten
+weiter grün, weil sie nur nach dem *Schlüssel* fragen; auf der Platte lagen
+noch die alten Bilder. Ein grüner Balken, der eine veraltete Datei
+durchwinkt, ist schlimmer als gar keine Prüfung: er beendet das Nachschauen.
 
 ## Keine Prüfung darf an ihrer eigenen Laufzeit hängen
 

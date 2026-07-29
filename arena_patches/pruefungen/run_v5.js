@@ -664,7 +664,21 @@ function step(name, ok, info) {
   const pbBg = await page.locator('#btnOpenBronze').evaluate(e => e.style.backgroundImage);
   step('Pack-Button: Asset + Fallback', /url\(/.test(pbBg) && /gradient/.test(pbBg));
   await page.click('#btnOpenBronze');
-  await page.waitForTimeout(500);
+  // 29.07.2026: Zwischen Klick und Kartenraster liegt jetzt die
+  // Oeffnungsszene (2,35 s, gemessen aus dem Drive-Video). Die alte
+  // Fassung wartete 500 ms und griff ins leere Raster — sie schrieb
+  // die Bauart „Klick zeigt sofort die Karten" fest, die es absichtlich
+  // nicht mehr gibt. Die Anforderung DAHINTER — Karten liegen verdeckt,
+  // nichts deckt sich von selbst auf — wird unveraendert weiter geprueft.
+  // Ein Tipp bricht die Szene ab; dass das geht, prueft packoeffnung.js.
+  await page.waitForTimeout(200);
+  if (await page.locator('#packLayer.on').count()) {
+    await page.mouse.click(195, 300);
+    await page.waitForTimeout(200);
+  }
+  step('Oeffnungsszene ist danach geschlossen',
+    (await page.locator('#packLayer.on').count()) === 0);
+  await page.waitForTimeout(300);
 
   const nCards = await page.locator('#packGrid .pcard').count();
   step('Karten liegen VERDECKT (kein Auto-Reveal)',

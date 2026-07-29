@@ -159,6 +159,31 @@ def schluesseltabelle(pfad_json):
 
 
 def lauf(ordner, pfad_json):
+    # ------------------------------------------------------------------
+    # DAS ARCHIV IST TABU.
+    #
+    # `arena_patches/assets` ist die gesicherte Kopie vom CDN, und
+    # HERKUNFT.json haelt je Datei den SHA-256 fest — der Nachweis, dass
+    # die Datei im Repo die Datei vom CDN ist. Freistellen schreibt die
+    # Dateien um und macht damit jeden dieser Hashes wertlos.
+    #
+    # Aufgefallen ist das am 29.07.2026 beim Versuch, die acht neuen
+    # Packs direkt im Archiv freizustellen. Der Lauf hat nichts kaputt
+    # gemacht — aber nur zufaellig: die Dateien heissen dort nach ihrem
+    # SCHLUESSEL (`pack_bronze.webp`), die Zuordnungstabelle sucht aber
+    # nach dem URL-Dateinamen. Ergebnis: „unbekannter Schluessel, nicht
+    # angefasst: 232" und Rueckgabewert 0. Ein Werkzeug, das 232 von 232
+    # Dateien uebergeht und Erfolg meldet, ist eine Falle.
+    #
+    # Freigestellt wird deshalb dort, wo die ausgelieferte Kopie liegt —
+    # im Vorschau-Repo, siehe werkzeuge/AUSLIEFERUNG.md.
+    # ------------------------------------------------------------------
+    if os.path.exists(os.path.join(ordner, "HERKUNFT.json")):
+        sys.exit("ABBRUCH: %s ist das gesicherte Archiv (HERKUNFT.json liegt "
+                 "darin).\nFreistellen wuerde jeden SHA-256 darin ungueltig "
+                 "machen.\nDer Schnitt gehoert in die AUSLIEFERUNG, nicht ins "
+                 "Archiv — siehe werkzeuge/AUSLIEFERUNG.md." % ordner)
+
     tabelle = schluesseltabelle(pfad_json)
     getan, ausn, unbekannt, gerettet, verweigert = [], [], [], [], []
 
@@ -221,6 +246,14 @@ if __name__ == "__main__":
     print("VERWEIGERT (Motiv waere zerstoert): %d %s" % (len(verweigert), verweigert))
     getan.sort(key=lambda x: x[1])
     print("am wenigsten Motiv uebrig: " + ", ".join("%s %.0f%%" % g for g in getan[:8]))
+    # Nichts erkannt heisst: falscher Ordner oder falsche Liste. Ohne
+    # diesen Abbruch meldet der Lauf Erfolg, obwohl er nichts getan hat —
+    # und der naechste Schritt baut auf einem Ergebnis auf, das es nicht
+    # gibt. Ein stiller Leerlauf ist der teuerste Fehler dieses Werkzeugs.
+    if not getan and not ausn and unbekannt:
+        sys.exit("ABBRUCH: kein einziger der %d Dateinamen liess sich einem "
+                 "Schluessel aus %s zuordnen.\nStimmen Bildordner und "
+                 "Asset-Liste zusammen?" % (len(unbekannt), sys.argv[2]))
     # Verweigerte Assets sind kein Fehlschlag des Laufs, aber eine Ansage:
     # sie brauchen eine Neuerzeugung mit sauberem Grund.
     sys.exit(0)
