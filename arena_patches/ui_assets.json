@@ -1067,6 +1067,14 @@
     "type": "icon",
     "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042756_0ad1f893-014a-444b-87cb-b489d7667c38.png"
   },
+  "ic_offline": {
+    "batch": 14,
+    "beschreibung": "Startseiten-Knopf fuer die Offline-Ertraege: Sanduhr mit Gold-Messing-Fassung, durch deren Taille GOLDMUENZEN statt Sand rieseln, unten aufgehaeuft mit ein paar blassen Kristallsplittern. Motiv absichtlich 'Zeit wird zu Beute' statt AAs Stierkopf - dieselbe Rolle, unsere Bildsprache.",
+    "job": "6ec00abf-bb37-46ee-bf1e-bdbd96fa100e",
+    "subtype": "icon",
+    "type": "image",
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260729_183611_6ec00abf-bb37-46ee-bf1e-bdbd96fa100e.png"
+  },
   "ic_plus": {
     "batch": 6,
     "beschreibung": "Utility-Icon Plus-Button (Ressourcen hinzukaufen): goldenes Plus in Kristallrahmen.",
@@ -1316,6 +1324,22 @@
     "job": "6cb19273-0d12-4073-8231-d2e56424d692",
     "type": "nav",
     "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_132919_6cb19273-0d12-4073-8231-d2e56424d692.png"
+  },
+  "off_banner": {
+    "batch": 14,
+    "beschreibung": "Standbild des Offline-Banners (16:9) und zugleich `poster` des Videos: Diorama einer Bahn, links ein Steinturm mit Wurfarm, ein Felsbrocken rollt nach rechts, drei Kristall-Goblins stieben auseinander, Fass und Kisten am Wegrand. Vorlage: AAs Banner im Offline-Fenster (IMG_3442), dort ein Turm der Steine rollt.",
+    "job": "b5ed5e95-949d-4afa-9d95-89dc879e789b",
+    "subtype": "banner",
+    "type": "image",
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260729_183312_b5ed5e95-949d-4afa-9d95-89dc879e789b.png"
+  },
+  "off_loop": {
+    "batch": 14,
+    "beschreibung": "Bewegte Fassung des Offline-Banners, 5 s, 1080p, erzeugt mit Kling 3.0 Turbo aus off_banner als Startbild. Feste Kamera, der Felsbrocken rollt, die Goblins stieben, Muenzen blitzen. Laeuft im Fenster als stummes Loop-Video mit off_banner als poster - faellt das Video aus, bleibt das Standbild.",
+    "job": "eba25a01-0562-4020-a017-7c81e7ac853c",
+    "subtype": "loop",
+    "type": "video",
+    "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260729_183559_eba25a01-0562-4020-a017-7c81e7ac853c.mp4"
   },
   "offer_arena_pack": {
     "batch": 17,

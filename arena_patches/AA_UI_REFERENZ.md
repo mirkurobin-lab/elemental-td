@@ -1880,13 +1880,15 @@ Fusion · Raritäten-Leiter · Packs & Pity · Festung · Clan & Krieg · Pass &
 Loop. Jede Seite trägt Asset-Schlüssel zur Illustration (die `card_*`-Artworks, `frame_*`,
 `pack_*`, `fort_castle`, `hub_clan`, `pass_keyart`) — das UI rendert generisch aus den Daten.
 
-### 18.3 „Offline Earnings" — beobachtet, bewusst nicht gebaut
+### 18.3 „Offline Earnings" — beobachtet, seit dem 30.07.2026 GEBAUT
 
 Gold **und** XP pro Stunde Abwesenheit, Deckel 8 h, „Quick Earnings" gegen Werbung oder Gems,
-eigenes Popup direkt nach dem Login-Kalender. Vollständige Bewertung samt der drei Gründe gegen
-eine Übernahme (Gold ist unser Endgame-Bottleneck · drei gestapelte Start-Popups · Werbung ist
-im Projekt ausgeschlossen) und der Skizze einer verträglichen Variante:
-`GAMEPLAY_OPTIMIERUNG.md` §10.
+eigenes Popup direkt nach dem Login-Kalender.
+
+> **Korrektur 30.07.2026.** Dieser Abschnitt hieß bis dahin „bewusst nicht gebaut" und verwies
+> auf drei Gründe gegen eine Übernahme. Der Auftraggeber hat die Übernahme angeordnet; das
+> Panel ist gebaut. Die drei Einwände sind nicht verschwunden, sondern einzeln beantwortet —
+> `GAMEPLAY_OPTIMIERUNG.md` §10.3. Unsere Maße und Abweichungen: **§26** in dieser Datei.
 
 ---
 
@@ -2817,3 +2819,67 @@ Weiter abgelesen:
 Jeder Spell hat seit dem 30.07.2026 **seine eigene Essenz**, deren Bild
 das Kartenbild ist — genau AAs Greenprint-Muster und genau das, was bei
 unseren Türmen schon galt. Siehe DESIGN_SPELLS.md, Kasten „REVIDIERT".
+
+---
+
+## 26. Offline-Erträge — Dialog (30.07.2026)
+
+> **Vorlage:** drei Screenshots des Auftraggebers (Hub mit Pfeil auf den Einstieg,
+> geöffneter Ertrags-Dialog, geöffneter „Quick Earnings"-Dialog).
+> **Mechanik und Zahlen:** `GAMEPLAY_OPTIMIERUNG.md` §10. Hier steht nur das Layout.
+
+### 26.1 Der Einstieg
+
+AA hängt den Knopf in die **rechte Hub-Schiene**. Bei uns war genau dieser Platz leer —
+die Schiene existierte, trug aber kein Element. Der Knopf ist dort eingezogen, mit einer
+Zählmarke, sobald etwas abzuholen ist.
+
+| | AA | unser Prototyp |
+|---|---|---|
+| Position | rechte Hub-Schiene | dieselbe |
+| Marke | rote Zahl oben rechts | rote Marke, **nur bei Guthaben** |
+| Öffnet sich von selbst | **ja**, Popup nach dem Login-Kalender | **nein**, nur per Tap |
+
+Die letzte Zeile ist die einzige bewusste Abweichung im Ablauf — Begründung: der
+Popup-Stapel-Einwand aus §10.2/§10.3.
+
+### 26.2 Der Dialog, von oben nach unten
+
+| Element | Maß | Anmerkung |
+|---|---|---|
+| Video-Kopf | **16:9**, volle Dialogbreite, Radius nur oben | in AA ein Turm, der Steine rollt |
+| Titelband | überlappt den Videofuß um die **halbe Bandhöhe** | `margin-top:-22px`, `z-index:2` |
+| Deckel-Band | eine Zeile, grün, „MAX 8 H" | AAs Platzierung direkt unter dem Titel |
+| Ratenzeile | **2 Spalten**, Gold links, XP rechts | je Icon + Wert, `…/h` |
+| Belohnungsraster | **4 Spalten**, quadratische Kacheln, Menge unten rechts | Gold · Karten · Material · XP |
+| Ehrlicher Satz | eine Zeile, mittig, klein | nennt **beide** Stundenzahlen, siehe unten |
+| Knopfpaar | **2 Spalten**, „Schnell-Ertrag" (gold) \| „Abholen" (grün) | AA hat dieselbe Aufteilung |
+
+**Der Satz unter dem Raster ist keine Zierde.** Er nennt die Abwesenheit **und** die
+angerechnete Zeit getrennt: *„Du warst 20 h weg, angerechnet wurden 8 h."* Ein Dialog, der
+nur „20 h" sagt, verspricht mehr als er zahlt; einer, der nur „8 h" sagt, verschweigt den
+Verlust. `pruefungen/offline.js` prüft beide Zahlen einzeln.
+
+### 26.3 Der Schnell-Ertrag
+
+Zweiter, kleinerer Dialog **über** dem ersten. Zwei Wege nebeneinander, jeder mit eigenem
+Tageszähler („Übrig: 3"). Der Gratis-Weg braucht ein Werbevideo und ist im Prototyp **offen
+als nicht angebunden ausgewiesen**, statt als toter Knopf dazustehen.
+
+> **Fehler beim Bau, hier festgehalten:** solange beide Ebenen offen waren, standen **zwei ✕**
+> übereinander. Behoben über `#qkLayer{z-index:290}` und `#offLayer.zu .itemclose{visibility:hidden}`.
+> Die Prüfung zählt jetzt die *sichtbaren* ✕ und besteht auf genau einem.
+
+### 26.4 Die drei neuen Assets
+
+| Schlüssel | Art | Inhalt |
+|---|---|---|
+| `ic_offline` | Icon | Sanduhr, in der statt Sand Goldmünzen rieseln |
+| `off_banner` | 16:9 Bild | Bahn-Diorama, Steinturm schleudert einen Felsbrocken — zugleich **Poster** des Videos |
+| `off_loop` | **Video, 5 s** | dasselbe Motiv in Bewegung, erzeugt mit **Kling 3.0 Turbo** aus `off_banner` als Startbild |
+
+`off_loop` beantwortet die Frage des Auftraggebers *„Ist es möglich mit Kling Videos zu
+erstellen und diese dann dort einzufügen?"* mit **ja** — Bild erzeugen, Bild als `start_image`
+an Kling geben, Ergebnis als `<video muted loop>` mit dem Startbild als `poster` einhängen.
+Der Poster ist Pflicht: örtlich ist das CDN nicht erreichbar (DESIGNSYSTEM §7b), und auf dem
+Gerät deckt er die Ladezeit ab.

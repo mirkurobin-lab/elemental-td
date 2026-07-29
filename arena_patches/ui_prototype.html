@@ -225,8 +225,15 @@ body.nur-waehrung .apphead .headcol{padding:6px 0}
 /* Der Trenner ist nur die FARBE eines Randes, den alle drei Gruppen
    tragen. Vorher hatte ihn nur `.cur + .cur` — zusammen mit dem
    ungleichen Innenabstand war die erste Gruppe dadurch 9 px schmaler
-   als die beiden anderen (98,8 / 107,8 / 107,8 px). Jetzt teilt sich
-   die Leiste in exakte Drittel. */
+   als die beiden anderen (98,8 / 107,8 / 107,8 px).
+   ⚠ KORREKTUR 30.07.2026: Hier stand „Jetzt teilt sich die Leiste in
+   exakte Drittel." Das stimmt nicht mehr, seit `.cur` auf `1 1 auto`
+   steht (damit Gold nicht als „12 5…" abgeschnitten wird) — nachgemessen
+   91,8 / 91,8 / 99,6 px. Die beiden Anforderungen „drei Zahlen auf einer
+   Mitte" und „nichts abschneiden" schliessen sich bei 14 px Schrift aus;
+   aufloesbar nur mit kompakter Schreibweise („126 K"). Die Messung, die
+   Zahlen und der Grund, warum die Pruefung dazu bewusst rot bleibt:
+   pruefungen/README.md, Abschnitt „Bekannt rot". */
 .cur + .cur{border-left-color:#1d2a35}
 /* Die Zahl nimmt den Rest der Gruppe ein — dadurch ist die Leiste
    tatsaechlich gefuellt und der Plus-Knopf sitzt immer rechts aussen.
@@ -2346,6 +2353,76 @@ span.ico{text-align:center}
  * Handschriften geben (genau der Befund, der beim Essenz-Fach schon
  * einmal aufgeraeumt werden musste).
  * ================================================================== */
+/* ==================================================================
+ * OFFLINE-ERTRAEGE — Fenster und Schnell-Ertrag (30.07.2026)
+ * ------------------------------------------------------------------
+ * Masse aus IMG_3442: der Video-Banner nimmt oben rund ein Viertel der
+ * Blatthoehe ein und wird vom Band UEBERLAPPT — das Band sitzt mit
+ * seiner Mitte auf der Unterkante des Videos, nicht darunter. Genau das
+ * gibt dem Fenster die Tiefe, die eine gestapelte Anordnung nicht hat.
+ * ================================================================== */
+/* ⚠ Der Schnell-Ertrag liegt UEBER dem Offline-Fenster (290 gegen 289),
+   und solange er offen ist, verschwindet das ✕ darunter. Sonst stehen
+   zwei Schliesskreuze uebereinander und man weiss nicht, welches
+   welches Fenster meint. */
+#qkLayer{z-index:290}
+#offLayer.zu .itemclose{visibility:hidden}
+#offLayer,#qkLayer{position:fixed;inset:0;z-index:289;display:none;
+  background:#04070ac2;align-items:center;justify-content:center;padding:18px}
+#offLayer.open,#qkLayer.open{display:flex}
+.offpop{width:100%;max-width:352px;animation:offerpop .34s cubic-bezier(.2,1.4,.4,1)}
+.offsheet{position:relative;border-radius:16px;background:var(--panel);
+  border:1px solid #ffffff1a;box-shadow:var(--mat-raised-lg);padding:0 0 14px}
+/* Der Videokopf. `overflow:hidden` + Radien oben, damit das Video die
+   Blattecken nicht ueberragt. 16:9, wie das erzeugte Material. */
+.offvid{position:relative;aspect-ratio:16/9;overflow:hidden;
+  border-radius:16px 16px 0 0;background:linear-gradient(160deg,#22303f,#0e1418)}
+.offvid video,.offvid img{width:100%;height:100%;object-fit:cover;display:block}
+/* Das Band ueberlappt den Videofuss um die halbe Bandhoehe. */
+.offband{margin:-22px 0 0;position:relative;z-index:2}
+#offLayer .itemclose,#qkLayer .itemclose{z-index:3}
+.offbody{padding:16px 14px 0}
+.offcap{display:flex;align-items:center;justify-content:center;gap:6px;
+  border-radius:10px;padding:7px;font-size:13px;font-weight:900;letter-spacing:.05em;
+  color:#0b2413;background:linear-gradient(180deg,#7fe08a,#46b05c);
+  box-shadow:inset 0 -2px 0 #2c7a3f}
+.offcap.alt{color:#e8eef3;background:linear-gradient(180deg,#2b3b4a,#1a2530);
+  box-shadow:inset 0 -2px 0 #0f1720;font-weight:800;letter-spacing:0}
+.offrates{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:9px 0 0}
+.offrate{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:10px;
+  background:var(--panel2);border:1px solid #ffffff14}
+.offrate i,.offrate img{width:19px;height:19px;flex:0 0 19px}
+.offrate b{font-size:14px;font-weight:900;color:#e8eef3}
+.offrate .xpstar{display:flex;align-items:center;justify-content:center;
+  font-size:8px;font-weight:900;font-style:normal;color:#0b1a2b;border-radius:50%;
+  background:linear-gradient(180deg,#7fd4ff,#3d9df2)}
+/* Belohnungsraster. Vier Spalten wie im Vorbild; die fuenfte Kachel
+   faellt in die zweite Reihe — dort steht sie im Original auch. */
+.offgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 0}
+.offcell{position:relative;aspect-ratio:1;border-radius:10px;
+  background:var(--panel2);border:1px solid #ffffff1a;
+  display:flex;align-items:center;justify-content:center;font-size:22px}
+.offcell img,.offcell .ico{width:62%;height:62%;object-fit:contain}
+.offcell b{position:absolute;right:3px;bottom:2px;font-size:10px;font-weight:900;
+  color:#fff;text-shadow:0 1px 2px #000c}
+.offnote{margin:11px 2px 0;font-size:10.5px;line-height:1.45;color:var(--dim);
+  text-align:center}
+.offnote .rot{color:#ff8a7a;font-weight:900}
+.offnote .gruen{color:#7fe08a;font-weight:900}
+.offbtns{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0 0}
+.offbtn{border-radius:11px;padding:11px 8px;font-size:13px;font-weight:900;
+  border:0;color:#fff;box-shadow:var(--mat-raised)}
+.offbtn.quick{background:linear-gradient(180deg,#f0b23c,#c8811d);color:#2a1a04}
+.offbtn.claim{background:linear-gradient(180deg,#66d17a,#2f9a4a)}
+.offbtn.frei{background:linear-gradient(180deg,#5cc8f0,#2286b8)}
+.offbtn.gem{background:linear-gradient(180deg,#66d17a,#2f9a4a)}
+.offbtn[disabled]{filter:grayscale(.7) brightness(.66);box-shadow:none}
+.qkcol{display:flex;flex-direction:column;gap:4px;align-items:stretch}
+.qkrest{font-size:10px;font-weight:800;color:var(--dim);text-align:center}
+/* Die Marke am Startseiten-Knopf traegt kein Zahl, sondern ein „!“ —
+   „wie viel" steht im Fenster, hier zaehlt nur „es liegt etwas da". */
+#tileOfflineBadge{min-width:16px}
+
 #itemLayer{position:fixed;inset:0;z-index:288;display:none;
   background:#04070ac2;align-items:center;justify-content:center;padding:18px}
 #itemLayer.open{display:flex}
@@ -6332,7 +6409,18 @@ button.pfplate{cursor:pointer}
            Bildschirm wir brauchen sie nur dort oben im Menue."
            Die LINKE Spalte bleibt: Login/Taeglich, Wochenziele und
            Erfolge stehen NIRGENDS sonst. -->
-      <div class="hubrail right" aria-hidden="true"></div>
+      <!-- ⚠ Diese Schiene war LEER (aria-hidden="true"). AA hat an genau
+           dieser Stelle den Offline-Ertrag (IMG_3441, weisser Pfeil des
+           Auftraggebers). Der Knopf oeffnet NICHTS von selbst — er traegt
+           nur eine Marke, wenn etwas bereitliegt. Genau das ist die
+           Antwort auf Einwand 2 aus GAMEPLAY_OPTIMIERUNG §10: „drei
+           Popups vor dem ersten Tap". -->
+      <div class="hubrail right">
+        <button class="railtile pressable" id="icoOffline"
+                title="Offline-Erträge abholen">
+          <span class="rti" data-ico="ic_offline" data-emoji="⏳"></span>
+          <i class="nb2" id="tileOfflineBadge" style="display:none">!</i></button>
+      </div>
     </div>
 
     <!-- 74-83 %: EVENTS | BATTLE (55 % Breite) | CHALLENGES (§14.3).
@@ -7137,6 +7225,68 @@ button.pfplate{cursor:pointer}
      Der Schliesser ist ein <span role="button">: er liegt ueber der
      Blattkante, und ein <button> dort haette denselben Verschachtelungs-
      Aerger erzeugt wie in den Kartenkacheln. -->
+<!-- ==================================================================
+     OFFLINE-ERTRAEGE (30.07.2026) — nachgebaut aus IMG_3442/3443.
+     Aufbau von oben: Video-Banner, Band, Deckel-Zeile, zwei Raten,
+     Belohnungsraster, der ehrliche Satz, zwei Knoepfe.
+     Der Video-Banner ist bewusst ein <video> und kein GIF: dieselbe
+     Bauart wie CARD_LOOP, mit dem Standbild als `poster`. Faellt das
+     Video aus (CDN, Datensparmodus), bleibt das Bild stehen — die
+     Flaeche ist nie leer.
+     ================================================================== -->
+<div id="offLayer" aria-hidden="true">
+  <div class="offpop">
+    <div class="offsheet" role="dialog" aria-modal="true" aria-labelledby="offTitle">
+      <div class="offvid" id="offVid"></div>
+      <div class="offband" id="offBand"></div>
+      <span class="itemclose pressable" id="offClose" role="button" tabindex="0"
+        aria-label="Fenster schließen">✕</span>
+      <div class="offbody">
+        <div class="offcap" id="offCap">MAX 8 H</div>
+        <div class="offrates">
+          <div class="offrate"><i data-ico="cur_gold" data-emoji="🪙"></i>
+            <b id="offRateGold">—</b></div>
+          <div class="offrate"><i class="xpstar">XP</i>
+            <b id="offRateXp">—</b></div>
+        </div>
+        <div class="offgrid" id="offGrid"></div>
+        <div class="offnote" id="offNote"></div>
+        <div class="offbtns">
+          <button class="offbtn quick pressable" id="offQuick">Schnell-Ertrag</button>
+          <button class="offbtn claim pressable" id="offClaim">Abholen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Schnell-Ertrag. Eigenes Fenster wie im Vorbild, weil es eine eigene
+     Entscheidung ist (Werbung oder Kristalle) und nicht nur ein Knopf. -->
+<div id="qkLayer" aria-hidden="true">
+  <div class="offpop">
+    <div class="offsheet" role="dialog" aria-modal="true">
+      <div class="offband" id="qkBand"></div>
+      <span class="itemclose pressable" id="qkClose" role="button" tabindex="0"
+        aria-label="Fenster schließen">✕</span>
+      <div class="offbody">
+        <div class="offcap alt" id="qkCap">—</div>
+        <div class="offgrid" id="qkGrid"></div>
+        <div class="offbtns">
+          <div class="qkcol">
+            <span class="qkrest" id="qkFreeRest">—</span>
+            <button class="offbtn frei pressable" id="qkFree">▶ Gratis</button>
+          </div>
+          <div class="qkcol">
+            <span class="qkrest" id="qkGemRest">—</span>
+            <button class="offbtn gem pressable" id="qkGem">💎 50</button>
+          </div>
+        </div>
+        <div class="offnote" id="qkNote"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="itemLayer" aria-hidden="true">
   <div class="itempop">
     <!-- aria-label statt aria-labelledby: die Bandueberschrift kommt aus
@@ -7270,6 +7420,7 @@ button.pfplate{cursor:pointer}
 <script src="./arena_friends.js"></script>
 <script src="./arena_profil.js"></script>
 <script src="./arena_vault.js"></script>
+<script src="./arena_offline.js"></script>
 <script src="./arena_daily.js"></script>
 <script src="./arena_rewards.js"></script>
 <script src="./arena_guide.js"></script>
@@ -7593,7 +7744,10 @@ button.pfplate{cursor:pointer}
     card_bann:        CDN + "hf_20260729_152514_b4a7a7a5-0486-4c6b-bc38-69ca4f74cedd.png",
     card_bollwerk:    CDN + "hf_20260729_152521_ea792ba5-90a8-46bc-9687-e99c3e355522.png",
     card_fokus:       CDN + "hf_20260729_152530_81a48467-daf7-4fa4-96f9-4726e360591e.png",
-    ess_arkan:        CDN + "hf_20260729_152539_85c7ce4e-f0b1-4692-abba-89cc0d636786.png",
+    /* ---- Batch 14: Offline-Ertraege (30.07.2026) ---- */
+    ic_offline:       CDN + "hf_20260729_183611_6ec00abf-bb37-46ee-bf1e-bdbd96fa100e.png",
+    off_banner:       CDN + "hf_20260729_183312_b5ed5e95-949d-4afa-9d95-89dc879e789b.png",
+    off_loop:         CDN + "hf_20260729_183559_eba25a01-0562-4020-a017-7c81e7ac853c.mp4",
     /* ---- Batch 4: Breitbanner 16:9 (Pass, Events) ---- */
     pass_keyart:      CDN + "hf_20260725_160701_42a171b5-06f3-458d-a766-f4992e4210e5.png",
     event_tournament: CDN + "hf_20260725_160704_9fb36583-0558-4407-a96c-83275fc4c95e.png",
@@ -10216,6 +10370,221 @@ button.pfplate{cursor:pointer}
    * Eine abgeschriebene Quote ist irgendwann eine falsche Quote, und
    * eine falsche Offenlegung ist schlimmer als gar keine.
    * ================================================================= */
+  /* ==================================================================
+   * UIOffline — Offline-Ertraege (30.07.2026)
+   * ------------------------------------------------------------------
+   * Nachgebaut aus IMG_3442/3443. Die Rechnung steckt vollstaendig in
+   * arena_offline.js; hier steht NUR die Anzeige und das Buchen der
+   * Belohnung ins Wallet.
+   *
+   * ⚠ ES OEFFNET SICH NICHTS VON SELBST. Der Knopf traegt eine Marke,
+   * mehr nicht. Das ist die Antwort auf Einwand 2 aus
+   * GAMEPLAY_OPTIMIERUNG §10 („drei Popups vor dem ersten Tap"): Login-
+   * Kalender und Angebotskette behalten ihren Platz, der Offline-Ertrag
+   * wartet.
+   * ================================================================== */
+  var UIOffline = (function () {
+    var AO = window.ArenaOffline;
+    function jetzt() { return Date.now(); }
+
+    /* Ein Belohnungsfeld. `art` bestimmt Bild und Beschriftung. */
+    function zelle(art, menge) {
+      if (!menge) return "";
+      var bild = { gold: ["cur_gold", "🪙"], xp: [null, "XP"],
+                   mat: ["cur_material", "⚗"], karte: ["card_back", "🃏"] }[art];
+      var inhalt = (art === "xp")
+        ? '<span class="ico" style="font-size:11px;font-weight:900">XP</span>'
+        : ico(bild[0], bild[1]);
+      return '<div class="offcell">' + inhalt + "<b>×" + fmt(menge) + "</b></div>";
+    }
+    function raster(o) {
+      return zelle("gold", o.gold) + zelle("karte", o.karten) +
+             zelle("mat", o.material) + zelle("xp", o.xp);
+    }
+
+    /* Das Video im Kopf. Dieselbe Bauart wie attachLoop() bei den
+       Karten: stumm, Endlosschleife, `poster` als Rueckfall. */
+    function video() {
+      var box = $("offVid");
+      if (!box || box.querySelector("video")) return;
+      var quelle = ASSETS.off_loop, standbild = ASSETS.off_banner;
+      if (standbild) {
+        var im = document.createElement("img");
+        im.src = standbild; im.alt = "";
+        im.addEventListener("error", function () { UIIcon.hide(im); });
+        box.appendChild(im);
+      }
+      if (!quelle) return;
+      var v = document.createElement("video");
+      v.muted = true; v.loop = true; v.autoplay = true; v.playsInline = true;
+      v.setAttribute("muted", ""); v.setAttribute("loop", "");
+      v.setAttribute("autoplay", ""); v.setAttribute("playsinline", "");
+      v.preload = "auto";
+      if (standbild) v.poster = standbild;
+      v.style.position = "absolute"; v.style.inset = "0";
+      /* ⚠ Faellt das Video aus (CDN, Datensparmodus, Codec), wird es
+         AUSGEBLENDET — darunter liegt das Standbild. Die Flaeche darf
+         nie leer sein. */
+      v.addEventListener("error", function () { v.style.display = "none"; });
+      v.src = quelle;
+      box.appendChild(v);
+      var pv = v.play();
+      if (pv && pv.catch) pv.catch(function () {});
+    }
+
+    function stundenText(h) {
+      var st = Math.floor(h), mi = Math.round((h - st) * 60);
+      if (mi === 60) { st++; mi = 0; }
+      return st + " h" + (mi ? " " + mi + " min" : "");
+    }
+
+    function zeichne() {
+      var st = AO.stand(jetzt());
+      $("offBand").innerHTML = secribbon("OFFLINE-ERTRÄGE");
+      $("offCap").innerHTML = ico("ic_offline", "⏳") +
+        "<span>MAX " + AO.DECKEL_H + " H</span>";
+      $("offRateGold").textContent = fmt(st.raten.gold) + "/h";
+      $("offRateXp").textContent = fmt(st.raten.xp) + "/h";
+      $("offGrid").innerHTML = raster(st) ||
+        '<div class="offcell" style="grid-column:1/-1;aspect-ratio:auto;padding:14px;' +
+        'font-size:11px;color:var(--dim)">Noch nichts angesammelt.</div>';
+      /* Der ehrliche Satz aus dem Vorbild — und er steht NUR da, wenn
+         wirklich gedeckelt wurde. Ihn immer anzuzeigen waere eine
+         Warnung ohne Anlass. */
+      $("offNote").innerHTML = st.gedeckelt
+        ? "Du warst <span class=\"rot\">" + stundenText(st.abwesendH) +
+          "</span> weg, angerechnet wurden <span class=\"gruen\">" +
+          AO.DECKEL_H + " h</span>."
+        : "Angesammelt seit dem letzten Abholen: <span class=\"gruen\">" +
+          stundenText(st.gutH) + "</span>.";
+      $("offClaim").disabled = !st.bereit;
+      $("offQuick").disabled = (st.quick.gratisOffen + st.quick.gemsOffen) <= 0;
+      hydrateIcons($("offLayer"));
+      video();
+    }
+
+    function zeichneQuick() {
+      var st = AO.stand(jetzt()), q = st.quick;
+      $("qkBand").innerHTML = secribbon("SCHNELL-ERTRAG");
+      $("qkCap").textContent = q.minuten + " Minuten Offline-Ertrag sofort";
+      $("qkGrid").innerHTML = raster(q);
+      $("qkFreeRest").textContent = "Übrig: " + q.gratisOffen;
+      $("qkGemRest").textContent = "Übrig: " + q.gemsOffen;
+      $("qkGem").innerHTML = ico("cur_gem", "💎") + " " + q.gemPreis;
+      $("qkFree").disabled = q.gratisOffen <= 0;
+      $("qkGem").disabled = q.gemsOffen <= 0 || gems() < q.gemPreis;
+      /* ⚠ Offener Punkt 3 aus §10: ohne Werbeanbindung gibt es hier
+         nichts umsonst. Das steht dem Spieler ins Gesicht statt still
+         zu scheitern. */
+      $("qkNote").innerHTML = WERBUNG_VERFUEGBAR
+        ? "Ein kurzes Video, dann liegen die Minuten auf dem Konto."
+        : "Der Gratis-Weg braucht eine Werbeanbindung — im Prototyp " +
+          "noch nicht vorhanden.";
+      hydrateIcons($("qkLayer"));
+    }
+
+    /* ⚠ Belohnte Werbung ist im Projekt bisher NICHT eingebunden
+       (GAMEPLAY_OPTIMIERUNG §10, Punkt 3). Der Schalter steht hier, an
+       EINER Stelle, damit das Anbinden spaeter eine Zeile ist — und
+       damit im Code sichtbar bleibt, dass es sie noch nicht gibt. */
+    var WERBUNG_VERFUEGBAR = false;
+
+    function marke() {
+      var b = $("tileOfflineBadge");
+      if (!b) return;
+      var st = AO.stand(jetzt());
+      b.style.display = st.bereit ? "" : "none";
+    }
+
+    function oeffne() {
+      zeichne();
+      $("offLayer").classList.add("open");
+      $("offLayer").setAttribute("aria-hidden", "false");
+      track("offline_open", {});
+    }
+    function schliesse() {
+      $("offLayer").classList.remove("open");
+      $("offLayer").setAttribute("aria-hidden", "true");
+      marke();
+    }
+    function schliesseQuick() {
+      $("qkLayer").classList.remove("open");
+      $("qkLayer").setAttribute("aria-hidden", "true");
+      $("offLayer").classList.remove("zu");
+    }
+
+    function hole() {
+      var r = AO.claim(jetzt());
+      if (!r.ok) { UISfx.deny(); toast("Es liegt noch nichts bereit."); return; }
+      setGold(gold() + r.gold);
+      /* Material ohne Sortenangabe: der Round-Robin verteilt es ueber
+         die Basis-Sorten. Spell-Essenz kommt bewusst NICHT von hier —
+         die hat ihre eigene Quelle (Spell-Slots). */
+      if (r.material) AC.addMaterial(r.material);
+      if (r.karten) {
+        for (var i = 0; i < r.karten; i++) {
+          AC.addDrop(POOL_IDS[Math.floor(Math.random() * POOL_IDS.length)], "common", 1);
+        }
+      }
+      UISfx.reward();
+      track("offline_claim", { gold: r.gold, stunden: Math.round(r.gutH) });
+      toast("+" + fmt(r.gold) + " Gold aus " + stundenText(r.gutH) + " Abwesenheit");
+      schliesse();
+      renderTop();
+    }
+
+    function quick(art) {
+      var opts = art === "gratis" ? { werbungGesehen: WERBUNG_VERFUEGBAR }
+                                  : { gems: gems() };
+      var r = AO.quick(art, jetzt(), opts);
+      if (!r.ok) {
+        UISfx.deny();
+        toast({ keine_werbung: "Werbung ist im Prototyp noch nicht angebunden.",
+                aufgebraucht: "Für heute aufgebraucht.",
+                gems: "Nicht genug Kristalle." }[r.grund] || "Geht gerade nicht.");
+        zeichneQuick();
+        return;
+      }
+      if (r.gemKosten) setGems(gems() - r.gemKosten);
+      UISfx.reward();
+      track("offline_quick", { art: art });
+      toast("+" + r.minuten + " Minuten Offline-Ertrag");
+      schliesseQuick();
+      zeichne();
+      renderTop();
+    }
+
+    function binde() {
+      if (!AO) return;
+      AO.start(jetzt());
+      var k = $("icoOffline"); if (k) k.addEventListener("click", oeffne);
+      var c = $("offClose"); if (c) c.addEventListener("click", schliesse);
+      var cl = $("offClaim"); if (cl) cl.addEventListener("click", hole);
+      var q = $("offQuick"); if (q) q.addEventListener("click", function () {
+        zeichneQuick();
+        $("offLayer").classList.add("zu");
+        $("qkLayer").classList.add("open");
+        $("qkLayer").setAttribute("aria-hidden", "false");
+      });
+      var qc = $("qkClose"); if (qc) qc.addEventListener("click", schliesseQuick);
+      var qf = $("qkFree"); if (qf) qf.addEventListener("click", function () { quick("gratis"); });
+      var qg = $("qkGem"); if (qg) qg.addEventListener("click", function () { quick("gems"); });
+      $("offLayer").addEventListener("click", function (e) {
+        if (e.target.id === "offLayer") schliesse();
+      });
+      $("qkLayer").addEventListener("click", function (e) {
+        if (e.target.id === "qkLayer") schliesseQuick();
+      });
+      marke();
+      /* Die Marke wandert mit der Zeit an — einmal je Minute reicht,
+         der Ertrag laeuft in Stunden. */
+      setInterval(marke, 60 * 1000);
+    }
+
+    return { binde: binde, marke: marke, oeffne: oeffne, zeichne: zeichne,
+             _quick: quick, _werbung: function (an) { WERBUNG_VERFUEGBAR = !!an; } };
+  })();
+
   var UIQuoten = (function () {
     function zeile(t, jePack) {
       return "<tr><td><span class=\"pkt\" style=\"background:" + t.color + "\"></span>" +
@@ -16663,6 +17032,7 @@ button.pfplate{cursor:pointer}
   applySettings();          // Sound-Schalter wirkt ab dem ersten Frame
   if (window.ArenaAudio) ArenaAudio.music("audio_theme");   // startet beim 1. Tap
   renderDaily();
+  UIOffline.binde();        // startet den Zeitstempel und setzt die Marke
   setNav("navHome");
   markPressable();         // EINE Interaktions-Schicht fuer alles Klickbare
   UIBadge.set("pack", 1);  // Demo: ein Gratis-Tagespack wartet
@@ -16713,6 +17083,8 @@ button.pfplate{cursor:pointer}
                      openJokerInfo: openJokerInfo,
                      setPackState: function (arr) { packState = arr; renderPack(); },
                      SPELL_IDS: SPELL_IDS, renderSpells: renderSpells,
+                     offOeffne: UIOffline.oeffne, offMarke: UIOffline.marke,
+                     offWerbung: UIOffline._werbung,
                      /* Fuer den Pruefstand: die Marken-Fabrik und die Tabelle.
                         Ohne sie liesse sich nicht messen, ob die sieben Pfade
                         tatsaechlich zeichnen — genau die Frage, die ein

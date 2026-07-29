@@ -529,13 +529,21 @@ größten Teil des Effekts.
 
 ---
 
-## 10. „Offline Earnings" — Beobachtung aus dem Referenzvideo (VORSCHLAG, nicht gebaut)
+## 10. Offline-Erträge — GEBAUT am 30.07.2026
 
-> **Quelle:** User-Referenzvideo eines anderen Mobile-TD (dasselbe Video, aus dem der
-> Login-Kalender und das Guide-System stammen). **Status: bewusst NICHT umgesetzt** — hier nur
-> festgehalten, damit die Entscheidung nachvollziehbar bleibt.
+> **Status: umgesetzt.** `arena_offline.js` (41 eigene Prüfschritte) + Dialog im Prototyp
+> + `pruefungen/offline.js` (42 Schritte, Browser).
+>
+> **Diese Sektion stand bis zum 30.07.2026 unter der Überschrift „VORSCHLAG, nicht gebaut".**
+> Der Auftraggeber hat die Entscheidung überstimmt: *„Das ist irgendwie im Bau verlorengegangen
+> die offline earnings. Das ist ein wichtiger Bestandteil um Gold und Materialien zu bekommen
+> während man nicht spielt muss eingefügt werden."* Das ist eine Design-Entscheidung, keine
+> Widerlegung — die drei Einwände unten waren richtig gestellt und mussten beim Bau
+> **beantwortet** werden, statt zu verschwinden. Wie, steht in §10.3.
 
-**Was das Referenzspiel macht:** Beim Start erscheint ein Panel „Offline Earnings" mit einer
+### 10.1 Was das Referenzspiel macht
+
+**Beim Start** erscheint ein Panel „Offline Earnings" mit einer
 Abrechnung der Zeit seit dem letzten Login:
 
 | Element | Beobachtung |
@@ -549,7 +557,7 @@ Abrechnung der Zeit seit dem letzten Login:
 einen Rückkehrgrund, der ohne Spielzeit auskommt. Der 8-h-Deckel erzeugt zusätzlich ein
 weiches Sitzungsraster („zweimal am Tag reinschauen lohnt, dreimal nicht").
 
-**Warum wir es (noch) nicht bauen — drei Gründe:**
+### 10.2 Die drei Einwände (Stand vor dem Bau, unverändert zitiert)
 
 1. **Es steht quer zu unserer Ökonomie.** Gold ist bei uns der Endgame-Bottleneck und
    ausdrücklich *an Leistung* gekoppelt (Match-Gold, Siegesserie, Festungs-Senke,
@@ -563,11 +571,45 @@ weiches Sitzungsraster („zweimal am Tag reinschauen lohnt, dreimal nicht").
    bisher bewusst ausgeschlossen (siehe „Was AA macht, das wir bewusst nicht übernehmen").
    Ohne Werbung bleibt nur der Gem-Kauf — und damit wäre das Panel eine reine Verkaufsfläche.
 
-**Wenn wir es später doch bauen, dann so:** nicht als Gold-Quelle, sondern als **Material- und
-XP-Quelle** (Ressourcen, die keine Endgame-Senke bedienen), Deckel bei 8 h, **kein** Boost gegen
-Gems, und **eingefaltet in den Login-Kalender** statt als eigenes Popup — eine zusätzliche Zeile
-„Während deiner Abwesenheit gesammelt" unter den sieben Kacheln. Dann kostet es kein
-zusätzliches Popup und keine Glaubwürdigkeit.
+### 10.3 Wie die drei Einwände beim Bau beantwortet wurden
+
+Der Auftrag lautete ausdrücklich **„Gold und Materialien"** — die alte Ausweichlösung
+(„nur Material und XP, kein Gold") war damit vom Tisch. Gold ist drin. Die Einwände bleiben
+trotzdem gültig, also musste jeder einzeln entschärft werden:
+
+| Einwand | Antwort im Bau | Wo es steht |
+|---|---|---|
+| **1. Gold für Nichtstun entwertet die Tagesquests** | Die Rate ist **eine** Stellschraube (`RATEN.gold`), gemessen gegen den Tagesertrag der Quests. Ein **voller** Deckel bringt 8 × 1 100 = **8 800 Gold** und bleibt damit unter den **9 000** eines gespielten Tages. Nichtstun kann Spielen also nie schlagen. AA nimmt 1 400/h — wir bewusst weniger. | `arena_offline.js`, Selbsttestschritt „ein voller Deckel bleibt unter dem Tagesertrag der Quests" |
+| **2. Drei gestapelte Start-Popups** | Der Dialog öffnet sich **von selbst überhaupt nicht**. Das Modul setzt nur eine **Marke** am Hub-Knopf; geöffnet wird er per Tap. Damit bleibt es bei zwei Start-Popups wie bisher. | `UIOffline.marke()`, Prüfschritt „ohne Guthaben ruft sie NICHT" |
+| **3. „Quick Earnings" braucht Werbung** | Der Gem-Weg ist gebaut, der Werbe-Weg wird **ehrlich verweigert**: `quick("gratis", …)` gibt `{ok:false, grund:"keine_werbung"}` zurück, und der Dialog schreibt hin, dass die Anbindung fehlt — statt einen toten Knopf hinzustellen. Sobald ein Anbieter angebunden ist, ist es ein Einzeiler. | Prüfschritte „ohne gesehene Werbung liefert der Gratis-Weg nichts" / „der Dialog sagt dem Spieler, dass die Anbindung fehlt" |
+
+### 10.4 Die gebauten Zahlen
+
+| Größe | Wert | Begründung |
+|---|---|---|
+| Deckel | **8 h** | wie im Referenzspiel; erzeugt das weiche „zweimal am Tag"-Raster |
+| Gold/h | **1 100** | siehe Einwand 1 — voller Deckel < Tagesquests |
+| XP/h | **140** | AA: 160 |
+| Material | Stufen bei 2/4/6/8 h → 20/40/60/80 | springt sichtbar, statt linear zu tröpfeln |
+| Karten | Stufen bei 2/4/6/8 h → 1/2/3/4 | dito |
+| Schnell-Ertrag | 120 min, 3× gratis + 3× für Gems pro Tag, 50 Gems | Gems-Preis, **kein** In-Game-Gold als Kaufwährung |
+
+**Zwei Entscheidungen, die man beim Nachlesen leicht für Flüchtigkeitsfehler hält:**
+
+1. **`claim()` setzt `seit = jetzt`, nicht `seit = jetzt − Überhang`.** Wer 20 h weg war,
+   bekommt 8 h und die restlichen 12 h sind **weg**. Würde man den Überhang stehen lassen,
+   wäre der Deckel zahnlos — man könnte ihn durch mehrfaches Abholen umgehen. Der Dialog sagt
+   das offen: *„Du warst 20 h weg, angerechnet wurden 8 h."*
+2. **`start()` überschreibt einen vorhandenen Zeitstempel nicht.** Sonst würde jeder Reload
+   die gesammelte Zeit wegwerfen.
+
+### 10.5 Was der ursprüngliche Vorschlag anders wollte
+
+Der alte Absatz schlug vor, die Erträge **in den Login-Kalender einzufalten** statt einen
+eigenen Dialog zu bauen. Das ist nicht umgesetzt: der Auftraggeber hat den Dialog des
+Referenzspiels mit Screenshots vorgegeben (eigenes Panel, Video-Kopf, Belohnungsraster,
+„Quick Earnings"). Der Popup-Einwand ist stattdessen über die Marke gelöst (Einwand 2) —
+das Panel existiert, drängt sich aber nicht auf.
 
 ---
 

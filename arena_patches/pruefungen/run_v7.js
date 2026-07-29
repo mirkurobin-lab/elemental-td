@@ -174,8 +174,8 @@ function step(name, ok, info) {
     daily: document.querySelectorAll('#viewHome .dailypanel').length,
     hubrows: document.querySelectorAll('#viewHome .hubrow, #viewHome .hubrow2').length,
     icons: document.querySelectorAll('.apphead .profrow .hubicon').length,
-    railtiles: document.querySelectorAll('#viewHome .hubband .hubrail .railtile').length,
-    railsLinks: document.querySelectorAll('#viewHome .hubband > .hubrail:first-child .railtile').length,
+    railsLinks: document.querySelectorAll('#viewHome .hubband .hubrail.left .railtile').length,
+    railsRechts: document.querySelectorAll('#viewHome .hubband .hubrail.right .railtile').length,
     // Die Profilzeile sitzt seit dem Kopf-Umbau im GLOBALEN Kopf, nicht
     // mehr in #viewHome — AA zeigt sie auf jedem Bildschirm (IMG_3347).
     kopfIcons: document.querySelectorAll('.apphead .profrow .hubicons > *').length,
@@ -207,9 +207,17 @@ function step(name, ok, info) {
   // einem anderen Reiter — „Links auf dem hauptbildschirm ist 3x das
   // gleiche". Der Kalender oeffnet es auf LOGIN, die uebrigen Reiter
   // stehen dort oben. Der Zaehler fasst jetzt alle vier zusammen.
+  // UMGESCHRIEBEN 30.07.2026: Bis hierher zaehlten drei Schritte `.railtile`
+  // OHNE Seitenangabe und verglichen mit 1. Das war nur richtig, solange die
+  // RECHTE Schiene leer war — der Schrittname sagte trotzdem „linke Schiene".
+  // Seit die Offline-Ertraege dort einen Knopf haben (AA_UI_REFERENZ §26),
+  // wurden sie rot, ohne dass die Anforderung verletzt war. Die lautet:
+  // „Links auf dem hauptbildschirm ist 3x das gleiche" darf nicht
+  // wiederkommen — je Schiene GENAU EINE Kachel, keine zwei Wege ins selbe
+  // Fenster. Gemessen wird ab jetzt je Seite getrennt.
   step('Belohnungen haengen senkrecht an der Seite, nicht im Kopf',
-    declutter.railtiles === 1 && declutter.railsLinks === 1,
-    declutter.railsLinks + ' links / ' + (declutter.railtiles - declutter.railsLinks) + ' rechts');
+    declutter.railsLinks === 1 && declutter.railsRechts === 1,
+    declutter.railsLinks + ' links / ' + declutter.railsRechts + ' rechts');
   step('Profilzeile traegt nur noch Freunde + Menue',
     declutter.kopfIcons === 2 && declutter.icons === 0, String(declutter.kopfIcons));
   step('Genau 4 Hex-Slots wie AA (§14.3)', declutter.slots === 4, String(declutter.slots));
@@ -487,7 +495,8 @@ function step(name, ok, info) {
       holes: [...document.querySelectorAll('img.ico, img.prodimg, img.navimg, img.plusimg')]
         .filter(i => i.complete && i.naturalWidth === 0).length,
       // Siehe oben: die Kopf-Icons sind zu den Schienen gewandert.
-      railIcons: document.querySelectorAll('.hubrail .railtile').length,
+      railIcons: document.querySelectorAll('.hubrail.left .railtile').length,
+      railIconsR: document.querySelectorAll('.hubrail.right .railtile').length,
     };
   });
   step('Alle Utility-Icons aus Batch 6 registriert',
@@ -495,6 +504,8 @@ function step(name, ok, info) {
   // 1 statt 7 seit dem 27.07.: siehe Begruendung weiter oben.
   step('Die linke Hub-Schiene traegt eine Kachel',
     utilIcons.railIcons === 1, String(utilIcons.railIcons));
+  step('Die rechte Hub-Schiene traegt eine Kachel (Offline-Ertraege)',
+    utilIcons.railIconsR === 1, String(utilIcons.railIconsR));
   step('Kein leeres Bildfeld: UIIcon.sweep hat alle Loecher geschlossen',
     utilIcons.holes === 0, utilIcons.holes + ' Loecher');
 
@@ -1736,7 +1747,8 @@ function step(name, ok, info) {
       pillen: pillen.map(e => Math.round(e.getBoundingClientRect().width)),
       links: b('.hubrail.left'), mitte: b('.hubmid'), rechts: b('.hubrail.right'),
       banner: b('.passbanner'), diorama: b('.diorama'),
-      kacheln: document.querySelectorAll('.railtile').length,
+      kacheln: document.querySelectorAll('.hubrail.left .railtile').length,
+      kachelnR: document.querySelectorAll('.hubrail.right .railtile').length,
       freunde: !!document.getElementById('tbFriends'),
       menuNeben: (() => {
         const f = document.getElementById('tbFriends'), m = document.getElementById('tbMenu');
@@ -1769,8 +1781,10 @@ function step(name, ok, info) {
     heim.links && nah(heim.links.b, 17, 3), heim.links ? heim.links.b + ' %' : '-');
   step('Rechte Schiene an AAs Platz (17 %)',
     heim.rechts && nah(heim.rechts.b, 17, 3), heim.rechts ? heim.rechts.b + ' %' : '-');
-  step('Eine Schienen-Kachel (Belohnungen, alle vier Reiter)',
+  step('Eine Schienen-Kachel links (Belohnungen, alle vier Reiter)',
     heim.kacheln === 1, heim.kacheln + ' Kacheln');
+  step('Eine Schienen-Kachel rechts (Offline-Ertraege, §26)',
+    heim.kachelnR === 1, heim.kachelnR + ' Kacheln');
   /* Nachgemessen an IMG_3344 in voller Aufloesung: 54,3 % breit,
      19,0 % hoch. Die alten 52,7/17,7 stammten aus einer zu kleinen
      Vorlage — der Nutzer hat zu Recht gesagt, die Arena sei zu klein. */

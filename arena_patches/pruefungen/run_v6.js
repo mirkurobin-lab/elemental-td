@@ -69,7 +69,16 @@ function step(name, ok, info) {
   const knoepfe = await page.locator('.profrow .hubicons .tbmenu').count();
   step('Namenszeile traegt nur Freunde- und Menue-Knopf (wie AA)',
     knoepfe === 2, String(knoepfe));
-  const schienen = await page.locator('.hubrail .railtile').count();
+  // UMGESCHRIEBEN 30.07.2026: Der Waehler griff auf `.hubrail` OHNE Seite und
+  // zaehlte damit BEIDE Schienen zusammen — der Schrittname sagte „linke
+  // Schiene", gemessen wurde die Summe. Solange die rechte Schiene leer war,
+  // fiel das nicht auf. Mit den Offline-Ertraegen (§26) traegt sie einen
+  // Knopf, und der Schritt wurde rot, ohne dass die Anforderung dahinter
+  // verletzt war. Die lautete: „Links auf dem hauptbildschirm ist 3x das
+  // gleiche" — es darf NICHT mehrere Kacheln geben, die dasselbe Fenster
+  // oeffnen. Genau das wird jetzt gemessen, je Schiene getrennt.
+  const schienen = await page.locator('.hubrail.left .railtile').count();
+  const schienenRechts = await page.locator('.hubrail.right .railtile').count();
   // UMGESCHRIEBEN 27.07.: waren 7 (3 links + 4 rechts). Die rechte
   // Schiene ist entfallen — Rangliste und Post stehen im Aufklapp-Menue,
   // der Kristalltresor im Shop, die Packs an den Truhen-Slots. Uebrig
@@ -80,8 +89,12 @@ function step(name, ok, info) {
   // einem anderen Reiter — „Links auf dem hauptbildschirm ist 3x das
   // gleiche". Der Kalender oeffnet es auf LOGIN, die uebrigen Reiter
   // stehen dort oben. Der Zaehler fasst jetzt alle vier zusammen.
-  step('Die Belohnungs-Kachel sitzt in der linken Schiene',
+  step('Die Belohnungs-Kachel sitzt allein in der linken Schiene',
     schienen === 1, String(schienen));
+  step('Die rechte Schiene traegt genau den Offline-Knopf',
+    schienenRechts === 1 &&
+    (await page.locator('.hubrail.right #icoOffline').count()) === 1,
+    String(schienenRechts));
   step('Alte Text-Hub-Kacheln entfernt (Entruempelung)',
     (await page.locator('#tileClanSub').count()) === 0 &&
     (await page.locator('.hubrow').count()) === 0 &&

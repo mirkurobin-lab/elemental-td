@@ -262,6 +262,94 @@ Beispiele aus diesem Verzeichnis:
   ganze Bestiarium" → „Gegner- und Boss-Reiter zusammen zeigen es" und
   „Zurück geht Detail → Gitter → Rad" → „Zurück geht eine Ebene hoch".
 
+## Wenn eine Erklärung sich anbietet, erst nachmessen (30.07.2026)
+
+Im Offline-Dialog stand statt eines Kartensymbols ein **leeres weißes Rechteck**.
+Die naheliegende Erklärung: das Zeichen 🂠 hat in dieser Umgebung keinen
+Schnitt, der Browser zeigt einen Ersatzkasten. Daraus wurde ein Prüfschritt
+gebaut, der Zeichen im Unicode-Spielkartenblock verbietet.
+
+**Beides war falsch.** Nachgemessen:
+
+| Zeichen | Breite bei 40 px |
+|---|---|
+| fehlender Codepunkt (U+10FFFD) | 30,0 px |
+| 🂠 U+1F0A0 | **40,9 px** |
+| ⚗ (liest sich einwandfrei) | 35,9 px |
+| 🃏 U+1F0CF | 49,9 px |
+
+🂠 hat sehr wohl einen Schnitt — er **zeichnet** nur eine leere Karte. Und der
+Blocktest hätte 🃏 verboten, also genau die richtige Lösung. Ein Prüfschritt,
+der aus einer plausiblen Erklärung statt aus einer Messung gebaut wird,
+schreibt den Denkfehler fest; dieser hier war beim ersten Lauf rot, obwohl
+nichts kaputt war.
+
+Zwei Lehren, beide stehen im Kopf von `offline.js`:
+
+1. **„Sieht blank aus" ist mit CSS nicht messbar.** ⚗ ist schmaler als 🂠 und
+   völlig in Ordnung. Der Fehler wurde durch **Ansehen** des Screenshots
+   gefunden — wie schon die unsichtbare `.pkcard`. Das wird in der Prüfung
+   offen zugegeben statt mit einem Ersatzmaß überdeckt.
+2. **Die messbare Klasse darunter wird trotzdem geprüft**: ein Rückfall ohne
+   jeden Schnitt. Verglichen wird gegen die zur Laufzeit ermittelte Breite
+   eines garantiert leeren Codepunkts — nicht gegen die fest verdrahtete 30.
+
+## Mutationstest: die Prüfung selbst kaputtmachen (30.07.2026)
+
+`offline.js` war beim ersten grünen Lauf 42 von 42. Das sagt für sich genommen
+nichts — eine Prüfung, die nichts misst, ist auch grün. Deshalb wurden drei
+echte Fehler eingebaut und jeweils geprüft, dass die Datei rot wird:
+
+| Mutation | erwartete Meldung | kam |
+|---|---|---|
+| Gold-Rate im Dialog fest verdrahtet (`1400` statt aus dem Modul) | Rate entkoppelt | ✔ „1400 gegen 1100" |
+| `#offLayer.zu .itemclose` auf `visible` | zwei ✕ | ✔ „2 sichtbare ✕" |
+| `DECKEL_H = 999` | Deckel greift nicht | ✔ zwei Schritte rot |
+
+Die dritte Mutation hat zusätzlich einen **Fehler in der Prüfung** aufgedeckt:
+der Schritt behauptete `gold === deckel × rate` und fiel um, obwohl das Modul
+mit aufgehobenem Deckel völlig korrekt die vollen 20 h zahlte. Er prüfte seine
+eigene Annahme („20 > Deckel") mit. Jetzt prüft er die Formel
+(`min(abwesend, deckel) × rate`), und **dass** der Deckel greift, sagt die
+Gegenprobe daneben. Ohne den Mutationstest wäre das nie aufgefallen.
+
+## Bekannt rot: „gleiche Drittel" gegen „nichts abschneiden" (30.07.2026)
+
+`run_v7.js` meldet **einen** Fehlschlag, der **nicht** aus der Arbeit an den
+Offline-Erträgen stammt — er besteht schon im Stand von `HEAD` (nachgeprüft,
+indem die Prüfung gegen `git show HEAD:…/ui_prototype.html` lief):
+
+```
+FAIL Die drei Waehrungen teilen die Leiste in gleiche Drittel  — 102 / 102 / 110 px
+```
+
+Dahinter stehen **zwei Anforderungen des Auftraggebers, die sich widersprechen**:
+
+| # | Anforderung | Folge im CSS |
+|---|---|---|
+| A | *„Ressourcen Anzahl … muss zentriert sein"* (IMG_3386) — drei Zahlen auf einer Mitte | verlangt `flex:1 1 0`, exakte Drittel |
+| B | Gold darf nicht als „12 5…" abgeschnitten werden (Befund aus dem Agenten-Audit) | verlangt `flex:1 1 auto`, Breite nach Inhalt |
+
+Gemessen, damit die Entscheidung nicht wieder aus dem Bauch fällt:
+
+| Aufbau | Breiten | Gold abgeschnitten? |
+|---|---|---|
+| `flex:1 1 auto` (heute) | 91,8 / 91,8 / **99,6** | nein |
+| `flex:1 1 0` bei 390 px | 94,4 / 94,4 / 94,4 | **ja**, schon bei „12 500" |
+| `flex:1 1 0` + Abstände auf 3/2 px bei 360 px | 86,5 × 3 | **ja** |
+
+Die Abstände zu trimmen reicht **nicht**: bei 360 px passt keine sechs- oder
+siebenstellige Zahl in ein Drittel bei 14 px Schrift. Beide Anforderungen sind
+nur gleichzeitig erfüllbar, wenn die Zahl **kürzer wird** — also mit einer
+kompakten Schreibweise („126 K", „1,27 Mio."), wie AA und praktisch jedes
+Mobile-Spiel sie im Kopf benutzt.
+
+**Das ist eine Produktentscheidung, keine Aufräumarbeit**, und sie ändert die
+Darstellung jeder Währung im Spiel. Deshalb bleibt der Schritt bewusst **rot**,
+statt ihn auf eine Toleranz aufzuweichen: eine Prüfung, die man passend macht,
+damit sie grün ist, hätte den Konflikt für immer zugedeckt. Sobald die
+Schreibweise entschieden ist, wird der Schritt grün, ohne dass man ihn anfasst.
+
 ## Was hier NICHT liegt
 
 Die Wegwerf-Skripte aus der Arbeit am Prototyp (`diag*.js`, `mess*.js`,
