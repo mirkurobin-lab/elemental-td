@@ -110,6 +110,43 @@ def lauf():
     else:
         print("ok    jede Datei aus HERKUNFT.json liegt wirklich da")
 
+    # ------------------------------------------------------------------
+    # Zeigt die gesicherte Datei noch auf DIESELBE Quelle?
+    #
+    # Diese dritte Frage fehlte, und ihr Fehlen ist am 29.07.2026 sofort
+    # aufgefallen: Die acht Pack-Bilder wurden gegen eine neue Fassung
+    # getauscht — neuer URL, gleicher Schluessel. Die beiden Pruefungen
+    # oben meldeten weiter gruen, weil sie nur nach dem SCHLUESSEL fragen.
+    # Auf der Platte lagen aber noch die alten Bilder.
+    #
+    # Ein gruener Balken, der eine veraltete Datei durchwinkt, ist
+    # schlimmer als gar keine Pruefung: er beendet das Nachschauen.
+    # ------------------------------------------------------------------
+    def stamm(u):
+        """Dateiname ohne `_min` und ohne Endung — die Fassungen `x.png`
+        und `x_min.webp` sind dasselbe Asset."""
+        n = os.path.splitext(os.path.basename((u or "").split("?")[0]))[0]
+        return n[:-4] if n.endswith("_min") else n
+
+    veraltet = []
+    for k, v in gesichert.items():
+        e = liste.get(k)
+        soll_url = e.get("url") if isinstance(e, dict) else e
+        if not isinstance(soll_url, str):
+            continue
+        if stamm(soll_url) != stamm(v.get("quelle")):
+            veraltet.append(k)
+    if veraltet:
+        fehler += 1
+        print("FEHL  %d gesicherte Dateien stammen aus einer ANDEREN Quelle "
+              "als ui_assets.json jetzt nennt:" % len(veraltet))
+        print("        " + ", ".join(veraltet[:12]))
+        print("      -> Workflow „Assets sichern\" erneut ausloesen, danach "
+              "freistellen.py laufen lassen.")
+    else:
+        print("ok    jede gesicherte Datei stammt aus der Quelle, die "
+              "ui_assets.json nennt")
+
     return fehler
 
 

@@ -6585,10 +6585,18 @@ button.pfplate{cursor:pointer}
     banner_rarity_v1: CDN + "hf_20260725_095716_6936452c-84d2-4fc4-ba15-4fa77ef8e6bd.png",
     banner_title:   CDNA + "346f0446-686b-454e-a5af-0d81967dcde5.png",   // v2, zugeschnitten
     banner_title_v1: CDN + "hf_20260725_095720_71db8bf1-f9c9-4acd-9d17-8ce7462e384d.png",
-    pack_bronze:    CDNA + "0c390187-c765-4139-88dd-7ad3245ea270.png",
-    pack_silver:    CDNA + "bb8037d7-9ee3-404e-9140-2a7faeb2dc4f.png",
-    pack_gold:      CDNA + "9f8cf919-6372-4b16-ae3e-f2adcda3fe5f.png",
-    pack_arcane:    CDNA + "18eee4bf-7483-4d88-8a93-af4ed3e8c6de.png",
+    /* Packs, Fassung 3 (29.07.2026) — nach dem Vorbild aus dem Drive-Video
+       (Hearthstone „Rise of Shadows"-Pack). Vorher war jede Stufe ein
+       EIGENES Objekt: Coffer, Schrein, Orb, Stern. Vier Bauarten neben-
+       einander lesen im Regal nicht als eine Familie, sondern als vier
+       Ideen. Jetzt ist es EINE Bauart — gebundenes Buendel mit gebrochener
+       Kante, zwei Gurte, in der Mitte EIN glühendes Prismen-Dreieck — und
+       nur Gurtmaterial und Glutfarbe unterscheiden die Stufen. Das ist
+       exakt das Prinzip des Vorbilds und der Grund, warum es funktioniert. */
+    pack_bronze:    CDN + "hf_20260729_092050_c642932f-6320-4f19-a6d7-7d63f679b6e1.png",
+    pack_silver:    CDN + "hf_20260729_092101_d6ef132d-fde6-42d1-bbb7-302de9e539c3.png",
+    pack_gold:      CDN + "hf_20260729_093315_d77a6d22-bcbc-4537-94ea-6e6db18c43bb.png",
+    pack_arcane:    CDN + "hf_20260729_093329_69f8ec73-4817-40c1-89db-a001793e19db.png",
     progress_frame: CDN + "hf_20260725_095742_a6bc63f3-733e-416b-b018-8358ca597e98.png",
     arena1:         CDN + "hf_20260725_095747_28a90d71-c3ab-4911-afd5-969483bfa22c.png",
     arena2:         CDN + "hf_20260725_095757_8ddd3202-0a7c-4f43-82a7-1d9d6a06d038.png",
@@ -6717,14 +6725,26 @@ button.pfplate{cursor:pointer}
        ist das quadratische Icon fuer die Produktkachel. Der Schluessel
        heisst deshalb `icon_arena_pack` und nicht `offer_*`: er sagt,
        WAS das Bild ist, nicht in welchem Angebot es gerade steckt. */
-    icon_arena_pack:       CDNA + "00257f1f-fd9b-4098-a945-cb190d8aacce.png",
+    icon_arena_pack:       CDN + "hf_20260729_093558_832b7c89-1eb3-41dc-b496-6166eab7b247.png",
     /* Beide ersetzt (Batch 12). Der Starter hatte kein brauchbares
        Produktbild — „das startet pack hat kein Bild bzw Icon sieht
        schlecht aus". Beim Tresor ist das Glasgefaess ABSICHTLICH leer und
        durchsichtig: die Fuellstandssaeule ist CSS und muss darunter
        durchscheinen, ein gefuelltes Glas im Bild wuerde sie verdecken. */
-    offer_starter:         CDNA + "a19085c8-1063-4ec4-9035-332b2e4ff8df.png",
-    offer_vault_bank:      CDNA + "10812943-e615-4957-860c-8c9b20eca6af.png",
+    /* Fassung 3: beide sind jetzt Packs derselben Familie. Der Tresor
+       traegt statt der Gurte einen Riegel mit Zahlenrad — das ist sein
+       einziges Unterscheidungsmerkmal und muss deshalb auf 20 px noch
+       lesbar sein; deswegen quer ueber die ganze Breite und nicht als
+       kleines Schloss in der Ecke. Die alte Glas-Amphore ist damit weg:
+       die Fuellstandssaeule ist eine CSS-Ebene HINTER dem Bild (siehe
+       `.vaultjar`, z 0), und durch das GLAS sah man sie. Ein deckender
+       Pack verdeckt sie in seiner Flaeche; nach dem Freistellen bleibt
+       sie nur noch RUND UM den Pack sichtbar. Das ist weniger, aber
+       nicht nichts — wer den vollen Stand zurueck will, legt die Saeule
+       UEBER den Pack statt darunter. Nachtrag: bis dahin gilt der
+       Zahlenwert daneben als fuehrende Anzeige. */
+    offer_starter:         CDN + "hf_20260729_093545_9c7815bd-4e00-449e-a02e-0c60a9f4e6db.png",
+    offer_vault_bank:      CDN + "hf_20260729_093410_046b5c20-96cb-4330-9bdc-4717f37a47d4.png",
     frame_card_orange:     CDN + "hf_20260726_042716_5bf79216-8800-472c-ab73-d9f93ea05991.png",
     frame_card_green:      CDN + "hf_20260726_042717_86ae6639-d698-4dfe-b5d0-6d042162c301.png",
     frame_card_light:      CDN + "hf_20260726_042727_98b627aa-e2fa-4869-a7db-4ddc1dff974a.png",
@@ -6891,7 +6911,7 @@ button.pfplate{cursor:pointer}
        ist die 21:9-Kulisse und liegt per bgArt() UNTER dem Inhalt —
        zwei Rollen, zwei Schluessel. Ein quadratisches Motiv unter
        `pack_vorrat` haette die Kulisse zerstoert. */
-    pack_vorrat_icon:  CDNA + "b13791d6-fb66-4c64-b7d9-36c607ece067.png",
+    pack_vorrat_icon:  CDN + "hf_20260729_093400_3e4edac8-9bd2-4650-b93c-f187a5764cf5.png",
     pack_vorrat:       CDN + "hf_20260727_093851_f11ee134-dfd3-4798-9d63-74f8d764f6a9.png",
     /* Gratis-Bereiche: Breitbanner fuer das Gratis-Gold, Rosette fuers
        taegliche Bronze-Pack. Beide textfrei — die Schrift kommt aus CSS,

@@ -1100,15 +1100,13 @@
   "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042818_625922e2-1731-4af8-ba70-c819bbb8b615.png"
  },
  "icon_arena_pack": {
-  "batch": 17,
-  "beschreibung": "Arena-Pack-PRODUKTIKON (Batch 17, NEUER Schluessel): ein heraldischer Schild — oben gerade, unten spitz — mit tiefblauer Saphir-Kristallflaeche in schwerer, glatter Goldfassung, EIN blauer Stein in der Mitte, darueber ein kleiner goldener Turnierbogen. Umriss: klassischer Schild (Motiv 64 % breit x 75 % hoch). Farbakzent Saphirblau/Gold.",
-  "herkunft": "Generierung 28008a4e (nano_banana_pro, 1:1, 1k). Danach deterministisch eingepasst: Massstab s=0,995, Motiv auf die Bildmitte verschoben, Hintergrund ausserhalb einer um 12 px erweiterten Motivmaske auf glattes #0e1418 gesetzt. Eigener Upload, daher d2ol7oe51mr4n9-URL wie bei av_smaragd.",
+  "batch": 18,
+  "beschreibung": "Bauart 3 (29.07.2026), nach dem Vorbild aus dem Drive-Video: ein gebundenes Buendel dunkler Obsidiantafeln mit GEBROCHENER Kante oben und unten, zwei Gurte quer, dazwischen genau EIN abwaerts zeigendes Prismen-Dreieck mit weissgluehendem Rand und Kristallglyph darin. Alle acht Packs teilen diese Bauart; es unterscheiden sich nur Gurtmaterial und Glutfarbe. Arena-Pack-Produktikon. Kampfspurige dunkelrote Guerte mit verbeultem Stahlbeschlag, Glut KARMINROT. `packart_arena1..8` bleiben die 21:9-Kulissen des Karussells.",
+  "herkunft": "Generierung 832b7c89-1eb3-41dc-b496-6166eab7b247 (nano_banana_pro, 3:4, 1k, Batch 18 — Packfamilie nach dem Hearthstone-Vorbild aus dem Drive-Video vom 29.07.2026). Auftrag mit der Hintergrundregel AN ERSTER STELLE, nachdem vier Laeufe auf WEISSEM Grund zurueckkamen und damit fuer freistellen.py unbrauchbar waren.",
   "hinweis": "Bewusst ein EIGENER Schluessel: `packart_arena1..8` und `bg_iap_arena` sind KULISSEN im Format 21:9 und bleiben unangetastet. `offer_arena_pack` zeigt seit Batch 17 auf dasselbe Bild, damit die Neuerung ohne Eingriff in ui_prototype.html sichtbar wird; wer den Prototyp anfasst, sollte die Arena-Kachel auf `icon_arena_pack` umhaengen und `offer_arena_pack` danach fallen lassen.",
-  "job": "28008a4e-48dc-4f5a-9bba-6154e44a728b",
-  "messwerte": "Randring 2 px L 5,96 (max 5,96 — gesetztes #0e1418) · Randabstand 12,01 % · Motivanteil 32,7 % · Deckung ueber der Freistell-Schwelle 74,1 % · 72-px-Probe: Standardabweichung 50,88, Kantenenergie 8,53 · OCR 0 Zeichen · md5 der ausgelieferten URL identisch zum erzeugten PNG (b4d3876e9015c8fe23f82d6f0b9f7a36)",
-  "size": "1024x1024",
+  "job": "832b7c89-1eb3-41dc-b496-6166eab7b247",
   "type": "offer_art",
-  "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/00257f1f-fd9b-4098-a945-cb190d8aacce.png"
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260729_093558_832b7c89-1eb3-41dc-b496-6166eab7b247.png"
  },
  "icon_check": {
   "batch": 2,
@@ -1292,14 +1290,12 @@
   "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042708_f26a5521-f28b-489d-b62f-01543a8facc6.png"
  },
  "offer_starter": {
-  "batch": 17,
-  "beschreibung": "Starter-Pack-Produktbild (Batch 17): ein BUENDEL, kein Behaelter — hinten ein Faecher aus drei goldgerandeten Karten, davor ein Haufen grosser smaragdgruener Facettenkristalle, vorn ein Stapel Goldmuenzen, das Ganze von EINEM flachen Goldband zusammengehalten. Umriss: breiter dreieckiger Huegel (Motiv 66 % breit x 60 % hoch). Farbakzent Smaragdgruen/Gold — die einzige gruene Stufe im Shop.",
-  "herkunft": "Generierung aa0b73b5 (nano_banana_pro, 1:1, 1k). Danach deterministisch eingepasst: Massstab s=1,000 (unveraendert), Motiv auf die Bildmitte verschoben, Hintergrund ausserhalb einer um 12 px erweiterten Motivmaske auf glattes #0e1418 gesetzt. Eigener Upload, daher d2ol7oe51mr4n9-URL wie bei av_smaragd.",
-  "job": "aa0b73b5-c01a-4ad5-91cf-9d30b80cefcc",
-  "messwerte": "Randring 2 px L 5,96 (max 5,96 — gesetztes #0e1418) · Randabstand 16,50 % · Motivanteil 26,8 % · Deckung ueber der Freistell-Schwelle 82,4 % · 72-px-Probe: Standardabweichung 47,10, Kantenenergie 8,75 · OCR 0 Zeichen · md5 der ausgelieferten URL identisch zum erzeugten PNG (2edd54c4b1d3d42f128a50f0df9e3c7c)",
-  "size": "1024x1024",
+  "batch": 18,
+  "beschreibung": "Bauart 3 (29.07.2026), nach dem Vorbild aus dem Drive-Video: ein gebundenes Buendel dunkler Obsidiantafeln mit GEBROCHENER Kante oben und unten, zwei Gurte quer, dazwischen genau EIN abwaerts zeigendes Prismen-Dreieck mit weissgluehendem Rand und Kristallglyph darin. Alle acht Packs teilen diese Bauart; es unterscheiden sich nur Gurtmaterial und Glutfarbe. Starter-Pack-Produktbild. Schlichte gruene Lederguerte, matte Messingschnallen, KEINE Nieten — absichtlich der aermlichste der Familie. Glut GEDAEMPFTES SMARAGDGRUEN.",
+  "herkunft": "Generierung 9c7815bd-4e00-449e-a02e-0c60a9f4e6db (nano_banana_pro, 3:4, 1k, Batch 18 — Packfamilie nach dem Hearthstone-Vorbild aus dem Drive-Video vom 29.07.2026). Auftrag mit der Hintergrundregel AN ERSTER STELLE, nachdem vier Laeufe auf WEISSEM Grund zurueckkamen und damit fuer freistellen.py unbrauchbar waren.",
+  "job": "9c7815bd-4e00-449e-a02e-0c60a9f4e6db",
   "type": "offer_art",
-  "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/a19085c8-1063-4ec4-9035-332b2e4ff8df.png"
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260729_093545_9c7815bd-4e00-449e-a02e-0c60a9f4e6db.png"
  },
  "offer_starter_alt": {
   "_alt": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042710_a70613fb-df46-48af-95a8-1d71ddae335e.png",
@@ -1315,15 +1311,13 @@
   "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_115056_0dfab782-685e-4def-afa3-30913a3ab88a.png"
  },
  "offer_vault_bank": {
-  "batch": 17,
-  "beschreibung": "Kristalltresor-Produktbild (Batch 17): eine hohe, streng symmetrische AMPHORE aus klarem, farblosem Glas — schmaler Hals, weiter Bauch, schwerer Gold-Messing-Fuss mit Filigran, oben ein Goldkronendeckel mit Knauf. Der Glaskoerper ist bewusst LEER und DURCHSICHTIG — man sieht durch ihn hindurch auf den dunklen Grund, damit die CSS-Fuellstandssaeule in `.vaultjar` sichtbar bleibt. Umriss: hohe Amphore (Motiv 35 % breit x 75 % hoch). Farbakzent Gold/farbloses Glas.",
-  "herkunft": "Generierung 289e54c0 (nano_banana_pro, 1:1, 1k). Danach deterministisch eingepasst: Massstab s=0,980, Motiv auf die Bildmitte verschoben, Hintergrund ausserhalb einer um 12 px erweiterten Motivmaske auf glattes #0e1418 gesetzt. Eigener Upload, daher d2ol7oe51mr4n9-URL wie bei av_smaragd.",
+  "batch": 18,
+  "beschreibung": "Bauart 3 (29.07.2026), nach dem Vorbild aus dem Drive-Video: ein gebundenes Buendel dunkler Obsidiantafeln mit GEBROCHENER Kante oben und unten, zwei Gurte quer, dazwischen genau EIN abwaerts zeigendes Prismen-Dreieck mit weissgluehendem Rand und Kristallglyph darin. Alle acht Packs teilen diese Bauart; es unterscheiden sich nur Gurtmaterial und Glutfarbe. Kristalltresor-Produktbild. Statt Guerten ein weissgoldener RIEGEL quer ueber die ganze Breite mit Zahlenrad in der Mitte — sein einziges Unterscheidungsmerkmal, deshalb breit statt klein. Glut KRISTALLGRUEN. Loest die Glas-Amphore ab; siehe Kommentar bei `.vaultjar` zur Fuellstandssaeule.",
+  "herkunft": "Generierung 046b5c20-96cb-4330-9bdc-4717f37a47d4 (nano_banana_pro, 3:4, 1k, Batch 18 — Packfamilie nach dem Hearthstone-Vorbild aus dem Drive-Video vom 29.07.2026). Auftrag mit der Hintergrundregel AN ERSTER STELLE, nachdem vier Laeufe auf WEISSEM Grund zurueckkamen und damit fuer freistellen.py unbrauchbar waren.",
   "hinweis": "Motivanteil 8,6 % und 72-px-Streuung 26,46 sind die niedrigsten Werte des Satzes — das ist KEIN Mangel, sondern die Folge der Vorgabe „Glas leer und durchsichtig\": nur Krone, Fuss und die Glaskanten sind hell, der Bauch ist absichtlich dunkel. Im Prototyp fuellt die CSS-Saeule genau diesen Bauch. Das Bild liegt als background-image auf `.vaultjar` und laeuft NICHT durch den Freistell-Filter.",
-  "job": "289e54c0-916c-4cda-9755-a7dc6d116709",
-  "messwerte": "Randring 2 px L 5,96 (max 5,96 — gesetztes #0e1418) · Randabstand 12,01 % · Motivanteil 8,6 % · Deckung ueber der Freistell-Schwelle 70,7 % · 72-px-Probe: Standardabweichung 26,46, Kantenenergie 4,56 · OCR 0 Zeichen · md5 der ausgelieferten URL identisch zum erzeugten PNG (f1a1d51c5b4dd6d20b0fd8e8f226ba95)",
-  "size": "1024x1024",
+  "job": "046b5c20-96cb-4330-9bdc-4717f37a47d4",
   "type": "offer_art",
-  "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/10812943-e615-4957-860c-8c9b20eca6af.png"
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260729_093410_046b5c20-96cb-4330-9bdc-4717f37a47d4.png"
  },
  "offer_vault_bank_alt": {
   "_alt": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042712_609d781f-a276-4767-a257-dea71279049b.png",
@@ -1339,14 +1333,12 @@
   "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_115444_f75634d9-6a96-4088-ac82-dedbc931f73c.png"
  },
  "pack_arcane": {
-  "batch": 16,
-  "beschreibung": "Arkan-Pack (800 Kristalle), die Spitze. Achtzackiger Amethyst-Stern mit dicken, stumpf endenden Zacken, an der Taille von einem schmalen Goldreif gefasst, innen magenta-violette Refraktionen. Umriss: kantiger Stern (Motiv 79 % breit x 65 % hoch). Farbakzent Violett/Magenta.",
-  "herkunft": "Generierung 55344b7a (nano_banana_pro, 3:4, 1k, Batch 16). Danach deterministisch eingepasst: Massstab s=0,885, Motiv auf die Bildmitte verschoben, Hintergrund ausserhalb einer um 12 px erweiterten Motivmaske auf glattes #0e1418 gesetzt. Roh hatte der Stern nur 5,02 % Randabstand. Eigener Upload, daher d2ol7oe51mr4n9-URL wie bei av_smaragd.",
-  "job": "55344b7a-35c0-422d-b6d4-304b5ff544c1",
-  "messwerte": "Randring 2 px L 5,96 (max 5,96) · Randabstand 10,16 % · Quadratprobe 0,00 % ausserhalb · Motivanteil 17,7 % · Deckung ueber der Freistell-Schwelle 99,1 % · 78-px-Probe: Standardabweichung 44,71, Kantenenergie 5,05 · OCR 0 Zeichen · md5 der ausgelieferten URL identisch zum erzeugten PNG (0d3cc6c0d85abd1f869e1b63ce723b97)",
-  "size": "896x1200",
+  "batch": 18,
+  "beschreibung": "Bauart 3 (29.07.2026), nach dem Vorbild aus dem Drive-Video: ein gebundenes Buendel dunkler Obsidiantafeln mit GEBROCHENER Kante oben und unten, zwei Gurte quer, dazwischen genau EIN abwaerts zeigendes Prismen-Dreieck mit weissgluehendem Rand und Kristallglyph darin. Alle acht Packs teilen diese Bauart; es unterscheiden sich nur Gurtmaterial und Glutfarbe. Arkan-Pack (800 Kristalle), die Spitze. Violette Guerte mit Weissgoldkante, Glut MAGENTA-VIOLETT mit weissem Kern — die einzige Stufe, die im Video-Vorbild-Ton gluent.",
+  "herkunft": "Generierung 69f8ec73-4817-40c1-89db-a001793e19db (nano_banana_pro, 3:4, 1k, Batch 18 — Packfamilie nach dem Hearthstone-Vorbild aus dem Drive-Video vom 29.07.2026). Auftrag mit der Hintergrundregel AN ERSTER STELLE, nachdem vier Laeufe auf WEISSEM Grund zurueckkamen und damit fuer freistellen.py unbrauchbar waren.",
+  "job": "69f8ec73-4817-40c1-89db-a001793e19db",
   "type": "pack",
-  "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/18eee4bf-7483-4d88-8a93-af4ed3e8c6de.png"
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260729_093329_69f8ec73-4817-40c1-89db-a001793e19db.png"
  },
  "pack_arcane_alt": {
   "batch": 1,
@@ -1385,14 +1377,12 @@
   "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093809_e5b4985d-37c1-4d18-b990-c2fda0c2a76a.png"
  },
  "pack_bronze": {
-  "batch": 16,
-  "beschreibung": "Bronze-Pack, das GRATIS-Tagespack. Flacher, breiter Kupfer-Coffer mit fast ebenem Deckel, dunklen Bronzebaendern und EINEM grossen facettierten Granat in der Deckelmitte. Umriss: breiter, niedriger Riegel (Motiv 76 % breit x 36 % hoch). Farbakzent Rotkupfer/Granatrot. Erscheint zweimal: 78x99 in der Shop-Kachel und 64x64 im Gratis-Band — deshalb quadratfest gebaut.",
-  "herkunft": "Generierung 6bb81c68 (nano_banana_pro, 3:4, 1k, Batch 16b). Danach deterministisch eingepasst: Massstab s=1,000 (unveraendert), Motiv auf die Bildmitte verschoben, Hintergrund ausserhalb einer um 12 px erweiterten Motivmaske auf glattes #0e1418 gesetzt. Eigener Upload, daher d2ol7oe51mr4n9-URL wie bei av_smaragd.",
-  "job": "6bb81c68-4f65-493e-93ec-1327b4b57c60",
-  "messwerte": "Randring 2 px L 5,96 (max 5,96 — gesetztes #0e1418) · Randabstand 11,94 % · Quadratprobe 0,00 % ausserhalb des mittigen Quadrats · Motivanteil 19,8 % · Deckung ueber der Freistell-Schwelle 75,1 % · 78-px-Probe: Standardabweichung 37,16, Kantenenergie 4,26 · OCR 0 Zeichen · md5 der ausgelieferten URL identisch zum erzeugten PNG (767a996fc969bdff15259cd30708a159)",
-  "size": "896x1200",
+  "batch": 18,
+  "beschreibung": "Bauart 3 (29.07.2026), nach dem Vorbild aus dem Drive-Video: ein gebundenes Buendel dunkler Obsidiantafeln mit GEBROCHENER Kante oben und unten, zwei Gurte quer, dazwischen genau EIN abwaerts zeigendes Prismen-Dreieck mit weissgluehendem Rand und Kristallglyph darin. Alle acht Packs teilen diese Bauart; es unterscheiden sich nur Gurtmaterial und Glutfarbe. Bronze-Pack (Gratis-Tagespack). Braun-bronzene Lederguerte mit Messingschnallen, Glut BERNSTEIN.",
+  "herkunft": "Generierung c642932f-6320-4f19-a6d7-7d63f679b6e1 (nano_banana_pro, 3:4, 1k, Batch 18 — Packfamilie nach dem Hearthstone-Vorbild aus dem Drive-Video vom 29.07.2026). Auftrag mit der Hintergrundregel AN ERSTER STELLE, nachdem vier Laeufe auf WEISSEM Grund zurueckkamen und damit fuer freistellen.py unbrauchbar waren.",
+  "job": "c642932f-6320-4f19-a6d7-7d63f679b6e1",
   "type": "pack",
-  "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/0c390187-c765-4139-88dd-7ad3245ea270.png"
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260729_092050_c642932f-6320-4f19-a6d7-7d63f679b6e1.png"
  },
  "pack_bronze_alt": {
   "batch": 1,
@@ -1404,14 +1394,12 @@
   "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095725_5c0984d9-f669-49ec-82f2-81817f8eab56.png"
  },
  "pack_gold": {
-  "batch": 16,
-  "beschreibung": "Gold-Pack (300 Kristalle). Runder Gold-Orb, am Aequator von einem breiten Filigranring gefasst, vorn EIN honigbernsteinfarbener Facettenstein mit warmem Innenlicht. Umriss: geschlossener Kreis (Motiv 67 % breit x 50 % hoch). Farbakzent Warmgold/Bernstein.",
-  "herkunft": "Generierung 1aad8233 (nano_banana_pro, 3:4, 1k, Batch 16). Danach deterministisch eingepasst: Massstab s=0,795, Motiv auf die Bildmitte verschoben, Hintergrund ausserhalb einer um 12 px erweiterten Motivmaske auf glattes #0e1418 gesetzt. Die 0,795 sind nicht die Randbedingung, sondern eine BEWUSSTE Verkleinerung: bei dem Massstab, der gerade eben 10 % Randabstand hielt (s=0,940), belegte der Orb 35,6 % der Flaeche und erschlug die anderen drei in der Reihe; bei 0,795 sind es 25,5 %. Eigener Upload, daher d2ol7oe51mr4n9-URL wie bei av_smaragd.",
-  "job": "1aad8233-ad5f-4593-8044-ccf38761949e",
-  "messwerte": "Randring 2 px L 5,96 (max 5,96) · Randabstand 16,18 % · Quadratprobe 0,00 % ausserhalb · Motivanteil 25,5 % · Deckung ueber der Freistell-Schwelle 78,1 % · 78-px-Probe: Standardabweichung 51,28, Kantenenergie 4,62 · OCR 0 Zeichen · md5 der ausgelieferten URL identisch zum erzeugten PNG (d3aef935174d66362a7165c37bdf0dfc)",
-  "size": "896x1200",
+  "batch": 18,
+  "beschreibung": "Bauart 3 (29.07.2026), nach dem Vorbild aus dem Drive-Video: ein gebundenes Buendel dunkler Obsidiantafeln mit GEBROCHENER Kante oben und unten, zwei Gurte quer, dazwischen genau EIN abwaerts zeigendes Prismen-Dreieck mit weissgluehendem Rand und Kristallglyph darin. Alle acht Packs teilen diese Bauart; es unterscheiden sich nur Gurtmaterial und Glutfarbe. Gold-Pack (300 Kristalle). Polierte Goldguerte mit Zierschnallen, Glut GOLDGELB.",
+  "herkunft": "Generierung d77a6d22-bcbc-4537-94ea-6e6db18c43bb (nano_banana_pro, 3:4, 1k, Batch 18 — Packfamilie nach dem Hearthstone-Vorbild aus dem Drive-Video vom 29.07.2026). Auftrag mit der Hintergrundregel AN ERSTER STELLE, nachdem vier Laeufe auf WEISSEM Grund zurueckkamen und damit fuer freistellen.py unbrauchbar waren.",
+  "job": "d77a6d22-bcbc-4537-94ea-6e6db18c43bb",
   "type": "pack",
-  "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/9f8cf919-6372-4b16-ae3e-f2adcda3fe5f.png"
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260729_093315_d77a6d22-bcbc-4537-94ea-6e6db18c43bb.png"
  },
  "pack_gold_alt": {
   "batch": 1,
@@ -1423,14 +1411,12 @@
   "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095735_28c01416-737f-414d-b8b6-0dd21a18e8a9.png"
  },
  "pack_silver": {
-  "batch": 16,
-  "beschreibung": "Silber-Pack (80 Kristalle). Schlanker, hochstehender Reliquienschrein aus poliertem Silber mit spitzem Dach, schmaler Goldkante und EINEM eisblauen Kristall hinter dem Frontschlitz. Umriss: schmale, hohe Spitze (Motiv 32 % breit x 74 % hoch). Farbakzent Silberweiss/Eisblau.",
-  "herkunft": "Generierung 27400036 (nano_banana_pro, 3:4, 1k, Batch 16). Danach deterministisch eingepasst: Massstab s=0,990, Motiv auf die Bildmitte verschoben, Hintergrund ausserhalb einer um 12 px erweiterten Motivmaske auf glattes #0e1418 gesetzt. Eigener Upload, daher d2ol7oe51mr4n9-URL wie bei av_smaragd.",
-  "job": "27400036-0918-45a6-88a1-484fd944d575",
-  "messwerte": "Randring 2 px L 5,96 (max 5,96) · Randabstand 12,67 % · Quadratprobe 0,00 % ausserhalb · Motivanteil 19,8 % · Deckung ueber der Freistell-Schwelle 99,1 % · 78-px-Probe: Standardabweichung 53,79, Kantenenergie 4,33 · OCR 0 Zeichen · md5 der ausgelieferten URL identisch zum erzeugten PNG (6a2c8e02bbca6a9ae50a33083d4dc7bf)",
-  "size": "896x1200",
+  "batch": 18,
+  "beschreibung": "Bauart 3 (29.07.2026), nach dem Vorbild aus dem Drive-Video: ein gebundenes Buendel dunkler Obsidiantafeln mit GEBROCHENER Kante oben und unten, zwei Gurte quer, dazwischen genau EIN abwaerts zeigendes Prismen-Dreieck mit weissgluehendem Rand und Kristallglyph darin. Alle acht Packs teilen diese Bauart; es unterscheiden sich nur Gurtmaterial und Glutfarbe. Silber-Pack (80 Kristalle). Stahlgraue Guerte mit gebuerstetem Silber und Nieten, Glut EISBLAU.",
+  "herkunft": "Generierung d6ef132d-fde6-42d1-bbb7-302de9e539c3 (nano_banana_pro, 3:4, 1k, Batch 18 — Packfamilie nach dem Hearthstone-Vorbild aus dem Drive-Video vom 29.07.2026). Auftrag mit der Hintergrundregel AN ERSTER STELLE, nachdem vier Laeufe auf WEISSEM Grund zurueckkamen und damit fuer freistellen.py unbrauchbar waren.",
+  "job": "d6ef132d-fde6-42d1-bbb7-302de9e539c3",
   "type": "pack",
-  "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/bb8037d7-9ee3-404e-9140-2a7faeb2dc4f.png"
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260729_092101_d6ef132d-fde6-42d1-bbb7-302de9e539c3.png"
  },
  "pack_silver_alt": {
   "batch": 1,
@@ -1451,15 +1437,13 @@
   "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093851_f11ee134-dfd3-4798-9d63-74f8d764f6a9.png"
  },
  "pack_vorrat_icon": {
-  "batch": 17,
-  "beschreibung": "VORRATS-PACK-Ikon (Batch 17, NEUER Schluessel) — die frueher „Vorrats-Truhe\" genannte Ware heisst jetzt Vorrats-Pack, und das Motiv traegt die Umbenennung mit: KEIN Truhendeckel mehr, sondern drei flache, versiegelte Kartenpaeckchen in tiefem Petrolblaugruen, flach aufeinandergestapelt, von EINEM breiten Goldband gehalten, oben ein tuerkiser Facettensiegelstein. Umriss: niedriger breiter Dreierstapel (Motiv 59 % breit x 45 % hoch). Farbakzent Petrol/Tuerkis.",
-  "herkunft": "Generierung 5d7a2956 (nano_banana_pro, 1:1, 1k, Nachzug). Danach deterministisch eingepasst: Massstab s=0,905, Motiv auf die Bildmitte verschoben, Hintergrund ausserhalb einer um 12 px erweiterten Motivmaske auf glattes #0e1418 gesetzt. Die Verkleinerung ist ABSICHT und nicht die Randbedingung: bei s=1,000 (Randabstand 16,9 %) lag der 32-px-Abstand zum Bronze-Coffer bei nur 9,69, bei s=0,905 bei 11,15 — beide sind flache breite Bloecke, und der Formunterschied steigt mit dem kleineren Motiv. Eigener Upload, daher d2ol7oe51mr4n9-URL.",
+  "batch": 18,
+  "beschreibung": "Bauart 3 (29.07.2026), nach dem Vorbild aus dem Drive-Video: ein gebundenes Buendel dunkler Obsidiantafeln mit GEBROCHENER Kante oben und unten, zwei Gurte quer, dazwischen genau EIN abwaerts zeigendes Prismen-Dreieck mit weissgluehendem Rand und Kristallglyph darin. Alle acht Packs teilen diese Bauart; es unterscheiden sich nur Gurtmaterial und Glutfarbe. Vorrats-Pack-Ikon. Bernsteinbraune, messingbeschlagene Guerte mit einem kleinen VORHAENGESCHLOSS am unteren Gurt, Glut BERNSTEIN. `pack_vorrat` daneben bleibt die 21:9-Kulisse.",
+  "herkunft": "Generierung 3e4edac8-9bd2-4650-b93c-f187a5764cf5 (nano_banana_pro, 3:4, 1k, Batch 18 — Packfamilie nach dem Hearthstone-Vorbild aus dem Drive-Video vom 29.07.2026). Auftrag mit der Hintergrundregel AN ERSTER STELLE, nachdem vier Laeufe auf WEISSEM Grund zurueckkamen und damit fuer freistellen.py unbrauchbar waren.",
   "hinweis": "DIES IST DER SCHLUESSEL, DEN DER PROTOTYP SCHON SUCHT: `.vorrathead` ruft ico(\"pack_vorrat_icon\", \"📦\") in einem 72x72-Kasten auf und faellt bisher auf das Emoji zurueck. `pack_vorrat` wurde NICHT ersetzt — das ist die 21:9-KULISSE, die per bgArt() als Flaeche unter dem Inhalt liegt; ein quadratisches Motiv an dieser Stelle wuerde die Kulisse zerstoeren. Deshalb kein `pack_vorrat_alt`.",
-  "job": "5d7a2956-fcb2-4224-a917-cef52c92d7a2",
-  "messwerte": "Randring 2 px L 5,96 (max 5,96 — gesetztes #0e1418) · Randabstand 20,02 % · Motivanteil 15,6 % · Deckung ueber der Freistell-Schwelle 73,1 % · 72-px-Probe: Standardabweichung 30,44, Kantenenergie 4,99 · OCR 0 Zeichen · md5 der ausgelieferten URL identisch zum erzeugten PNG (f4ac0d50e2a28a71f6eec4084f978ee0)",
-  "size": "1024x1024",
+  "job": "3e4edac8-9bd2-4650-b93c-f187a5764cf5",
   "type": "icon",
-  "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/b13791d6-fb66-4c64-b7d9-36c607ece067.png"
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260729_093400_3e4edac8-9bd2-4650-b93c-f187a5764cf5.png"
  },
  "packart_arena1": {
   "batch": 12,

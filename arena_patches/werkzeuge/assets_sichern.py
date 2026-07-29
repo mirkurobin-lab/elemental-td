@@ -108,8 +108,20 @@ def kleinfassung(url):
     return re.sub(r"\.(png|jpg|jpeg)$", "_min.webp", url, flags=re.I)
 
 
-def eine(k, url, ziel, i, n):
-    """Ein Asset holen. Gibt (schluessel, eintrag, zustand, fehler) zurueck."""
+def eine(k, url, ziel, i, n, alt=None):
+    """Ein Asset holen. Gibt (schluessel, eintrag, zustand, fehler) zurueck.
+
+    `alt` ist der Eintrag desselben Schluessels aus dem letzten Lauf
+    (HERKUNFT.json). Er entscheidet, ob eine vorhandene Datei noch gilt.
+
+    ⚠ Der Dateiname ist der SCHLUESSEL, nicht der URL. Ein Asset unter
+    demselben Schluessel neu zu erzeugen — genau das passierte am
+    29.07.2026 mit den acht Packs — heisst also: die Datei liegt schon
+    da, stammt aber aus einer anderen Quelle. Die alte Fassung „schon
+    da, uebersprungen" hat sie deshalb stillschweigend behalten und der
+    Lauf meldete Erfolg. Wer nur auf `os.path.exists` prueft, prueft die
+    Existenz und nennt es Aktualitaet.
+    """
     kandidaten = []
     if re.search(r"\.(png|jpg|jpeg)$", url, re.I):
         kandidaten.append(kleinfassung(url))
@@ -120,9 +132,12 @@ def eine(k, url, ziel, i, n):
         endung = os.path.splitext(kand.split("?")[0])[1].lower() or ".bin"
         name = k + endung
         pfad = os.path.join(ziel, name)
-        zustand = "schon"
-        if os.path.exists(pfad):                    # wiederholbar
+        # Vorhanden UND aus derselben Quelle -> uebernehmen. Sonst neu holen.
+        lag_da = os.path.exists(pfad)
+        passt = bool(alt) and alt.get("quelle") == kand
+        if lag_da and passt:                        # wiederholbar
             roh = open(pfad, "rb").read()
+            zustand = "schon"
         else:
             try:
                 roh = hole(kand)
@@ -130,7 +145,7 @@ def eine(k, url, ziel, i, n):
                 letzter = str(e)
                 continue
             open(pfad, "wb").write(roh)
-            zustand = "neu"
+            zustand = "ersetzt" if lag_da else "neu"
         melde("[%3d/%d] %-9s %-28s %7.1f KB  %s"
               % (i, n, zustand, k[:28], len(roh) / 1000,
                  "min" if nr == 0 and len(kandidaten) > 1 else "orig"))
@@ -148,7 +163,15 @@ def eine(k, url, ziel, i, n):
 def lauf(pfad_json, ziel):
     d = json.load(open(pfad_json, encoding="utf-8"))
     os.makedirs(ziel, exist_ok=True)
-    herkunft, fehler, neu, schon, summe = {}, [], 0, 0, 0
+    herkunft, fehler, neu, schon, ersetzt, summe = {}, [], 0, 0, 0, 0
+
+    # Die Herkunft des LETZTEN Laufs. Ohne sie kann der Lauf nicht
+    # unterscheiden, ob eine vorhandene Datei noch die richtige ist.
+    pfad_alt = os.path.join(ziel, "HERKUNFT.json")
+    try:
+        vorher = json.load(open(pfad_alt, encoding="utf-8"))["assets"]
+    except Exception:                               # noqa: BLE001
+        vorher = {}
 
     aufgaben = []
     for k in sorted(d):
@@ -163,12 +186,15 @@ def lauf(pfad_json, ziel):
     melde("%d Assets, %d gleichzeitig" % (n, PARALLEL))
     with ThreadPoolExecutor(max_workers=PARALLEL) as pool:
         ergebnisse = list(pool.map(
-            lambda x: eine(x[1][0], x[1][1], ziel, x[0] + 1, n),
+            lambda x: eine(x[1][0], x[1][1], ziel, x[0] + 1, n,
+                           vorher.get(x[1][0])),
             enumerate(aufgaben)))
 
     for k, eintrag, zustand, e in ergebnisse:
         if zustand == "neu":
             neu += 1
+        elif zustand == "ersetzt":
+            ersetzt += 1
         elif zustand == "schon":
             schon += 1
         if eintrag:
@@ -187,8 +213,8 @@ def lauf(pfad_json, ziel):
             "assets": herkunft,
         }, f, ensure_ascii=False, indent=1, sort_keys=True)
 
-    print("neu geholt: %d · schon da: %d · gesamt %.1f MB"
-          % (neu, schon, summe / 1e6))
+    print("neu geholt: %d · ersetzt (neue Quelle): %d · schon da: %d · "
+          "gesamt %.1f MB" % (neu, ersetzt, schon, summe / 1e6))
     if fehler:
         print("FEHLGESCHLAGEN: %d" % len(fehler))
         for k, e in fehler[:20]:

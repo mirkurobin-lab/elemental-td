@@ -29,10 +29,17 @@ direkt — kein Server, kein Build.
 | `shop_raender.js` | 20 | Randfarben: Inhalt (Kristall/Gold) und Produktfamilie (Packs) |
 | `flug.js` | 12 | Sammel-Animation — aus JEDEM Fenster, nicht nur aus dem Shop |
 | `guide.js` | 36 | Defenders Guide: bewegbare Reiterleiste, großes Icon am offenen Reiter, Gegner/Boss als eigene Reiter, kein Booster-Reiter |
-| `assets_vollstaendig.py` | 3 | Jedes benutzte Asset ist verzeichnet UND gesichert |
+| `assets_vollstaendig.py` | 4 | Jedes benutzte Asset ist verzeichnet, gesichert UND aktuell |
 
 `assets_vollstaendig.py` ist die einzige Prüfung hier, die kein Playwright
 braucht (`python3 pruefungen/assets_vollstaendig.py` aus `arena_patches/`).
+
+Am 29.07.2026 kam eine vierte Frage dazu: **zeigt die gesicherte Datei noch
+auf dieselbe Quelle?** Die acht Pack-Bilder wurden gegen eine neue Fassung
+getauscht — neuer URL, gleicher Schlüssel. Die drei Prüfungen davor meldeten
+weiter grün, weil sie nur nach dem *Schlüssel* fragen; auf der Platte lagen
+noch die alten Bilder. Ein grüner Balken, der eine veraltete Datei
+durchwinkt, ist schlimmer als gar keine Prüfung: er beendet das Nachschauen.
 Sie deckt eine Lücke ab, die keine der anderen sehen kann: ein Asset, das
 direkt in die `ASSETS`-Tabelle der HTML geschrieben wurde, ohne Eintrag in
 `ui_assets.json`. So etwas fällt aus **jedem** Werkzeug heraus, das über die
