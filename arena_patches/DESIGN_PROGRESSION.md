@@ -824,6 +824,96 @@ Start ohnehin eine leere v2-Bank und wird über die normalen Packs versorgt.
 
 ---
 
+## E2) Spells — die dritte Kartenart (Auftrag 29.07.2026, noch NICHT gebaut)
+
+> „Später brauchen wir auch spells wo der Spieler 2 wählen kann und ins Match
+> mitnehmen kann die dann auch im Battledeck rechts und links vom main skill in
+> den Sechsecken angezeigt werden. Diese skills können genau so wie Tower und
+> heros gelevelt und fusioniert werden. Diese werden dann zusätzlich in den
+> boosters droppen."
+
+Das schließt den Satz von früher ab: **jeder Held hat EINEN Hauptskill**, und
+der Spieler nimmt **zwei Spells** mit ins Match — im Battledeck als die beiden
+Sechsecke **links und rechts** vom Hauptskill.
+
+### Was daran neu ist
+
+Spells sind keine eigene Mechanik, sondern eine **dritte Kartenart im
+bestehenden System**: dieselbe Raritätsleiter, dasselbe Merge (3 gleiche →
+nächste Stufe), dasselbe Level-Cap je Stufe, dasselbe Level-Up über Gold +
+Essenz. Damit ist der Bauaufwand im Logikmodul klein — die Frage ist nicht
+*wie*, sondern *wieviel*.
+
+### Die eine Entscheidung, die vorher fallen muss
+
+**Teilen sich Spells die Kartenslots eines Packs, oder bekommen sie eigene?**
+Das ist keine Geschmacksfrage, es verschiebt die ganze Turm-Progression.
+`rollCard()` gewichtet heute jede Karte mit 1, Helden über `HERO_WEIGHT` mit
+0,2. Bei sechs Türmen und zwei Helden ist die Summe 6,4:
+
+| Fall | Summe | Turm | Spell | Held |
+|---|---|---|---|---|
+| **heute** (6 Türme, 2 Helden) | 6,4 | **15,6 %** | — | 3,1 % |
+| A1 — 6 Spells teilen die Slots, Gewicht 1 | 12,4 | **8,1 %** | 8,1 % | 1,6 % |
+| A2 — 6 Spells teilen die Slots, Gewicht 0,5 | 9,4 | **10,6 %** | 5,3 % | 2,1 % |
+| **B — Spells bekommen EIGENE Slots** | 6,4 | **15,6 %** | eigene Kurve | 3,1 % |
+
+Fall A1 **halbiert** den Turm-Nachschub. Und weil seit State v4 die Essenz
+eines Turms an dessen Kartendrops hängt, halbiert er nicht nur die Karten,
+sondern **auch das Material** — der Weg auf Lv 100 wird doppelt so lang, ohne
+dass jemand an einer Zahl gedreht hätte. Auch A2 kostet noch ein Drittel.
+
+**Empfehlung: Fall B.** Gründe:
+
+1. Der Auftrag sagt „**zusätzlich** in den boosters droppen". Zusätzlich heißt
+   dazu, nicht davon ab.
+2. Es ist dieselbe Bauart, die bei den Essenz-Posten schon steht: ein Pack hat
+   `cardSlots` **und** `materialSlots`. Ein `spellSlots` daneben ist keine neue
+   Idee, sondern die bekannte.
+3. Jede Kurve bleibt für sich einstellbar. Wenn Spells zu selten sind, dreht
+   man an `spellSlots` — und nicht versehentlich am Turm-Nachschub mit.
+4. Der Reveal wird besser: ein eigener Slot ist ein eigener Moment im
+   Pack-Öffnen, so wie die Essenz heute schon einer ist.
+
+Vorschlag für die Slot-Zahlen (analog zur bestehenden Staffel, noch offen):
+Bronze 0 · Silber 1 · Gold 1 · Arkan 2. Bronze ohne Spell hält das
+Einstiegspack schlank und macht Silber+ zum ersten Ort, an dem Spells
+überhaupt vorkommen.
+
+### Was ein Spell braucht, damit er ins System passt
+
+Das Modul erzwingt das inzwischen selbst — pro Spell:
+
+* **Eintrag in `PERKS`** (das ist die Kartenliste des Moduls) mit den fünf
+  Stufenfächern `good/rare/epic/legendary/supreme`.
+* **Eine eigene Essenz in `MATERIALS`**, Schlüssel = Spell-ID.
+* **Artwork**, damit `matIco()` das Essenz-Icon daraus bilden kann.
+
+> **Nachgemessen, nicht behauptet:** ein Spell in `PERKS` **ohne** seine Essenz
+> lässt den Selbsttest sofort rot laufen —
+> `FAIL jede Karte hat genau eine eigene Essenz — 8 Sorten / 9 Karten`.
+> Genau dafür ist die Prüfung als *Kopplung* geschrieben und nicht als „es sind
+> acht". Man kann einen Spell also nicht halb einbauen.
+
+### Was im Battledeck dazukommt
+
+Drei Sechsecke in einer Reihe: **Spell — Hauptskill — Spell**. Der Hauptskill
+gehört dem Helden und ist nicht wählbar; die beiden äußeren sind Slots, die
+sich aus der Spell-Sammlung füllen lassen. Die genauen Maße und die
+Fensterführung kommen aus dem Screenrecording (AA_UI_REFERENZ.md §22) —
+**die zweispaltige Deck-Ansicht ist dort noch nicht ausgewertet**, deshalb
+steht hier bewusst noch keine Pixelangabe.
+
+### Offen (Auftraggeber)
+
+* Wieviele Spells zum Start? Die Drop-Verdünnung hängt daran, aber bei Fall B
+  nur noch innerhalb der Spell-Slots.
+* Teilen Spells die Element-Zugehörigkeit der Türme (Feuer-Spell, Frost-Spell),
+  oder sind sie eine eigene Kategorie? Das entscheidet, ob ein Spell in die
+  Element-Farbwelt einzahlt oder eine eigene bekommt.
+
+---
+
 ## F) Implementierungs-Reihenfolge
 
 | # | Schritt | Warum hier | Aufwand |
