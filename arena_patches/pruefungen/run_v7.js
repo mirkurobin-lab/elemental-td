@@ -384,10 +384,22 @@ function step(name, ok, info) {
   await shot('guide');
 
   // ================= 6. HANDBUCH =================
-  await page.click('#btnToManual');
+  /* UMGESCHRIEBEN 29.07.2026. Diese Pruefung klickte `#btnToManual` und
+     verlangte danach `#viewManual.active`. Beides schrieb die alte
+     Bauart fest: das Handbuch war ein eigener View hinter einem
+     Notknopf im Guide-Kopf. Seit dem Reiter-Umbau ist es ein REITER des
+     Guides (AA-Aufbau, IMG_3361/3362), und der Notknopf ist weg — der
+     Kommentar an ihm hat genau das angekuendigt.
+     Die Anforderung DAHINTER bleibt gleich und wird weiter gemessen:
+     das Handbuch ist aus dem Guide heraus erreichbar und zeigt dort
+     seine acht Seiten. Nur der Weg heisst jetzt „Reiter" statt „Knopf". */
+  await page.evaluate(() => window.__proto.guideTab('manual'));
   await page.waitForTimeout(420);
-  step('Handbuch oeffnet aus dem Guide',
-    await page.locator('#viewManual').evaluate(e => e.classList.contains('active')));
+  step('Handbuch oeffnet aus dem Guide (Reiter)',
+    await page.evaluate(() =>
+      document.getElementById('viewGuide').classList.contains('active') &&
+      window.__proto.gTab() === 'manual' &&
+      !document.getElementById('gpManual').hidden));
   const m0 = await page.evaluate(() => ({
     pages: document.querySelectorAll('#manList .manpage').length,
     open: document.querySelectorAll('#manList .manpage.open').length,
@@ -417,8 +429,14 @@ function step(name, ok, info) {
     (await page.locator('#btnSetLogin').count()) === 1);
   await page.click('#btnSetManual');
   await page.waitForTimeout(380);
+  /* UMGESCHRIEBEN 29.07.2026 (siehe oben): der Einstellungs-Knopf ruft
+     weiterhin `show("navManual")`. Dass dahinter kein eigener View mehr
+     steckt, sondern ein Reiter, ist genau der Punkt — der Weg aus den
+     Einstellungen darf davon nichts merken. */
   step('Handbuch ist auch aus den Einstellungen erreichbar',
-    await page.locator('#viewManual').evaluate(e => e.classList.contains('active')));
+    await page.evaluate(() =>
+      document.getElementById('viewGuide').classList.contains('active') &&
+      window.__proto.gTab() === 'manual'));
 
   /* ================= 6b. AAA-ICON-SWEEP (Batch 6) =================
      Geprueft wird die STRUKTUR, nicht ob das CDN antwortet: Im Prototyp
@@ -2285,28 +2303,41 @@ function step(name, ok, info) {
     menuAuf.zaehler);
   /* Ein entfernter Eintrag ist nur dann eine Aufraeumung und kein
      Verlust, wenn das Ziel woanders steht. Beides wird belegt. */
+  /* UMGESCHRIEBEN 29.07.2026. Vorher hiess der Schritt „Gegner bleiben
+     ueber den Guide-Kopf erreichbar" und pruefte `#btnToBestiary`. Der
+     Knopf war ausdruecklich ein Provisorium („Bis der Guide-Umbau
+     steht …") und ist mit dem Umbau verschwunden. Die Anforderung
+     dahinter — ein aus dem Menue entfernter Eintrag muss woanders
+     erreichbar bleiben — wird weiter gemessen, nur ueber den Weg, den
+     es jetzt gibt: den Reiter GEGNER im Guide. */
   const ersatz = await page.evaluate(() => ({
     clan: !!document.getElementById('navClan'),
-    gegner: !!document.getElementById('btnToBestiary')
+    gegner: !!document.querySelector('#guideRail [data-gtab="enemies"]'),
+    kopf: !!document.getElementById('btnToBestiary')
   }));
   step('Clan bleibt ueber die Hauptleiste unten erreichbar', ersatz.clan);
-  step('Gegner bleiben ueber den Guide-Kopf erreichbar', ersatz.gegner);
+  step('Gegner bleiben als eigener Reiter im Guide erreichbar', ersatz.gegner);
+  step('Der Notknopf im Guide-Kopf ist mit dem Umbau weg', !ersatz.kopf);
 
+  /* Der Einstieg fuehrt jetzt in den Guide; das Element-Rad ist dort
+     der Reiter ELEMENTE (AAs Seite 1, AA_WELLEN_REFERENZ §2.1). */
   await page.evaluate(() => {
     document.getElementById('tbMenuLayer').hidden = true;
-    document.getElementById('btnToBestiary').click();
+    window.__proto.show('navGuide');
+    window.__proto.guideTab('elements');
   });
   await page.waitForTimeout(500);
   const rad = await page.evaluate(() => ({
     view: (document.querySelector('.view.active') || {}).id,
+    tab: window.__proto.gTab(),
     knoten: document.querySelectorAll('#elWheel .elnode').length,
     pfeile: document.querySelectorAll('#elWheel line').length,
-    p2: document.getElementById('bsPage2').hidden,
+    p2: document.getElementById('gpEnemies').hidden,
     p3: document.getElementById('bsPage3').hidden
   }));
-  step('Bestiarium oeffnet auf Seite 1 (Element-Rad)',
-    rad.view === 'viewBestiary' && !rad.p2 === false && rad.p3 === true,
-    rad.view + ' · Gitter versteckt ' + rad.p2 + ' · Detail versteckt ' + rad.p3);
+  step('Element-Rad ist ein eigener Reiter des Guides',
+    rad.view === 'viewGuide' && rad.tab === 'elements' && rad.p2 === true && rad.p3 === true,
+    rad.view + '/' + rad.tab + ' · Gitter versteckt ' + rad.p2 + ' · Detail versteckt ' + rad.p3);
   step('Das Rad zeigt alle sechs Elemente',
     rad.knoten === 6, rad.knoten + ' Knoten');
   /* Die Pfeile sind der eigentliche Inhalt des Rades. Beim ersten Anlauf
@@ -2326,15 +2357,34 @@ function step(name, ok, info) {
 
   await page.evaluate(() => document.getElementById('bsToGrid').click());
   await page.waitForTimeout(400);
-  const gitter = await page.evaluate(() => ({
-    kacheln: document.querySelectorAll('.mobtile').length,
-    mitName: [...document.querySelectorAll('.mobtile .mnm')].filter(e => e.textContent.trim().length > 2).length,
-    wellen: document.querySelectorAll('.waverow').length,
-    bosse: document.querySelectorAll('.mobtile.boss').length
-  }));
-  step('Gegner-Gitter zeigt das ganze Bestiarium',
-    gitter.kacheln === 9 && gitter.mitName === gitter.kacheln,
-    gitter.kacheln + ' Kacheln, ' + gitter.mitName + ' benannt');
+  /* UMGESCHRIEBEN 29.07.2026: „das ganze Bestiarium" waren 9 Kacheln in
+     EINEM Gitter. Seit dem Reiter-Umbau teilen sich GEGNER und BOSS die
+     Liste (AA fuehrt beide als eigene Reiter, IMG_3361/3362). Gemessen
+     wird deshalb die Summe ueber beide Reiter — die Anforderung „kein
+     Gegner faellt aus dem Nachschlagewerk" ist dieselbe geblieben. */
+  const gitter = await page.evaluate(() => {
+    const zaehl = () => ({
+      k: document.querySelectorAll('#mobGrid .mobtile, #bossGrid .mobtile').length,
+      n: [...document.querySelectorAll('#mobGrid .mobtile .mnm, #bossGrid .mobtile .mnm')]
+           .filter(e => e.textContent.trim().length > 2).length
+    });
+    window.__proto.guideTab('boss');
+    const b = zaehl();
+    window.__proto.guideTab('enemies');
+    const a = zaehl();
+    return {
+      kacheln: a.k + b.k - 0, mitName: a.n + b.n,
+      // beide Gitter sind gerendert, also einmal insgesamt zaehlen
+      gesamt: document.querySelectorAll('#mobGrid .mobtile').length +
+              document.querySelectorAll('#bossGrid .mobtile').length,
+      wellen: document.querySelectorAll('#waveList .waverow').length,
+      bosse: document.querySelectorAll('#bossGrid .mobtile.boss').length,
+      imGegner: document.querySelectorAll('#mobGrid .mobtile.boss').length
+    };
+  });
+  step('Gegner- und Boss-Reiter zusammen zeigen das ganze Bestiarium',
+    gitter.gesamt === 9 && gitter.bosse >= 1 && gitter.imGegner === 0,
+    gitter.gesamt + ' Kacheln, davon ' + gitter.bosse + ' im Boss-Reiter');
   /* ⚠ Diese Pruefung gibt es, weil der View zuerst NEBEN einem Modal
      stand statt in #app. Ohne die Breitenbegrenzung von #app war er
      1067 px breit, die Kacheln 350 px, und aus drei Spalten wurde
@@ -2342,7 +2392,9 @@ function step(name, ok, info) {
      gruen — Anzahl und Layout sind zwei verschiedene Fragen. */
   const breite = await page.evaluate(() => {
     const g = document.getElementById('mobGrid');
-    const t = document.querySelector('.mobtile');
+    // Seit dem Reiter-Umbau gibt es ZWEI Gitter im Guide — die Messung
+    // muss sagen, welches sie meint, sonst misst sie ein verstecktes.
+    const t = document.querySelector('#mobGrid .mobtile');
     const app = document.getElementById('app');
     return { gitter: Math.round(g.getBoundingClientRect().width),
              kachel: t ? Math.round(t.getBoundingClientRect().width) : 0,
@@ -2358,14 +2410,20 @@ function step(name, ok, info) {
   step('Der Wellenplan nennt die Marken, nicht alle 27 Wellen',
     gitter.wellen >= 5 && gitter.wellen <= 10, gitter.wellen + ' Zeilen');
 
-  await page.evaluate(() => document.querySelector('.mobtile').click());
+  await page.evaluate(() => document.querySelector('#mobGrid .mobtile').click());
   await page.waitForTimeout(400);
+  /* Alle Abfragen sind seit 29.07.2026 auf `#bsPage3` verengt. Grund:
+     Handbuch und Gegner-Detail liegen jetzt im SELBEN View und benutzen
+     beide die Klasse `.mhn` (`.manhead .mhn` bzw. `.mobhead .mhn`). Ein
+     unverankertes `querySelector('.mhn')` traf den Handbuch-Titel und
+     die Pruefung haette den falschen Text gelesen — aufgefallen beim
+     Nachstellen, nicht beim Lesen. */
   const det = await page.evaluate(() => ({
-    name: (document.querySelector('.mhn') || {}).textContent,
-    felder: document.querySelectorAll('.statcell').length,
-    beschriftungen: [...document.querySelectorAll('.statcell .sl')].map(e => e.textContent),
-    stufe: (document.querySelector('.lvltx') || {}).textContent,
-    zielFeld: [...document.querySelectorAll('.mobfield b')].map(e => e.textContent)
+    name: (document.querySelector('#bsPage3 .mhn') || {}).textContent,
+    felder: document.querySelectorAll('#bsPage3 .statcell').length,
+    beschriftungen: [...document.querySelectorAll('#bsPage3 .statcell .sl')].map(e => e.textContent),
+    stufe: (document.querySelector('#bsPage3 .lvltx') || {}).textContent,
+    zielFeld: [...document.querySelectorAll('#bsPage3 .mobfield b')].map(e => e.textContent)
   }));
   /* AA zeigt GENAU VIER Werte in einem 2x2-Gitter (§2.3). Mehr waere
      eine Abweichung, weniger eine Luecke. */
@@ -2396,7 +2454,7 @@ function step(name, ok, info) {
     const a = lies();
     for (let i = 0; i < 9; i++) document.getElementById('bsLvlUp').click();
     const b = lies();
-    const st = document.querySelector('.lvltx').textContent;
+    const st = document.querySelector('#bsPage3 .lvltx').textContent;
     return { a, b, st };
   });
   const zahl = t => parseInt(String(t).replace(/[^0-9]/g, ''), 10) || 0;
@@ -2404,16 +2462,26 @@ function step(name, ok, info) {
     zahl(kurve.b) > zahl(kurve.a) * 4,
     kurve.a + ' → ' + kurve.b + ' (' + kurve.st + ')');
 
+  /* UMGESCHRIEBEN 29.07.2026. Die alte Fassung schrieb AAs lineare
+     Strecke fest: Detail -> Gitter -> Rad, zweimal `#bsBack`. Die
+     Strecke gibt es nicht mehr, weil Rad und Gitter Geschwister-REITER
+     sind statt Vorgaenger und Nachfolger.
+     Die Anforderung dahinter bleibt: Zurueck geht eine EBENE hoch und
+     nicht sofort aus dem Guide raus. Genau das wird gemessen — einmal
+     ueber `#bsBack` in der Karte, einmal ueber den Kopf-Knopf. */
   const zurueck1 = await page.evaluate(() => {
     document.getElementById('bsBack').click();
-    return document.getElementById('bsPage2').hidden ? 'nicht Gitter' : 'Gitter';
+    return document.getElementById('gpEnemies').hidden ? 'nicht Gitter' : 'Gitter';
   });
   const zurueck2 = await page.evaluate(() => {
-    document.getElementById('bsBack').click();
-    return document.getElementById('bsPage1').hidden ? 'nicht Rad' : 'Rad';
+    document.querySelector('#mobGrid .mobtile').click();
+    document.getElementById('guideBack').click();
+    return { gitter: !document.getElementById('gpEnemies').hidden,
+             view: (document.querySelector('.view.active') || {}).id };
   });
   step('Zurueck geht eine Ebene hoch, nicht sofort raus',
-    zurueck1 === 'Gitter' && zurueck2 === 'Rad', zurueck1 + ' → ' + zurueck2);
+    zurueck1 === 'Gitter' && zurueck2.gitter && zurueck2.view === 'viewGuide',
+    zurueck1 + ' → ' + zurueck2.view + (zurueck2.gitter ? '/Gitter' : '/—'));
 
   /* Kein Rechnen in der UI: jede Zahl muss aus dem Modul kommen. Sonst
      laeuft das Balancing beim ersten Dreh auseinander. */

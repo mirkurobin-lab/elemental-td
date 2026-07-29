@@ -3206,6 +3206,66 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
 .socchip .soclogo{position:absolute;left:26%;top:26%;width:48%;height:48%;
   color:#fff;filter:drop-shadow(0 1px 2px #000c);z-index:2}
 
+/* ==================================================================
+ * COMMUNITY-FENSTER (#viewCommunity)
+ * ------------------------------------------------------------------
+ * Aufbau von oben nach unten:
+ *   Kulisse (.commfig) · Anspruch (.commclaim) · Bandtrenner ·
+ *   sieben Kanalzeilen (.socgrp > .socrow) · Rechtehinweis.
+ *
+ * ⚠ Das Fenster bekommt BEWUSST keinen eigenen Flaechenverlauf, wie ihn
+ * #viewClan oder #viewFortress tragen. Der Grund steht oben bei
+ * .commfig: die Plattenfarbe der Kulissendatei liegt DeltaRGB (4,1,1)
+ * neben --bg. Auf --bg ist das Rechteck unsichtbar, auf --panel
+ * (rgb 22,32,42) waere es ein sichtbarer Kasten. Die Figur steht darum
+ * direkt auf dem Fenstergrund und NIE in einem Panel — und das Fenster
+ * faerbt seinen Grund nicht um.
+ *
+ * Licht kommt von oben: jede erhabene Flaeche hier traegt --mat-raised,
+ * eigene Schatten gibt es keine.
+ * ================================================================== */
+.commclaim{text-align:center;margin:-4px 0 var(--gap-lg);padding:0 10px}
+.commkick{font-size:9.5px;letter-spacing:.22em;font-weight:800;color:#c6b4ee}
+/* .goldtext steht hier auf --bg, also auf DUNKLEM Grund — erlaubt. */
+.commtitle{font-size:22px;line-height:1.15;margin-top:3px}
+.commsub{margin:6px auto 0;max-width:302px;font-size:11px;line-height:1.55;color:var(--dim)}
+
+/* Kanalgruppe: EIN Rahmen um sieben gleichartige Zeilen — dieselbe
+   Bauart wie .setgrp in den Einstellungen, damit „Liste gleichartiger
+   Zeilen" im ganzen Spiel gleich aussieht. */
+.socgrp{border-radius:var(--radius);border:1px solid var(--line);overflow:hidden;
+  background:linear-gradient(180deg,#1b2732,#131c25);box-shadow:var(--mat-raised)}
+.socrow{display:flex;align-items:center;gap:10px;padding:9px 11px}
+.socrow+.socrow{border-top:1px solid #1f2b35}
+.socname{flex:1;min-width:0;font-size:12.5px;font-weight:800;color:#dbe6ef}
+.socname small{display:block;margin-top:2px;font-size:9.5px;font-weight:700;
+  color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Die Zeile sagt „Folgen" — NICHT „Partner". Das ist keine Wortwahl,
+   sondern eine der fuenf Auflagen aus LIZENZEN.md §6: eine Marke darf
+   benutzt werden, um auf den eigenen Kanal BEI DIESEM DIENST zu zeigen,
+   nicht um eine Partnerschaft oder Billigung zu behaupten. */
+.socfolg{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;
+  min-width:72px;border:0;border-radius:10px;padding:8px 13px;line-height:1;
+  font-size:11px;font-weight:900;letter-spacing:.02em;color:#fff;text-decoration:none;
+  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);box-shadow:var(--mat-raised)}
+/* WARTEZUSTAND. Ein Knopf, der aussieht, als fuehre er irgendwohin, und
+   dann nichts tut, ist schlechter als einer, der ehrlich sagt „kommt
+   noch". Der Platzhalter ist deshalb SICHTBAR anders — gedeckt statt
+   farbig, mit der Marke BALD daneben — und erklaert sich beim Tippen.
+   Sobald eine Adresse in SOC_LINKS steht, wird aus derselben Zeile
+   automatisch ein echter <a>. */
+.socfolg.bald{background:linear-gradient(180deg,#3a4a58,#222e39 55%,#1a242d);
+  color:#9db0be}
+.socbald{flex:0 0 auto;font-size:8.5px;font-weight:900;letter-spacing:.10em;
+  color:#a9bccb;background:#0b1116;border:1px solid #2b3b47;
+  border-radius:8px;padding:4px 7px;box-shadow:var(--mat-sunken)}
+/* Rechtehinweis. Steht sichtbar unter den Zeilen, nicht in einem
+   Aufklapper: er ist die Stelle, an der das Fenster selbst sagt, dass
+   die Zeichen fremde Marken sind und keine Partnerschaft besteht. */
+.socrecht{margin-top:10px;font-size:9.5px;line-height:1.6;color:var(--dim);
+  text-align:center}
+
 /* ---------- Season-Pass ---------- */
 .passbar{display:flex;align-items:center;gap:var(--gap);margin-top:var(--gap);padding:var(--pad);
   border-radius:12px;background:#0b1116;border:1px solid var(--line);font-size:10.5px;
@@ -4415,6 +4475,85 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   -webkit-text-fill-color:#8fa0ad;color:#8fa0ad;box-shadow:0 3px 0 #16202a}
 .loginlater{width:100%;margin-top:7px;font-size:11px;color:#8fa0ad;padding:6px 0;font-weight:700}
 
+/* ==================================================================
+ * DEFENDERS GUIDE — BEWEGBARE REITERLEISTE (29.07.2026)
+ * ------------------------------------------------------------------
+ * Auftrag woertlich: „oben [ist] wieder eine beeegbare Leiste wie in
+ * unserem main menu. Mach die icons dann wieder grösser wenn es
+ * geöffnet wird."
+ *
+ * Zwei Eigenschaften, die den Unterschied zu einer Reiterzeile machen:
+ *
+ * 1. BEWEGBAR. Die Leiste ist ein echter Querscroller — Wischen macht
+ *    das Betriebssystem, es gibt hier KEINEN Gestencode. Das ist
+ *    dieselbe Bauart wie beim Arena-Pack-Karussell (`.apkrail`) und
+ *    hat denselben Grund: ein natives Scrollen kann per Definition
+ *    keinen Klick ausloesen, also braucht es dafuer auch keine zweite
+ *    Sperre neben `klickSperre` aus dem View-Wisch. `overscroll-
+ *    behavior-x:contain` haelt den senkrechten Wisch frei
+ *    (DESIGNSYSTEM §6l), und `querscroller()` im View-Wisch findet die
+ *    Leiste ueber `overflow-x`, gibt ihr also die Geste, solange sie
+ *    noch Weg hat.
+ *
+ * 2. DIE BREITEN SIND ABSICHT, NICHT ZUFALL.
+ *      5 Reiter · 4 x 72 px + 1 x 118 px + 4 x 8 px Abstand
+ *      + 2 x 12 px Polster = 462 px
+ *    `#app` ist auf 430 px gedeckelt, ein Telefon ist schmaler. Die
+ *    Leiste laeuft damit IMMER ueber die Kante — eine Leiste, die
+ *    zufaellig passt, sieht aus wie eine Reiterzeile und wird nicht
+ *    angefasst. Der angeschnittene Nachbar am Rand ist die Einladung.
+ *
+ * 3. ICON GROSS = REITER OFFEN. 24 px zu, 38 px offen. 24 px liegt
+ *    ueber der 20-px-Lesbarkeitsgrenze des Projekts — der geschlossene
+ *    Reiter wird kleiner, nicht unlesbar.
+ *
+ * Licht von oben: der offene Reiter ist ERHABEN (--mat-raised-lg), die
+ * geschlossenen sind EINGESENKT (--mat-sunken). Kein eigener Schatten.
+ *
+ * EIGENE ENTSCHEIDUNG: alle Zahlen oben. Aus IMG_3360-3365 wurde nichts
+ * nachgemessen; sie stammen aus der Banner-Metrik dieses Projekts.
+ * ================================================================== */
+.grailwrap{position:relative;margin:2px -12px 0}
+.grail{display:flex;align-items:flex-end;gap:var(--gap);
+  overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x proximity;overscroll-behavior-x:contain;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  padding:6px 12px 8px;scroll-behavior:smooth}
+.grail::-webkit-scrollbar{display:none}
+.grtab{position:relative;flex:0 0 auto;width:72px;scroll-snap-align:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;
+  padding:8px 5px 9px;border-radius:var(--radius);text-align:center;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg,#18222c,#101820);
+  box-shadow:var(--mat-sunken);
+  transition:width var(--t-mid) var(--ease-out),
+             background var(--t-mid) var(--ease-out),
+             border-color var(--t-mid) var(--ease-out)}
+.grtab .gri{display:flex;align-items:center;justify-content:center;
+  width:24px;height:24px;
+  transition:width var(--t-mid) var(--ease-overshoot),
+             height var(--t-mid) var(--ease-overshoot)}
+.grtab .gri .ico{width:24px;height:24px;object-fit:contain;
+  transition:width var(--t-mid) var(--ease-overshoot),
+             height var(--t-mid) var(--ease-overshoot)}
+.grtab .gri span.ico{font-size:19px;line-height:24px}
+.grtab .grn{font-size:9px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--dim);white-space:nowrap;line-height:1}
+/* Der offene Reiter: breiter, erhaben, grosses Icon, heller Text. */
+.grtab.on{width:118px;
+  background:linear-gradient(180deg,#2b3d4f,#17222d);
+  border-color:#41586c;box-shadow:var(--mat-raised-lg)}
+.grtab.on .gri{width:38px;height:38px}
+.grtab.on .gri .ico{width:38px;height:38px}
+.grtab.on .gri span.ico{font-size:31px;line-height:38px}
+.grtab.on .grn{font-size:11px;color:var(--txt)}
+/* Zaehler am Reiter (offene Belohnungen im Aufgaben-Reiter). Sitzt in
+   der Ecke und braucht deshalb das `position:relative` oben. */
+.grtab .grb{position:absolute;right:4px;top:4px;min-width:16px;height:16px;line-height:16px;
+  padding:0 4px;border-radius:8px;font-size:9.5px;font-weight:900;font-style:normal;
+  background:var(--danger);color:#2a0410;box-shadow:var(--sh-1)}
+.gpane[hidden]{display:none}
+
 /* ---------- Einsteiger-Guide ---------- */
 .gprog{display:flex;align-items:center;gap:10px;padding:var(--pad);margin-top:2px;
   border-radius:var(--radius);border:1px solid var(--line);
@@ -4435,8 +4574,13 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   background-repeat:no-repeat;background-position:right -10px center;background-size:auto 150%,cover}
 .gchead .gcs{font-size:22px;flex:0 0 auto}
 .gchead .gct{flex:1;min-width:0}
-.gchead .gcn{font-size:13.5px;font-weight:900;line-height:1.2}
-.gchead .gcd{font-size:9.5px;color:var(--dim);margin-top:2px;line-height:1.4}
+/* ⚠ 29.07.2026: Name und Untertitel sind <span> und liefen deshalb in
+   EINER Zeile weiter — „Erste SchritteDas Fundament: ein Match, …".
+   Zu sehen auf jedem Guide-Screenshot, nie gemessen, weil keine Pruefung
+   nach Zeilenumbruechen fragt. Zwei `display:block` statt zwei neuer
+   Elemente. */
+.gchead .gcn{display:block;font-size:13.5px;font-weight:900;line-height:1.2}
+.gchead .gcd{display:block;font-size:9.5px;color:var(--dim);margin-top:2px;line-height:1.4}
 .gchead .gcc{flex:0 0 auto;font-size:11px;font-weight:900;color:var(--gold)}
 .gchead .gcar{flex:0 0 auto;font-size:11px;color:var(--dim);transition:transform .2s}
 .gchap.open .gchead .gcar{transform:rotate(180deg)}
@@ -4451,9 +4595,14 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .gtask.done .gtb{background:linear-gradient(180deg,#7ad14f,#3aad16);border-color:#7ad14f;
   color:#0a2404;font-weight:900}
 .gtask .gtt{flex:1;min-width:0}
-.gtask .gtn{font-size:11.5px;font-weight:800;line-height:1.25}
-.gtask .gtd{font-size:9px;color:var(--dim);margin-top:2px;line-height:1.4}
+/* Dieselbe Ursache wie bei `.gchead .gcn` — Titel, Beschreibung und
+   Belohnungszeile sind drei Zeilen, keine drei Saetze hintereinander.
+   `.gtr` bekommt den Umbruch nur INNERHALB von `.gtt`: als Geschwister
+   des Knopfes („✓ abgeholt") muss es weiter in der Zeile stehen. */
+.gtask .gtn{display:block;font-size:11.5px;font-weight:800;line-height:1.25}
+.gtask .gtd{display:block;font-size:9px;color:var(--dim);margin-top:2px;line-height:1.4}
 .gtask .gtr{font-size:9px;color:var(--gold);font-weight:800;margin-top:2px}
+.gtask .gtt > .gtr{display:block}
 .gclaim{flex:0 0 auto;border-radius:var(--radius-sm);padding:7px 11px;font-size:11px;
   font-weight:900;background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);
   box-shadow:0 3px 0 #6d551a;-webkit-text-fill-color:#3a2b07;color:#3a2b07}
@@ -5674,6 +5823,44 @@ button.pfplate{cursor:pointer}
     <p class="credits" id="credits">—</p>
   </section>
 
+  <!-- ===== VIEW CO: COMMUNITY =====
+       AAs Aufklapp-Menue fuehrt an vierter Stelle in eine Community-
+       Seite; bei uns ist das der Ort fuer die eigenen Kanaele. Der View
+       ist reine Praesentation: die sieben Zeilen entstehen aus
+       SOC_PLATFORMS, das Plaettchen aus socChip(), die Adressen aus
+       SOC_LINKS.
+       BEWUSST NICHT in SWIPE_ORDER und ohne Bottom-Nav-Knopf — wie
+       Rangliste, Post und Freunde ein Ziel aus der Kopfzeile (§15.5).
+       Die Kulisse steht direkt auf dem Fenstergrund (--bg), NICHT in
+       einem Panel: Begruendung im Blatt bei .commfig / #viewCommunity. -->
+  <section id="viewCommunity" class="view">
+    <div class="viewhead"><button class="backbtn" id="commBack">‹</button>
+      <h2 class="title">Community</h2></div>
+
+    <!-- Kulisse, kein Icon: class="ico" ist hier verboten (§6h frisst die
+         dunkelblaue Kristallfigur). Faellt das CDN aus, blendet
+         UIIcon.hide das Bild aus — darunter liegt der Fenstergrund, kein
+         Loch und kein zerbrochenes Bildfeld.
+         ⚠ BEWUSST OHNE src-Attribut im Markup. Ein leeres src="" zeigt
+         beim Parsen auf das DOKUMENT, schlaegt sofort fehl und ruft
+         onerror, BEVOR das Skript UIIcon angelegt hat — eine
+         ReferenceError im Log, noch ehe die App laeuft. Die Quelle setzt
+         renderCommunity(). -->
+    <img class="commfig" id="commArt" alt=""
+         loading="lazy" decoding="async" onerror="UIIcon.hide(this)">
+    <div class="commclaim">
+      <div class="commkick">SPIELERGEMEINSCHAFT</div>
+      <div class="commtitle goldtext">Bleib in Verbindung</div>
+      <div class="commsub">Balance-Notizen, Turniertermine und die Vorschau auf die
+        nächste Saison kündigen wir zuerst auf unseren eigenen Kanälen an.</div>
+    </div>
+
+    <div class="secribbon sm" data-ribbon="ribbon_section_sm"><span class="srt">UNSERE KANÄLE</span></div>
+    <div class="socgrp" id="socList"></div>
+    <p class="socrecht" id="commRecht">—</p>
+    <p class="fortnote" id="commNote">—</p>
+  </section>
+
   <!-- ===== VIEW EP: PROFIL BEARBEITEN (AAs EDIT PROFILE) =====
        Vorschau → Reiter (Avatare | Rahmen) → Raster. Alle Zahlen,
        Namen, Bedingungen und der locked-Zustand kommen aus
@@ -5703,33 +5890,119 @@ button.pfplate{cursor:pointer}
     </div>
   </section>
 
-  <!-- ===== VIEW G: EINSTEIGER-GUIDE =====
-       Gestaffelte Kapitel mit Aufgabenliste. Die Haekchen kommen aus
-       window.ArenaGuide, das sie wiederum aus den bestehenden Zustaenden
-       ableitet (Telemetrie-Trichter, Karten, Clan, Festung, Daily).
-       Dieser View enthaelt KEINE eigene Fortschrittslogik. -->
-  <section id="viewGuide" class="view">
-    <div class="viewhead"><button class="backbtn" id="guideBack">‹</button>
-      <h2 class="title">Guide</h2>
-      <button class="mini pressable" id="btnToManual">📖 Handbuch</button>
-      <!-- Der Gegner-Einstieg sass bis 27.07. als eigener Eintrag im
-           Aufklapp-Menue oben rechts. Er gehoert in den Guide — bei AA
-           sind GEGNER und BOSS Reiter DES Guides (IMG_3361/3362). Bis
-           der Guide-Umbau steht, haelt dieser Knopf das Bestiarium
-           erreichbar; danach ist er die Abkuerzung auf den Reiter. -->
-      <button class="mini pressable" id="btnToBestiary">👾 Gegner</button></div>
-    <div class="gprog" id="guideProg"></div>
-    <div id="guideChapters"></div>
-    <p class="fortnote" id="guideNote">—</p>
-  </section>
+  <!-- ==================================================================
+       VIEW G: DEFENDERS GUIDE — EIN View mit einer REITERLEISTE
+       (Umbau 29.07.2026)
+       ------------------------------------------------------------------
+       Vorher waren das DREI Views: Einsteiger-Guide, Handbuch und
+       Bestiarium, verbunden durch zwei Notknoepfe im Guide-Kopf
+       (`#btnToManual`, `#btnToBestiary`). Der Kommentar an
+       `#btnToBestiary` hat selbst gesagt, dass er nur bis zum Umbau
+       bleibt: bei AA sind GEGNER und BOSS Reiter DES Guides
+       (Auftraggeber-Belege IMG_3361/IMG_3362).
 
-  <!-- ===== VIEW MB: SPIEL-HANDBUCH =====
-       Aufklappbare Erklaerseiten, Daten aus ArenaGuide.MANUAL. -->
-  <section id="viewManual" class="view">
-    <div class="viewhead"><button class="backbtn" id="manBack">‹</button>
-      <h2 class="title">Handbuch</h2></div>
-    <div id="manList"></div>
-    <p class="fortnote" id="manNote">—</p>
+       Wortlaut des Auftraggebers (zu IMG_3360-3365):
+         „Die Schaltflächen booster brauchen wir nicht die kannst du weg
+          lassen. Also ist oben wieder eine beeegbare Leiste wie in
+          unserem main menu. Mach die icons dann wieder grösser wenn es
+          geöffnet wird."
+       Daraus die drei harten Vorgaben, die dieses Markup umsetzt:
+         1. KEIN Booster-Reiter  — es gibt hier keinen, auch nicht als
+            „Belohnungen"-Ersatz.
+         2. Die Leiste ist BEWEGBAR — sie ist ein echter Querscroller
+            (`.grail`, `overflow-x:auto`), keine starre Reiterzeile.
+            Die aktiven/inaktiven Breiten sind so gewaehlt, dass die
+            Reihe IMMER breiter ist als `#app` (max. 430 px) — eine
+            Leiste, die zufaellig passt, ist keine bewegbare Leiste.
+         3. Der OFFENE Reiter traegt das GROSSE Icon (38 px), die
+            uebrigen das kleine (24 px, nie unter der 20-px-Grenze).
+
+       EIGENE ENTSCHEIDUNGEN (kein AA-Beleg in AA_UI_REFERENZ.md /
+       AA_WELLEN_REFERENZ.md — bitte nicht als Messung weiterreichen):
+         · Die FUENF Reiter und ihre Reihenfolge. Belegt ist nur, dass
+           GEGNER und BOSS Reiter des Guides sind. „Aufgaben" und
+           „Handbuch" sind unsere beiden Guide-Haelften (AA_UI_REFERENZ
+           §18.2), „Elemente" ist AAs Seite 1 des Defenders Guide
+           (AA_WELLEN_REFERENZ §2.1) — dass sie ein eigener REITER wird
+           statt der ersten Station einer Strecke, ist unsere Wahl.
+         · Alle Masse der Leiste (72/118 px Reiterbreite, 24/38 px
+           Icon, 8 px Abstand). Aus den Screenshots wurde NICHTS
+           nachgemessen; die Werte kommen aus der Banner-Metrik dieses
+           Projekts und aus der 20-px-Lesbarkeitsgrenze.
+         · Die Besetzung des BOSS-Reiters (welche Gegner, welche
+           Wellen). AA_WELLEN_REFERENZ §5 haelt ausdruecklich fest,
+           dass AAs Guide KEINE Boss-Kennzeichnung zeigt — der Inhalt
+           kommt deshalb aus unserem eigenen `arena_waves.js`.
+       ================================================================== -->
+  <section id="viewGuide" class="view">
+    <div class="viewhead">
+      <button class="backbtn pressable" id="guideBack">‹</button>
+      <h2 class="title">Defenders Guide</h2>
+      <span class="headico"><i data-ico="ic_shield" data-emoji="🛡"></i></span>
+    </div>
+
+    <!-- Die bewegbare Leiste. `.grailwrap` zieht sie bis an beide
+         Bildschirmkanten (wie `.apkwrap` beim Arena-Pack-Karussell),
+         damit der angeschnittene Nachbarreiter am Rand SICHTBAR ist —
+         das ist die Einladung zu wischen. -->
+    <div class="grailwrap">
+      <div class="grail" id="guideRail" role="tablist" aria-label="Guide-Reiter"></div>
+    </div>
+
+    <!-- Reiter 1 — AUFGABEN (der bisherige Einsteiger-Guide).
+         Enthaelt KEINE eigene Fortschrittslogik: die Haekchen kommen
+         aus window.ArenaGuide. -->
+    <div class="gpane" id="gpTasks" role="tabpanel" aria-labelledby="grt-tasks">
+      <div class="gprog" id="guideProg"></div>
+      <div id="guideChapters"></div>
+      <p class="fortnote" id="guideNote">—</p>
+    </div>
+
+    <!-- Reiter 2 — HANDBUCH (aufklappbare Erklaerseiten aus
+         ArenaGuide.MANUAL). War bis 29.07. ein eigener View. -->
+    <div class="gpane" id="gpManual" role="tabpanel" aria-labelledby="grt-manual" hidden>
+      <div id="manList"></div>
+      <p class="fortnote" id="manNote">—</p>
+    </div>
+
+    <!-- Reiter 3 — ELEMENTE (AAs Seite 1 des Defenders Guide,
+         AA_WELLEN_REFERENZ §2.1: Erklaerabsatz + Rad). -->
+    <div class="gpane" id="gpElements" role="tabpanel" aria-labelledby="grt-elements" hidden>
+      <div class="bsintro">
+        Türme machen <b>+20 %</b> Schaden gegen das Element, gegen das sie
+        stark sind, und <i>−20 %</i> gegen das, gegen das sie schwach sind.
+        <b>Neutrale</b> Gegner haben weder Stärke noch Schwäche.
+      </div>
+      <div class="elwheel" id="elWheel"></div>
+      <div class="elhint" id="elHint"></div>
+      <button class="battlebtn pressable" id="bsToGrid"
+        style="width:100%;min-height:46px;font-size:14px;margin-top:16px">Gegner ansehen</button>
+    </div>
+
+    <!-- Reiter 4 — GEGNER (AAs Seite 2: Kachelgitter + Wellenplan). -->
+    <div class="gpane" id="gpEnemies" role="tabpanel" aria-labelledby="grt-enemies" hidden>
+      <div class="bsintro">Diese Gegner können in Kämpfen und Wellen auftauchen.</div>
+      <div class="mobgrid" id="mobGrid"></div>
+      <div class="secribbon sm" data-ribbon="ribbon_section_sm"><span class="srt">Wellenplan</span></div>
+      <div id="waveList"></div>
+    </div>
+
+    <!-- Reiter 5 — BOSS. -->
+    <div class="gpane" id="gpBoss" role="tabpanel" aria-labelledby="grt-boss" hidden>
+      <div class="bsintro">Bosse stehen am Ende eines Akts. Sie bringen mehr
+        Lebenspunkte mit als die ganze Welle davor — und die Welle, in der sie
+        laufen, schickt weniger Begleitung.</div>
+      <div class="mobgrid" id="bossGrid"></div>
+      <div class="secribbon sm" data-ribbon="ribbon_section_sm"><span class="srt">Bosswellen</span></div>
+      <div id="bossWaves"></div>
+    </div>
+
+    <!-- Die Gegner-Detailkarte gehoert zu BEIDEN Kachel-Reitern (Gegner
+         und Boss) und steht deshalb NEBEN den Reitern, nicht in einem.
+         Sie ersetzt den Inhalt des gerade offenen Reiters; `#bsBack`
+         fuehrt zurueck auf dessen Gitter. Ein zweiter Detail-Renderer
+         je Reiter waere dieselbe Karte zweimal. -->
+    <div id="bsPage3" hidden></div>
   </section>
 
   <!-- Bestaetigungsdialog (Zuruecksetzen) -->
@@ -5946,36 +6219,10 @@ button.pfplate{cursor:pointer}
        Clan braucht den Dauerplatz, weil er taeglich angefasst wird, das
        Pack-Oeffnen passiert dagegen ereignisgetrieben (nach Sieg, aus
        Truhe, aus dem Shop) und wird von dort ohnehin direkt angesprungen. -->
-<!-- ===== VIEW: DEFENDERS GUIDE (Bestiarium) =====
-     Nachbau aus AA_WELLEN_REFERENZ §2. Drei Ebenen in EINER View, weil
-     AA sie auch als eine Strecke fuehrt (Rad -> Gitter -> Detail, mit
-     Zurueck). Ein eigener View je Ebene waere dreimal dieselbe Kopfzeile
-     und dreimal derselbe Wisch-Ausschluss. -->
-<section id="viewBestiary" class="view">
-  <div class="viewhead">
-    <button class="backbtn pressable" id="bsBack">‹</button>
-    <h2 class="title">Defenders Guide</h2>
-    <span class="headico"><i data-ico="ic_shield" data-emoji="🛡"></i></span>
-  </div>
-  <div id="bsPage1">
-    <div class="bsintro">
-      Türme machen <b>+20 %</b> Schaden gegen das Element, gegen das sie
-      stark sind, und <i>−20 %</i> gegen das, gegen das sie schwach sind.
-      <b>Neutrale</b> Gegner haben weder Stärke noch Schwäche.
-    </div>
-    <div class="elwheel" id="elWheel"></div>
-    <div class="elhint" id="elHint"></div>
-    <button class="battlebtn pressable" id="bsToGrid"
-      style="width:100%;min-height:46px;font-size:14px;margin-top:16px">Gegner ansehen</button>
-  </div>
-  <div id="bsPage2" hidden>
-    <div class="bsintro">Diese Gegner können in Kämpfen und Wellen auftauchen.</div>
-    <div class="mobgrid" id="mobGrid"></div>
-    <div class="secribbon sm" data-ribbon="ribbon_section_sm"><span class="srt">Wellenplan</span></div>
-    <div id="waveList"></div>
-  </div>
-  <div id="bsPage3" hidden></div>
-</section>
+<!-- Der eigenstaendige Bestiarium-View ist am 29.07.2026 in `#viewGuide`
+     aufgegangen: Elemente, Gegner und Boss sind dort Reiter (AA-Aufbau,
+     IMG_3361/3362). Die Element-, Gitter- und Detail-Bausteine sind
+     unveraendert uebernommen, nur ihr Behaelter hat gewechselt. -->
 
   <!-- Die Beschriftung steckt in .nlbl, damit sie sich ein- und ausklappen
        laesst: bei AA traegt nur der aktive Reiter seinen Namen. -->
@@ -7252,6 +7499,136 @@ button.pfplate{cursor:pointer}
       if (m.marke !== "#000000") d.style.setProperty("--marke", m.marke);
     }
     return d;
+  }
+
+  /* ==================================================================
+   * SOC_LINKS — die Ziel-Adressen der sieben Kanaele
+   * ------------------------------------------------------------------
+   * ⚠ PLATZHALTER, und zwar absichtlich: die Kanaele sind noch nicht
+   * eingerichtet. Das hier ist die EINZIGE Stelle, die dafuer spaeter
+   * angefasst werden muss — Adresse eintragen, fertig.
+   *
+   * Solange ein Eintrag leer ist, rendert seine Zeile im WARTEZUSTAND:
+   * gedeckter Knopf, Marke „BALD" daneben, und ein Tipp darauf sagt,
+   * was fehlt. Ein Knopf, der aussieht, als fuehre er irgendwohin, und
+   * dann nichts tut, ist schlechter als einer, der ehrlich sagt „kommt
+   * noch". Sobald eine Adresse eingetragen ist, wird aus derselben
+   * Zeile ohne weitere Aenderung ein echter <a>.
+   *
+   * Jede Adresse MUSS auf unseren eigenen Kanal BEI DIESEM DIENST
+   * zeigen. Genau diesen Gebrauch erlauben alle sieben
+   * Markenrichtlinien (LIZENZEN.md §6) — eine Marke, die woandershin
+   * fuehrt, waere von der Erlaubnis nicht gedeckt.
+   * ================================================================== */
+  var SOC_LINKS = {
+    discord: "", youtube: "", tiktok: "", x: "",
+    instagram: "", reddit: "", facebook: ""
+  };
+  /* Anzeigeform einer Adresse: ohne Schema, ohne Schraegstrich am Ende.
+     „discord.gg/arcaneprism" liest sich in einer 9,5-px-Unterzeile,
+     „https://discord.gg/arcaneprism/" laeuft ins Ellipsis. */
+  function socAdresse(url) {
+    return String(url).replace(/^https?:\/\//i, "").replace(/\/+$/, "");
+  }
+
+  /* ==================================================================
+   * COMMUNITY-FENSTER — Aufbau der sieben Kanalzeilen
+   * ------------------------------------------------------------------
+   * Der View ist reine Praesentation. Die fuenf Auflagen aus
+   * LIZENZEN.md §6 sind hier eingehalten, jede an einer benannten
+   * Stelle:
+   *   1. Marke unveraendert  — socChip() setzt den Pfad aus SOC_MARKEN
+   *      1:1 in ein viewBox="0 0 24 24" ohne transform.
+   *   2. Einfarbig weiss     — fill="currentColor" auf color:#fff
+   *      (.soclogo); gefaerbt wird der GRUND, nie die Marke.
+   *   3. Keine Partnerschaft — die Zeile sagt „Folgen"; darunter steht
+   *      #commRecht und sagt es ausdruecklich noch einmal.
+   *   4. Schutzraum          — .soclogo belegt 48 % des Plaettchens,
+   *      ringsum bleiben 26 %.
+   *   5. Nie als eigenes Logo — die sieben erscheinen NUR in diesen
+   *      Zeilen, nirgends als App-, Kopf- oder Menuesymbol.
+   * ================================================================== */
+  function renderCommunity() {
+    /* Kulisse. Sie steht direkt auf --bg (siehe Blatt), traegt KEIN
+       class="ico" und wird nicht freigestellt. Ohne Asset bleibt sie
+       weg — ein leeres Bildfeld waere schlimmer als keins. */
+    var art = $("commArt");
+    if (art) {
+      if (ASSETS.community_keyart) art.src = ASSETS.community_keyart;
+      else UIIcon.hide(art);
+    }
+
+    var liste = $("socList");
+    liste.innerHTML = "";
+    SOC_PLATFORMS.forEach(function (p) {
+      var url = String(SOC_LINKS[p.id] || "").trim();
+      var row = document.createElement("div");
+      row.className = "socrow";
+      /* Das Plaettchen kommt aus der bestehenden Fabrik — die Marke ist
+         Inline-SVG und damit auch ohne CDN da (§7b). */
+      row.appendChild(socChip(p));
+
+      var nm = document.createElement("div");
+      nm.className = "socname";
+      nm.appendChild(document.createTextNode(p.name));
+      var sub = document.createElement("small");
+      sub.textContent = url ? socAdresse(url) : "Adresse wird nachgetragen";
+      nm.appendChild(sub);
+      row.appendChild(nm);
+
+      var knopf;
+      if (url) {
+        knopf = document.createElement("a");
+        knopf.className = "socfolg pressable";
+        knopf.href = url;
+        knopf.target = "_blank";
+        knopf.rel = "noopener noreferrer";
+        knopf.setAttribute("aria-label", p.name + " folgen");
+      } else {
+        /* Wartezustand: erst die Marke BALD, dann der gedeckte Knopf.
+           Beides zusammen — nicht nur die Farbe — macht den Platzhalter
+           auch dann erkennbar, wenn jemand Farben nicht unterscheidet. */
+        var tag = document.createElement("span");
+        tag.className = "socbald";
+        tag.textContent = "BALD";
+        row.appendChild(tag);
+
+        knopf = document.createElement("button");
+        knopf.className = "socfolg bald pressable";
+        knopf.setAttribute("aria-disabled", "true");
+        knopf.setAttribute("aria-label", p.name + " folgen — Adresse wird nachgetragen");
+        knopf.addEventListener("click", function () {
+          UISfx.tap();
+          toast(p.name + ": der Link wird nachgetragen, bevor das Spiel startet.");
+          track("community_link_offen", { plattform: p.id });
+        });
+      }
+      /* „Folgen" — NICHT „Partner", „Offizieller Kanal" oder
+         „Zusammenarbeit". Auflage 3 aus LIZENZEN.md §6. */
+      knopf.textContent = "Folgen";
+      row.appendChild(knopf);
+      liste.appendChild(row);
+    });
+
+    $("commRecht").textContent =
+      "Discord, YouTube, TikTok, X, Instagram, Reddit und Facebook sind Marken der " +
+      "jeweiligen Unternehmen. Ihre Zeichen stehen hier ausschließlich als Wegweiser " +
+      "zu unseren eigenen Kanälen bei diesen Diensten. Eine Partnerschaft, " +
+      "Zusammenarbeit oder Billigung durch diese Anbieter besteht nicht.";
+    var offen = SOC_PLATFORMS.filter(function (p) {
+      return !String(SOC_LINKS[p.id] || "").trim();
+    }).length;
+    $("commNote").textContent = offen
+      ? offen + " von " + SOC_PLATFORMS.length + " Kanälen sind noch nicht eingerichtet — " +
+        "diese Zeilen warten sichtbar, statt ins Leere zu führen. Die Bildmarken liegen " +
+        "als Vektor im Dokument (simple-icons, CC0) und sind deshalb auch dann da, wenn " +
+        "kein Bild lädt."
+      : "Alle Kanäle sind verknüpft. Die Bildmarken liegen als Vektor im Dokument " +
+        "(simple-icons, CC0) und sind deshalb auch dann da, wenn kein Bild lädt.";
+
+    hydrateRibbons($("viewCommunity"));
+    markPressable($("viewCommunity"));
+    sweepSoon($("viewCommunity"));
   }
 
   /* ==================================================================
@@ -12705,11 +13082,14 @@ button.pfplate{cursor:pointer}
    * Stelle gedreht werden kann (arena_waves.js, Block FORMELN) und die
    * UI ohne Nacharbeit folgt.
    *
-   * Drei Ebenen wie bei AA (AA_WELLEN_REFERENZ §2), umgeschaltet ueber
-   * `bsSeite`. Zurueck geht immer eine Ebene hoch, nie sofort raus —
-   * AAs `Back` verhaelt sich genauso.
+   * UMBAU 29.07.2026: Aus den drei Ebenen (`bsSeite` 1/2/3) sind
+   * REITER des Guides geworden — Elemente, Gegner, Boss. Was bleibt,
+   * ist die Detailkarte: sie ist keine Ebene mehr, sondern ein Zustand
+   * DES offenen Kachel-Reiters (`bsDetail`). Zurueck fuehrt weiterhin
+   * eine Ebene hoch, nur ist „hoch" jetzt das Gitter des Reiters, aus
+   * dem man kam, statt eine feste Vorgaengerseite.
    * ================================================================== */
-  var bsSeite = 1;         // 1 Rad · 2 Gitter · 3 Detailkarte
+  var bsDetail = false;    // Detailkarte statt Gitter im offenen Reiter
   var bsMob = null;        // Schluessel des gezeigten Gegners
   var bsLevel = 1;         // Stand des Stufenreglers
 
@@ -12789,32 +13169,45 @@ button.pfplate{cursor:pointer}
   }
 
   /* Kachelgitter. Der Stufenstand wird MITGEFUEHRT, damit ein Sprung ins
-     Detail nicht auf Stufe 1 zurueckfaellt — AA macht das genauso. */
-  function renderMobGrid() {
+     Detail nicht auf Stufe 1 zurueckfaellt — AA macht das genauso.
+
+     Seit dem Reiter-Umbau bedient DIESELBE Funktion zwei Reiter: GEGNER
+     zeigt alle Nicht-Bosse, BOSS nur die Bosse. Das Gitter ist beide
+     Male dasselbe Bauteil — ein zweiter Renderer waere zweimal derselbe
+     Fehler, wenn sich die Kachel aendert.
+     ⚠ `nurBoss` filtert an `m.boss` aus arena_waves.js. Hier wird NICHT
+     entschieden, WER ein Boss ist. */
+  function renderMobGrid(nurBoss) {
     var W = AW(); if (!W) return;
-    var liste = W.bestiary(bsLevel);
-    $("mobGrid").innerHTML = liste.map(function (m) {
-      return '<button class="mobtile pressable' + (m.boss ? " boss" : "") +
-        '" data-mob="' + m.key + '">' +
-        (m.boss ? '<span class="bosslbl">BOSS</span>' : "") +
-        '<span class="mel">' + (m.elementAsset ? ico(m.elementAsset, "◆") : "◇") + "</span>" +
-        '<span class="mart">' + ico(m.artKey, "👾") + "</span>" +
-        '<span class="mnm">' + m.nameDe + "</span></button>";
-    }).join("");
-    Array.prototype.forEach.call($("mobGrid").querySelectorAll("[data-mob]"), function (b) {
+    var gitter = $(nurBoss ? "bossGrid" : "mobGrid");
+    var liste = W.bestiary(bsLevel).filter(function (m) { return !!m.boss === !!nurBoss; });
+    gitter.innerHTML = liste.length
+      ? liste.map(function (m) {
+          return '<button class="mobtile pressable' + (m.boss ? " boss" : "") +
+            '" data-mob="' + m.key + '">' +
+            (m.boss ? '<span class="bosslbl">BOSS</span>' : "") +
+            '<span class="mel">' + (m.elementAsset ? ico(m.elementAsset, "◆") : "◇") + "</span>" +
+            '<span class="mart">' + ico(m.artKey, "👾") + "</span>" +
+            '<span class="mnm">' + m.nameDe + "</span></button>";
+        }).join("")
+      : leerfeld("ic_helm", "👾", "Noch keine Einträge",
+                 "Hier stehen die Gegner, sobald das Wellenmodul sie führt.", true);
+    Array.prototype.forEach.call(gitter.querySelectorAll("[data-mob]"), function (b) {
       b.addEventListener("click", function () {
         UISfx.tap();
         bsMob = b.getAttribute("data-mob");
-        bsSeite = 3;
-        renderBestiary();
+        bsDetail = true;
+        renderGuide();
       });
     });
     /* Wellenplan: nicht alle 27 Wellen, sondern die Marken, an denen sich
        etwas aendert — Aktwechsel und Bosswellen. Eine 27-zeilige Liste
-       waere vollstaendig und unlesbar. */
-    var marken = [1, 7, 9, 14, 18, 22, 27];
-    $("waveList").innerHTML = marken.map(function (n) {
-      var w = W.waveAt(n);
+       waere vollstaendig und unlesbar.
+       Im BOSS-Reiter bleiben davon nur die Bosswellen uebrig — dieselbe
+       Liste, anders gefiltert. */
+    var marken = [1, 7, 9, 14, 18, 22, 27].map(function (n) { return W.waveAt(n); });
+    if (nurBoss) marken = marken.filter(function (w) { return w.boss; });
+    $(nurBoss ? "bossWaves" : "waveList").innerHTML = marken.map(function (w) {
       var namen = w.entries.map(function (e) { return e.count + "× " + e.nameDe; });
       var summe = w.entries.reduce(function (a, e) { return a + e.hpTotal; }, 0);
       return '<div class="waverow' + (w.boss ? " boss" : "") + '">' +
@@ -12841,7 +13234,12 @@ button.pfplate{cursor:pointer}
     var rs = b.resistantTo ? elDe(b.resistantTo) : null;
     var bewegung = { slow: "Langsam", normal: "Normal", fast: "Schnell" };
     var ziel = { ground: "Boden", air: "Luft", both: "Luft & Boden" };
+    /* Der Zurueck-Knopf sitzt SEIT dem Reiter-Umbau in der Karte selbst.
+       Vorher stand er in der Kopfzeile des Bestiarium-Views — die gibt
+       es nicht mehr, und der Kopf des Guides gehoert jetzt dem Guide.
+       Er fuehrt auf das Gitter DES Reiters, aus dem man kam. */
     $("bsPage3").innerHTML =
+      '<button class="mini pressable" id="bsBack" style="margin-bottom:8px">‹ Zurück</button>' +
       '<div class="mobhead">' +
         '<span class="mh"><span class="mhn">' + m.nameDe + "</span>" +
         '<span class="mhe">' + m.elementDe +
@@ -12891,29 +13289,109 @@ button.pfplate{cursor:pointer}
     if (up) up.addEventListener("click", function () {
       if (bsLevel < m.maxLevel) { bsLevel++; UISfx.tap(); renderMobDetail(); }
     });
+    var zur = $("bsBack");
+    if (zur) zur.addEventListener("click", function () {
+      UISfx.tap(); bsDetail = false; renderGuide();
+    });
     markPressable($("bsPage3"));
     sweepSoon($("bsPage3"));
   }
 
-  function renderBestiary() {
-    var W = AW();
-    if (!W) {
-      $("bsPage1").innerHTML = '<div class="bsintro">Das Wellen-Modul ist nicht geladen.</div>';
-      return;
+  /* ==================================================================
+   * DIE REITERLEISTE DES GUIDES
+   * ------------------------------------------------------------------
+   * Fuenf Reiter, EIN aktiver. Der aktive traegt das grosse Icon —
+   * das ist die woertliche Vorgabe des Auftraggebers und deshalb hier
+   * die einzige Klasse, die die Leiste kennt (`.on`); die Groessen
+   * stehen im Blatt, nicht im Code.
+   *
+   * Es gibt bewusst KEINEN Booster-Reiter: „Die Schaltflächen booster
+   * brauchen wir nicht die kannst du weg lassen."
+   *
+   * EIGENE ENTSCHEIDUNG (kein AA-Beleg): die Auswahl der fuenf Reiter,
+   * ihre Reihenfolge und ihre Icons. Belegt ist nur, dass GEGNER und
+   * BOSS Reiter DES Guides sind (IMG_3361/3362).
+   * ================================================================== */
+  var GTABS = [
+    { k: "tasks",    ico: "hub_challenges", emo: "📋", txt: "Aufgaben" },
+    { k: "manual",   ico: "ic_compass",     emo: "📖", txt: "Handbuch" },
+    { k: "elements", ico: "el_feuer",       emo: "🔥", txt: "Elemente" },
+    { k: "enemies",  ico: "ic_helm",        emo: "👾", txt: "Gegner" },
+    { k: "boss",     ico: "ic_crown",       emo: "👑", txt: "Boss" }
+  ];
+  var gTab = "tasks";
+  var GPANE = { tasks: "gpTasks", manual: "gpManual", elements: "gpElements",
+                enemies: "gpEnemies", boss: "gpBoss" };
+  /* Welche Reiter zeigen ein Kachelgitter mit Detailkarte? Nur diese
+     duerfen `bsDetail` ueberhaupt sehen — sonst bliebe die Karte beim
+     Reiterwechsel offen stehen. */
+  function gTabHatDetail(k) { return k === "enemies" || k === "boss"; }
+
+  function renderGuideRail() {
+    var G = GDof();
+    var offen = G ? G.badge() : 0;
+    $("guideRail").innerHTML = GTABS.map(function (t) {
+      var an = t.k === gTab;
+      return '<button class="grtab pressable' + (an ? " on" : "") +
+        '" id="grt-' + t.k + '" role="tab" data-gtab="' + t.k + '"' +
+        ' aria-selected="' + (an ? "true" : "false") + '"' +
+        ' aria-label="' + t.txt + '">' +
+        '<span class="gri">' + ico(t.ico, t.emo) + "</span>" +
+        '<span class="grn">' + t.txt + "</span>" +
+        (t.k === "tasks" && offen > 0
+          ? '<i class="grb">' + (offen > 99 ? "99+" : offen) + "</i>" : "") +
+        "</button>";
+    }).join("");
+    Array.prototype.forEach.call($("guideRail").querySelectorAll("[data-gtab]"), function (b) {
+      b.addEventListener("click", function () {
+        UISfx.tap();
+        guideTab(b.getAttribute("data-gtab"));
+      });
+    });
+    /* Den offenen Reiter in die Mitte holen. Von Hand statt per
+       scrollIntoView(): das wuerde auch die SENKRECHTE Position der
+       Seite anfassen, und ein Reiterwechsel darf nicht scrollen. */
+    var an = $("guideRail").querySelector(".grtab.on");
+    if (an) {
+      var r = $("guideRail");
+      r.scrollLeft = Math.max(0, an.offsetLeft - (r.clientWidth - an.offsetWidth) / 2);
     }
-    $("bsPage1").hidden = bsSeite !== 1;
-    $("bsPage2").hidden = bsSeite !== 2;
-    $("bsPage3").hidden = bsSeite !== 3;
-    if (bsSeite === 1) renderElWheel();
-    if (bsSeite === 2) renderMobGrid();
-    if (bsSeite === 3) renderMobDetail();
-    hydrateIcons($("viewBestiary"));
-    hydrateRibbons($("viewBestiary"));
-    markPressable($("viewBestiary"));
-    sweepSoon($("viewBestiary"));
+  }
+
+  /* guideTab(k) — Reiter wechseln. Einziger Weg; auch die alten
+     Einstiege (`show("navManual")`, `show("navBestiary")`) laufen hier
+     durch, damit es fuer „welcher Reiter ist offen" genau eine
+     Wahrheit gibt. */
+  function guideTab(k) {
+    if (!GPANE[k]) k = "tasks";
+    if (k !== gTab) bsDetail = false;     // Karte gehoert ihrem Reiter
+    gTab = k;
+    renderGuide();
   }
 
   function renderGuide() {
+    renderGuideRail();
+    var detail = bsDetail && gTabHatDetail(gTab);
+    for (var k in GPANE) {
+      var p = $(GPANE[k]);
+      if (p) p.hidden = (k !== gTab) || detail;
+    }
+    $("bsPage3").hidden = !detail;
+
+    if (gTab === "tasks") renderGuideTasks();
+    if (gTab === "manual") renderManual();
+    if (gTab === "elements") renderElWheel();
+    if (gTabHatDetail(gTab)) {
+      if (detail) renderMobDetail();
+      else renderMobGrid(gTab === "boss");
+    }
+    hydrateIcons($("viewGuide"));
+    hydrateRibbons($("viewGuide"));
+    markPressable($("viewGuide"));
+    sweepSoon($("viewGuide"));
+  }
+
+  function renderGuideTasks() {
     /* Kopfbild. bgArtV statt bgArt: Text steht UNTEN auf dem Bild, das
        Abdunkelungsband muss deshalb senkrecht laufen (§6c, Messwerte in
        patches/keyarts.md §0a). Der Aufruf ist wiederholbar — bgArtV nimmt
@@ -13049,7 +13527,7 @@ button.pfplate{cursor:pointer}
     G.readPage(pages[0].key);
     $("manNote").textContent = "Alle Systeme kurz erklärt. Erreichbar aus dem Guide " +
       "und aus den Einstellungen.";
-    markPressable($("viewManual"));
+    markPressable($("gpManual"));
   }
 
   /* ==================================================================
@@ -13257,8 +13735,11 @@ button.pfplate{cursor:pointer}
                navFriends: "viewFriends",
                navPass: "viewPass", navHeroes: "viewHeroes", navEvents: "viewEvents",
                navMail: "viewMail", navSettings: "viewSettings",
-               navGuide: "viewGuide", navManual: "viewManual",
-               navBestiary: "viewBestiary",
+               /* navManual und navBestiary stehen hier NICHT mehr: seit
+                  dem Reiter-Umbau (29.07.2026) gibt es keine eigenen
+                  Views dafuer. show() setzt sie auf navGuide um und
+                  waehlt den Reiter. */
+               navGuide: "viewGuide", navCommunity: "viewCommunity",
                navEditProfile: "viewEditProfile",
                navMatchEnd: "viewMatchEnd" };
   var NAV_IDS = ["navShop", "navCollection", "navHome", "navClan", "navFortress", "navPack",
@@ -13274,6 +13755,16 @@ button.pfplate{cursor:pointer}
   }
   function show(navId) {
     if (navId === "navTower") { openDetail(curId); return; }
+    /* Handbuch und Bestiarium sind seit dem Reiter-Umbau (29.07.2026)
+       keine eigenen Views mehr, sondern Reiter des Guides. Die alten
+       Ziele bleiben trotzdem gueltig — sie waehlen jetzt einfach den
+       passenden Reiter. So muss keine der ueber ein Dutzend Aufrufer
+       (Einstellungen, Menue, Tests) etwas davon wissen. */
+    if (navId === "navManual" || navId === "navBestiary") {
+      gTab = navId === "navManual" ? "manual" : "enemies";
+      bsDetail = false;
+      navId = "navGuide";
+    }
     $("detailModal").classList.remove("open");
     // Match-Ende blendet die Bottom-Nav aus (siehe CSS body.me-open).
     document.body.classList.toggle("me-open", navId === "navMatchEnd");
@@ -13311,8 +13802,7 @@ button.pfplate{cursor:pointer}
     if (navId === "navMail") renderMail();
     if (navId === "navSettings") renderSettings();
     if (navId === "navGuide") renderGuide();
-    if (navId === "navBestiary") renderBestiary();
-    if (navId === "navManual") renderManual();
+    if (navId === "navCommunity") renderCommunity();
     if (navId === "navEditProfile") renderEditProfile();
   }
 
@@ -13503,11 +13993,10 @@ button.pfplate{cursor:pointer}
    *    das anders, weil AA unten KEINEN Clan-Tab hat.
    *    Dasselbe Argument haelt Freunde draussen: `#tbFriends` steht
    *    direkt links neben dem Menue-Knopf, keine 8 px entfernt.
-   * 2. GEGNER (`navBestiary`) wird doppelt, sobald der Defenders Guide
-   *    AAs Aufbau hat: dort werden GEGNER und BOSS eigene Reiter IM
-   *    Guide (Belege IMG_3361, IMG_3362). Der Weg fuehrt jetzt ueber
-   *    den Guide-Eintrag — auch solange der Umbau noch nicht steht,
-   *    naemlich ueber `#btnToBestiary` im Guide-Kopf.
+   * 2. GEGNER (`navBestiary`) waere doppelt: seit dem Reiter-Umbau
+   *    (29.07.2026) sind GEGNER und BOSS Reiter IM Guide (Belege
+   *    IMG_3361, IMG_3362). Der Weg fuehrt ueber den Guide-Eintrag,
+   *    der genau dort landet.
    *
    * Was bleibt, sind vier Ziele in zwei Gruppen und zwei Groessen.
    * Die Gewichtung ist keine Geschmacksfrage: Rangliste und Guide sind
@@ -13532,7 +14021,19 @@ button.pfplate{cursor:pointer}
     { nav: "navBoard", ico: "ic_rank", emo: "🏅", txt: "Rangliste",
       sub: "Global, Clan und Umgebung", pri: true },
     { nav: "navGuide", ico: "hub_challenges", emo: "📖", txt: "Guide",
-      sub: "Kapitel, Handbuch und Gegner", pri: true },
+      sub: "Aufgaben, Handbuch, Gegner und Boss", pri: true },
+    /* COMMUNITY steht bei AA an zweiter Stelle dieses Menues; bei uns
+       zeigte der Eintrag frueher auf den Clan und war damit eine
+       Doppelung des Bottom-Nav-Knopfes (siehe Begruendung oben). Jetzt
+       fuehrt er dorthin, wo er hingehoert: auf unsere eigenen Kanaele.
+       Er ist ein ZIEL, kein Verwaltungspunkt — also Gruppe „Spielen",
+       gross, mit Unterzeile.
+       `ic_share` ist der dicke Pfeil nach rechts oben: er sagt bei 24 px
+       „hier geht es hinaus" und bleibt lesbar. Die Unterzeile nennt
+       BEWUSST keine Anbieternamen — fremde Marken erscheinen nur in den
+       Kanalzeilen des Fensters selbst (LIZENZEN.md §6, Auflage 5). */
+    { nav: "navCommunity", ico: "ic_share", emo: "↗", txt: "Community",
+      sub: "Unsere Kanäle und Neuigkeiten", pri: true },
     { grp: "Konto" },
     { nav: "navMail", ico: "ic_mail", emo: "✉", txt: "Post", zaehler: "mail" },
     { nav: "navSettings", ico: "ic_gear", emo: "⚙", txt: "Einstellungen" }
@@ -13592,16 +14093,13 @@ button.pfplate{cursor:pointer}
     if (e.key === "Escape" && !$("tbMenuLayer").hidden) tbMenuZu();
   });
 
-  /* Zurueck im Bestiarium geht eine EBENE hoch, nicht sofort raus —
-     AAs `Back` verhaelt sich genauso (Detail -> Gitter -> Rad -> Start). */
-  $("bsBack").addEventListener("click", function () {
-    UISfx.tap();
-    if (bsSeite === 3) { bsSeite = 2; renderBestiary(); return; }
-    if (bsSeite === 2) { bsSeite = 1; renderBestiary(); return; }
-    show("navHome");
-  });
+  /* `#bsBack` wird beim Rendern der Detailkarte erzeugt und dort auch
+     verdrahtet (renderMobDetail) — es gibt ihn nicht mehr dauerhaft im
+     Markup. Hier bleibt nur die Abkuerzung vom Element-Rad ins
+     Gegner-Gitter, die AAs „Gegner ansehen" entspricht; sie wechselt
+     jetzt den REITER statt die Seite. */
   $("bsToGrid").addEventListener("click", function () {
-    UISfx.confirm(); bsSeite = 2; renderBestiary();
+    UISfx.confirm(); guideTab("enemies");
   });
 
   /* Die Einstellungen sind vom Startbildschirm in das Aufklapp-Menue
@@ -13645,14 +14143,18 @@ button.pfplate{cursor:pointer}
     if (e.target === $("offerLayer")) closeOfferPopup();
   });
   $("clanBack").addEventListener("click", function () { show("navHome"); });
-  $("guideBack").addEventListener("click", function () { show("navHome"); });
-  $("manBack").addEventListener("click", function () { show("navGuide"); });
-  $("btnToManual").addEventListener("click", function () { show("navManual"); });
-  /* Das Bestiarium startet IMMER auf Seite 1. Ein Nachschlagewerk, das
-     dort wieder aufmacht, wo man zuletzt war, verwirrt beim zweiten
-     Besuch mehr als es hilft. (Stand vorher am Menue-Eintrag.) */
-  $("btnToBestiary").addEventListener("click", function () {
-    bsSeite = 1; bsMob = null; bsLevel = 1; show("navBestiary");
+  /* Der Guide-Kopf hat seit dem Reiter-Umbau nur noch EINEN Knopf. Die
+     beiden Notknoepfe `#btnToManual` und `#btnToBestiary` sind weg —
+     ihre Ziele sind Reiter, und ein zweiter Weg auf einen Reiter, der
+     ohnehin in der Leiste steht, ist genau die Doppelung, die auf der
+     Startseite schon einmal beanstandet wurde.
+     Zurueck geht eine Ebene hoch: steht die Gegner-Detailkarte offen,
+     schliesst sie zuerst — AAs `Back` verhaelt sich genauso. */
+  $("guideBack").addEventListener("click", function () {
+    if (bsDetail && gTabHatDetail(gTab)) {
+      UISfx.tap(); bsDetail = false; renderGuide(); return;
+    }
+    show("navHome");
   });
   $("btnSetGuide").addEventListener("click", function () { show("navGuide"); });
   $("btnSetManual").addEventListener("click", function () { show("navManual"); });
@@ -13666,6 +14168,10 @@ button.pfplate{cursor:pointer}
     if (e.target === $("dailyLayer")) closeDaily();
   });
   $("boardBack").addEventListener("click", function () { show("navHome"); });
+  /* Community wird nur ueber das Aufklapp-Menue betreten; der
+     Zurueck-Pfeil fuehrt darum auf die Startseite, wie bei Rangliste
+     und Post. */
+  $("commBack").addEventListener("click", function () { UISfx.tap(); show("navHome"); });
   $("lbJump").addEventListener("click", lbScrollToMe);
   $("reqDlgClose").addEventListener("click", function () {
     $("reqDlg").classList.remove("open");
@@ -14197,6 +14703,12 @@ button.pfplate{cursor:pointer}
                         Emoji-Rueckfall verdeckt (§7b). */
                      socChip: socChip, SOC_MARKEN: SOC_MARKEN,
                      SOC_PLATFORMS: SOC_PLATFORMS,
+                     /* Community-Fenster: die Adresstabelle liegt offen,
+                        damit die Pruefung BEIDE Zustaende messen kann —
+                        Wartezustand (leer) und verlinkte Zeile. Ohne das
+                        liesse sich der verlinkte Fall nur belegen, indem
+                        man echte Adressen eintraegt. */
+                     SOC_LINKS: SOC_LINKS, renderCommunity: renderCommunity,
                      setSort: setSort, sortedIds: sortedIds,
                      ASSETS: ASSETS, ARENA_TIERS: ARENA_TIERS, renderHome: renderHome,
                      openRoad: openRoad, closeRoad: closeRoad, nodeList: nodeList,
@@ -14250,6 +14762,8 @@ button.pfplate{cursor:pointer}
                      attachLoop: attachLoop, CARD_LOOP: CARD_LOOP,
                      AU: function () { return window.ArenaAudio; },
                      renderGuide: renderGuide, renderManual: renderManual,
+                     guideTab: guideTab, gTab: function () { return gTab; },
+                     GTABS: GTABS, bsDetail: function () { return bsDetail; },
                      renderLoginPopup: renderLoginPopup, openLogin: openLogin,
                      closeLogin: closeLogin, doLoginClaim: doLoginClaim,
                      maybeShowLogin: maybeShowLogin, guideMark: guideMark,
