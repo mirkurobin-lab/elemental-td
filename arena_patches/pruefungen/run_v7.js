@@ -610,8 +610,12 @@ function step(name, ok, info) {
     shopBlocks.packBronze === 0 && shopBlocks.packFrei === 1,
     shopBlocks.packs + ' Kacheln in ' + shopBlocks.packSpalten + ' Spalten, ' +
     shopBlocks.packBronze + ' Bronze im Raster, ' + shopBlocks.packFrei + ' Gratis-Band');
+  /* (29.07.2026) Vorher wurden FUENF Chancen-Zeilen verlangt. Suprem
+     steht jetzt ausdruecklich mit 0 % dabei — „kommt nicht vor" ist eine
+     Aussage, die der Kaeufer sehen soll. Sechs Zeilen sind also der
+     Sollzustand, nicht ein Zaehlfehler. */
   step('(5) Vorrats-Truhe: OEFFNEN x1 und x10 plus Chancen-Klappe',
-    shopBlocks.vorrat === 2 && shopBlocks.vorratOdds === 5,
+    shopBlocks.vorrat === 2 && shopBlocks.vorratOdds === 6,
     shopBlocks.vorrat + ' Knoepfe / ' + shopBlocks.vorratOdds + ' Chancen-Zeilen');
   step('(6) Kristalltresor sitzt auf AAs Roulette-Platz', shopBlocks.vault === 1);
   step('(7) Gem-Pakete: 6 Staffeln als Produktkarten', shopBlocks.gems === 6,

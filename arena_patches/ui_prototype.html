@@ -3095,7 +3095,7 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
   gap:11px;padding:11px;min-height:var(--banner-h);
   border-radius:var(--radius);overflow:hidden;
   box-shadow:var(--mat-raised-lg)}
-.tagesband{border:1px solid var(--line);
+.tagesband{position:relative;border:1px solid var(--line);/* position:relative wegen des ⓘ (.oddsi, absolut oben rechts) — ohne das haengt es am naechsten positionierten Vorfahren. */
   background:linear-gradient(150deg,#243342,#141d26 60%,#0e1418)}
 /* Der Bildkasten. Eingesenkt wie der Produktbild-Kasten der
    Produktkachel — beides sind Behaelter fuer ein Bild, also dieselbe
@@ -3169,7 +3169,7 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
 /* Baut auf dem Tagesband auf und ergaenzt nur, was der Tresor eigenes
    hat: die Fuellstands-Saeule, den Fortschrittsbalken und den
    „voll"-Zustand. */
-.vaultbox{border:1px solid #a45ef23d;
+.vaultbox{position:relative;border:1px solid #a45ef23d;/* position:relative wegen des ⓘ (.oddsi). */
   background:linear-gradient(150deg,#2a1c4a,#161028 60%,#0e1418)}
 .vaultbox.full{border-color:#f2c53d;
   box-shadow:var(--mat-raised-lg),0 0 0 1px #f2c53d55,0 0 22px #f2c53d3d;
@@ -3319,7 +3319,7 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
 #offerLayer{position:fixed;inset:0;display:none;z-index:80;align-items:center;
   justify-content:center;background:#05090cd6;padding:18px}
 #offerLayer.open{display:flex}
-.offerpop{width:100%;max-width:340px;border-radius:20px;overflow:hidden;
+.offerpop{position:relative;width:100%;max-width:340px;border-radius:20px;overflow:visible;/* overflow VISIBLE und position:relative wegen des ⓘ: mit `hidden` wuerde der Knopf an der abgerundeten Ecke beschnitten. */
   border:1px solid #dc1ddb66;box-shadow:0 24px 60px -20px #000,0 0 40px -10px #dc1ddb55;
   background:linear-gradient(160deg,#3a1440,#1c1030 58%,#0e1418);
   animation:offerpop .45s cubic-bezier(.2,1.4,.4,1)}
@@ -8980,8 +8980,8 @@ button.pfplate{cursor:pointer}
     /* Das ⓘ wird hier mit erzeugt, weil diese Zeile ihr innerHTML bei
        jedem Aufruf neu setzt — ein Knopf aus dem statischen Markup wäre
        nach dem ersten Rendern weg. */
-    $("pityLine").innerHTML = '<button class="oddsi pressable" data-odds="bronze" ' +
-      'style="top:50%;transform:translateY(-50%)" aria-label="Drop-Raten anzeigen">i</button>' +
+    $("pityLine").innerHTML = '<span class="oddsi pressable" role="button" tabindex="0" data-odds="bronze" ' +
+      'style="top:50%;transform:translateY(-50%)" aria-label="Drop-Raten anzeigen">i</span>' +
       ico("frame_epic", "🛟") + " <b>Episch</b> garantiert in ≤" + p.epicIn +
       " Packs · <span class=\"leg\">Legendär</span> in ≤" + p.legendaryIn;
   }
@@ -9187,15 +9187,58 @@ button.pfplate{cursor:pointer}
       lay.classList.remove("on");
       lay.setAttribute("aria-hidden", "true");
     }
+    /* ===================================================================
+     * Der zweite Fall: FESTE Ausschüttung.
+     *
+     * Der Kristalltresor sammelt Kristalle nach einer festen Formel
+     * (arena_vault.js `gemsPerWin`, linear aus dem Arena-Index) und zahlt
+     * beim Öffnen exakt den Zählerstand aus, den der Spieler vorher sieht.
+     * Kein `Math.random` im ganzen Modul.
+     *
+     * Er ist damit KEINE Loot-Box und fällt nicht unter Apple 3.1.1.
+     * Eine Quotentabelle dort wäre nicht nur überflüssig, sondern
+     * FALSCH: sie würde einen Zufall behaupten, den es nicht gibt.
+     *
+     * Der Auftraggeber wollte die Angabe trotzdem an jedem Behälter —
+     * die Absicht dahinter ist Transparenz, nicht die Tabelle. Also
+     * bekommt der Tresor dasselbe ⓘ, aber die zutreffende Aussage:
+     * was genau herauskommt, und dass daran nichts gewürfelt wird.
+     * ================================================================= */
+    function zeigeFest(art) {
+      var box = $("oddsBox"), lay = $("oddsLayer");
+      if (!box || !lay) return;
+      var V = window.ArenaVault, v = V && V.vault ? V.vault(null, DEMO_TROPHIES) : null;
+      box.innerHTML =
+        "<h3 class=\"goldtext\">Kristalltresor · Inhalt</h3>" +
+        "<div class=\"oddssub\">Hier wird nichts gewürfelt.</div>" +
+        "<table class=\"oddstab\"><tbody>" +
+          "<tr><td>Ausschüttung</td><td>" +
+            (v ? fmt(v.gems) + " Kristalle" : "der angesammelte Stand") + "</td></tr>" +
+          "<tr><td>Karten</td><td>keine</td></tr>" +
+          "<tr><td>Packs</td><td>keine</td></tr>" +
+          "<tr><td>Zufall</td><td><span class=\"gar\">keiner</span></td></tr>" +
+        "</tbody></table>" +
+        "<div class=\"oddsnote\">Der Tresor füllt sich nach einer festen Formel " +
+          "mit jedem Sieg. Beim Öffnen bekommst du genau den Stand, der vorher " +
+          "auf der Kachel steht — es gibt keine Chancen und keine Überraschung." +
+        "</div>" +
+        "<button class=\"oddsclose pressable\" id=\"oddsClose\">Schliessen</button>";
+      lay.classList.add("on");
+      lay.setAttribute("aria-hidden", "false");
+      markPressableLater();
+    }
+
     /* Ein Zuhörer am Dokument statt einer je Kachel: die Kacheln werden
        bei jedem Shop-Rendern neu gebaut, einzeln gebundene Zuhörer wären
        danach tot. */
     document.addEventListener("click", function (e) {
+      var f = e.target.closest && e.target.closest("[data-festinfo]");
+      if (f) { e.preventDefault(); e.stopPropagation(); zeigeFest(f.getAttribute("data-festinfo")); return; }
       var b = e.target.closest && e.target.closest("[data-odds]");
       if (b) { e.preventDefault(); e.stopPropagation(); zeige(b.getAttribute("data-odds")); return; }
       if (e.target.id === "oddsClose" || e.target.id === "oddsLayer") schliesse();
     });
-    return { zeige: zeige, schliesse: schliesse };
+    return { zeige: zeige, zeigeFest: zeigeFest, schliesse: schliesse };
   })();
 
   function openBronze() { openPackKey("bronze"); }
@@ -9977,10 +10020,16 @@ button.pfplate{cursor:pointer}
   var IAP_PACKS = [
     { id:"arena", name:"Arena-Pack", sub:"Einmal pro Saison", art:"icon_arena_pack", emoji:"🎁",
       price:"Fr. 3.–", value:"+180 % Wert",
+      /* `packKey` ist der ENTHALTENE Pack-Typ. Er steht hier ausdrücklich
+         und wird nicht aus dem Icon-Schlüssel („pack_silver") abgeleitet:
+         der Icon-Name sagt, welches Bild gezeigt wird, nicht, woraus
+         gewürfelt wird. Bei einer Pflichtangabe darf man das nicht raten. */
+      packKey:"silver",
       items:[["cur_gold","🪙","5 000"],["cur_gem","💚","50"],["pack_silver","🎁","×3"],
              ["ess_attack","⚗","×25"]] },
     { id:"starter", name:"Starter-Pack", sub:"Nur für neue Beschwörer · einmalig",
       art:"offer_starter", emoji:"✨", price:"Fr. 9.–", value:"+320 % Wert",
+      packKey:"gold",
       items:[["cur_gold","🪙","20 000"],["cur_gem","💚","250"],["pack_gold","🎁","×2"],
              ["card_back","🃏","1 Seltene"]] },
   ];
@@ -10116,8 +10165,8 @@ button.pfplate{cursor:pointer}
       var price = (sp.cur === "gold" ? ico("cur_gold", "🪙") : ico("cur_gem", "💚")) + " " + fmt(sp.cost);
       return '<div class="shopcard tinted" data-pack="' + sp.key +
         '" style="position:relative;' + tintStyle("pack_" + sp.key) + '">' +
-        '<button class="oddsi pressable" data-odds="' + sp.key +
-          '" aria-label="Drop-Raten anzeigen">i</button>' +
+        '<span class="oddsi pressable" role="button" tabindex="0" data-odds="' + sp.key +
+          '" aria-label="Drop-Raten anzeigen">i</span>' +
         '<span class="sart">' + ico("pack_" + sp.key, "🎁", "xl") + "</span>" +
         '<span class="snm">' + pk.name + "</span>" +
         '<span class="promise">' + pk.promise + "</span>" +
@@ -10166,6 +10215,11 @@ button.pfplate{cursor:pointer}
    * ================================================================== */
   function tagesband(o) {
     return '<div class="tagesband' + (o.cls ? " " + o.cls : "") + '" ' + (o.attr || "") + ">" +
+      /* `odds` traegt den Pack-Schluessel, wenn das Band ein Pack ausgibt.
+         Ohne diesen Durchreicher haette der Aufrufer nur einen Kommentar
+         setzen koennen und keinen Knopf — genau das ist mir passiert. */
+      (o.odds ? '<span class="oddsi pressable" role="button" tabindex="0" data-odds="' + o.odds +
+        '" aria-label="Drop-Raten anzeigen">i</span>' : "") +
       (o.gratis ? '<span class="freebadge">GRATIS</span>' : "") +
       '<span class="bandart">' + ico(o.art, o.emoji || "•") + "</span>" +
       '<span class="bandtx"><span class="bnm">' + o.name + "</span>" +
@@ -10186,8 +10240,13 @@ button.pfplate{cursor:pointer}
     st = st || tagStand();
     var weg = !!st.packGratis;
     box.innerHTML = tagesband({
+      /* Auch das Gratis-Pack traegt das ⓘ. Es ist kein Kauf und damit
+         nicht offenlegungspflichtig — aber es ist das Pack, das der
+         Spieler am haeufigsten oeffnet, und eine Quote, die nur beim
+         Bezahlen sichtbar ist, wirkt wie eine Quote, die man versteckt,
+         solange es nichts kostet. */
       cls: "tinted", attr: 'data-freepack="1" style="' + tintStyle("pack_bronze") + '"',
-      gratis: !weg, art: "pack_bronze", emoji: "🥉",
+      gratis: !weg, art: "pack_bronze", emoji: "🥉", odds: "bronze",
       name: AC.PACKS.bronze.name + " · Tagespack",
       sub: AC.PACKS.bronze.promise,
       btn: weg ? "Wieder in " + restText(shopTagRest(Date.now())) : "ABHOLEN",
@@ -10324,6 +10383,12 @@ button.pfplate{cursor:pointer}
             feld("cur_gold", "🪙", fmt(p.gold), "#e0b94a") +
             feld("cur_gem", "💚", fmt(p.gems), "#2fd47a") +
             feld("pack_gold", "🎁", "×" + p.packs, "#a06ee0") +
+            /* Echtgeldkauf mit enthaltenen Booster-Packs: Apple 3.1.1
+               verlangt die Quoten VOR dem Kauf. Der Schluessel ist der
+               ENTHALTENE Pack-Typ, nicht das Buendel — gewuerfelt wird
+               beim Oeffnen des Packs, nicht beim Kauf des Buendels. */
+            '<span class="oddsi pressable" role="button" tabindex="0" data-odds="gold" ' +
+              'aria-label="Drop-Raten der enthaltenen Packs">i</span>' +
             feld("ess_attack", "⚗", "×" + p.ess, "#ff8a5c") +
           "</span>" +
           '<span class="apkpr"><span class="apkalt">Fr. ' + alt.toFixed(0) + ".–</span>" +
@@ -10408,6 +10473,8 @@ button.pfplate{cursor:pointer}
       return '<div class="iapcard tinted" data-iap="' + p.id + '" style="' +
         tintStyle(p.id === "arena" ? "iap_arena" : "pack_arcane") + '">' +
         '<span class="valbadge">' + p.value + "</span>" +
+        (p.packKey ? '<span class="oddsi pressable" role="button" tabindex="0" data-odds="' + p.packKey +
+          '" aria-label="Drop-Raten der enthaltenen Packs">i</span>' : "") +
         '<span class="iart" data-prodart="' + p.art + '">' + p.emoji + "</span>" +
         '<span class="itx"><span class="inm goldtext">' + p.name + "</span>" +
           '<span class="isub">' + p.sub + "</span>" +
@@ -10496,26 +10563,46 @@ button.pfplate{cursor:pointer}
     var p = AC.getPityStatus();
     var rab = vorratRabatt();
 
-    /* Chancen-Tabelle. `weights` sind Prozente je Kartenslot und stehen
-       in derselben Reihenfolge wie TIERS[0..4]. Suprem droppt nie — es
-       taucht deshalb auch in der Tabelle nicht auf, statt mit 0 % dazu
-       stehen und wie ein Fehler zu wirken. */
+    /* ⚠ 29.07.2026: Diese Tabelle wurde aus `pk.weights` selbst gebaut —
+       eine ZWEITE Quelle für dieselben Zahlen, mit eigener Formatierung
+       und der eigenen Entscheidung, Suprem wegzulassen. Sie wich vom
+       ⓘ-Fenster bereits ab: keine Pack-Chance, Garantie nicht
+       eingerechnet, Suprem gar nicht genannt.
+       Zwei Quoten-Tabellen laufen genauso auseinander wie zwei
+       Kartenzahlen — und bei einer Pflichtangabe ist eine abweichende
+       Zahl kein Schönheitsfehler, sondern eine falsche Zusage.
+       Jetzt kommt beides aus ArenaCards.oddsFor(). Die Kurzfassung hier
+       bleibt (sie ist ohne Tippen sichtbar), die Vollfassung liegt hinter
+       dem ⓘ. */
+    var quoten = AC.oddsFor(VORRAT.pack);
     // Dezimalkomma, nicht -punkt: die ganze UI ist deutsch (§Sprache).
     function proz(w) {
       return (w >= 1 ? w.toFixed(w % 1 ? 1 : 0) : w.toFixed(2)).replace(".", ",");
     }
-    var reihen = pk.weights.map(function (w, i) {
-      var t = AC.TIERS[i];
+    var reihen = quoten.perSlot.map(function (t) {
       return '<div class="orow"><i class="odot" style="background:' + t.color + '"></i>' +
         '<span class="onm">' + t.name + "</span>" +
-        '<span class="oval">' + proz(w) + " %</span></div>";
-    }).join("");
-    var balken = pk.weights.map(function (w, i) {
-      return '<i style="flex:' + w + ';background:' + AC.TIERS[i].color + '"></i>';
+        '<span class="oval">' + proz(t.pct) + " %</span></div>";
+    }).join("") +
+      /* Suprem steht jetzt AUCH hier mit 0 %. „Kommt nicht vor" ist eine
+         Aussage, die der Käufer sehen soll — das Weglassen war eine
+         Annahme darüber, was ihn nicht interessiert. */
+      '<div class="orow"><i class="odot" style="background:' + quoten.supreme.color + '"></i>' +
+        '<span class="onm">' + quoten.supreme.name + "</span>" +
+        '<span class="oval">0 %</span></div>';
+    var balken = quoten.perSlot.map(function (t) {
+      return '<i style="flex:' + t.pct + ';background:' + t.color + '"></i>';
     }).join("");
 
     box.className = "vorratbox" + (vorratOffen ? " open" : "");
     box.innerHTML =
+      /* Das Vorrats-Pack IST ein Gold-Pack (VORRAT.pack) — sein Inhalt
+         wird gewürfelt, es fällt also unter dieselbe Offenlegungspflicht
+         wie die drei Booster im Regal. Die Kurztabelle unten zeigt die
+         Raten je Karte; das ⓘ zeigt zusätzlich die Chance je Pack, die
+         eingerechnete Garantie und den Pity-Stand. */
+      '<span class="oddsi pressable" role="button" tabindex="0" data-odds="' + VORRAT.pack +
+        '" aria-label="Drop-Raten anzeigen">i</span>' +
       '<div class="vorrathead">' +
         /* ⚠ HIER DARF `pack_vorrat` NICHT STEHEN. Das Asset ist eine
            KULISSE (21:9, §6b) und traegt laut eigener Notiz niemals
@@ -13171,7 +13258,10 @@ button.pfplate{cursor:pointer}
       // Gem-Identitaet: Smaragd statt Blau (Abgrenzung von AA).
       el.style.setProperty("--t1", v.full ? "#6b4f14" : "#12613c");
       el.style.setProperty("--t2", v.full ? "#2a1e08" : "#072014");
-      el.innerHTML = vaultHTML(v, id === "vaultShop");
+      el.innerHTML = (id === "vaultShop"
+        ? '<span class="oddsi pressable" role="button" tabindex="0" data-festinfo="tresor" ' +
+          'aria-label="Was der Tresor ausschüttet">i</span>' : "") +
+        vaultHTML(v, id === "vaultShop");
       /* Smaragd-Kulisse — dieselbe Gem-Identitaet wie --gemc und cur_gem
          (§4: gruen, nicht violett wie bei AA). Der Verlauf aus dem
          .tinted-Koerper bleibt darunter und traegt weiter den Zustand
@@ -13230,6 +13320,9 @@ button.pfplate{cursor:pointer}
           " Gold · " + o.content.material + " Material · " +
           o.content.packs.length + "x Pack</div>" +
         '<div class="otime">⏳ noch ' + o.leftText + "</div></div>" +
+      (o.content.packs && o.content.packs.length
+        ? '<span class="oddsi pressable" role="button" tabindex="0" data-odds="' + o.content.packs[0] +
+          '" style="right:30px" aria-label="Drop-Raten der enthaltenen Packs">i</span>' : "") +
       '<button class="offerbuy pressable" data-buyoffer="' + o.key + '">' + o.priceText +
         "<small>ansehen</small></button></div>";
   }
@@ -13273,6 +13366,12 @@ button.pfplate{cursor:pointer}
       '<div class="ogrid">' + items.map(function (i) {
         return '<div class="oitem">' + ico(i.ico, i.emo) + " " + i.t + "</div>";
       }).join("") + "</div>" +
+      /* ⓘ im Kauf-Popup. Von allen Stellen ist das die wichtigste:
+         Apple 3.1.1 verlangt die Quoten „prior to purchase", und hier
+         steht der Kaufknopf. Der Schluessel ist der enthaltene Pack-Typ. */
+      (o.content.packs && o.content.packs.length
+        ? '<span class="oddsi pressable" role="button" tabindex="0" data-odds="' + o.content.packs[0] +
+          '" aria-label="Drop-Raten der enthaltenen Packs">i</span>' : "") +
       '<div class="ofoot"><div class="otimer">⏳ Nur noch ' + o.leftText + "</div>" +
         '<button class="obtn pressable" id="offerBuy">' + o.priceText + " · jetzt sichern</button>" +
         '<button class="olater pressable" id="offerLater">Später</button>' +

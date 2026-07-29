@@ -223,12 +223,28 @@ function step(name, ok, info) {
     };
   });
   await page.waitForTimeout(250);
-  step('Chancen-Klappe oeffnet und listet alle fuenf Raritaeten', vt.offen &&
-    vt.zeilen.length === 5, vt.zeilen.length + ' Zeilen');
-  step('Jede Prozentzahl stammt 1:1 aus ArenaCards.PACKS[...].weights',
-    vt.zeilen.every((z, i) => Math.abs(z.wert - vt.gewichte[i]) < 0.005 &&
-                              z.name === vt.tierNamen[i]),
+  /* (29.07.2026) Vorher: „listet alle FUENF Raritaeten" und „jede Zahl
+     stammt 1:1 aus weights". Beides schrieb die alte Bauart fest.
+     Geaendert hat sich zweierlei ABSICHTLICH:
+       * Suprem steht jetzt mit 0 % dabei statt zu fehlen. „Kommt nicht
+         vor" ist eine Aussage, die der Kaeufer sehen soll; das Weglassen
+         war eine Annahme darueber, was ihn nicht interessiert.
+       * Die Zahlen kommen aus ArenaCards.oddsFor() statt direkt aus
+         `weights` — es gab zwei Quellen fuer dieselbe Quote, und sie
+         wichen bereits voneinander ab.
+     Die Anforderung DAHINTER wird unveraendert geprueft: was auf der
+     Kachel steht, muss das sein, woraus gewuerfelt wird. */
+  step('Chancen-Klappe listet alle sechs Stufen', vt.offen &&
+    vt.zeilen.length === 6, vt.zeilen.length + ' Zeilen');
+  step('Jede Prozentzahl stammt aus ArenaCards.oddsFor()',
+    vt.zeilen.slice(0, 5).every((z, i) => Math.abs(z.wert - vt.gewichte[i]) < 0.005 &&
+                                          z.name === vt.tierNamen[i]),
     vt.zeilen.map(z => z.name + ' ' + z.wert).join(' · '));
+  step('Suprem steht ausdruecklich mit 0 % dabei',
+    vt.zeilen[5] && /Suprem/.test(vt.zeilen[5].name) && vt.zeilen[5].wert === 0,
+    vt.zeilen[5] ? vt.zeilen[5].name + ' ' + vt.zeilen[5].wert : 'fehlt');
+  step('das Vorrats-Pack traegt ein ⓘ (Offenlegungspflicht)',
+    (await page.locator('#vorratShop [data-odds]').count()) === 1);
   step('Mitleidszeile zeigt getPityStatus(), nicht geschaetzte Zahlen',
     vt.pityTxt.indexOf('≤ ' + vt.epicIn) >= 0 &&
     vt.pityTxt.indexOf('≤ ' + vt.legIn) >= 0, vt.pityTxt);

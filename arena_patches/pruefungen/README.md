@@ -1,6 +1,6 @@
 # Prüfungen
 
-Fünfzehn Playwright-Suiten mit zusammen **1 064 Schritten**, plus zwei
+Fünfzehn Playwright-Suiten mit zusammen **1 076 Schritten**, plus zwei
 Sonderprüfungen, die nur mit tatsächlich geladenen Bildern laufen.
 
 ## Aufruf
@@ -28,7 +28,7 @@ direkt — kein Server, kein Build.
 | `run_v6.js` | 281 | Clan, Ghost-Clankrieg, Spenden, Rangliste, Post |
 | `run_v7.js` | 334 | Startseite, Banner-Metrik, Pass, Guide, Profil, Avatare, Shop-Maße |
 | `run_friends.js` | 25 | Freundesliste, Anfragen, Suche |
-| `run_shop.js` | 34 | Tagesangebote, Booster-Packs, Gold, Tresor, Vorrats-Truhe |
+| `run_shop.js` | 36 | Tagesangebote, Booster-Packs, Gold, Tresor, Vorrats-Truhe |
 | `avatare.js` | 12 | Fünf zur Wahl, Helden am Besitz, Auswahl im Raster |
 | `login_kal.js` | 9 | Login-Kalender: drei pro Reihe, Tag 7 als Band |
 | `home_menue.js` | 20 | Keine doppelten Wege, Menü-Icons lesbar |
@@ -37,7 +37,7 @@ direkt — kein Server, kein Build.
 | `flug.js` | 12 | Sammel-Animation — aus JEDEM Fenster, nicht nur aus dem Shop |
 | `community.js` | 89 | Community-Reiter: Marken, echte Ziele |
 | `packoeffnung.js` | 36 | Pack-Öffnung: gemessene Zeitkurve, Abbruch, Neustart |
-| `quoten.js` | 38 | Drop-Raten hinter dem ⓘ — Auflage nach Apple 3.1.1 / Google Play |
+| `quoten.js` | 48 | Drop-Raten hinter dem ⓘ — Auflage nach Apple 3.1.1 / Google Play |
 | `guide.js` | 36 | Defenders Guide: bewegbare Reiterleiste, großes Icon am offenen Reiter, Gegner/Boss als eigene Reiter, kein Booster-Reiter |
 | `assets_vollstaendig.py` | 4 | Jedes benutzte Asset ist verzeichnet, gesichert UND aktuell |
 

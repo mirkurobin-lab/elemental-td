@@ -96,6 +96,50 @@ const pruef = (n, w, z) => {
     knoepfe.every(x => x.w >= 24 && x.h >= 24),
     knoepfe.map(x => x.w + "x" + x.h).join(" "));
 
+  /* ---------- 2b. ABDECKUNG: jede Kauf- und Öffnungsflaeche ----------
+     Ein Agent hat 22 Stellen kartiert, an denen ein Pack gekauft, vergeben
+     oder geoeffnet wird. Zwei trugen ein ⓘ. Diese Liste haelt fest, welche
+     es tragen MUESSEN — nicht als Zahl („mindestens drei"), sondern
+     namentlich: eine Zahl waere schon dann gruen, wenn irgendwo drei
+     Knoepfe stehen, und genau so uebersieht man die vierte Flaeche.
+
+     Die drei ersten sind nach Apple 3.1.1 / Google Play zwingend
+     (Echtgeld bzw. Kristalle); die uebrigen sind Oeffnungsflaechen, wo
+     die Angabe fachlich hingehoert. */
+  const flaechen = [
+    ["#packShop [data-odds]",       3, "die drei kaufbaren Booster"],
+    ["#vorratShop [data-odds]",     1, "Vorrats-Pack (Kristalle, gewuerfelter Inhalt)"],
+    ["#arenaPackBox [data-odds]",   2, "Arena- und Starter-Pack (Echtgeld, enthalten Booster)"],
+    ["#apkRail [data-odds]",        1, "Arena-Karussell (Echtgeld, enthaelt Booster)"],
+    ["#packFreeBox [data-odds]",    1, "Gratis-Tagespack"],
+    ["#vaultShop [data-festinfo]",  1, "Kristalltresor — FESTE Ausschuettung, keine Quote"],
+  ];
+  for (const [sel, min, warum] of flaechen) {
+    const n = await p.evaluate(s => document.querySelectorAll(s).length, sel);
+    pruef("Abdeckung: " + warum, n >= min, n + " von mind. " + min + " (" + sel + ")");
+  }
+
+  /* Der Tresor darf KEINE Quotentabelle bekommen. Er zahlt einen festen,
+     vorher sichtbaren Betrag aus (arena_vault.js, kein Math.random im
+     ganzen Modul) und ist damit keine Loot-Box. Eine Quote dort waere
+     nicht ueberfluessig, sondern falsch: sie behauptete einen Zufall,
+     den es nicht gibt. */
+  pruef("der Tresor traegt KEIN data-odds",
+    (await p.evaluate(() => document.querySelectorAll("#vaultShop [data-odds]").length)) === 0);
+  await p.click("#vaultShop [data-festinfo]");
+  await p.waitForTimeout(300);
+  const fest = await p.evaluate(() =>
+    document.getElementById("oddsBox").textContent.replace(/\s+/g, " "));
+  pruef("der Tresor sagt ausdruecklich, dass nichts gewuerfelt wird",
+    /nichts gew(ü|ue)rfelt/i.test(fest), fest.slice(0, 80));
+  /* Ohne Leerzeichen pruefen: benachbarte Tabellenzellen liefern in
+     textContent „Kartenkeine" ohne Trenner. */
+  pruef("und nennt Karten und Packs ausdruecklich mit „keine\"",
+    /Karten\s*keine/.test(fest) && /Packs\s*keine/.test(fest), fest.slice(0, 140));
+  pruef("im Tresor-Fenster steht KEIN Prozentwert", !/%/.test(fest), fest.slice(0, 100));
+  await p.click("#oddsClose");
+  await p.waitForTimeout(200);
+
   /* ---------- 3. Was im Fenster steht, stimmt mit der Rechnung ---------- */
   await p.click("#viewShop [data-odds='arcane']");
   await p.waitForTimeout(300);
