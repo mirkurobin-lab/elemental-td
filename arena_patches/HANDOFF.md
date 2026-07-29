@@ -408,10 +408,13 @@ gemeinsamen Kostenzähler ist eine Rückerstattung nicht trivial (welche Stufe w
 >
 > **📼 Nachgeführt 2026-07-25 nach Video 6** (`AA_UI_REFERENZ.md` §12) — vier Punkte, die die
 > bestätigten Systeme betreffen:
-> * **Material-Sorten statt generischem Material.** AA führt ≥8 Materialsorten mit
->   Kategorie-Labels („speed", „special"), nicht eine gemeinsame Ressource (§12.3). Wir starten
->   mit **drei** Sorten (⚔️ Angriffs- / ⚡ Tempo- / ✨ Spezial-Essenz), je Karte fest zugeordnet.
->   `arena_cards.js` ist auf **State v3** angehoben, die Migration v2→v3 drittelt Altbestände.
+> * **Material-Sorten statt generischem Material.** AA führt ≥8 Materialsorten, nicht eine
+>   gemeinsame Ressource (§12.3). Zuerst mit **drei** Sorten umgesetzt (State v3).
+>   **⚠ Am 29.07.2026 korrigiert:** die damals gelesenen „Kategorie-Labels speed/special"
+>   gehören zu **gesperrten Türmen** im Abschnitt TO BE FOUND, nicht zum Material — und jedes
+>   Material-Icon im RESOURCES-Raster ist eine **Turm-Miniatur** (Catapult-Detail „78/15" ↔
+>   Raster „x78"). Material und Karte sind 1:1. Seither: **eine Essenz je Karte**, Schlüssel
+>   == Karten-ID, **State v4**. Siehe DESIGN_PROGRESSION.md §B „⚠ KORREKTUR 2".
 > * **Pity-Counter wird OFFEN angezeigt.** AA schreibt ihn direkt auf die Truhe („Get Legendary
 >   in ~50 opens", §8.2) und verzichtet dafür ganz auf Prozent-Drop-Raten. Unsere frühere
 >   Entscheidung „Stand verstecken" ist damit revidiert — `getPityStatus()` + Pity-Zeile im
@@ -487,10 +490,12 @@ Gold-Wallet abhängig, aber ohne Gold-Einkommen und ohne Trophäenstand hat sie 
 - `localStorage.arenaCards` hat nach dem ersten Pack `v: 3`,
   `materials: {attack, speed, special}` (**kein** Zahlenfeld `material` mehr), `gold === null`
   und pro Karte `{tier, lvl, copies:{common…supreme}, mergeBoni, pendingBoni}`.
-- **Material-Sorten:** `ArenaCards.materialTypeOf('fire') === 'attack'`, `('water') ===
-  'speed'`, `('nature') === 'special'`, unbekannte ID → `'special'`.
-- **Sorten-Verbrauch:** Level-Up an FROST senkt **nur** `materials.speed`;
-  `canLevelUp('fire')` meldet `reason: 'material'`, solange nur Tempo-Essenz im Vorrat liegt.
+- **Essenzen (v4):** `ArenaCards.materialTypeOf('fire') === 'fire'` — der Sortenschlüssel IST
+  die Karten-ID; `MATERIAL_KEYS` deckt sich exakt mit der Kartenliste; unbekannte ID → `null`
+  (kein stiller Ersatz mehr).
+- **Sorten-Verbrauch:** Level-Up an FROST senkt **nur** `materials.water`;
+  `canLevelUp('fire')` meldet `reason: 'material'`, solange nur Frost-Essenz im Vorrat liegt —
+  auch bei 999 Stück davon.
 - **Pack-Material:** `openPack().materialSlots` ist `[{type, amount, name, sym}]`, Summe der
   `amount` == `material`; die Zeremonie ruft pro Flip `addMaterial(amount, type)`.
 - **Offener Pity:** `ArenaCards.getPityStatus()` → bei frischem Zähler `{epicIn: 26,
@@ -528,10 +533,10 @@ Gold-Wallet abhängig, aber ohne Gold-Einkommen und ohne Trophäenstand hat sie 
   (bewusst knapp: DAWN Lv44 kostet 18 000 und ist damit sichtbar unbezahlbar — der
   dokumentierte Gold-Bottleneck). Top-Bar: 1136 🏆 / 245 💎 / 12 500 🪙.
   Reset-Knopf unten in der Sammlung.
-- Durchklicken: Sammlung (drei Material-Bestände in der Leiste) → Karte antippen → Detail zeigt
-  die **Material-Sorte des Turms** („⚡ Tempo-Essenz 21 / 5") plus die fremden Sorten als
-  „nicht verwendbar" → **Upgrade** (Level/Power/Gold ändern sich live, es sinkt **nur** die
-  Sorte der Karte) → Sortierung auf **„Nach Rarität"** umstellen (Raster ordnet sich um) →
+- Durchklicken: Sammlung (**Essenz-Summe** in der Leiste, Tipp klappt das Fach mit allen acht
+  Beständen auf) → Karte antippen → Detail zeigt die **eigene Essenz des Turms**
+  („🔥 Ember-Essenz 21 / 5") und woher sie kommt → **Upgrade** (Level/Power/Gold ändern sich
+  live, es sinkt **nur** die Essenz dieser Karte) → Sortierung auf **„Nach Rarität"** umstellen (Raster ordnet sich um) →
   Schmiede → 3 identische Karten antippen → **VERSCHMELZEN** → Bonus wählen (Rahmenfarbe
   wechselt) → Packs (**Pity-Zeile** „Episch garantiert in ≤N Packs · Legendär in ≤M" unter dem
   Öffnen-Button) → **Bronze-Pack öffnen** → einzeln flippen (Material-Slots zeigen ihre Sorte)

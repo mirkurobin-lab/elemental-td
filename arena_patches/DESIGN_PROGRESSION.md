@@ -24,7 +24,7 @@ UI-Nachbau). Alle Zahlen in diesem Dokument sind die Quelle der Wahrheit für di
 >
 > | Was | Vorher | Jetzt |
 > |---|---|---|
-> | **Upgrade-Material** | eine generische Ressource | **3 Sorten** je Karten-Rolle (§B „Material-Sorten"), State **v3** |
+> | **Upgrade-Material** | eine generische Ressource | **3 Sorten** je Karten-Rolle (§B „Material-Sorten"), State **v3** — am 29.07. auf **eine Sorte JE KARTE** korrigiert, State **v4**, siehe ⚠ KORREKTUR 2 |
 > | **Pity-Counter** | Stand versteckt, Regel offen | **offen angezeigt** — „Episch garantiert in ≤N Packs" (§C) |
 > | **Season-Pass** | 60 Stufen, 2 Spuren, Medaillen aus Quests | **3 Spuren** FREE/EPIC/LEGENDARY, ~30 Tage, Medals über **Siegesserien**, Overflow-Regel nach dem Cap (§D) |
 > | **Arena-Schwellen** | geschätzt 250 / 700 | **belegt 600 / 1200 / 1500**, Liga ab ~2900; Trophy-Road-Schrittweite 50 → 100 → 200 (§D) |
@@ -212,51 +212,96 @@ Arcane-Kauf, und der Pity-Zähler feuerte für Arcane-Käufer nie.
 
 ### Material-**Sorten** (korrigiert 2026-07-25, Video 6)
 
-> **⚠ KORREKTUR.** Die erste Fassung dieses Kapitels nahm **eine generische** Ressource an
-> („Arkan-Essenz"), gestützt darauf, dass zwei Turmkarten identisch **19** anzeigten. Video 6
-> zeigt das RESOURCES-Raster ausgescrollt (§7.1) und widerlegt das: Es gibt dort **mindestens
-> 8 verschiedene Materialsorten** mit **unabhängigen** Beständen (18 / 16 / 10 / 8 / 7 / 6 / 2
-> / 1) und Kategorie-Labels — wörtlich lesbar waren **„speed"** und **„special"**. Die
-> Gleichheit der beiden „19" war Zufall; Skyflares abweichendes „40/3" ist der Gegenbeweis
-> (§12.3).
+> **⚠ KORREKTUR 1 (25.07.2026).** Die erste Fassung dieses Kapitels nahm **eine generische**
+> Ressource an („Arkan-Essenz"), gestützt darauf, dass zwei Turmkarten identisch **19**
+> anzeigten. Video 6 zeigt das RESOURCES-Raster ausgescrollt (§7.1) und widerlegt das: Es gibt
+> dort **mindestens 8 verschiedene Materialsorten** mit **unabhängigen** Beständen
+> (18 / 16 / 10 / 8 / 7 / 6 / 2 / 1). Die Gleichheit der beiden „19" war Zufall; Skyflares
+> abweichendes „40/3" ist der Gegenbeweis (§12.3).
+>
+> **⚠ KORREKTUR 2 (29.07.2026) — und diese betrifft die Korrektur selbst.** Aus Video 6
+> wurden damals „Kategorie-Labels **speed** und **special**" gelesen und daraus **drei
+> Kategorien** abgeleitet. Die Screenshots IMG_3427-3430 zeigen, dass das eine Fehllesung
+> war — gleich doppelt:
+>
+> 1. **Die Labels gehören nicht zum Material.** „Special" und „Speed" stehen im Abschnitt
+>    **TO BE FOUND** unter **gesperrten Türmen**. Es sind Turm-Rollen, keine Materialsorten.
+> 2. **Jedes Material-Icon im RESOURCES-Raster ist eine Turm-Miniatur.** Und die Zahl im
+>    Turm-Detail ist dieselbe, die im Raster unter genau diesem Turm steht: Catapult zeigt im
+>    Detail **„78/15"**, im Raster steht unter der Catapult-Miniatur **„x78"**.
+>
+> Material und Karte sind in AA also **1:1**. Es gab nie eine Kategorie-Ebene dazwischen.
 
-**Wir starten mit DREI Sorten**, nicht mit acht:
+**Eine Essenz JE KARTE** (Stand 29.07.2026, **State v4**):
 
-| Sorte | Symbol | Abnehmer | Begründung |
+| Essenz | Symbol | Abnehmer | Farbe |
 |---|---|---|---|
-| **Angriffs-Essenz** | ⚔️ | EMBER (fire), STONE (earth) | die beiden reinen Schadensbringer |
-| **Tempo-Essenz** | ⚡ | FROST (water), DAWN (light) | Slow/Support, beide über Tempo skaliert |
-| **Spezial-Essenz** | ✨ | THORN (nature), HOLLOW (darkness), SOLARA, MAGMOR | Status-Effekt-Türme und Helden-Ults |
+| **Ember-Essenz** | 🔥 | EMBER (fire) | `#ff6b3d` |
+| **Frost-Essenz** | ❄ | FROST (water) | `#3dc8ff` |
+| **Thorn-Essenz** | 🌿 | THORN (nature) | `#46c46a` |
+| **Stone-Essenz** | 🪨 | STONE (earth) | `#e0a43c` |
+| **Dawn-Essenz** | ☀ | DAWN (light) | `#ffe36b` |
+| **Hollow-Essenz** | 🌑 | HOLLOW (darkness) | `#9b6bff` |
+| **Solara-Essenz** | ✨ | SOLARA (Held) | `#ffd23d` |
+| **Magmor-Essenz** | 🌋 | MAGMOR (Held) | `#ff4d2d` |
 
-**Warum drei und nicht acht.** Bei einem Pool von 8 Karten hätte jede der 8 Sorten **genau
-einen** Abnehmer — dann ist der Vorrat keine Entscheidung mehr, sondern nur eine zweite
-Schreibweise für „Fortschritt an dieser Karte". Drei Sorten mit je 2-4 Abnehmern erzeugen
-dagegen die Frage, die das System interessant macht: *„Reicht meine Tempo-Essenz für FROST
-oder für DAWN?"* Das ist genau die Rolle, die Material in AA hat — es entscheidet **welche**
-Karte hochgezogen wird, nicht **ob**. Mit dem Pool wächst die Zahl der Sorten mit
-(Faustregel: eine Sorte je 2-3 Karten, also 8-10 Sorten bei Pool 20 — dann sind wir bei AAs
-Größenordnung).
+**Der Schlüssel einer Sorte IST die Karten-ID.** `materialTypeOf('fire') === 'fire'`. Damit
+gibt es keine Zuordnungstabelle mehr, die man beim Anlegen einer Karte vergessen könnte zu
+pflegen — wer eine Karte einträgt, hat ihre Essenz angelegt. Der Selbsttest prüft das als
+Kopplung, nicht als Zahl: `MATERIAL_KEYS` muss identisch zur Kartenliste sein, sonst rot.
 
-Implementiert als `MATERIALS` + `CARD_MATERIAL`-Registry in `arena_cards.js`;
-`materialTypeOf(cardId)` liefert die Sorte, **unbekannte IDs fallen auf `special`** (damit
-später eingeführte Skill-, Item- und Trick-Karten nicht ins Leere greifen). Der Bestand liegt
-als `state.materials = {attack, speed, special}` (**State v3**); `canLevelUp()` und
-`levelUp()` prüfen und verbrauchen **ausschließlich die Sorte der Karte** — ein Berg
-Tempo-Essenz hilft EMBER nicht. Migration siehe §E.
+**Unbekannte IDs bekommen KEINE Ersatzsorte.** Vorher fielen sie still auf `special` — ein
+später eingeführtes Item hätte sich mit Turm-Material leveln lassen. Jetzt liefert
+`materialTypeOf()` für Unbekanntes `null`, `materialInfoOf()` eine ehrliche
+Platzhalter-Auskunft und `canLevelUp()` scheitert an `reason: 'material'`.
+
+**Was wir damit aufgeben — und warum das in Ordnung ist.** Die Dreier-Aufteilung sollte die
+Frage erzeugen *„Reicht meine Tempo-Essenz für FROST oder für DAWN?"*. Die gibt es jetzt nicht
+mehr. Dafür wandert die Entscheidung an eine ehrlichere Stelle: **welche Karten man spielt**,
+bestimmt, welche Essenz sich zu sammeln lohnt. Und das ist die Entscheidung, die AA
+tatsächlich stellt.
+
+**NACHSCHUB — der Teil, den man leicht übersieht.** Bei acht statt drei Sorten und weiterhin
+gleichverteiltem Materialdrop käme für eine bestimmte Karte nur noch **ein Achtel** statt
+eines Drittels an: eine stille Kürzung um den Faktor **2,7** für genau den Turm, den ein
+Spieler hochziehen will. Deshalb droppen die Material-Slots eines Packs seit v4 **die
+Essenzen der Karten, die in diesem Pack lagen**. Wirkung, im Selbsttest über 10 000 Packs
+nachgemessen:
+
+* Die Essenz-Verteilung folgt exakt der **Kartenverteilung** — 6 Türme à ~15,6 %, 2 Helden à
+  ~3,1 % (Helden droppen über `HERO_WEIGHT` 5× seltener, ihre Essenz also auch).
+* Die Menge je Karte bleibt gegenüber v3 praktisch unverändert.
+* Und es entsteht der Zusammenhang, den AA auch hat: *die Karte, die aus dem Pack kommt,
+  bringt ihren eigenen Nachschub mit.*
+
+Die Prüfung dafür misst **die Kopplung selbst** („jeder Essenz-Posten gehört zu einer Karte
+aus DIESEM Pack") und nicht nur die Verteilung — die beiden Kurven ähneln sich zu sehr, als
+dass eine Verteilungsprüfung allein den Unterschied gemerkt hätte.
 
 **„TO BE FOUND" übernehmen (§7.1).** AA zeigt unterhalb des RESOURCES-Rasters einen eigenen
 Abschnitt mit den **noch nicht besessenen** Materialien und direkt darunter, **in welcher
 Arena** sie freigeschaltet werden („Arena 4", „Arena 5", „Arena 8") bzw. „Not found" für
 Unbekannte. Das ist ein außergewöhnlich starkes Retention-Element, weil es aus einer leeren
-Zelle ein **konkretes Ziel** macht: Der Spieler weiß nicht nur, dass ihm etwas fehlt, sondern
-**wohin er dafür muss**. Für uns:
+Zelle ein **konkretes Ziel** macht. Mit einer Essenz je Karte ist es jetzt sogar
+buchstäblich dasselbe Raster wie die Kartensammlung. Für uns:
 
-* Im Material-Panel der Sammlung alle Sorten zeigen — auch die **noch nicht existierenden**,
-  als graue Platzhalter mit der Arena-Angabe darunter („Ab Arena 5").
-* In der Turm-Detailkarte steht die Sorte des Turms **mit Namen und Symbol** (im Prototyp
-  umgesetzt: „⚡ Tempo-Essenz 16 / 5"), darunter kleingedruckt die anderen Bestände mit dem
-  Hinweis *„für diesen Turm nicht verwendbar"*. Ohne diese Zeile wirkt ein leerer Vorrat wie
-  ein Bug, obwohl er eine Designentscheidung ist.
+* Das **Essenz-Fach** in der Sammlung zeigt alle Sorten, auch die mit Bestand 0 (abgeblendet,
+  nicht ausgeblendet). Später kommen die noch nicht existierenden als graue Platzhalter mit
+  Arena-Angabe dazu.
+* Die Kopfleiste trägt seit v4 nur noch die **Summe** — acht Zahlen passen nicht in eine
+  Zeile, die schon ein Sortier-Menü trägt. Ein Tipp klappt das Fach darunter auf.
+* In der Turm-Detailkarte steht die Essenz **mit Namen, Bild und Bedarf** („🔥 Ember-Essenz
+  16 / 5"). Die frühere Zeile *„die anderen Sorten — für diesen Turm nicht verwendbar"* ist
+  **weg**: bei drei Sorten war sie eine Beruhigung, bei acht wäre sie eine Textwand. An ihrer
+  Stelle steht jetzt, **woher** die Essenz kommt — das ist die Frage, die ein leerer Vorrat
+  wirklich aufwirft.
+
+**Das Icon einer Essenz ist das Artwork ihrer Karte** (`matIco()` im Prototyp bildet
+Sorten-Schlüssel → `CARD_ART` ab). Genau wie in AA, wo die Turm-Miniatur das Material-Icon
+ist. Das ist nicht nur billiger als acht neue Bilder, es ist die einzige Variante, bei der
+**kein Material-Bild fehlen kann**: gibt es die Karte, gibt es ihr Icon. Ein generisches
+Essenz-Bild (`ess_special`) steht nur noch dort, wo bewusst eine **Summe** gemeint ist —
+Bundle-Zeile, Login-Kalender, Guide-Aufgabe, Straßen-Knoten.
 
 ### Level-Kosten
 
@@ -348,7 +393,8 @@ das Modell ist ehrlicher, und eine Gut-Karte ist rechnerisch exakt drei Gewöhnl
 **Material ist der zweite, stillere Bottleneck:** 517 Material pro Karte bis Lv100 bei ~24
 Material/Tag für die **gesamte** Sammlung. Material ist damit die Ressource, die entscheidet,
 **welche** Karte man hochzieht — genau die Rolle, die sie in AA hat (§5 / §7.1). Durch die
-**drei Sorten** verschärft sich das gezielt: Pro Sorte kommen nur ~8 Stück/Tag herein, und
+**einer Essenz je Karte** verschärft sich das gezielt: Pro Essenz kommen nur wenige
+Stück/Tag herein, und
 eine Sorte versorgt 2-4 Karten. Der Engpass ist damit nicht mehr „mein Vorrat", sondern
 „mein Vorrat **für diese Rolle**" — die Entscheidung wird enger und dadurch spürbarer.
 Pack-Material-Slots droppen eine **zufällige** Sorte (gleichverteilt, gemessen 33.4 / 33.4 /
@@ -499,9 +545,11 @@ den Merge erreichbar. Das ist der Reveal-Moment: Der Spieler dreht eine Karte um
 | **Gold** | Trophy-Road-Knoten, Rang-Aufstieg | 9 | 4 | 4 000-8 000 | 38 / 38 / 18.4 / 4.6 / 1 |
 | **Arkan** | Season-Pass-Premium, Events | 11 | 6 | 12 000-25 000 | 18 / 34 / 29 / 15 / 4 |
 
-Pro Material-Slot fallen **2-5** Material an (Bronze also ⌀ 7, Arkan ⌀ 21) — **in einer
-zufälligen der drei Sorten** (gleichverteilt). Jeder Material-Slot ist damit ein eigener
-kleiner Reveal („welche Essenz?"), und gezieltes Farmen einer Sorte ist unmöglich.
+Pro Material-Slot fallen **2-5** Material an (Bronze also ⌀ 7, Arkan ⌀ 21) — als **Essenz
+einer Karte, die in DIESEM Pack lag** (gleichverteilt über die gezogenen Karten-IDs, seit
+State v4). Jeder Material-Slot ist damit ein eigener kleiner Reveal („welche Essenz?"), und
+das Icon zeigt sofort, für welchen Turm sie zählt. Gezieltes Farmen einer Essenz bleibt
+unmöglich — man kann nur beeinflussen, welche Packs man öffnet, nicht welche Karten fallen.
 `openPack()` liefert die Slots als `[{type, amount, name, sym, color}]`, die Zeremonie ruft
 pro Flip `addMaterial(amount, type)`.
 
@@ -704,7 +752,7 @@ Die **Farbe bleibt also erhalten** — das ist die einzige Größe, die ein Spie
 Sammlung im Kopf hat. Eine v1-Karte auf Lv45 (blau) ist danach eine **Selten**-Karte auf Lv45
 mit Cap 55: gleiche Farbe, gleiches Level, und der Weg nach oben ist wieder offen.
 
-**v2 → v3** (Material-Sorten, `ArenaCards.migrateV1()` läuft **beide** Stufen in einem
+**v2 → v3** (Material-Sorten, `ArenaCards.migrateV1()` läuft **alle** Stufen in einem
 Durchlauf, ein v1-Stand also v1→v2→v3):
 
 | v2 | v3 |
@@ -717,10 +765,36 @@ Durchlauf, ein v1-Stand also v1→v2→v3):
 Beispiel: 100 Material → **34 / 33 / 33**. Niemand verliert etwas, und die Sorten starten
 ausbalanciert — welche Sorte ein Spieler in v2 „gemeint" hat, ist nicht rekonstruierbar, jede
 Ungleichverteilung wäre also willkürlich. Das alte Zahlenfeld `material` wird beim Lesen
-entfernt, damit kein Code versehentlich weiter darauf zugreift; `getMaterials()` liefert
-stattdessen `{attack, speed, special, total}`. `addMaterial(n)` **ohne** Sortenangabe bleibt
-rückwärtskompatibel und verteilt round-robin über die drei Sorten (mit wanderndem Rest-Zeiger,
-damit zehn Einzelaufrufe nicht alle auf `attack` landen).
+entfernt, damit kein Code versehentlich weiter darauf zugreift.
+
+#### v3 → v4 (eine Essenz je Karte, 29.07.2026)
+
+Jede Altsorte geht an **genau die Karten, die sie bisher bedient hat**; der Rest einer nicht
+glatt teilbaren Menge an den ersten Empfänger der Gruppe:
+
+| v3-Sorte | → v4-Essenzen |
+|---|---|
+| `attack` | `fire`, `earth` |
+| `speed` | `water`, `light` |
+| `nature`… nein: `special` | `nature`, `darkness`, `solara`, `magmor` |
+
+Beispiel aus dem Selbsttest: `{attack: 41, speed: 7, special: 26}` → `fire 21 / earth 20`,
+`water 4 / light 3`, `nature 8 / darkness 6 / solara 6 / magmor 6`. **Summe 74 vorher wie
+nachher** — der Test prüft genau das, nicht die Einzelzahlen allein.
+
+> **⚠ Eine Migration muss ihre eigene Form einfrieren.** `migrateV2toV3()` hat bis zum
+> 29.07.2026 `emptyMaterials()` und `MATERIAL_KEYS` benutzt — also die Form der *jeweils
+> aktuellen* Fassung. Solange die aktuelle Fassung v3 war, fiel das nicht auf. Mit v4 hätte
+> es einen v2-Stand über die **acht neuen** Schlüssel verteilt, und der Schritt v3→v4 hätte
+> danach unter `attack`/`speed`/`special` nichts mehr gefunden: das Material eines
+> Altspielers wäre je nach Reihenfolge verdoppelt oder verschwunden. Die v3-Form steht
+> deshalb jetzt als eigene Konstante `V3_KEYS` im Modul und ändert sich nie wieder.
+
+`getMaterials()` liefert seit v4 `{fire, water, nature, earth, light, darkness, solara,
+magmor, total}`. `addMaterial(n)` **ohne** Sortenangabe bleibt rückwärtskompatibel und
+verteilt round-robin über **alle** Sorten (mit wanderndem Rest-Zeiger, damit zehn
+Einzelaufrufe nicht alle auf derselben landen) — genau das nutzen die generischen
+Belohnungen (Straßen-Knoten, Login-Kalender, Guide-Aufgaben).
 
 Der ältere Pfad **arenaHub → arenaCards** (`newLvl = min(100, round(oldLvl × 5))`) entfällt: Die
 v1-Migration hat ihn bereits ausgeführt; wer direkt von `arenaHub` kommt, bekommt beim ersten
@@ -777,11 +851,10 @@ Die Schritte 4, 6 und 7 haben mit `arena_patches/ui_prototype.html` eine **lauff
 - [ ] `localStorage.arenaCards` existiert nach dem ersten Pack, hat **`v: 3`** und enthält
       `{cards, materials: {attack, speed, special}, matRR, gold: null, pityEpic,
       pityLegendary, packsOpened}` — **kein** Zahlenfeld `material` mehr.
-- [ ] **Material-Sorten:** `materialTypeOf('fire') === 'attack'`, `('water') === 'speed'`,
-      `('nature') === 'special'`, unbekannte ID → `'special'`.
-- [ ] **Sorten-Verbrauch:** ein Level-Up an FROST senkt **nur** `materials.speed`;
-      `canLevelUp('fire')` meldet `reason: 'material'`, solange nur Tempo-Essenz im Vorrat
-      liegt (auch bei Bergen davon).
+- [ ] **Essenzen:** `materialTypeOf('fire') === 'fire'` (Schlüssel == Karten-ID);
+      `MATERIAL_KEYS` deckt sich **exakt** mit der Kartenliste; unbekannte ID → `null`;
+      `canLevelUp('fire')` meldet `reason: 'material'`, solange nur Frost-Essenz im Vorrat
+      liegt — auch bei 999 Stück davon.
 - [ ] **Pack-Sorten:** `openPack().materialSlots` ist ein Array aus `{type, amount}`, die
       Summe der `amount` entspricht `material`, und die Sorten sind über viele Packs
       gleichverteilt (gemessen 33.4 / 33.4 / 33.2 % über 20 000 Slots).

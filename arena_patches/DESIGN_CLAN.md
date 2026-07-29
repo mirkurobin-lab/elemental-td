@@ -309,8 +309,9 @@ Bronze-Pack liefert 5 Karten, davon ~4 grau). Realistisch für einen aktiven Spi
 
 Ein Level-Up im Bereich Lv 8–12 kostet 4 500 🪙 (`GOLD_BANDS`); die Spenden-Belohnung ist damit
 **Beschleuniger im niedrigen Prozentbereich**, kein Einkommensersatz. Die Sortenbindung des
-Materials ist dabei der elegantere Teil: Wer `fire`/`earth` spendet, bekommt Angriffs-Essenz —
-also genau das Material für die Karten, die er offensichtlich im Überfluss hat. Die Belohnung
+Materials ist dabei der elegantere Teil: Wer `fire` spendet, bekommt Ember-Essenz — seit
+State v4 also **exakt** das Material für die Karte, die er offensichtlich im Überfluss hat
+(vorher war es die Sorte einer Zweier-/Vierergruppe, jetzt die Karte selbst). Die Belohnung
 verstärkt die vorhandene Schwerpunktsetzung statt sie zu verwässern.
 
 **Wer bucht was:** Kartenkopien und Material bucht das Modul selbst über `ArenaCards` (dessen

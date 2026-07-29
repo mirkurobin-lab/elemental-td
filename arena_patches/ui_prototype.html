@@ -432,6 +432,24 @@ select.sel{font-family:inherit;border:1px solid var(--line);appearance:none;
   background-size:4px 4px,4px 4px;background-repeat:no-repeat}
 select.sel option{background:var(--panel);color:var(--txt)}
 #matCount b{color:var(--txt);font-weight:800}
+/* ---------- Essenz-Vorrat (eine Sorte je Karte, 29.07.2026) ----------
+   Vier Spalten, zwei Reihen — bei acht Karten genau voll, bei zehn
+   waechst es nach unten statt in die Breite. Die Kachel ist bewusst
+   flach: sie ist eine Zahl mit Bild, kein Knopf. */
+.matchip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;
+  border:1px solid #ffffff1f;background:#ffffff0d;cursor:pointer}
+.matchip[aria-expanded="true"]{border-color:var(--gold);background:#f2a13d1f}
+.matchip .essauf{font-size:9px;color:var(--dim);margin-left:1px}
+.essbank{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0 0}
+.essbank[hidden]{display:none}
+.esscell{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px 5px;
+  border-radius:9px;background:var(--panel2);border:1px solid #ffffff14;min-width:0}
+.esscell .ico,.esscell img.ico{width:26px;height:26px}
+.esscell .essn{font-size:8px;color:var(--dim);letter-spacing:.02em;max-width:100%;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.esscell .essz{font-size:12px;font-weight:900;line-height:1}
+.esscell.leer{opacity:.45}
+.esscell.eigen{border-color:var(--gold);background:#f2a13d1a}
 .forgebtn{background:linear-gradient(180deg,#f2a13d,#c9762a);color:#231402;font-weight:900;
   font-size:12px;padding:7px 12px;border-radius:9px;letter-spacing:.05em}
 
@@ -900,6 +918,10 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
 .pcfront{transform:rotateY(180deg)}
 .pcard.res .pcfront{background:var(--panel2)}
 .pcside .face{display:flex;flex-direction:column;align-items:center;gap:2px}
+/* Essenz im Pack-Reveal: das Karten-Artwork traegt die Aussage, nicht
+   ein 20-px-Emoji. Feste Groesse, damit die Karte nicht springt,
+   wenn das Bild spaeter als der Rest da ist. */
+.pcside .face .ico.gross,.pcside .face img.ico.gross{width:34px;height:34px}
 .pcside .face .t{font-size:7.5px;font-weight:900;letter-spacing:.03em}
 /* Glühen WÄHREND der Drehung, in der Drop-Raritätsfarbe */
 .pcglow{position:absolute;inset:-6px;border-radius:13px;pointer-events:none;opacity:0;
@@ -6320,8 +6342,17 @@ button.pfplate{cursor:pointer}
         <option value="tier">Nach Rarität</option>
       </select>
       <span class="spacer"></span>
-      <span class="mini" id="matCount">…</span>
+      <!-- Essenz-Vorrat. Bis zum 29.07.2026 standen hier DREI Zahlen
+           nebeneinander — eine je Sorte. Seit jede Karte ihre eigene
+           Essenz hat, waeren es acht, und acht Zahlen passen nicht in
+           eine Zeile, die schon ein Sortier-Menue traegt. Hier steht
+           deshalb die SUMME; die Aufschluesselung klappt darunter auf.
+           Kein Modal: der Vorrat ist eine Nebenauskunft, kein Vorgang. -->
+      <span class="mini matchip pressable" id="matCount" role="button" tabindex="0"
+        aria-expanded="false" aria-controls="essBank"
+        aria-label="Essenz-Vorrat aufklappen">…</span>
     </div>
+    <div class="essbank" id="essBank" hidden></div>
 
     <div class="grid" id="collGrid"></div>
     <div class="hint" id="collHint"></div>
@@ -7346,6 +7377,37 @@ button.pfplate{cursor:pointer}
     fire: "loop_ember", water: "loop_frost", nature: "loop_thorn", earth: "loop_stone",
     light: "loop_dawn", darkness: "loop_hollow", solara: "loop_solara", magmor: "loop_magmor",
   };
+  /* ==================================================================
+   * matIco(sorte, klasse) — Icon EINER ESSENZ-SORTE
+   * ------------------------------------------------------------------
+   * Seit dem 29.07.2026 gehoert jede Essenz genau EINER Karte, und der
+   * Schluessel der Sorte IST die Karten-ID (arena_cards.js, „STATE v4").
+   * Das Icon ist deshalb das Artwork DIESER Karte — genau wie in AA, wo
+   * im RESOURCES-Raster Turm-Miniaturen als Material stehen.
+   *
+   * Das ist nicht nur billiger als acht neue Bilder, es ist auch die
+   * einzige Variante, bei der KEIN Material-Bild fehlen kann: gibt es
+   * die Karte, gibt es ihr Icon. Vorher hing an jeder neuen Sorte ein
+   * eigener Bildauftrag — und bis der geliefert war, stand ein Emoji da.
+   *
+   * ESS_SAMMEL ist das eine verbliebene generische Essenz-Bild. Es steht
+   * NUR dort, wo bewusst eine SUMME ueber alle Sorten gemeint ist
+   * (Bundle-Zeile „×25 Essenz", Tagesbelohnung, Guide-Aufgabe). Wo eine
+   * bestimmte Sorte gemeint ist, steht nie das Sammelbild.
+   * (`ess_attack`/`ess_speed` sind seither unbenutzt; sie bleiben in
+   *  ui_assets.json verzeichnet, damit die Sicherungskette geschlossen
+   *  bleibt — sie zu loeschen wuerde nur HERKUNFT.json aufreissen.) */
+  var ESS_SAMMEL = "ess_special";
+  function matIco(sorte, cls) {
+    var c = BY_ID[sorte];
+    if (!c) return ico(ESS_SAMMEL, "⚗", cls);
+    return ico(CARD_ART[sorte] || ESS_SAMMEL, c.art || "⚗", cls);
+  }
+  function matName(sorte) {
+    var m = AC.MATERIAL_BY_KEY ? AC.MATERIAL_BY_KEY[sorte] : null;
+    if (!m) { AC.MATERIALS.forEach(function (x) { if (x.key === sorte) m = x; }); }
+    return m ? m.name : "Essenz";
+  }
   function attachLoop(box, id) {
     if (!box || !ASSETS[CARD_LOOP[id]]) return null;
     var old = box.querySelector("video.cvid");
@@ -8109,9 +8171,14 @@ button.pfplate{cursor:pointer}
     var m = (t / stepAt(t)) % 3;
     if (m === 1) return { icon: "🪙", ico: "cur_gold", label: "Gold",
                           q: "×" + fmt(200 + Math.floor(t / 50) * 40) };
-    if (m === 2) return { icon: "⚗", ico: "ess_special", label: "Arkan-Essenz",
+    /* Strassen-Essenz ist bewusst GENERISCH (Sammelbild, Sammelname):
+       die Knoten stehen fuer die ganze Leiter, und ein Knoten, der eine
+       bestimmte Turm-Essenz zusagt, waere fuer jeden wertlos, der genau
+       diesen Turm nicht spielt. Verteilt wird sie beim Einloesen
+       gleichmaessig ueber alle Sorten (addMaterial ohne Sorte). */
+    if (m === 2) return { icon: "⚗", ico: ESS_SAMMEL, label: AC.MATERIAL_NAME,
                           q: "×" + (2 + Math.floor(t / 300)) };
-    return { icon: "⚔", ico: "ess_attack", label: "Angriffs-Essenz", q: "×" + (2 + Math.floor(t / 400)) };
+    return { icon: "⚗", ico: ESS_SAMMEL, label: AC.MATERIAL_NAME, q: "×" + (2 + Math.floor(t / 400)) };
   }
   function nodeList() {
     var out = [], t = 50, block = {};
@@ -8133,9 +8200,15 @@ button.pfplate{cursor:pointer}
   /* ================= Demo-Seed ================= */
   var SEED_KEY = "arenaUiProtoSeed";
   function seed() {
-    // State v3: Material liegt in DREI Sorten (AA-Befund §12.3).
+    /* State v4: jede KARTE hat ihre eigene Essenz. Die Zahlen sind
+       bewusst ungleich — ein Demo-Stand, in dem alle acht Vorraete gleich
+       hoch sind, sieht aus wie ein Platzhalter und zeigt nicht, worum es
+       bei der Umstellung geht: dass man fuer JEDEN Turm getrennt sammelt.
+       EMBER und FROST (Deck-Tuerme) liegen vorn, die Helden hinten. */
     var st = { v: AC.STATE_VERSION, cards: {},
-               materials: { attack: 26, speed: 21, special: 17 }, matRR: 0, gold: null,
+               materials: { fire: 19, water: 14, nature: 11, earth: 8,
+                            light: 12, darkness: 5, solara: 3, magmor: 2 },
+               matRR: 0, gold: null,
                pityEpic: 6, pityLegendary: 21, packsOpened: 12 };
     function mk(tier, lvl, copies, boni) {
       var c = { tier: tier, lvl: lvl, copies: {}, mergeBoni: boni || [], pendingBoni: [] };
@@ -8424,12 +8497,35 @@ button.pfplate{cursor:pointer}
         $({ gold: "curGold", gems: "curGems", trophies: "curTrophies" }[art]).textContent = fmt(h);
       }
     });
-    // Material-Vorrat je Sorte (§7.1: AA führt jede Sorte getrennt)
+    /* Essenz-Vorrat: SUMME in der Leiste, Aufschluesselung im Fach
+       darunter. Die Summe ist hier keine Notloesung wegen Platzmangel,
+       sondern die richtige Groesse fuer diese Stelle: „habe ich
+       ueberhaupt Essenz?" beantwortet sie, „reicht sie fuer DIESEN
+       Turm?" beantwortet das Kartendetail. */
     var bank = AC.getMaterials();
-    var MATICO = { attack: "ess_attack", speed: "ess_speed", special: "ess_special" };
-    $("matCount").innerHTML = AC.MATERIALS.map(function (m) {
-      return ico(MATICO[m.key] || "ess_special", m.sym) + " <b>" + bank[m.key] + "</b>";
-    }).join(" ");
+    $("matCount").innerHTML = ico(ESS_SAMMEL, "⚗") + " <b>" + fmt(bank.total) + "</b>" +
+      '<span class="essauf" aria-hidden="true">' + (essBankOffen ? "▴" : "▾") + "</span>";
+    renderEssBank();
+  }
+  /* renderEssBank(hervor) — alle Sorten mit Bestand.
+     `hervor` hebt EINE Sorte hervor (das Kartendetail nutzt das, damit
+     man im Vorrat sofort die eigene Essenz der offenen Karte findet). */
+  var essBankOffen = false;
+  function renderEssBank(hervor) {
+    var el = $("essBank"); if (!el) return;
+    var bank = AC.getMaterials();
+    el.hidden = !essBankOffen;
+    var chip = $("matCount");
+    if (chip) chip.setAttribute("aria-expanded", essBankOffen ? "true" : "false");
+    if (!essBankOffen) { el.innerHTML = ""; return; }
+    el.innerHTML = AC.MATERIALS.map(function (m) {
+      var n = bank[m.key] | 0;
+      return '<div class="esscell' + (n ? "" : " leer") + (m.key === hervor ? " eigen" : "") +
+        '" data-esssorte="' + m.key + '" title="' + m.name + '">' +
+        matIco(m.key) +
+        '<span class="essz" style="color:' + m.color + '">' + fmt(n) + "</span>" +
+        '<span class="essn">' + m.name.replace("-Essenz", "") + "</span></div>";
+    }).join("");
   }
   function renderCollection() {
     renderTop();
@@ -8549,18 +8645,23 @@ button.pfplate{cursor:pointer}
       mh.innerHTML = txt;
     }
 
-    // Upgrade-Material-Block (§5 / §12.3) — SORTE der Karte + Buttons
+    /* Upgrade-Essenz (§5 / §12.3) — die EIGENE Essenz dieser Karte.
+       Bis zum 29.07.2026 stand hier zusaetzlich eine Liste „die anderen
+       Sorten, fuer diesen Turm nicht verwendbar". Das war bei drei
+       Sorten eine Beruhigung („dein Vorrat ist nicht leer, nur die
+       falsche Sorte") und waere bei acht eine Wand aus Text, die von
+       der einen Zahl ablenkt, auf die es ankommt. An seiner Stelle
+       steht jetzt, WOHER die Essenz kommt — das ist die Frage, die ein
+       leerer Vorrat wirklich aufwirft. */
     var need = v.needMaterial, have = v.haveMaterial;
-    var MATICO2 = { attack: "ess_attack", speed: "ess_speed", special: "ess_special" };
-    $("dMatSym").innerHTML = ico(MATICO2[v.materialType] || "ess_special", v.materialSym, "big");
+    $("dMatSym").innerHTML = matIco(v.materialType, "big");
     $("dMatName").textContent = v.materialName;
     $("dMatName").style.color = v.materialColor;
     $("dMat").innerHTML = (have < need ? '<span class="bad">' + have + "</span>" : have) + " / " + need;
-    // Die anderen Sorten mit anzeigen — sonst wirkt ein leerer Vorrat wie ein Bug.
-    var bank = v.materials;
-    $("dMatSub").innerHTML = AC.MATERIALS.filter(function (m) { return m.key !== v.materialType; })
-      .map(function (m) { return m.sym + " " + m.name + " " + bank[m.key]; }).join(" · ") +
-      " — für diesen Turm nicht verwendbar";
+    $("dMatSub").innerHTML = have >= need
+      ? "Reicht für dieses Level-Up. Nur " + v.materialName + " hebt " + m.name + "."
+      : "Fehlen <b>" + (need - have) + "</b>. " + v.materialName + " kommt aus Packs, in denen " +
+        m.name + " liegt — und aus dem Tagesangebot.";
     var chk = AC.canLevelUp(curId, gold());
     var up = $("btnUpgrade");
     // innerHTML, nicht textContent: ico() liefert ein <img>, sobald das
@@ -8570,6 +8671,7 @@ button.pfplate{cursor:pointer}
     up.disabled = !chk.ok;
     up.firstChild.nodeValue = v.atCap ? "CAP ERREICHT" : "UPGRADE";
     renderTop();
+    renderEssBank(v.materialType);   // im offenen Fach die eigene Sorte hervorheben
   }
   function doUpgrade() {
     var chk = AC.canLevelUp(curId, gold());
@@ -9280,9 +9382,12 @@ button.pfplate{cursor:pointer}
           '<div class="facewrap"><div class="t" style="color:' + color + '">' +
           tierOf(s.d.tier).name + "</div></div>";
       } else if (s.kind === "mat") {
-        // Sorte ist Teil des Reveals — "welche Essenz?" ist eine eigene kleine Frage.
-        face = '<div class="face"><div style="font-size:20px">' + s.m.sym + '</div>' +
-          '<div class="t" style="color:' + color + '">+' + s.m.amount + "</div></div>";
+        /* Sorte ist Teil des Reveals — "welche Essenz?" ist eine eigene
+           kleine Frage, und seit jede Karte ihre eigene hat, eine
+           interessantere: das Icon IST der Turm, fuer den sie zaehlt. */
+        face = '<div class="face">' + matIco(s.m.type, "gross") +
+          '<div class="t" style="color:' + (s.m.color || color) + '">+' + s.m.amount +
+          "</div></div>";
       } else {
         face = '<div class="face"><div style="font-size:20px">' + ico("cur_gold", "🪙") +
           '</div><div class="t">+' + fmt(s.n) + "</div></div>";
@@ -9437,7 +9542,8 @@ button.pfplate{cursor:pointer}
     var parts = Object.keys(byTier).map(function (k) { return byTier[k] + "× " + k; });
     // Material nach Sorte aufschlüsseln (nur die, die tatsächlich gedroppt sind)
     var matParts = AC.MATERIALS.filter(function (m) { return packResult.materialByType[m.key] > 0; })
-      .map(function (m) { return "<b>+" + packResult.materialByType[m.key] + "</b> " + m.sym + " " + m.name; });
+      .map(function (m) { return "<b>+" + packResult.materialByType[m.key] + "</b> " +
+        matIco(m.key) + " " + m.name; });
     $("packSummary").style.display = "";
     $("packSummary").innerHTML = "<b>+" + packResult.cards.length + " Karten</b> (" + parts.join(", ") +
       ")<br>" + matParts.join(" · ") + "<br><b>+" + fmt(packResult.gold) +
@@ -9825,16 +9931,17 @@ button.pfplate{cursor:pointer}
      `geben()` bucht — Material und Karten ueber ArenaCards, Gold ueber
      den Hub. Keine Ware bucht Gems: siehe Waehrungsregel oben. */
   function zufallsTurm(h) { return TOWER_IDS[h % TOWER_IDS.length]; }
+  /* ESSENZ-POSTEN. Bis zum 29.07.2026 standen hier drei feste Posten —
+     einer je Sorte. Mit einer Sorte JE KARTE waeren es acht, und acht
+     Essenz-Posten in einem Tagesangebot mit fuenf Plaetzen ist keine
+     Auswahl mehr, sondern eine Liste. Deshalb dieselbe Bauart wie beim
+     Turm-Posten darunter: der Posten steht fest, WELCHE Sorte er heute
+     fuehrt, zieht der Tageshash. Drei Posten, acht moegliche Sorten —
+     das ist der Grund, morgen nochmal zu schauen. */
   var DEAL_WAREN = [
-    { id:"ess_att", art:"shop_mat_attack", emoji:"⚔", name:"Angriffs-Essenz",
-      zahl:20, gold:3000, gems:120, stueck:3,
-      geben:function(){ AC.addMaterial(20, "attack"); } },
-    { id:"ess_tmp", art:"shop_mat_speed", emoji:"⚡", name:"Tempo-Essenz",
-      zahl:20, gold:3000, gems:120, stueck:3,
-      geben:function(){ AC.addMaterial(20, "speed"); } },
-    { id:"ess_spz", art:"shop_mat_special", emoji:"✨", name:"Spezial-Essenz",
-      zahl:15, gold:4200, gems:160, stueck:2,
-      geben:function(){ AC.addMaterial(15, "special"); } },
+    { id:"ess_gr", essenz:true, zahl:20, gold:3000, gems:120, stueck:3 },
+    { id:"ess_md", essenz:true, zahl:20, gold:3000, gems:120, stueck:3 },
+    { id:"ess_kl", essenz:true, zahl:15, gold:4200, gems:160, stueck:2 },
     /* Turm-Posten. Das Bild ist das Artwork DES TURMS, der heute
        drankommt — auch der wird gezogen. „Fuege tower ein" heisst
        genau das: man sieht, WELCHE Karte im Angebot ist. */
@@ -9865,12 +9972,7 @@ button.pfplate{cursor:pointer}
       geben:function(){ setGold(gold() + 600); } },
     { id:"fr_gems", art:"shop_gem_t1", emoji:"💚", name:"Kristalle", zahl:10,
       geben:function(){ setGems(gems() + 10); } },
-    { id:"fr_att", art:"shop_mat_attack", emoji:"⚔", name:"Angriffs-Essenz", zahl:8,
-      geben:function(){ AC.addMaterial(8, "attack"); } },
-    { id:"fr_tmp", art:"shop_mat_speed", emoji:"⚡", name:"Tempo-Essenz", zahl:8,
-      geben:function(){ AC.addMaterial(8, "speed"); } },
-    { id:"fr_spz", art:"shop_mat_special", emoji:"✨", name:"Spezial-Essenz", zahl:6,
-      geben:function(){ AC.addMaterial(6, "special"); } },
+    { id:"fr_ess", essenz:true, zahl:8 },
   ];
   var DEAL_BEZAHLT = 5;   // so viele bezahlte Posten neben dem Gratis-Posten
 
@@ -9889,10 +9991,28 @@ button.pfplate{cursor:pointer}
       t = korb[i]; korb[i] = korb[j]; korb[j] = t;
     }
     var raus = [];
+    /* essenzPosten(w, tag) — fuellt einen Essenz-Posten mit der Sorte
+       DES TAGES. Bild und Name kommen aus der Karte, nicht aus einer
+       zweiten Tabelle: `matIco` bildet Sorte → Karten-Artwork ab. So
+       kann der Posten nicht eine Sorte ankuendigen und eine andere
+       buchen — es gibt nur einen Schluessel. */
+    function essenzPosten(d, w, tag) {
+      var keys = AC.MATERIAL_KEYS;
+      var sorte = keys[shopHash("ess", tag, w.id) % keys.length];
+      var k = BY_ID[sorte] || {};
+      d.essSorte = sorte;
+      d.art = CARD_ART[sorte];
+      d.emoji = k.art || "⚗";
+      d.name = matName(sorte);
+      d.geben = (function (so, n) { return function () { AC.addMaterial(n, so); }; })(sorte, w.zahl);
+      return d;
+    }
     // Gratis-Posten des Tages
     var g = DEAL_GRATIS[shopHash("gratis", tag) % DEAL_GRATIS.length];
-    raus.push({ id: g.id, art: g.art, emoji: g.emoji, name: g.name, zahl: g.zahl,
-                cur: "free", cost: 0, stueck: 1, gratis: true, geben: g.geben });
+    var gd = { id: g.id, art: g.art, emoji: g.emoji, name: g.name, zahl: g.zahl,
+               cur: "free", cost: 0, stueck: 1, gratis: true, geben: g.geben };
+    if (g.essenz) essenzPosten(gd, g, tag);
+    raus.push(gd);
     for (i = 0; i < korb.length && raus.length <= DEAL_BEZAHLT; i++) {
       var w = korb[i];
       /* Waehrung des Tages. Kann die Ware nur eine, ist die Wahl
@@ -9903,6 +10023,7 @@ button.pfplate{cursor:pointer}
       var d = { id: w.id, art: w.art, emoji: w.emoji, name: w.name, zahl: w.zahl,
                 cur: cur, cost: cur === "gold" ? w.gold : w.gems,
                 stueck: w.stueck, gratis: false, geben: w.geben };
+      if (w.essenz) essenzPosten(d, w, tag);
       if (w.turm) {
         /* Welcher Turm heute im Angebot ist, haengt am Tag UND an der
            Warenkennung — sonst waeren „3 gewoehnliche" und „1 gute"
@@ -10026,7 +10147,7 @@ button.pfplate{cursor:pointer}
          gewürfelt wird. Bei einer Pflichtangabe darf man das nicht raten. */
       packKey:"silver",
       items:[["cur_gold","🪙","5 000"],["cur_gem","💚","50"],["pack_silver","🎁","×3"],
-             ["ess_attack","⚗","×25"]] },
+             [ESS_SAMMEL,"⚗","×25"]] },
     { id:"starter", name:"Starter-Pack", sub:"Nur für neue Beschwörer · einmalig",
       art:"offer_starter", emoji:"✨", price:"Fr. 9.–", value:"+320 % Wert",
       packKey:"gold",
@@ -10389,7 +10510,7 @@ button.pfplate{cursor:pointer}
                beim Oeffnen des Packs, nicht beim Kauf des Buendels. */
             '<span class="oddsi pressable" role="button" tabindex="0" data-odds="gold" ' +
               'aria-label="Drop-Raten der enthaltenen Packs">i</span>' +
-            feld("ess_attack", "⚗", "×" + p.ess, "#ff8a5c") +
+            feld(ESS_SAMMEL, "⚗", "×" + p.ess, "#c39bff") +
           "</span>" +
           '<span class="apkpr"><span class="apkalt">Fr. ' + alt.toFixed(0) + ".–</span>" +
             '<span class="apkneu">Fr. ' + p.preis + '.–</span></span>' +
@@ -10720,7 +10841,7 @@ button.pfplate{cursor:pointer}
         return '<b style="color:' + t.color + '">' + proTier[t.key] + "×</b> " + t.name;
       }).join(" · ");
     var matZ = AC.MATERIALS.filter(function (m) { return mat[m.key]; })
-      .map(function (m) { return "<b>+" + mat[m.key] + "</b> " + m.sym + " " + m.name; })
+      .map(function (m) { return "<b>+" + mat[m.key] + "</b> " + matIco(m.key) + " " + m.name; })
       .join(" · ");
     askConfirm("Vorrats-Pack ×" + n + " geöffnet",
       "<b>Karten</b><br>" + (kartenZ || "—") + "<br><br>" +
@@ -12523,7 +12644,12 @@ button.pfplate{cursor:pointer}
     /* Belohnungstabelle — reine Funktion der Stufe. Abwechslung entsteht
        aus den Teilbarkeiten: alle 10 ein Pack-Meilenstein, alle 5 ein
        kleineres Pack, dazwischen Material und Gold. */
-    var MAT_BY_MOD = ["attack", "speed", "special"];
+    /* Welche Essenz eine Passstufe gibt, rotiert ueber ALLE Sorten.
+       Frueher stand hier eine feste Dreierliste mit `% 3` — mit acht
+       Sorten haette der Pass drei davon bedient und fuenf nie. Die
+       Laenge kommt jetzt aus der Sortenliste selbst; kommt eine Karte
+       dazu, ist ihre Essenz im Pass, ohne dass hier jemand nachzieht. */
+    var MAT_BY_MOD = AC.MATERIAL_KEYS;
     function reward(level, track) {
       var ms = level % 10 === 0;
       if (track === "free") {
@@ -12532,9 +12658,10 @@ button.pfplate{cursor:pointer}
         if (level % 5 === 0) return { kind: "pack", key: "bronze", ico: "pack_bronze",
                          emoji: "🎁", label: "Bronze-Pack", sub: "5 Karten + Material" };
         if (level % 3 === 0) {
-          var mk = MAT_BY_MOD[(level / 3 | 0) % 3];
-          return { kind: "mat", key: mk, n: 10 + level, ico: "ess_" + mk, emoji: "⚗",
-                   label: (10 + level) + " Material", sub: matName(mk) };
+          var mk = MAT_BY_MOD[(level / 3 | 0) % MAT_BY_MOD.length];
+          return { kind: "mat", key: mk, n: 10 + level, ico: CARD_ART[mk] || ESS_SAMMEL,
+                   emoji: (BY_ID[mk] || {}).art || "⚗",
+                   label: (10 + level) + " Essenz", sub: matName(mk) };
         }
         return { kind: "gold", n: 300 + 40 * level, ico: "cur_gold", emoji: "🪙",
                  label: fmt(300 + 40 * level) + " Gold", sub: "Sofort gutgeschrieben" };
@@ -12548,19 +12675,17 @@ button.pfplate{cursor:pointer}
       if (level % 7 === 0) return { kind: "emote", key: EMOTE_ORDER[(level / 7 | 0) % 6],
                  ico: null, emoji: "💬", label: "Emote freigeschaltet", sub: "Für den Clan-Feed" };
       if (level % 2 === 0) {
-        var mk2 = MAT_BY_MOD[(level / 2 | 0) % 3];
-        return { kind: "mat", key: mk2, n: 20 + 2 * level, ico: "ess_" + mk2, emoji: "⚗",
-                 label: (20 + 2 * level) + " Material", sub: matName(mk2) };
+        var mk2 = MAT_BY_MOD[(level / 2 | 0) % MAT_BY_MOD.length];
+        return { kind: "mat", key: mk2, n: 20 + 2 * level, ico: CARD_ART[mk2] || ESS_SAMMEL,
+                 emoji: (BY_ID[mk2] || {}).art || "⚗",
+                 label: (20 + 2 * level) + " Essenz", sub: matName(mk2) };
       }
       return { kind: "gold", n: 800 + 120 * level, ico: "cur_gold", emoji: "🪙",
                label: fmt(800 + 120 * level) + " Gold", sub: "Sofort gutgeschrieben" };
     }
     var EMOTE_ORDER = ["gl", "thx", "need", "war", "nice", "hi"];
-    function matName(k) {
-      var n = "Essenz";
-      AC.MATERIALS.forEach(function (m) { if (m.key === k) n = m.name; });
-      return n;
-    }
+    /* matName() ist die globale Fassung (bei matIco definiert) — hier
+       stand einmal eine zweite, wortgleiche Kopie. */
 
     function state() {
       var o = read(), now = Date.now();
@@ -12898,12 +13023,12 @@ button.pfplate{cursor:pointer}
       subject: "Willkommen im Kristallhof!",
       body: "Schön, dass du da bist. Als Startgeschenk legen wir dir Gold und " +
             "Upgrade-Material ins Postfach — genug für die ersten Level-Ups deiner Türme.",
-      reward: { gold: 5000, material: 30, matType: "attack" } },
+      reward: { gold: 5000, material: 30, matType: "fire" } },
     { id: "m_clanchest", from: "Prisma-Orden", ico: "🛡",
       subject: "Clantruhe der Woche ausgeschüttet",
       body: "Euer Clan hat die Wochen-Quests zu 91 % erfüllt — die Silber-Clantruhe " +
             "ging an alle 30 Mitglieder. Weiter so am Wochenende im Krieg!",
-      reward: { gold: 2500, material: 15, matType: "special" } },
+      reward: { gold: 2500, material: 15, matType: "darkness" } },
     { id: "m_season", from: "Spielleitung", ico: "🎟",
       subject: "Neue Saison: „Goldene Fortuna“",
       body: "Die neue Season läuft bis zum Monatsende. 50 Stufen, zwei Spuren, " +
@@ -12947,7 +13072,7 @@ button.pfplate{cursor:pointer}
       if (m.reward) {
         rew = '<div class="mrew">' +
           '<span class="rchip">' + ico("cur_gold", "🪙") + " " + fmt(m.reward.gold) + "</span>" +
-          '<span class="rchip">' + ico("ess_" + m.reward.matType, "⚗") + " " +
+          '<span class="rchip">' + matIco(m.reward.matType) + " " +
             m.reward.material + "</span>" +
           '<button class="mailtake pressable' + (taken ? " done" : "") + '" data-mail="' +
             m.id + '"' + (taken ? " disabled" : "") + ">" +
@@ -12989,7 +13114,8 @@ button.pfplate{cursor:pointer}
     mailSave(st);
     UISfx.reward();
     fireSparkBurst(ev);
-    toast("Erhalten: " + fmt(m.reward.gold) + " Gold + " + m.reward.material + " Material");
+    toast("Erhalten: " + fmt(m.reward.gold) + " Gold + " + m.reward.material + " " +
+      matName(m.reward.matType));
     renderMail(); renderTop(); renderHubTiles();
   }
 
@@ -13310,7 +13436,7 @@ button.pfplate{cursor:pointer}
   }
 
   /* ---------- Angebotskette ---------- */
-  var OFFER_ICO = { gems: "cur_gem", gold: "cur_gold", material: "ess_special" };
+  var OFFER_ICO = { gems: "cur_gem", gold: "cur_gold", material: ESS_SAMMEL };
   function offerRowHTML(o) {
     return '<div class="offercard" data-offer="' + o.key + '">' +
       '<button class="offerx pressable" data-offerx="' + o.key + '" title="Ausblenden">×</button>' +
@@ -13355,7 +13481,7 @@ button.pfplate{cursor:pointer}
     var items = [
       { ico: "cur_gem", emo: "💚", t: fmt(o.content.gems) + " Gems" },
       { ico: "cur_gold", emo: "🪙", t: fmt(o.content.gold) + " Gold" },
-      { ico: "ess_special", emo: "⚗", t: o.content.material + " Material" },
+      { ico: ESS_SAMMEL, emo: "⚗", t: o.content.material + " Material" },
       { ico: "pack_" + o.content.packs[0], emo: "🎁",
         t: o.content.packs[0].toUpperCase() + "-Pack" },
     ];
@@ -13669,7 +13795,7 @@ button.pfplate{cursor:pointer}
    * ================================================================== */
   var LOGIN_SEEN_KEY = "arenaLoginSeen";
   function DYof2() { return window.ArenaDaily || null; }
-  var LOGIN_ICO = { gold: "cur_gold", material: "ess_special", gems: "cur_gem",
+  var LOGIN_ICO = { gold: "cur_gold", material: ESS_SAMMEL, gems: "cur_gem",
                     pack: null, finale: null };
   function loginTileIco(d) {
     if (d.pack) return ico("pack_" + d.pack, d.sym, "big");
@@ -14108,7 +14234,7 @@ button.pfplate{cursor:pointer}
           '<span class="gtt"><span class="gtn">' + t.title + "</span>" +
           '<span class="gtd">' + t.desc + "</span>" +
           '<span class="gtr">' + ico("cur_gold", "🪙") + " " + fmt(t.gold) + " · " +
-            ico("ess_special", "⚗") + " " + t.material + "</span></span>" + btn + "</div>";
+            ico(ESS_SAMMEL, "⚗") + " " + t.material + "</span></span>" + btn + "</div>";
       }).join("");
       var packBtn = c.chapterClaimed
         ? '<span class="gtr">✓ abgeholt</span>'
@@ -14901,6 +15027,24 @@ button.pfplate{cursor:pointer}
   $("selSortForge").addEventListener("change", function () {
     setSort($("selSortForge").value); renderForge();
   });
+  /* Essenz-Fach auf/zu. Tastatur mitgedacht: der Chip ist ein <span> mit
+     role="button" (nicht <button>) — ein <button> in einer Leiste, die
+     selbst schon Bedienelemente traegt, hat hier schon einmal einen
+     Parser-Fehler ausgeloest. Ein role="button" muss Leertaste und
+     Enter selbst behandeln, sonst ist er fuer die Tastatur tot. */
+  (function () {
+    var chip = $("matCount"); if (!chip) return;
+    function um() {
+      essBankOffen = !essBankOffen;
+      chip.setAttribute("aria-label",
+        essBankOffen ? "Essenz-Vorrat zuklappen" : "Essenz-Vorrat aufklappen");
+      renderTop();
+    }
+    chip.addEventListener("click", um);
+    chip.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") { e.preventDefault(); um(); }
+    });
+  })();
   /* Der Helden-Tab fuehrt in den eigenen Helden-View: Helden brauchen
      Buehnen-Artwork und Beschreibung, dafuer ist eine 5-Spalten-Kachel
      zu klein. Skills/Items bleiben Platzhalter. */

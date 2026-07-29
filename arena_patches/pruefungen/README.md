@@ -1,6 +1,6 @@
 # Prüfungen
 
-Fünfzehn Playwright-Suiten mit zusammen **1 076 Schritten**, plus zwei
+Sechzehn Playwright-Suiten mit zusammen **1 109 Schritten**, plus zwei
 Sonderprüfungen, die nur mit tatsächlich geladenen Bildern laufen.
 
 ## Aufruf
@@ -38,6 +38,7 @@ direkt — kein Server, kein Build.
 | `community.js` | 89 | Community-Reiter: Marken, echte Ziele |
 | `packoeffnung.js` | 36 | Pack-Öffnung: gemessene Zeitkurve, Abbruch, Neustart |
 | `quoten.js` | 48 | Drop-Raten hinter dem ⓘ — Auflage nach Apple 3.1.1 / Google Play |
+| `essenzen.js` | 33 | Eine Essenz je Karte: Sortenliste == Kartenliste, Ankündigung == Buchung, Fach/Detail/Shop/Pass |
 | `guide.js` | 36 | Defenders Guide: bewegbare Reiterleiste, großes Icon am offenen Reiter, Gegner/Boss als eigene Reiter, kein Booster-Reiter |
 | `assets_vollstaendig.py` | 4 | Jedes benutzte Asset ist verzeichnet, gesichert UND aktuell |
 
@@ -58,6 +59,41 @@ getauscht — neuer URL, gleicher Schlüssel. Die drei Prüfungen davor meldeten
 weiter grün, weil sie nur nach dem *Schlüssel* fragen; auf der Platte lagen
 noch die alten Bilder. Ein grüner Balken, der eine veraltete Datei
 durchwinkt, ist schlimmer als gar keine Prüfung: er beendet das Nachschauen.
+
+## Grün heißt nicht geprüft — der Fall vom 29.07.2026
+
+Am 29.07.2026 wurde das Upgrade-Material von drei geteilten Sorten auf
+**eine eigene Sorte je Karte** umgestellt: neues Datenmodell, neue
+Migration, neue Pack-Mechanik, sechs veränderte Stellen in der
+Oberfläche. Danach liefen alle **fünfzehn** bestehenden Suiten durch —
+**ohne eine einzige Anpassung**, 1 076/1 076 grün.
+
+Das war kein Freibrief, sondern der Befund: **keine** dieser Suiten hatte
+je etwas über das Material-System behauptet, was von der Zahl der Sorten
+abhing. Sie hätten genauso grün gemeldet, wenn
+
+* das neue Essenz-Fach leer geblieben wäre,
+* ein Shop-Posten eine Sorte angekündigt und eine andere gebucht hätte,
+* der Pass fünf von acht Sorten nie ausgeschüttet hätte,
+* oder ein Level-Up die Essenz der falschen Karte abgezogen hätte.
+
+Daraus `essenzen.js` — und die Regel dahinter:
+
+> **Wenn eine Änderung an einem System keine einzige bestehende Prüfung
+> rot macht, ist die erste Frage nicht „gut gelaufen", sondern: welche
+> Prüfung hätte rot werden MÜSSEN?**
+
+`essenzen.js` misst deshalb Kopplungen statt Zahlen: nicht „es sind acht
+Sorten" (acht ist heute zufällig richtig), sondern *die Sortenliste und
+die Kartenliste sind dieselbe Liste* — kommt morgen eine neunte Karte
+dazu, wird die Prüfung rot, bis deren Essenz existiert.
+
+Derselbe Gedanke im Modul-Selbsttest: die Essenz-Verteilung eines Packs
+wird nicht gegen eine feste Prozentzahl geprüft, sondern gegen die
+**Kartenverteilung desselben Laufs** — eine feste Zahl hätte
+`HERO_WEIGHT` stillschweigend überschrieben. Und weil sich die beiden
+Kurven ohnehin ähneln, prüft ein eigener Schritt die Kopplung direkt:
+*jeder Essenz-Posten gehört zu einer Karte aus DIESEM Pack.*
 
 ## Keine Prüfung darf an ihrer eigenen Laufzeit hängen
 
