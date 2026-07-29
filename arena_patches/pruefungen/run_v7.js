@@ -2310,9 +2310,13 @@ function step(name, ok, info) {
      dahinter — ein aus dem Menue entfernter Eintrag muss woanders
      erreichbar bleiben — wird weiter gemessen, nur ueber den Weg, den
      es jetzt gibt: den Reiter GEGNER im Guide. */
+  /* Gefragt wird die Reiter-TABELLE, nicht das gerenderte Markup: die
+     Leiste wird erst beim Oeffnen des Guides gefuellt, und an dieser
+     Stelle des Laufs steht die Startseite. Eine Pruefung, die vom
+     Renderzustand eines anderen Views abhaengt, ist eine Zeitbombe. */
   const ersatz = await page.evaluate(() => ({
     clan: !!document.getElementById('navClan'),
-    gegner: !!document.querySelector('#guideRail [data-gtab="enemies"]'),
+    gegner: window.__proto.GTABS.some(t => t.k === 'enemies'),
     kopf: !!document.getElementById('btnToBestiary')
   }));
   step('Clan bleibt ueber die Hauptleiste unten erreichbar', ersatz.clan);

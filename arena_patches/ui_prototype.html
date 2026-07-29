@@ -1091,6 +1091,17 @@ footer{padding:6px 12px 14px;text-align:center}
 .battlebtn .goldtext{background-image:none;filter:none;
   -webkit-text-fill-color:#3a2b07;color:#3a2b07;
   text-shadow:0 1px 0 #ffffff66}
+/* ⚠ 29.07.2026, vierter Fall derselben Sache — diesmal OHNE .goldtext:
+   `#bsToGrid` („Gegner ansehen") traegt seinen Text direkt im Knopf und
+   erbte damit die helle Grundschrift (#e8eef3) auf der goldenen Flaeche.
+   Aufgefallen ist es erst, als der Knopf mit dem Reiter-Umbau aus dem
+   Bestiarium-View in den Guide gewandert ist: die Leuchtdichte-Pruefung
+   in run_v7 laeuft ueber `.view.active`, und `#viewBestiary` stand nie
+   auf ihrer Liste. Der Fehler ist also aelter als der Umbau — er war nur
+   fuer jede Pruefung unsichtbar.
+   Die Regel bleibt dieselbe: helle Flaeche traegt dunkle Schrift. */
+.battlebtn{-webkit-text-fill-color:#3a2b07;color:#3a2b07;
+  text-shadow:0 1px 0 #ffffff66}
 
 /* ==================================================================
  * ASSET-EBENE
@@ -6574,10 +6585,10 @@ button.pfplate{cursor:pointer}
     banner_rarity_v1: CDN + "hf_20260725_095716_6936452c-84d2-4fc4-ba15-4fa77ef8e6bd.png",
     banner_title:   CDNA + "346f0446-686b-454e-a5af-0d81967dcde5.png",   // v2, zugeschnitten
     banner_title_v1: CDN + "hf_20260725_095720_71db8bf1-f9c9-4acd-9d17-8ce7462e384d.png",
-    pack_bronze:    CDN + "hf_20260725_095725_5c0984d9-f669-49ec-82f2-81817f8eab56.png",
-    pack_silver:    CDN + "hf_20260725_095727_a48313e3-3fb7-4156-b276-9622a9f313a6.png",
-    pack_gold:      CDN + "hf_20260725_095735_28c01416-737f-414d-b8b6-0dd21a18e8a9.png",
-    pack_arcane:    CDN + "hf_20260725_095739_dad6b23f-bd87-42bb-934a-f0e05d24d4c3.png",
+    pack_bronze:    CDNA + "0c390187-c765-4139-88dd-7ad3245ea270.png",
+    pack_silver:    CDNA + "bb8037d7-9ee3-404e-9140-2a7faeb2dc4f.png",
+    pack_gold:      CDNA + "9f8cf919-6372-4b16-ae3e-f2adcda3fe5f.png",
+    pack_arcane:    CDNA + "18eee4bf-7483-4d88-8a93-af4ed3e8c6de.png",
     progress_frame: CDN + "hf_20260725_095742_a6bc63f3-733e-416b-b018-8358ca597e98.png",
     arena1:         CDN + "hf_20260725_095747_28a90d71-c3ab-4911-afd5-969483bfa22c.png",
     arena2:         CDN + "hf_20260725_095757_8ddd3202-0a7c-4f43-82a7-1d9d6a06d038.png",
@@ -6701,14 +6712,19 @@ button.pfplate{cursor:pointer}
     shop_mat_attack:       CDN + "hf_20260726_042656_2ed86a73-0ba8-442c-8ce6-e3e28e870218.png",
     shop_mat_speed:        CDN + "hf_20260726_042658_0e1c3c87-a56b-4948-a419-b8ca861c0493.png",
     shop_mat_special:      CDN + "hf_20260726_042705_1892cf67-384b-41fe-8b0f-6ae8ec989f87.png",
-    offer_arena_pack:      CDN + "hf_20260726_042708_f26a5521-f28b-489d-b62f-01543a8facc6.png",
+    /* Das Arena-Pack-PRODUKTBILD. `packart_arena1..8` sind die 21:9-
+       Kulissen des Karussells und bleiben, wie sie sind — dies hier
+       ist das quadratische Icon fuer die Produktkachel. Der Schluessel
+       heisst deshalb `icon_arena_pack` und nicht `offer_*`: er sagt,
+       WAS das Bild ist, nicht in welchem Angebot es gerade steckt. */
+    icon_arena_pack:       CDNA + "00257f1f-fd9b-4098-a945-cb190d8aacce.png",
     /* Beide ersetzt (Batch 12). Der Starter hatte kein brauchbares
        Produktbild — „das startet pack hat kein Bild bzw Icon sieht
        schlecht aus". Beim Tresor ist das Glasgefaess ABSICHTLICH leer und
        durchsichtig: die Fuellstandssaeule ist CSS und muss darunter
        durchscheinen, ein gefuelltes Glas im Bild wuerde sie verdecken. */
-    offer_starter:         CDN + "hf_20260727_115056_0dfab782-685e-4def-afa3-30913a3ab88a.png",
-    offer_vault_bank:      CDN + "hf_20260727_115444_f75634d9-6a96-4088-ac82-dedbc931f73c.png",
+    offer_starter:         CDNA + "a19085c8-1063-4ec4-9035-332b2e4ff8df.png",
+    offer_vault_bank:      CDNA + "10812943-e615-4957-860c-8c9b20eca6af.png",
     frame_card_orange:     CDN + "hf_20260726_042716_5bf79216-8800-472c-ab73-d9f93ea05991.png",
     frame_card_green:      CDN + "hf_20260726_042717_86ae6639-d698-4dfe-b5d0-6d042162c301.png",
     frame_card_light:      CDN + "hf_20260726_042727_98b627aa-e2fa-4869-a7db-4ddc1dff974a.png",
@@ -6871,6 +6887,11 @@ button.pfplate{cursor:pointer}
     pack_arena_klein:  CDN + "hf_20260727_093825_c05fb801-db27-4b80-8fee-28e1a06a3522.png",
     pack_arena_mittel: CDN + "hf_20260727_093809_e5b4985d-37c1-4d18-b990-c2fda0c2a76a.png",
     pack_arena_gross:  CDN + "hf_20260727_093832_fa45c953-24f8-4e15-8c4b-4bbd16b27545.png",
+    /* Das quadratische ICON der Vorrats-Sektion. `pack_vorrat` daneben
+       ist die 21:9-Kulisse und liegt per bgArt() UNTER dem Inhalt —
+       zwei Rollen, zwei Schluessel. Ein quadratisches Motiv unter
+       `pack_vorrat` haette die Kulisse zerstoert. */
+    pack_vorrat_icon:  CDNA + "b13791d6-fb66-4c64-b7d9-36c607ece067.png",
     pack_vorrat:       CDN + "hf_20260727_093851_f11ee134-dfd3-4798-9d63-74f8d764f6a9.png",
     /* Gratis-Bereiche: Breitbanner fuer das Gratis-Gold, Rosette fuers
        taegliche Bronze-Pack. Beide textfrei — die Schrift kommt aus CSS,
@@ -9403,7 +9424,7 @@ button.pfplate{cursor:pointer}
   }
 
   var IAP_PACKS = [
-    { id:"arena", name:"Arena-Pack", sub:"Einmal pro Saison", art:"offer_arena_pack", emoji:"🎁",
+    { id:"arena", name:"Arena-Pack", sub:"Einmal pro Saison", art:"icon_arena_pack", emoji:"🎁",
       price:"Fr. 3.–", value:"+180 % Wert",
       items:[["cur_gold","🪙","5 000"],["cur_gem","💚","50"],["pack_silver","🎁","×3"],
              ["ess_attack","⚗","×25"]] },
@@ -9934,7 +9955,7 @@ button.pfplate{cursor:pointer}
            bliebe von 21:9 ein Briefschlitz uebrig. Die Kulisse liegt
            unten per bgArt(), wo sie hingehoert.
            Der Kasten braucht ein EIGENES, quadratisches, freistellbares
-           Truhen-Motiv. Solange der Schluessel `pack_vorrat_icon` nicht
+           Truhen-Motiv. Der Schluessel `pack_vorrat_icon`
            in ASSETS steht, liefert ico() sauber das Emoji — die Kachel
            ist vollstaendig lesbar, nur eben ohne Grafik. Bewusst KEIN
            Ersatz-Schluessel aus einer anderen Rolle: ein Bronze-Truhen-

@@ -1,6 +1,6 @@
 # Prüfungen
 
-Neun Playwright-Suiten mit zusammen **813 Schritten**, plus zwei Sonderprüfungen,
+Zehn Playwright-Suiten mit zusammen **849 Schritten**, plus zwei Sonderprüfungen,
 die nur mit tatsächlich geladenen Bildern laufen.
 
 ## Aufruf
@@ -28,6 +28,7 @@ direkt — kein Server, kein Build.
 | `splash.js` | 10 | Startbildschirm: Schriftzug, Ladebalken, Notausgang |
 | `shop_raender.js` | 20 | Randfarben: Inhalt (Kristall/Gold) und Produktfamilie (Packs) |
 | `flug.js` | 12 | Sammel-Animation — aus JEDEM Fenster, nicht nur aus dem Shop |
+| `guide.js` | 36 | Defenders Guide: bewegbare Reiterleiste, großes Icon am offenen Reiter, Gegner/Boss als eigene Reiter, kein Booster-Reiter |
 | `assets_vollstaendig.py` | 3 | Jedes benutzte Asset ist verzeichnet UND gesichert |
 
 `assets_vollstaendig.py` ist die einzige Prüfung hier, die kein Playwright
@@ -105,6 +106,14 @@ Beispiele aus diesem Verzeichnis:
 - „Solara ist bei 1 136 🏆 gesperrt" → „Solara ist frei, weil das Demo-Profil
   den Helden besitzt". Die Bedingung hat sich geändert, die Kopplung wird
   weiter geprüft.
+- (29.07.2026, Guide-Reiterumbau) „Handbuch öffnet aus dem Guide" maß
+  `#btnToManual` → `#viewManual.active`. Beides war die alte Bauart: ein
+  eigener View hinter einem Notknopf, dessen Kommentar selbst sagte, dass er
+  nur bis zum Umbau bleibt. Jetzt gemessen: der Guide ist aktiv, der Reiter
+  `manual` ist gewählt, seine Fläche ist offen. Ebenso „Bestiarium öffnet auf
+  Seite 1" → „Element-Rad ist ein eigener Reiter", „Gegner-Gitter zeigt das
+  ganze Bestiarium" → „Gegner- und Boss-Reiter zusammen zeigen es" und
+  „Zurück geht Detail → Gitter → Rad" → „Zurück geht eine Ebene hoch".
 
 ## Was hier NICHT liegt
 
