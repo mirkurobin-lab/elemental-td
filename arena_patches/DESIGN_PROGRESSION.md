@@ -880,6 +880,25 @@ Bronze 0 · Silber 1 · Gold 1 · Arkan 2. Bronze ohne Spell hält das
 Einstiegspack schlank und macht Silber+ zum ersten Ort, an dem Spells
 überhaupt vorkommen.
 
+> **⚠ KORREKTUR (29.07.2026, nachgerechnet in DESIGN_SPELLS.md §F).** Diese
+> Staffel ist zu dünn, und zwar messbar. In Gewöhnlich-Äquivalenten (Gewichte
+> × [1, 3, 9, 27, 81]) bringt 0/1/1/2 bei 2 Bronze + 1 Silber am Tag **2,76**
+> Äquivalente, verteilt auf vier Spells also **0,69 je Spell und Tag** — das
+> sind **353 Tage** bis zum ersten Suprem-Spell gegen **44** bei einem Turm.
+> Das Achtfache, für eine Kartenart, von der man zwei pro Match trägt und die
+> im Battledeck direkt neben dem Helden sitzt.
+>
+> Nachgerechnet empfohlen: **1/2/2/3** → 8,78 Äquivalente/Tag, 2,19 je Spell,
+> **111 Tage**. Damit bleiben Spells rund 2,5× langsamer als Türme, was der
+> Vorgabe „die Progression soll eine Weile dauern" entspricht, ohne sie zur
+> Sackgasse zu machen.
+>
+> Der Nebeneffekt gehört mitentschieden: **Bronze bekommt dabei einen
+> Spell-Slot.** Oben stand „Bronze schlank halten" — der Gegengrund ist, dass
+> Bronze zwei Drittel des Tagesertrags stellt. Ohne Bronze-Slot hängt der
+> gesamte Spell-Nachschub an einem einzigen Silber-Pack pro Tag, und wer einen
+> Tag lang nur Bronze öffnet, bekommt **null** Spells zu sehen.
+
 ### Was ein Spell braucht, damit er ins System passt
 
 Das Modul erzwingt das inzwischen selbst — pro Spell:

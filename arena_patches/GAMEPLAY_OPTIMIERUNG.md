@@ -577,3 +577,64 @@ danach ein Zweizeiler pro Handkarte.
 | **Forced Ads** („Buy any offer to remove forced ads") | keine erzwungene Werbung | — |
 | Helden über **separate Shard-Währung** | Helden laufen im **selben Kartensystem** (5× seltener) | Kein zweiter Währungs-Track, keine zweite UI |
 | Rarität endet bei **Legendary** | zusätzliche Endstufe **Suprem** | Langzeit-Ziel für die Lv-100-Vorgabe |
+
+---
+
+## 12. Wellen-HP und Turmschaden liegen nicht auf derselben Skala (29.07.2026)
+
+**Gemessen, nicht geschätzt.** `arena_waves.js` gegen die Turm-Stats aus
+`ui_prototype.html` `CARDS`, Matchlänge 7 min / 27 Wellen = 15,6 s je Welle
+(§1). Ein Turm auf Lv 20 leistet im Mittel **136,5 DPS**
+(90,3 Grund-DPS × `statMul(20)` = 1,512):
+
+| Welle | Gesamt-HP | nötige DPS | Türme Lv 20 | … mit ★5 (×1,94) |
+|---|---:|---:|---:|---:|
+| 5 | 19 454 | 1 247 | 10 | **5** |
+| 12 | 360 556 | 23 113 | 170 | **88** |
+| 18 (Boss) | 1 680 249 | 107 708 | 789 | **407** |
+| 27 (Boss) | 5 870 969 | 376 344 | 2 757 | **1 422** |
+
+Ab Welle 5 ist die Rechnung noch plausibel. Ab Welle 12 nicht mehr: 88 Türme
+auf ★5 sind keine Spielsituation, die es geben kann.
+
+> **⚠ Eine Vermutung ausdrücklich ausgeräumt.** Bei der ersten Sichtung lautete
+> der Verdacht, es fehle „eine In-Match-Ausbaustufe, die nirgends dokumentiert
+> ist". **Das stimmt nicht** — sie ist dokumentiert, direkt hier in §1
+> (Match-Gold + Upgrade-Knopf) und §3 (Sternstufen). Sie ist nur (a) bei uns
+> deaktiviert und (b) **um Größenordnungen zu klein**, um die Lücke zu
+> schließen: ★1 → ★5 sind vier Schritte à +18 %, zusammen **×1,94**. Das
+> halbiert die nötige Turmzahl und ändert an Faktor 28 nichts.
+>
+> Der Unterschied ist wichtig, weil er die Richtung der Reparatur bestimmt.
+> Wären die Sternstufen die Lösung, müsste man §3 umsetzen. Da sie es nicht
+> sind, muss **eine der beiden Zahlenwelten neu skaliert werden**.
+
+**Wo die Ursache steckt.** Die HP-Kurve ist `HP(L) = 250 + 30 · L^2.5`
+(`arena_waves.js`), die Wellen-Gesamt-HP wächst von Welle 1 (756) bis Welle 27
+(5 870 969) um **Faktor 7 766**. Die Turmseite wächst über die ganze
+Meta-Progression um `statMul(100)` = **8,62** plus Merge-Boni (grob ×1,25).
+Zwei Kurven mit derart verschiedener Steigung können nicht auf einem gemeinsamen
+Board zusammenkommen — unabhängig davon, welche Zahl man einzeln dreht.
+
+**Was das NICHT ist:** kein Fehler in `arena_waves.js` für sich. Die Kurve ist
+in sich schlüssig und aus AA-Videomaterial abgeleitet (Gegner-HP-Wachstum §... ).
+Sie ist nur nie gegen unsere eigenen Turmzahlen gerechnet worden.
+
+**Was als Nächstes zu klären ist — bevor irgendjemand einen Playtest ansetzt:**
+
+1. Ist die Wellen-Kurve als **Gesamt-HP je Welle** gemeint oder als HP **je
+   Bahn/je Spieler**? Bei zwei Spielern und geteilten Bahnen ändert sich der
+   Nenner, aber nicht die Größenordnung.
+2. Wieviele Türme stehen in einem echten Match am Ende auf dem Board? Diese Zahl
+   steht nirgends fest und ist der wichtigste fehlende Parameter.
+3. Erst danach: `HP_COEFF`/`HP_EXP` senken **oder** die `CARDS`-Schadenszahlen
+   anheben. Nicht beides gleichzeitig, sonst weiß hinterher niemand, welche
+   Änderung gewirkt hat.
+
+**Folge für alles, was jetzt entworfen wird:** solange die Skala offen ist, sind
+absolute Schadenswerte nicht kalibrierbar. Die vier Spells in `DESIGN_SPELLS.md`
+sind deshalb bewusst skalenfrei angegeben — als Prozent der Maximal-HP oder in
+derselben Einheit wie die `CARDS`-Stats. Wer die Turmzahlen mit einem Faktor
+multipliziert, multipliziert die Spells automatisch mit.
+
+**Aufwand: M** · **Priorität: 1** (blockiert jeden belastbaren Playtest)
