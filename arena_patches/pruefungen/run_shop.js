@@ -375,6 +375,29 @@ function step(name, ok, info) {
       }
       return false;
     }).length);
+  /* ⚠ Diese Pruefung misst die CSS-EIGENSCHAFT, nicht den Fuellgrad.
+     Oertlich ist das CDN gesperrt, jedes Bild hat naturalWidth 0 — ein
+     gemessener Fuellgrad waere immer NaN und die Pruefung damit blind
+     (DESIGNSYSTEM §7b). Die Ursache ist aber genau diese Eigenschaft:
+     mit `contain` fuellten die hochformatigen Turm-Artworks (382x512)
+     ihren quadratischen Kasten nur zu 75 %, die quadratischen Icons zu
+     100 % — zwei Bildgroessen im selben Raster, und genau das ist
+     „sieht nicht sauber aus". Den Fuellgrad misst der Live-Durchgang. */
+  const bildfit = await page.evaluate(() => {
+    const im = [...document.querySelectorAll('#dealGrid .prodcard .pcart img.prodimg')];
+    const kaesten = [...document.querySelectorAll('#dealGrid .prodcard .pcart')]
+      .map(e => Math.round(e.getBoundingClientRect().width) + 'x' +
+                Math.round(e.getBoundingClientRect().height));
+    return { n: im.length,
+             falsch: im.filter(e => getComputedStyle(e).objectFit !== 'cover').length,
+             groessen: new Set(kaesten).size };
+  });
+  step('Alle Angebotsbilder fuellen ihren Kasten (object-fit: cover)',
+    bildfit.n > 0 && bildfit.falsch === 0,
+    bildfit.n + ' Bilder, ' + bildfit.falsch + ' abweichend');
+  step('Alle Bildkaesten im Angebotsraster sind gleich gross',
+    bildfit.groessen === 1, bildfit.groessen + ' verschiedene Groessen');
+
   step('.goldtext steht auf keiner hellen/goldenen Flaeche im Shop',
     goldAufHell === 0, String(goldAufHell));
 

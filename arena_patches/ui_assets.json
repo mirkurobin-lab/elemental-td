@@ -3,11 +3,12 @@
   "audio_lizenz": "Alle Audiodateien sind CC0 (OpenGameArt.org). Titel, Links und Bearbeitungen: arena_patches/LIZENZEN.md",
   "batches": {
    "1": "25 Assets: Buttons, Rahmen, Raritaets-Frames, Packs, Panels, Arena-Dioramen 1-6.",
+   "16": "4 Booster-Pack-Artworks (pack_bronze/silver/gold/arcane, Neufassung). Vier VERSCHIEDENE Umrisse statt vier gleicher Rechtecke: breiter Coffer, hohe Spitze, Kreis, Stern. Die Vorgaenger liegen als pack_*_alt daneben.",
    "2": "52 Assets: (A) 7 Waehrungs-/Ressourcen-Icons, (B) 13 Nav-/Hub-Icons, (C) 8 Strassen-Elemente, (D) 12 Teaser-Artworks, (E) 4 Leiter-/Liga-Embleme, (F) 4 Kleinteile, dazu 1 Burg-Basis-Artwork und 3 grosse Festungs-Track-Embleme.",
    "3": "2 Assets für die Pack-Öffnung: Kartenrücken (Prisma-Emblem) und das Legendär-Vollbild-Cinematic (5 s, 720x1280)."
   },
   "cdnBase": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/",
-  "credits": "Batch 1: 25 Generationen x 2 = 50 Credits. Batch 2: 52 Generationen x 2 = 104 Credits. Batch 3 (Pack-Zeremonie): 1 Bild x 2 + 1 Video (kling3_0_turbo) x 7,5 = 9,5 Credits. Batch 3 (Festungs-Layout Variante 2 „Banner-Stapel\"): 4 Bilder x 2 = 8 Credits. Batch 4 (Karten-Artworks, Breitbanner, Emote-Tokens): 17 Bilder x 2 = 34 Credits. Batch 5 (Pass-Keyart-Video, 8 Karten-Loops, 6 CC0-Audiodateien): 9 Videos x 7,5 = 67,5 Credits; Audio 0 Credits (CC0 von OpenGameArt, siehe LIZENZEN.md). Gesamt 115 Assets / 273 Credits, 0 Retakes. Batch 8 (Endscreen-Politur): 4 Bilder x 2 = 8 Credits. Batch 12 (Produktbilder + Gratis-Motive): 5 Bilder x 2 = 10 Credits, davon 1 Verwurf (Kristalltresor v1: Randleuchten und zu wenig Randabstand). Batch 13 (Startbildschirm/Splash): 4 Bilder x 2 = 8 Credits, 0 Retakes; 2 uebernommen (splash_key, splash_key_alt), 2 Schwestervarianten unbenutzt. Batch 14 (Profil-Avatare, 7 Porträts): 20 Bilder x 2 = 40 Credits, davon 13 Verwürfe — 5x weisser statt schwarzer Grund (Randring L > 93; die hellen Referenzbilder faerben den Hintergrund ein), 7x zu wenig Randabstand oder Motiv ausserhalb der Kreismaske, 1x helle Pixel im Randring (L_max 92,9). Gegenmittel, das zuverlaessig half: die Hintergrundregel als ERSTEN Absatz des Prompts, woertlich „PURE SOLID BLACK, RGB 0,0,0 ... the background receives no light at all\". Batch 14b (Nachzieher Solara + Smaragd): 10 Bilder x 2 = 20 Credits. Solara geloest (9 Verwuerfe), Smaragd NICHT geloest (2 Verwuerfe, beide schlechter als der Bestand). Batch 14c (Smaragd rechnerisch eingepasst statt neu erzeugt): 0 Credits.",
+  "credits": "Batch 1: 25 Generationen x 2 = 50 Credits. Batch 2: 52 Generationen x 2 = 104 Credits. Batch 3 (Pack-Zeremonie): 1 Bild x 2 + 1 Video (kling3_0_turbo) x 7,5 = 9,5 Credits. Batch 3 (Festungs-Layout Variante 2 „Banner-Stapel\"): 4 Bilder x 2 = 8 Credits. Batch 4 (Karten-Artworks, Breitbanner, Emote-Tokens): 17 Bilder x 2 = 34 Credits. Batch 5 (Pass-Keyart-Video, 8 Karten-Loops, 6 CC0-Audiodateien): 9 Videos x 7,5 = 67,5 Credits; Audio 0 Credits (CC0 von OpenGameArt, siehe LIZENZEN.md). Gesamt 115 Assets / 273 Credits, 0 Retakes. Batch 8 (Endscreen-Politur): 4 Bilder x 2 = 8 Credits. Batch 12 (Produktbilder + Gratis-Motive): 5 Bilder x 2 = 10 Credits, davon 1 Verwurf (Kristalltresor v1: Randleuchten und zu wenig Randabstand). Batch 13 (Startbildschirm/Splash): 4 Bilder x 2 = 8 Credits, 0 Retakes; 2 uebernommen (splash_key, splash_key_alt), 2 Schwestervarianten unbenutzt. Batch 14 (Profil-Avatare, 7 Porträts): 20 Bilder x 2 = 40 Credits, davon 13 Verwürfe — 5x weisser statt schwarzer Grund (Randring L > 93; die hellen Referenzbilder faerben den Hintergrund ein), 7x zu wenig Randabstand oder Motiv ausserhalb der Kreismaske, 1x helle Pixel im Randring (L_max 92,9). Gegenmittel, das zuverlaessig half: die Hintergrundregel als ERSTEN Absatz des Prompts, woertlich „PURE SOLID BLACK, RGB 0,0,0 ... the background receives no light at all\". Batch 14b (Nachzieher Solara + Smaragd): 10 Bilder x 2 = 20 Credits. Solara geloest (9 Verwuerfe), Smaragd NICHT geloest (2 Verwuerfe, beide schlechter als der Bestand). Batch 14c (Smaragd rechnerisch eingepasst statt neu erzeugt): 0 Credits. Batch 16 (Booster-Packs, Neufassung): 8 Bilder x 2 = 16 Credits, danach 1 Bronze-Nachzug 2 Bilder x 2 = 4 Credits, zusammen 20 Credits. 6 Verwuerfe: beide Bernstein-Bronzen der ersten Runde (32-px-Abstand zu Gold nur dE 10,50 / Gesamt 7,27 — dieselbe warme Familie), Silber-Schwester (Motiv ragte 1,48 % aus dem mittigen Quadrat), Gold-Schwester (Stein und Ring aussermittig), Arkan-Schwester (duennere Zacken, 15,3 % Motivanteil) und die zweite Granat-Bronze des Nachzugs (nur 62,0 % Deckung ueber der Freistell-Schwelle, also Loecher im Motiv). Randabstand und Zentrierung wurden NICHT nachgewuerfelt, sondern gerechnet (Verfahren wie av_smaragd) — 0 zusaetzliche Credits.",
   "erzeugt": "2026-07-25",
   "hinweise": [
    "ALLE Assets sind TEXT-FREI (per Tesseract-OCR verifiziert). Beschriftung kommt als HTML-Ebene obendrauf (.goldtext).",
@@ -24,7 +25,11 @@
    "AURA-FALLE (Batch 14, neun Verwuerfe gekostet): Die Freistell-Maske zaehlt LEUCHTEN als Motiv. Bei einer strahlenden Figur (Solara, Lichtherrin) misst „Randabstand\" deshalb nicht die Ausdehnung ihrer GESTALT, sondern die ihres LICHTS — das Motiv erschien randfuellend, obwohl ihr Koerper klein in der Mitte sass. Jede Vergroesserung machte es schlimmer, jede Verkleinerung zu klein. GEGENMITTEL: bei allem, was leuchtet, den Strahlenkranz im Prompt ausdruecklich verbieten — „no halo, no aura, no god rays, no bloom, no rim glow, no light motes, her outline is a hard clean cut-out edge\". Danach sprang die Motivflaeche in EINEM Zug von 4,4 % auf 30,7 %. Gilt fuer jede kuenftige Licht-, Feuer- oder Magiefigur.",
    "KOPF SEPARAT MESSEN: „Kopf vollstaendig im Kreis\" ist nur aussagekraeftig, wenn der Kopf lokalisiert wird; die Bounding-Box des Motivs sagt darueber nichts. Verfahren: Zeilenbreite der Motivmaske bilden, die BREITESTE Zeile ist die Schulter, die SCHMALSTE darueber der Hals; das Kopfband reicht vom obersten Motivpixel bis zum Hals. Daraus Kopfmitte in % der Bildhoehe (Sollbereich 38–45 %). Eine erste Fassung, die den Breitensprung von oben suchte, scheiterte an Haarspitzen und Kronzacken.",
    "PROMPT-BEFUND: Die Formel „head clearly in the upper half\" fuehrt zu einer Kopfmitte von 23–32 % der Bildhoehe statt der brauchbaren 38–45 %. Sie stand in allen sieben Avatar-Prompts von Batch 14. In der Kreismaske sichtbar angeschnitten war am Ende aber nur av_smaragd — die anderen sechs lesen sich sauber. Eine Kennzahl ausserhalb des Korridors ist ein Hinweis, wo man hinsehen soll, noch kein Mangel; hier hat das Hinsehen fuenf von sechs entlastet. Fuer den naechsten Satz die Kopfhoehe direkt vorgeben („the centre of the head sits at about 40 percent of the image height\").",
-   "MASSSTABSFEHLER RECHNET MAN, MAN WUERFELT IHN NICHT NACH: Wenn eine Generierung die richtige Komposition hat und nur knapp aus der Kreismaske ragt (r_max wenig ueber 1,0), ist Skalieren + Verschieben auf schwarzem Grund deterministisch, kostenlos und reproduzierbar — siehe av_smaragd. Achtung: die Verschiebung veraendert r_max mit, deshalb den Massstab per Binaersuche bestimmen und nicht mit 0,85/r_max abschaetzen."
+   "MASSSTABSFEHLER RECHNET MAN, MAN WUERFELT IHN NICHT NACH: Wenn eine Generierung die richtige Komposition hat und nur knapp aus der Kreismaske ragt (r_max wenig ueber 1,0), ist Skalieren + Verschieben auf schwarzem Grund deterministisch, kostenlos und reproduzierbar — siehe av_smaragd. Achtung: die Verschiebung veraendert r_max mit, deshalb den Massstab per Binaersuche bestimmen und nicht mit 0,85/r_max abschaetzen.",
+   "BOOSTER-PACKS (Batch 16): Bei 78 px in der Shop-Kachel entscheidet der UMRISS, nicht der Zierrat. Die vier Stufen haben deshalb vier verschiedene Silhouetten — Bronze breiter niedriger Coffer, Silber hohe schmale Spitze, Gold Kreis, Arkan Stern — und zusaetzlich vier getrennte Farbfamilien. Gemessene paarweise Unterscheidbarkeit bei 32 px (mittlerer Lab-Abstand · Formunterschied 1-IoU · Produkt dE*(0,5+Form)): Bronze/Silber 19,58 · 0,638 · 22,28 | Bronze/Gold 15,42 · 0,269 · 11,86 | Bronze/Arkan 20,37 · 0,357 · 17,47 | Silber/Gold 22,92 · 0,533 · 23,69 | Silber/Arkan 21,73 · 0,529 · 22,36 | Gold/Arkan 28,78 · 0,348 · 24,41.",
+   "BEFUND BRONZE/GOLD: Das ist das schwaechste Paar des Satzes und bleibt es. Coffer und Kugel sind bei 32 px beide kompakte, mittig sitzende Klumpen (IoU 0,73), und beide Stufen sind qualitativ warm. Der erste Bronze-Entwurf hatte einen BERNSTEIN-Stein wie Gold und kam nur auf dE 10,50 / Gesamt 7,27; ein Nachzug mit rotkupfernem Korpus und GRANAT-Stein hat das auf dE 15,42 / Gesamt 11,86 gehoben. Weiter traegt die Farbe nicht, ohne die Bronze-Lesart zu verlieren. Entschaerft wird es dadurch, dass die beiden nie nebeneinander stehen: Bronze ist aus dem 3-Spalten-Raster raus und lebt im Gratis-Band unter dem Raster.",
+   "FREISTELL-SCHWELLE MITDENKEN: `#icoFrei` im Prototyp macht alles unter rund 26 % Helligkeit durchsichtig (feFuncA-Tabelle, 0 bis 24 %, ab 28 % voll). Wer ein Pack in tiefe Schatten setzt, bekommt Loecher IM Motiv. Deshalb steht im Prompt „the underside darker but never black\" und in den Messwerten die Kennzahl „Deckung ueber der Freistell-Schwelle\": Silber und Arkan 99,1 %, Gold 78,1 %, Bronze 75,1 %. Ein Bronze-Kandidat mit 62,0 % wurde deswegen verworfen.",
+   "AURA-FALLE, zweiter Beleg: Ein Booster-Pack ist genau das Motiv, das jeder Generator in Strahlenkranz und Funkenflug huellt — der alte pack_arcane ist dafuer das Beispiel. Mit dem Verbot als eigenem Absatz im Prompt („no halo, no aura, no god rays, no bloom, no rim glow, no sparks leaving the object; the outline is a hard clean cut-out edge\") hatte KEINE der zehn Generierungen von Batch 16 einen Strahlenkranz."
   ],
   "modell": "nano_banana_pro (Higgsfield), resolution 1k, Style-Sheet als Bild-Referenz",
   "palette": {
@@ -1284,8 +1289,19 @@
   "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_115444_f75634d9-6a96-4088-ac82-dedbc931f73c.png"
  },
  "pack_arcane": {
+  "batch": 16,
+  "beschreibung": "Arkan-Pack (800 Kristalle), die Spitze. Achtzackiger Amethyst-Stern mit dicken, stumpf endenden Zacken, an der Taille von einem schmalen Goldreif gefasst, innen magenta-violette Refraktionen. Umriss: kantiger Stern (Motiv 79 % breit x 65 % hoch). Farbakzent Violett/Magenta.",
+  "herkunft": "Generierung 55344b7a (nano_banana_pro, 3:4, 1k, Batch 16). Danach deterministisch eingepasst: Massstab s=0,885, Motiv auf die Bildmitte verschoben, Hintergrund ausserhalb einer um 12 px erweiterten Motivmaske auf glattes #0e1418 gesetzt. Roh hatte der Stern nur 5,02 % Randabstand. Eigener Upload, daher d2ol7oe51mr4n9-URL wie bei av_smaragd.",
+  "job": "55344b7a-35c0-422d-b6d4-304b5ff544c1",
+  "messwerte": "Randring 2 px L 5,96 (max 5,96) · Randabstand 10,16 % · Quadratprobe 0,00 % ausserhalb · Motivanteil 17,7 % · Deckung ueber der Freistell-Schwelle 99,1 % · 78-px-Probe: Standardabweichung 44,71, Kantenenergie 5,05 · OCR 0 Zeichen · md5 der ausgelieferten URL identisch zum erzeugten PNG (0d3cc6c0d85abd1f869e1b63ce723b97)",
+  "size": "896x1200",
+  "type": "pack",
+  "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/18eee4bf-7483-4d88-8a93-af4ed3e8c6de.png"
+ },
+ "pack_arcane_alt": {
   "batch": 1,
   "beschreibung": "Arkan-Pack, violettes Obsidian-Kristall mit prismatischen Refraktionen, geschlossen, Hochformat.",
+  "hinweis": "Vorgaenger aus Batch 1 (geschlossenes Kartenpaeckchen im Zierrahmen). Ersetzt in Batch 16, weil alle vier Stufen denselben Umriss hatten — ein Hochkant-Rechteck — und sich bei 32 px nur noch ueber die Farbe unterschieden. Beim Arkan-Vorgaenger kam ein breiter Strahlenkranz dazu, der die Freistell-Maske aufblaeht (AURA-FALLE). Bleibt als Rueckfallebene liegen.",
   "job": "dad6b23f-bd87-42bb-934a-f0e05d24d4c3",
   "size": "848x1264",
   "type": "pack",
@@ -1319,24 +1335,57 @@
   "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093809_e5b4985d-37c1-4d18-b990-c2fda0c2a76a.png"
  },
  "pack_bronze": {
+  "batch": 16,
+  "beschreibung": "Bronze-Pack, das GRATIS-Tagespack. Flacher, breiter Kupfer-Coffer mit fast ebenem Deckel, dunklen Bronzebaendern und EINEM grossen facettierten Granat in der Deckelmitte. Umriss: breiter, niedriger Riegel (Motiv 76 % breit x 36 % hoch). Farbakzent Rotkupfer/Granatrot. Erscheint zweimal: 78x99 in der Shop-Kachel und 64x64 im Gratis-Band — deshalb quadratfest gebaut.",
+  "herkunft": "Generierung 6bb81c68 (nano_banana_pro, 3:4, 1k, Batch 16b). Danach deterministisch eingepasst: Massstab s=1,000 (unveraendert), Motiv auf die Bildmitte verschoben, Hintergrund ausserhalb einer um 12 px erweiterten Motivmaske auf glattes #0e1418 gesetzt. Eigener Upload, daher d2ol7oe51mr4n9-URL wie bei av_smaragd.",
+  "job": "6bb81c68-4f65-493e-93ec-1327b4b57c60",
+  "messwerte": "Randring 2 px L 5,96 (max 5,96 — gesetztes #0e1418) · Randabstand 11,94 % · Quadratprobe 0,00 % ausserhalb des mittigen Quadrats · Motivanteil 19,8 % · Deckung ueber der Freistell-Schwelle 75,1 % · 78-px-Probe: Standardabweichung 37,16, Kantenenergie 4,26 · OCR 0 Zeichen · md5 der ausgelieferten URL identisch zum erzeugten PNG (767a996fc969bdff15259cd30708a159)",
+  "size": "896x1200",
+  "type": "pack",
+  "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/0c390187-c765-4139-88dd-7ad3245ea270.png"
+ },
+ "pack_bronze_alt": {
   "batch": 1,
   "beschreibung": "Bronze-Pack, kupfern, geschlossen, Hochformat.",
+  "hinweis": "Vorgaenger aus Batch 1 (geschlossenes Kartenpaeckchen im Zierrahmen). Ersetzt in Batch 16, weil alle vier Stufen denselben Umriss hatten — ein Hochkant-Rechteck — und sich bei 32 px nur noch ueber die Farbe unterschieden. Beim Arkan-Vorgaenger kam ein breiter Strahlenkranz dazu, der die Freistell-Maske aufblaeht (AURA-FALLE). Bleibt als Rueckfallebene liegen.",
   "job": "5c0984d9-f669-49ec-82f2-81817f8eab56",
   "size": "848x1264",
   "type": "pack",
   "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095725_5c0984d9-f669-49ec-82f2-81817f8eab56.png"
  },
  "pack_gold": {
+  "batch": 16,
+  "beschreibung": "Gold-Pack (300 Kristalle). Runder Gold-Orb, am Aequator von einem breiten Filigranring gefasst, vorn EIN honigbernsteinfarbener Facettenstein mit warmem Innenlicht. Umriss: geschlossener Kreis (Motiv 67 % breit x 50 % hoch). Farbakzent Warmgold/Bernstein.",
+  "herkunft": "Generierung 1aad8233 (nano_banana_pro, 3:4, 1k, Batch 16). Danach deterministisch eingepasst: Massstab s=0,795, Motiv auf die Bildmitte verschoben, Hintergrund ausserhalb einer um 12 px erweiterten Motivmaske auf glattes #0e1418 gesetzt. Die 0,795 sind nicht die Randbedingung, sondern eine BEWUSSTE Verkleinerung: bei dem Massstab, der gerade eben 10 % Randabstand hielt (s=0,940), belegte der Orb 35,6 % der Flaeche und erschlug die anderen drei in der Reihe; bei 0,795 sind es 25,5 %. Eigener Upload, daher d2ol7oe51mr4n9-URL wie bei av_smaragd.",
+  "job": "1aad8233-ad5f-4593-8044-ccf38761949e",
+  "messwerte": "Randring 2 px L 5,96 (max 5,96) · Randabstand 16,18 % · Quadratprobe 0,00 % ausserhalb · Motivanteil 25,5 % · Deckung ueber der Freistell-Schwelle 78,1 % · 78-px-Probe: Standardabweichung 51,28, Kantenenergie 4,62 · OCR 0 Zeichen · md5 der ausgelieferten URL identisch zum erzeugten PNG (d3aef935174d66362a7165c37bdf0dfc)",
+  "size": "896x1200",
+  "type": "pack",
+  "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/9f8cf919-6372-4b16-ae3e-f2adcda3fe5f.png"
+ },
+ "pack_gold_alt": {
   "batch": 1,
   "beschreibung": "Gold-Pack, strahlendes Gold mit Bernstein-Kristall, geschlossen, Hochformat.",
+  "hinweis": "Vorgaenger aus Batch 1 (geschlossenes Kartenpaeckchen im Zierrahmen). Ersetzt in Batch 16, weil alle vier Stufen denselben Umriss hatten — ein Hochkant-Rechteck — und sich bei 32 px nur noch ueber die Farbe unterschieden. Beim Arkan-Vorgaenger kam ein breiter Strahlenkranz dazu, der die Freistell-Maske aufblaeht (AURA-FALLE). Bleibt als Rueckfallebene liegen.",
   "job": "28c01416-737f-414d-b8b6-0dd21a18e8a9",
   "size": "848x1264",
   "type": "pack",
   "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095735_28c01416-737f-414d-b8b6-0dd21a18e8a9.png"
  },
  "pack_silver": {
+  "batch": 16,
+  "beschreibung": "Silber-Pack (80 Kristalle). Schlanker, hochstehender Reliquienschrein aus poliertem Silber mit spitzem Dach, schmaler Goldkante und EINEM eisblauen Kristall hinter dem Frontschlitz. Umriss: schmale, hohe Spitze (Motiv 32 % breit x 74 % hoch). Farbakzent Silberweiss/Eisblau.",
+  "herkunft": "Generierung 27400036 (nano_banana_pro, 3:4, 1k, Batch 16). Danach deterministisch eingepasst: Massstab s=0,990, Motiv auf die Bildmitte verschoben, Hintergrund ausserhalb einer um 12 px erweiterten Motivmaske auf glattes #0e1418 gesetzt. Eigener Upload, daher d2ol7oe51mr4n9-URL wie bei av_smaragd.",
+  "job": "27400036-0918-45a6-88a1-484fd944d575",
+  "messwerte": "Randring 2 px L 5,96 (max 5,96) · Randabstand 12,67 % · Quadratprobe 0,00 % ausserhalb · Motivanteil 19,8 % · Deckung ueber der Freistell-Schwelle 99,1 % · 78-px-Probe: Standardabweichung 53,79, Kantenenergie 4,33 · OCR 0 Zeichen · md5 der ausgelieferten URL identisch zum erzeugten PNG (6a2c8e02bbca6a9ae50a33083d4dc7bf)",
+  "size": "896x1200",
+  "type": "pack",
+  "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/bb8037d7-9ee3-404e-9140-2a7faeb2dc4f.png"
+ },
+ "pack_silver_alt": {
   "batch": 1,
   "beschreibung": "Silber-Pack, poliertes Silber, geschlossen, Hochformat.",
+  "hinweis": "Vorgaenger aus Batch 1 (geschlossenes Kartenpaeckchen im Zierrahmen). Ersetzt in Batch 16, weil alle vier Stufen denselben Umriss hatten — ein Hochkant-Rechteck — und sich bei 32 px nur noch ueber die Farbe unterschieden. Beim Arkan-Vorgaenger kam ein breiter Strahlenkranz dazu, der die Freistell-Maske aufblaeht (AURA-FALLE). Bleibt als Rueckfallebene liegen.",
   "job": "a48313e3-3fb7-4156-b276-9622a9f313a6",
   "size": "848x1264",
   "type": "pack",

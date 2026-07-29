@@ -21,12 +21,13 @@ direkt — kein Server, kein Build.
 | `run_v6.js` | 281 | Clan, Ghost-Clankrieg, Spenden, Rangliste, Post |
 | `run_v7.js` | 333 | Startseite, Banner-Metrik, Pass, Guide, Profil, Avatare, Shop-Maße |
 | `run_friends.js` | 25 | Freundesliste, Anfragen, Suche |
-| `run_shop.js` | 30 | Tagesangebote, Booster-Packs, Gold, Tresor, Vorrats-Truhe |
+| `run_shop.js` | 32 | Tagesangebote, Booster-Packs, Gold, Tresor, Vorrats-Truhe |
 | `avatare.js` | 12 | Fünf zur Wahl, Helden am Besitz, Auswahl im Raster |
 | `login_kal.js` | 9 | Login-Kalender: drei pro Reihe, Tag 7 als Band |
 | `home_menue.js` | 17 | Keine doppelten Wege, Menü-Icons lesbar |
 | `splash.js` | 10 | Startbildschirm: Schriftzug, Ladebalken, Notausgang |
 | `shop_raender.js` | 20 | Randfarben: Inhalt (Kristall/Gold) und Produktfamilie (Packs) |
+| `flug.js` | 12 | Sammel-Animation — aus JEDEM Fenster, nicht nur aus dem Shop |
 | `assets_vollstaendig.py` | 3 | Jedes benutzte Asset ist verzeichnet UND gesichert |
 
 `assets_vollstaendig.py` ist die einzige Prüfung hier, die kein Playwright

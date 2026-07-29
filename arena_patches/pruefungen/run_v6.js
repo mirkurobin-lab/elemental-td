@@ -1218,7 +1218,14 @@ function step(name, ok, info) {
     cap: window.ArenaVault.vault().cap, inVault: window.ArenaVault.vault().gems,
   }));
   await page.click('#cfYes');
-  await page.waitForTimeout(400);
+  /* ⚠ 1800 statt 400 ms. Seit dem Sammel-Flug ist die Kopfleiste
+     waehrend der Animation ABSICHTLICH eingefroren: die Zahl gehoert
+     dem Flug, bis die erste Muenze landet, sonst kommt er zu spaet zu
+     seiner eigenen Nachricht. Der Wert stimmt also — er kommt nur rund
+     eine Sekunde spaeter. Die Pruefung behauptet weiterhin dasselbe
+     („die Kopfleiste zeigt den neuen Stand"), sie wartet nur, bis der
+     Effekt fertig ist, statt mitten hineinzugreifen. */
+  await page.waitForTimeout(1800);
   const afterOpen = await page.evaluate(() => ({
     gems: window.__proto.gems(), tier: window.ArenaVault.vault().tier,
     cap: window.ArenaVault.vault().cap, inVault: window.ArenaVault.vault().gems,

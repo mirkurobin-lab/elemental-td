@@ -984,6 +984,41 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
 @media (prefers-reduced-motion:reduce){.splashtitel{animation:none}
   #splashLayer,.splbar i{transition:none}}
 
+/* ==================================================================
+ * SAMMEL-FLUG
+ * ------------------------------------------------------------------
+ * Die Buehne liegt ueber allem und faengt NICHTS ab: waehrend Muenzen
+ * fliegen, muss die App bedienbar bleiben. Ein Effekt, der einen
+ * Doppeltipp verschluckt, ist schlimmer als kein Effekt.
+ * ================================================================== */
+#flugLayer{position:fixed;inset:0;z-index:290;pointer-events:none;overflow:hidden}
+.flug{position:absolute;left:0;top:0;width:22px;height:22px;
+  display:flex;align-items:center;justify-content:center;font-size:17px;line-height:1;
+  will-change:transform,opacity;
+  animation:flugbahn 620ms cubic-bezier(.35,0,.25,1) forwards}
+.flug .ico,.flug img{width:22px;height:22px;object-fit:contain;
+  filter:drop-shadow(0 2px 5px #000b)}
+/* Der Bogen als Keyframes statt als Bahnberechnung je Bild: der Browser
+   rechnet ihn auf dem Compositor, das haelt auch auf schwachen Geraeten
+   60 Bilder. Die drei Punkte kommen als CSS-Variablen aus dem Aufruf. */
+@keyframes flugbahn{
+  0%  {transform:translate3d(var(--x0),var(--y0),0) scale(.55);opacity:0}
+  14% {opacity:1;transform:translate3d(var(--x0),var(--y0),0) scale(1.15)}
+  55% {transform:translate3d(var(--xm),var(--ym),0) scale(1)}
+  100%{transform:translate3d(var(--x1),var(--y1),0) scale(.42);opacity:.15}
+}
+/* Der Treffer an der Pille: kurz, kraeftig, und er faerbt NICHT um —
+   eine Waehrung, die beim Zuwachs die Farbe wechselt, liest sich wie
+   eine Warnung. */
+.cur-treffer{animation:curtreffer 340ms var(--ease-overshoot)}
+@keyframes curtreffer{
+  0%{transform:scale(1)} 38%{transform:scale(1.17)} 100%{transform:scale(1)}
+}
+@media (prefers-reduced-motion:reduce){
+  .flug{display:none}
+  .cur-treffer{animation:none;outline:2px solid #ffffff5c;outline-offset:2px}
+}
+
 #cineLayer{position:fixed;inset:0;z-index:260;display:none;background:#000;
   align-items:center;justify-content:center;overflow:hidden}
 #cineLayer.on{display:flex;animation:cinefade 260ms ease-out}
@@ -1720,7 +1755,7 @@ span.ico{text-align:center}
  * SHOP — AA-SEKTIONSREIHENFOLGE (§8.1)
  * ------------------------------------------------------------------
  * 1 Promo-Banner · 2 Arena-/Starter-Pack · 3 Tagesangebote · 4 Packs ·
- * 5 Vorrats-Truhe (AAs Arcane Supplies Chest, §8.2) ·
+ * 5 Vorrats-Pack (AAs Arcane Supplies Chest, §8.2) ·
  * 6 Kristalltresor (AAs Roulette-Platz) · 7 Gem-Pakete · 8 Gold-Tausch
  * Alle Hoehen/Radien/Abstaende aus der Metrik (§19.2) — die Sektionen
  * unterscheiden sich in der FARBE und im Inhalt, nie in der Geometrie.
@@ -2028,7 +2063,20 @@ span.ico{text-align:center}
 .prodcard .pcqty{position:absolute;right:4px;bottom:3px;z-index:2;
   font-style:normal;font-size:10px;font-weight:900;letter-spacing:.02em;
   color:#fff;text-shadow:0 1px 0 #000,0 0 5px #000c}
-.prodcard .pcart img.prodimg{width:100%;height:100%;object-fit:contain}
+/* ⚠ `cover`, NICHT `contain`. Die Tagesangebote mischen zwei Bildarten:
+   quadratische Produkt-Icons (320x320) und Turm-Artworks im Hochformat
+   (382x512). Mit `contain` fuellten die quadratischen ihren Kasten
+   exakt, die hochformatigen nur zu 75 % — je 9 px leerer Streifen
+   links und rechts. Im Raster stehen dann sechs Kacheln, von denen
+   zwei ein kleineres Bild tragen; genau das ist „sieht nicht sauber
+   aus".
+   Bei einer 1:1-Quelle ist `cover` wirkungslos (sie fuellt ohnehin
+   exakt) — es aendert also NUR die hochformatigen und laesst die
+   uebrigen unberuehrt.
+   `object-position` auf 28 % Hoehe: der Beschnitt nimmt unten mehr weg
+   als oben, und oben steht bei einem Turm-Artwork der Kopf. */
+.prodcard .pcart img.prodimg{width:100%;height:100%;object-fit:cover;
+  object-position:center 28%}
 /* Die Gold-Produktbilder sind gemessen stumpf: Farbton 35 Grad, aber nur
    0,32-0,39 Saettigung gegen 0,58 beim Waehrungs-Icon. Bei 108 px liest
    das als graue Muenze, nicht als Gold — genau der Befund „die Gold-Icons
@@ -5219,7 +5267,7 @@ button.pfplate{cursor:pointer}
                    deshalb den Season-Pass als staerkstes Dauerangebot,
                    darunter die personalisierte Angebotskette.
          Platz 4 — AAs Truhenblock ist bei uns AUFGETEILT: die
-                   Booster-Packs (Platz 4) und die Vorrats-Truhe
+                   Booster-Packs (Platz 4) und die Vorrats-Pack
                    (Platz 5) bekommen je ein eigenes Band, weil die
                    Truhe eine ganz andere Bedienung hat (x1/x10,
                    Mitleidszeile, Chancen-Klappe) als eine Pack-Kachel.
@@ -5275,11 +5323,11 @@ button.pfplate{cursor:pointer}
     <div class="packshop" id="packShop"></div>
     <div id="packFreeBox"></div>
 
-    <!-- (5) Vorrats-Truhe — AAs „Arcane Supplies Chest" (§8.2).
+    <!-- (5) Vorrats-Pack — AAs „Arcane Supplies Chest" (§8.2).
              Sie sitzt bei AA MIT den Truhen, also direkt hinter den
              Packs, nicht am Ende des Shops. -->
     <div class="secribbon" data-sec="5" data-ribbon="ribbon_section_lg">
-      <span class="srt">Vorrats-Truhe</span>
+      <span class="srt">Vorrats-Pack</span>
       <span class="srx" id="vorratPity">—</span></div>
     <div class="vorratbox" id="vorratShop"></div>
 
@@ -6545,7 +6593,7 @@ button.pfplate{cursor:pointer}
     soc_reddit:        CDN + "hf_20260727_065758_e7cd530b-d3da-4779-bdbb-026685306791.png",
     soc_facebook:      CDN + "hf_20260727_065805_2c66e610-eaef-46c2-8d8d-ee2badf40fc0.png",
     /* ---- Batch 11: KULISSEN fuer das Arena-Pack-Karussell und die
-       Vorrats-Truhe. Alle 21:9 (1584x672), Style-Sheet-Job 22646ce4.
+       Vorrats-Pack. Alle 21:9 (1584x672), Style-Sheet-Job 22646ce4.
        ROLLE = KULISSE (§6b): background-size cover, nie 100% 100%.
        §6h gilt hier NICHT — eine Kulisse SOLL decken. Sie duerfen
        deshalb niemals class="ico" tragen; der Freistell-Filter aus §6h
@@ -7468,10 +7516,188 @@ button.pfplate{cursor:pointer}
       '<div class="dots">' + dots + "</div>" +
       '<div class="lvl">LvL ' + v.lvl + "</div></button>";
   }
+  /* ==================================================================
+   * SAMMEL-FLUG — „das Gold fliegt oben in die Anzeige"
+   * ------------------------------------------------------------------
+   * WARUM AN DEN SETTERN UND NICHT AN DEN KNOEPFEN
+   * Der Auftrag lautet: „jedes Fenster muss dies ausfuehren auch Clan
+   * usw". Man koennte die Animation an jede Abholstelle haengen — Shop,
+   * Clan-Spende, Post, Login-Kalender, Pack, Strassenknoten, Quests,
+   * Match-Ende. Das waeren ein Dutzend Aufrufstellen, und die
+   * dreizehnte, die naechste Woche dazukommt, haette sie nicht. Der
+   * Fehler waere unsichtbar: nichts stuerzt ab, es fliegt nur nichts.
+   *
+   * Deshalb haengt sie an `setGold`/`setGems`/`addMaterial`. WAECHST ein
+   * Betrag, fliegt er. Damit ist jede heutige und jede kuenftige
+   * Abholstelle abgedeckt, ohne dass jemand daran denken muss.
+   *
+   * WOHER DIE MUENZEN STARTEN
+   * Vom letzten Tipp — wie bei AA. Der Setter weiss nicht, welcher Knopf
+   * ihn ausgeloest hat, aber der Finger war gerade dort. Das ist nicht
+   * nur einfacher, es ist auch richtiger: die Belohnung kommt sichtbar
+   * aus dem, was man angefasst hat.
+   *
+   * DIE ZAHL DARF NICHT VORAUSEILEN
+   * Fliegt Gold nach oben, waehrend die Anzeige den neuen Stand schon
+   * zeigt, ist der Flug sinnlos — er kommt zu spaet zu seiner eigenen
+   * Nachricht. `HALT` friert die Anzeige auf dem ALTEN Wert ein, bis die
+   * erste Muenze landet; dann zaehlt sie hoch. renderTop respektiert das.
+   * ================================================================== */
+  var UIFlug = (function () {
+    var ZIEL = { gold: "curGold", gems: "curGems", trophies: "curTrophies" };
+    var IKO  = { gold: "cur_gold", gems: "cur_gem", trophies: "cur_trophy",
+                 material: "cur_material" };
+    var SYM  = { gold: "🪙", gems: "💚", trophies: "🏆", material: "⚗" };
+    var HALT = {};                 // art -> eingefrorener Anzeigewert
+    var tipp = null;
+    document.addEventListener("pointerdown", function (e) {
+      tipp = { x: e.clientX, y: e.clientY };
+    }, true);
+
+    function sparsam() {
+      return window.matchMedia &&
+             window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    }
+    function buehne() {
+      var b = $("flugLayer");
+      if (!b) {
+        b = document.createElement("div");
+        b.id = "flugLayer";
+        document.body.appendChild(b);
+      }
+      return b;
+    }
+    /* Wie viele Muenzen? Nicht so viele wie Einheiten — 5 000 Gold waeren
+       5 000 Sprites. Die Menge sagt nichts ueber die Anzahl, sie sagt
+       etwas ueber das GEWICHT: mehr Beute, mehr Muenzen, gedeckelt. */
+    function anzahl(betrag) {
+      return Math.max(3, Math.min(11, Math.round(Math.log10(Math.max(1, betrag)) * 3) + 2));
+    }
+    function zaehlHoch(el, von, bis, ms) {
+      var t0 = null;
+      function schritt(t) {
+        if (t0 === null) t0 = t;
+        var f = Math.min(1, (t - t0) / ms);
+        el.textContent = fmt(Math.round(von + (bis - von) * (1 - Math.pow(1 - f, 3))));
+        if (f < 1) requestAnimationFrame(schritt);
+      }
+      requestAnimationFrame(schritt);
+    }
+
+    /* `zielEl` ueberschreibt das Standardziel. Material hat keine Pille
+       in der Kopfleiste — seine Zahl steht im Sammlungs-Kopf, und dorthin
+       muss der Flug gehen, sonst fliegt er ins Leere. */
+    function flug(art, betrag, vonPunkt, zielEl) {
+      var zielId = ZIEL[art];
+      var ziel = zielEl || (zielId && $(zielId));
+      var pille = ziel && (ziel.closest(".cur") || ziel);
+      if (!ziel || !pille || !pille.getBoundingClientRect().width) return;
+      var zr = pille.getBoundingClientRect();
+      var zx = zr.left + zr.width / 2, zy = zr.top + zr.height / 2;
+      var von = vonPunkt || tipp || { x: zx, y: zy + 220 };
+      /* Nur die drei Kopfleisten-Waehrungen zaehlen hoch; Material hat
+         dort keine eigene Anzeige, es fliegt nur. */
+      var zaehlt = !!ZIEL[art] && !zielEl;
+      var neu = art === "gold" ? gold() : art === "gems" ? gems() : DEMO_TROPHIES;
+      var alt = neu - betrag;
+
+      if (sparsam()) {                             // Bewegung abbestellt
+        pille.classList.add("cur-treffer");
+        setTimeout(function () { pille.classList.remove("cur-treffer"); }, 320);
+        return;
+      }
+      if (zaehlt) { HALT[art] = alt; ziel.textContent = fmt(alt); }
+
+      var b = buehne(), n = anzahl(betrag), gelandet = 0;
+      for (var i = 0; i < n; i++) {
+        (function (i) {
+          var s = document.createElement("i");
+          s.className = "flug";
+          s.innerHTML = ico(IKO[art], SYM[art] || "✦");
+          /* Streuung am Start, damit die Muenzen nicht als Kette
+             abfliegen, sondern als Haufchen aufplatzen. */
+          var sx = von.x + (Math.random() - 0.5) * 46;
+          var sy = von.y + (Math.random() - 0.5) * 34;
+          /* Der Bogen: erst nach aussen/unten, dann zum Ziel. Zwei
+             Zwischenpunkte reichen fuer die Wahrnehmung einer Kurve. */
+          s.style.setProperty("--x0", sx + "px");
+          s.style.setProperty("--y0", sy + "px");
+          s.style.setProperty("--xm", (sx + (zx - sx) * 0.28 + (Math.random() - 0.5) * 60) + "px");
+          s.style.setProperty("--ym", (sy - 60 - Math.random() * 70) + "px");
+          s.style.setProperty("--x1", zx + "px");
+          s.style.setProperty("--y1", zy + "px");
+          s.style.animationDelay = (i * 42) + "ms";
+          b.appendChild(s);
+          s.addEventListener("animationend", function () {
+            s.remove();
+            if (++gelandet === 1) {                // die ERSTE Muenze zaehlt an
+              pille.classList.add("cur-treffer");
+              setTimeout(function () { pille.classList.remove("cur-treffer"); }, 340);
+              if (zaehlt) { delete HALT[art]; zaehlHoch(ziel, alt, neu, 40 * n + 260); }
+              if (window.UISfx && UISfx.reward) UISfx.reward();
+            }
+          });
+        })(i);
+      }
+    }
+    return {
+      flug: flug,
+      halt: function (art) { return HALT[art]; },
+      /* Fuer Stellen, die einen bestimmten Startpunkt wollen (z. B. eine
+         Truhe in der Bildschirmmitte statt des Fingers). */
+      vonElement: function (el) {
+        if (!el) return null;
+        var r = el.getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+      },
+    };
+  })();
+
+  /* Die Setter fliegen jetzt. `setGold`/`setGems` sind
+     Funktionsdeklarationen — die Bindung laesst sich neu belegen, und
+     JEDE bestehende Aufrufstelle bekommt damit die neue Fassung, ohne
+     dass eine davon angefasst werden muss. */
+  var _setGold = setGold, _setGems = setGems;
+  setGold = function (v) {
+    var vor = gold(); _setGold(v);
+    var d = gold() - vor;
+    if (d > 0) UIFlug.flug("gold", d);
+  };
+  setGems = function (v) {
+    var vor = gems(); _setGems(v);
+    var d = gems() - vor;
+    if (d > 0) UIFlug.flug("gems", d);
+  };
+  (function () {
+    if (!AC || typeof AC.addMaterial !== "function") return;
+    var _add = AC.addMaterial;
+    AC.addMaterial = function (menge, sorte) {
+      var r = _add.apply(AC, arguments);
+      /* Material hat keine eigene Pille in der Kopfleiste — es steht im
+         Sammlungs-Kopf. Der Flug geht deshalb dorthin, wo die Zahl
+         wirklich steht, sonst fliegt er ins Leere. */
+      var el = $("matCount");
+      if (menge > 0 && el && el.offsetParent) {
+        var r2 = el.getBoundingClientRect();
+        UIFlug.flug("material", menge, null, el);
+      }
+      return r;
+    };
+  })();
+
   function renderTop() {
     $("curTrophies").textContent = fmt(DEMO_TROPHIES);
     $("curGems").textContent = fmt(gems());
     $("curGold").textContent = fmt(gold());
+    /* Waehrend ein Flug laeuft, gehoert die Zahl dem Flug. Ohne das
+       ueberschreibt der naechste Render-Durchgang den eingefrorenen
+       Wert und der Flug landet auf einer Zahl, die schon stimmt. */
+    ["gold", "gems", "trophies"].forEach(function (art) {
+      var h = UIFlug.halt(art);
+      if (h !== undefined) {
+        $({ gold: "curGold", gems: "curGems", trophies: "curTrophies" }[art]).textContent = fmt(h);
+      }
+    });
     // Material-Vorrat je Sorte (§7.1: AA führt jede Sorte getrennt)
     var bank = AC.getMaterials();
     var MATICO = { attack: "ess_attack", speed: "ess_speed", special: "ess_special" };
@@ -8961,7 +9187,7 @@ button.pfplate{cursor:pointer}
       "Starter-Pack und die Gem-Pakete zeigen Preise in Fr. wie AAs Store, lösen aber " +
       "keinen Kauf aus — der Gold-Tausch unten läuft dagegen echt gegen die Demo-Wallet.";
     $("shopNote").innerHTML = "Sektionsreihenfolge nach AA (§8.1): Promo · Arena-Pack · " +
-      "Tagesangebote · Packs · Vorrats-Truhe · Kristalltresor · Gems · Gold. Die " +
+      "Tagesangebote · Packs · Vorrats-Pack · Kristalltresor · Gems · Gold. Die " +
       "Tagesangebote werden deterministisch aus dem Datum gezogen (FNV-1a wie in " +
       "arena_daily.js) und wechseln um 00:00 UTC. Alle Preise und Stückzahlen " +
       "skalieren im echten Spiel mit dem Fortschritt (§8.4).";
@@ -9335,9 +9561,9 @@ button.pfplate{cursor:pointer}
            in ASSETS steht, liefert ico() sauber das Emoji — die Kachel
            ist vollstaendig lesbar, nur eben ohne Grafik. Bewusst KEIN
            Ersatz-Schluessel aus einer anderen Rolle: ein Bronze-Truhen-
-           bild auf der Vorrats-Truhe waere eine Falschaussage. */
+           bild auf der Vorrats-Pack waere eine Falschaussage. */
         '<span class="bandart">' + ico("pack_vorrat_icon", "📦") + "</span>" +
-        '<span class="bandtx"><span class="vrnm">Vorrats-Truhe</span>' +
+        '<span class="bandtx"><span class="vrnm">Vorrats-Pack</span>' +
           '<span class="vrpr">' + pk.promise + " · " + pk.cardSlots + " Karten, " +
             pk.materialSlots + " Essenz-Posten und Gold je Öffnung.</span></span></div>" +
       /* Mitleidszeile — AAs „Get Legendary in N opens", offen und ohne
@@ -9442,7 +9668,7 @@ button.pfplate{cursor:pointer}
     var matZ = AC.MATERIALS.filter(function (m) { return mat[m.key]; })
       .map(function (m) { return "<b>+" + mat[m.key] + "</b> " + m.sym + " " + m.name; })
       .join(" · ");
-    askConfirm("Vorrats-Truhe ×" + n + " geöffnet",
+    askConfirm("Vorrats-Pack ×" + n + " geöffnet",
       "<b>Karten</b><br>" + (kartenZ || "—") + "<br><br>" +
       "<b>Essenz</b><br>" + (matZ || "—") + "<br><br>" +
       "<b>+" + fmt(goldSum) + " Gold</b>" +
