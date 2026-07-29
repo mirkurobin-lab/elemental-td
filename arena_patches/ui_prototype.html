@@ -450,6 +450,52 @@ select.sel option{background:var(--panel);color:var(--txt)}
 .esscell .essz{font-size:12px;font-weight:900;line-height:1}
 .esscell.leer{opacity:.45}
 .esscell.eigen{border-color:var(--gold);background:#f2a13d1a}
+/* ---------- Joker-Vorrat (Schmiede, 29.07.2026) ----------
+   BAUGLEICH mit dem Essenz-Fach darueber: dieselbe Kachel (.esscell),
+   dieselben Masse, dieselbe Regel fuer den Bestand 0 (abgeblendet, nicht
+   ausgeblendet — eine Stufe, die verschwindet, sieht aus, als gaebe es
+   sie nicht, statt als haette man keine). Eine zweite Bauart fuer
+   dieselbe Aussage „wovon habe ich wie viel" haette den Prototyp in zwei
+   Handschriften geteilt.
+   FUENF Spalten statt vier: Joker gibt es fuer fuenf Stufen — Suprem ist
+   Endstufe und hat keinen (arena_cards.js, JOKER_TIER_KEYS). */
+.jokerleiste{margin:0 0 10px}
+.jokerbank{grid-template-columns:repeat(5,1fr);margin:0}
+.jokerkopf{display:flex;align-items:center;gap:6px;margin:0 2px 5px;
+  font-size:9px;font-weight:800;letter-spacing:.06em;color:var(--dim);text-transform:uppercase}
+.jokerkopf .jkzahl{color:var(--txt);font-weight:900;font-size:11px}
+.jokerkopf .jkhint{font-size:8.5px;font-weight:700;text-transform:none;letter-spacing:0}
+/* Die Joker-Kachel ist im Gegensatz zur Essenz-Kachel ein BEDIENELEMENT
+   (sie oeffnet das Gegenstands-Fenster) — deshalb Zeiger und Fokusring.
+   Der Stufenname traegt hier die Stufenfarbe, weil die Stufe die einzige
+   Unterscheidung zwischen fuenf sonst identischen Kacheln ist. */
+.esscell.jokercell{cursor:pointer}
+.esscell.jokercell .essn{font-weight:800}
+/* Die Emoji-Rueckfallebene ist bei .ico nur 26x26 gross, erbt aber die
+   Schriftgroesse des Blattes — ohne diese Zeile stuende ein 13-px-Emoji
+   in einem 26-px-Kasten. Bei geliefertem Bild greift sie nicht (img). */
+.esscell.jokercell span.ico{font-size:19px;line-height:26px}
+/* ---------- Joker im Anforderungsfeld ----------
+   EIGENE Rahmenfarbe, nicht die der Stufe: im Anforderungsfeld muss auf
+   einen Blick unterscheidbar bleiben, was echte Kopie ist und was
+   Platzhalter. Violett ist im Prototyp sonst nirgends Kartenrahmenfarbe,
+   kollidiert also mit keiner Raritaet. */
+.reqslot.joker{border-style:solid;border-color:#8b6ce8;color:#d8ccff;
+  background:linear-gradient(160deg,#3a2a6e66,#141024 70%)}
+.reqslot.joker .jkemo{font-size:30px;line-height:1;filter:drop-shadow(0 2px 4px #000)}
+.reqslot.joker .jklbl{position:absolute;left:0;right:0;bottom:0;background:#000a;
+  font-size:8px;font-weight:900;letter-spacing:.06em;text-align:center;padding:1px 0}
+/* Joker-Umschalter. VORGABE AUS, und zwar erzwungen durch `display:none`
+   im Grundzustand: die Zeile erscheint ueberhaupt erst, wenn ein Joker
+   die Luecke schliessen KANN. Ein Joker, der ungefragt verbraucht wird,
+   ist ein Vertrauensbruch — deshalb ist das hier kein Automatismus,
+   sondern eine Zeile, die man antippen muss. */
+.jokerschalter{display:none;align-items:center;gap:8px;width:100%;margin-top:9px;
+  padding:7px 9px;border-radius:10px;text-align:left;font:inherit;cursor:pointer;
+  background:#1a1330;border:1px solid #6d4fd633;color:#e6dcff}
+.jokerschalter.an{display:flex}
+.jokerschalter .jstxt{flex:1;min-width:0;font-size:11px;font-weight:800;line-height:1.35}
+.jokerschalter .jshint{display:block;font-size:9px;font-weight:700;color:#a89bd0;margin-top:2px}
 .forgebtn{background:linear-gradient(180deg,#f2a13d,#c9762a);color:#231402;font-weight:900;
   font-size:12px;padding:7px 12px;border-radius:9px;letter-spacing:.05em}
 
@@ -2118,6 +2164,77 @@ span.ico{text-align:center}
 .oddsbox .oddsclose{margin-top:12px;width:100%;min-height:38px;border-radius:10px;
   font-weight:900;font-size:12.5px;background:linear-gradient(180deg,#2c3d4d,#1a2530);
   color:#dbe6ef;border:1px solid #ffffff24}
+
+/* ==================================================================
+ * GEGENSTANDS-FENSTER „WOHER / WOFUER" (AA_UI_REFERENZ §22.3)
+ * ------------------------------------------------------------------
+ * AA erklaert jeden Gegenstand an Ort und Stelle: woher bekomme ich ihn
+ * und wofuer ist er. Diese Fassung ist deshalb bewusst
+ * GEGENSTANDSFREI — im Blatt steht nichts ueber Joker. Essenzen und
+ * Spells sollen dasselbe Fenster benutzen; sonst stehen hier in einem
+ * halben Jahr drei Fenster, die dieselbe Auskunft in drei
+ * Handschriften geben (genau der Befund, der beim Essenz-Fach schon
+ * einmal aufgeraeumt werden musste).
+ * ================================================================== */
+#itemLayer{position:fixed;inset:0;z-index:288;display:none;
+  background:#04070ac2;align-items:center;justify-content:center;padding:18px}
+#itemLayer.open{display:flex}
+.itempop{width:100%;max-width:352px;animation:offerpop .34s cubic-bezier(.2,1.4,.4,1)}
+/* Das Band liegt mit seiner MITTE auf der Blattoberkante — 22 px sind
+   die halbe Bandhoehe (.secribbon min-height 44px) — und ist an beiden
+   Seiten 14 px BREITER als das Blatt. Genau daraus entsteht der Befund
+   aus §22.3: „die Bandenden ragen links und rechts ueber den Rahmen
+   hinaus". Ohne den Ueberstand liegt das Band buendig und liest sich
+   als Kopfzeile statt als Band. */
+.itemsheet{position:relative;margin-top:22px;border-radius:16px;padding:34px 12px 12px;
+  background:linear-gradient(180deg,#2b3d55,#1b2735 60%,#131c26);
+  border:1px solid var(--line);
+  box-shadow:var(--mat-raised-lg),0 24px 60px -20px #000}
+.itemband{position:absolute;left:-14px;right:-14px;top:-22px;z-index:2}
+.itemband .secribbon{margin:0;width:100%}
+/* RUND und ueberlappend AUSSERHALB der oberen Rahmenkante — AAs
+   X-Marke. Nicht innen: innen frisst der Knopf genau die Ecke, in der
+   bei einem laengeren Namen noch Bandtext steht. */
+.itemclose{position:absolute;right:-8px;top:-16px;z-index:4;
+  width:32px;height:32px;border-radius:50%;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:900;color:#fff;text-shadow:0 1px 2px #0009;
+  border:1px solid #ffffff30;
+  /* Dieselbe Ruecknahme der obersten Verlaufsstufe wie bei .rwclose:
+     #ff6a72 waeren am obersten Bildpunkt 2,78:1 und damit heller als
+     jeder andere Schliessknopf im Prototyp. */
+  background:linear-gradient(180deg,#e85a63,#c4222f 60%,#8c1620);
+  box-shadow:var(--mat-raised),0 6px 14px -6px #000}
+.itemtop{display:grid;grid-template-columns:102px 1fr;gap:10px}
+/* EINGESENKTE Flaeche (§22.3): der Schatten geht nach INNEN, damit das
+   Artwork in einer Mulde liegt statt auf einer Platte. 3:4 ist das
+   Kartenverhaeltnis des ganzen Prototyps (.tile, .reqslot). */
+.itemart{position:relative;aspect-ratio:3/4;border-radius:12px;overflow:hidden;
+  background:#0d151c;border:1px solid #ffffff14;
+  box-shadow:inset 0 3px 10px #000a,inset 0 -1px 0 #ffffff10;
+  display:flex;align-items:center;justify-content:center}
+/* Das Artwork kommt als .artbox herein — derselbe Baustein wie in jeder
+   Kachel, damit die Emoji-Rueckfallebene ohne Sonderweg funktioniert.
+   Nur die Platte darunter wird zurueckgenommen: sie wuerde genau den
+   eingesenkten Schatten zudecken, der die Mulde ausmacht. */
+.itemart .artbox{inset:7px;background:none;border-radius:9px}
+.itemart .cartemo{font-size:46px;filter:drop-shadow(0 2px 5px #000)}
+/* Menge unten rechts IM Artwork — AA schreibt „x1" in die Mulde, nicht
+   darunter. Unten rechts, weil das Artwork oben links am dichtesten ist. */
+.itemmenge{position:absolute;right:5px;bottom:5px;background:#000b;border-radius:7px;
+  font-size:11px;font-weight:900;padding:1px 6px}
+.itembox{background:#16202c;border:1px solid #ffffff12;border-radius:10px;padding:7px 8px}
+.itemwofuer{margin-top:10px}
+.itembt{margin-bottom:4px;font-size:9px;font-weight:900;letter-spacing:.1em;
+  color:var(--dim);text-transform:uppercase}
+.itemlist{list-style:none;margin:0;padding:0;font-size:10.5px;line-height:1.5;color:#c7d5e1}
+.itemlist li{position:relative;padding-left:10px}
+.itemlist li::before{content:"•";position:absolute;left:0;color:var(--gold)}
+/* EIGENER Bildlauf im WOHER-Kasten (§22.3 zeigt dort eine eigene
+   Bildlaufleiste). 76 px sind vier Zeilen: die Quellenliste waechst mit
+   jedem neuen Event, und das Fenster darf davon nicht laenger werden —
+   sonst wandert der WOFUER-Kasten aus dem Bild. */
+.itemwoher .itemlist{max-height:76px;overflow-y:auto;overscroll-behavior:contain}
 .packshop{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap)}
 .packshop .shopcard .sart{font-size:30px}
 /* ⚠ DIE PREISKNOEPFE MUESSEN AUF EINER LINIE SITZEN, EGAL WIE LANG DER
@@ -6472,6 +6589,18 @@ button.pfplate{cursor:pointer}
            MAX LEVEL alt → neu plus zwei Stat-Vorschauen ein und verlangt
            KEIN Gold. Beides ist hier nachgebaut. -->
       <div class="mergepreview" id="mergePreview"></div>
+      <!-- Joker-Umschalter. Steht ZWISCHEN Vorschau und Knopf, weil er
+           genau dazwischen gehoert: die Vorschau sagt, was entsteht,
+           dieser Schalter sagt, WOMIT es bezahlt wird, und erst danach
+           kommt der Knopf, der es ausloest.
+           Ein <button> ist hier erlaubt — .reqpanel ist ein <div>, kein
+           Bedienelement. Das Schaltbild darin ist ein <span>, nicht der
+           <button class="swch"> aus den Einstellungen: ein Knopf im
+           Knopf hat hier schon einmal die halbe Karte zerlegt. -->
+      <button class="jokerschalter" id="jokerToggle" aria-pressed="false">
+        <span class="swch off" id="jokerSw" aria-hidden="true"><i></i></span>
+        <span class="jstxt" id="jokerToggleTxt"></span>
+      </button>
       <div class="forgeactions">
         <button class="btn ghost" id="btnClearReq" style="flex:1">Leeren</button>
         <button class="btn up" id="btnMerge" style="flex:1.4" disabled>VERSCHMELZEN</button>
@@ -6484,6 +6613,19 @@ button.pfplate{cursor:pointer}
       </select>
       <span class="spacer"></span>
       <button class="forgebtn" id="btnMergeAll">ALLE VERSCHMELZEN</button>
+    </div>
+    <!-- Joker-Vorrat. Steht UEBER dem Raster, weil er zur Frage „was
+         kann ich hier verschmelzen" gehoert und nicht zur Antwort
+         darunter. Aufbau und Masse sind die des Essenz-Fachs in der
+         Sammlung (.essbank/.esscell) — dasselbe Bauteil fuer dieselbe
+         Aussage. Anders als dort ist er IMMER offen: er hat nur fuenf
+         Kacheln und traegt keine Zeile, die er sonst sprengen wuerde. -->
+    <div class="jokerleiste" id="jokerLeiste">
+      <div class="jokerkopf">Joker-Vorrat
+        <span class="jkzahl" id="jokerTotal">0</span>
+        <span class="spacer"></span>
+        <span class="jkhint">Kachel antippen für Details</span></div>
+      <div class="essbank jokerbank" id="jokerBank"></div>
     </div>
     <div class="grid" id="forgeGrid"></div>
     <div class="hint">Tippe drei <b>identische</b> Karten derselben Stufe an. Der Merge hebt
@@ -6783,6 +6925,39 @@ button.pfplate{cursor:pointer}
 <div id="oddsLayer" aria-hidden="true">
   <div class="oddsbox" id="oddsBox" role="dialog" aria-modal="true"></div>
 </div>
+
+<!-- ===== GEGENSTANDS-FENSTER „WOHER / WOFUER" (AA_UI_REFERENZ §22.3) =====
+     EIN Fenster fuer JEDEN Gegenstand — geoeffnet wird es ueber
+     openItemInfo({...}). Im Markup steht deshalb nur die Fassung; Name,
+     Artwork, Menge und beide Listen kommen vom Aufrufer. Heute ruft nur
+     die Joker-Vorratsleiste hier an, morgen sollen es Essenzen und
+     Spells sein — und das geht nur, wenn hier nichts ueber Joker steht.
+     Der Schliesser ist ein <span role="button">: er liegt ueber der
+     Blattkante, und ein <button> dort haette denselben Verschachtelungs-
+     Aerger erzeugt wie in den Kartenkacheln. -->
+<div id="itemLayer" aria-hidden="true">
+  <div class="itempop">
+    <!-- aria-label statt aria-labelledby: die Bandueberschrift kommt aus
+         secribbon(), und die Fabrik vergibt keine IDs. Den Namen kennt
+         openItemInfo() ohnehin — er wird dort gesetzt. -->
+    <div class="itemsheet" id="itemSheet" role="dialog" aria-modal="true">
+      <div class="itemband" id="itemBand"></div>
+      <span class="itemclose pressable" id="itemClose" role="button" tabindex="0"
+        aria-label="Fenster schließen">✕</span>
+      <div class="itemtop">
+        <div class="itemart" id="itemArt"><span class="itemmenge" id="itemMenge"></span></div>
+        <div class="itembox itemwoher">
+          <div class="itembt">Woher</div>
+          <ul class="itemlist" id="itemWoher"></ul>
+        </div>
+      </div>
+      <div class="itembox itemwofuer">
+        <div class="itembt">Wofür</div>
+        <ul class="itemlist" id="itemWofuer"></ul>
+      </div>
+    </div>
+  </div>
+</div>
 <div id="fxLayer"></div>
 
 <!-- ===== Angebots-Popup =====
@@ -7033,6 +7208,13 @@ button.pfplate{cursor:pointer}
     pack_silver:    CDN + "hf_20260729_092101_d6ef132d-fde6-42d1-bbb7-302de9e539c3.png",
     pack_gold:      CDN + "hf_20260729_093315_d77a6d22-bcbc-4537-94ea-6e6db18c43bb.png",
     pack_arcane:    CDN + "hf_20260729_093329_69f8ec73-4817-40c1-89db-a001793e19db.png",
+    /* JOKER-Platzhalterkarte (Batch 12, 29.07.2026) — derselbe Aufbau
+       wie jedes andere Kartenbild, damit die Emoji-Rueckfallebene 🃏
+       ueber cardArtHTML()/ico() ohne Sonderweg greift (§6). Das ist im
+       Moment keine Theorie: das CDN ist aus dieser Umgebung nicht
+       erreichbar, sichtbar ist also das Emoji — und genau so muss es
+       auch aussehen, wenn es beim Spieler einmal ausfaellt. */
+    card_joker:     CDN + "hf_20260729_140512_e1befded-a35c-4bdf-8e6e-acc068759882.png",
     progress_frame: CDN + "hf_20260725_095742_a6bc63f3-733e-416b-b018-8358ca597e98.png",
     arena1:         CDN + "hf_20260725_095747_28a90d71-c3ab-4911-afd5-969483bfa22c.png",
     arena2:         CDN + "hf_20260725_095757_8ddd3202-0a7c-4f43-82a7-1d9d6a06d038.png",
@@ -8312,6 +8494,10 @@ button.pfplate{cursor:pointer}
 
   /* ================= Demo-Seed ================= */
   var SEED_KEY = "arenaUiProtoSeed";
+  /* Der Demo-Joker-Vorrat als Funktion, nicht als Objekt: seed() und der
+     Nachtrag unten schreiben beide daraus, und ein geteiltes Objekt
+     waere ein Stand, den zwei Stellen versehentlich weiterreichen. */
+  function JOKER_DEMO() { return { common: 4, good: 2, rare: 1, epic: 0, legendary: 0 }; }
   function seed() {
     /* State v4: jede KARTE hat ihre eigene Essenz. Die Zahlen sind
        bewusst ungleich — ein Demo-Stand, in dem alle acht Vorraete gleich
@@ -8322,6 +8508,16 @@ button.pfplate{cursor:pointer}
                materials: { fire: 19, water: 14, nature: 11, earth: 8,
                             light: 12, darkness: 5, solara: 3, magmor: 2 },
                matRR: 0, gold: null,
+               /* Joker-Demobestand. Ungleich verteilt, aus demselben
+                  Grund wie bei den Essenzen: ueberall dieselbe Zahl
+                  sieht aus wie ein Platzhalter. Die Verteilung ist
+                  ausserdem so gewaehlt, dass die Schmiede BEIDE Faelle
+                  zeigt, ohne dass man erst etwas tun muss —
+                  magmor/gewoehnlich (1 Kopie) braucht 2 Joker,
+                  water/gut und solara/gut (je 2 Kopien) brauchen 1 —
+                  und dazu zwei leere Stufen, damit auch der abgeblendete
+                  Zustand einmal zu sehen ist. */
+               jokers: JOKER_DEMO(),
                pityEpic: 6, pityLegendary: 21, packsOpened: 12 };
     function mk(tier, lvl, copies, boni) {
       var c = { tier: tier, lvl: lvl, copies: {}, mergeBoni: boni || [], pendingBoni: [] };
@@ -8360,6 +8556,25 @@ button.pfplate{cursor:pointer}
     localStorage.setItem(SEED_KEY, "1");
   }
   if (!localStorage.getItem(SEED_KEY)) seed();
+  /* Joker-NACHTRAG. seed() laeuft nur beim allerersten Start — wer den
+     Prototyp schon einmal offen hatte, saehe vom Joker sonst nur fuenf
+     leere Kacheln und haette keine Moeglichkeit, das Feature zu
+     beurteilen. Den SEED_KEY zu erhoehen waere der grobe Weg: er wuerde
+     auch Gold, Festung und alle Kartenstaende zuruecksetzen, also genau
+     die Dinge, die mit Jokern nichts zu tun haben. Deshalb ein eigener
+     Schluessel, der GENAU EINMAL nachbucht — und nur, wenn der Vorrat
+     tatsaechlich leer ist. Wer schon Joker hat, merkt davon nichts. */
+  var JOKER_SEED_KEY = "arenaUiProtoJoker";
+  if (!localStorage.getItem(JOKER_SEED_KEY)) {
+    try {
+      if (!(jokerVorrat().total | 0)) {
+        var jst = AC.get();
+        jst.jokers = JOKER_DEMO();
+        AC._write(jst);
+      }
+      localStorage.setItem(JOKER_SEED_KEY, "1");
+    } catch (e) {}
+  }
 
   /* ================= Helfer ================= */
   var $ = function (id) { return document.getElementById(id); };
@@ -8806,8 +9021,200 @@ button.pfplate{cursor:pointer}
     renderDetail();
   }
 
+  /* ==================================================================
+   * GEGENSTANDS-FENSTER — openItemInfo({...})   (AA_UI_REFERENZ §22.3)
+   * ------------------------------------------------------------------
+   * AA erklaert jeden Gegenstand an Ort und Stelle: WOHER bekomme ich
+   * ihn, WOFUER ist er. Diese Funktion kennt deshalb keinen einzigen
+   * Gegenstand — sie bekommt Name, Artwork, Menge und die beiden Listen
+   * uebergeben. Heute ruft nur die Joker-Vorratsleiste an; Essenzen und
+   * Spells sollen dasselbe Fenster benutzen, und das geht nur, wenn hier
+   * nichts ueber Joker steht.
+   *
+   * o = { titel, art (HTML), menge, woher:[…], wofuer:[…] }
+   * `menge` darf null sein — dann faellt die Mengen-Marke weg (nicht
+   * jeder Gegenstand ist zaehlbar; ein Spell zum Beispiel).
+   * ================================================================== */
+  function openItemInfo(o) {
+    o = o || {};
+    var lay = $("itemLayer"); if (!lay) return;
+    var titel = o.titel || "Gegenstand";
+    $("itemBand").innerHTML = secribbon(titel);
+    hydrateRibbons($("itemBand"));
+    $("itemSheet").setAttribute("aria-label", titel);
+    /* Die Mengen-Marke liegt absolut IN der Mulde und bleibt deshalb im
+       Markup stehen; ersetzt wird nur das Artwork davor. Sie jedes Mal
+       mitzubauen hiesse, ihre Position an zwei Stellen zu pflegen. */
+    var art = $("itemArt"), menge = $("itemMenge");
+    Array.prototype.slice.call(art.children).forEach(function (el) {
+      if (el !== menge) el.parentNode.removeChild(el);
+    });
+    art.insertAdjacentHTML("afterbegin", o.art || '<span class="artbox"></span>');
+    hydrateFrames(art);
+    var hatMenge = (o.menge !== null && o.menge !== undefined);
+    menge.style.display = hatMenge ? "" : "none";
+    menge.textContent = hatMenge ? "×" + fmt(o.menge | 0) : "";
+    function liste(el, arr) {
+      /* „—" statt eines leeren Kastens: ein Kasten ohne Inhalt liest
+         sich wie ein Ladefehler, ein Strich wie „hier gibt es nichts". */
+      el.innerHTML = (arr && arr.length ? arr : ["—"]).map(function (z) {
+        return "<li>" + z + "</li>";
+      }).join("");
+    }
+    liste($("itemWoher"), o.woher);
+    liste($("itemWofuer"), o.wofuer);
+    lay.classList.add("open");
+    lay.setAttribute("aria-hidden", "false");
+    markPressable(lay);
+  }
+  function closeItemInfo() {
+    var lay = $("itemLayer"); if (!lay) return;
+    lay.classList.remove("open");
+    lay.setAttribute("aria-hidden", "true");
+  }
+
+  /* ==================================================================
+   * JOKER — Bruecke zur Logik in arena_cards.js
+   * ------------------------------------------------------------------
+   * Ein Joker der Stufe X ersetzt beim Verschmelzen EINE fehlende Kopie
+   * dieser Stufe. Hoechstens JOKER_MAX = 2 je Verschmelzung, es muss
+   * also immer mindestens eine echte Kopie dabei sein — sonst gaebe es
+   * kein Ziel, aus dem die neue Karte entsteht.
+   *
+   * Jeder Durchgriff auf die Kartenlogik steht hier und NUR hier, und
+   * jeder ist mit `typeof … === "function"` abgesichert: die Logik
+   * entsteht parallel zu dieser Oberflaeche, und eine Seite, die beim
+   * Laden an einer noch fehlenden Funktion zerbricht, nimmt einem genau
+   * die Moeglichkeit, alles andere zu pruefen.
+   * Gelesen wird BEI JEDEM AUFRUF, nicht einmal beim Start eingefroren —
+   * sonst haengt der Prototyp an dem Stand fest, den arena_cards.js
+   * zufaellig im Moment des Ladens hatte.
+   * ================================================================== */
+  function jokerMax() { return (AC.JOKER_MAX | 0) || 2; }
+  function jokerTiers() {
+    // Ohne Suprem: Endstufe, es gibt nichts, wozu man sie verschmelzen koennte.
+    return AC.JOKER_TIER_KEYS || AC.TIER_KEYS.slice(0, AC.TIER_KEYS.length - 1);
+  }
+  function jokerVorrat() {
+    if (typeof AC.getJokers === "function") return AC.getJokers();
+    var o = { total: 0 };
+    jokerTiers().forEach(function (k) { o[k] = 0; });
+    return o;
+  }
+  /* jokerArt(rahmen) — Joker-Bild im GENAU SELBEN Aufbau wie jede Karte
+     (cardArtHTML): das Emoji liegt unten, das Bild darueber, onerror
+     blendet das Bild aus und legt damit das Emoji frei — dieselbe
+     Rueckfallebene wie ueberall sonst, kein zweiter Weg daneben (§6).
+     Der `u`-Zweig bleibt trotz gelieferter URL stehen: er ist der
+     Zustand, in dem der Schluessel wieder einmal leer ist (neue Fassung
+     in Arbeit), und ohne ihn stuende dann ein <img src=""> im DOM. */
+  function jokerArt(rahmen) {
+    var u = ASSETS.card_joker;
+    return '<span class="artbox jokerbox"><span class="cartemo">🃏</span>' +
+      (u ? '<img class="cart" src="' + u + '" alt="🃏" loading="lazy" ' +
+           'decoding="async" onerror="UIIcon.hide(this)">' : "") + "</span>" +
+      (rahmen ? '<span class="frm" data-frame="frame_' + rahmen + '"></span>' : "");
+  }
+  /* Die Quellen stehen als Daten da, nicht als Satz im Renderer: das
+     Gegenstands-Fenster soll sie spaeter fuer JEDEN Gegenstand aus
+     dessen eigener Liste ziehen. */
+  var JOKER_QUELLEN = ["Arena-Truhen", "Arena-Belohnungen", "Events"];
+  function jokerName(tierKey) { return tierOf(tierKey).name + "-Joker"; }
+  /* renderJokerBank() — Vorrat je Stufe. Bewusst OHNE eigene Bauteile:
+     .essbank/.esscell sind schon das Fach fuer „wovon habe ich wie
+     viel". Stufen mit 0 bleiben stehen und werden nur abgeblendet —
+     wer nie einen legendaeren Joker gesehen hat, soll trotzdem wissen,
+     dass es ihn gibt. */
+  function renderJokerBank() {
+    var el = $("jokerBank"); if (!el) return;
+    var v = jokerVorrat();
+    var summe = 0;
+    var html = jokerTiers().map(function (tk) {
+      var t = tierOf(tk), n = v[tk] | 0;
+      summe += n;
+      return '<span class="esscell jokercell pressable' + (n ? "" : " leer") +
+        '" data-joker="' + tk + '" role="button" tabindex="0" title="' + jokerName(tk) +
+        '" aria-label="' + jokerName(tk) + ", " + n + ' Stück">' +
+        ico("card_joker", "🃏") +
+        '<span class="essz">' + fmt(n) + "</span>" +
+        '<span class="essn" style="color:' + t.color + '">' + t.name + "</span></span>";
+    }).join("");
+    el.innerHTML = html;
+    var tot = $("jokerTotal");
+    // Die Summe kommt aus der Logik, wenn es sie gibt — sonst aus dem,
+    // was gerade gezeichnet wurde. Zwei Zahlen duerfen nicht auseinanderlaufen.
+    if (tot) tot.textContent = fmt(v.total === undefined ? summe : v.total | 0);
+  }
+  /* Ein Joker-Fach im Gegenstands-Fenster. Der Text sagt genau EINE
+     Sache — was der Joker ersetzt — und danach die Grenze, die ihn
+     ehrlich haelt. Beides gehoert zusammen: die Grenze ohne den Zweck
+     klingt nach Schikane, der Zweck ohne die Grenze verspricht zu viel. */
+  function openJokerInfo(tierKey) {
+    var t = tierOf(tierKey);
+    openItemInfo({
+      titel: jokerName(tierKey),
+      art: jokerArt(tierKey),
+      menge: jokerVorrat()[tierKey] | 0,
+      woher: JOKER_QUELLEN,
+      wofuer: [
+        "Ersetzt beim Verschmelzen eine fehlende <b style=\"color:" + t.color + '">' +
+          t.name + "</b>-Kopie",
+        "Höchstens " + jokerMax() + " Joker je Verschmelzung — mindestens eine " +
+          "echte Kopie muss dabei sein",
+      ],
+    });
+  }
+
   /* ================= Forge / Merge (§4.3) ================= */
-  var req = { id: null, tier: null, n: 0 };
+  /* `joker` ist die ausdrueckliche Zusage des Spielers, die Luecke mit
+     Jokern zu fuellen. Vorgabe false, und bei jeder Neuwahl wieder
+     false: ein Joker, der ungefragt verbraucht wird, ist ein
+     Vertrauensbruch. */
+  var req = { id: null, tier: null, n: 0, joker: false };
+  /* jokerLage() — was der Joker fuer die AKTUELLE Auswahl leisten kann.
+     EINE Quelle fuer Slots, Umschalter, Knopfbeschriftung UND Buchung.
+     Stuenden die Bedingungen viermal im Code, koennte der Knopf etwas
+     anderes abbuchen, als der Umschalter angekuendigt hat. */
+  function jokerLage() {
+    var aus = { fehlt: 0, vorrat: 0, moeglich: false };
+    if (!req.id || !req.tier) return aus;
+    if (!AC.nextTierKey(req.tier)) return aus;      // Suprem hat keinen Joker
+    var c = AC.get().cards[req.id];
+    var have = c ? (c.copies[req.tier] | 0) : 0;
+    /* Der Joker fuellt nur ECHTE Luecken. Wer fuenf Kopien besitzt und
+       erst eine angetippt hat, hat keine Luecke, sondern noch nicht zu
+       Ende getippt — ihm hier einen Joker anzubieten hiesse, ihn zum
+       Verbrennen von Vorrat einzuladen. */
+    if (have >= 3 || req.n < have) return aus;
+    var fehlt = 3 - have;
+    // fehlt > JOKER_MAX faellt hier raus — und damit auch der Fall
+    // „gar keine echte Kopie" (fehlt === 3), ganz ohne zweite Regel.
+    if (fehlt < 1 || fehlt > jokerMax()) return aus;
+    var info = (typeof AC.mergeInfo === "function") ? AC.mergeInfo(req.id, req.tier) : null;
+    var vorrat = info && info.jokerVorrat !== undefined
+      ? (info.jokerVorrat | 0) : (jokerVorrat()[req.tier] | 0);
+    aus.fehlt = fehlt;
+    aus.vorrat = vorrat;
+    /* Ganz oder gar nicht: ein Joker, der die Luecke nur halb schliesst,
+       waere verbraucht, ohne dass ein Merge zustande kommt. */
+    aus.moeglich = vorrat >= fehlt;
+    return aus;
+  }
+  /* Der Umschalter. Er erscheint NUR, wenn ein Joker die Luecke wirklich
+     schliessen kann — ein dauerhaft sichtbarer, meist toter Schalter
+     waere eine Einladung, die fast immer ins Leere geht. */
+  function renderJokerSchalter(jl) {
+    var b = $("jokerToggle"); if (!b) return;
+    b.classList.toggle("an", !!jl.moeglich);
+    if (!jl.moeglich) { b.setAttribute("aria-pressed", "false"); return; }
+    b.setAttribute("aria-pressed", req.joker ? "true" : "false");
+    var sw = $("jokerSw");
+    sw.classList.toggle("on", !!req.joker);
+    sw.classList.toggle("off", !req.joker);
+    $("jokerToggleTxt").innerHTML = "Mit Joker füllen (−" + jl.fehlt + " 🃏)" +
+      '<span class="jshint">' + jl.fehlt + " von 3 " + tierOf(req.tier).name +
+      "-Kopien fehlen · Vorrat " + jl.vorrat + "</span>";
+  }
   function forgeEntries() {
     var out = [], st = AC.get();
     sortedIds().forEach(function (id) {
@@ -8821,6 +9228,10 @@ button.pfplate{cursor:pointer}
   }
   function renderForge() {
     renderTop();
+    var jl = jokerLage();
+    // Faellt das Angebot weg (andere Karte gewaehlt, Vorrat leer), faellt
+    // die Zusage mit — sonst bucht der Knopf etwas, was niemand mehr sieht.
+    if (!jl.moeglich) req.joker = false;
     $("reqSlots").innerHTML = [0, 1, 2].map(function (i) {
       if (i < req.n) {
         var t = tierOf(req.tier), m = BY_ID[req.id];
@@ -8828,9 +9239,21 @@ button.pfplate{cursor:pointer}
           ";background:linear-gradient(160deg," + m.color + '33,#111a21 70%)">' +
           artBox(req.id, t.key) + "</div>";
       }
+      if (req.joker) {
+        return '<div class="reqslot joker" title="' + jokerName(req.tier) + '">' +
+          jokerArt() + '<span class="jklbl">JOKER</span></div>';
+      }
       return '<div class="reqslot">＋</div>';
     }).join("");
-    $("btnMerge").disabled = req.n < 3;
+    renderJokerSchalter(jl);
+    renderJokerBank();
+    /* Der Knopf ist frei, wenn drei Slots gedeckt sind — durch echte
+       Kopien ODER durch die ausdrueckliche Joker-Zusage. */
+    $("btnMerge").disabled = !(req.n >= 3 || (req.joker && jl.moeglich));
+    /* Und er sagt, was er kostet. Ein Knopf, der stumm Vorrat abbucht,
+       ist genau der Vertrauensbruch, den der Umschalter verhindern soll. */
+    $("btnMerge").textContent = (req.joker && jl.moeglich)
+      ? "VERSCHMELZEN (−" + jl.fehlt + " 🃏)" : "VERSCHMELZEN";
     renderMergePreview();
     $("forgeGrid").innerHTML = forgeEntries().map(function (e) {
       var sel = (req.id === e.id && req.tier === e.tier) ? "sel" : "";
@@ -9097,20 +9520,37 @@ button.pfplate{cursor:pointer}
   }
 
   function pickForge(id, tier) {
-    if (req.id !== id || req.tier !== tier) { req = { id: id, tier: tier, n: 0 }; }
+    // Neue Karte ⇒ neue Auswahl UND neue Joker-Frage: die Zusage galt der
+    // alten Karte und darf nicht stillschweigend mitwandern.
+    if (req.id !== id || req.tier !== tier) { req = { id: id, tier: tier, n: 0, joker: false }; }
     var have = AC.get().cards[id].copies[tier];
     if (req.n >= 3) { toast("Bereits 3 Karten gewählt"); return; }
-    if (req.n >= have) { toast("Nicht genug Kopien (" + have + "/3)"); return; }
+    if (req.n >= have) {
+      /* Bei genau dieser Meldung setzt der Joker an — deshalb sagt sie
+         jetzt auch, dass es einen Weg gibt, statt nur „geht nicht". */
+      var jl = jokerLage();
+      toast(jl.moeglich
+        ? "Nur " + have + "/3 Kopien — mit " + jl.fehlt + " 🃏 Joker geht es trotzdem"
+        : "Nicht genug Kopien (" + have + "/3)");
+      renderForge();
+      return;
+    }
     if (!AC.nextTierKey(tier)) { toast("Suprem ist die Endstufe"); return; }
     req.n++;
     renderForge();
   }
   function doMerge() {
-    if (req.n < 3) return;
+    var jl = jokerLage();
+    var nutz = (req.joker && jl.moeglich) ? jl.fehlt : 0;
+    if (req.n < 3 && !nutz) return;
     var id = req.id, tier = req.tier;
-    var r = AC.merge(id, tier);
-    req = { id: null, tier: null, n: 0 };
+    /* Die Zahl der Joker geht IMMER mit — auch als 0. Ein Aufruf, der
+       den Parameter mal setzt und mal weglaesst, macht aus dem
+       Vorgabewert der Logik eine zweite, unsichtbare Regel. */
+    var r = AC.merge(id, tier, nutz);
+    req = { id: null, tier: null, n: 0, joker: false };
     if (!r) { toast("Merge fehlgeschlagen"); renderForge(); return; }
+    if (nutz) toast("🃏 " + nutz + " Joker eingesetzt");
     renderForge();
     // Zeremonie auf der neu entstandenen Karte — der Raritätsrahmen wechselt sichtbar.
     var neu = $("forgeGrid").querySelector('[data-id="' + id + '"][data-tier="' +
@@ -9129,10 +9569,15 @@ button.pfplate{cursor:pointer}
   function doMergeAll() {
     var total = 0, ids = [];
     POOL_IDS.forEach(function (id) {
-      var r = AC.mergeAll(id);
+      /* ALLE VERSCHMELZEN fasst NIEMALS Joker an — kaskadiert werden
+         ausschliesslich echte Kopien. `useJokers:false` steht hier
+         ausgeschrieben, obwohl es der Vorgabewert ist: an einem Knopf,
+         der in einem Zug ueber acht Karten laeuft, muss am Aufruf
+         selbst ablesbar sein, dass er keinen Vorrat verbrennt. */
+      var r = AC.mergeAll(id, { useJokers: false });
       if (r.merges) { total += r.merges; ids.push(id); }
     });
-    req = { id: null, tier: null, n: 0 };
+    req = { id: null, tier: null, n: 0, joker: false };
     renderForge();
     if (!total) { toast("Nichts zu verschmelzen"); return; }
     var grid = $("forgeGrid");
@@ -15173,7 +15618,7 @@ button.pfplate{cursor:pointer}
   $("btnUnequip").addEventListener("click", function () { toast("Ablegen ist im Prototyp nur Deko"); });
   $("btnMerge").addEventListener("click", doMerge);
   $("btnMergeAll").addEventListener("click", doMergeAll);
-  $("btnClearReq").addEventListener("click", function () { req = { id: null, tier: null, n: 0 }; renderForge(); });
+  $("btnClearReq").addEventListener("click", function () { req = { id: null, tier: null, n: 0, joker: false }; renderForge(); });
   $("cerBtn").addEventListener("click", closeCeremony);
   $("mergeCeremony").addEventListener("click", function (e) {
     if (e.target === $("mergeCeremony")) closeCeremony();
@@ -15211,6 +15656,54 @@ button.pfplate{cursor:pointer}
       if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") { e.preventDefault(); um(); }
     });
   })();
+  /* ---------- Joker: Umschalter, Vorratsleiste, Gegenstands-Fenster ----------
+     Die Kacheln der Vorratsleiste werden bei jedem renderForge() neu
+     gebaut — der Zuhoerer haengt deshalb an der LEISTE, nicht an den
+     Kacheln. Ein Zuhoerer je Kachel waere nach dem ersten Neuzeichnen
+     weg (dieselbe Falle wie beim ⓘ in der Pity-Zeile).
+     Die Kacheln sind <span role="button">, also muessen Enter und
+     Leertaste hier von Hand behandelt werden, sonst sind sie fuer die
+     Tastatur tot. */
+  (function () {
+    var t = $("jokerToggle");
+    if (t) {
+      t.addEventListener("click", function () {
+        var jl = jokerLage();
+        if (!jl.moeglich) return;
+        req.joker = !req.joker;
+        renderForge();
+      });
+    }
+    var leiste = $("jokerBank");
+    if (leiste) {
+      function oeffne(e) {
+        var z = e.target && e.target.closest ? e.target.closest("[data-joker]") : null;
+        if (z) openJokerInfo(z.getAttribute("data-joker"));
+      }
+      leiste.addEventListener("click", oeffne);
+      leiste.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+          e.preventDefault(); oeffne(e);
+        }
+      });
+    }
+    var lay = $("itemLayer");
+    if (lay) {
+      // Klick auf die Flaeche NEBEN dem Blatt schliesst — wie bei jedem
+      // anderen Fenster im Prototyp (#oddsLayer, #mergeCeremony).
+      lay.addEventListener("click", function (e) {
+        if (e.target === lay || e.target.id === "itemClose") closeItemInfo();
+      });
+      $("itemClose").addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+          e.preventDefault(); closeItemInfo();
+        }
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && lay.classList.contains("open")) closeItemInfo();
+      });
+    }
+  })();
   /* Der Helden-Tab fuehrt in den eigenen Helden-View: Helden brauchen
      Buehnen-Artwork und Beschreibung, dafuer ist eine 5-Spalten-Kachel
      zu klein. Skills/Items bleiben Platzhalter. */
@@ -15226,7 +15719,7 @@ button.pfplate{cursor:pointer}
   $("btnReset").addEventListener("click", function () {
     localStorage.removeItem(SEED_KEY);
     AC._reset(); seed();
-    packResult = null; packState = []; req = { id: null, tier: null, n: 0 };
+    packResult = null; packState = []; req = { id: null, tier: null, n: 0, joker: false };
     $("packGrid").innerHTML = ""; $("packSummary").style.display = "none";
     show("navCollection");
     toast("Demo-Zustand zurückgesetzt");
@@ -15706,6 +16199,36 @@ button.pfplate{cursor:pointer}
                         die Pruefung liest sie, statt Zahlen einzufrieren,
                         die sich in der Umsetzung noch verschieben. */
                      stufeFx: stufeFx,
+                     /* JOKER. Der Pruefstand muss drei Dinge messen
+                        koennen, die von aussen sonst nicht erreichbar
+                        sind: den VORRAT (jokerVorrat), die LAGE der
+                        aktuellen Auswahl (jokerLage — die eine Quelle
+                        fuer Slots, Umschalter und Buchung) und die
+                        Auswahl selbst (forgeReq). `req` geht bewusst als
+                        Funktion heraus, nicht als Verweis: das Objekt
+                        wird bei jeder Neuwahl ERSETZT, ein einmal
+                        exportierter Verweis zeigte danach auf einen
+                        Stand von vorgestern.
+                        setForgeReq setzt eine Auswahl ohne Klickfolge —
+                        ohne das muesste eine Pruefung fuer den
+                        Zwei-Joker-Fall raten, welche Kachel wo liegt. */
+                     jokerVorrat: jokerVorrat, jokerLage: jokerLage,
+                     jokerMax: jokerMax, jokerTiers: jokerTiers,
+                     jokerName: jokerName, JOKER_QUELLEN: JOKER_QUELLEN,
+                     renderJokerBank: renderJokerBank, renderForge: renderForge,
+                     forgeReq: function () { return req; },
+                     setForgeReq: function (id, tier, n, mitJoker) {
+                       req = { id: id, tier: tier, n: n | 0, joker: !!mitJoker };
+                       renderForge();
+                     },
+                     pickForge: pickForge, doMerge: doMerge, doMergeAll: doMergeAll,
+                     /* Das Gegenstands-Fenster ist ABSICHTLICH mit
+                        exportiert, obwohl es heute nur der Joker ruft:
+                        die Pruefung soll belegen koennen, dass es fuer
+                        jeden Gegenstand taugt — mit Daten, die mit
+                        Jokern nichts zu tun haben. */
+                     openItemInfo: openItemInfo, closeItemInfo: closeItemInfo,
+                     openJokerInfo: openJokerInfo,
                      setPackState: function (arr) { packState = arr; renderPack(); },
                      /* Fuer den Pruefstand: die Marken-Fabrik und die Tabelle.
                         Ohne sie liesse sich nicht messen, ob die sieben Pfade
