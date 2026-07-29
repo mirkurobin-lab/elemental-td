@@ -709,9 +709,48 @@ Entwurf für diese Karte.
 
 ## I) Entscheidungen — Stand 30.07.2026
 
+> ### ⚠ REVIDIERT (30.07.2026, nachmittags) — Variante A statt B
+>
+> Vormittags fiel die Entscheidung auf **B** (eine gemeinsame
+> Arkan-Essenz). Nachmittags kamen die AA-Bildschirme **IMG_3433 /
+> IMG_3434**, und die zeigen das Gegenteil: dort hat **jeder Spell sein
+> eigenes Upgrade-Material** („Greenprint"), und dessen Bild **ist das
+> Kartenbild selbst**, grün eingefärbt. Bestand im Bild: `87/4` bzw.
+> `106/4`.
+>
+> Ansage daraufhin: *„Bau den AA Weg ein aber mit 3 Karten für die
+> Fusion."* Umgesetzt ist damit **Variante A**:
+>
+> | | |
+> |---|---|
+> | Essenz | vier eigene Sorten — `splitter`, `bann`, `bollwerk`, `fokus` |
+> | Bild | das Kartenbild, wie bei jedem Turm (`matIco()` → `CARD_ART`) |
+> | Nachschub | `SPELL_PER_SLOT` **4–8** statt 2–4 |
+> | Fusion | **3 Karten**, unverändert |
+>
+> **Warum die Verdopplung des Nachschubs:** mit vier eigenen Sorten
+> landet nur die Hälfte des Nachschubs auf den **zwei** Spells, die man
+> wirklich spielt. Die Verdopplung stellt den Spielenden dorthin zurück,
+> wo er mit dem gepoolten Vorrat stand — bei klarerer Kopplung. AAs
+> eigenes Bild stützt das: dort steht der Vorrat auf **87** bei Bedarf
+> **4**. Die Knappheit sitzt im **Gold** (10 000 je Level-Up), nicht im
+> Material.
+>
+> **Was dadurch entfällt:** die Sonderregel in `materialTypeOf`, die
+> Ausnahme in zwei Prüfsuiten, das Icon `ess_arkan`, und der Satz im
+> Kartendetail, der die abweichende Herkunft erklären musste. Die
+> Kopplung „**jede Karte hat genau eine eigene Essenz**" gilt wieder
+> ohne Sonderfall — und fängt damit **mehr** als vorher.
+>
+> **⚠ Der Preis bleibt und ist bewusst bezahlt:** man levelt, was fällt,
+> nicht was man will. Bei vier Spells tragbar; wer auf vierzig geht,
+> muss diese Entscheidung erneut treffen.
+
 ### ✅ Entschieden und gebaut
 
-1. **Essenz: Variante B.** Eine gemeinsame **Arkan-Essenz** für alle vier Spells.
+1. ~~**Essenz: Variante B.** Eine gemeinsame **Arkan-Essenz** für alle vier Spells.~~
+   **→ überholt, siehe Kasten oben. Gebaut ist Variante A.**
+   Der ursprüngliche Wortlaut zur Nachvollziehbarkeit:
    Wortlaut: *„Nimm Variante B für das Level des spells … Wird in dem Fall dann mit
    Gold und den Arkan Essenzen gelevelt, gleiche Muster und Max lvl pro Rarität wie
    von Hero und towern."*

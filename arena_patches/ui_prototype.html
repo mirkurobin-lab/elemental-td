@@ -439,16 +439,16 @@ select.sel{font-family:inherit;border:1px solid var(--line);appearance:none;
 select.sel option{background:var(--panel);color:var(--txt)}
 #matCount b{color:var(--txt);font-weight:800}
 /* ---------- Essenz-Vorrat (eine Sorte je Karte, 29.07.2026) ----------
-   ⚠ Drei Spalten seit dem 30.07.2026, vorher vier. Mit der neunten
-   Sorte (Arkan) ging die Rechnung nicht mehr auf: 4 × 2 voll, dann eine
-   einzelne Kachel links in einer dritten Reihe und drei leere Plaetze
-   daneben. Bei DREI Spalten sind neun Sorten exakt 3 × 3.
+   ⚠ Zurueck auf VIER Spalten (30.07.2026, nachmittags). Die Zahl der
+   Sorten ist zweimal gewandert: 8 (vier Spalten, zwei Reihen) → 9 mit
+   Arkan (da ging vier nicht mehr auf, deshalb drei) → 12 mit den vier
+   eigenen Spell-Sorten. Zwoelf sind bei vier Spalten exakt drei Reihen.
    Die Kachel ist bewusst flach: sie ist eine Zahl mit Bild, kein Knopf. */
 .matchip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;
   border:1px solid #ffffff1f;background:#ffffff0d;cursor:pointer}
 .matchip[aria-expanded="true"]{border-color:var(--gold);background:#f2a13d1f}
 .matchip .essauf{font-size:9px;color:var(--dim);margin-left:1px}
-.essbank{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0 0}
+.essbank{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0 0}
 .essbank[hidden]{display:none}
 .esscell{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px 5px;
   border-radius:9px;background:var(--panel2);border:1px solid #ffffff14;min-width:0}
@@ -7329,29 +7329,38 @@ button.pfplate{cursor:pointer}
       stats:[{k:"Ult-Schaden",b:455,t:"dmg"},{k:"Angriffstempo",b:0.68,t:"rate"},
              {k:"Lavafeld",b:2.4,t:"sec"},{k:"Reichweite",b:5.2,t:"flat"}] },
     /* ---------- SPELLS (30.07.2026) ----------
+       ⚠ `power` ist NICHT 0. AA zeigt fuer Spells eine echte Kraftzahl
+       (IMG_3434: „Power: 3532"), und unsere Deck-Ansicht summiert die
+       Kraft ueber alle belegten Plaetze — mit 0 haetten zwei von neun
+       Plaetzen gar nicht mitgezaehlt. Die Werte liegen bewusst leicht
+       unter den Tuermen: ein Spell wirkt einmal je Abklingzeit, ein
+       Turm dauerhaft.
+
        Zwei nimmt der Spieler ins Match mit; im Battledeck sitzen sie als
        Sechsecke links und rechts der Helden-Ult. Sie stehen mit in
        CARDS, weil Detailansicht, Schmiede und Sammlung sonst einen
        zweiten, fast gleichen Weg braeuchten — `spell:true` haelt sie
        aus POOL_IDS und TOWER_IDS heraus.
-       `elem:"arkan"` ist kein Element im Spielsinn: Spells sind
-       neutral. Es ist der Essenz-Schluessel, mit dem sie leveln. */
-    { id:"splitter", name:"SPLITTER", elem:"arkan", spell:true, color:"#bfe0ff", art:"💠",
+       ⚠ `elem` traegt den ESSENZ-Schluessel, nicht ein Element im
+       Spielsinn — Spells sind neutral. Seit dem 30.07.2026 ist das je
+       Spell die eigene ID (AA-Beleg IMG_3434: dort hat jeder Spell sein
+       eigenes Upgrade-Material, dessen Bild die Karte selbst ist). */
+    { id:"splitter", name:"SPLITTER", elem:"splitter", spell:true, color:"#bfe0ff", art:"💠",
       target:"Wegfeld", cooldown:45,
       desc:"Ein Prismensplitter zerplatzt über dem Weg und regnet Scherben auf alles darunter.",
-      power:0,
+      power:1150,
       stats:[{k:"Radius",b:2.2,t:"flat"},{k:"Einschlag",b:8,t:"pct"},
              {k:"Grundschaden",b:120,t:"dmg"},{k:"Abklingzeit",b:45,t:"cd"}] },
-    { id:"bann", name:"BANN", elem:"arkan", spell:true, color:"#e07ad8", art:"🔻",
+    { id:"bann", name:"BANN", elem:"bann", spell:true, color:"#e07ad8", art:"🔻",
       target:"Gegner", cooldown:30,
       desc:"Markiert Gegner: sie erleiden +35 % Schaden und verlieren 40 % ihrer Rüstung.",
-      power:0,
+      power:980,
       stats:[{k:"Schadensbonus",b:35,t:"pct"},{k:"Rüstung",b:-40,t:"pct"},
              {k:"Dauer",b:8,t:"sec"},{k:"Abklingzeit",b:30,t:"cd"}] },
-    { id:"bollwerk", name:"BOLLWERK", elem:"arkan", spell:true, color:"#7fe3d8",
+    { id:"bollwerk", name:"BOLLWERK", elem:"bollwerk", spell:true, color:"#7fe3d8",
       art:"🧱", target:"Wegfeld", cooldown:40,
       desc:"Eine Kristallwand sperrt den Weg für 4 s. Flieger ziehen darüber hinweg.",
-      power:0,
+      power:900,
       /* ⚠ Kein „Trefferpunkte 0". Die Wand hat bewusst KEINE HP — sie
          ist nicht zerstoerbar, sie laeuft ab (DESIGN_SPELLS.md D.3).
          Eine Null als Kennzahl liest sich wie ein Fehler oder wie eine
@@ -7359,10 +7368,10 @@ button.pfplate{cursor:pointer}
          Zerbersten, die es wirklich gibt. */
       stats:[{k:"Standzeit",b:4,t:"sec"},{k:"Breite",b:3,t:"flat"},
              {k:"Berstbetäubung",b:1,t:"sec"},{k:"Abklingzeit",b:40,t:"cd"}] },
-    { id:"fokus", name:"FOKUS", elem:"arkan", spell:true, color:"#ffd98a",
+    { id:"fokus", name:"FOKUS", elem:"fokus", spell:true, color:"#ffd98a",
       art:"🔆", target:"Türme", cooldown:35,
       desc:"Türme im Umkreis feuern 12 s lang mit −25 % Angriffsintervall.",
-      power:0,
+      power:1050,
       stats:[{k:"Angriffstempo",b:-25,t:"pct"},{k:"Radius",b:2.5,t:"flat"},
              {k:"Dauer",b:12,t:"sec"},{k:"Abklingzeit",b:35,t:"cd"}] },
   ];
@@ -7914,9 +7923,6 @@ button.pfplate{cursor:pointer}
     fire: "card_ember", water: "card_frost", nature: "card_thorn", earth: "card_stone",
     light: "card_dawn", darkness: "card_hollow", solara: "card_solara", magmor: "card_magmor",
     splitter: "card_splitter", bann: "card_bann", bollwerk: "card_bollwerk", fokus: "card_fokus",
-    /* Arkan ist die einzige Essenz OHNE eigene Karte — sie braucht
-       deshalb als einzige ein eigenes Bild statt der Karten-Miniatur. */
-    arkan: "ess_arkan",
   };
   function cardArtHTML(id, cls) {
     var m = BY_ID[id] || {}, emoji = m.art || "❔";
@@ -7961,11 +7967,9 @@ button.pfplate{cursor:pointer}
   var ESS_SAMMEL = "ess_special";
   function matIco(sorte, cls) {
     var c = BY_ID[sorte];
-    /* ⚠ Arkan hat KEINE Karte — `BY_ID.arkan` ist leer, und ohne diesen
-       Zweig waere die Spell-Essenz als einzige auf das Sammel-Emoji
-       zurueckgefallen, waehrend alle acht Element-Essenzen ihr eigenes
-       Turmbild tragen. Genau die Sorte Loch, die man erst im Bild sieht. */
-    if (!c && CARD_ART[sorte]) return ico(CARD_ART[sorte], "🔷", cls);
+    /* Seit dem 30.07.2026 gibt es keine Sorte ohne Karte mehr — der
+       Sonderzweig fuer Arkan ist mit ihr verschwunden. Bleibt der
+       Notnagel fuer unbekannte Schluessel. */
     if (!c) return ico(ESS_SAMMEL, "⚗", cls);
     return ico(CARD_ART[sorte] || ESS_SAMMEL, c.art || "⚗", cls);
   }
@@ -8794,14 +8798,12 @@ button.pfplate{cursor:pointer}
     var st = { v: AC.STATE_VERSION, cards: {},
                /* ⚠ `arkan` fehlte hier bis zum 30.07.2026 — mit der Folge,
                   dass der neue Spell-Reiter als EINZIGER einen toten
-                  Stand zeigte: vier Karten auf Lv 1, Vorrat 0, waehrend
-                  jeder andere Reiter ein gelebtes Konto zeigt. 24 ist
-                  bewusst knapp: es reicht fuer ein paar Level-Ups und
-                  laesst den Spell-Slot der Packs trotzdem noch etwas
-                  bedeuten. */
+                  Stand zeigte. Seit dem 30.07.2026 sind es vier eigene
+                  Sorten, ungleich gefuellt — wie bei den Tuermen, damit
+                  man im Fach sieht, dass sie sich unabhaengig fuellen. */
                materials: { fire: 19, water: 14, nature: 11, earth: 8,
                             light: 12, darkness: 5, solara: 3, magmor: 2,
-                            arkan: 24 },
+                            splitter: 9, bann: 6, bollwerk: 4, fokus: 5 },
                matRR: 0, gold: null,
                /* Joker-Demobestand. Ungleich verteilt, aus demselben
                   Grund wie bei den Essenzen: ueberall dieselbe Zahl
@@ -9231,13 +9233,14 @@ button.pfplate{cursor:pointer}
     renderTop();
     $("collGrid").innerHTML = SPELL_IDS.map(function (id) { return tileHTML(id); }).join("");
     hydrateFrames($("viewCollection"));
-    var vorrat = AC.getMaterials()[AC.SPELL_MATERIAL] | 0;
+    var vorraete = AC.getMaterials(), summe = 0;
+    SPELL_IDS.forEach(function (id) { summe += vorraete[id] | 0; });
     var bereit = 0;
     SPELL_IDS.forEach(function (id) { if (AC.progressToNextMerge(id).ready) bereit++; });
     $("collHint").innerHTML = bereit
       ? "🔴 <b>" + bereit + " Spell(s) bereit zum Verschmelzen</b> — ab in die Schmiede."
-      : "Zwei Spells nimmst du ins Match. Sie leveln mit <b>Arkan-Essenz</b> — " +
-        "du hast <b>" + fmt(vorrat) + "</b>. Arkan kommt aus den Spell-Slots der Packs.";
+      : "Zwei Spells nimmst du ins Match. Jeder levelt mit <b>seiner eigenen Essenz</b> — " +
+        "zusammen <b>" + fmt(summe) + "</b>. Sie kommt aus den Spell-Slots der Packs.";
     bind($("collGrid"), openDetail);
     markPressable($("viewCollection"));
   }
@@ -9370,22 +9373,16 @@ button.pfplate{cursor:pointer}
     $("dMatName").textContent = v.materialName;
     $("dMatName").style.color = v.materialColor;
     $("dMat").innerHTML = (have < need ? '<span class="bad">' + have + "</span>" : have) + " / " + need;
-    /* ⚠ Fuer Spells stimmt der Turm-Satz NICHT. „Kommt aus Packs, in
-       denen SPLITTER liegt" waere schlicht falsch: Arkan faellt in
-       JEDEM Spell-Slot, egal welcher Spell darin steckt, und alle vier
-       teilen sich den Vorrat. Ein Text, der die Herkunft falsch
-       beschreibt, ist schlimmer als keiner — der Spieler sucht dann an
-       der falschen Stelle. */
+    /* Seit der Umstellung auf eigene Spell-Sorten stimmt der Satz fuer
+       BEIDE Kartenarten — nur die Quelle unterscheidet sich: Turmessenz
+       kommt aus den Essenz-Slots und dem Tagesangebot, Spell-Essenz aus
+       den Spell-Slots. */
     var spell = AC.isSpell(curId);
     $("dMatSub").innerHTML = have >= need
-      ? (spell
-          ? "Reicht für dieses Level-Up. " + v.materialName + " hebt jeden Spell."
-          : "Reicht für dieses Level-Up. Nur " + v.materialName + " hebt " + m.name + ".")
-      : (spell
-          ? "Fehlen <b>" + (need - have) + "</b>. " + v.materialName +
-            " kommt aus den Spell-Slots der Packs — alle vier Spells teilen sich den Vorrat."
-          : "Fehlen <b>" + (need - have) + "</b>. " + v.materialName +
-            " kommt aus Packs, in denen " + m.name + " liegt — und aus dem Tagesangebot.");
+      ? "Reicht für dieses Level-Up. Nur " + v.materialName + " hebt " + m.name + "."
+      : "Fehlen <b>" + (need - have) + "</b>. " + v.materialName + " kommt aus " +
+        (spell ? "den Spell-Slots der Packs, in denen " + m.name + " liegt."
+               : "Packs, in denen " + m.name + " liegt — und aus dem Tagesangebot.");
     var chk = AC.canLevelUp(curId, gold());
     var up = $("btnUpgrade");
     // innerHTML, nicht textContent: ico() liefert ein <img>, sobald das
@@ -10363,7 +10360,7 @@ button.pfplate{cursor:pointer}
         face = artBox(s.d.cardId, s.d.tier) +
           '<div class="facewrap"><div class="t" style="color:' + color + '">' +
           tierOf(s.d.tier).name + '</div>' +
-          '<div class="spellzu">' + matIco("arkan", "") + " +" + s.d.arkan + "</div></div>";
+          '<div class="spellzu">' + matIco(s.d.essenzTyp, "") + " +" + s.d.essenz + "</div></div>";
       } else if (s.kind === "mat") {
         /* Sorte ist Teil des Reveals — "welche Essenz?" ist eine eigene
            kleine Frage, und seit jede Karte ihre eigene hat, eine
@@ -10480,7 +10477,9 @@ button.pfplate{cursor:pointer}
          Arkan-Essenz. Arkan liegt bewusst NICHT in materialByType
          (siehe arena_cards.js), sonst zaehlte es als Essenz-Slot mit. */
       AC.addDrop(s.d.cardId, s.d.tier, 1);
-      if (s.d.arkan) AC.addMaterial(s.d.arkan, AC.SPELL_MATERIAL);
+      /* Die Essenz gehoert dem Spell, der in diesem Slot lag — dieselbe
+         Kopplung wie bei den Tuermen. */
+      if (s.d.essenz) AC.addMaterial(s.d.essenz, s.d.essenzTyp);
     } else if (s.kind === "mat") {
       AC.addMaterial(s.m.amount, s.m.type);   // Sorte mitgeben!
     } else {
@@ -10591,12 +10590,14 @@ button.pfplate{cursor:pointer}
     packResult.cards.forEach(function (c) { byTier[c.tierName] = (byTier[c.tierName] || 0) + 1; });
     var parts = Object.keys(byTier).map(function (k) { return byTier[k] + "× " + k; });
     // Material nach Sorte aufschlüsseln (nur die, die tatsächlich gedroppt sind)
-    /* Arkan steht bewusst NICHT in materialByType — es kommt aus den
-       Spell-Slots. Fuer die Zusammenfassung wird es hier dazugelegt,
-       damit der Spieler sieht, was er insgesamt bekommen hat. */
+    /* Spell-Essenz steht bewusst NICHT in materialByType — sie kommt
+       aus den Spell-Slots. Fuer die Zusammenfassung wird sie hier
+       dazugelegt, damit der Spieler sieht, was er insgesamt bekommen
+       hat. */
     var mengen = {};
     AC.MATERIAL_KEYS.forEach(function (k) { mengen[k] = packResult.materialByType[k] || 0; });
-    mengen[AC.SPELL_MATERIAL] = (mengen[AC.SPELL_MATERIAL] || 0) + (packResult.arkan || 0);
+    var sebt = packResult.spellEssenzByType || {};
+    for (var sk in sebt) mengen[sk] = (mengen[sk] || 0) + sebt[sk];
     var matParts = AC.MATERIALS.filter(function (m) { return mengen[m.key] > 0; })
       .map(function (m) { return "<b>+" + mengen[m.key] + "</b> " +
         matIco(m.key) + " " + m.name; });
@@ -11902,10 +11903,11 @@ button.pfplate{cursor:pointer}
         if (sp.tierIndex > best) best = sp.tierIndex;
         spellZ[sp.cardId] = (spellZ[sp.cardId] | 0) + 1;
       });
-      if (r.arkan) {
-        AC.addMaterial(r.arkan, AC.SPELL_MATERIAL);
-        mat[AC.SPELL_MATERIAL] = (mat[AC.SPELL_MATERIAL] | 0) + r.arkan;
-      }
+      (r.spells || []).forEach(function (sp) {
+        if (!sp.essenz) return;
+        AC.addMaterial(sp.essenz, sp.essenzTyp);
+        mat[sp.essenzTyp] = (mat[sp.essenzTyp] | 0) + sp.essenz;
+      });
       goldSum += r.gold;
       if (r.pity) pityTreffer++;
       // Dieselbe Ereignis-Naht wie openPackKey(), einmal je Pack.

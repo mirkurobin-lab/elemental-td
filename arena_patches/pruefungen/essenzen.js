@@ -60,37 +60,34 @@ function check(label, cond, info) {
     const AC = window.ArenaCards;
     return {
       sorten: AC.MATERIAL_KEYS.slice().sort(),
-      element: AC.ELEMENT_MATERIAL_KEYS.slice().sort(),
+      basis: AC.BASIS_MATERIAL_KEYS.slice().sort(),
       karten: Object.keys(AC.PERKS).sort(),
       turmkarten: Object.keys(AC.PERKS).filter(k => !AC.isSpell(k)).sort(),
       spells: AC.SPELL_KEYS.slice().sort(),
-      identitaet: AC.ELEMENT_MATERIAL_KEYS.every(k => AC.materialTypeOf(k) === k),
-      spellsAufArkan: AC.SPELL_KEYS.every(k => AC.materialTypeOf(k) === AC.SPELL_MATERIAL),
-      arkanOhneKarte: AC.materialTypeOf(AC.SPELL_MATERIAL) === null,
+      identitaet: AC.MATERIAL_KEYS.every(k => AC.materialTypeOf(k) === k),
+      spellsEigen: AC.SPELL_KEYS.every(k => AC.materialTypeOf(k) === k),
+      spellSorten: AC.SPELL_MATERIAL_KEYS.slice().sort(),
       unbekannt: AC.materialTypeOf('gibtsnicht'),
       altSorten: ['attack', 'speed', 'special'].map(k => AC.materialTypeOf(k)),
       version: AC.STATE_VERSION,
       namen: AC.MATERIALS.map(m => m.name),
     };
   });
-  /* ⚠ ZWEITE FASSUNG (30.07.2026). Bis hierher lautete die Regel
-     „Sortenliste == Kartenliste", ohne Ausnahme. Mit den Spells stimmt
-     das nicht mehr, und zwar absichtlich: sie sind neutral und teilen
-     sich EINE Sorte (Variante B). Die Prüfung wird deshalb nicht
-     weicher, sondern genauer — sie sagt die Regel mitsamt ihrer
-     Ausnahme, und jede Hälfte hat ihren eigenen Schritt. Eine Zeile
-     „irgendwie passt das schon" hätte beide Fehlerarten durchgelassen:
-     eine Turmkarte ohne Essenz UND einen Spell mit eigener. */
-  check('jede Turm-/Heldenkarte hat genau eine eigene Essenz',
-    modell.element.join(',') === modell.turmkarten.join(','),
-    modell.element.length + ' Element-Sorten / ' + modell.turmkarten.length + ' Turmkarten');
-  check('jeder Spell zieht dieselbe Arkan-Essenz', modell.spellsAufArkan,
-    modell.spells.join(','));
-  check('Arkan ist die einzige Sorte OHNE eigene Karte', modell.arkanOhneKarte);
-  check('jede Karte ist entweder Turmkarte oder Spell',
-    modell.karten.length === modell.turmkarten.length + modell.spells.length,
-    modell.karten.length + ' = ' + modell.turmkarten.length + ' + ' + modell.spells.length);
-  check('Element-Sortenschlüssel IST die Karten-ID', modell.identitaet);
+  /* ⚠ DRITTE FASSUNG (30.07.2026, nachmittags). Die zweite trug eine
+     Ausnahme („Spells teilen sich Arkan"). Sie ist mit den AA-Bildern
+     weggefallen — dort hat jeder Spell sein eigenes Upgrade-Material.
+     Damit gilt die Regel wieder OHNE Sonderfall, und die Prüfung wird
+     dadurch nicht schwächer: es gibt keinen Zweig mehr, in dem etwas
+     durchrutschen könnte. */
+  check('jede Karte hat genau eine eigene Essenz',
+    modell.sorten.join(',') === modell.karten.join(','),
+    modell.sorten.length + ' Sorten / ' + modell.karten.length + ' Karten');
+  check('der Sortenschlüssel IST die Karten-ID, ohne Ausnahme', modell.identitaet);
+  check('auch jeder Spell hat seine EIGENE Sorte', modell.spellsEigen,
+    modell.spellSorten.join(','));
+  check('Basis- und Spell-Sorten ergeben zusammen die ganze Liste',
+    modell.basis.length + modell.spellSorten.length === modell.sorten.length,
+    modell.basis.length + ' + ' + modell.spellSorten.length + ' = ' + modell.sorten.length);
   check('unbekannte ID bekommt KEINE Ersatzsorte', modell.unbekannt === null, '' + modell.unbekannt);
   check('die drei alten Sortennamen sind keine Sorten mehr',
     modell.altSorten.every(x => x === null), JSON.stringify(modell.altSorten));

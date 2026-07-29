@@ -57,26 +57,31 @@ function check(label, cond, info) {
       const e = document.getElementById(id); if (e) e.classList.remove('open');
     }));
 
-  /* ============ 1. Variante B: EINE Essenz für alle vier ============ */
-  console.log('\n== 1. Alle Spells teilen die Arkan-Essenz (Variante B) ==');
+  /* ============ 1. Jeder Spell hat seine EIGENE Essenz ============ */
+  console.log('\n== 1. Jeder Spell hat seine eigene Essenz (AA-Weg) ==');
   const modell = await page.evaluate(() => {
     const AC = window.ArenaCards;
     return {
       spells: AC.SPELL_KEYS.slice(),
       sorten: AC.SPELL_KEYS.map(k => AC.materialTypeOf(k)),
-      arkanIstSorte: AC.MATERIAL_KEYS.indexOf(AC.SPELL_MATERIAL) >= 0,
-      arkanOhneKarte: AC.materialTypeOf(AC.SPELL_MATERIAL) === null,
-      elementOhneArkan: AC.ELEMENT_MATERIAL_KEYS.indexOf(AC.SPELL_MATERIAL) < 0,
+      alleSortenDa: AC.SPELL_KEYS.every(k => AC.MATERIAL_KEYS.indexOf(k) >= 0),
+      keineImBasis: AC.SPELL_KEYS.every(k => AC.BASIS_MATERIAL_KEYS.indexOf(k) < 0),
+      spellSorten: AC.SPELL_MATERIAL_KEYS.slice().sort(),
       maxImMatch: AC.SPELL_SLOTS_MAX,
     };
   });
   check('es gibt vier Spells', modell.spells.length === 4, modell.spells.join(','));
-  check('alle vier ziehen DIESELBE Sorte',
-    new Set(modell.sorten).size === 1 && modell.sorten[0] === 'arkan',
+  /* ⚠ Kehrtwende am 30.07.2026 nachmittags: vormittags teilten sich die
+     vier EINE Sorte (Variante B), seit den AA-Bildern (IMG_3434) hat
+     jeder seine eigene. Dieser Schritt prüft das GEGENTEIL von vorher —
+     deshalb steht der Grund hier und nicht nur im Commit. */
+  check('jeder Spell hat seine EIGENE Sorte, keine geteilte',
+    new Set(modell.sorten).size === 4 &&
+    modell.sorten.every((s, i) => s === modell.spells[i]),
     modell.sorten.join(','));
-  check('Arkan ist eine echte Sorte im Vorrat', modell.arkanIstSorte);
-  check('Arkan hat KEINE eigene Karte', modell.arkanOhneKarte);
-  check('Arkan zählt nicht zu den Element-Sorten', modell.elementOhneArkan);
+  check('alle vier Sorten stehen im Vorrat', modell.alleSortenDa,
+    modell.spellSorten.join(','));
+  check('keine Spell-Sorte zählt zu den Basis-Sorten', modell.keineImBasis);
   check('zwei Spells gehen ins Match', modell.maxImMatch === 2, modell.maxImMatch);
 
   /* ====== 2. Gleiche Muster und Caps wie Held und Turm ====== */
@@ -185,9 +190,9 @@ function check(label, cond, info) {
       const typ = ['bronze', 'silver', 'gold', 'arcane'][i % 4];
       const pk = AC.openPack(typ, null, ['solara', 'magmor']);
       pk.cards.forEach(c => { if (AC.isSpell(c.cardId)) spellsInKarten++; });
-      arkanInEssenz += pk.materialByType[AC.SPELL_MATERIAL] || 0;
+      AC.SPELL_MATERIAL_KEYS.forEach(k => { arkanInEssenz += pk.materialByType[k] || 0; });
       spellSlots += pk.spells.length;
-      arkanAusSlots += pk.arkan;
+      arkanAusSlots += pk.spellEssenz;
       pk.spells.forEach(x => { gesehen[x.cardId] = 1; });
       let summe = 0;
       pk.materialSlots.forEach(m => { summe += m.amount; });
@@ -203,13 +208,13 @@ function check(label, cond, info) {
   });
   check('kein Spell fällt jemals in einen normalen Kartenslot',
     slots.spellsInKarten === 0, slots.spellsInKarten + ' über 600 Packs');
-  check('keine Arkan-Essenz fällt jemals in einen Essenz-Slot',
+  check('keine Spell-Essenz fällt jemals in einen Essenz-Slot',
     slots.arkanInEssenz === 0, slots.arkanInEssenz);
   check('jedes Pack liefert genau so viele Spell-Slots wie definiert',
     slots.essenzSummeStimmt, 'Staffel ' + slots.staffel.join('/'));
-  check('jeder Spell-Slot bringt Arkan mit',
-    slots.arkanAusSlots > 0 && slots.arkanAusSlots / slots.spellSlots >= 2 &&
-    slots.arkanAusSlots / slots.spellSlots <= 4,
+  check('jeder Spell-Slot bringt Essenz mit',
+    slots.arkanAusSlots > 0 && slots.arkanAusSlots / slots.spellSlots >= 4 &&
+    slots.arkanAusSlots / slots.spellSlots <= 8,
     (slots.arkanAusSlots / slots.spellSlots).toFixed(2) + ' je Slot');
   check('alle vier Spells kommen über die Zeit vor',
     slots.verschiedene === 4, slots.verschiedene);
@@ -245,8 +250,8 @@ function check(label, cond, info) {
   check('der Reiter zeigt genau die vier Spells',
     reiter.n === 4 && reiter.alleSpells && reiter.vollstaendig, reiter.n + ' Kacheln');
   check('die Kacheln haben eine Fläche', reiter.sichtbar);
-  check('der Hinweis nennt die Arkan-Essenz',
-    /Arkan/.test(reiter.hinweis), reiter.hinweis.slice(0, 70));
+  check('der Hinweis nennt die eigene Essenz',
+    /eigenen Essenz/.test(reiter.hinweis), reiter.hinweis.slice(0, 70));
 
   /* ====== 6. Das Detail sagt die Wahrheit ====== */
   console.log('\n== 6. Das Spell-Detail sagt die Wahrheit ==');
@@ -265,15 +270,15 @@ function check(label, cond, info) {
       cd: stats.find(s => /ABKLINGZEIT/i.test(s)) || '',
     };
   });
-  check('das Detail nennt die Arkan-Essenz',
-    detail.essenz === 'Arkan-Essenz', detail.essenz);
+  check('das Detail nennt die eigene Essenz des Spells',
+    detail.essenz === 'Splitter-Essenz', detail.essenz);
   /* ⚠ Der Herkunftstext der Türme („kommt aus Packs, in denen EMBER
      liegt") ist für einen Spell FALSCH: Arkan fällt in jedem Spell-Slot,
      unabhängig davon, welcher Spell darin steckt. Ein Text, der die
      Herkunft falsch beschreibt, schickt den Spieler an die falsche
      Stelle — deshalb ein eigener Schritt dafür. */
-  check('der Herkunftstext nennt die Spell-Slots, nicht die eigene Karte',
-    /Spell-Slots/.test(detail.sub) && !/in denen SPLITTER liegt/.test(detail.sub),
+  check('der Herkunftstext nennt die Spell-Slots UND die eigene Karte',
+    /Spell-Slots/.test(detail.sub) && /SPLITTER/.test(detail.sub),
     detail.sub.slice(0, 90));
   /* ⚠ „Power: 0" war die erste Fassung — eine ehrliche Rechnung mit
      sinnloser Aussage. Ein Spell schiesst nicht, er hat keine Power. */
@@ -287,26 +292,34 @@ function check(label, cond, info) {
   check('die Abklingzeit wächst NICHT mit dem Level',
     detail.cd !== '' && !/→/.test(detail.cd), detail.cd);
 
-  /* ====== 7. Ein Spell-Level-Up nimmt Arkan und sonst nichts ====== */
-  console.log('\n== 7. Level-Up greift nur auf Arkan zu ==');
+  /* ====== 7. Ein Spell-Level-Up nimmt SEINE Sorte und sonst nichts ====== */
+  console.log('\n== 7. Level-Up greift nur auf die eigene Sorte zu ==');
   const lvlUp = await page.evaluate(() => {
     const AC = window.ArenaCards;
     AC._reset();
-    const sp = AC.SPELL_KEYS[0];
+    const sp = AC.SPELL_KEYS[0], anderer = AC.SPELL_KEYS[1];
     AC.addDrop(sp, 'common', 1);
     AC.addMaterial(999, 'fire');
-    const nurFremd = AC.canLevelUp(sp, 9e9).reason;
-    AC.addMaterial(50, AC.SPELL_MATERIAL);
+    const nurTurm = AC.canLevelUp(sp, 9e9).reason;
+    /* Der schaerfere Gegentest: die Essenz eines ANDEREN Spells. Vor
+       der Umstellung haette sie geholfen — alle vier teilten sich einen
+       Vorrat. Jetzt darf sie es nicht. */
+    AC.addMaterial(999, anderer);
+    const nurSpellFremd = AC.canLevelUp(sp, 9e9).reason;
+    AC.addMaterial(50, sp);
     const vorher = AC.getMaterials();
     const r = AC.levelUp(sp);
     const nachher = AC.getMaterials();
     const geaendert = AC.MATERIAL_KEYS.filter(k => vorher[k] !== nachher[k]);
-    return { nurFremd, geaendert, neu: r && r.newLvl, sorte: r && r.materialType };
+    return { nurTurm, nurSpellFremd, geaendert, neu: r && r.newLvl,
+             sorte: r && r.materialType, sp };
   });
-  check('999 Turmessenz helfen dem Spell nicht', lvlUp.nurFremd === 'material', lvlUp.nurFremd);
-  check('mit Arkan klappt das Level-Up', lvlUp.neu === 2, lvlUp.neu);
-  check('GENAU EINE Sorte hat sich verändert — Arkan',
-    lvlUp.geaendert.length === 1 && lvlUp.geaendert[0] === 'arkan',
+  check('999 Turmessenz helfen dem Spell nicht', lvlUp.nurTurm === 'material', lvlUp.nurTurm);
+  check('999 Essenz eines ANDEREN Spells helfen auch nicht',
+    lvlUp.nurSpellFremd === 'material', lvlUp.nurSpellFremd);
+  check('mit der eigenen Essenz klappt das Level-Up', lvlUp.neu === 2, lvlUp.neu);
+  check('GENAU EINE Sorte hat sich verändert — die eigene',
+    lvlUp.geaendert.length === 1 && lvlUp.geaendert[0] === lvlUp.sp,
     lvlUp.geaendert.join(','));
 
   check('keine JS-Fehler', errors.length === 0, errors[0]);

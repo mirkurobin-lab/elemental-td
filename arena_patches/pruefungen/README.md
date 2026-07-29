@@ -96,6 +96,26 @@ wird nicht gegen eine feste Prozentzahl geprüft, sondern gegen die
 Kurven ohnehin ähneln, prüft ein eigener Schritt die Kopplung direkt:
 *jeder Essenz-Posten gehört zu einer Karte aus DIESEM Pack.*
 
+## Nachtrag zur Ausnahme: sie ist am selben Tag wieder verschwunden
+
+Der Abschnitt unten beschreibt, wie die Kopplung „eine Sorte je Karte"
+am 30.07.2026 vormittags eine Ausnahme bekam (Spells teilen sich eine
+Essenz). **Nachmittags war sie wieder weg** — die AA-Bildschirme zeigten,
+dass dort jeder Spell sein eigenes Upgrade-Material hat, und die Ansage
+lautete, es nachzubauen.
+
+Beide Male wurde dieselbe Prüfung angefasst, und beide Male nach
+derselben Regel: **sie sagt, was gilt — nicht, was gerade grün ist.**
+Erst mit Ausnahme, dann wieder ohne. Was sie NIE tat, ist weicher zu
+werden: die heutige Fassung fängt eine Karte ohne Essenz, eine Essenz
+ohne Karte und einen Spell mit fremder Sorte.
+
+Der Nebeneffekt ist die eigentliche Lehre: **eine Prüfung, die eine
+Kehrtwende überlebt, ohne dass jemand sie aufweicht, hat den Umbau
+begleitet statt ihn zu behindern.** Die Kehrtwende kostete zwei Stunden,
+nicht zwei Tage — weil an jeder Stelle stand, warum sie so war.
+
+
 ## Eine Regel mit Ausnahme wird genauer, nicht weicher
 
 Am 30.07.2026 kamen die Spells dazu, und die zentrale Kopplung des

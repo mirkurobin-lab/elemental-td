@@ -2761,3 +2761,59 @@ Prozent der Bühnenbreite. Die Zeitmarke in §22.4 („t ≈ 144–166 s") war
 Was in den **Sechsecken** genau steht (im Video „11" und „12" — Zahlen,
 keine Namen), und ob die Zahl eine Stufe, eine Menge oder eine Aufladung
 ist. Das braucht einen Bildausschnitt in höherer Auflösung.
+
+
+---
+
+## 25. Spell-Detail und Spell-Fusion (AA-Bildschirme, 30.07.2026)
+
+**Quelle:** `IMG_3433` (INFERNO RAIN), `IMG_3434` (METEOR STRIKE),
+`IMG_3435` (Fusion BLIZZARD WING), je 1320 × 2868.
+
+### 25.1 Das Spell-Detail
+
+| Element | Beleg |
+|---|---|
+| Kartenform | **Sechseck** mit Element-Marke oben links, auf lila Karte |
+| Stufenband | `LVL: 12/40` grün, mit Aufwärtspfeil — **die Zahl im Sechseck ist das Level** |
+| Kraft | `Power: 3532` bzw. `3404` — **AA zeigt für Spells eine echte Kraftzahl** |
+| Ziel | „Ground" bzw. „Air & Ground" |
+| Werte | Damage 806.5 **+43.1** · Radius 1 · Cooldown 51 — der grüne Zuschlag ist der Gewinn des nächsten Level-Ups |
+| Fusions-Hinweis | „**Merge 2 identical** Meteor Strike cards to unlock: Damage +17 %" |
+| **Upgrade-Material** | Werkzeugtipp „**Greenprint · Upgrades skills**", Bestand `87/4` — **das Bild ist das Kartenbild selbst, grün eingefärbt** |
+| Knöpfe | Unequip · **Upgrade 🪙10 000** · Max Level |
+
+### 25.2 Die Fusion — und wie „Merge 2" zu lesen ist
+
+`IMG_3435` löst den Widerspruch. Der Bildschirm zeigt:
+
+```
+   [Ergebnis LvL 1]
+        ↑
+   [Karte] + [Karte] [Karte]
+              REQUIRED CARDS
+             X2 GOOD BLIZZARD WING
+```
+
+Eine Karte **plus zwei erforderliche** — also **drei insgesamt**. Das
+„Merge 2 identical" im Detail meint **zwei weitere**, nicht zwei
+insgesamt. `MERGE_COST = 3` bleibt damit richtig, und die Ansage
+*„Braucht auch 3"* ist am Bild belegt.
+
+Weiter abgelesen:
+
+* Die Fusion hebt **MAX LEVEL 20 → 30** — bei AA also **+10 je Stufe**.
+  Wir arbeiten mit **+15** auf einer 100er-Spanne (25/40/55/70/85/100),
+  das ist die bekannte, bewusste Skalierung.
+* Die Fusion **verbessert auch die Werte direkt**: Damage 84 → 92.8,
+  Cooldown 57 → **54** (kleiner = besser).
+* Die Schmiede hat **„By Level"-Sortierung** und **„Merge All"** — beides
+  haben wir.
+* Links oben im Raster liegen **zwei Joker-Karten** mit `x1` — dieselbe
+  Bauart, die wir am 29.07. eingebaut haben.
+
+### 25.3 Was daraus gebaut wurde
+
+Jeder Spell hat seit dem 30.07.2026 **seine eigene Essenz**, deren Bild
+das Kartenbild ist — genau AAs Greenprint-Muster und genau das, was bei
+unseren Türmen schon galt. Siehe DESIGN_SPELLS.md, Kasten „REVIDIERT".

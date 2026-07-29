@@ -131,6 +131,11 @@
    * Das eigentliche Icon ist im UI das Karten-Artwork — ui_prototype.html
    * `matIco()` bildet Sorten-Schlüssel → CARD_ART ab. Ein fehlendes
    * Material-Bild kann es damit nicht geben. */
+  /* Die Spell-Schluessel als nackte Liste, VOR MATERIALS. SPELLS
+     (mit Namen, Rolle, Abklingzeit) folgt weiter unten und leitet sich
+     davon ab — so steht die Liste einmal da und nicht zweimal. */
+  var SPELL_ROH = { splitter: 1, bann: 1, bollwerk: 1, fokus: 1 };
+
   var MATERIALS = [
     { key: "fire",     name: "Ember-Essenz",  sym: "🔥", color: "#ff6b3d" },
     { key: "water",    name: "Frost-Essenz",  sym: "❄",  color: "#3dc8ff" },
@@ -140,25 +145,30 @@
     { key: "darkness", name: "Hollow-Essenz", sym: "🌑", color: "#9b6bff" },
     { key: "solara",   name: "Solara-Essenz", sym: "✨", color: "#ffd23d" },
     { key: "magmor",   name: "Magmor-Essenz", sym: "🌋", color: "#ff4d2d" },
-    /* ⚠ ARKAN ist die AUSNAHME von der 1:1-Regel, und zwar eine
-       entschiedene (Auftraggeber, 30.07.2026, Variante B aus
-       DESIGN_SPELLS.md §E): Spells sind neutral, sie haben kein Element
-       — also auch keine eigene Sorte je Spell. Alle vier teilen sich
-       eine. Vier Sorten fuer vier Spells haetten bei 4 Spell-Slots am
-       Tag rechnerisch 1,0 Nachschub je Spell ergeben; gepoolt sind es
-       12,0 frei verteilbare. Der Preis ist bekannt: der Vorrat sagt
-       nicht mehr, WELCHER Spell gemeint ist. Das ist bei vier Karten
-       tragbar und bei vierzig nicht — wer Spells stark erweitert, muss
-       diese Entscheidung neu treffen. */
-    { key: "arkan",    name: "Arkan-Essenz",  sym: "🔷", color: "#cfd8e3" },
+    /* ⚠ KEHRTWENDE (30.07.2026, nachmittags). Vormittags galt Variante B
+       — EINE gemeinsame „Arkan-Essenz" fuer alle Spells. Dann kamen die
+       AA-Bildschirme (IMG_3433/3434): dort hat JEDER Spell sein eigenes
+       Upgrade-Material („Greenprint"), und dessen Bild IST das
+       Kartenbild, gruen eingefaerbt. Damit faellt die Ausnahme weg und
+       die Regel gilt wieder ohne Sonderfall: eine Sorte je Karte.
+       Der bekannte Preis — der Nachschub je Spell sinkt auf ein Viertel
+       — ist mit SPELL_PER_SLOT bezahlt (2-4 → 4-8). AAs eigenes Bild
+       stuetzt das: dort steht der Vorrat auf 87 bei Bedarf 4. Die
+       Knappheit sitzt im Gold, nicht im Material. */
+    { key: "splitter", name: "Splitter-Essenz", sym: "💠", color: "#bfe0ff" },
+    { key: "bann",     name: "Bann-Essenz",     sym: "🔻", color: "#e07ad8" },
+    { key: "bollwerk", name: "Bollwerk-Essenz", sym: "🧱", color: "#7fe3d8" },
+    { key: "fokus",    name: "Fokus-Essenz",    sym: "🔆", color: "#ffd98a" },
   ];
   var MATERIAL_KEYS = MATERIALS.map(function (m) { return m.key; });
-  /* Die acht ELEMENT-Sorten ohne Arkan. Ueberall dort gebraucht, wo
-     „irgendeine Essenz" gemeint ist (Round-Robin, Pack-Slots): Arkan
-     darf da NICHT mitlaufen, sonst verduennt jede Turm-Belohnung sich
-     still um ein Neuntel und der Spell-Nachschub kaeme aus Quellen, die
-     nie darueber sprechen. Arkan hat eigene, benannte Quellen. */
-  var ELEMENT_MATERIAL_KEYS = MATERIAL_KEYS.filter(function (k) { return k !== "arkan"; });
+  /* ⚠ Hiess bis zum 30.07.2026 `ELEMENT_MATERIAL_KEYS` — falsch, denn
+     Solara und Magmor sind HELDEN, keine Elemente (Elemente gibt es
+     sechs). Der Unterschied, der wirklich zaehlt, ist ein anderer:
+     Turm- und Heldensorten fallen aus den Essenz-Slots, Spell-Sorten
+     aus den Spell-Slots. Beide Listen sind ABGELEITET, nicht gepflegt. */
+  var SPELL_MATERIAL_KEYS = MATERIALS.filter(function (m) { return SPELL_ROH[m.key]; })
+                                     .map(function (m) { return m.key; });
+  var BASIS_MATERIAL_KEYS = MATERIAL_KEYS.filter(function (k) { return !SPELL_ROH[k]; });
   var MATERIAL_BY_KEY = {};
   MATERIALS.forEach(function (m) { MATERIAL_BY_KEY[m.key] = m; });
 
@@ -185,7 +195,6 @@
   var SPELL_KEYS = SPELLS.map(function (s) { return s.key; });
   var SPELL_BY_KEY = {};
   SPELLS.forEach(function (s) { SPELL_BY_KEY[s.key] = s; });
-  var SPELL_MATERIAL = "arkan";
   var SPELL_SLOTS_MAX = 2;         // so viele nimmt der Spieler ins Match
   function isSpell(id) { return !!SPELL_BY_KEY[id]; }
   function spellInfoOf(id) {
@@ -197,8 +206,7 @@
    * Es steht nur noch da, damit aufrufender Code, der die Tabelle liest,
    * nicht bricht — und damit sichtbar ist, DASS die Zuordnung 1:1 ist. */
   var CARD_MATERIAL = {};
-  ELEMENT_MATERIAL_KEYS.forEach(function (k) { CARD_MATERIAL[k] = k; });
-  SPELL_KEYS.forEach(function (k) { CARD_MATERIAL[k] = SPELL_MATERIAL; });
+  MATERIAL_KEYS.forEach(function (k) { CARD_MATERIAL[k] = k; });
 
   /* Unbekannte IDs (Skills, Items, Trick-Karten später) haben KEINE
    * Sorte. Wir erfinden auch keine: materialTypeOf() gibt null zurück,
@@ -209,18 +217,16 @@
   var UNKNOWN_MATERIAL = { key: null, name: "Unbekannte Essenz", sym: "❔", color: "#9aa3ad" };
   function materialTypeOf(cardId) {
     /* Spells zuerst: sie tragen alle Arkan. Danach die 1:1-Regel — und
-       zwar ueber ELEMENT_MATERIAL_KEYS, nicht ueber MATERIAL_BY_KEY.
+       zwar ueber die Identitaet, nicht ueber MATERIAL_BY_KEY.
        Sonst waere `materialTypeOf("arkan")` gleich "arkan", und ein
        Aufrufer koennte eine Karte namens „arkan" leveln, die es gar
        nicht gibt. Arkan ist eine Sorte OHNE Karte — die einzige. */
+    /* ⚠ Der Waechter bleibt, auch wenn die Sonderregel fuer Spells weg
+       ist: ohne ihn lieferte `materialTypeOf(undefined)` den Wert
+       `undefined` zurueck — CARD_MATERIAL[undefined] ist undefined, und
+       `undefined === undefined` ist wahr. Das sah aus wie „keine Sorte"
+       und war es NICHT. */
     if (!cardId || typeof cardId !== "string") return null;
-    if (SPELL_BY_KEY[cardId]) return SPELL_MATERIAL;
-    /* ⚠ Ohne den Wächter oben lieferte `materialTypeOf(undefined)` den
-       Wert `undefined` zurück: CARD_MATERIAL[undefined] ist undefined,
-       und `undefined === undefined` ist wahr. Der Rückgabewert sah dann
-       aus wie „keine Sorte" und war es NICHT — er hätte durch jede
-       Prüfung `=== null` durchgereicht werden können. Die Selbstprüfung
-       hat genau das gefunden. */
     return CARD_MATERIAL[cardId] === cardId ? cardId : null;
   }
   // materialInfoOf(cardId) → {key, name, sym, color}
@@ -294,7 +300,12 @@
    * bei den Türmen („die Karte bringt ihren Nachschub mit"), nur
    * gepoolt, weil alle Spells dieselbe Sorte ziehen. Ohne diese Quelle
    * gäbe es Arkan nirgends und das ganze System stünde still. */
-  var SPELL_PER_SLOT = [2, 4];       // Arkan-Essenz je Spell-Slot
+  /* ⚠ 4-8 statt 2-4 seit dem 30.07.2026. Grund in einer Zeile: mit vier
+     eigenen Sorten statt einer gemeinsamen landet nur die Haelfte des
+     Nachschubs auf den ZWEI Spells, die man wirklich spielt. Die
+     Verdopplung stellt den Spielenden wieder dorthin, wo er mit dem
+     gepoolten Vorrat stand — bei klarerer Kopplung. */
+  var SPELL_PER_SLOT = [4, 8];       // eigene Essenz je Spell-Slot
   var PACKS = {
     bronze: { key: "bronze", name: "Bronze-Pack", color: "#c98a52",
               source: "Jeder 3. Sieg (arena_profile packAwarded)",
@@ -758,8 +769,8 @@
     if (!s.cards || typeof s.cards !== "object") s.cards = {};
     s.materials = normMaterials(s.materials);
     s.jokers = normJokers(s.jokers);
-    s.matRR = ((s.matRR | 0) % ELEMENT_MATERIAL_KEYS.length + ELEMENT_MATERIAL_KEYS.length)
-              % ELEMENT_MATERIAL_KEYS.length;
+    s.matRR = ((s.matRR | 0) % BASIS_MATERIAL_KEYS.length + BASIS_MATERIAL_KEYS.length)
+              % BASIS_MATERIAL_KEYS.length;
     s.gold = null;
     delete s.material;   // v2-Feld — existiert seit v3 nicht mehr
     return s;
@@ -832,16 +843,17 @@
     if (typeKey && MATERIAL_BY_KEY[typeKey]) {
       st.materials[typeKey] = Math.max(0, st.materials[typeKey] + n);
     } else if (n) {
-      /* ⚠ ELEMENT_MATERIAL_KEYS, nicht MATERIAL_KEYS: „irgendeine
-         Essenz" aus Pass, Shop oder Kalender darf NICHT still zu einem
-         Neuntel Arkan werden. Der Spell-Nachschub hat benannte Quellen
-         (Spell-Slots der Packs), damit man ihn auch stellen kann. */
-      var sign = n < 0 ? -1 : 1, mag = Math.abs(n), L = ELEMENT_MATERIAL_KEYS.length;
+      /* ⚠ BASIS_MATERIAL_KEYS, nicht MATERIAL_KEYS: „irgendeine Essenz"
+         aus Pass, Shop oder Kalender darf NICHT still zu einem Drittel
+         Spell-Essenz werden. Der Spell-Nachschub hat eine benannte
+         Quelle — die Spell-Slots der Packs —, damit man ihn stellen
+         kann statt ihn zu suchen. */
+      var sign = n < 0 ? -1 : 1, mag = Math.abs(n), L = BASIS_MATERIAL_KEYS.length;
       var per = Math.floor(mag / L), rest = mag % L, cur = st.matRR | 0;
       for (i = 0; i < L; i++) {
         var add = per + (i < rest ? 1 : 0);
         if (!add) continue;
-        var key = ELEMENT_MATERIAL_KEYS[(cur + i) % L];
+        var key = BASIS_MATERIAL_KEYS[(cur + i) % L];
         st.materials[key] = Math.max(0, st.materials[key] + sign * add);
       }
       st.matRR = (cur + rest) % L;
@@ -1316,29 +1328,37 @@
        gleich anfuehlt. Sie gehen NICHT in `cards` — der Aufrufer soll
        sie getrennt anzeigen koennen (eigene Slots im Oeffnungsraster),
        und `cards.length` bleibt `cardSlots`. */
-    var spells = [], arkan = 0;
+    var spells = [], spellEssenz = 0, spellByType = {};
+    SPELL_MATERIAL_KEYS.forEach(function (k) { spellByType[k] = 0; });
     var nSpell = def.spellSlots | 0;
     for (i = 0; i < nSpell; i++) {
       var ts = tierOf(rollWeighted(def.weights, rng));
       var sk = SPELL_KEYS[Math.min(SPELL_KEYS.length - 1, Math.floor(rng() * SPELL_KEYS.length))];
-      var sd = SPELL_BY_KEY[sk];
-      var arkanHier = randInt(rng, SPELL_PER_SLOT[0], SPELL_PER_SLOT[1]);
-      arkan += arkanHier;
+      var sd = SPELL_BY_KEY[sk], smd = MATERIAL_BY_KEY[sk];
+      /* ⚠ Die Essenz gehoert dem Spell, der in DIESEM Slot lag — genau
+         die Kopplung, die bei den Tuermen seit v4 gilt: die Karte
+         bringt ihren eigenen Nachschub mit. Wer SPLITTER zieht, bekommt
+         SPLITTER-Essenz, nicht „irgendwas fuer Spells". */
+      var menge = randInt(rng, SPELL_PER_SLOT[0], SPELL_PER_SLOT[1]);
+      spellEssenz += menge;
+      spellByType[sk] += menge;
       spells.push({ cardId: sk, name: sd.name, rolle: sd.rolle, tier: ts.key,
                     tierName: ts.name, tierIndex: ts.index, color: ts.color,
-                    count: 1, arkan: arkanHier });
+                    count: 1, essenz: menge,
+                    essenzTyp: sk, essenzName: smd.name, essenzSym: smd.sym });
     }
-    /* ⚠ Arkan wird BEWUSST NICHT in `byType`/`material` verrechnet.
-       Die beiden Felder sind das Ergebnis der ESSENZ-Slots, und die
-       Vorgabe lautet, dass Spells da nicht mitzaehlen. Waere Arkan
-       drin, stimmte `Summe der Slots == material` nicht mehr, und jede
-       Auswertung „wie viel Essenz bringt ein Pack" haette still den
-       Spell-Nachschub mitgezaehlt. Der Aufrufer bucht `arkan` extra —
+    /* ⚠ Spell-Essenz wird BEWUSST NICHT in `byType`/`material`
+       verrechnet. Die beiden Felder sind das Ergebnis der ESSENZ-Slots,
+       und die Vorgabe lautet, dass Spells da nicht mitzaehlen. Waere
+       sie drin, stimmte `Summe der Slots == material` nicht mehr, und
+       jede Auswertung „wie viel Essenz bringt ein Pack" haette still
+       den Spell-Nachschub mitgezaehlt. Der Aufrufer bucht sie extra —
        eine Zeile mehr, dafuer keine Zahl, die zwei Dinge bedeutet. */
 
     return { packType: def.key, name: def.name, promise: def.promise, color: def.color,
              cards: cards, materialSlots: matSlots, materialByType: byType, material: mat,
-             spellSlots: spells, spells: spells, arkan: arkan,
+             spellSlots: spells, spells: spells,
+             spellEssenz: spellEssenz, spellEssenzByType: spellByType,
              gold: randInt(rng, def.gold[0], def.gold[1]),
              pity: pityHit, guarantee: def.guarantee, packsOpened: st.packsOpened,
              pityStatus: getPityStatus() };
@@ -1500,8 +1520,8 @@
     MERGE_TIER_KEYS: MERGE_TIER_KEYS, MERGE_COST: MERGE_COST, MAX_LEVEL: MAX_LEVEL,
     GOLD_BANDS: GOLD_BANDS, MATERIAL_NAME: MATERIAL_NAME,
     MATERIALS: MATERIALS, MATERIAL_KEYS: MATERIAL_KEYS, CARD_MATERIAL: CARD_MATERIAL,
-    ELEMENT_MATERIAL_KEYS: ELEMENT_MATERIAL_KEYS,
-    SPELLS: SPELLS, SPELL_KEYS: SPELL_KEYS, SPELL_MATERIAL: SPELL_MATERIAL,
+    BASIS_MATERIAL_KEYS: BASIS_MATERIAL_KEYS, SPELL_MATERIAL_KEYS: SPELL_MATERIAL_KEYS,
+    SPELLS: SPELLS, SPELL_KEYS: SPELL_KEYS,
     SPELL_SLOTS_MAX: SPELL_SLOTS_MAX, SPELL_PER_SLOT: SPELL_PER_SLOT,
     POOL_IDS: POOL_IDS, isSpell: isSpell, spellInfoOf: spellInfoOf,
     MATERIAL_BY_KEY: MATERIAL_BY_KEY,
@@ -1565,44 +1585,41 @@
     MATERIALS.forEach(function (m) {
       console.log("  " + m.sym + " " + pad(m.name, 18) + pad(m.key, 10) + m.color);
     });
-    /* ⚠ ZWEITE FASSUNG (30.07.2026, Spells nach Variante B).
-       Bis hierher galt „Sortenliste == Kartenliste" ohne Ausnahme. Das
-       ist jetzt falsch, und zwar entschieden: Spells sind neutral und
-       teilen sich Arkan. Die Prüfung darf deswegen nicht schwächer
-       werden — sie sagt die Regel MIT ihrer Ausnahme:
+    /* ⚠ DRITTE FASSUNG (30.07.2026, nachmittags). Die zweite hatte eine
+       Ausnahme („Spells teilen sich Arkan"). Die ist mit den
+       AA-Bildschirmen weggefallen: dort hat jeder Spell sein eigenes
+       Upgrade-Material. Damit gilt die Regel wieder OHNE Sonderfall,
+       und die Pruefung wird dadurch nicht schwaecher, sondern schaerfer
+       — es gibt keinen Zweig mehr, in dem etwas durchrutschen koennte:
 
-         Turm- und Heldenkarten:  je eine eigene Sorte (1:1)
-         Spells:                  alle gemeinsam `arkan`
-         Arkan:                   die einzige Sorte OHNE eigene Karte
+         JEDE Karte hat genau eine eigene Sorte, und der Sortenschluessel
+         IST die Karten-ID.
 
-       Wer morgen einen fünften Spell einträgt, ohne ihn in SPELLS
-       aufzunehmen, wird hier rot — denn dann ist er weder das eine noch
-       das andere. Wer eine neunte Turmkarte anlegt, ohne ihre Essenz,
-       ebenso. Genau das soll die Zeile leisten. */
+       Wer morgen eine Karte eintraegt, ohne ihre Essenz anzulegen, wird
+       hier rot. Wer eine Sorte anlegt, zu der es keine Karte gibt,
+       ebenso. */
     var kartenIds = Object.keys(PERKS).sort().join(",");
-    var turmIds = Object.keys(PERKS).filter(function (k) { return !isSpell(k); }).sort().join(",");
-    check("jede Turm-/Heldenkarte hat genau eine eigene Essenz",
-      ELEMENT_MATERIAL_KEYS.slice().sort().join(",") === turmIds,
-      ELEMENT_MATERIAL_KEYS.length + " Element-Sorten / " +
-      Object.keys(PERKS).filter(function (k) { return !isSpell(k); }).length + " Turmkarten");
-    check("jede Karte in PERKS ist entweder Turmkarte oder Spell",
-      Object.keys(PERKS).every(function (k) {
-        return isSpell(k) || ELEMENT_MATERIAL_KEYS.indexOf(k) >= 0;
-      }), kartenIds);
+    check("jede Karte hat genau eine eigene Essenz",
+      MATERIAL_KEYS.slice().sort().join(",") === kartenIds,
+      MATERIAL_KEYS.length + " Sorten / " + Object.keys(PERKS).length + " Karten");
+    check("der Sortenschlüssel IST die Karten-ID (Identität, ohne Ausnahme)",
+      MATERIAL_KEYS.every(function (k) { return materialTypeOf(k) === k; }));
     check("alle vier Spells sind in PERKS ausformuliert",
       SPELL_KEYS.every(function (k) { return !!PERKS[k]; }), SPELL_KEYS.join(","));
-    check("Element-Sortenschlüssel IST die Karten-ID (Identität)",
-      ELEMENT_MATERIAL_KEYS.every(function (k) { return materialTypeOf(k) === k; }));
-    check("jeder Spell zieht Arkan, keiner eine eigene Sorte",
-      SPELL_KEYS.every(function (k) { return materialTypeOf(k) === SPELL_MATERIAL; }));
-    check("Arkan ist die einzige Sorte ohne eigene Karte",
-      materialTypeOf(SPELL_MATERIAL) === null &&
-      MATERIAL_KEYS.filter(function (k) { return materialTypeOf(k) !== k; }).length === 1);
+    check("jeder Spell hat seine EIGENE Essenz, keine geteilte",
+      SPELL_KEYS.every(function (k) { return materialTypeOf(k) === k; }) &&
+      new Array(SPELL_KEYS.length).length === SPELL_MATERIAL_KEYS.length,
+      SPELL_MATERIAL_KEYS.join(","));
+    check("Basis- und Spell-Sorten zusammen sind die ganze Liste",
+      BASIS_MATERIAL_KEYS.length + SPELL_MATERIAL_KEYS.length === MATERIAL_KEYS.length &&
+      BASIS_MATERIAL_KEYS.every(function (k) { return !isSpell(k); }) &&
+      SPELL_MATERIAL_KEYS.every(isSpell),
+      BASIS_MATERIAL_KEYS.length + " + " + SPELL_MATERIAL_KEYS.length);
     check("CARD_MATERIAL bildet jede Karte auf ihre Sorte ab",
       Object.keys(PERKS).every(function (k) { return CARD_MATERIAL[k] === materialTypeOf(k); }) &&
       Object.keys(CARD_MATERIAL).length === Object.keys(PERKS).length);
-    check("keine zwei Turmkarten teilen sich eine Essenz",
-      (function () { var g = {}; return ELEMENT_MATERIAL_KEYS.every(function (k) {
+    check("keine zwei Karten teilen sich eine Essenz",
+      (function () { var g = {}; return MATERIAL_KEYS.every(function (k) {
         if (g[k]) return false; g[k] = 1; return true; }); })());
     check("Namen und Symbole sind eindeutig", (function () {
       var n = {}, y = {};
@@ -1846,13 +1863,14 @@
       Math.abs(matSlotsBySort.solara / matSlotsTotal * 100 - 3.125) < 1.2,
       (matSlotsBySort.fire / matSlotsTotal * 100).toFixed(2) + " % / " +
       (matSlotsBySort.solara / matSlotsTotal * 100).toFixed(2) + " %");
-    /* ELEMENT_MATERIAL_KEYS, nicht MATERIAL_KEYS: Arkan darf hier NICHT
-       fallen. Es kommt aus den Spell-Slots, und dass das so bleibt,
-       prüft der eigene Abschnitt weiter unten. */
-    check("jede Element-Sorte droppt überhaupt",
-      ELEMENT_MATERIAL_KEYS.every(function (k) { return matBySort[k] > 0; }));
-    check("Arkan faellt NICHT aus den Element-Slots",
-      !matBySort[SPELL_MATERIAL], matBySort[SPELL_MATERIAL] + " Stueck");
+    /* BASIS_MATERIAL_KEYS, nicht MATERIAL_KEYS: Spell-Sorten duerfen
+       hier NICHT fallen. Sie kommen aus den Spell-Slots, und dass das
+       so bleibt, prueft der eigene Abschnitt weiter unten. */
+    check("jede Basis-Sorte droppt überhaupt",
+      BASIS_MATERIAL_KEYS.every(function (k) { return matBySort[k] > 0; }));
+    check("KEINE Spell-Sorte faellt aus den Essenz-Slots",
+      SPELL_MATERIAL_KEYS.every(function (k) { return !matBySort[k]; }),
+      SPELL_MATERIAL_KEYS.map(function (k) { return k + ":" + (matBySort[k] | 0); }).join(" "));
     check("Ø Gold/Pack ≈ 600", goldTotal / N > 550 && goldTotal / N < 650, r2(goldTotal / N));
     check("Pity Episch greift: nie >" + PITY_EPIC + " Packs ohne Episch+", maxStreakNoEpic <= PITY_EPIC, maxStreakNoEpic);
     check("Pity Legendär greift: nie >" + PITY_LEGENDARY + " Packs ohne Legendär", maxStreakNoLeg <= PITY_LEGENDARY, maxStreakNoLeg);
@@ -2007,7 +2025,7 @@
     /* Acht, nicht neun: der Round-Robin laeuft ueber die Element-Sorten.
        Arkan bleibt aussen vor, sonst verduennte jede allgemeine
        Essenz-Belohnung sich still in den Spell-Vorrat. */
-    var L_M = ELEMENT_MATERIAL_KEYS.length;
+    var L_M = BASIS_MATERIAL_KEYS.length;
     API._reset();
     var mm = addMaterial(30, "water");
     check("addMaterial(30,'water') bucht nur auf 'water'", mm.water === 30 &&
@@ -2018,22 +2036,22 @@
     addMaterial(L_M);
     check("addMaterial(" + L_M + ") ohne Sorte verteilt je 1", (function () {
       var g = getMaterials();
-      return g.total === L_M && ELEMENT_MATERIAL_KEYS.every(function (k) { return g[k] === 1; })
-        && g[SPELL_MATERIAL] === 0;
+      return g.total === L_M && BASIS_MATERIAL_KEYS.every(function (k) { return g[k] === 1; })
+        && SPELL_MATERIAL_KEYS.every(function (k) { return g[k] === 0; });
     })(), JSON.stringify(getMaterials()));
     API._reset();
     for (var rr = 0; rr < L_M; rr++) addMaterial(1);
     check("Round-Robin: " + L_M + "× addMaterial(1) landet auf " + L_M + " verschiedenen Sorten",
       (function () {
         var g = getMaterials();
-        return g.total === L_M && ELEMENT_MATERIAL_KEYS.every(function (k) { return g[k] === 1; })
-          && g[SPELL_MATERIAL] === 0;
+        return g.total === L_M && BASIS_MATERIAL_KEYS.every(function (k) { return g[k] === 1; })
+          && SPELL_MATERIAL_KEYS.every(function (k) { return g[k] === 0; });
       })(), JSON.stringify(getMaterials()));
     API._reset();
     addMaterial(L_M + 2);
     check("addMaterial(" + (L_M + 2) + ") ohne Sorte: Rest wandert, Summe stimmt", (function () {
       var g = getMaterials();
-      var w = ELEMENT_MATERIAL_KEYS.map(function (k) { return g[k]; }).sort().join(",");
+      var w = BASIS_MATERIAL_KEYS.map(function (k) { return g[k]; }).sort().join(",");
       return g.total === L_M + 2 && w === new Array(L_M - 2).fill(1).concat([2, 2]).sort().join(",");
     })(), JSON.stringify(getMaterials()));
     /* ================= §4d SPELLS (30.07.2026) =================
@@ -2055,27 +2073,37 @@
         view(sp).needGold === view("fire").needGold,
         view(sp).needMaterial + "/" + view("fire").needMaterial);
 
-      // 2. Aber Arkan, nicht die eigene Sorte.
-      check("Spell zieht Arkan", view(sp).materialType === SPELL_MATERIAL,
+      // 2. Die EIGENE Sorte — wie bei jedem Turm (AA-Beleg IMG_3434).
+      check("Spell zieht seine eigene Sorte", view(sp).materialType === sp,
         view(sp).materialType);
       check("Turmessenz hilft dem Spell NICHT", (function () {
         API._reset(); addDrop(sp, "common", 1);
         addMaterial(999, "fire");
         return canLevelUp(sp, 999999).reason === "material";
       })());
-      check("Arkan levelt den Spell", (function () {
+      check("die eigene Essenz levelt den Spell", (function () {
         API._reset(); addDrop(sp, "common", 1);
-        addMaterial(999, SPELL_MATERIAL);
+        addMaterial(999, sp);
         var vor = view(sp).lvl, r = levelUp(sp);
-        return !!r && r.newLvl === vor + 1 && r.materialType === SPELL_MATERIAL;
+        return !!r && r.newLvl === vor + 1 && r.materialType === sp;
       })());
-      check("alle vier Spells teilen DENSELBEN Vorrat", (function () {
+      /* Der Gegentest zur alten Fassung: FRUEHER teilten sich die vier
+         einen Vorrat. Jetzt darf die Essenz des einen dem anderen NICHT
+         helfen — sonst waere die Umstellung nur halb passiert. */
+      check("die Essenz eines Spells hilft einem anderen NICHT", (function () {
         API._reset();
-        SPELL_KEYS.forEach(function (k) { addDrop(k, "common", 1); });
-        addMaterial(20, SPELL_MATERIAL);
-        var vorher = getMaterials()[SPELL_MATERIAL];
+        addDrop(SPELL_KEYS[1], "common", 1);
+        addMaterial(999, SPELL_KEYS[0]);
+        return canLevelUp(SPELL_KEYS[1], 999999).reason === "material";
+      })());
+      check("jeder Spell hat einen EIGENEN Vorrat", (function () {
+        API._reset();
+        SPELL_KEYS.forEach(function (k) { addDrop(k, "common", 1); addMaterial(20, k); });
+        var vorher = getMaterials();
         levelUp(SPELL_KEYS[1]);
-        return getMaterials()[SPELL_MATERIAL] < vorher;
+        var nachher = getMaterials();
+        var geaendert = SPELL_KEYS.filter(function (k) { return vorher[k] !== nachher[k]; });
+        return geaendert.length === 1 && geaendert[0] === SPELL_KEYS[1];
       })());
 
       // 3. Fusion: 3 gleiche → naechste Stufe, wie ueberall.
@@ -2103,21 +2131,41 @@
         var pk = openPack("bronze", null, ["solara", "magmor"], rngS);
         ausSlots += pk.spells.length;
         spellSlotSumme += pk.spells.length;
-        arkanSumme += pk.arkan;
+        arkanSumme += pk.spellEssenz;
         for (var j = 0; j < pk.cards.length; j++) if (isSpell(pk.cards[j].cardId)) ausKarten++;
       }
       check("Spells fallen NIE in den normalen Kartenslots", ausKarten === 0, ausKarten);
       check("Bronze liefert genau einen Spell-Slot je Pack",
         ausSlots === packe * PACKS.bronze.spellSlots, ausSlots + " ueber " + packe + " Packs");
-      check("jeder Spell-Slot legt Arkan dazu (2-4)",
-        arkanSumme / spellSlotSumme > SPELL_PER_SLOT[0] - 0.2 &&
-        arkanSumme / spellSlotSumme < SPELL_PER_SLOT[1] + 0.2,
+      check("jeder Spell-Slot legt Essenz dazu (" + SPELL_PER_SLOT.join("-") + ")",
+        arkanSumme / spellSlotSumme > SPELL_PER_SLOT[0] - 0.3 &&
+        arkanSumme / spellSlotSumme < SPELL_PER_SLOT[1] + 0.3,
         (arkanSumme / spellSlotSumme).toFixed(2) + " je Slot");
-      check("Arkan taucht NICHT in materialByType der Essenz-Slots auf", (function () {
+      /* ⚠ Die WICHTIGSTE Zeile des Abschnitts: die Essenz gehoert dem
+         Spell, der in DIESEM Slot lag. Ohne sie waere die Kopplung
+         „die Karte bringt ihren Nachschub mit" nur behauptet. */
+      check("die Essenz gehoert dem Spell, der im Slot lag", (function () {
+        var r3 = mulberry32(1234), ok3 = true, n3 = 0;
+        for (var i3 = 0; i3 < 500; i3++) {
+          var pk3 = openPack("arcane", null, [], r3);
+          pk3.spells.forEach(function (x) {
+            n3++;
+            if (x.essenzTyp !== x.cardId) ok3 = false;
+          });
+          SPELL_KEYS.forEach(function (k) {
+            var ausSlots = 0;
+            pk3.spells.forEach(function (x) { if (x.cardId === k) ausSlots += x.essenz; });
+            if (pk3.spellEssenzByType[k] !== ausSlots) ok3 = false;
+          });
+        }
+        return ok3 && n3 > 100;
+      })());
+      check("keine Spell-Sorte taucht in materialByType der Essenz-Slots auf", (function () {
         var pk = openPack("gold", null, ["solara", "magmor"], mulberry32(7));
         var summe = 0;
         pk.materialSlots.forEach(function (m) { summe += m.amount; });
-        return pk.materialByType[SPELL_MATERIAL] === 0 && summe === pk.material;
+        return SPELL_MATERIAL_KEYS.every(function (k) { return pk.materialByType[k] === 0; }) &&
+               summe === pk.material;
       })());
       check("alle vier Spells kommen ueber die Zeit vor", (function () {
         var gesehen = {}, r2 = mulberry32(99), n = 0;
@@ -2140,13 +2188,13 @@
     })());
     check("unbekannte Sorte wird wie 'ohne Sorte' verteilt", (function () {
       API._reset(); addMaterial(L_M, "quatsch");
-      var g = getMaterials(); return ELEMENT_MATERIAL_KEYS.every(function (k) { return g[k] === 1; });
+      var g = getMaterials(); return BASIS_MATERIAL_KEYS.every(function (k) { return g[k] === 1; });
     })());
     check("ein v3-Sortenname bucht NICHTS mehr gezielt", (function () {
       API._reset(); addMaterial(L_M, "attack");
       var g = getMaterials();
       // wird verteilt, nicht auf einen Topf 'attack' gelegt (den gibt es nicht)
-      return g.total === L_M && ELEMENT_MATERIAL_KEYS.every(function (k) { return g[k] === 1; }) &&
+      return g.total === L_M && BASIS_MATERIAL_KEYS.every(function (k) { return g[k] === 1; }) &&
         g.attack === undefined;
     })());
 
