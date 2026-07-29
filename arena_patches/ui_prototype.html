@@ -8957,12 +8957,55 @@ button.pfplate{cursor:pointer}
       arena: "icon_arena_pack", vorrat: "pack_vorrat_icon",
       tresor: "offer_vault_bank"
     };
-    /* Endplätze der fünf Karten: drei oben, zwei unten — die Anordnung
-       aus dem Video. Werte sind Anteile der Bühnenbreite. */
-    var PLATZ = [
-      { x: -.30, y: -.22, r: -6 }, { x: 0, y: -.26, r: 2 }, { x: .30, y: -.22, r: 7 },
-      { x: -.16, y: .20, r: -3 }, { x: .16, y: .20, r: 5 }
-    ];
+    /* ===================================================================
+     * DIE ZAHL DER KARTEN KOMMT AUS DEM PACK, NICHT AUS DIESER DATEI.
+     *
+     * Bis 29.07.2026 lagen hier fünf feste Plätze — die Anordnung aus dem
+     * Vorbild-Video. Unser System zieht aber je nach Pack 5, 7, 9 oder 11
+     * Karten (`ArenaCards.PACKS[key].cardSlots`). Wer ein Arkan-Pack
+     * öffnete, sah elf Karten im Raster, aber nur fünf davon fliegen.
+     *
+     * Zwei Zahlen, die dasselbe meinen und getrennt gepflegt werden,
+     * laufen immer auseinander. Die Plätze werden deshalb GERECHNET.
+     *
+     * Die Zeilenaufteilung folgt dem Vorbild: oben mehr als unten, weil
+     * die untere Reihe näher am Daumen liegt und dort Luft braucht.
+     *
+     *    5 → 3+2      7 → 4+3      9 → 3+3+3      11 → 4+4+3
+     *
+     * Die Kartengröße sinkt mit der Zahl, sonst überlappen sie sich —
+     * bei elf Karten wäre die Bühne sonst eine Wand.
+     * ================================================================= */
+    var REIHEN = { 5: [3, 2], 7: [4, 3], 9: [3, 3, 3], 11: [4, 4, 3] };
+
+    function reihenFuer(n) {
+      if (REIHEN[n]) return REIHEN[n].slice();
+      /* Unbekannte Zahl: so gleichmäßig wie möglich auf höchstens drei
+         Reihen verteilen, obere Reihen zuerst gefüllt. */
+      var z = n <= 6 ? 2 : 3, r = [], i, rest = n;
+      for (i = 0; i < z; i++) { var k = Math.ceil(rest / (z - i)); r.push(k); rest -= k; }
+      return r;
+    }
+
+    function plaetze(n) {
+      var reihen = reihenFuer(n), zeilen = reihen.length, raus = [], i, j;
+      /* Breite je Karte: bei zwei Reihen großzügig, bei drei enger. */
+      var breite = zeilen >= 3 ? (n > 9 ? .145 : .16) : (n > 5 ? .17 : .19);
+      var hoehe = breite / .72;                 /* Seitenverhältnis der Karte */
+      var yStart = -((zeilen - 1) * (hoehe + .03)) / 2;
+      for (i = 0; i < zeilen; i++) {
+        var m = reihen[i], y = yStart + i * (hoehe + .03);
+        for (j = 0; j < m; j++) {
+          var x = (j - (m - 1) / 2) * (breite + .025);
+          /* Leichte Streuung, damit es gelegt und nicht gesetzt wirkt.
+             Deterministisch aus der Position, nicht zufällig — sonst
+             springt die Szene bei jedem Öffnen anders. */
+          raus.push({ x: x, y: y, r: ((i + j) % 2 ? 1 : -1) * (2 + ((i * 3 + j) % 5)),
+                      b: breite });
+        }
+      }
+      return raus;
+    }
     var DAUER = 3000, laufend = null;
 
     function raeumen() {
@@ -8986,13 +9029,19 @@ button.pfplate{cursor:pointer}
       art.style.visibility = quelle ? "" : "hidden";
 
       var breite = st.getBoundingClientRect().width || 300;
-      var n = Math.max(1, Math.min(PLATZ.length, anzahl || 5));
-      for (var i = 0; i < n; i++) {
-        var p = PLATZ[i], c = document.createElement("div");
+      /* Obergrenze 16: darüber wird die Bühne zur Wand, und mehr als ein
+         Arkan-Pack (11) gibt es nicht. Keine untere Grenze ausser 1 —
+         ein Pack ohne Karten wäre ein Fehler weiter oben, den diese
+         Szene nicht kaschieren soll. */
+      var n = Math.max(1, Math.min(16, anzahl || 5));
+      var liste = plaetze(n);
+      for (var i = 0; i < liste.length; i++) {
+        var p = liste[i], c = document.createElement("div");
         c.className = "pkcard";
         c.style.setProperty("--zx", Math.round(p.x * breite) + "px");
         c.style.setProperty("--zy", Math.round(p.y * breite) + "px");
         c.style.setProperty("--zr", p.r + "deg");
+        c.style.width = (p.b * 100).toFixed(1) + "%";
         st.appendChild(c);
       }
 

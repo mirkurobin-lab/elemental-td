@@ -217,7 +217,8 @@ const pruef = (n, w, z) => {
   pruef("die Ebene ist offen", waehrend.offen);
   pruef("die Animation laeuft", waehrend.spielt);
   pruef("aria-hidden ist waehrenddessen false", waehrend.versteckt === "false");
-  pruef("fuenf Karten liegen bereit", waehrend.karten === 5, waehrend.karten + " Stueck");
+  pruef("die Kartenzahl kommt aus dem Pack (Bronze = 5)",
+    waehrend.karten === 5, waehrend.karten + " Stueck");
   pruef("die Ebene deckt den App-Inhalt", waehrend.z >= 260, "z-index " + waehrend.z);
   /* Ein Zielort in Pixeln, nicht 0 — sonst landen alle Karten aufeinander.
      Genau das passiert, wenn die Buehnenbreite beim Rechnen 0 war. */
@@ -230,6 +231,42 @@ const pruef = (n, w, z) => {
   const bronze = /rgb\((\d+),\s*(\d+),\s*(\d+)\)/.exec(waehrend.farbe);
   pruef("Bronze glueht bernstein, nicht magenta",
     bronze && +bronze[1] > 180 && +bronze[2] > 110 && +bronze[3] < 110, waehrend.farbe);
+
+  /* ---------- 2b. Die Zahl folgt dem Pack ----------
+     29.07.2026: Die Szene legte FEST fuenf Plaetze an, egal was im Pack
+     war. Wer ein Arkan-Pack oeffnete, sah elf Karten im Raster, aber nur
+     fuenf davon fliegen. Zwei Zahlen, die dasselbe meinen und getrennt
+     gepflegt werden, laufen immer auseinander — deshalb wird hier gegen
+     `ArenaCards.PACKS[key].cardSlots` geprueft und nicht gegen eine
+     Zahl in dieser Datei. */
+  await p.mouse.click(195, 300);
+  await p.waitForTimeout(150);
+  const proTyp = await p.evaluate(async () => {
+    const raus = [];
+    for (const key of ["bronze", "silver", "gold", "arcane"]) {
+      window.__proto.openPackKey(key);
+      await new Promise(r => setTimeout(r, 120));
+      raus.push({ key: key,
+                  soll: window.ArenaCards.PACKS[key].cardSlots,
+                  ist: document.getElementById("pkStage").querySelectorAll(".pkcard").length });
+      document.getElementById("packLayer").dispatchEvent(
+        new PointerEvent("pointerdown", { bubbles: true }));
+      await new Promise(r => setTimeout(r, 120));
+    }
+    return raus;
+  });
+  proTyp.forEach(x => pruef(
+    "Pack " + x.key + ": " + x.soll + " Karten fliegen",
+    x.ist === x.soll, x.ist + " statt " + x.soll));
+  /* Und die Gegenprobe: die vier Typen sind NICHT alle gleich. Waere die
+     Zahl wieder fest verdrahtet, gingen die vier Schritte oben nur dann
+     durch, wenn zufaellig alle Packs gleich viele Karten haetten. */
+  pruef("die vier Pack-Typen unterscheiden sich in der Kartenzahl",
+    new Set(proTyp.map(x => x.ist)).size === 4,
+    proTyp.map(x => x.key + "=" + x.ist).join(" "));
+
+  await p.evaluate(() => { window.__proto.openPackKey("bronze"); });
+  await p.waitForTimeout(150);
 
   /* ---------- 3. Ein Tipp bricht ab ---------- */
   await p.mouse.click(195, 300);
