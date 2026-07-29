@@ -824,7 +824,31 @@ Start ohnehin eine leere v2-Bank und wird über die normalen Packs versorgt.
 
 ---
 
-## E2) Spells — die dritte Kartenart (Auftrag 29.07.2026, noch NICHT gebaut)
+## E2) Spells — die dritte Kartenart
+
+> ### ✅ GEBAUT (30.07.2026)
+>
+> Die Überschrift trug bis eben „noch NICHT gebaut". Das stimmt nicht mehr.
+> Entschieden und umgesetzt:
+>
+> | | Entscheidung | Wo |
+> |---|---|---|
+> | Essenz | **Variante B** — eine gemeinsame `arkan` für alle vier | `arena_cards.js` `MATERIALS`, `SPELL_MATERIAL` |
+> | Leveln | **dieselben** Caps, Material- und Goldfunktionen wie Turm/Held | derselbe Code, keine Zwillinge |
+> | Fusion | 3 gleiche → nächste Rarität, `MERGE_COST = 3` | unverändert |
+> | Pack-Slots | **eigene**, Staffel `1/2/2/3` | `PACKS[*].spellSlots` |
+> | Essenz-Slots | **unberührt** — Arkan liegt nicht in `materialByType` | bewusst getrennt |
+> | Arkan-Quelle | 2–4 je Spell-Slot | `SPELL_PER_SLOT` |
+> | UI | eigener Reiter „Spells" in der Sammlung, gleicher Detail- und Schmiedepfad | `renderSpells()` |
+>
+> Die vier Spells und ihre 40 Merge-Boni stehen in **DESIGN_SPELLS.md**;
+> geprüft wird das Ganze von `pruefungen/spells.js` (36 Schritte).
+>
+> **Was noch fehlt:** die Anzeige im **Battledeck** — die beiden Sechsecke
+> links und rechts der Helden-Ult. Der Deck-Bildschirm ist aus dem
+> Referenzvideo **noch nicht in lesbarer Auflösung ausgewertet**
+> (AA_UI_REFERENZ.md §22.4), und ich baue ihn nicht auf Verdacht.
+
 
 > „Später brauchen wir auch spells wo der Spieler 2 wählen kann und ins Match
 > mitnehmen kann die dann auch im Battledeck rechts und links vom main skill in

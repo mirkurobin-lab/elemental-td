@@ -1,6 +1,6 @@
 # Prüfungen
 
-Sechzehn Playwright-Suiten mit zusammen **1 133 Schritten**, plus zwei
+Siebzehn Playwright-Suiten mit zusammen **1 172 Schritten**, plus zwei
 Sonderprüfungen, die nur mit tatsächlich geladenen Bildern laufen.
 
 ## Aufruf
@@ -36,6 +36,7 @@ direkt — kein Server, kein Build.
 | `shop_raender.js` | 20 | Randfarben: Inhalt (Kristall/Gold) und Produktfamilie (Packs) |
 | `flug.js` | 12 | Sammel-Animation — aus JEDEM Fenster, nicht nur aus dem Shop |
 | `community.js` | 89 | Community-Reiter: Marken, echte Ziele |
+| `spells.js` | 36 | Die vier Spells (Variante B): eine gemeinsame Arkan-Essenz, gleiche Caps/Kurven wie Türme, Fusion 3→nächste Rarität, **eigene Pack-Slots** ohne Berührung der Essenz-Slots, eigener Reiter, ehrliches Detail |
 | `packoeffnung.js` | 60 | Pack-Öffnung: Zeitkurve **gekoppelt statt eingefroren**, Farbausströmung, sichtbare Karten, Abbruch, Neustart, **Raritäts-Leiter der Aufdeckung** |
 | `quoten.js` | 48 | Drop-Raten hinter dem ⓘ — Auflage nach Apple 3.1.1 / Google Play |
 | `essenzen.js` | 33 | Eine Essenz je Karte: Sortenliste == Kartenliste, Ankündigung == Buchung, Fach/Detail/Shop/Pass |
@@ -94,6 +95,33 @@ wird nicht gegen eine feste Prozentzahl geprüft, sondern gegen die
 `HERO_WEIGHT` stillschweigend überschrieben. Und weil sich die beiden
 Kurven ohnehin ähneln, prüft ein eigener Schritt die Kopplung direkt:
 *jeder Essenz-Posten gehört zu einer Karte aus DIESEM Pack.*
+
+## Eine Regel mit Ausnahme wird genauer, nicht weicher
+
+Am 30.07.2026 kamen die Spells dazu, und die zentrale Kopplung des
+Essenz-Systems stimmte nicht mehr: "Sortenliste == Kartenliste" gilt
+seither nicht ausnahmslos, weil vier neutrale Spell-Karten sich **eine**
+Sorte teilen (Arkan). Zwei Suiten wurden dadurch rot — `essenzen.js` und
+der Modul-Selbsttest.
+
+Der bequeme Weg wäre gewesen, die Prüfung auf "irgendwie passt das schon"
+abzuschwächen. Stattdessen spricht sie die Regel jetzt **mitsamt ihrer
+Ausnahme** aus, und jede Hälfte hat ihren eigenen Schritt:
+
+* Turm- und Heldenkarten: **je eine eigene Sorte** (1:1)
+* Spells: **alle gemeinsam** `arkan`
+* Arkan: die **einzige Sorte ohne eigene Karte**
+* und: jede Karte in `PERKS` ist **entweder** Turmkarte **oder** Spell
+
+Damit fängt sie mehr als vorher, nicht weniger: eine Turmkarte ohne
+Essenz wird rot, ein Spell mit eigener Essenz wird rot, und ein fünfter
+Spell, den jemand einträgt ohne ihn in `SPELLS` aufzunehmen, ebenfalls —
+denn dann ist er weder das eine noch das andere.
+
+**Die Regel dahinter:** Wenn eine Änderung eine Kopplungsprüfung rot
+macht, ist die Frage nicht "wie mache ich sie wieder grün", sondern "wie
+lautet die Regel jetzt". Eine Prüfung, die man beim ersten Widerspruch
+aufweicht, prüft danach gar nichts mehr.
 
 ## Eine eingefrorene Zahl sagt „falsch" zur richtigen Änderung
 

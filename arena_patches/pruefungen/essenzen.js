@@ -60,18 +60,37 @@ function check(label, cond, info) {
     const AC = window.ArenaCards;
     return {
       sorten: AC.MATERIAL_KEYS.slice().sort(),
+      element: AC.ELEMENT_MATERIAL_KEYS.slice().sort(),
       karten: Object.keys(AC.PERKS).sort(),
-      identitaet: AC.MATERIAL_KEYS.every(k => AC.materialTypeOf(k) === k),
+      turmkarten: Object.keys(AC.PERKS).filter(k => !AC.isSpell(k)).sort(),
+      spells: AC.SPELL_KEYS.slice().sort(),
+      identitaet: AC.ELEMENT_MATERIAL_KEYS.every(k => AC.materialTypeOf(k) === k),
+      spellsAufArkan: AC.SPELL_KEYS.every(k => AC.materialTypeOf(k) === AC.SPELL_MATERIAL),
+      arkanOhneKarte: AC.materialTypeOf(AC.SPELL_MATERIAL) === null,
       unbekannt: AC.materialTypeOf('gibtsnicht'),
       altSorten: ['attack', 'speed', 'special'].map(k => AC.materialTypeOf(k)),
       version: AC.STATE_VERSION,
       namen: AC.MATERIALS.map(m => m.name),
     };
   });
-  check('jede Karte hat genau eine eigene Essenz',
-    modell.sorten.join(',') === modell.karten.join(','),
-    modell.sorten.length + ' Sorten / ' + modell.karten.length + ' Karten');
-  check('Sortenschlüssel IST die Karten-ID', modell.identitaet);
+  /* ⚠ ZWEITE FASSUNG (30.07.2026). Bis hierher lautete die Regel
+     „Sortenliste == Kartenliste", ohne Ausnahme. Mit den Spells stimmt
+     das nicht mehr, und zwar absichtlich: sie sind neutral und teilen
+     sich EINE Sorte (Variante B). Die Prüfung wird deshalb nicht
+     weicher, sondern genauer — sie sagt die Regel mitsamt ihrer
+     Ausnahme, und jede Hälfte hat ihren eigenen Schritt. Eine Zeile
+     „irgendwie passt das schon" hätte beide Fehlerarten durchgelassen:
+     eine Turmkarte ohne Essenz UND einen Spell mit eigener. */
+  check('jede Turm-/Heldenkarte hat genau eine eigene Essenz',
+    modell.element.join(',') === modell.turmkarten.join(','),
+    modell.element.length + ' Element-Sorten / ' + modell.turmkarten.length + ' Turmkarten');
+  check('jeder Spell zieht dieselbe Arkan-Essenz', modell.spellsAufArkan,
+    modell.spells.join(','));
+  check('Arkan ist die einzige Sorte OHNE eigene Karte', modell.arkanOhneKarte);
+  check('jede Karte ist entweder Turmkarte oder Spell',
+    modell.karten.length === modell.turmkarten.length + modell.spells.length,
+    modell.karten.length + ' = ' + modell.turmkarten.length + ' + ' + modell.spells.length);
+  check('Element-Sortenschlüssel IST die Karten-ID', modell.identitaet);
   check('unbekannte ID bekommt KEINE Ersatzsorte', modell.unbekannt === null, '' + modell.unbekannt);
   check('die drei alten Sortennamen sind keine Sorten mehr',
     modell.altSorten.every(x => x === null), JSON.stringify(modell.altSorten));

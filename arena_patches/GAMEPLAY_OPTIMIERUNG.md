@@ -113,6 +113,32 @@ Cooldowns sind außerdem der natürliche Platz für **Karten-Level-Effekte** (�
 
 ## 3. Türme haben in AA **In-Match-Sternstufen** (Star Levels)
 
+> ### ⚠ KORREKTUR (30.07.2026) — dieser Abschnitt gilt für AA, NICHT für uns
+>
+> Ansage des Auftraggebers: *„Wir haben keine in Game tower upgrades mit
+> Sternen, wir haben Tower die sich fusionieren."*
+>
+> Damit ist die **Empfehlung unten hinfällig**, und zwar nicht, weil sie
+> falsch gerechnet war, sondern weil sie ein Problem löst, das wir nicht
+> haben. Unsere Progression liegt vollständig im Meta: Karten fusionieren
+> (3 → nächste Rarität), leveln über Essenz und Gold, und was im Match
+> steht, steht mit dem Wert, den es beim Betreten mitbringt.
+>
+> **Was das für die Folgepunkte heißt:**
+> * Der **Fluch „Sternenfall"** braucht ein anderes Ziel. Ohne
+>   Sternstufen kann er nichts herabsetzen — er müsste stattdessen auf
+>   eine matchlokale Größe zielen (Tempo, Reichweite, Ladung).
+>   **Offen, nicht entschieden.**
+> * Die **zweite Gold-Senke im Match** aus §1 fällt damit ebenfalls weg.
+>   Match-Gold hat dann nur noch das Bauen als Senke.
+> * Der **Skalenbefund in §12** (Wellen-HP gegen Turmschaden) hat seine
+>   Rechengrundlage verloren: er nahm ★1→★5 als eine der Stellschrauben
+>   an. Siehe die Korrektur dort.
+>
+> Der Abschnitt bleibt stehen, weil der **AA-Beleg** stimmt und beim
+> Vergleich mit dem Vorbild weiter gebraucht wird. Er ist ab hier
+> Fundstück, nicht Bauplan.
+
 **Beleg (§9.2).** Eine gegnerische Skill-Karte beschreibt sich wörtlich mit
 **„Reduces star levels of a … by 1/1/2 star level(s)"**. Es existiert also ein
 **matchlokaler Stufen-Layer pro Turm**, der von gegnerischen Karten **gesenkt** werden kann —
@@ -581,6 +607,26 @@ danach ein Zweizeiler pro Handkarte.
 ---
 
 ## 12. Wellen-HP und Turmschaden liegen nicht auf derselben Skala (29.07.2026)
+
+> ### ⚠ AUSGESETZT (30.07.2026)
+>
+> Ansage des Auftraggebers: *„Das System von Monster Waves und Jo usw
+> wird neu gebaut, also derzeit nicht relevant kalkulierbar."*
+>
+> Der **Befund** bleibt gültig — die beiden Kurven passten nicht
+> zusammen, und das war unabhängig von der Ursache messbar. Die
+> **Empfehlungen** darunter sind es nicht mehr: sie rechnen gegen eine
+> Wellenkurve, die es so nicht mehr geben wird, und eine davon nimmt die
+> ★1→★5-Achse als Stellschraube an, die es bei uns nie gab (§3).
+>
+> Wenn die neue Wellenkurve steht, gehört diese Rechnung **einmal neu
+> aufgestellt** — mit denselben zwei Fragen, die dafür beantwortet sein
+> müssen: Ist die Wellen-HP **pro Bahn oder gesamt**, und **wie viele
+> Türme** stehen am Ende eines echten Matches? Ohne die beiden Zahlen ist
+> jede Skalenaussage geraten.
+>
+> Bis dahin: **nicht danach bauen.**
+
 
 **Gemessen, nicht geschätzt.** `arena_waves.js` gegen die Turm-Stats aus
 `ui_prototype.html` `CARDS`, Matchlänge 7 min / 27 Wellen = 15,6 s je Welle

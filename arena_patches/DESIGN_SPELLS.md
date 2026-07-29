@@ -707,15 +707,48 @@ Entwurf für diese Karte.
 
 ---
 
-## I) Was der Auftraggeber entscheiden muss
+## I) Entscheidungen — Stand 30.07.2026
 
-1. **Essenz:** A (eigene Essenz je Spell, sofort baubar) oder **B (gemeinsame
-   Arkan-Essenz, Empfehlung)** — §E.
-2. **Spell-Slots:** §E2s `0/1/1/2` oder die nachgerechnete Staffel **`1/2/2/3`** — §F.
-3. **Kartenfarbe:** ein gemeinsames Silber für alle Spells, oder vier eigene Töne — §G.
-4. **FOKUS' Ult-Ladung:** bleibt drin (dann muss „Ult-Ladung" definiert werden) oder fällt
+### ✅ Entschieden und gebaut
+
+1. **Essenz: Variante B.** Eine gemeinsame **Arkan-Essenz** für alle vier Spells.
+   Wortlaut: *„Nimm Variante B für das Level des spells … Wird in dem Fall dann mit
+   Gold und den Arkan Essenzen gelevelt, gleiche Muster und Max lvl pro Rarität wie
+   von Hero und towern."*
+   → `arena_cards.js`: neunte Sorte `arkan`, `SPELL_MATERIAL`, `materialTypeOf()`
+   bildet alle Spells darauf ab. Level-Caps, Material- und Goldkurve sind **dieselben
+   Funktionen** wie bei Türmen und Helden — nicht nachgebaute Zwillinge, sondern
+   derselbe Code. `pruefungen/spells.js` §2 misst das über alle sechs Stufen.
+2. **Fusion bleibt:** 3 gleiche Spell-Karten → nächste Rarität, `MERGE_COST = 3`
+   wie überall. 243 Gewöhnlich-Kopien laufen auch bei einem Spell bis Suprem durch.
+3. **Spell-Slots: `1/2/2/3`** (Bronze/Silber/Gold/Arkan), die nachgerechnete Staffel
+   aus §F. Begründung dort; der Kern in einem Satz: bei `0/1/1/2` liefert ein
+   Tagespensum **einen** Spell-Slot, bei `1/2/2/3` **vier**.
+4. **Arkan-Quelle:** die Spell-Slots selbst, 2–4 Stück je Slot. Das spiegelt die
+   v4-Kopplung „die Karte bringt ihren Nachschub mit", nur gepoolt.
+   ⚠ **Das ist meine Ableitung, nicht deine Ansage** — ohne eine benannte Quelle
+   gäbe es Arkan nirgends und das System stünde still. Wenn Arkan zusätzlich aus
+   Pass, Arena-Prämien oder Login-Kalender kommen soll, ist das eine Zeile mehr;
+   heute kommt es **ausschließlich** aus den Spell-Slots. Bewusst NICHT aus dem
+   allgemeinen Essenz-Round-Robin: sonst verdünnt jede Turm-Belohnung sich still
+   um ein Neuntel.
+
+### ⏳ Noch offen
+
+5. **Kartenfarbe:** ein gemeinsames Silber für alle Spells, oder vier eigene Töne — §G.
+   Gebaut ist vorerst **je Spell ein eigener Ton** (passend zum Artwork), weil die
+   vier Karten sich im Raster sonst nur über das Bild unterscheiden.
+6. **FOKUS' Ult-Ladung:** bleibt drin (dann muss „Ult-Ladung" definiert werden) oder fällt
    weg (dann Tempo-Bonus −30 % statt −25 %) — §D.4.
-5. **Der fünfte Spell:** Wirtschaftskarte (Gold / zusätzliche Turmkarte) als eigene Rolle
+7. **Der fünfte Spell:** Wirtschaftskarte (Gold / zusätzliche Turmkarte) als eigene Rolle
    nachziehen, ja oder nein — §D.4, verworfene Alternative.
-6. **Nicht Teil dieses Dokuments, aber vorher zu klären:** der Skalen-Befund aus §C.2 —
-   Wellen-HP und Turm-Schaden liegen heute nicht auf derselben Skala.
+
+### ❌ Erledigt durch Ansage
+
+8. **Der Skalen-Befund aus §C.2** ist **ausgesetzt**: *„Das System von Monster Waves
+   und Jo usw wird neu gebaut, also derzeit nicht relevant kalkulierbar."* Der Befund
+   bleibt als Messung gültig, die Empfehlungen rechnen gegen eine Kurve, die es so
+   nicht mehr geben wird. Siehe GAMEPLAY_OPTIMIERUNG.md §12.
+9. **★-Stufen im Match gibt es bei uns nicht** — *„Wir haben keine in Game tower
+   upgrades mit Sternen, wir haben Tower die sich fusionieren."* Überall dort, wo
+   §C.2 mit einer In-Match-Upgrade-Achse gerechnet hat, fällt diese Achse weg.

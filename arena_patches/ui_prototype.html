@@ -4185,6 +4185,16 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   justify-content:flex-end;pointer-events:none}
 .pcfront .facewrap .t{background:linear-gradient(180deg,#0e141800,#0e1418e8 55%);
   font-size:8.5px;font-weight:900;letter-spacing:.05em;text-align:center;padding:8px 2px 3px}
+/* Der Spell-Slot bringt ZWEI Dinge: die Karte und die Arkan-Essenz. Die
+   Zugabe steht als eigene Zeile unter der Stufe, damit sie nicht wie
+   eine Eigenschaft der Karte aussieht. */
+.pcfront .facewrap .spellzu{background:#0e1418e8;color:#cfd8e3;font-size:8px;
+  font-weight:900;text-align:center;padding:0 2px 4px;display:flex;
+  align-items:center;justify-content:center;gap:3px}
+.pcfront .facewrap .spellzu .ico,.pcfront .facewrap .spellzu img{width:9px;height:9px}
+/* Spell-Slots tragen den Arkan-Rand statt der Ressourcen-Optik — auf
+   einen Blick erkennbar, dass sie NICHT aus den Kartenslots kommen. */
+.pcard.spellslot .pcfront{box-shadow:inset 0 0 0 1px #cfd8e355,inset 0 0 14px -4px #cfd8e3aa}
 /* Emote-Tokens (rund, Batch 4) */
 .emotok{position:relative;flex:0 0 auto;width:34px;height:34px;border-radius:50%;
   overflow:hidden;display:block;margin:0 auto 3px;font-size:17px;
@@ -6701,7 +6711,7 @@ button.pfplate{cursor:pointer}
 
     <div class="tabs">
       <button class="tab on" id="tabTowers">Türme</button>
-      <button class="tab" id="tabSkills">Skills</button>
+      <button class="tab" id="tabSpells">Spells</button>
       <button class="tab" id="tabItems">Items</button>
       <button class="tab" id="tabHeroes">Helden</button>
       <span class="spacer"></span>
@@ -7289,6 +7299,43 @@ button.pfplate{cursor:pointer}
       power:1720,
       stats:[{k:"Ult-Schaden",b:455,t:"dmg"},{k:"Angriffstempo",b:0.68,t:"rate"},
              {k:"Lavafeld",b:2.4,t:"sec"},{k:"Reichweite",b:5.2,t:"flat"}] },
+    /* ---------- SPELLS (30.07.2026) ----------
+       Zwei nimmt der Spieler ins Match mit; im Battledeck sitzen sie als
+       Sechsecke links und rechts der Helden-Ult. Sie stehen mit in
+       CARDS, weil Detailansicht, Schmiede und Sammlung sonst einen
+       zweiten, fast gleichen Weg braeuchten — `spell:true` haelt sie
+       aus POOL_IDS und TOWER_IDS heraus.
+       `elem:"arkan"` ist kein Element im Spielsinn: Spells sind
+       neutral. Es ist der Essenz-Schluessel, mit dem sie leveln. */
+    { id:"splitter", name:"SPLITTER", elem:"arkan", spell:true, color:"#bfe0ff", art:"💠",
+      target:"Wegfeld", cooldown:45,
+      desc:"Ein Prismensplitter zerplatzt über dem Weg und regnet Scherben auf alles darunter.",
+      power:0,
+      stats:[{k:"Radius",b:2.2,t:"flat"},{k:"Einschlag",b:8,t:"pct"},
+             {k:"Grundschaden",b:120,t:"dmg"},{k:"Abklingzeit",b:45,t:"cd"}] },
+    { id:"bann", name:"BANN", elem:"arkan", spell:true, color:"#e07ad8", art:"🔻",
+      target:"Gegner", cooldown:30,
+      desc:"Markiert Gegner: sie erleiden +35 % Schaden und verlieren 40 % ihrer Rüstung.",
+      power:0,
+      stats:[{k:"Schadensbonus",b:35,t:"pct"},{k:"Rüstung",b:-40,t:"pct"},
+             {k:"Dauer",b:8,t:"sec"},{k:"Abklingzeit",b:30,t:"cd"}] },
+    { id:"bollwerk", name:"BOLLWERK", elem:"arkan", spell:true, color:"#7fe3d8",
+      art:"🧱", target:"Wegfeld", cooldown:40,
+      desc:"Eine Kristallwand sperrt den Weg für 4 s. Flieger ziehen darüber hinweg.",
+      power:0,
+      /* ⚠ Kein „Trefferpunkte 0". Die Wand hat bewusst KEINE HP — sie
+         ist nicht zerstoerbar, sie laeuft ab (DESIGN_SPELLS.md D.3).
+         Eine Null als Kennzahl liest sich wie ein Fehler oder wie eine
+         Wand, die sofort faellt. Stattdessen die Betaeubung beim
+         Zerbersten, die es wirklich gibt. */
+      stats:[{k:"Standzeit",b:4,t:"sec"},{k:"Breite",b:3,t:"flat"},
+             {k:"Berstbetäubung",b:1,t:"sec"},{k:"Abklingzeit",b:40,t:"cd"}] },
+    { id:"fokus", name:"FOKUS", elem:"arkan", spell:true, color:"#ffd98a",
+      art:"🔆", target:"Türme", cooldown:35,
+      desc:"Türme im Umkreis feuern 12 s lang mit −25 % Angriffsintervall.",
+      power:0,
+      stats:[{k:"Angriffstempo",b:-25,t:"pct"},{k:"Radius",b:2.5,t:"flat"},
+             {k:"Dauer",b:12,t:"sec"},{k:"Abklingzeit",b:35,t:"cd"}] },
   ];
   var BY_ID = {};
   CARDS.forEach(function (c) { BY_ID[c.id] = c; });
@@ -7297,9 +7344,15 @@ button.pfplate{cursor:pointer}
      Schmiede: ein Held ist KEIN Turm, er hat einen eigenen Reiter. Vorher
      lief beides ueber POOL_IDS, deshalb standen Solara und Magmor im
      Sammlungsraster zwischen den Tuermen. */
-  var POOL_IDS = CARDS.map(function (c) { return c.id; });
+  /* ⚠ Spells sind ueberall ausgenommen: sie fallen NICHT aus den
+     normalen Kartenslots (sie haben eigene), und sie stehen weder im
+     Turm- noch im Heldenraster. Beide Listen filtern deshalb `spell`
+     mit — sonst haette sich SPLITTER zwischen die Tuerme gesetzt,
+     genau wie es Solara und Magmor vor dem Helden-Reiter getan haben. */
+  var SPELL_IDS = CARDS.filter(function (c) { return c.spell; }).map(function (c) { return c.id; });
+  var POOL_IDS = CARDS.filter(function (c) { return !c.spell; }).map(function (c) { return c.id; });
   var HERO_IDS = CARDS.filter(function (c) { return c.hero; }).map(function (c) { return c.id; });
-  var TOWER_IDS = CARDS.filter(function (c) { return !c.hero; }).map(function (c) { return c.id; });
+  var TOWER_IDS = CARDS.filter(function (c) { return !c.hero && !c.spell; }).map(function (c) { return c.id; });
   var DECK = ["fire", "water", "nature", "light"];
 
   /* ================= Hub-Wallet (Gold liegt NICHT in ArenaCards) ======== */
@@ -7470,6 +7523,12 @@ button.pfplate{cursor:pointer}
     card_hollow:      CDN + "hf_20260725_163318_f95b1d45-da51-4ca8-ba40-1e8849ac1461.png",
     card_solara:      CDN + "hf_20260725_163321_b8b3a10d-c9e7-48d1-a374-ad3c3ead8577.png",
     card_magmor:      CDN + "hf_20260725_163323_2e544b8e-568c-4c59-967c-83424bf3e1c1.png",
+    /* ---- Batch 13: Spells + Arkan-Essenz (30.07.2026) ---- */
+    card_splitter:    CDN + "hf_20260729_152504_be9dca72-1bfb-482b-b1e5-7184f210c314.png",
+    card_bann:        CDN + "hf_20260729_152514_b4a7a7a5-0486-4c6b-bc38-69ca4f74cedd.png",
+    card_bollwerk:    CDN + "hf_20260729_152521_ea792ba5-90a8-46bc-9687-e99c3e355522.png",
+    card_fokus:       CDN + "hf_20260729_152530_81a48467-daf7-4fa4-96f9-4726e360591e.png",
+    ess_arkan:        CDN + "hf_20260729_152539_85c7ce4e-f0b1-4692-abba-89cc0d636786.png",
     /* ---- Batch 4: Breitbanner 16:9 (Pass, Events) ---- */
     pass_keyart:      CDN + "hf_20260725_160701_42a171b5-06f3-458d-a766-f4992e4210e5.png",
     event_tournament: CDN + "hf_20260725_160704_9fb36583-0558-4407-a96c-83275fc4c95e.png",
@@ -7798,6 +7857,10 @@ button.pfplate{cursor:pointer}
   var CARD_ART = {
     fire: "card_ember", water: "card_frost", nature: "card_thorn", earth: "card_stone",
     light: "card_dawn", darkness: "card_hollow", solara: "card_solara", magmor: "card_magmor",
+    splitter: "card_splitter", bann: "card_bann", bollwerk: "card_bollwerk", fokus: "card_fokus",
+    /* Arkan ist die einzige Essenz OHNE eigene Karte — sie braucht
+       deshalb als einzige ein eigenes Bild statt der Karten-Miniatur. */
+    arkan: "ess_arkan",
   };
   function cardArtHTML(id, cls) {
     var m = BY_ID[id] || {}, emoji = m.art || "❔";
@@ -7842,6 +7905,11 @@ button.pfplate{cursor:pointer}
   var ESS_SAMMEL = "ess_special";
   function matIco(sorte, cls) {
     var c = BY_ID[sorte];
+    /* ⚠ Arkan hat KEINE Karte — `BY_ID.arkan` ist leer, und ohne diesen
+       Zweig waere die Spell-Essenz als einzige auf das Sammel-Emoji
+       zurueckgefallen, waehrend alle acht Element-Essenzen ihr eigenes
+       Turmbild tragen. Genau die Sorte Loch, die man erst im Bild sieht. */
+    if (!c && CARD_ART[sorte]) return ico(CARD_ART[sorte], "🔷", cls);
     if (!c) return ico(ESS_SAMMEL, "⚗", cls);
     return ico(CARD_ART[sorte] || ESS_SAMMEL, c.art || "⚗", cls);
   }
@@ -8755,12 +8823,19 @@ button.pfplate{cursor:pointer}
     if (s.t === "rate") return s.b / Math.pow(mul, 0.30);   // kleiner = besser
     if (s.t === "sec")  return s.b * (1 + (mul - 1) * 0.35);
     if (s.t === "pct")  return Math.min(95, s.b * (1 + (mul - 1) * 0.30));
+    /* ⚠ "cd" = Abklingzeit. Sie darf NICHT mit dem Level wachsen. Als
+       `sec` gebaut zeigte das Spell-Detail „45,0 s → 45,3 s": ein
+       Level-Up haette die Wartezeit VERLAENGERT und sich dabei wie eine
+       Verbesserung angeschrieben. Abklingzeit sinkt ausschliesslich
+       ueber Merge-Boni (DESIGN_SPELLS.md §D) — hier steht sie fest. */
+    if (s.t === "cd")   return s.b;
     return s.b;                                            // flat
   }
   function statText(s, v) {
     if (s.t === "dmg") return fmt(v);
     if (s.t === "rate") return v.toFixed(2) + " s";
     if (s.t === "sec")  return v.toFixed(1) + " s";
+    if (s.t === "cd")   return v.toFixed(0) + " s";
     if (s.t === "pct")  return v.toFixed(1) + " %";
     return String(s.b);
   }
@@ -9039,6 +9114,25 @@ button.pfplate{cursor:pointer}
     bind($("deckRow"), openDetail);
     markPressable($("viewCollection"));
   }
+  /* Spell-Raster. Gleiche Kacheln wie die Tuerme, gleiche Detailkarte,
+     gleiche Schmiede — nur die Liste und der Hinweistext sind eigen.
+     Der Hinweis nennt die Arkan-Essenz, weil das die eine Sache ist, die
+     hier anders funktioniert als bei einem Turm. */
+  function renderSpells() {
+    renderTop();
+    $("collGrid").innerHTML = SPELL_IDS.map(function (id) { return tileHTML(id); }).join("");
+    hydrateFrames($("viewCollection"));
+    var vorrat = AC.getMaterials()[AC.SPELL_MATERIAL] | 0;
+    var bereit = 0;
+    SPELL_IDS.forEach(function (id) { if (AC.progressToNextMerge(id).ready) bereit++; });
+    $("collHint").innerHTML = bereit
+      ? "🔴 <b>" + bereit + " Spell(s) bereit zum Verschmelzen</b> — ab in die Schmiede."
+      : "Zwei Spells nimmst du ins Match. Sie leveln mit <b>Arkan-Essenz</b> — " +
+        "du hast <b>" + fmt(vorrat) + "</b>. Arkan kommt aus den Spell-Slots der Packs.";
+    bind($("collGrid"), openDetail);
+    markPressable($("viewCollection"));
+  }
+
   function bind(root, fn) {
     var els = root.querySelectorAll("[data-id]");
     for (var i = 0; i < els.length; i++) {
@@ -9095,7 +9189,18 @@ button.pfplate{cursor:pointer}
     $("dLoopPh").textContent = "⚔ " + m.name + "-Loop";
 
     var mul = v.statMul, nextMul = v.nextStatMul, canUp = !v.atCap;
-    $("dPower").textContent = fmt(m.power * mul);
+    /* ⚠ Ein Spell hat keine Power-Zahl — er schiesst nicht. „Power: 0"
+       waere eine ehrliche Rechnung mit einer sinnlosen Aussage; der
+       Spieler liest daraus, die Karte sei wertlos. Stattdessen steht
+       dort die Rolle, die der Spell im Match spielt. */
+    var pz = document.querySelector(".power");
+    if (AC.isSpell(curId)) {
+      var si = AC.spellInfoOf(curId);
+      if (pz) pz.innerHTML = "✷ Rolle: <span>" + (si ? si.rolle : "Spell") + "</span>";
+    } else {
+      if (pz) pz.innerHTML = '⚡ Power: <span id="dPower">0</span>';
+      $("dPower").textContent = fmt(m.power * mul);
+    }
 
     // 2×2-Stat-Grid mit "aktuell → nachher"-Vorschau (§2.3)
     $("dStats").innerHTML = m.stats.map(function (s) {
@@ -9149,10 +9254,22 @@ button.pfplate{cursor:pointer}
     $("dMatName").textContent = v.materialName;
     $("dMatName").style.color = v.materialColor;
     $("dMat").innerHTML = (have < need ? '<span class="bad">' + have + "</span>" : have) + " / " + need;
+    /* ⚠ Fuer Spells stimmt der Turm-Satz NICHT. „Kommt aus Packs, in
+       denen SPLITTER liegt" waere schlicht falsch: Arkan faellt in
+       JEDEM Spell-Slot, egal welcher Spell darin steckt, und alle vier
+       teilen sich den Vorrat. Ein Text, der die Herkunft falsch
+       beschreibt, ist schlimmer als keiner — der Spieler sucht dann an
+       der falschen Stelle. */
+    var spell = AC.isSpell(curId);
     $("dMatSub").innerHTML = have >= need
-      ? "Reicht für dieses Level-Up. Nur " + v.materialName + " hebt " + m.name + "."
-      : "Fehlen <b>" + (need - have) + "</b>. " + v.materialName + " kommt aus Packs, in denen " +
-        m.name + " liegt — und aus dem Tagesangebot.";
+      ? (spell
+          ? "Reicht für dieses Level-Up. " + v.materialName + " hebt jeden Spell."
+          : "Reicht für dieses Level-Up. Nur " + v.materialName + " hebt " + m.name + ".")
+      : (spell
+          ? "Fehlen <b>" + (need - have) + "</b>. " + v.materialName +
+            " kommt aus den Spell-Slots der Packs — alle vier Spells teilen sich den Vorrat."
+          : "Fehlen <b>" + (need - have) + "</b>. " + v.materialName +
+            " kommt aus Packs, in denen " + m.name + " liegt — und aus dem Tagesangebot.");
     var chk = AC.canLevelUp(curId, gold());
     var up = $("btnUpgrade");
     // innerHTML, nicht textContent: ico() liefert ein <img>, sobald das
@@ -10085,6 +10202,13 @@ button.pfplate{cursor:pointer}
     packResult.cards.forEach(function (c) { packState.push({ kind: "card", d: c, done: false }); });
     // Material-Slots tragen jetzt eine SORTE: {type, amount, name, sym, color}
     packResult.materialSlots.forEach(function (s) { packState.push({ kind: "mat", m: s, done: false }); });
+    /* Spell-Slots liegen HINTER den Essenz-Slots und vor dem Gold: sie
+       sind seltener als eine Essenz und weniger als eine Turmkarte. Sie
+       stehen als eigene Sorte im Raster, damit sichtbar bleibt, dass sie
+       nicht aus den Kartenslots kommen. */
+    (packResult.spells || []).forEach(function (sp) {
+      packState.push({ kind: "spell", d: sp, done: false });
+    });
     packState.push({ kind: "gold", n: packResult.gold, done: false });
     $("packSummary").style.display = "none";
     /* Erst die Szene, dann das Raster. Die Reihenfolge ist die ganze
@@ -10101,7 +10225,7 @@ button.pfplate{cursor:pointer}
     markPressableLater();
     var back = ASSETS.card_back;
     $("packGrid").innerHTML = packState.map(function (s, i) {
-      var color = s.kind === "card" ? tierOf(s.d.tier).color
+      var color = (s.kind === "card" || s.kind === "spell") ? tierOf(s.d.tier).color
         : s.kind === "mat" ? s.m.color : "#f2c53d";
       var face;
       if (s.kind === "card") {
@@ -10110,6 +10234,14 @@ button.pfplate{cursor:pointer}
         face = artBox(s.d.cardId, s.d.tier) +
           '<div class="facewrap"><div class="t" style="color:' + color + '">' +
           tierOf(s.d.tier).name + "</div></div>";
+      } else if (s.kind === "spell") {
+        /* Der Spell-Slot zeigt BEIDES: die Karte und die Arkan-Essenz,
+           die derselbe Slot mitbringt. Zwei Slots daraus zu machen waere
+           ehrlicher gezaehlt und im Aufdecken zaeh — es ist EIN Fund. */
+        face = artBox(s.d.cardId, s.d.tier) +
+          '<div class="facewrap"><div class="t" style="color:' + color + '">' +
+          tierOf(s.d.tier).name + '</div>' +
+          '<div class="spellzu">' + matIco("arkan", "") + " +" + s.d.arkan + "</div></div>";
       } else if (s.kind === "mat") {
         /* Sorte ist Teil des Reveals — "welche Essenz?" ist eine eigene
            kleine Frage, und seit jede Karte ihre eigene hat, eine
@@ -10128,8 +10260,11 @@ button.pfplate{cursor:pointer}
          unsichtbar und kosten nichts. Sie erst beim Aufdecken
          einzuhaengen hiesse, im selben Frame Layout UND Animation zu
          starten; der erste Puls fiele dann aus. */
-      return '<button class="pcard' + (s.done ? " flipped" : "") + (s.kind !== "card" ? " res" : "") +
-        '" data-i="' + i + '" data-tier="' + (s.kind === "card" ? s.d.tierIndex : -1) +
+      return '<button class="pcard' + (s.done ? " flipped" : "") +
+        ((s.kind !== "card" && s.kind !== "spell") ? " res" : "") +
+        (s.kind === "spell" ? " spellslot" : "") +
+        '" data-i="' + i + '" data-tier="' +
+        ((s.kind === "card" || s.kind === "spell") ? s.d.tierIndex : -1) +
         '" style="color:' + color + '">' +
         '<span class="pcglow"></span>' +
         '<span class="pcring1"></span><span class="pcring2"></span>' +
@@ -10138,6 +10273,7 @@ button.pfplate{cursor:pointer}
           '<span class="pcside pcback" style="background-image:url(&quot;' + back +
             '&quot;),radial-gradient(circle at 50% 42%,#3b2a5e,#141b26 68%)">' +
             '<span class="bk">' + (s.kind === "card" ? "✦"
+              : s.kind === "spell" ? "✷"
               : s.kind === "mat" ? ico("cur_material", "⚗")
               : ico("cur_gold", "🪙")) + "</span></span>" +
           '<span class="pcside pcfront" style="border-color:' + color +
@@ -10197,7 +10333,11 @@ button.pfplate{cursor:pointer}
     { dauer: 820, partikel: 26 },   // Legendaer
   ];
   function stufeFx(slot) {
-    var idx = (slot && slot.kind === "card") ? (slot.d.tierIndex | 0) : 0;
+    /* Auch der Spell-Slot traegt eine Karte mit Stufe — er bekommt
+       dieselbe Raritaets-Leiter. Ohne den Zusatz waere ein legendaerer
+       Spell so still aufgedeckt worden wie ein Goldposten. */
+    var idx = (slot && (slot.kind === "card" || slot.kind === "spell"))
+      ? (slot.d.tierIndex | 0) : 0;
     if (idx < 0) idx = 0;
     if (idx > STUFEN_FX.length - 1) idx = STUFEN_FX.length - 1;  // Suprem faellt nie
     var f = STUFEN_FX[idx];
@@ -10213,6 +10353,12 @@ button.pfplate{cursor:pointer}
     s.done = true;
     if (s.kind === "card") {
       AC.addDrop(s.d.cardId, s.d.tier, 1);
+    } else if (s.kind === "spell") {
+      /* Zwei Buchungen aus EINEM Slot: die Spell-Karte und die
+         Arkan-Essenz. Arkan liegt bewusst NICHT in materialByType
+         (siehe arena_cards.js), sonst zaehlte es als Essenz-Slot mit. */
+      AC.addDrop(s.d.cardId, s.d.tier, 1);
+      if (s.d.arkan) AC.addMaterial(s.d.arkan, AC.SPELL_MATERIAL);
     } else if (s.kind === "mat") {
       AC.addMaterial(s.m.amount, s.m.type);   // Sorte mitgeben!
     } else {
@@ -10323,8 +10469,14 @@ button.pfplate{cursor:pointer}
     packResult.cards.forEach(function (c) { byTier[c.tierName] = (byTier[c.tierName] || 0) + 1; });
     var parts = Object.keys(byTier).map(function (k) { return byTier[k] + "× " + k; });
     // Material nach Sorte aufschlüsseln (nur die, die tatsächlich gedroppt sind)
-    var matParts = AC.MATERIALS.filter(function (m) { return packResult.materialByType[m.key] > 0; })
-      .map(function (m) { return "<b>+" + packResult.materialByType[m.key] + "</b> " +
+    /* Arkan steht bewusst NICHT in materialByType — es kommt aus den
+       Spell-Slots. Fuer die Zusammenfassung wird es hier dazugelegt,
+       damit der Spieler sieht, was er insgesamt bekommen hat. */
+    var mengen = {};
+    AC.MATERIAL_KEYS.forEach(function (k) { mengen[k] = packResult.materialByType[k] || 0; });
+    mengen[AC.SPELL_MATERIAL] = (mengen[AC.SPELL_MATERIAL] || 0) + (packResult.arkan || 0);
+    var matParts = AC.MATERIALS.filter(function (m) { return mengen[m.key] > 0; })
+      .map(function (m) { return "<b>+" + mengen[m.key] + "</b> " +
         matIco(m.key) + " " + m.name; });
     $("packSummary").style.display = "";
     $("packSummary").innerHTML = "<b>+" + packResult.cards.length + " Karten</b> (" + parts.join(", ") +
@@ -15878,12 +16030,18 @@ button.pfplate{cursor:pointer}
   /* Der Helden-Tab fuehrt in den eigenen Helden-View: Helden brauchen
      Buehnen-Artwork und Beschreibung, dafuer ist eine 5-Spalten-Kachel
      zu klein. Skills/Items bleiben Platzhalter. */
-  var COLL_TABS = ["tabTowers", "tabSkills", "tabItems", "tabHeroes"];
+  var COLL_TABS = ["tabTowers", "tabSpells", "tabItems", "tabHeroes"];
   COLL_TABS.forEach(function (k) {
     $(k).addEventListener("click", function () {
       if (k === "tabHeroes") { show("navHeroes"); return; }
       COLL_TABS.forEach(function (x) { $(x).classList.toggle("on", x === k); });
       if (k === "tabTowers") { $("collGrid").style.display = ""; renderCollection(); }
+      /* Der Spell-Reiter laeuft ueber DENSELBEN Renderpfad wie die
+         Tuerme — tileHTML, openDetail, Schmiede. Ein eigener Pfad waere
+         eine zweite Stelle, an der Level, Stufe und Fortschritt
+         angezeigt werden, und die laufen erfahrungsgemaess auseinander.
+         Die einzige Abweichung ist die Liste. */
+      else if (k === "tabSpells") { $("collGrid").style.display = ""; renderSpells(); }
       else { $("collGrid").style.display = "none"; $("collHint").textContent = "Bald verfügbar."; }
     });
   });
@@ -16401,6 +16559,7 @@ button.pfplate{cursor:pointer}
                      openItemInfo: openItemInfo, closeItemInfo: closeItemInfo,
                      openJokerInfo: openJokerInfo,
                      setPackState: function (arr) { packState = arr; renderPack(); },
+                     SPELL_IDS: SPELL_IDS, renderSpells: renderSpells,
                      /* Fuer den Pruefstand: die Marken-Fabrik und die Tabelle.
                         Ohne sie liesse sich nicht messen, ob die sieben Pfade
                         tatsaechlich zeichnen — genau die Frage, die ein
