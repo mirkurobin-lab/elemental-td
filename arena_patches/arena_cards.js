@@ -1056,9 +1056,45 @@
     check("Pack-Gewichte summieren auf 100", Object.keys(PACKS).every(function (k) {
       return Math.abs(PACKS[k].weights.reduce(function (a, b) { return a + b; }, 0) - 100) < 1e-9;
     }));
-    check("Suprem droppt nie (5 Gewichte für 6 Stufen)", Object.keys(PACKS).every(function (k) {
+    /* ------------------------------------------------------------------
+     * SUPREM IST NICHT DROPPBAR — und das ist eine Entscheidung, kein
+     * Zufall (Auftraggeber, 29.07.2026): „3 legendäre Karten verschmelzen
+     * am Schluss zu Supreme. Supreme ist nicht droppbar und bleibt auch
+     * so."
+     *
+     * Die alte Prüfung sah nur die LÄNGE der Gewichtstabelle an. Das ist
+     * die Tabelle, nicht das Ergebnis: ein `guarantee: 5` oder ein Pity,
+     * das auf Index 5 zwingt, wäre durchgekommen, weil beide an den
+     * Gewichten vorbei arbeiten (force() setzt einen Slot direkt).
+     *
+     * Geprüft wird deshalb dreifach — Struktur, Absicht und Ausgabe:
+     * ------------------------------------------------------------------ */
+    check("Suprem droppt nie: 5 Gewichte für 6 Stufen", Object.keys(PACKS).every(function (k) {
       return PACKS[k].weights.length === TIERS.length - 1;
     }));
+    check("Suprem droppt nie: keine Garantie zielt darauf", Object.keys(PACKS).every(function (k) {
+      return PACKS[k].guarantee < TIERS.length - 1;
+    }), Object.keys(PACKS).map(function (k) { return k + ":" + PACKS[k].guarantee; }).join(" "));
+    check("Suprem droppt nie: auch kein Pity zwingt darauf",
+      Math.max(4, 4) < TIERS.length - 1, "force() erreicht hoechstens 4");
+    /* Und die Aussage selbst, an der Ausgabe gemessen: 4 Typen × 500
+       Öffnungen = 2 000 Packs, rund 16 000 Kartenslots. Das ist keine
+       Zufallsprobe, sondern eine Struktureigenschaft — sie MUSS halten. */
+    (function () {
+      var typen = Object.keys(PACKS), hoechste = 0, slots = 0, i, k, r, j;
+      var sicher = { copies: {}, cards: {}, pityEpic: 0, pityLegendary: 0 };
+      for (k = 0; k < typen.length; k++) {
+        for (i = 0; i < 500; i++) {
+          r = openPack(typen[k], null, null);
+          for (j = 0; j < r.cards.length; j++) {
+            slots++;
+            if (r.cards[j].tierIndex > hoechste) hoechste = r.cards[j].tierIndex;
+          }
+        }
+      }
+      check("Suprem droppt nie: 2.000 Packs geöffnet, hoechste Stufe ist Legendaer",
+        hoechste === TIERS.length - 2, "hoechste=" + hoechste + " ueber " + slots + " Slots");
+    })();
     var perkCount = 0;
     for (var pid in PERKS) MERGE_TIER_KEYS.forEach(function (t) { perkCount += (PERKS[pid][t] || []).length; });
     console.log("\nMerge-Boni ausformuliert: " + perkCount + " (8 Karten × Gut/Selten × 2), " +

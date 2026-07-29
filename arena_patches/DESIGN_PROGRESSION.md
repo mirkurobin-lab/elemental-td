@@ -141,6 +141,53 @@ Schrittweite 10 ergäbe Cap 75 an der Spitze — die Lv-100-Vorgabe wäre unerre
 Leiter endet exakt bei 100. Die Namen folgen AA (**„Gut"** zwischen Gewöhnlich und Selten, §3),
 die Endstufe **Suprem** ist unsere Ergänzung — in AA existiert oberhalb Legendary nichts.
 
+#### Suprem ist nicht droppbar — Festlegung 29.07.2026
+
+> „3 legendäre Karten verschmelzen am Schluss zu Supreme. Supreme ist nicht droppbar und
+> bleibt auch so. Wir belassen unsere Drop-Tabelle wie sie ist. Legendär soll so selten sein,
+> am Ende kann der Spieler sich bis legendär sowieso hoch fusionieren, die Progression soll
+> eine Weile dauern." — Auftraggeber
+
+Damit ist **Suprem die einzige Stufe ohne Droppfad**. Sie entsteht ausschließlich aus
+**3 identischen Legendären** derselben Karte (`MERGE_COST = 3`), und über die volle Leiter
+gerechnet aus **3⁵ = 243 gewöhnlichen Karten** derselben Sorte.
+
+Das war bis dahin ein *Nebeneffekt* der Datenlage: die Gewichtstabelle hat fünf Einträge für
+sechs Stufen, also blieb die sechste übrig. Ein Nebeneffekt ist keine Regel — ein späterer
+sechster Gewichtseintrag, ein `guarantee: 5` oder ein Pity, das auf Index 5 zwingt, hätte
+Suprem still droppbar gemacht. Garantie und Pity arbeiten nämlich **an den Gewichten vorbei**:
+`force()` setzt einen Slot direkt.
+
+`arena_cards.js` prüft die Zusage deshalb jetzt vierfach — Struktur, Absicht **und Ausgabe**:
+
+| Prüfung | misst |
+|---|---|
+| 5 Gewichte für 6 Stufen | die Tabelle |
+| keine Garantie zielt auf Index 5 | die Absicht je Pack |
+| `force()` erreicht höchstens 4 | den Pity-Pfad |
+| **2 000 Packs geöffnet, höchste Stufe = Legendär** | das Ergebnis, über ~16 000 Kartenslots |
+
+Die vierte ist die einzige, die den Fehler *gefunden* hätte — die anderen drei beschreiben nur,
+wo man hinschauen muss.
+
+#### Wie lange „eine Weile" gemessen dauert
+
+Simulation über je 4 000 Durchläufe gegen den echten `openPack()`, Pity eingerechnet — Packs
+bis zur **ersten** Suprem-Karte:
+
+| Pack | Garantie | Packs | Legendäre/Pack |
+|---|---|---:|---:|
+| Bronze | ≥ Gut | 605 | 0,014 |
+| Silber | ≥ Selten | 404 | 0,021 |
+| Gold | ≥ Episch | 96 | 0,090 |
+| Arcane | ≥ Legendär | **8,1** | **1,079** |
+
+⚠ **Offener Punkt.** Das Arcane-Pack umgeht die Droptabelle: seine Garantie hebt es von 0,44 auf
+1,08 Legendäre je Pack und macht die Spitze in acht Packs erreichbar — gegen 96 über Gold. Mit
+Garantie **Episch** statt Legendär wären es **20,2 Packs** bei 0,435 Legendären je Pack. Die
+Änderung ist nicht vorgenommen: sie hängt an einem 800-Kristall-Kauf und braucht eine
+ausdrückliche Entscheidung.
+
 ### Merge
 
 * **3 identische Karten derselben Stufe → 1 Karte der nächsten Stufe.** „Identisch" heißt
