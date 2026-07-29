@@ -18,7 +18,7 @@ direkt — kein Server, kein Build.
 | Datei | Schritte | Gegenstand |
 |---|---:|---|
 | `run_v5.js` | 107 | Grundgerüst, Navigation, Sammlung, Festung, Packs |
-| `run_v6.js` | 280 | Clan, Ghost-Clankrieg, Spenden, Rangliste, Post |
+| `run_v6.js` | 281 | Clan, Ghost-Clankrieg, Spenden, Rangliste, Post |
 | `run_v7.js` | 333 | Startseite, Banner-Metrik, Pass, Guide, Profil, Avatare, Shop-Maße |
 | `run_friends.js` | 25 | Freundesliste, Anfragen, Suche |
 | `run_shop.js` | 30 | Tagesangebote, Booster-Packs, Gold, Tresor, Vorrats-Truhe |
@@ -26,6 +26,7 @@ direkt — kein Server, kein Build.
 | `login_kal.js` | 9 | Login-Kalender: drei pro Reihe, Tag 7 als Band |
 | `home_menue.js` | 17 | Keine doppelten Wege, Menü-Icons lesbar |
 | `splash.js` | 10 | Startbildschirm: Schriftzug, Ladebalken, Notausgang |
+| `shop_raender.js` | 20 | Randfarben: Inhalt (Kristall/Gold) und Produktfamilie (Packs) |
 | `assets_vollstaendig.py` | 3 | Jedes benutzte Asset ist verzeichnet UND gesichert |
 
 `assets_vollstaendig.py` ist die einzige Prüfung hier, die kein Playwright
@@ -37,6 +38,31 @@ Asset-Liste arbeitet — es wird nie gesichert und beim Freistellen als
 „unbekannt" übersprungen. Still, ohne Fehlermeldung. Genau so sind 17
 Bilder durchgerutscht, darunter vier Arena-Kulissen, die ein Werkzeug
 deshalb sogar zerschnitten hat.
+
+## Keine Prüfung darf an ihrer eigenen Laufzeit hängen
+
+Vier Prüfungen sind an einem einzigen Tag rot geworden, ohne dass sich am
+Produkt etwas geändert hätte — sie lasen `Date.now()` statt einen
+festgehaltenen Zeitpunkt:
+
+- **Truhen-Staffel**: maß Tag 0, +3 und +6. Je nach Wochentag fielen die
+  späteren Proben in die nächste Woche, wo der Fortschritt zurücksetzt.
+- **Clan-Sendelimit**: erschöpfte das Limit über fremde Anfragen — wie
+  viele offen sind, hängt am Zeitpunkt. Bei zu wenigen brach die Schleife
+  ab und meldete 9/10. `sendQuota`, `requests` und `donateCards` nehmen
+  alle ein `now` entgegen; die Prüfung hat es nur nie benutzt.
+- **Gratis-Posten im Shop**: summierte nur Gold und Kristalle. Der Posten
+  wird täglich neu gezogen und kann auch Material sein — an so einem Tag
+  maß sie 0 gegen erwartete 6.
+
+Die Regel daraus: **wenn eine Mechanik ein `now` entgegennimmt, übergib
+es.** Eine Prüfung, die vom Wochentag ihres Laufs abhängt, meldet
+irgendwann einen Fehler, den es nicht gibt — und wer das zweimal erlebt,
+schaut beim dritten Mal nicht mehr hin. Das ist der eigentliche Schaden.
+
+Und ein Messfehler derselben Art: `materials` führt die Summe unter
+`total` **neben** den Einzelsorten. Wer über alle Werte summiert, zählt
+jede Einheit doppelt.
 
 ## Die zwei Sonderfälle — und warum es sie gibt
 

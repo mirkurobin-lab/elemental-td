@@ -165,14 +165,25 @@ function step(name, ok, info) {
     const st = P.tagStand(); st.gratis = false; P.tagSpeichern(st);
     P.renderShop();
     const d = P.dealsHeute().filter(x => x.gratis)[0];
-    const vor = { gold: P.gold(), gems: P.gems() };
+    /* ⚠ AUCH MATERIAL. Der Gratis-Posten wird taeglich neu gezogen und
+       kann Gold, Kristalle ODER Material sein. Die Pruefung summierte
+       nur Gold und Kristalle — an einem Tag, an dem Material gezogen
+       wurde, mass sie eine Buchung von 0 gegen eine erwartete Menge von
+       sechs und meldete einen Fehler, den es nicht gab. Sie war an den
+       Zufall des Tages gebunden statt an die Mechanik. */
+    /* NUR `total`. Das Objekt fuehrt die Summe NEBEN den Einzelsorten
+       (total/attack/speed/special) — wer ueber alle Werte summiert,
+       zaehlt jede Einheit doppelt. */
+    const mat = () => +(P.AC.view('solara').materials || {}).total || 0;
+    const topf = () => P.gold() + P.gems() + mat();
+    const vor = topf();
     document.querySelector('#dealGrid [data-buy="' + d.id + '"]').click();
-    const nach1 = { gold: P.gold(), gems: P.gems() };
+    const nach1 = topf();
     P.buyDeal(d.id);   // zweiter Versuch — darf nichts mehr buchen
-    const nach2 = { gold: P.gold(), gems: P.gems() };
+    const nach2 = topf();
     return { id: d.id, zahl: d.zahl,
-             gebucht: (nach1.gold - vor.gold) + (nach1.gems - vor.gems),
-             zweiterVersuch: (nach2.gold - nach1.gold) + (nach2.gems - nach1.gems),
+             gebucht: nach1 - vor,
+             zweiterVersuch: nach2 - nach1,
              merker: P.tagStand().gratis,
              knopfTot: !!document.querySelector('#dealGrid [data-gratis] .pcbuy[disabled]') };
   });

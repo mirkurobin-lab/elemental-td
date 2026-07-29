@@ -165,7 +165,15 @@ function step(name, ok, info) {
   step('Keine Stufe faelschlich als erreicht markiert', reached <= 3,
     reached + ' von 3 (Wochenanfang: 0 ist richtig)');
   const staffel = await page.evaluate(() => {
-    const T = Date.now();
+    /* ⚠ NICHT Date.now(): die Truhen-Staffel laeuft ueber die WOCHE und
+       setzt am Wochenanfang zurueck. Mit dem Tageswert als Basis fielen
+       „+3 Tage" und „+6 Tage" je nach Wochentag in die naechste Woche —
+       dann faellt der Fortschritt zurueck und die Pruefung meldet einen
+       Fehler, den es nicht gibt. Sie war damit an die Uhrzeit ihres
+       Laufs gebunden statt an die Mechanik.
+       Basis ist jetzt ein fester Montag 00:00 UTC; die drei Proben
+       liegen garantiert in derselben Woche. */
+    const T = Date.UTC(2026, 6, 27);   // Montag
     return [0, 3, 6].map(d => {
       const c = window.ArenaClan.chestTier(T + d * 864e5);
       return { tag: d, pct: Math.round(c.pct * 100), stufe: c.tier || '—' };
@@ -284,20 +292,36 @@ function step(name, ok, info) {
   // --- Limit: bis 10 fuellen, dann muss die 11. scheitern ---
   const limit = await page.evaluate(() => {
     const CL = window.ArenaClan, AC = window.ArenaCards;
-    // Vorrat aufstocken, damit wirklich das SENDELIMIT greift und nicht der Bestand
+    /* ⚠ FESTER ZEITPUNKT. Vorher lief das gegen Date.now() — und wie
+       viele fremde Anfragen offen sind, haengt am Zeitpunkt: `get(now)`
+       erzeugt und schliesst sie ueber die Zeit. Reichten sie gerade
+       nicht fuer zehn Karten, brach die Schleife bei `if (!r) break`
+       ab und die Pruefung meldete 9/10 — ein Fehler, den es im Produkt
+       nie gab. Sie war an ihre eigene Laufzeit gebunden.
+       sendQuota, requests und donateCards nehmen alle ein `now`
+       entgegen; die Pruefung hat es nur nie benutzt. */
+    const JETZT = Date.UTC(2026, 6, 29, 12);   // Mittwochmittag
     CL.TOWER_IDS.forEach(id => AC.addDrop(id, 'common', 60));
-    let sent = CL.sendQuota().used, guard = 0;
-    while (CL.sendQuota().left > 0 && guard++ < 40) {
-      const r = CL.requests().filter(x => !x.mine && !x.closed && x.left > 0)[0];
+    const offen = () => CL.requests(JETZT).filter(x => !x.mine && !x.closed && x.left > 0);
+    const kapazitaet = offen().reduce((s, r) => s + r.left, 0);
+    let guard = 0;
+    while (CL.sendQuota(JETZT).left > 0 && guard++ < 40) {
+      const r = offen()[0];
       if (!r) break;
-      const n = Math.min(r.left, CL.sendQuota().left);
-      try { CL.donateCards(r.id, n); sent += n; } catch (e) { break; }
+      const n = Math.min(r.left, CL.sendQuota(JETZT).left);
+      try { CL.donateCards(r.id, n, 'common', JETZT); } catch (e) { break; }
     }
-    const r2 = CL.requests().filter(x => !x.mine && !x.closed && x.left > 0)[0];
+    const r2 = offen()[0];
     let msg = null;
-    if (r2) { try { CL.donateCards(r2.id, 1); } catch (e) { msg = e.message; } }
-    return { used: CL.sendQuota().used, full: CL.sendQuota().full, msg };
+    if (r2) { try { CL.donateCards(r2.id, 1, 'common', JETZT); } catch (e) { msg = e.message; } }
+    const q = CL.sendQuota(JETZT);
+    return { used: q.used, full: q.full, msg, kapazitaet };
   });
+  /* Das Limit ist nur pruefbar, wenn ueberhaupt zehn Karten Nachfrage
+     da sind. Fehlt sie, ist das ein Mangel des AUFBAUS und muss als
+     solcher dastehen — nicht als Produktfehler getarnt. */
+  step('Genug offene Anfragen, um das Sendelimit zu pruefen',
+    limit.kapazitaet >= 10, limit.kapazitaet + ' Karten Nachfrage');
   step('Genau 10 Karten pro 3 h gehen durch', limit.used === 10 && limit.full === true,
     limit.used + '/10');
   step('Die 11. Karte wird abgelehnt (Limit + Restzeit in der Meldung)',
