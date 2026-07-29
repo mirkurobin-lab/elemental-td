@@ -307,6 +307,101 @@ const pruef = (n, w, z) => {
   pruef("die Szene endet ohne Zutun", !danach.offen);
   pruef("danach steht das Kartenraster", danach.raster > 0, danach.raster + " Karten");
 
+  /* ---------- 6. Die Raritaets-Leiter der Aufdeckung ----------
+   * Anlass: bis zum 29.07.2026 war die Aufdeckung BINAER — ab Episch
+   * ein Burst-Ring, ab Legendaer das Cinematic. Gewoehnlich, Gut und
+   * Selten waren in Dauer, Bewegung und Ton NICHT unterscheidbar.
+   * Geprueft wird deshalb nicht „Stufe 3 hat einen Burst" (das war auch
+   * vorher wahr), sondern: JEDE Stufe unterscheidet sich von JEDER
+   * anderen — und zwar streng monoton steigend. Eine Leiter mit zwei
+   * gleich hohen Sprossen ist keine. */
+  const leiter = await p.evaluate(() => {
+    const AC = window.ArenaCards;
+    const out = [];
+    for (let t = 0; t <= 4; t++) {
+      // Ein Ein-Karten-Pack mit GENAU dieser Stufe stellen.
+      window.__proto.setPackState([{ kind: "card", done: false, d: {
+        cardId: "fire", tier: AC.TIER_KEYS[t], tierIndex: t,
+        tierName: AC.TIERS[t].name, color: AC.TIERS[t].color, count: 1 } }]);
+      const fx = window.__proto.stufeFx({ kind: "card", d: { tierIndex: t } });
+      out.push({ t: t, dauer: fx.dauer, partikel: fx.partikel, stufe: fx.stufe });
+    }
+    // Und was bekommen Gold-/Essenz-Posten?
+    const gold = window.__proto.stufeFx({ kind: "gold", n: 500 });
+    const mat = window.__proto.stufeFx({ kind: "mat", m: { amount: 3 } });
+    return { out: out, gold: gold, mat: mat };
+  });
+  pruef("stufeFx ist pruefbar exportiert", !!leiter && leiter.out.length === 5);
+  pruef("jede Stufe hat ihre eigene Dauer",
+    new Set(leiter.out.map(x => x.dauer)).size === 5,
+    leiter.out.map(x => x.dauer).join("/"));
+  pruef("jede Stufe hat ihre eigene Partikelzahl",
+    new Set(leiter.out.map(x => x.partikel)).size === 5,
+    leiter.out.map(x => x.partikel).join("/"));
+  pruef("die Dauer steigt streng monoton",
+    leiter.out.every((x, i) => i === 0 || x.dauer > leiter.out[i - 1].dauer));
+  pruef("die Partikelzahl steigt streng monoton",
+    leiter.out.every((x, i) => i === 0 || x.partikel > leiter.out[i - 1].partikel));
+  pruef("Gold- und Essenz-Posten liegen auf der untersten Stufe",
+    leiter.gold.stufe === 0 && leiter.mat.stufe === 0,
+    leiter.gold.stufe + "/" + leiter.mat.stufe);
+
+  /* Das Blatt muss die Stufen auch WIRKLICH unterscheiden — eine
+     Leiter, die nur in JS existiert, sieht der Spieler nicht. */
+  const css = await p.evaluate(() => {
+    const noetig = ["pcwisch", "pcpuls", "pcstrahl", "pcwelle", "pcbeben", "pcheb"];
+    const da = {};
+    for (const bl of document.styleSheets) {
+      let rs; try { rs = bl.cssRules; } catch (e) { continue; }
+      for (const r of rs) if (r.type === CSSRule.KEYFRAMES_RULE) da[r.name] = 1;
+    }
+    // und die Stufenklassen muessen adressiert werden
+    let txt = "";
+    for (const bl of document.styleSheets) {
+      let rs; try { rs = bl.cssRules; } catch (e) { continue; }
+      for (const r of rs) txt += (r.selectorText || "") + " ";
+    }
+    return {
+      fehlend: noetig.filter(n => !da[n]),
+      klassen: [0, 1, 2, 3, 4].filter(i => txt.indexOf(".pcard.r" + i) >= 0),
+      reduziert: txt.indexOf("prefers-reduced-motion") >= 0 ||
+        [...document.styleSheets].some(bl => {
+          let rs; try { rs = bl.cssRules; } catch (e) { return false; }
+          return [...rs].some(r => r.type === CSSRule.MEDIA_RULE &&
+            r.conditionText.indexOf("reduced-motion") >= 0);
+        }),
+    };
+  });
+  pruef("jede Stufen-Animation steht im Blatt", css.fehlend.length === 0,
+    css.fehlend.join(","));
+  pruef("die oberen vier Stufen werden im Blatt adressiert",
+    css.klassen.length >= 4, "r" + css.klassen.join(",r"));
+  pruef("es gibt eine Ruecknahme fuer `Bewegung reduzieren`", css.reduziert);
+
+  /* Und die Karte traegt die Stufe nach dem Aufdecken auch am Element. */
+  await p.evaluate(() => { window.__proto.openPackKey("bronze"); });
+  await p.waitForTimeout(3400);
+  const amElement = await p.evaluate(async () => {
+    const karten = [...document.querySelectorAll("#packGrid .pcard")];
+    const treffer = [];
+    for (const k of karten) {
+      const t = parseInt(k.getAttribute("data-tier"), 10);
+      if (t < 0) continue;              // Gold/Essenz
+      k.click();
+      await new Promise(r => setTimeout(r, 60));
+      treffer.push({ t: t, hatKlasse: k.classList.contains("r" + t),
+                     dauer: k.style.getPropertyValue("--pcdur") });
+      await new Promise(r => setTimeout(r, 900));
+    }
+    return treffer;
+  });
+  pruef("jede aufgedeckte Karte traegt ihre Stufenklasse",
+    amElement.length > 0 && amElement.every(x => x.hatKlasse),
+    amElement.map(x => "r" + x.t + (x.hatKlasse ? "" : "!")).join(" "));
+  pruef("und ihre eigene Dauer als CSS-Variable",
+    amElement.every(x => /^\d+ms$/.test(x.dauer)),
+    amElement.map(x => x.dauer).join(" "));
+
   pruef("keine JS-Fehler", jsF.length === 0, jsF[0]);
 
   console.log(ok + " ok, " + fehl + " fehlgeschlagen");

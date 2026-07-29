@@ -935,6 +935,103 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
   animation:burst .8s ease-out forwards}
 @keyframes burst{0%{box-shadow:0 0 0 0 #fff,0 0 26px 10px currentColor;opacity:1}
   100%{box-shadow:0 0 0 26px #fff0;opacity:0}}
+
+/* ==================================================================
+ * RARITAeTS-LEITER DER AUFDECKUNG (29.07.2026)
+ * ------------------------------------------------------------------
+ * Vorher war die Aufdeckung BINAeR: ab Episch ein Burst-Ring und mehr
+ * Partikel, ab Legendaer das Vollbild-Cinematic. Gewoehnlich, Gut und
+ * Selten sahen einander gleich — gleiche Dauer, gleiche Bewegung,
+ * gleicher Ton. Damit war der haeufigste Fall (74 % der Karten sind
+ * gewoehnlich) auch der einzige, der nie etwas erzaehlt, und die
+ * mittleren Stufen haben nichts, worauf man sich freuen kann.
+ *
+ * Jede Stufe bekommt deshalb eine eigene Handschrift. Die Leiter
+ * steigt in FUENF Groessen gleichzeitig — Dauer, Glut, Partikel,
+ * Bewegung und Umgebung — damit der Unterschied auch dann ankommt,
+ * wenn eine davon (z. B. Ton) abgeschaltet ist:
+ *
+ *   Gewoehnlich  480 ms · knappe Drehung, kein Ring          ·  4 Partikel
+ *   Gut          560 ms · Schimmer wischt ueber die Karte    ·  8 Partikel
+ *   Selten       640 ms · EIN Ringpuls, Karte hebt sich      · 12 Partikel
+ *   Episch       720 ms · ZWEI Ringpulse + Strahlenkranz,    · 18 Partikel
+ *                         die Nachbarkarten dimmen ab
+ *   Legendaer    820 ms · Vollbild-Cinematic davor, Schock-  · 26 Partikel
+ *                         welle, Bildschirm-Ruettler, Nachglut
+ *
+ * Die Dauer steht an EINER Stelle (--pcdur) und wird von JS gesetzt;
+ * die Uebergangsdauer der Drehung liest sie mit. Ohne das haetten
+ * Blatt und Skript zwei Wahrheiten, und die Kurve waere wieder das,
+ * was der Auftraggeber am 28.07. beanstandet hat: „viel zu schnell". */
+.pcard{--pcdur:600ms}
+.pc3d{transition-duration:var(--pcdur)}
+
+/* --- Gut: ein Lichtwisch ueber die Vorderseite --- */
+.pcard.r1 .pcfront::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(105deg,#fff0 38%,#ffffff5c 50%,#fff0 62%);
+  transform:translateX(-120%);animation:pcwisch 620ms ease-out 220ms}
+@keyframes pcwisch{0%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+
+/* --- Selten: ein Ringpuls, und die Karte hebt sich aus der Reihe --- */
+.pcard.r2 .pcring1,.pcard.r3 .pcring1,.pcard.r3 .pcring2{
+  content:"";position:absolute;inset:0;border-radius:11px;pointer-events:none;
+  border:2px solid currentColor;opacity:0}
+.pcard.r2 .pcring1{animation:pcpuls 700ms ease-out 260ms}
+.pcard.r3 .pcring1{animation:pcpuls 780ms ease-out 240ms}
+.pcard.r3 .pcring2{animation:pcpuls 780ms ease-out 420ms}
+@keyframes pcpuls{
+  0%{transform:scale(.86);opacity:0}
+  30%{opacity:.95}
+  100%{transform:scale(1.85);opacity:0}}
+.pcard.r2.turning{animation:pcheb 640ms ease-out}
+@keyframes pcheb{0%{transform:scale(1)}45%{transform:scale(1.07)}100%{transform:scale(1)}}
+
+/* --- Episch: Strahlenkranz hinter der Karte, Nachbarn dimmen ab --- */
+.pcard.r3 .pcstrahl{position:absolute;inset:-40%;pointer-events:none;opacity:0;
+  background:conic-gradient(from 0deg,currentColor 0 6deg,#0000 6deg 30deg,
+    currentColor 30deg 36deg,#0000 36deg 60deg,currentColor 60deg 66deg,#0000 66deg 90deg,
+    currentColor 90deg 96deg,#0000 96deg 120deg,currentColor 120deg 126deg,#0000 126deg 150deg,
+    currentColor 150deg 156deg,#0000 156deg 180deg,currentColor 180deg 186deg,#0000 186deg 210deg,
+    currentColor 210deg 216deg,#0000 216deg 240deg,currentColor 240deg 246deg,#0000 246deg 270deg,
+    currentColor 270deg 276deg,#0000 276deg 300deg,currentColor 300deg 306deg,#0000 306deg 330deg,
+    currentColor 330deg 336deg,#0000 336deg 360deg);
+  -webkit-mask-image:radial-gradient(circle,#000 12%,#0000 62%);
+          mask-image:radial-gradient(circle,#000 12%,#0000 62%);
+  animation:pcstrahl 900ms ease-out 200ms}
+@keyframes pcstrahl{
+  0%{opacity:0;transform:rotate(0deg) scale(.5)}
+  35%{opacity:.55}
+  100%{opacity:0;transform:rotate(46deg) scale(1.25)}}
+/* Der Spotlight-Effekt: waehrend eine epische Karte kommt, treten die
+   anderen zurueck. Nicht die Buehne abdunkeln (das flackert bei jedem
+   Flip), sondern nur die uebrigen Karten. */
+#packGrid.spot .pcard:not(.turning):not(.legend){filter:brightness(.42) saturate(.7);
+  transition:filter 220ms ease}
+#packGrid .pcard{transition:filter 420ms ease}
+
+/* --- Legendaer: Schockwelle und ein kurzer Ruettler --- */
+.pcard.r4 .pcwelle{position:absolute;inset:0;border-radius:11px;pointer-events:none;
+  border:3px solid #fff7d6;opacity:0;animation:pcwelle 900ms cubic-bezier(.2,.7,.3,1) 180ms}
+@keyframes pcwelle{
+  0%{transform:scale(.8);opacity:0}
+  18%{opacity:1}
+  100%{transform:scale(3.1);opacity:0}}
+#packGrid.beben{animation:pcbeben 460ms ease-out}
+@keyframes pcbeben{
+  0%{transform:translate3d(0,0,0)}
+  15%{transform:translate3d(-4px,2px,0)}
+  32%{transform:translate3d(3px,-3px,0)}
+  50%{transform:translate3d(-3px,-1px,0)}
+  68%{transform:translate3d(2px,2px,0)}
+  84%{transform:translate3d(-1px,-1px,0)}
+  100%{transform:translate3d(0,0,0)}}
+
+/* Wer „Bewegung reduzieren" gesetzt hat, bekommt die Leiter ueber
+   Helligkeit und Glut, nicht ueber Bewegung — aber er bekommt sie. */
+@media (prefers-reduced-motion:reduce){
+  .pcard.r2.turning,#packGrid.beben{animation:none}
+  .pcard.r3 .pcstrahl,.pcard.r4 .pcwelle{animation-duration:1ms;opacity:0}
+  .pcard.r1 .pcfront::after{animation:none;opacity:0}}
 .packhint{margin-top:8px;font-size:10.5px;color:var(--dim);text-align:center;line-height:1.5}
 
 /* ==================================================================
@@ -7613,9 +7710,25 @@ button.pfplate{cursor:pointer}
       deny:    function () { blip(220, 130, 0.16, "square", 0.05); },
       reward:  function () { [0, 90, 180, 300].forEach(function (d, i) {
                              setTimeout(function () { blip(640 + i * 190, 900 + i * 220, 0.12, "sine", 0.055); }, d); }); },
-      // Karten-Swish + Ding beim Aufdecken (Referenzvideo, §17.1)
-      flip:    function () { blip(300, 1500, 0.13, "sawtooth", 0.028);
-                             setTimeout(function () { blip(1650, 2100, 0.07, "sine", 0.045); }, 300); },
+      /* Karten-Swish + Ding beim Aufdecken (Referenzvideo, §17.1).
+         `stufe` (0-4) hebt den Ton mit der Raritaet: der Swish bleibt,
+         das Ding danach steigt und bekommt ab Selten einen zweiten,
+         ab Episch einen dritten Anschlag. Ohne Argument (Altaufrufe)
+         klingt es wie vorher. Der Ton ist die dritte Achse der
+         Raritaets-Leiter — wer stumm spielt, hat immer noch Dauer,
+         Glut, Partikel und Bewegung. */
+      flip:    function (stufe) {
+                 var st = Math.max(0, Math.min(4, stufe | 0));
+                 blip(300, 1500 + st * 120, 0.13, "sawtooth", 0.028);
+                 var grund = 1650 + st * 210, n = st >= 3 ? 3 : (st >= 2 ? 2 : 1);
+                 for (var i = 0; i < n; i++) {
+                   (function (k) {
+                     setTimeout(function () {
+                       blip(grund + k * 260, grund + 450 + k * 260, 0.07, "sine", 0.045);
+                     }, 300 + k * 110);
+                   })(i);
+                 }
+               },
       // Legendaer: Crescendo unter dem Cinematic
       legend:  function () { [0, 140, 280, 420, 620, 900].forEach(function (d, i) {
                              setTimeout(function () {
@@ -9394,10 +9507,17 @@ button.pfplate{cursor:pointer}
       }
       // Zwei echte 3D-Seiten. Die Rückseite traegt das Kartenrücken-Asset,
       // der Gradient darunter bleibt als Fallback stehen (CDN offline).
+      /* Raritaets-Schmuck. Die Huellen stehen IMMER im Markup, auch fuer
+         eine gewoehnliche Karte — sie sind ohne die Stufenklasse
+         unsichtbar und kosten nichts. Sie erst beim Aufdecken
+         einzuhaengen hiesse, im selben Frame Layout UND Animation zu
+         starten; der erste Puls fiele dann aus. */
       return '<button class="pcard' + (s.done ? " flipped" : "") + (s.kind !== "card" ? " res" : "") +
         '" data-i="' + i + '" data-tier="' + (s.kind === "card" ? s.d.tierIndex : -1) +
         '" style="color:' + color + '">' +
         '<span class="pcglow"></span>' +
+        '<span class="pcring1"></span><span class="pcring2"></span>' +
+        '<span class="pcstrahl"></span><span class="pcwelle"></span>' +
         '<span class="pc3d">' +
           '<span class="pcside pcback" style="background-image:url(&quot;' + back +
             '&quot;),radial-gradient(circle at 50% 42%,#3b2a5e,#141b26 68%)">' +
@@ -9442,9 +9562,35 @@ button.pfplate{cursor:pointer}
     }
     doFlip(i, el, cb, false, fast);
   }
-  // fast = "Alle aufdecken": die Drehungen bleiben 600 ms lang, starten aber
-  // im Abstand von ~170 ms — dadurch laeuft eine Kaskade statt acht
-  // gleichzeitiger Flips (und statt acht Sekunden Wartezeit).
+  /* stufeFx(slot) → {stufe, dauer, partikel}
+   * Die Raritaets-Leiter an EINER Stelle. Alles andere (Blatt, Ton,
+   * Umgebung) liest von hier — vorher standen die Schwellen an vier
+   * Stellen verteilt (`>= 3` fuer Partikel, `>= 3` fuer den Burst,
+   * `>= LEGEND_FROM` fuer das Cinematic, 640 ms fest fuer das Ende der
+   * Drehung), und eine Aenderung an einer davon liess die anderen
+   * stehen.
+   *
+   * Gold- und Essenz-Posten sind KEINE Karten und bekommen bewusst die
+   * unterste Stufe: sie sind Beiwerk, und ein Essenz-Posten, der so
+   * gefeiert wird wie eine seltene Karte, entwertet die Karte. */
+  var STUFEN_FX = [
+    { dauer: 480, partikel: 4 },    // Gewoehnlich
+    { dauer: 560, partikel: 8 },    // Gut
+    { dauer: 640, partikel: 12 },   // Selten
+    { dauer: 720, partikel: 18 },   // Episch
+    { dauer: 820, partikel: 26 },   // Legendaer
+  ];
+  function stufeFx(slot) {
+    var idx = (slot && slot.kind === "card") ? (slot.d.tierIndex | 0) : 0;
+    if (idx < 0) idx = 0;
+    if (idx > STUFEN_FX.length - 1) idx = STUFEN_FX.length - 1;  // Suprem faellt nie
+    var f = STUFEN_FX[idx];
+    return { stufe: idx, dauer: f.dauer, partikel: f.partikel };
+  }
+
+  // fast = "Alle aufdecken": die Drehungen laufen in ihrer eigenen Dauer,
+  // starten aber im Abstand von ~170 ms — dadurch laeuft eine Kaskade
+  // statt acht gleichzeitiger Flips (und statt acht Sekunden Wartezeit).
   function doFlip(i, el, cb, legendary, fast) {
     var s = packState[i];
     if (!s || s.done) { if (cb) cb(); return; }
@@ -9457,33 +9603,53 @@ button.pfplate{cursor:pointer}
       setGold(gold() + s.n);
     }
     if (el) {
-      el.classList.add("turning");
+      var st = stufeFx(s);
+      el.style.setProperty("--pcdur", st.dauer + "ms");
+      el.classList.add("turning", "r" + st.stufe);
       void el.offsetWidth;
       el.classList.add("flipped");
       if (legendary) el.classList.add("legend");
-      UISfx.flip();
+      UISfx.flip(st.stufe);
+      /* Umgebung. Nur die beiden oberen Stufen greifen ueber die eigene
+         Karte hinaus — sonst waere jeder Flip ein Ereignis und damit
+         keiner mehr. */
+      var gitter = $("packGrid");
+      if (gitter && st.stufe >= 3) {
+        gitter.classList.add("spot");
+        setTimeout(function () { gitter.classList.remove("spot"); }, st.dauer + 320);
+      }
+      if (gitter && st.stufe >= 4) {
+        gitter.classList.remove("beben"); void gitter.offsetWidth;
+        gitter.classList.add("beben");
+        setTimeout(function () { gitter.classList.remove("beben"); }, 500);
+      }
       // Partikel genau in der Kartenmitte, wenn die Vorderseite erscheint.
       setTimeout(function () {
         var r = el.getBoundingClientRect();
-        UIFx.spark(r.left + r.width / 2, r.top + r.height / 2,
-                   legendary ? 20 : (s.kind === "card" && s.d.tierIndex >= 3 ? 14 : 8));
-        if (s.kind === "card" && s.d.tierIndex >= 3) el.classList.add("burst");
-      }, 300);
-      setTimeout(function () { el.classList.remove("turning"); }, 640);
+        UIFx.spark(r.left + r.width / 2, r.top + r.height / 2, st.partikel);
+        if (st.stufe >= 3) el.classList.add("burst");
+      }, Math.round(st.dauer / 2));
+      setTimeout(function () { el.classList.remove("turning"); }, st.dauer + 40);
       /* NACH der Drehung geht die Karte in ihren Loop ueber — der
          Moment, in dem der Spieler sie zum ersten Mal sieht, ist der,
          der bewegt sein muss. Das Standbild bleibt darunter liegen. */
       if (s.kind === "card") {
         setTimeout(function () {
           attachLoop(el.querySelector(".pcfront .artbox"), s.d.cardId);
-        }, 620);
+        }, st.dauer + 20);
       }
     }
     renderTop();
     updateNavBadge();
+    /* Die Wartezeiten haengen an DER Dauer dieser Karte, nicht mehr an
+       einer festen 660. Sonst waere die Zusammenfassung bei einer
+       legendaeren Karte (820 ms) schon offen, waehrend die Karte noch
+       dreht — und bei einer gewoehnlichen (480 ms) haengt der Spieler
+       180 ms in der Luft. */
+    var nach = el ? (stufeFx(s).dauer + 60) : 0;
     var allDone = packState.every(function (x) { return x.done; });
-    if (allDone) setTimeout(showSummary, el ? 680 : 0);
-    if (cb) setTimeout(cb, el ? (fast ? 170 : 660) : 0);
+    if (allDone) setTimeout(showSummary, el ? nach + 20 : 0);
+    if (cb) setTimeout(cb, el ? (fast ? 170 : nach) : 0);
   }
 
   /* Vollbild-Cinematic mit garantiertem Ausweg (§17.3). */
@@ -15535,6 +15701,12 @@ button.pfplate{cursor:pointer}
      ohne etwas zu messen — ein hohler gruener Balken. */
   window.__proto = { AC: AC, openDetail: openDetail, show: show, seed: seed,
     renderPity: renderPity, UIQuoten: UIQuoten,
+                     /* Raritaets-Leiter der Aufdeckung. `stufeFx` ist die
+                        EINE Quelle fuer Dauer und Partikelzahl je Stufe;
+                        die Pruefung liest sie, statt Zahlen einzufrieren,
+                        die sich in der Umsetzung noch verschieben. */
+                     stufeFx: stufeFx,
+                     setPackState: function (arr) { packState = arr; renderPack(); },
                      /* Fuer den Pruefstand: die Marken-Fabrik und die Tabelle.
                         Ohne sie liesse sich nicht messen, ob die sieben Pfade
                         tatsaechlich zeichnen — genau die Frage, die ein
