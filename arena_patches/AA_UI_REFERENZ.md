@@ -2488,3 +2488,132 @@ oft zu machen, statt es zu einer seltenen Großentscheidung zu erheben.
    Covered) — Labels gelesen, Zahlen nicht.
 10. ❌ **Gold-Kurve unterhalb Lv 20 und oberhalb Lv 21** — der neue Punkt 25 000 steht
     isoliert; ob die Kurve dort wirklich abflacht, braucht eine zweite Messung (§21.4).
+
+---
+
+## 22. Screenrecording „Battledeck" vom 29.07.2026 — Zwischenstand der Auswertung
+
+**Quelle:** `ScreenRecording_07-29-2026 15-04-54_1.MP4` (Drive-ID
+`16eVFRY4SHeliqPR7ZvpZKZW6c1mLlBUI`), **400 437 172 Bytes**, **187,4 s**,
+1320 × 2868, 60 fps, HEVC.
+
+### 22.0 Wie das Video ausgewertet wird — und warum das hier steht
+
+Die Datei ist zu groß, um sie örtlich zu holen: der Ausgangs-Proxy sperrt
+`drive.usercontent.google.com`, `cloudfront` und jeden Datei-Zwischenwirt;
+erreichbar ist von hier aus **nur GitHub**. Die Auswertung läuft deshalb in
+der Sandbox (dort ist Drive erreichbar), und jedes Einzelbild muss als
+Base64 durch das Werkzeugprotokoll zurück. Das Protokoll schneidet bei
+~20 000 Zeichen ab, ein Bild darf also **≤ ~14 KB** groß sein.
+
+Daraus die Arbeitsweise, die sich bewährt hat:
+
+1. **Kontaktbogen zuerst.** 94 Einzelbilder (alle 2 s), 46 × 100 px,
+   Graustufen, WebP q8 → 25 KB, in zwei Stücken übertragen. Der Bogen ist
+   zu klein zum Lesen, aber groß genug, um zu erkennen **welcher Bildschirm
+   wann** zu sehen ist. Ohne ihn zieht man teure Einzelbilder aufs Geratewohl
+   — die ersten drei Vollbilder lagen daneben, weil ich das Deck am Anfang
+   vermutet hatte und es tatsächlich in der zweiten Hälfte liegt.
+2. **Dann gezielt Einzelbilder** an den interessanten Zeitpunkten, 496 px
+   breit, Graustufen, autokontrastiert, Qualität so weit herunter, bis die
+   Datei unter 14 KB liegt. In dieser Größe ist **jede Beschriftung lesbar** —
+   nachgeprüft an „Daily Kill Limit: 4934" und „Merge normal Good tower cards".
+3. **Prüfsumme über jede Übertragung.** `md5sum` in der Sandbox gegen
+   `md5sum` nach dem Dekodieren. Eine frühere Übertragung in diesem Projekt
+   ist still verstümmelt angekommen und hat ein Drittel eines Screenshots
+   unbrauchbar gemacht, ohne dass etwas gemeldet hätte.
+
+> **Die Sandbox stirbt ~10 s nach jedem Aufruf.** Das Video ist danach weg
+> und muss neu geholt werden (~40 s). Alles, was zusammengehört, gehört in
+> **einen** Aufruf — oder in einen Hintergrundprozess, der alle < 60 s
+> angestoßen wird.
+
+### 22.1 Was das Video zeigt (Ablauf über 187 s)
+
+| Zeit | Bildschirm |
+|---|---|
+| 0 – ~46 s | **HERO PASS** — Heldenporträt, „Switch ⟳ Hero", Belohnungsleiter |
+| ~48 – ~70 s | Listenansichten, Übergang |
+| ~72 – ~94 s | Karten-/Turmdetail-Fenster (großes Mittelpanel mit Porträt) |
+| ~96 – ~142 s | **Collection** — Kartenraster + **RESOURCES**-Raster, Detailfenster |
+| ~144 – ~166 s | Zweispaltige Ansicht (Vergleich/Deck) |
+| ~168 – 187 s | Weitere Raster + Fenster |
+
+Das Deck liegt also **nicht** am Anfang. Wer nur die ersten Sekunden
+anschaut, sieht den Hero Pass und hält ihn für das Deck.
+
+### 22.2 HERO PASS (t ≈ 20 s) — gemessen
+
+Von oben nach unten:
+
+* **Chip oben links:** Heldensymbol + „x10", darunter „**Purchase Rewards**".
+* **Held groß in der Bühnenfläche**, darunter mittig „**Switch ⟳ Hero**"
+  (Text – Icon – Text, das Icon ist ein Kreispfeil).
+* **Bandüberschrift „HERO PASS"** mit einem **ⓘ** rechts daneben.
+* **Zähler-Leiste:** links ein Totenkopf, Text „**Daily Kill Limit: 4934**",
+  darunter ein Fortschrittsbalken „**2989/3000**", rechts in einer runden
+  Marke „**10**".
+* **Belohnungsleiter**, senkrecht scrollend: links eine **sechseckige
+  Stufenmarke** (4, 5, 6, 7 …), rechts daneben die Belohnungskachel mit
+  Artwork und Menge (`x500`, `x5`, `x6`), **über** jeder abholbaren Kachel
+  ein eigener Knopf „**Claim**". Die Stufen sind durch eine senkrechte
+  Linie verbunden.
+* **Fußzeile:** „**Ends in: 4d 11h**" mit Uhr-Symbol.
+* **Ganz unten:** links „**Back**", mittig ein breiter Preisknopf „**Fr.18**".
+
+Bemerkenswert für uns: **der Claim-Knopf sitzt ÜBER der Kachel**, nicht
+darin und nicht daneben. Und die Restlaufzeit steht **unter** der Leiter,
+direkt über den Knöpfen — nicht im Kopf.
+
+### 22.3 Collection + RESOURCES + Gegenstands-Fenster (t ≈ 122 s) — gemessen
+
+Der Bildschirm hinter dem Fenster:
+
+* Oben die Währungsleiste (u. a. **526** und **9787**).
+* **Kartenraster**, 5 Spalten, jede Kachel mit Band „**LVL 1**" unten.
+* Sektionsüberschrift „**RESOURCES**".
+* **Material-Raster, 4 Spalten**, jede Kachel eine **Turm-Miniatur** mit
+  Menge: **x78 · x68 · x66 · x64** / **x61 · x58 · x49 · x43**.
+* Untere Navigationsleiste, aktiver Reiter „**Collection**".
+
+> Das ist die dritte, unabhängige Bestätigung, dass **Material und Turm in
+> AA 1:1 zusammengehören** (nach IMG_3427-3430 und dem Catapult-Beleg
+> „78/15" ↔ „x78"). Unsere Umstellung auf **eine Essenz je Karte**
+> (DESIGN_PROGRESSION.md §B, State v4) steht damit auf drei Beinen.
+
+**Das Gegenstands-Fenster** (Overlay, mittig, verdeckt das Raster):
+
+* **Bandüberschrift** mit dem Namen — hier „**JOKER GOOD TOWER**" — die
+  Bandenden ragen links und rechts über den Rahmen hinaus.
+* **X-Knopf** in einer runden Marke, rechts **außerhalb** der oberen
+  Rahmenkante (überlappend, nicht innen).
+* **Linke Spalte:** großes Artwork in einer eingesenkten Fläche, unten
+  rechts die Menge „**x1**".
+* **Rechte Spalte:** Kasten „**GET FROM**" mit Aufzählung
+  (• Arena Chests • Arena Rewards • Special Event) und **eigener
+  Bildlaufleiste** — die Liste kann länger sein als der Kasten.
+* **Darunter über die volle Breite:** Kasten „**USED TO**" mit
+  „• Merge normal Good tower cards".
+
+**Zwei Bauteile, die wir noch nicht haben:**
+
+1. **Das GET FROM / USED TO-Fenster.** AA erklärt jeden Gegenstand an Ort
+   und Stelle: *woher* bekomme ich ihn und *wofür* ist er. Das ist genau
+   die Auskunft, die bei uns heute fehlt — unser Kartendetail sagt, was
+   eine Karte kann, aber nicht, woher ihre Essenz kommt. (Der Untertext im
+   Kartendetail, den ich heute eingebaut habe, ist die kleine Fassung
+   davon; die große gehört als eigenes Fenster nachgezogen.)
+2. **Die JOKER-Karte.** Ein Platzhalter, der sich mit **jeder** normalen
+   Karte derselben Stufe verschmelzen lässt („Merge normal Good tower
+   cards"). Damit entschärft AA genau den Frust, den unsere Pyramide
+   erzeugt: 243 Kopien DERSELBEN Karte für Suprem. Ein Joker je Stufe wäre
+   bei uns eine naheliegende Ergänzung — **noch nicht entschieden**, das
+   gehört dem Auftraggeber vorgelegt.
+
+### 22.4 Was noch fehlt
+
+Der eigentliche **Deck-Bildschirm** (t ≈ 144 – 166 s, die zweispaltige
+Ansicht) und die Fenster der zweiten Hälfte sind **noch nicht in lesbarer
+Auflösung ausgewertet**. Die Zeitmarken stehen fest, der Weg ist
+eingespielt; es fehlt nur die Übertragung. Bis dahin ist zum Deck-Aufbau
+**nichts belegt** — und deshalb steht hier auch nichts dazu.
