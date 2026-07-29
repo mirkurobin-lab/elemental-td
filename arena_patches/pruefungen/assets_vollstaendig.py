@@ -87,18 +87,52 @@ def lauf():
         return fehler
 
     gesichert = json.load(open(pfad_h, encoding="utf-8"))["assets"]
+
+    # ------------------------------------------------------------------
+    # Bekannte, datierte Ausnahmen (29.07.2026)
+    #
+    # Die Netzpolitik dieser Umgebung sperrt CONNECT auf *.cloudfront.net.
+    # Neue Assets lassen sich von der Baumaschine aus nicht mehr ins Repo
+    # sichern — die 229 aelteren stammen aus der Zeit davor.
+    #
+    # Das darf weder still verschwinden (dann faellt es keinem auf) noch
+    # dauerhaft rot leuchten (dann schaut irgendwann keiner mehr hin).
+    # Deshalb: eine ausdrueckliche Liste. Wer einen Schluessel dort
+    # eintraegt, tut das sichtbar im Diff und mit Grund und Datum; alles
+    # andere bleibt ein Fehler.
+    # ------------------------------------------------------------------
+    pfad_na = datei("assets", "NICHT_ERREICHBAR.json")
+    ausnahmen = {}
+    if os.path.exists(pfad_na):
+        ausnahmen = json.load(open(pfad_na, encoding="utf-8")).get("eintraege", {})
+
     soll = {k for k in liste if not k.startswith("_")
             and isinstance(liste[k], (dict, str))}
     fehlend = sorted(soll - set(gesichert))
-    if fehlend:
+    erklaert = [k for k in fehlend if k in ausnahmen]
+    unerklaert = [k for k in fehlend if k not in ausnahmen]
+    if unerklaert:
         fehler += 1
         print("FEHL  %d Eintraege ohne gesicherte Datei: %s"
-              % (len(fehlend), ", ".join(fehlend[:10])))
+              % (len(unerklaert), ", ".join(unerklaert[:10])))
         print("      -> Workflow „Assets sichern\" erneut ausloesen "
               "(er holt nur das Fehlende nach).")
     else:
         print("ok    alle %d Eintraege liegen als Datei unter assets/"
               % len(gesichert))
+    for k in erklaert:
+        a = ausnahmen[k]
+        print("WARN  %s ist NICHT gesichert (seit %s): %s"
+              % (k, a.get("seit", "?"), a.get("grund", "")[:88]))
+    # Eine Ausnahme fuer etwas, das inzwischen doch gesichert ist, ist
+    # selbst ein Fehler — sonst verwahrlost die Liste.
+    ueberfluessig = sorted(set(ausnahmen) & set(gesichert))
+    if ueberfluessig:
+        fehler += 1
+        print("FEHL  %d Ausnahmen in NICHT_ERREICHBAR.json sind ueberholt "
+              "(das Asset liegt da): %s" % (len(ueberfluessig),
+              ", ".join(ueberfluessig)))
+        print("      -> Eintrag loeschen. Die Liste ist kein Ablagefach.")
 
     # Fehlt umgekehrt eine Datei, auf die HERKUNFT.json zeigt?
     verwaist = [k for k, v in gesichert.items()

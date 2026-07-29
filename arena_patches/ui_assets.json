@@ -1980,5 +1980,13 @@
   "job": "949e2b93-321e-4d5f-b64f-c09d5ba099a5",
   "type": "teaser",
   "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133702_949e2b93-321e-4d5f-b64f-c09d5ba099a5.png"
+ },
+ "card_joker": {
+  "batch": 12,
+  "beschreibung": "Joker-Karte (Platzhalter beim Verschmelzen, AA-Befund 29.07.2026): prismatischer Kristall in Kartenform, Narrenkappe ueber Vierstern eingraviert, goldener Rautenrahmen, weissgoldener Innenglanz. Bewusst mehrfarbig-irisierend, damit die Karte zu KEINEM Element gehoert - sie steht fuer 'jede Karte'.",
+  "job": "e1befded-a35c-4bdf-8e6e-acc068759882",
+  "subtype": "card_art",
+  "type": "image",
+  "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260729_140512_e1befded-a35c-4bdf-8e6e-acc068759882.png"
  }
 }

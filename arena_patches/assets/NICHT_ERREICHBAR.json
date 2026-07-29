@@ -1,0 +1,12 @@
+{
+  "_hinweis": "Assets, die in ui_assets.json verzeichnet sind, aber NICHT ins Repo gesichert werden konnten, weil die Quelle von der Baumaschine aus nicht erreichbar ist. JEDER Eintrag hier ist eine bewusste, datierte Ausnahme und muss einen Grund tragen. assets_vollstaendig.py meldet sie als WARNUNG statt als Fehler - aber nur die, die hier stehen. Wer einen Eintrag hinzufuegt, sieht ihn im Diff; wer ihn vergisst, bekommt einen roten Balken.",
+  "_regel": "Diese Liste ist kein Ablagefach. Sobald die Quelle wieder erreichbar ist, gehoert der Eintrag geloescht und das Asset gesichert.",
+  "eintraege": {
+    "card_joker": {
+      "seit": "2026-07-29",
+      "grund": "Die Netzpolitik dieser Umgebung sperrt CONNECT auf *.cloudfront.net (gateway 403). Nachgemessen ueber $HTTPS_PROXY/__agentproxy/status: 'connect_rejected - policy denial' fuer d8j0ntlcm91z4.cloudfront.net und d2ol7oe51mr4n9.cloudfront.net. Die 229 aelteren Assets stammen aus der Zeit davor, als der Host noch offen war.",
+      "folge": "Die Live-Vorschau ist NICHT betroffen: der Prototyp laedt das Bild ueber die CDN-Konstante direkt. Betroffen ist nur die Unabhaengigkeit vom CDN fuer dieses eine Asset.",
+      "loesung": "Der Sicherungsschritt muss dorthin wandern, wo das CDN erreichbar ist - in die Sandbox, als Teil der Auslieferung. Solange das nicht umgebaut ist, bleibt der Eintrag hier."
+    }
+  }
+}

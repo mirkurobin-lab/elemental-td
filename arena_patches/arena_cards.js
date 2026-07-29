@@ -246,6 +246,36 @@
   };
   var PACK_ALIAS = { silber: "silver", arkan: "arcane", arcan: "arcane", bronce: "bronze" };
 
+  /* ---------- JOKER-Karten (AA-Befund, Screenrecording 29.07.2026) ----------
+   * AA hat einen Platzhalter je Stufe — im Video als „JOKER GOOD TOWER"
+   * mit der Zeile „USED TO · Merge normal Good tower cards".
+   *
+   * WARUM WIR IHN ÜBERNEHMEN: unsere Pyramide verlangt 243 Kopien
+   * DERSELBEN Karte für Suprem (3⁵). Wer 240 EMBER und 3 STONE hat, kommt
+   * keinen Schritt weiter — und das ist der Punkt, an dem eine Sammlung
+   * aufhört, sich nach Fortschritt anzufühlen. Der Joker löst genau diese
+   * Blockade, ohne die Pyramide zu verkleinern.
+   *
+   * DIE EINE REGEL, DIE IHN EHRLICH HÄLT: höchstens JOKER_MAX = 2 Joker je
+   * Verschmelzung. Es muss also immer mindestens EINE echte Kopie dabei
+   * sein. Drei Joker hätten sonst kein Ziel — aus was soll die neue Karte
+   * werden? — und ein Joker, der eine Karte aus dem Nichts erzeugt, wäre
+   * keine Hilfe mehr, sondern die Abkürzung an der Sammlung vorbei.
+   *
+   * Joker haben KEINE Stufe im Sinne der Leiter: ein Gut-Joker ersetzt eine
+   * gute Kopie, er wird nicht selbst verschmolzen. Deshalb liegen sie als
+   * eigener Vorrat neben den Karten, nicht in `cards`.
+   *
+   * SUPREM HAT KEINEN JOKER: Suprem ist Endstufe, es gibt nichts, wozu man
+   * ihn verschmelzen könnte.
+   *
+   * BEZUGSQUELLE: Arena-Truhen, Arena-Belohnungen, Events — NICHT die
+   * Kartenslots der Booster. Das ist AAs eigene Angabe („GET FROM: Arena
+   * Chests · Arena Rewards · Special Event") und zugleich die Vorgabe des
+   * Auftraggebers, die Drop-Tabelle unangetastet zu lassen. */
+  var JOKER_MAX = 2;                       // höchstens 2 Joker je Merge
+  var JOKER_TIER_KEYS = TIER_KEYS.slice(0, TIER_KEYS.length - 1);  // ohne Suprem
+
   var MATERIAL_PER_SLOT = [2, 5];  // pro Material-Slot 2-5 Stück
   var PITY_EPIC = 25;              // Packs ohne Episch+ → nächster erzwingt Episch
   var PITY_LEGENDARY = 75;         // Packs ohne Legendär → erzwingt Legendär
@@ -493,6 +523,20 @@
     }
     return o;
   }
+  function emptyJokers() {
+    var o = {};
+    for (var i = 0; i < JOKER_TIER_KEYS.length; i++) o[JOKER_TIER_KEYS[i]] = 0;
+    return o;
+  }
+  function normJokers(j) {
+    var o = emptyJokers();
+    if (j && typeof j === "object") {
+      for (var i = 0; i < JOKER_TIER_KEYS.length; i++) {
+        o[JOKER_TIER_KEYS[i]] = Math.max(0, j[JOKER_TIER_KEYS[i]] | 0);
+      }
+    }
+    return o;
+  }
   function materialsTotal(m) {
     var n = 0;
     for (var i = 0; i < MATERIAL_KEYS.length; i++) n += m[MATERIAL_KEYS[i]] | 0;
@@ -503,6 +547,12 @@
       v: STATE_VERSION,
       cards: {},          // {id: {tier, lvl, copies:{tier:n}, mergeBoni:[], pendingBoni:[]}}
       materials: emptyMaterials(), // Upgrade-Material JE KARTE (v4)
+      /* Joker-Vorrat je Stufe. BEWUSST OHNE Versions-Sprung: das Feld ist
+         rein additiv, und get() füllt jedes fehlende Feld aus fresh() nach.
+         Ein v4-Stand von gestern bekommt es beim ersten Lesen, ohne dass
+         eine Migration laufen muss — und ohne dass eine Migration, die
+         nichts umzurechnen hat, in der Kette stehen bleibt. */
+      jokers: emptyJokers(),
       matRR: 0,           // Round-Robin-Zeiger für addMaterial() ohne Sorte
       gold: null,         // BEWUSST null — Gold verwaltet der Hub (arenaHub)
       pityEpic: 0, pityLegendary: 0, packsOpened: 0,
@@ -517,6 +567,7 @@
     for (var k in f) if (s[k] === undefined) s[k] = f[k];
     if (!s.cards || typeof s.cards !== "object") s.cards = {};
     s.materials = normMaterials(s.materials);
+    s.jokers = normJokers(s.jokers);
     s.matRR = ((s.matRR | 0) % MATERIAL_KEYS.length + MATERIAL_KEYS.length) % MATERIAL_KEYS.length;
     s.gold = null;
     delete s.material;   // v2-Feld — existiert seit v3 nicht mehr
@@ -614,11 +665,65 @@
 
   /* ================= Merge ================= */
 
-  function canMerge(id, tierKey) {
+  /* ---------- Joker-Vorrat ---------- */
+  function getJokersFrom(st) {
+    var o = { total: 0 };
+    for (var i = 0; i < JOKER_TIER_KEYS.length; i++) {
+      var k = JOKER_TIER_KEYS[i];
+      o[k] = st.jokers[k] | 0;
+      o.total += o[k];
+    }
+    return o;
+  }
+  function getJokers() { return getJokersFrom(get()); }
+  /* addJoker(tierKey, n) — bucht n Joker auf eine Stufe. Negative n ziehen
+   * ab (Bestand bleibt ≥ 0). OHNE gültige Stufe passiert NICHTS: einen
+   * Joker „irgendwohin" zu verteilen wie beim Material wäre hier falsch —
+   * die Stufe IST seine Eigenschaft, ein Joker ohne Stufe existiert nicht. */
+  function addJoker(tierKey, n) {
+    n = Math.floor(Number(n) || 0);
+    var st = get();
+    if (JOKER_TIER_KEYS.indexOf(tierKey) >= 0 && n) {
+      st.jokers[tierKey] = Math.max(0, (st.jokers[tierKey] | 0) + n);
+      save(st);
+    }
+    return getJokersFrom(st);
+  }
+
+  /* mergeInfo(id, tierKey) → alles, was die Oberfläche für EINE Zeile der
+   * Schmiede braucht. Eine Stelle, damit Blatt, Knopfbeschriftung und
+   * Regel nicht auseinanderlaufen — vorher hätte die Oberfläche „habe/
+   * brauche" selbst gerechnet und die Joker-Grenze zweimal gekannt. */
+  function mergeInfo(id, tierKey) {
+    var st = get(), c = cardIn(st, id);
+    var gueltig = !!TIER_BY_KEY[tierKey] && !!nextTierKey(tierKey);
+    var have = gueltig ? (c.copies[tierKey] | 0) : 0;
+    var fehlt = Math.max(0, MERGE_COST - have);
+    var vorrat = (JOKER_TIER_KEYS.indexOf(tierKey) >= 0) ? (st.jokers[tierKey] | 0) : 0;
+    /* Nutzbar sind höchstens JOKER_MAX, höchstens der Vorrat, höchstens die
+     * Lücke — und nie so viele, dass keine echte Kopie übrig bliebe. */
+    var nutzbar = Math.min(JOKER_MAX, vorrat, fehlt, MERGE_COST - 1);
+    return { tier: tierKey, nextTier: gueltig ? nextTierKey(tierKey) : null,
+             have: have, need: MERGE_COST, fehlt: fehlt,
+             jokerVorrat: vorrat, jokerNutzbar: nutzbar,
+             ok: gueltig && have >= MERGE_COST,
+             okMitJokern: gueltig && have >= 1 && (have + nutzbar) >= MERGE_COST };
+  }
+
+  /* canMerge(id, tierKey, useJokers)
+   * useJokers ist optional und steht auf 0 — Altaufrufe verhalten sich
+   * unverändert. Das ist Absicht: „Alle verschmelzen" darf keine Joker
+   * verbrauchen, nur weil die Signatur gewachsen ist. */
+  function canMerge(id, tierKey, useJokers) {
     var c = cardOf(id);
     if (!TIER_BY_KEY[tierKey]) return false;
     if (!nextTierKey(tierKey)) return false;          // Suprem ist Endstufe
-    return (c.copies[tierKey] | 0) >= MERGE_COST;
+    var j = Math.max(0, Math.min(JOKER_MAX, Math.floor(Number(useJokers) || 0)));
+    if (j === 0) return (c.copies[tierKey] | 0) >= MERGE_COST;
+    var info = mergeInfo(id, tierKey);
+    if (j > info.jokerVorrat) return false;
+    if (j > MERGE_COST - 1) return false;             // eine echte Kopie muss bleiben
+    return (c.copies[tierKey] | 0) >= (MERGE_COST - j);
   }
 
   // progressToNextMerge(id) → {tier, have, need, ready, nextTier}
@@ -635,13 +740,22 @@
    * Verbraucht 3 Kopien der Stufe tierKey und erzeugt 1 Kopie der nächsten.
    * Steigt die AKTIVE Stufe der Karte dadurch, wird der kartenspezifische
    * Bonus dieser Stufe zur Wahl gestellt (chooseMergeBonus). */
-  function merge(id, tierKey) {
+  function merge(id, tierKey, useJokers) {
     var st = get(), c = cardIn(st, id);
     if (!TIER_BY_KEY[tierKey]) return null;
     var nk = nextTierKey(tierKey);
-    if (!nk || c.copies[tierKey] < MERGE_COST) return null;
+    if (!nk) return null;
+    /* Joker-Anteil festzurren, BEVOR irgendetwas abgezogen wird. Alle drei
+     * Grenzen greifen: höchstens JOKER_MAX, höchstens der Vorrat, und nie
+     * so viele, dass keine echte Kopie mehr dabei wäre. */
+    var j = Math.max(0, Math.min(JOKER_MAX, Math.floor(Number(useJokers) || 0)));
+    if (j > (st.jokers[tierKey] | 0)) return null;
+    if (j > MERGE_COST - 1) return null;
+    var echt = MERGE_COST - j;
+    if (c.copies[tierKey] < echt) return null;
     var beforeIdx = tierOf(c.tier).index;
-    c.copies[tierKey] -= MERGE_COST;
+    c.copies[tierKey] -= echt;
+    if (j) st.jokers[tierKey] = Math.max(0, (st.jokers[tierKey] | 0) - j);
     c.copies[nk] += 1;
     recomputeTier(c);
     var tierUp = tierOf(c.tier).index > beforeIdx;
@@ -656,19 +770,35 @@
     save(st);
     return { ok: true, from: tierKey, newTier: c.tier, tierUp: tierUp,
              cap: capOf(c.tier), bonusTier: tierUp ? c.tier : null,
-             bonusChoices: choices, pending: c.pendingBoni.slice() };
+             bonusChoices: choices, pending: c.pendingBoni.slice(),
+             jokersUsed: j, copiesUsed: echt, jokers: getJokersFrom(st) };
   }
 
   /* mergeAll(id) → {merges, byTier, newTier, pending}
    * AA-Feature "Merge All": kaskadiert von unten nach oben, so dass aus
    * 243 Gewöhnlich-Kopien genau 1 Suprem-Karte wird (3^5). */
-  function mergeAll(id) {
-    var byTier = {}, total = 0, last = null;
+  /* mergeAll(id, opts) — opts.useJokers muss AUSDRÜCKLICH gesetzt werden.
+   * Ohne die Option fasst „Alle verschmelzen" keinen einzigen Joker an.
+   * Grund: eine Kaskade, die im Vorbeigehen den Joker-Vorrat leert, ist
+   * genau die Sorte Überraschung, die man einem Spieler nicht antut — er
+   * hat auf einen Knopf gedrückt, nicht auf jede einzelne Verschmelzung. */
+  function mergeAll(id, opts) {
+    var mitJoker = !!(opts && opts.useJokers);
+    var byTier = {}, total = 0, last = null, jokerTotal = 0;
     for (var i = 0; i < TIER_KEYS.length - 1; i++) {
       var tk = TIER_KEYS[i];
       var guard = 0;
-      while (canMerge(id, tk) && guard++ < 100000) {
-        var r = merge(id, tk);
+      while (guard++ < 100000) {
+        var j = 0;
+        if (canMerge(id, tk)) {
+          j = 0;
+        } else if (mitJoker) {
+          var inf = mergeInfo(id, tk);
+          if (!inf.okMitJokern || !inf.jokerNutzbar) break;
+          j = inf.jokerNutzbar;
+        } else break;
+        var r = merge(id, tk, j);
+        jokerTotal += j;
         if (!r) break;
         byTier[tk] = (byTier[tk] || 0) + 1;
         total++; last = r;
@@ -676,7 +806,8 @@
     }
     var c = cardOf(id);
     return { merges: total, byTier: byTier, newTier: c.tier, cap: capOf(c.tier),
-             pending: c.pendingBoni.slice(), last: last };
+             pending: c.pendingBoni.slice(), last: last,
+             jokersUsed: jokerTotal, jokers: getJokers() };
   }
 
   // chooseMergeBonus(id, perkId) → {ok, tier, perk} | null
@@ -1141,6 +1272,7 @@
     MATERIALS: MATERIALS, MATERIAL_KEYS: MATERIAL_KEYS, CARD_MATERIAL: CARD_MATERIAL,
     MATERIAL_BY_KEY: MATERIAL_BY_KEY,
     PITY_EPIC: PITY_EPIC, PITY_LEGENDARY: PITY_LEGENDARY, HERO_WEIGHT: HERO_WEIGHT,
+    JOKER_MAX: JOKER_MAX, JOKER_TIER_KEYS: JOKER_TIER_KEYS,
     STATE_VERSION: STATE_VERSION,
     // Mathe
     statMul: statMul, goldFor: goldFor, materialFor: materialFor, tierOf: tierOf,
@@ -1151,7 +1283,8 @@
     getMaterials: getMaterials, getPityStatus: getPityStatus, oddsFor: oddsFor,
     // Bank
     get: get, addDrop: addDrop, addMaterial: addMaterial, owned: owned, view: view,
-    canMerge: canMerge, merge: merge, mergeAll: mergeAll,
+    canMerge: canMerge, merge: merge, mergeAll: mergeAll, mergeInfo: mergeInfo,
+    getJokers: getJokers, addJoker: addJoker,
     chooseMergeBonus: chooseMergeBonus, mergeBonusChoices: mergeBonusChoices,
     pendingBonusChoices: pendingBonusChoices, progressToNextMerge: progressToNextMerge,
     canLevelUp: canLevelUp, levelUp: levelUp, modsOf: modsOf, perkById: perkById,
@@ -1490,6 +1623,95 @@
     check("Merge unterhalb der aktiven Stufe erzeugt nur eine Kopie", mr2.tierUp === false &&
       get().cards.water.copies.good === 2 && get().cards.water.tier === "good");
     check("Merge auf Suprem nicht möglich (Endstufe)", canMerge("water", "supreme") === false);
+
+    /* --- 4c. JOKER-Karten (AA-Befund 29.07.2026) ---
+     * Geprüft werden die REGELN, nicht meine Umsetzung. Die wichtigste ist
+     * die Obergrenze: ein Joker hilft, er ersetzt nicht die Sammlung.
+     * Deshalb steht hier ausdrücklich auch der Fall, der scheitern MUSS —
+     * drei Joker ohne echte Kopie. Eine Prüfung, die nur das Gelingen
+     * misst, hätte eine Umsetzung durchgewunken, die aus drei Jokern eine
+     * Karte macht, die man gar nicht besitzt. */
+    console.log("\nJoker:");
+    check("kein Joker für Suprem (Endstufe, nichts zu verschmelzen)",
+      JOKER_TIER_KEYS.indexOf("supreme") < 0 &&
+      JOKER_TIER_KEYS.length === TIER_KEYS.length - 1,
+      JOKER_TIER_KEYS.join("/"));
+    API._reset();
+    var jk = addJoker("good", 5);
+    check("addJoker bucht auf die genannte Stufe", jk.good === 5 && jk.total === 5,
+      JSON.stringify(jk));
+    check("addJoker mit unbekannter Stufe bucht NICHTS", (function () {
+      var vor = getJokers().total;
+      addJoker("gibtsnicht", 9); addJoker("supreme", 9);
+      return getJokers().total === vor;
+    })(), JSON.stringify(getJokers()));
+    check("Joker überleben das Neulesen des Standes", getJokers().good === 5);
+
+    // Zwei echte Kopien + ein Joker
+    API._reset();
+    addJoker("good", 3);
+    addDrop("fire", "good", 2);
+    var i1 = mergeInfo("fire", "good");
+    console.log("  fehlt " + i1.fehlt + ", Vorrat " + i1.jokerVorrat +
+      ", nutzbar " + i1.jokerNutzbar + ", ok=" + i1.ok + ", mitJokern=" + i1.okMitJokern);
+    check("mergeInfo: 2 Kopien → fehlt 1, ohne Joker nicht möglich",
+      i1.have === 2 && i1.fehlt === 1 && i1.ok === false && i1.okMitJokern === true);
+    check("mergeInfo: nutzbar ist auf die Lücke begrenzt, nicht auf den Vorrat",
+      i1.jokerNutzbar === 1, i1.jokerNutzbar + " bei Vorrat " + i1.jokerVorrat);
+    var m1 = merge("fire", "good", 1);
+    check("Merge mit 1 Joker verbraucht 2 Kopien + 1 Joker",
+      m1 && m1.jokersUsed === 1 && m1.copiesUsed === 2 && getJokers().good === 2,
+      m1 ? (m1.copiesUsed + " Kopien / " + m1.jokersUsed + " Joker") : "null");
+    check("und erzeugt eine Kopie GENAU DIESER Karte auf der nächsten Stufe",
+      get().cards.fire.copies.rare === 1 && get().cards.fire.copies.good === 0);
+
+    // Eine echte Kopie + zwei Joker
+    API._reset();
+    addJoker("common", 4);
+    addDrop("water", "common", 1);
+    var m2 = merge("water", "common", 2);
+    check("Merge mit 2 Jokern verbraucht 1 Kopie + 2 Joker",
+      m2 && m2.jokersUsed === 2 && m2.copiesUsed === 1 && getJokers().common === 2,
+      m2 ? (m2.copiesUsed + " / " + m2.jokersUsed) : "null");
+
+    // Der Fall, der scheitern MUSS
+    API._reset();
+    addJoker("common", 9);
+    check("DREI Joker ohne echte Kopie werden abgelehnt",
+      merge("nature", "common", 3) === null && getJokers().common === 9,
+      "Vorrat danach " + getJokers().common);
+    check("canMerge sagt dasselbe", canMerge("nature", "common", 3) === false);
+    check("auch mit 2 Jokern und NULL Kopien geht nichts",
+      merge("nature", "common", 2) === null && getJokers().common === 9);
+    API._reset();
+    addJoker("common", 1);
+    addDrop("nature", "common", 1);
+    check("mehr Joker verlangt als vorhanden → abgelehnt, Vorrat unberührt",
+      merge("nature", "common", 2) === null && getJokers().common === 1);
+
+    // mergeAll fasst ohne Option keinen Joker an
+    API._reset();
+    addJoker("common", 6);
+    addDrop("earth", "common", 2);
+    var ma = mergeAll("earth");
+    check("„Alle verschmelzen\" ohne Option verbraucht NULL Joker",
+      ma.jokersUsed === 0 && getJokers().common === 6 && ma.merges === 0,
+      ma.merges + " Merges, " + ma.jokersUsed + " Joker");
+    var ma2 = mergeAll("earth", { useJokers: true });
+    check("mit ausdrücklicher Option greift es zu",
+      ma2.jokersUsed > 0 && ma2.merges > 0,
+      ma2.merges + " Merges, " + ma2.jokersUsed + " Joker");
+    check("und stoppt, sobald keine echte Kopie mehr da ist",
+      get().cards.earth.copies.common === 0);
+
+    // Ein Stand von gestern kennt das Feld noch nicht
+    API._reset();
+    API._write({ v: STATE_VERSION, cards: {}, materials: emptyMaterials(), matRR: 0,
+                 gold: null, pityEpic: 2, pityLegendary: 5, packsOpened: 7 });
+    check("ein v4-Stand OHNE Joker-Feld bekommt es beim Lesen (keine Migration nötig)",
+      getJokers().total === 0 && get().jokers.good === 0 &&
+      get().pityEpic === 2 && get().packsOpened === 7,
+      JSON.stringify(getJokers()));
 
     /* --- 4b. Essenzen: Buchung & Verbrauch --- */
     var L_M = MATERIAL_KEYS.length;
