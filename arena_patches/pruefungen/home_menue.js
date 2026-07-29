@@ -43,7 +43,10 @@ const pruef = (name, wahr, zusatz) => {
              hatBild: !!i, w: r ? Math.round(r.width) : 0, h: r ? Math.round(r.height) : 0,
              vorText: !!(i && t && i.getBoundingClientRect().right <= t.getBoundingClientRect().left + 1) };
   }));
-  pruef("vier Menueeintraege", m.length === 4, "sind " + m.length);
+  // Angepasst 27.07.: fuenf seit dem Community-Eintrag. Die Aussage der
+  // Datei ist nicht die Zahl, sondern dass JEDER Eintrag ein lesbares
+  // Bild vor seinem Text traegt — das prueft die Schleife darunter.
+  pruef("fuenf Menueeintraege", m.length === 5, "sind " + m.length);
   m.forEach(e => {
     pruef("„" + e.txt + "“ hat ein Bild", e.hatBild);
     pruef("„" + e.txt + "“ Bild >= 20 px", e.w >= 20 && e.h >= 20, e.w + "x" + e.h);

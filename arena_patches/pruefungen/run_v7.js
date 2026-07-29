@@ -2275,8 +2275,12 @@ function step(name, ok, info) {
       zaehler: (li.querySelector('.tbmi[data-nav="navMail"] .tbmn') || {}).textContent || ''
     };
   });
-  step('Menue fuehrt genau vier Ziele — Clan und Gegner sind raus',
-    menuAuf.eintraege.length === 4 &&
+  /* Angepasst 27.07.: das Menue hat ein FUENFTES Ziel bekommen
+     (Community). Die Zahl vier war nie die Anforderung — die
+     Anforderung war „Clan und Gegner gehoeren hier NICHT hin", weil sie
+     eigene Wege haben. Genau das misst der Schritt weiter. */
+  step('Menue fuehrt fuenf Ziele — Clan und Gegner sind raus',
+    menuAuf.eintraege.length === 5 &&
     !menuAuf.eintraege.some(e => e.nav === 'navClan' || e.nav === 'navBestiary'),
     menuAuf.eintraege.map(e => e.nav).join(' · '));
   step('Zwei Zwischenueberschriften gliedern die Liste',
@@ -2285,15 +2289,18 @@ function step(name, ok, info) {
     menuAuf.gruppen.join(' · '));
   step('Jede Gruppe steht VOR ihren Eintraegen',
     menuAuf.folge.join('|') ===
-      'GRP:Spielen|navBoard|navGuide|GRP:Konto|navMail|navSettings',
+      'GRP:Spielen|navBoard|navGuide|navCommunity|GRP:Konto|navMail|navSettings',
     menuAuf.folge.join(' · '));
   /* Das ist der eigentliche Befund des Nutzers: sechs gleich hohe
      Balken sind eine Liste, kein Menue. Gewicht heisst messbar
      unterschiedliche Hoehe, nicht nur andere Reihenfolge. */
   const pri = menuAuf.eintraege.filter(e => e.pri);
   const sec = menuAuf.eintraege.filter(e => !e.pri);
+  /* 3 statt 2 grosse Eintraege — Community ist ein ZIEL, kein
+     Verwaltungspunkt. Die Aussage bleibt: Ziele stehen oben und sind
+     messbar hoeher als die Verwaltung darunter. */
   step('Ziele sind gross, Verwaltung ist klein (echter Hoehenunterschied)',
-    pri.length === 2 && sec.length === 2 &&
+    pri.length === 3 && sec.length === 2 &&
     Math.min(...pri.map(e => e.h)) >= Math.max(...sec.map(e => e.h)) + 10,
     pri.map(e => e.h).join('/') + ' px gegen ' + sec.map(e => e.h).join('/') + ' px');
   step('Die grossen Eintraege tragen eine Unterzeile',
