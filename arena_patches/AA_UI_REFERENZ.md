@@ -2700,3 +2700,64 @@ das der Prototyp lädt, Alpha trägt, **ist von hier aus nicht prüfbar**
 den Kasten und die Bilder müssen durch `remove_background`. **Zu prüfen,
 sobald die Live-Vorschau wieder erreichbar ist** — vorher ist jede
 Änderung daran geraten.
+
+---
+
+## 24. BATTLE DECK — ausgemessen (30.07.2026)
+
+**Quelle:** `ScreenRecording_07-29-2026 15-04-54_1.MP4`, **t = 100 s**.
+Rahmen auf 430 px Breite skaliert (unsere Bühnenbreite), Werte daraus als
+Prozent der Bühnenbreite. Die Zeitmarke in §22.4 („t ≈ 144–166 s") war
+**falsch** — dort laufen Merge-Zeremonien. Der Deck-Bildschirm liegt bei
+**≈ 92–104 s**.
+
+### 24.1 Der Aufbau
+
+```
+┌──────────────────────────────────────────┐
+│        ~~~ BATTLE DECK ~~~          (i)  │  Band, volle Breite
+├──────────────────────────────────────────┤
+│ ┌──────────┐  ┌────┐ ┌────┐ ┌────┐       │
+│ │          │◆ │ T1 │ │ T2 │ │ T3 │       │  ◆ = Skill-Marke
+│ │  HELD    │  └────┘ └────┘ └────┘       │      in der Ecke
+│ │          │  ┌────┐ ┌────┐ ┌────┐       │
+│ │  LvL 25  │  │ T4 │ │ T5 │ │ T6 │       │
+│ └──────────┘  └────┘ └────┘ └────┘       │
+│  ⬡    ⬡        [1][2][3🔒][4🔒] [≡]      │  ⬡ = Spell-Plätze
+├──────────────────────────────────────────┤
+│   Towers  │  Skills  │  Items            │  Reiter
+└──────────────────────────────────────────┘
+```
+
+### 24.2 Die Maße
+
+| Element | Wert | in % der Bühne |
+|---|---|---|
+| Bühne | 430 × 934 | — |
+| Band „BATTLE DECK" | y 122–160 | Höhe 4,1 % der Höhe |
+| **Heldenrahmen** | x 18–172, y 182–370 | **35,8 % breit**, Verhältnis B:H = 1 : 1,22 |
+| **Turmkarte** | 74 × 94 | **17,2 % breit**, Verhältnis B:H = 1 : 1,27 |
+| Spalten-Lücke | 6 px | 1,4 % |
+| Turmraster | 3 Spalten × 2 Reihen, x 182–416 | **6 Karten — belegt, nicht geraten** |
+| **Spell-Sechseck** | ~54 × 54, x 28–82 und 92–146 | **12,6 % breit**, zwei Stück |
+| Deck-Wahl | 4 Knöpfe + Listen-Knopf, y 402–428 | Deck 3 und 4 mit Schloss |
+| Reiterleiste | y 445–478 | drei Reiter |
+
+### 24.3 Was daraus folgt
+
+* **Sechs Turmkarten je Deck** — im Bild abgelesen (LvL 20/27/15 · 20/11/17),
+  und vom Auftraggeber bestätigt: *„es müssen 6 Turm Karten pro Deck sein"*.
+* **Die zwei Spell-Sechsecke sitzen UNTER dem Helden**, nebeneinander, auf
+  Höhe der Deck-Wahl. Nicht links und rechts der Ult, sondern als Paar
+  unterhalb des Heldenrahmens — die Ult-Marke sitzt oben in der Ecke des
+  Rahmens.
+* **Vier Deck-Plätze**, zwei davon gesperrt. Ein Fach für später; wir
+  bauen die Umschaltung mit, sperren 3 und 4 wie im Vorbild.
+* Der Held ist **nicht** eine von sieben gleichen Kacheln, sondern eine
+  eigene, größere Fläche links. Höhe = beide Turmreihen zusammen.
+
+### 24.4 Noch nicht abgelesen
+
+Was in den **Sechsecken** genau steht (im Video „11" und „12" — Zahlen,
+keine Namen), und ob die Zahl eine Stufe, eine Menge oder eine Aufladung
+ist. Das braucht einen Bildausschnitt in höherer Auflösung.
