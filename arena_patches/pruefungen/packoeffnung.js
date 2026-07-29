@@ -9,19 +9,33 @@
  *
  * Eine so gewonnene Kurve ist genau so lange etwas wert, wie sie
  * unveraendert bleibt. Sie sieht im Code aus wie beliebige krumme
- * Prozentzahlen (23.4 %, 71.5 %, 76.2 %) — der naechste Leser haelt sie
- * fuer ungefaehr und rundet sie. Genau davor schuetzt diese Datei:
- * sie prueft die drei Marken, die den Effekt tragen.
+ * Prozentzahlen (19.43 %, 45.00 %, 59.43 %) — der naechste Leser haelt
+ * sie fuer ungefaehr und rundet sie. Genau davor schuetzt diese Datei.
  *
- * DIE DREI MARKEN
- *   Atemzug zurueck  550-800 ms   die Glut FAELLT wieder ab
- *   Bruch            1680-1790    110 ms von 0,4 auf 0,89
- *   Asymmetrie       530 ms hinauf gegen 120 ms hinunter (4,4:1)
+ * ⚠ ZWEITE FASSUNG. Die erste Pruefung war GRUEN, waehrend die Animation
+ * falsch lief — sie hat genau die geglaettete Kurve festgeschrieben, die
+ * der Auftraggeber sofort als „viel zu schnell, viele Details werden
+ * einfach uebersprungen" erkannt hat. Zwei Fehlerklassen sind dabei
+ * durchgerutscht, beide stehen jetzt als eigene Schritte hier drin:
  *
- * Der Rueckfall ist der Teil, den Nachbauten weglassen, weil er sich
- * beim Ansehen wie eine Panne anfuehlt. Ohne ihn wirkt der Knall billig.
- * Eine Pruefung, die nur „es blitzt irgendwann" sagt, wuerde das nicht
- * merken.
+ *   1. GEGLAETTETE KURVE. Der Aufbau hat DREI Puls-Rueckfall-Zyklen
+ *      (583/750, 1033/1117, 1350/1417 ms). Ich hatte einen daraus
+ *      gemacht. Aus drei Atemzuegen einen zu machen halbiert die
+ *      gefuehlte Dauer, obwohl die Gesamtzahl gleich bleibt. Die
+ *      Pruefung zaehlt deshalb GENAU DREI Taeler, nicht „mindestens
+ *      eines" — eine Schwelle haette das nie gemeldet.
+ *
+ *   2. FEHLENDER ANFANGSWERT. `pkbeben` setzte `opacity` erst bei 76 %.
+ *      Der Browser interpoliert dann vom Ausgangswert ueber die GANZE
+ *      Animation dorthin: der Pack war bei 1,5 s schon zu 37 % verblasst.
+ *      Im CSS sieht das aus wie eine Auslassung, in Wahrheit ist es eine
+ *      stille Rampe ueber alles. Geprueft wird jetzt fuer JEDE
+ *      pk-Animation, dass am 0-%-Stop alles steht, was spaeter kommt.
+ *
+ * Die Lehre daraus gilt ueber diese Datei hinaus: eine Pruefung, die aus
+ * derselben Vorlage gebaut wird wie die Sache, die sie pruefen soll,
+ * bestaetigt den Denkfehler statt ihn zu finden. Sie muss gegen die
+ * MESSUNG stehen, nicht gegen die Umsetzung.
  *
  * WAS SIE NICHT KANN
  * Ob die Szene SCHOEN ist. Oertlich ist das CDN nicht erreichbar
@@ -52,42 +66,127 @@ const pruef = (n, w, z) => {
   });
 
   /* ---------- 1. Die Kurve steht im Stylesheet ---------- */
-  const kurve = await p.evaluate(() => {
-    let text = "";
+  const roh = await p.evaluate(() => {
+    const aus = {};
     for (const s of document.styleSheets) {
       let r; try { r = s.cssRules; } catch (e) { continue; }
-      for (const rule of r) if (rule.name === "pkglut") text = rule.cssText;
+      for (const rule of r) if (rule.name && /^pk/.test(rule.name)) aus[rule.name] = rule.cssText;
     }
-    if (!text) return null;
-    const marken = {};
-    text.replace(/([\d.]+)%\s*\{([^}]*)\}/g, (_, pct, body) => {
-      const m = /opacity:\s*([\d.]+)/.exec(body);
-      if (m) marken[pct] = parseFloat(m[1]);
-    });
-    return marken;
+    return aus;
   });
-  pruef("die Glutkurve @keyframes pkglut existiert", !!kurve);
+  /* ⚠ `cssText` einer @keyframes-Regel ist in die Regel selbst
+     eingewickelt: `@keyframes pkglut { 0% { … } 7.23% { … } }`. Wer
+     direkt darauf loslaesst, faengt die AEUSSERE Klammer und liest
+     danach jeden Block um einen versetzt — die Pruefung meldete
+     „pkglut ohne opacity bei 0 %", obwohl der Stop da war. Deshalb
+     zuerst die Huelle abziehen. */
+  const inhalt = t => {
+    if (!t) return "";
+    const a = t.indexOf("{"), b = t.lastIndexOf("}");
+    return a < 0 || b < a ? "" : t.slice(a + 1, b);
+  };
 
-  if (kurve) {
-    const bei = pct => kurve[pct];
-    // Millisekunde -> Prozent bei 2350 ms Gesamtdauer.
-    const puls = bei("23.4"), tal = bei("34"), laden = bei("71.5"),
-          bruch = bei("76.2"), spitze = bei("82.1"), abfall = bei("87.2");
-
-    pruef("erster Puls bei 550 ms ist gesetzt", puls > 0.1 && puls < 0.3, "opacity " + puls);
-    /* DIE wichtigste Aussage der Datei. */
-    pruef("Atemzug zurueck: bei 800 ms faellt die Glut wieder ab",
-      tal !== undefined && tal < puls * 0.5, "550 ms " + puls + " -> 800 ms " + tal);
-    pruef("Hauptladung bei 1680 ms liegt ueber dem ersten Puls",
-      laden > puls, laden + " gegen " + puls);
-    pruef("Bruch bei 1790 ms springt auf ueber 0,8", bruch > 0.8, "opacity " + bruch);
-    pruef("Bruch ist ein SPRUNG, nicht ein Anstieg (mehr als das Doppelte)",
-      bruch > laden * 2, laden + " -> " + bruch);
-    pruef("Spitze bei 1930 ms ist der Hoechstwert", spitze >= bruch, spitze + " gegen " + bruch);
-    /* Aufbau 1150->1680 = 530 ms, Abbau 1930->2050 = 120 ms. */
-    pruef("Aufbau und Abbau sind asymmetrisch (Abfall unter 0,25)",
-      abfall < 0.25, "opacity bei 2050 ms " + abfall);
+  /* Stops einer @keyframes-Regel als [Prozent, Deckkraft] lesen. */
+  function stops(text, eigenschaft) {
+    const raus = [];
+    if (!text) return raus;
+    inhalt(text).replace(/([\d.,%\s]+)\{([^}]*)\}/g, (_, kopf, koerper) => {
+      const m = new RegExp(eigenschaft + ":\\s*([\\d.]+)").exec(koerper);
+      if (!m) return;
+      kopf.split(",").forEach(k => {
+        const z = parseFloat(k.trim());
+        if (!isNaN(z)) raus.push([z, parseFloat(m[1])]);
+      });
+    });
+    return raus.sort((a, b) => a[0] - b[0]);
   }
+
+  pruef("die Glutkurve @keyframes pkglut existiert", !!roh.pkglut);
+  pruef("der Kern hat eine EIGENE Kurve (@keyframes pkkernglut)", !!roh.pkkernglut);
+
+  const glut = stops(roh.pkglut, "opacity");
+  if (glut.length) {
+    /* Millisekunde -> Prozent bei 3000 ms Gesamtdauer. */
+    const bei = ms => {
+      const p = +(ms / 30).toFixed(2);
+      const t = glut.find(s => Math.abs(s[0] - p) < 0.06);
+      return t ? t[1] : undefined;
+    };
+    const p1 = bei(583), t1 = bei(750), p2 = bei(1033), t2 = bei(1117),
+          p3 = bei(1350), t3 = bei(1417), laden = bei(1650),
+          bruch = bei(1783), spitze = bei(1867), abfall = bei(2100);
+
+    /* ------------------------------------------------------------------
+       DIE WICHTIGSTE AUSSAGE DER DATEI: DREI Rueckfaelle, nicht einer.
+       Die erste Fassung hatte die Kurve GEGLAETTET — aus drei Atemzuegen
+       wurde eine Rampe, und der Auftraggeber sah es sofort: „viel zu
+       schnell, viele Details werden einfach uebersprungen". Aus drei
+       Zyklen einen zu machen halbiert die gefuehlte Dauer, obwohl die
+       Gesamtzahl gleich bleibt. Eine Pruefung, die nur „es faellt
+       irgendwo zurueck" sagt, haette das durchgewinkt.
+       ------------------------------------------------------------------ */
+    pruef("Puls 1 bei 583 ms", p1 > 0.12 && p1 < 0.25, String(p1));
+    pruef("Rueckfall 1 bei 750 ms", t1 !== undefined && t1 < p1 * 0.5, p1 + " -> " + t1);
+    pruef("Puls 2 bei 1033 ms steigt wieder", p2 > t1, t1 + " -> " + p2);
+    pruef("Rueckfall 2 bei 1117 ms", t2 !== undefined && t2 < p2, p2 + " -> " + t2);
+    pruef("Puls 3 bei 1350 ms ist der hoechste vor der Ladung", p3 > p1 && p3 > p2,
+      [p1, p2, p3].join(" / "));
+    pruef("Rueckfall 3 bei 1417 ms", t3 !== undefined && t3 < p3, p3 + " -> " + t3);
+    /* Genau drei Taeler zaehlen — nicht „mindestens eines". */
+    let taeler = 0;
+    for (let i = 1; i < glut.length - 1; i++)
+      if (glut[i][1] < glut[i - 1][1] && glut[i][1] <= glut[i + 1][1] && glut[i][0] < 55) taeler++;
+    pruef("es sind GENAU drei Rueckfaelle vor der Hauptladung", taeler === 3,
+      taeler + " gezaehlt");
+
+    pruef("Hauptladung bei 1650 ms liegt ueber allen Pulsen", laden > p3, p3 + " -> " + laden);
+    pruef("Bruch bei 1783 ms springt auf ueber 0,9", bruch > 0.9, String(bruch));
+    pruef("der Bruch ist ein SPRUNG (mehr als das Doppelte der Ladung)",
+      bruch > laden * 2, laden + " -> " + bruch);
+    pruef("Plateau-Spitze bei 1867 ms ist der Hoechstwert", spitze >= bruch,
+      spitze + " gegen " + bruch);
+    pruef("Abfall bei 2100 ms unter 0,2", abfall < 0.2, String(abfall));
+    /* Anlauf 1650 ms gegen Knall 133 ms = 12:1. */
+    pruef("Anlauf und Knall sind stark asymmetrisch", (1650 / 133) > 10, "12:1");
+  }
+
+  /* ------------------------------------------------------------------
+     DIE ZWEITE FEHLERKLASSE, und die teurere: ein fehlender ANFANGSWERT.
+     `pkbeben` setzte `opacity` erst bei 76 %. Der Browser interpoliert
+     dann VOM AUSGANGSWERT ueber die ganze Animation dorthin — der Pack
+     war bei 1,5 s schon zu 37 % verblasst, waehrend er noch laden sollte.
+     Im CSS sieht das aus wie eine Auslassung; in Wahrheit ist es eine
+     stille Rampe ueber alles. Deshalb wird hier fuer JEDE pk-Animation
+     verlangt, dass jede Eigenschaft, die sie spaeter setzt, schon am
+     0-%-Stop steht.
+     ------------------------------------------------------------------ */
+  const luecken = [];
+  for (const [name, text] of Object.entries(roh)) {
+    const bloecke = [];
+    inhalt(text).replace(/([\d.,%\s]+)\{([^}]*)\}/g, (_, kopf, koerper) => {
+      kopf.split(",").forEach(k => {
+        const z = parseFloat(k.trim());
+        if (!isNaN(z)) bloecke.push([z, koerper]);
+      });
+    });
+    if (!bloecke.length) continue;
+    /* Ausnahme mit Grund: eine Regel mit EINEM einzigen Stop (`to{…}`)
+       ist die Bauart „von wo auch immer du gerade bist bis hierhin" —
+       genau das, was eine Endlosdrehung wie `pkspin` braucht, damit sie
+       nahtlos schleift. Ein Anfangswert waere dort falsch, nicht
+       fehlend. Die Regel gilt fuer die einmal laufenden Kurven. */
+    if (bloecke.length === 1) continue;
+    bloecke.sort((a, b) => a[0] - b[0]);
+    const start = bloecke.filter(b => b[0] === 0).map(b => b[1]).join(";");
+    const genannt = new Set();
+    bloecke.forEach(b => (b[1].match(/[a-z-]+(?=\s*:)/g) || []).forEach(e => genannt.add(e)));
+    genannt.forEach(e => {
+      if (!new RegExp("(^|;|\\s)" + e + "\\s*:").test(start))
+        luecken.push(name + " ohne " + e + " bei 0 %");
+    });
+  }
+  pruef("jede pk-Animation setzt bei 0 % alles, was sie spaeter aendert",
+    luecken.length === 0, luecken.slice(0, 4).join(" · "));
 
   /* ---------- 2. Der Ablauf im Betrieb ---------- */
   await p.evaluate(() => { window.__proto.show("navPack"); });
@@ -163,7 +262,7 @@ const pruef = (n, w, z) => {
 
   /* ---------- 5. Sie endet von allein ---------- */
   await p.evaluate(() => { window.__proto.openPackKey("arcane"); });
-  await p.waitForTimeout(2700);
+  await p.waitForTimeout(3500);   // 3000 ms Szene + 180 ms Zuschlag
   const danach = await p.evaluate(() => ({
     offen: document.getElementById("packLayer").classList.contains("on"),
     raster: document.querySelectorAll("#packGrid .pcard").length,
