@@ -1,6 +1,6 @@
 {
- "_bytes": 76582039,
- "_dateien": 220,
+ "_bytes": 77788837,
+ "_dateien": 229,
  "_hinweis": "Erzeugt von werkzeuge/assets_sichern.py. Schluessel, Quell-URL, Dateiname, Groesse und SHA-256 je Asset — der Nachweis, dass die Datei im Repo die Datei vom CDN ist.",
  "assets": {
   "arena1": {
@@ -871,6 +871,13 @@
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042818_625922e2-1731-4af8-ba70-c819bbb8b615_min.webp",
    "sha256": "099de572970548457b6a53bfe384e6f6ed9f46c1e931e623f2c17511032535e6"
   },
+  "icon_arena_pack": {
+   "bytes": 501485,
+   "datei": "icon_arena_pack.png",
+   "kleinfassung": false,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/00257f1f-fd9b-4098-a945-cb190d8aacce.png",
+   "sha256": "be4b6c1673e231fb86c0467acd2ddaf2a0816a92f94fad670759fa0b4f54d308"
+  },
   "icon_check": {
    "bytes": 38140,
    "datei": "icon_check.webp",
@@ -1022,12 +1029,26 @@
    "bytes": 64908,
    "datei": "offer_arena_pack.webp",
    "kleinfassung": true,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/00257f1f-fd9b-4098-a945-cb190d8aacce_min.webp",
+   "sha256": "590163193e85aff270bdbb0c59a56f66cc38827ec16a0315bc9ee3942d9a67b9"
+  },
+  "offer_arena_pack_alt": {
+   "bytes": 64908,
+   "datei": "offer_arena_pack_alt.webp",
+   "kleinfassung": true,
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042708_f26a5521-f28b-489d-b62f-01543a8facc6_min.webp",
    "sha256": "590163193e85aff270bdbb0c59a56f66cc38827ec16a0315bc9ee3942d9a67b9"
   },
   "offer_starter": {
    "bytes": 39980,
    "datei": "offer_starter.webp",
+   "kleinfassung": true,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/a19085c8-1063-4ec4-9035-332b2e4ff8df_min.webp",
+   "sha256": "8cc4d4707ec9e1a04e2f36419b2dd2f8cf45e4cc9bee1325a4906ad434b8991e"
+  },
+  "offer_starter_alt": {
+   "bytes": 39980,
+   "datei": "offer_starter_alt.webp",
    "kleinfassung": true,
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_115056_0dfab782-685e-4def-afa3-30913a3ab88a_min.webp",
    "sha256": "8cc4d4707ec9e1a04e2f36419b2dd2f8cf45e4cc9bee1325a4906ad434b8991e"
@@ -1036,12 +1057,26 @@
    "bytes": 38588,
    "datei": "offer_vault_bank.webp",
    "kleinfassung": true,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/10812943-e615-4957-860c-8c9b20eca6af_min.webp",
+   "sha256": "4610ebd7ecc8b99c2c388e80ab3b21db0637623d157e852677be945ac483dd13"
+  },
+  "offer_vault_bank_alt": {
+   "bytes": 38588,
+   "datei": "offer_vault_bank_alt.webp",
+   "kleinfassung": true,
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_115444_f75634d9-6a96-4088-ac82-dedbc931f73c_min.webp",
    "sha256": "4610ebd7ecc8b99c2c388e80ab3b21db0637623d157e852677be945ac483dd13"
   },
   "pack_arcane": {
    "bytes": 72072,
    "datei": "pack_arcane.webp",
+   "kleinfassung": true,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/18eee4bf-7483-4d88-8a93-af4ed3e8c6de_min.webp",
+   "sha256": "f670978716e34611ae7821c403cc311cf6fd47cc25421c899dec6c115044cd7f"
+  },
+  "pack_arcane_alt": {
+   "bytes": 72072,
+   "datei": "pack_arcane_alt.webp",
    "kleinfassung": true,
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095739_dad6b23f-bd87-42bb-934a-f0e05d24d4c3_min.webp",
    "sha256": "f670978716e34611ae7821c403cc311cf6fd47cc25421c899dec6c115044cd7f"
@@ -1071,6 +1106,13 @@
    "bytes": 42462,
    "datei": "pack_bronze.webp",
    "kleinfassung": true,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/0c390187-c765-4139-88dd-7ad3245ea270_min.webp",
+   "sha256": "c55bcad52ea8e5add8de29701eab9dea56e3a12308f0c8eb1ba4128f8ca0a12a"
+  },
+  "pack_bronze_alt": {
+   "bytes": 42462,
+   "datei": "pack_bronze_alt.webp",
+   "kleinfassung": true,
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095725_5c0984d9-f669-49ec-82f2-81817f8eab56_min.webp",
    "sha256": "c55bcad52ea8e5add8de29701eab9dea56e3a12308f0c8eb1ba4128f8ca0a12a"
   },
@@ -1078,12 +1120,26 @@
    "bytes": 47598,
    "datei": "pack_gold.webp",
    "kleinfassung": true,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/9f8cf919-6372-4b16-ae3e-f2adcda3fe5f_min.webp",
+   "sha256": "80dbf7d1f444cc66140ac07d9be6f7de956fe16238e28bac565dd4213f7e3065"
+  },
+  "pack_gold_alt": {
+   "bytes": 47598,
+   "datei": "pack_gold_alt.webp",
+   "kleinfassung": true,
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095735_28c01416-737f-414d-b8b6-0dd21a18e8a9_min.webp",
    "sha256": "80dbf7d1f444cc66140ac07d9be6f7de956fe16238e28bac565dd4213f7e3065"
   },
   "pack_silver": {
    "bytes": 50660,
    "datei": "pack_silver.webp",
+   "kleinfassung": true,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/bb8037d7-9ee3-404e-9140-2a7faeb2dc4f_min.webp",
+   "sha256": "50a676c2ea7da7463463ea97e9323a6ca90d4a2032b1bfe56d75e64b2520666e"
+  },
+  "pack_silver_alt": {
+   "bytes": 50660,
+   "datei": "pack_silver_alt.webp",
    "kleinfassung": true,
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095727_a48313e3-3fb7-4156-b276-9622a9f313a6_min.webp",
    "sha256": "50a676c2ea7da7463463ea97e9323a6ca90d4a2032b1bfe56d75e64b2520666e"
@@ -1094,6 +1150,13 @@
    "kleinfassung": true,
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260727_093851_f11ee134-dfd3-4798-9d63-74f8d764f6a9_min.webp",
    "sha256": "ca5712edfaaa73d18ff94e308dc7ada85258d0b377aef9a82cb6960c139880a3"
+  },
+  "pack_vorrat_icon": {
+   "bytes": 349045,
+   "datei": "pack_vorrat_icon.png",
+   "kleinfassung": false,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/b13791d6-fb66-4c64-b7d9-36c607ece067.png",
+   "sha256": "056719638a517bac05293cd8ed8365cc14bf3180e30a21474466817c3a3dd624"
   },
   "packart_arena1": {
    "bytes": 32002,
