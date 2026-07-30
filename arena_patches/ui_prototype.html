@@ -1986,6 +1986,25 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
 .pkfintitel{flex:0 0 100%;text-align:center;font-size:12px;font-weight:900;
   letter-spacing:.1em;text-transform:uppercase;color:#f4e3a6;
   margin:0 0 8px;text-shadow:0 2px 6px #000c}
+/* Das Canvas liegt UEBER allem in der Buehne, aber unter dem Deck: die
+   Splitter fliegen vor dem Pack, die Karten kommen danach und muessen
+   lesbar bleiben. `pointer-events:none`, weil der Tap der Ebene gehoert. */
+/* ⚠ 120 % und nicht 150 %. Hier stand `inset:-25%` mit 150 % Kantenlaenge,
+   also 2,25-mal die Buehnenflaeche. Der Ueberstand ist dafuer da, dass ein
+   grosses vorbeifliegendes Bruchstueck nicht am Buehnenrand abgeschnitten
+   wird — 20 % Ueberstand reichen dafuer, gemessen an den Bildlagen der
+   Vorbeiflieger (hoechstens 0,5 Buehnenbreiten vom Mittelpunkt).
+   Der Grund fuer die Kuerzung ist Rechenzeit: die Leinwand wird jeden
+   Rahmen ganzflaechig behandelt (Loeschen bzw. Schweif), und beides kostet
+   mit der FLAECHE. 1,44 statt 2,25 sind 36 % weniger Bildpunkte, bei
+   gleicher Wirkung. */
+.pkfx{position:absolute;inset:-10%;width:120%;height:120%;
+  pointer-events:none;z-index:4}
+/* Das Material liegt VOR dem Licht: die Bruchstuecke sind das Pack selbst
+   und muessen die Funken verdecken, nicht umgekehrt. Nur ein z-index
+   Unterschied — die Groesse ist identisch, sonst laufen die beiden
+   Koordinatensysteme auseinander. */
+.pkfx2{z-index:5}
 .pkskip{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);
   border-radius:11px;padding:9px 20px;font-size:12px;font-weight:900;
   background:#0e1418c4;border:1px solid #e0b94a66;color:#f4e3a6}
@@ -7620,6 +7639,18 @@ button.pfplate{cursor:pointer}
     <img class="pkart" id="pkArt" alt="" decoding="async" data-eager="Oeffnungsszene">
     <div class="pkflash"></div>
     <div class="pkwave"></div>
+    <!-- Die Sprengung. Ein CANVAS, kein CSS — und das ist der Kern der
+         Sache: CSS kann kein additives Blending, also koennen sich
+         ueberlappende Lichter dort nicht zu Weiss aufaddieren. Genau
+         daran erkennt man einen billigen Effekt. Die Physik steht in
+         arena_packfx.js und ist ohne Browser pruefbar. -->
+    <canvas class="pkfx" id="pkFx"></canvas>
+    <!-- Die zweite Ebene: das MATERIAL. Getrennt, weil die beiden Ebenen
+         unterschiedlich geraeumt werden — Licht mit Schweif, Material
+         jeden Rahmen geloescht. Ein Splitter mit Schweif hinterliess
+         einen Stapel hartkantiger Kopien und sah nach ruckelnder
+         Bildrate aus. Siehe fxStart(). -->
+    <canvas class="pkfx pkfx2" id="pkFx2"></canvas>
   </div>
   <button class="pkskip pressable" id="pkSkip">Überspringen</button>
 </div>
@@ -7838,6 +7869,7 @@ button.pfplate{cursor:pointer}
 <script src="./arena_profil.js"></script>
 <script src="./arena_vault.js"></script>
 <script src="./arena_offline.js"></script>
+<script src="./arena_packfx.js"></script>
 <script src="./arena_daily.js"></script>
 <script src="./arena_rewards.js"></script>
 <script src="./arena_guide.js"></script>
@@ -10730,6 +10762,28 @@ button.pfplate{cursor:pointer}
        die Pruefung sie gegen beide, nicht gegen eine eingefrorene
        Konstante. */
     var DAUER = 4000, laufend = null;
+    /* Der Bruch — der Moment, in dem das Pack aufreisst. NICHT als 2200
+       hingeschrieben, sondern als 55 % von DAUER gerechnet: genau dort
+       liegt der Hoehepunkt von `pkblitz`, dort sitzt `pkschlag` und dort
+       starten die Funken (`animation-delay:2200ms` im Blatt). Wer DAUER
+       aendert, verschiebt sonst die Leinwand gegen das Blatt — und der
+       Knall laege neben dem Blitz.
+       ⚠ 2200, nicht 2060: die 2060 stammen aus dem LEGENDAER-AUSBRUCH
+       eines 10er-Zugs im Referenzvideo, nicht aus dem Aufreissen. Siehe
+       den Hinweis bei `.pkstage.beben` im Blatt. */
+    var BRUCH = Math.round(DAUER * 0.55);
+    /* Eigener Timer fuer die Leinwand-Sprengung. Bewusst NICHT `laufend`:
+       der traegt den Schwebe-Einsatz bei 75 % von DAUER, und beide Zeiten
+       laufen gleichzeitig. Ein gemeinsamer Handle wuerde den einen
+       Einsatz beim Setzen des anderen verschlucken. */
+    var bruchTimer = null;
+    /* Der Zuhoerer des Überspringen-Knopfes, modulweit gemerkt — aus
+       demselben Grund wie `haengenderTipp`: der Knopf lebt im Markup und
+       ueberlebt jede Szene. Ohne dieses Merken haette die zweite geoeffnete
+       Packung zwei Zuhoerer und ein Tap wuerde zwei Szenen ueberspringen.
+       Genau diese Fehlerklasse hat die Pruefung beim Tipp-Zuhoerer
+       gefunden; sie wird hier nicht ein zweites Mal gebaut. */
+    var haengenderSprung = null;
     /* ⚠ Der aktuell haengende Tipp-Zuhoerer, modulweit gemerkt.
        Fehler vom 30.07.2026, von der Pruefung gefunden: `spiele()` hat
        Timer und DOM geraeumt, aber den `pointerdown`-Zuhoerer der VORIGEN
@@ -10743,7 +10797,362 @@ button.pfplate{cursor:pointer}
        er angelegt hat — auch das, was man nicht sieht. */
     var haengenderTipp = null;
 
+    /* ==============================================================
+     * DIE SPRENGUNG ZEICHNEN (30.07.2026)
+     * --------------------------------------------------------------
+     * Physik: arena_packfx.js. Hier steht nur das Bild.
+     *
+     * DREI DINGE MACHEN DEN UNTERSCHIED ZU CSS, und jedes einzelne ist
+     * der Grund, warum die CSS-Fassung „zu billig" wirkte:
+     *   1. ADDITIVES BLENDEN (`lighter`). Ueberlappende Funken addieren
+     *      sich zu Weiss. Ohne das bleibt jeder Funke so hell wie er
+     *      ist, und die Mitte einer Explosion ist nicht heisser als ihr
+     *      Rand — was physikalisch falsch aussieht, auch wenn niemand
+     *      sagen kann warum.
+     *   2. SCHWEIF STATT LOESCHEN. Statt das Bild je Bild zu leeren,
+     *      wird es mit einem halbdurchsichtigen Schwarz uebermalt. Das
+     *      ergibt echte Bewegungsunschaerfe, weil das vorige Bild
+     *      durchscheint.
+     *   3. TIEFENSORTIERUNG. Was nah ist, wird gross und ZULETZT
+     *      gezeichnet. Damit fliegen Splitter an der Kamera vorbei
+     *      statt vor ihr her — der Griff, der den Zuschauer in die
+     *      Szene holt.
+     *
+     * ⚠ RUECKFALL FUER DAS PACKBILD: oertlich ist das CDN nicht
+     * erreichbar, und auf dem Geraet kann ein Bild fehlschlagen. Ohne
+     * Rueckfall waere die Sprengung dann unsichtbar — genau die
+     * Fehlerklasse, die an diesem Tag dreimal zugeschlagen hat. Fehlt
+     * das Bild, werden die Splitter als volle Flaechen in der Packfarbe
+     * gezeichnet. Die Bewegung bleibt identisch.
+     * ============================================================== */
+    var fxLauf = null;
+
+    function fxStop() {
+      if (fxLauf) { cancelAnimationFrame(fxLauf); fxLauf = null; }
+      /* BEIDE Ebenen. Eine vergessene Ebene haengt als Standbild ueber der
+         Buehne — und weil `#pkFx2` das Material traegt, waere genau das
+         Packbruchstueck stehengeblieben. */
+      ["pkFx", "pkFx2"].forEach(function (id) {
+        var c = $(id);
+        if (c && c.getContext) {
+          var g = c.getContext("2d");
+          g.setTransform(1, 0, 0, 1, 0, 0);
+          g.globalCompositeOperation = "source-over";
+          g.globalAlpha = 1;
+          g.clearRect(0, 0, c.width, c.height);
+        }
+      });
+    }
+
+    function fxStart(anzahlKarten, farbe, bildEl) {
+      var FX = window.ArenaPackFX, c = $("pkFx"), c2 = $("pkFx2");
+      if (!FX || !c || !c.getContext || !c2 || !c2.getContext) return;
+      var g = c.getContext("2d"), g2 = c2.getContext("2d");
+
+      /* Geraetepixel, nicht CSS-Pixel: auf einem Telefon mit dreifacher
+         Dichte waere ein Funke sonst ein verwaschener Klotz.
+         ⚠ GEDECKELT BEI 1,5, nicht bei 2. Der Deckel stand bei 2 und
+         kostete bei dreifacher Bildschirmdichte eine Leinwand von rund
+         1236 px Kante — zweimal, jeden Rahmen ganzflaechig behandelt.
+         1,5 sind 44 % weniger Bildpunkte. Vertretbar ist das, weil auf
+         dieser Ebene nur weiche Lichter und bewegte Bruchstuecke liegen:
+         beides hat keine Kante, die von der letzten halben Pixelreihe
+         lebt. Fuer Schrift oder Rahmen waere derselbe Deckel falsch —
+         darum steht er HIER und nicht als allgemeine Regel. */
+      var dpr = Math.min(1.5, window.devicePixelRatio || 1);
+      var r = c.getBoundingClientRect();
+      var bw_ = Math.max(1, Math.round(r.width * dpr));
+      var bh_ = Math.max(1, Math.round(r.height * dpr));
+      c.width = c2.width = bw_;
+      c.height = c2.height = bh_;
+      var mx = bw_ / 2, my = bh_ / 2;
+      /* Alle Groessen im Modul sind Anteile der BUEHNENBREITE. Erst hier
+         werden sie zu Pixeln — deshalb sieht die Szene auf dem Tablet
+         und auf dem kleinen Telefon gleich aus. */
+      var E = bw_;
+      /* Kantenlaenge, mit der das Packbild in die Splitter geschnitten
+         wird. 0,34 der Buehnenbreite entspricht ungefaehr der Groesse,
+         in der das Pack vor dem Bruch dasteht — nur so sieht der erste
+         Rahmen nach dem Bruch aus wie DASSELBE Pack, das eben noch da war
+         und nicht wie ein zweites, kleineres. */
+      var PACK = E * 0.34;
+
+      /* Der Startwert kommt aus der Kartenzahl, nicht aus der Uhr: so
+         sieht dasselbe Pack immer gleich aus und ein Standbildvergleich
+         bleibt moeglich. */
+      var teile = FX.erzeuge(anzahlKarten, 1000 + anzahlKarten * 37);
+      var vorher = 0, ende = false;
+      var hatBild = !!(bildEl && bildEl.complete && bildEl.naturalWidth > 0);
+
+      /* ==============================================================
+       * VORGERECHNETE LICHTPUNKTE
+       * --------------------------------------------------------------
+       * Hier stand ein `createRadialGradient` JE TEILCHEN JE RAHMEN. Bei
+       * rund 230 Teilchen sind das 230 neue Verlaufsobjekte sechzig Mal
+       * je Sekunde — und der Rahmenzaehler hat es belegt: bei dreifacher
+       * Auflaesung kamen nur 20 fps zustande. Ein Verlauf ist im Canvas
+       * eines der teuersten Objekte, weil er beim Anlegen eine Farbtabelle
+       * aufbaut.
+       * Jetzt: EINMAL je Sorte in eine kleine eigene Leinwand gezeichnet,
+       * danach nur noch `drawImage` mit Skalierung. Das ist der
+       * Standardgriff und kostet einen Bruchteil.
+       * ⚠ 64 px Kantenlaenge, nicht mehr: der Punkt wird ohnehin weich
+       * skaliert, und eine grosse Vorlage kostet beim Zeichnen Bandbreite.
+       * ============================================================== */
+      function punktBild(kern, mitte) {
+        var s = document.createElement("canvas");
+        s.width = s.height = 64;
+        var sg = s.getContext("2d");
+        var v = sg.createRadialGradient(32, 32, 0, 32, 32, 32);
+        v.addColorStop(0, kern);
+        v.addColorStop(0.18, mitte);
+        v.addColorStop(0.5, farbe);
+        v.addColorStop(1, "rgba(0,0,0,0)");
+        sg.fillStyle = v;
+        sg.fillRect(0, 0, 64, 64);
+        return s;
+      }
+      var bildGlut = punktBild("#fff6d8", "#ffd98a");
+      var bildStaub = punktBild("#ffffff", "#ffffff");
+
+      /* Dasselbe fuer den Funkenstreifen: ein waagerechter Streifen mit
+         weissem Kopf und farbigem Schweif, der beim Zeichnen nur noch
+         gedreht wird. Ein `createLinearGradient` je Funke je Rahmen war
+         bei bis zu 160 Funken der zweite grosse Posten. */
+      function streifenBild(weiss) {
+        var s = document.createElement("canvas");
+        s.width = 64; s.height = 8;
+        var sg = s.getContext("2d");
+        var v = sg.createLinearGradient(64, 0, 0, 0);
+        v.addColorStop(0, "#ffffff");
+        v.addColorStop(weiss ? 0.55 : 0.22, farbe);
+        v.addColorStop(1, "rgba(0,0,0,0)");
+        sg.fillStyle = v;
+        /* Runder Kopf, damit der Streifen keine Schnittkante zeigt. */
+        sg.beginPath();
+        sg.moveTo(64, 0); sg.lineTo(0, 0); sg.lineTo(0, 8); sg.lineTo(64, 8);
+        sg.arc(64, 4, 4, -1.5708, 1.5708);
+        sg.closePath(); sg.fill();
+        return s;
+      }
+      var bildFunkeWeiss = streifenBild(true);
+      var bildFunkeFarbe = streifenBild(false);
+
+      function bild(jetzt) {
+        if (ende) return;
+        /* ⚠ DER DECKEL LAG BEI 0,05 s UND WAR EIN FEHLER — gefunden am
+           30.07.2026 durch Zaehlen der Rahmen, nicht durch Ansehen.
+           Mit einem Deckel von 0,05 s kann die Szene je Rahmen hoechstens
+           0,05 s Teilchenzeit aufholen. Bricht die Bildrate unter 20 ein,
+           laeuft die Sprengung also in ZEITLUPE und zieht bis hinter die
+           Kartenlandung — statt Rahmen zu verlieren, verliert sie Tempo.
+           Das ist die falsche Richtung: eine Zeremonie darf ruckeln, aber
+           sie darf nicht ihren Platz im Ablauf verlassen.
+           0,25 s laesst die Szene bei Einbruechen Rahmen FALLEN. Moeglich
+           ist das nur, weil die Wegintegration in arena_packfx.js exakt
+           ist und einen grossen Schritt richtig rechnet; mit dem alten
+           Euler-Schritt waere ein 0,25-s-Sprung sichtbar falsch gewesen.
+           Der Deckel bleibt, damit ein zurueckgeholter Hintergrund-Tab
+           nicht die ganze Sprengung in einem Rahmen verbraucht.
+
+           ⚠ WAS HIER NICHT BELEGT IST: eine Bildrate auf dem GERAET.
+           Gemessen wurde in der Entwicklungsumgebung, und die hat keine
+           Grafikeinheit — Chromium rastert dort in Software. Die Zahlen von
+           dort (20 Rahmen/s bei einfacher, 3 bei dreifacher Dichte) sagen
+           ueber ein Telefon mit GPU nichts aus und stehen hier
+           ausdruecklich NICHT als Geraetewert. Belegt ist nur die
+           REIHENFOLGE der Kosten: was ganzflaechig je Rahmen passiert,
+           dominiert. Danach sind der Ueberstand der Leinwand und der
+           dpr-Deckel gesetzt. Eine echte Zahl braucht ein echtes Geraet. */
+        var dt = vorher ? Math.min(0.25, (jetzt - vorher) / 1000) : 0.016;
+        vorher = jetzt;
+
+        /* ==========================================================
+         * ZWEI EBENEN, ZWEI RAEUMARTEN — Fix vom 30.07.2026.
+         * ----------------------------------------------------------
+         * Hier stand: `fillStyle="rgba(6,9,13,0.30)"` ueber die GANZE
+         * Leinwand, als Schweif. Gemessen war das gruen (Helligkeit
+         * steigt beim Bruch, faellt danach). Angesehen war es ein
+         * schwerer Fehler: die Leinwand liegt UEBER der Buehne, und ein
+         * dunkles Rechteck mit 30 % Deckung wird nach drei Rahmen
+         * praktisch undurchsichtig. Die Szene war ab 2,4 s ein schwarzes
+         * Loch — die EINFLIEGENDEN KARTEN, also genau das, wofuer das
+         * Pack gekauft wurde, lagen dahinter und waren weg.
+         *
+         * Richtig ist `destination-out`: das LOESCHT Deckkraft, statt
+         * Dunkel aufzutragen. Wo nichts ist, bleibt die Leinwand
+         * durchsichtig und die Buehne sichtbar. Der Schweif bleibt.
+         *
+         * Und zwei Ebenen, weil die beiden Sachen unvereinbar sind:
+         *   · `#pkFx`  Licht — Funken, Glut, Staub. MIT Schweif; ein
+         *     Funke ohne Schweif ist ein Punkt.
+         *   · `#pkFx2` Material — Splitter und Druckwelle. JEDEN Rahmen
+         *     GELOESCHT. Mit Schweif hinterliess jeder Splitter einen
+         *     Stapel hartkantiger Kopien — das liest sich nicht als
+         *     Bewegungsunschaerfe, sondern als ruckelnde Bildrate.
+         *     Gebrochenes Glas ist scharf, nicht verschmiert.
+         * ========================================================== */
+        g.setTransform(1, 0, 0, 1, 0, 0);
+        g.globalCompositeOperation = "destination-out";
+        g.fillStyle = "rgba(0,0,0,0.34)";
+        g.fillRect(0, 0, bw_, bh_);
+
+        g2.setTransform(1, 0, 0, 1, 0, 0);
+        g2.clearRect(0, 0, bw_, bh_);
+
+        var lebend = FX.schritt(teile, dt);
+
+        /* Fern zuerst, nah zuletzt. */
+        teile.sort(function (a, b) { return b.z - a.z; });
+
+        g.globalCompositeOperation = "lighter";
+        for (var i = 0; i < teile.length; i++) {
+          var t = teile[i];
+          if (t.leben <= 0) continue;
+          var sk = FX.skala(t.z);
+          var px = mx + t.x * E * sk, py = my + t.y * E * sk;
+          var a = Math.max(0, Math.min(1, t.leben));
+
+          if (t.art === FX.ART.WELLE) {
+            /* Die Druckwelle: ein Ring, der aufgeht und duenner wird.
+               Auf der GELOESCHTEN Ebene — auf der Schweifebene ergab sie
+               ein halbes Dutzend Geisterringe, die wie eine
+               Schallplattenrille aussahen. */
+            var rad = (1 - t.leben) * E * 0.62;
+            g2.globalCompositeOperation = "lighter";
+            g2.globalAlpha = a * 0.5;
+            g2.strokeStyle = "#ffffff";
+            g2.lineWidth = Math.max(1, 9 * a * dpr);
+            g2.beginPath(); g2.arc(mx, my, rad, 0, 6.2832); g2.stroke();
+            g2.globalAlpha = a * 0.3;
+            g2.strokeStyle = farbe;
+            g2.lineWidth = Math.max(1, 20 * a * dpr);
+            g2.beginPath(); g2.arc(mx, my, rad * 0.94, 0, 6.2832); g2.stroke();
+            continue;
+          }
+
+          if (t.art === FX.ART.SPLITTER) {
+            /* --- Ein Bruchstueck: Dreieck ausschneiden, Packbild
+                   hineinzeichnen, Bruchkante aufhellen. ---
+               Der Ausschnitt laeuft ueber `clip()` und nicht ueber
+               `drawImage` mit Quellrechteck: nur so bekommt das Stueck
+               eine SCHRAEGE Kante. Ein Quellrechteck kann nur Rechtecke,
+               und daran ist die erste Fassung gescheitert. */
+            var p = t.p;
+            g2.save();
+            g2.translate(px, py);
+            g2.rotate(t.dreh);
+            g2.scale(sk, sk);
+            g2.beginPath();
+            g2.moveTo((p[0][0] - t.cu) * PACK, (p[0][1] - t.cv) * PACK);
+            g2.lineTo((p[1][0] - t.cu) * PACK, (p[1][1] - t.cv) * PACK);
+            g2.lineTo((p[2][0] - t.cu) * PACK, (p[2][1] - t.cv) * PACK);
+            g2.closePath();
+            g2.save();
+            g2.clip();
+            g2.globalAlpha = a;
+            if (hatBild) {
+              /* Das GANZE Packbild, an derselben Stelle wie im Original —
+                 der Schnitt macht der Pfad. Deshalb passen die Stuecke
+                 beim Bruch nahtlos aufeinander. */
+              g2.globalCompositeOperation = "source-over";
+              g2.drawImage(bildEl, -t.cu * PACK, -t.cv * PACK, PACK, PACK);
+              /* Ein Hauch Eigenglut, damit der Splitter nicht wie ein
+                 ausgeschnittenes Papier wirkt. */
+              g2.globalCompositeOperation = "lighter";
+              g2.globalAlpha = a * 0.30;
+              g2.fillStyle = farbe;
+              g2.fillRect(-PACK, -PACK, PACK * 2, PACK * 2);
+            } else {
+              /* ⚠ Rueckfall ohne CDN (oertlich immer, auf dem Geraet bei
+                 einem fehlgeschlagenen Bild). Ein VERLAUF, keine Flaeche:
+                 eine gleichmaessig gefuellte Form liest sich als
+                 Konfettischnipsel, ein Verlauf mit heller Kante als
+                 Bruchstueck. Die Bewegung ist in beiden Faellen gleich. */
+              var fg = g2.createLinearGradient(-PACK / 2, -PACK / 2, PACK / 2, PACK / 2);
+              fg.addColorStop(0, "#ffffff");
+              fg.addColorStop(0.45, farbe);
+              fg.addColorStop(1, "rgba(0,0,0,0.9)");
+              g2.globalCompositeOperation = "source-over";
+              g2.fillStyle = fg;
+              g2.fillRect(-PACK, -PACK, PACK * 2, PACK * 2);
+            }
+            g2.restore();
+            /* Die BRUCHKANTE. Der eine Strich, der aus einer Flaeche ein
+               Stueck Material macht: frisch gebrochenes Glas fasst das
+               Licht an der Kante. Ohne ihn bleibt jeder Splitter flach —
+               das ist der Unterschied, den man in einem Blizzard-Video
+               sieht, ohne ihn benennen zu koennen. */
+            g2.globalCompositeOperation = "lighter";
+            g2.globalAlpha = a * 0.85;
+            g2.strokeStyle = "#ffffff";
+            g2.lineWidth = Math.max(0.6, 1.6 * dpr) / sk;
+            g2.stroke();
+            g2.restore();
+            continue;
+          }
+
+          if (t.art === FX.ART.FUNKE) {
+            /* Ein Streifen ENTLANG der Flugrichtung, nicht ein Punkt.
+               Ein runder Punkt liest sich als Konfetti, ein Streifen als
+               Energie — dieselbe Erkenntnis wie bei den CSS-Funken. */
+            var vl = Math.sqrt(t.vx * t.vx + t.vy * t.vy) || 0.001;
+            var lang = Math.min(0.09, vl * 0.045) * E * sk;
+            var dick = Math.max(1.4 * dpr, t.dicke * sk * dpr);
+            /* Die Vorlage zeigt nach RECHTS (Kopf bei x = 64), darum wird
+               sie in die Flugrichtung gedreht und der Kopf auf die
+               Teilchenlage gelegt. Der Schweif liegt damit automatisch
+               HINTER dem Kopf — dieselbe Aussage wie vorher, nur ohne
+               Verlauf je Rahmen.
+               ⚠ Der Kopf ist IMMER weiss, auch beim farbigen Funken; die
+               Packfarbe kommt erst dahinter. Vorher stand am Kopf direkt
+               die Farbe, und der Funke war ein magentafarbener Strich
+               zwischen magentafarbenen Glutpunkten: unsichtbar. Ein heisser
+               Kern mit farbigem Schweif ist der Unterschied zwischen
+               „Licht" und „Farbe". */
+            g.save();
+            g.translate(px, py);
+            g.rotate(Math.atan2(t.vy, t.vx));
+            g.globalAlpha = a;
+            g.drawImage(t.weiss ? bildFunkeWeiss : bildFunkeFarbe,
+              -lang, -dick / 2, lang, dick);
+            g.restore();
+            continue;
+          }
+
+          /* Glut und Staub: runde Lichtpunkte mit Halo.
+             ⚠ Der Halo lag bei Faktor 3 und der Kern bei 35 % davon. Beim
+             Ansehen bei dreifacher Auflaesung war die Mitte der Buehne
+             dadurch ein Teppich aus rund 30 px grossen weichen Flecken,
+             und die FUNKEN — der schnelle, gerichtete Teil — waren
+             dahinter nicht mehr auszumachen. Gemessen ist beides „hell",
+             nur eines davon liest sich als Energie.
+             Jetzt: engerer Halo (2,0), harter kleiner Kern (18 % — steckt
+             in der Vorlage). Ein Lichtpunkt braucht einen Kern, den man
+             nicht mehr aufloesen kann, sonst ist er eine Wolke. */
+          var rr = Math.max(0.6, t.r * E * sk);
+          var halo = rr * 2.0;
+          /* Staub deutlich zurueckgenommen: er soll die Luft fuellen, nicht
+             mitspielen. */
+          g.globalAlpha = a * (t.art === FX.ART.STAUB ? 0.26 : 0.8);
+          g.drawImage(t.art === FX.ART.GLUT ? bildGlut : bildStaub,
+            px - halo, py - halo, halo * 2, halo * 2);
+        }
+
+        g.globalAlpha = 1;
+        if (lebend > 0) { fxLauf = requestAnimationFrame(bild); }
+        else { ende = true; fxStop(); }
+      }
+      fxLauf = requestAnimationFrame(bild);
+    }
+
     function raeumen() {
+      /* Zuerst die Leinwand stillstellen, dann das DOM abbauen. Umgekehrt
+         liefe die Schleife noch einen Rahmen lang auf eine Leinwand, die
+         gerade aus dem Blick faellt — sichtbar als kurzer Blitz beim
+         Schliessen. */
+      if (bruchTimer) { clearTimeout(bruchTimer); bruchTimer = null; }
+      fxStop();
       var st = $("pkStage"); if (!st) return;
       [].slice.call(st.querySelectorAll(".pkcard")).forEach(function (c) { c.remove(); });
       var d = $("pkDeck"); if (d) d.remove();
@@ -10885,7 +11294,38 @@ button.pfplate{cursor:pointer}
       void lay.offsetWidth;
       lay.classList.add("spielt");
 
+      /* Steht VOR der Sprengung, obwohl `schliessen()` erst danach kommt:
+         der Bruch-Rueckruf prueft dieses Flag, und `var` waere zwar
+         hochgezogen, aber beim Lesen des Codes unklar. */
       var beendet = false;
+
+      /* ==============================================================
+       * DIE SPRENGUNG (30.07.2026)
+       * --------------------------------------------------------------
+       * Vorgabe: „der pack wird perfekt angezeigt nur die Animation passt
+       * nicht" — und die Frage, wie Blizzard das macht. Antwort: das Pack
+       * wird nicht ueberblendet, es wird ZERLEGT. Die Leinwand schneidet
+       * genau dieses Packbild in Splitter und schleudert sie durch die
+       * Kamera. Nur so gehoert der Bruch zum Pack und nicht zu einem
+       * Effekt, der darueber liegt.
+       * Warum Leinwand und nicht CSS: CSS kann nicht additiv mischen,
+       * darum wirkte der alte Ausbruch milchig statt heiss. Und jenseits
+       * von etwa 50 bewegten Knoten bricht das Blatt ein — hier fliegen
+       * bis zu 300 Teile.
+       * ⚠ Erst NACH `spielt`. Vorher hat `#pkFx` keine Bildschirmflaeche,
+       * `getBoundingClientRect()` gaebe 0×0 und die Sprengung liefe auf
+       * eine Leinwand von einem Pixel.
+       * ============================================================== */
+      bruchTimer = setTimeout(function () {
+        bruchTimer = null;
+        if (beendet) return;
+        /* `art` und nicht ASSETS[...]: die Splitter schneiden aus dem
+           Element, das der Spieler gerade sieht. Fehlt das Bild (kein
+           CDN), zeichnet das Modul volle Flaechen in der Packfarbe —
+           die Bewegung bleibt dieselbe. */
+        fxStart(n, farbe, (art.style.visibility === "hidden") ? null : art);
+      }, BRUCH);
+
       function schliessen() {
         if (beendet) return;
         beendet = true;
@@ -10894,6 +11334,11 @@ button.pfplate{cursor:pointer}
         lay.setAttribute("aria-hidden", "true");
         lay.removeEventListener("pointerdown", tipp);
         if (haengenderTipp === tipp) haengenderTipp = null;
+        var kn = $("pkSkip");
+        if (kn && haengenderSprung) {
+          kn.removeEventListener("pointerdown", haengenderSprung);
+          haengenderSprung = null;
+        }
         raeumen();
         fertig();
       }
@@ -10990,6 +11435,43 @@ button.pfplate{cursor:pointer}
       }
       haengenderTipp = tipp;
       lay.addEventListener("pointerdown", tipp);
+
+      /* ==============================================================
+       * „ÜBERSPRINGEN" — vom 30.07.2026, vorher ein TOTER KNOPF.
+       * --------------------------------------------------------------
+       * `#pkSkip` stand seit dem ersten Entwurf im Markup, war gestylt,
+       * sichtbar — und hatte NIE einen Zuhoerer. Gefunden beim Bau der
+       * Sprengungspruefung, die die Szene schliessen wollte und keinen
+       * Weg dafuer fand. Ein Knopf, der nichts tut, ist schlimmer als
+       * keiner: der Spieler drueckt ihn, nichts passiert, und er haelt die
+       * App fuer kaputt.
+       * Er springt NICHT einfach ins Schliessen: die Karten sind bezahlt
+       * und muessen gezeigt werden. Er ueberspringt die ZEREMONIE — Deck
+       * sofort schwebend, alle Karten offen, Beute-Uebersicht — und laesst
+       * den Spieler dann selbst schliessen. Das ist, was „ueberspringen"
+       * in AA bedeutet und was der Auftraggeber erwartet.
+       * ============================================================== */
+      var knopf = $("pkSkip");
+      if (knopf) {
+        if (haengenderSprung) {
+          knopf.removeEventListener("pointerdown", haengenderSprung);
+        }
+        haengenderSprung = function (e) {
+          e.preventDefault();
+          e.stopPropagation();   /* sonst zaehlt der Tap auch als Aufdecken */
+          if (beendet) return;
+          if (bruchTimer) { clearTimeout(bruchTimer); bruchTimer = null; }
+          fxStop();
+          if (laufend) { clearTimeout(laufend); laufend = null; }
+          deck.classList.add("schwebt");
+          staub.classList.add("an");
+          /* Alle noch liegenden Karten in einem Zug aufdecken. */
+          var wache = 0;
+          while (deckeAuf() && wache++ < 40) { /* leer */ }
+          if (!finaleGezeigt) zeigeFinale();
+        };
+        knopf.addEventListener("pointerdown", haengenderSprung);
+      }
 
       /* Der Stapel schwebt, sobald der Flug durch ist. 75 % von DAUER ist
          der Zeitpunkt, an dem pkkarte die Karten gelegt hat (siehe
