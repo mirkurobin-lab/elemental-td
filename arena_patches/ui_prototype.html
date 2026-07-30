@@ -1326,6 +1326,39 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
 /* Der Treffer an der Pille: kurz, kraeftig, und er faerbt NICHT um —
    eine Waehrung, die beim Zuwachs die Farbe wechselt, liest sich wie
    eine Warnung. */
+/* ---------- Kartenflug ----------
+   Ein Kartensymbol statt einer Muenze: hochkant im Kartenformat 3:4,
+   mit dem Rand in der Farbe der erhaltenen Stufe. Eine Muenze fuer eine
+   Karte zu nehmen waere billiger gewesen und haette gelogen — der
+   Spieler soll am Flug sehen, WAS er bekommen hat. */
+.flugkarte{width:19px;height:25px;border-radius:4px;
+  background:linear-gradient(160deg,#33465e,#131c25);
+  border:1.5px solid var(--kf,#e0b94a);
+  box-shadow:0 0 10px 1px var(--kf,#e0b94a),0 3px 8px #000a}
+.flugkarte::after{content:"";position:absolute;inset:2px 3px;border-radius:2px;
+  background:linear-gradient(180deg,#ffffff2e,#ffffff00 60%)}
+/* Der Aufschlag auf dem Sammlungs-Reiter. Wie bei der Waehrungspille:
+   kurz, kraeftig, ohne Farbwechsel. */
+.nav-treffer{animation:navtreffer 360ms var(--ease-overshoot)}
+@keyframes navtreffer{0%{transform:scale(1)}40%{transform:scale(1.16)}100%{transform:scale(1)}}
+/* Eine ERSTE Karte ist ein anderes Ereignis als die vierte Kopie: dazu
+   ein Lichtstoss, der vom Reiter nach aussen laeuft. Er liegt in einem
+   ::after, damit nichts im Baum dafuer angelegt werden muss, und traegt
+   pointer-events:none — der Reiter bleibt in jedem Bild anklickbar. */
+.nav-neu{animation:navtreffer 360ms var(--ease-overshoot)}
+.nav-neu::before{content:"";position:absolute;left:50%;top:44%;
+  width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;
+  pointer-events:none;z-index:0;
+  background:radial-gradient(circle,#fff 0%,#ffe9a8 34%,#e0b94a00 70%);
+  animation:navneu .9s var(--ease-out) forwards}
+@keyframes navneu{
+  0%{opacity:0;transform:scale(.3)}
+  18%{opacity:.95;transform:scale(1.5)}
+  100%{opacity:0;transform:scale(3.1)}}
+@media (prefers-reduced-motion:reduce){
+  .nav-neu::before{display:none}
+  .nav-treffer,.nav-neu{animation:none}
+}
 .cur-treffer{animation:curtreffer 340ms var(--ease-overshoot)}
 @keyframes curtreffer{
   0%{transform:scale(1)} 38%{transform:scale(1.17)} 100%{transform:scale(1)}
@@ -11191,7 +11224,69 @@ button.pfplate{cursor:pointer}
         var r = el.getBoundingClientRect();
         return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
       },
+      /* ==============================================================
+       * KARTENFLUG — „oder man neue Karten bekommt"
+       * --------------------------------------------------------------
+       * Dieselbe Bauart wie beim Gold, aus demselben Grund: er haengt
+       * an der EINEN Stelle, an der Karten entstehen (AC.addDrop),
+       * nicht an den Knoepfen, die sie vergeben. Pack, Clan-Spende,
+       * Post, Strassenknoten, Quest, Match-Ende — und die siebte
+       * Quelle, die naechste Woche dazukommt.
+       *
+       * Zwei Unterschiede zur Muenze, beide inhaltlich:
+       *  1. Das Ziel ist der Sammlungs-Reiter, nicht die Kopfleiste.
+       *     Dort landen Karten, und dorthin muss der Blick.
+       *  2. Eine ERSTE Karte ist ein anderes Ereignis als die vierte
+       *     Kopie. Sie bekommt einen Lichtstoss auf dem Reiter und den
+       *     Legendaer-Klang; eine Kopie bekommt den Belohnungs-Klang.
+       *     Wenn jeder Zuwachs gleich gefeiert wird, feiert keiner.
+       * ============================================================== */
+      karte: function (id, tierKey, n, istNeu) {
+        var ziel = $("navCollection");
+        if (!ziel || !ziel.getBoundingClientRect().width) return;
+        var t = (window.ArenaCards && ArenaCards.tierOf) ? ArenaCards.tierOf(tierKey) : null;
+        var farbe = (t && t.color) || "#e0b94a";
+        var zr = ziel.getBoundingClientRect();
+        var zx = zr.left + zr.width / 2, zy = zr.top + zr.height / 2;
+        var von = tipp || { x: zx, y: zy - 260 };
+        if (sparsam()) { navTreffer(ziel, istNeu); return; }
+        /* Karten sind Einzelstuecke, keine Schuettware: hoechstens vier
+           Sprites, sonst wird aus „drei Karten" ein Schwarm. */
+        var b = buehne(), anz = Math.max(1, Math.min(4, n | 0)), gelandet = 0;
+        for (var i = 0; i < anz; i++) {
+          (function (i) {
+            var s = document.createElement("i");
+            s.className = "flug flugkarte";
+            s.style.setProperty("--kf", farbe);
+            var sx = von.x + (Math.random() - 0.5) * 40;
+            var sy = von.y + (Math.random() - 0.5) * 28;
+            s.style.setProperty("--x0", sx + "px");
+            s.style.setProperty("--y0", sy + "px");
+            s.style.setProperty("--xm", (sx + (zx - sx) * 0.3 + (Math.random() - 0.5) * 54) + "px");
+            s.style.setProperty("--ym", (sy - 54 - Math.random() * 60) + "px");
+            s.style.setProperty("--x1", zx + "px");
+            s.style.setProperty("--y1", zy + "px");
+            s.style.animationDelay = (i * 78) + "ms";
+            b.appendChild(s);
+            s.addEventListener("animationend", function () {
+              s.remove();
+              if (++gelandet === 1) {
+                navTreffer(ziel, istNeu);
+                if (window.UISfx) (istNeu && UISfx.legend ? UISfx.legend() : UISfx.reward && UISfx.reward());
+              }
+            });
+          })(i);
+        }
+      },
     };
+    /* Der Aufschlag auf dem Reiter. Bei einer neuen Karte zusaetzlich ein
+       Lichtstoss — die Klasse laeuft ueber ein ::after, das nur fuer die
+       Dauer der Animation da ist. */
+    function navTreffer(ziel, istNeu) {
+      var kl = istNeu ? "nav-neu" : "nav-treffer";
+      ziel.classList.remove(kl); void ziel.offsetWidth; ziel.classList.add(kl);
+      setTimeout(function () { ziel.classList.remove(kl); }, istNeu ? 900 : 360);
+    }
   })();
 
   /* Die Setter fliegen jetzt. `setGold`/`setGems` sind
@@ -11221,6 +11316,27 @@ button.pfplate{cursor:pointer}
       var pg = $("curGems"); if (pg) pg.textContent = fmt(TEST_GEMS);
     }
   };
+  /* Karten fliegen jetzt auch — an derselben Naht wie Gold und Material:
+     an der Stelle, an der sie ENTSTEHEN. `addDrop` ist die einzige
+     Funktion, die Kopien gutschreibt; wer eine neue Belohnungsquelle
+     baut, ruft sie zwangslaeufig auf und bekommt die Animation mit.
+     „Neu" heisst: die Karte hatte vorher NULL Kopien in allen Stufen.
+     Das ist die einzige Lesart, die auch stimmt, wenn eine gewoehnliche
+     Kopie zu einer Sammlung dazukommt, die schon eine seltene enthaelt. */
+  (function () {
+    if (!AC || typeof AC.addDrop !== "function") return;
+    var _drop = AC.addDrop;
+    AC.addDrop = function (id, tierKey, n) {
+      var vorher = 0;
+      try {
+        var c = AC.get().cards[id];
+        if (c && c.copies) for (var k in c.copies) vorher += c.copies[k] | 0;
+      } catch (e) { vorher = 1; }   // im Zweifel NICHT als „neu" feiern
+      var r = _drop.apply(AC, arguments);
+      if ((n | 0) > 0) UIFlug.karte(id, tierKey, n, vorher === 0);
+      return r;
+    };
+  })();
   (function () {
     if (!AC || typeof AC.addMaterial !== "function") return;
     var _add = AC.addMaterial;

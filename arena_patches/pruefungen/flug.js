@@ -80,6 +80,64 @@ const pruef = (n, w, z) => { if (w) ok++; else { fehl++; console.log("  FEHL " +
   });
   pruef("ein Kauf (Abnahme) fliegt NICHT", ab === 0, ab + " Sprites");
 
+  /* ================= 6. KARTENFLUG =================
+     Vorgabe: „Wir brauchen überall Animationen wenn Ressourcen collected
+     werden oder man neue Karten bekommt." Der zweite Teil haengt an
+     AC.addDrop — der einzigen Stelle, an der Kopien entstehen.
+
+     ⚠ Gemessen wird mit einem BEOBACHTER, nicht mit einem Blick zu
+     einem geratenen Zeitpunkt. Die Klasse liegt nur 360 bzw. 900 ms an;
+     ein Blick 900 ms nach dem Aufruf sah nichts und haette „passiert
+     nichts" gemeldet, obwohl alles lief. */
+  await p.evaluate(() => {
+    window.__nav = [];
+    new MutationObserver(() => window.__nav.push(document.getElementById("navCollection").className))
+      .observe(document.getElementById("navCollection"), { attributes: true, attributeFilter: ["class"] });
+  });
+  const kartenProbe = async (id, alsNeu) => {
+    await p.evaluate(([i, neu]) => {
+      window.__nav = [];
+      const AC = window.__proto.AC;
+      if (neu) {   /* ⚠ AC.get() liefert eine KOPIE — ohne _write bliebe
+                      der Stand unveraendert und die Karte nicht neu. */
+        const st = AC.get();
+        for (const k in st.cards[i].copies) st.cards[i].copies[k] = 0;
+        AC._write(st);
+      }
+      AC.addDrop(i, "epic", 2);
+    }, [id, alsNeu]);
+    await p.waitForTimeout(140);
+    const sofort = await p.evaluate(() => {
+      const s = document.querySelector("#flugLayer .flugkarte");
+      return { n: document.querySelectorAll("#flugLayer .flugkarte").length,
+               rand: s ? getComputedStyle(s).borderTopColor : "-" };
+    });
+    await p.waitForTimeout(1500);
+    const kl = await p.evaluate(() => [...new Set(window.__nav)].join(" "));
+    return { n: sofort.n, rand: sofort.rand, kl };
+  };
+
+  const kopie = await kartenProbe("fire", false);
+  pruef("eine erhaltene Kartenkopie fliegt", kopie.n >= 1, kopie.n + " Sprites");
+  /* Die Farbe kommt aus ArenaCards.TIERS, nicht aus einer eingefrorenen
+     Zahl: die Pruefung fragt die Quelle. */
+  const epicFarbe = await p.evaluate(() => {
+    const c = window.ArenaCards.tierOf("epic").color.replace("#", "");
+    return "rgb(" + parseInt(c.slice(0,2),16) + ", " + parseInt(c.slice(2,4),16) + ", " + parseInt(c.slice(4,6),16) + ")";
+  });
+  pruef("der Kartenrand traegt die Farbe der erhaltenen Stufe",
+    kopie.rand === epicFarbe, kopie.rand + " gegen " + epicFarbe);
+  pruef("eine weitere Kopie bekommt den normalen Aufschlag",
+    /nav-treffer/.test(kopie.kl) && !/nav-neu/.test(kopie.kl), kopie.kl);
+
+  const erste = await kartenProbe("fire", true);
+  pruef("eine ERSTE Karte bekommt den Lichtstoss",
+    /nav-neu/.test(erste.kl), erste.kl);
+  /* Gegenprobe: die beiden Faelle muessen sich UNTERSCHEIDEN. Ohne sie
+     waere die Staffel gruen, auch wenn beide dasselbe taeten. */
+  pruef("gegen: neue Karte und weitere Kopie sind nicht dasselbe",
+    erste.kl !== kopie.kl, kopie.kl + " / " + erste.kl);
+
   pruef("keine JS-Fehler", jsF.length === 0, jsF[0]);
   console.log(ok + " ok, " + fehl + " fehlgeschlagen");
   await b.close(); process.exit(fehl ? 1 : 0);
