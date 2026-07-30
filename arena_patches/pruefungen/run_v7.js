@@ -12,7 +12,13 @@ const { chromium } = require('playwright-core');
 const path = require('path');
 const fs = require('fs');
 
-const FILE = 'file://' + path.resolve('/home/user/elemental-td/arena_patches/ui_prototype.html');
+/* ⚠ AM EIGENEN ORT MESSEN (30.07.2026). Hier stand der feste Pfad
+   /home/user/elemental-td/... — laeuft die Suite aus einem Worktree,
+   prueft sie damit die HAUPT-Auscheckung und nicht die Datei, die
+   danebenliegt. Ein gruener Lauf sagte dann nichts ueber die Aenderung
+   aus, die man gerade gemacht hat. Der Pfad haengt jetzt an dieser
+   Datei, nicht an einer Maschine. */
+const FILE = 'file://' + path.resolve(__dirname, '..', 'ui_prototype.html');
 /* Galerie-Ordner. ui_shots_v7 bleibt als Stand VOR dem AAA-Icon-Sweep
    erhalten; die aktuelle Galerie ist v8. */
 const SHOTS = '/tmp/claude-0/-home-user-elemental-td/4b0a76dd-5b22-5fdf-85e8-579f1b036ae5/scratchpad/ui_shots_v8';
@@ -551,46 +557,60 @@ function gegen(name, sollFalschSein, info) { step('gegen: ' + name, !sollFalschS
 
   // ================= 7. ALLE VIEWS DURCHKLICKEN + SCREENSHOTS =========
   await go('navSettings'); await shot('einstellungen');
-  /* --- 7b. Shop: AA-Sektionsreihenfolge (§8.1) ---
-     1 Promo · 2 Arena-/Starter-Pack · 3 Tagesangebote · 4 Packs ·
-     5 Kristalltresor (AAs Roulette-Platz) · 6 Gems · 7 Gold.
+  /* --- 7b. Shop: AA-Sektionsreihenfolge (§27.1, abgelesen 30.07.2026) ---
+     1 Arena-Packs · 2 Tagesangebote · 3 Vorrats-Pack (AAs ARCANE
+     SUPPLIES CHEST) · 4 Booster-Packs (AAs CHEST) · 5 Kristalltresor
+     (AAs ENDLESS ROULETTE) · 6 Gems · 7 Gold.
      Geprueft wird die DOM-Reihenfolge, nicht die Optik. */
   await go('navShop');
   const shopOrder = await page.evaluate(() => {
-    const marks = [...document.querySelectorAll('#viewShop [data-sec]')];
+    const sichtbar = e => !!(e && e.getClientRects().length);
+    const marks = [...document.querySelectorAll('#viewShop [data-sec]')].filter(sichtbar);
     return {
       order: marks.map(e => e.getAttribute('data-sec')),
       // Blocktitel in DOM-Reihenfolge
       labels: marks.map(e => (e.querySelector('.srt') || e.querySelector('.sh') || e)
         .textContent.replace(/\s+/g, ' ').trim().slice(0, 22)),
       // Die Inhaltscontainer muessen in derselben Folge stehen
-      slots: ['shopPromo', 'arenaPackBox', 'dealGrid', 'packShop', 'vorratShop',
+      slots: ['arenaPackBox', 'dealGrid', 'vorratShop', 'packShop',
               'vaultShop', 'gemShop', 'goldShop']
         .map(id => { const e = document.getElementById(id);
-                     return e ? [...document.getElementById('viewShop').querySelectorAll('*')].indexOf(e) : -1; }),
+                     return sichtbar(e) ? [...document.getElementById('viewShop').querySelectorAll('*')].indexOf(e) : -1; }),
     };
   });
-  /* ⚠ AUS SIEBEN SEKTIONEN SIND ACHT GEWORDEN (27.07.), und das ist eine
-     Design-Entscheidung, keine Regression. AAs Platz 4 ist EIN Block
-     „Truhen/Packs", in dem die Arcane Supplies Chest neben den anderen
-     Truhen steht (§8.1/§8.2). Bei uns hat die Vorrats-Truhe eine ganz
-     andere Bedienung als eine Pack-Kachel — x1/x10, Mitleidszeile,
-     Chancen-Klappe — und bekommt deshalb ein eigenes Band. Die alte
-     Fassung dieser Pruefung (`length === 7`, `'1,2,3,4,5,6,7'`) haette
-     genau diese Aufteilung verboten.
-     Was hier weiterhin geprueft wird, ist das eigentlich Wichtige: die
-     Nummern sind lueckenlos und aufsteigend, und die Inhaltscontainer
-     stehen in derselben Folge im DOM. */
-  step('Shop traegt genau acht markierte Sektionen',
-    shopOrder.order.length === 8, shopOrder.order.join(','));
-  step('Sektionsreihenfolge lueckenlos 1-8 nach AA §8.1',
-    shopOrder.order.join(',') === '1,2,3,4,5,6,7,8', shopOrder.labels.join(' · '));
+  /* ⚠ UMGESCHRIEBEN AM 30.07.2026 — VON ACHT AUF SIEBEN SEKTIONEN.
+     Diese Pruefung stand zuletzt auf ACHT, mit der Begruendung, unser
+     Vorrats-Pack brauche ein eigenes Band neben dem Truhenblock. Die
+     Aufteilung bleibt richtig; falsch war die achte Sektion davor.
+     §27.1 ist an acht Screenshots abgelesen (IMG_3449-3456) und zeigt:
+     AA hat an Position 1 GAR KEINEN Banner. Der Werbe-Entfernen-Banner
+     aus §8.1 ist dort nicht (mehr) vorhanden, und einen Pass-Banner hat
+     der Store nie gehabt. Beides ist bei uns gestrichen — den Pass
+     verkaufen wir auf dem Hauptbildschirm, ein zweites Mal im Shop ist
+     kein zweites Angebot.
+     Ausserdem ruecken zwei Sektionen: AAs ARCANE SUPPLIES CHEST steht
+     VOR dem Truhenblock (Platz 3), nicht dahinter. §8.2 hatte das
+     andersherum vermutet.
+     Was hier weiterhin geprueft wird, ist unveraendert das eigentlich
+     Wichtige: die Nummern sind lueckenlos und aufsteigend, und die
+     Inhaltscontainer stehen in derselben Folge im DOM. Neu ist nur,
+     dass ausschliesslich SICHTBARE Sektionen zaehlen — ein
+     ausgeblendeter Baustein ist keine geloeschte Sektion. */
+  step('Shop traegt genau sieben sichtbare Sektionen',
+    shopOrder.order.length === 7, shopOrder.order.join(','));
+  step('Sektionsreihenfolge lueckenlos 1-7 nach AA §27.1',
+    shopOrder.order.join(',') === '1,2,3,4,5,6,7', shopOrder.labels.join(' · '));
   step('Inhaltscontainer stehen in derselben Folge im DOM',
     shopOrder.slots.every((v, i) => v >= 0 && (i === 0 || v > shopOrder.slots[i - 1])),
     shopOrder.slots.join(' < '));
   const shopBlocks = await page.evaluate(() => ({
-    promo: !!document.getElementById('shopPromo'),
-    promoTxt: document.getElementById('shopPromo').textContent.replace(/\s+/g, ' ').trim(),
+    /* ⚠ Frueher wurde hier `#shopPromo` ausgelesen. Das Pass-Banner ist
+       weg (§27.1); gezaehlt wird jetzt, dass es KEINES mehr gibt —
+       weder als Pass- noch als Werbe-Entfernen-Banner. */
+    passBanner: document.querySelectorAll(
+      '#viewShop #shopPromo, #viewShop .promobanner, #viewShop .passbanner').length,
+    bannerShop: document.querySelectorAll(
+      '#viewShop [data-adfree], #viewShop .adbanner, #viewShop [data-noads]').length,
     iap: document.querySelectorAll('#arenaPackBox .iapcard').length,
     iapBadges: document.querySelectorAll('#arenaPackBox .valbadge').length,
     iapIcons: document.querySelectorAll('#arenaPackBox .iapicons span').length,
@@ -608,7 +628,7 @@ function gegen(name, sollFalschSein, info) { step('gegen: ' + name, !sollFalschS
     vault: document.querySelectorAll('#vaultShop .vaultjar').length,
     gems: document.querySelectorAll('#gemShop .prodcard').length,
     golds: document.querySelectorAll('#goldShop .prodcard').length,
-    goldFrei: document.querySelectorAll('#goldFreeBox .tagesband').length,
+    goldGratis: document.querySelectorAll('#goldShop [data-goldfree]').length,
     gemFrames: document.querySelectorAll('#gemShop .prodcard.fr-kristall').length,
     goldFrames: document.querySelectorAll('#goldShop .prodcard.fr-gold').length,
     dealFrames: document.querySelectorAll('#dealGrid .prodcard.fr-light').length,
@@ -616,13 +636,23 @@ function gegen(name, sollFalschSein, info) { step('gegen: ' + name, !sollFalschS
     ribbons: document.querySelectorAll('#viewShop .secribbon').length,
     seals: [...document.querySelectorAll('#viewShop .seal')].map(e => e.textContent.trim()),
   }));
-  step('(1) Promo-Banner an Position 1, mit Inhalt',
-    shopBlocks.promo && /Fortuna|Premium/.test(shopBlocks.promoTxt),
-    shopBlocks.promoTxt.slice(0, 40));
-  step('(2) Arena-Pack + Starter-Pack mit value-Badge und Icon-Reihe',
+  /* ⚠ UMGESCHRIEBEN (30.07.2026). Der Schritt hiess „(1) Promo-Banner an
+     Position 1, mit Inhalt" und schrieb damit genau den Baustein fest,
+     den der Auftraggeber weghaben wollte: „Der battledpass der im Shop
+     oben ist kann entfernt werden den brauchen wir an dieser Stelle
+     nicht weil wir ihn schon auf der Battle ansicht (hauptbildschirm)
+     oben verkaufen." Dazu „Den Banner Shop braucht es im Shop nicht der
+     ist in AA auch nicht drin."
+     Er wird nicht geloescht, sondern auf die neue Zusage gedreht: an
+     Position 1 steht das Arena-Pack-Karussell, und BEIDE Banner sind
+     verschwunden — nicht nur ausgeblendet. */
+  step('(1) Kein Pass-Banner und kein Banner-Shop mehr im Shop (§27.1)',
+    shopBlocks.passBanner === 0 && shopBlocks.bannerShop === 0,
+    shopBlocks.passBanner + ' Pass-Banner / ' + shopBlocks.bannerShop + ' Banner-Shop');
+  step('(1) Arena-Pack + Starter-Pack mit value-Badge und Icon-Reihe',
     shopBlocks.iap === 2 && shopBlocks.iapBadges === 2 && shopBlocks.iapIcons >= 8,
     shopBlocks.iap + ' Karten, ' + shopBlocks.iapIcons + ' Item-Icons');
-  step('(3) Tagesangebote: 6 Posten, davon genau EINER gratis',
+  step('(2) Tagesangebote: 6 Posten, davon genau EINER gratis',
     shopBlocks.deals === 6 && shopBlocks.dealGratis === 1,
     shopBlocks.deals + ' Deals / ' + shopBlocks.dealGratis + ' gratis');
   /* ⚠ UMGESCHRIEBEN (27.07.): frueher `packs >= 4`. Bronze ist aus dem
@@ -640,19 +670,22 @@ function gegen(name, sollFalschSein, info) { step('gegen: ' + name, !sollFalschS
      steht jetzt ausdruecklich mit 0 % dabei — „kommt nicht vor" ist eine
      Aussage, die der Kaeufer sehen soll. Sechs Zeilen sind also der
      Sollzustand, nicht ein Zaehlfehler. */
-  step('(5) Vorrats-Truhe: OEFFNEN x1 und x10 plus Chancen-Klappe',
+  step('(3) Vorrats-Pack: OEFFNEN x1 und x10 plus Chancen-Klappe',
     shopBlocks.vorrat === 2 && shopBlocks.vorratOdds === 6,
     shopBlocks.vorrat + ' Knoepfe / ' + shopBlocks.vorratOdds + ' Chancen-Zeilen');
-  step('(6) Kristalltresor sitzt auf AAs Roulette-Platz', shopBlocks.vault === 1);
-  step('(7) Gem-Pakete: 6 Staffeln als Produktkarten', shopBlocks.gems === 6,
+  step('(5) Kristalltresor sitzt auf AAs Roulette-Platz', shopBlocks.vault === 1);
+  step('(6) Gem-Pakete: 6 Staffeln als Produktkarten', shopBlocks.gems === 6,
     String(shopBlocks.gems));
-  /* ⚠ UMGESCHRIEBEN (27.07.): frueher `golds === 4`. Das Tagesgold ist
-     keine vierte Rasterkachel mehr, sondern ein Band UNTER den drei
-     kaufbaren Staffeln — „Mach das free Gold unter die 3 kaufbaren Gold
-     Sachen. In der Groesse des Banners wie den Kristalltresor." */
-  step('(8) Gold-Tausch: 3 kaufbare Staffeln + Gratis-Gold als Band',
-    shopBlocks.golds === 3 && shopBlocks.goldFrei === 1,
-    shopBlocks.golds + ' Kacheln / ' + shopBlocks.goldFrei + ' Band');
+  /* ⚠ UMGESCHRIEBEN (30.07.2026): frueher „3 kaufbare Staffeln +
+     Gratis-Gold als Band". Das Band war die Antwort auf VIER Gold-
+     Posten, von denen einer gratis war. AA hat DREI Staffeln, und die
+     erste davon ist die gratis abzuholende (§27.2) — es bleibt nichts,
+     was unter dem Raster stehen koennte. Die Zusage „das Gratisstueck
+     ist als solches erkennbar" bleibt und haengt jetzt am Merker
+     `data-goldfree` auf der Kachel. */
+  step('(7) Gold: 3 Staffeln, davon genau eine gratis (§27.2)',
+    shopBlocks.golds === 3 && shopBlocks.goldGratis === 1,
+    shopBlocks.golds + ' Kacheln / ' + shopBlocks.goldGratis + ' Gratisposten');
   /* ⚠ UMGESCHRIEBEN 27.07. — und diese Pruefung ist der Grund, warum
      der Fehler so lange stand. Sie hiess „Gems orange, Gold gruen" und
      hat damit genau die Vertauschung FESTGESCHRIEBEN, die der
@@ -683,43 +716,65 @@ function gegen(name, sollFalschSein, info) { step('gegen: ' + name, !sollFalschS
      diese Zeile haette ihn eingefordert. Der Bandtext wird jetzt weiter
      unten gegen SEINEN Grund geprueft („Bandschrift kontrastiert gegen
      ihren Bandgrund"), statt hier gegen eine fremde Annahme. Die uebrigen
-     vier Selektoren sind unveraendert echte helle Flaechen. */
-  const sealLum = await page.$$eval('#viewShop .seal, #viewShop .valbadge, #viewShop .prb, ' +
-    '#goldShop .pcbuy.goldprice', els => els.map(e => {
+     vier Selektoren sind unveraendert echte helle Flaechen.
+     ⚠ `.prb` (der Knopf des Pass-Banners) ist am 30.07.2026 ebenfalls
+     ausgetragen — den Baustein gibt es nicht mehr (§27.1). Dafuer kommt
+     der GRATIS-Knopf der ersten Gold-Staffel dazu: er ist seit dem
+     Umbau eine helle Flaeche im Raster und faellt damit unter dieselbe
+     Regel. Die Mindestzahl bleibt bei acht Flaechen, nur die Herkunft
+     verschiebt sich. */
+  const sealLum = await page.$$eval('#viewShop .seal, #viewShop .valbadge, ' +
+    '#goldShop .pcbuy.goldprice, #goldShop .pcbuy.freeprice:not([disabled])',
+    els => els.map(e => {
       const cs = getComputedStyle(e);
       const m = /rgb\((\d+), (\d+), (\d+)\)/.exec(cs.webkitTextFillColor || cs.color);
       return { cls: e.className, lum: m ? (+m[1] * 0.299 + +m[2] * 0.587 + +m[3] * 0.114) : 255 };
     }));
   const sealBad = sealLum.filter(x => x.lum > 120);
   step('Siegel/Badges/Goldknoepfe/Ribbon-Text tragen dunkle Schrift',
-    sealLum.length >= 8 && sealBad.length === 0,
+    sealLum.length >= 7 && sealBad.length === 0,
     sealLum.length + ' geprueft' + (sealBad.length ? ' — Verstoss: ' + sealBad[0].cls : ''));
-  // Metrik auf den neuen Bausteinen
+  /* Metrik auf den neuen Bausteinen.
+     ⚠ Die Hoehenmessung hing am Pass-Banner (`#shopPromo`, gegen
+     --banner-h). Der Baustein ist weg; gemessen wird jetzt der
+     Kristalltresor, das breite Band, das den Platz des Roulettes haelt
+     und dieselbe Reihenhoehe einhalten muss. Die Zusage — „ein breites
+     Band ist mindestens --banner-h hoch" — ist unveraendert. */
   const shopMetric = await page.evaluate(() => {
     const root = getComputedStyle(document.documentElement);
     const cs = n => getComputedStyle(document.querySelector(n));
-    return { promoH: Math.round(document.getElementById('shopPromo').getBoundingClientRect().height),
+    return { bandH: Math.round(document.getElementById('vaultShop').getBoundingClientRect().height),
              bannerH: parseFloat(root.getPropertyValue('--banner-h')),
              iapR: cs('.iapcard').borderRadius, gemR: cs('#gemShop .prodcard').borderRadius,
              varR: root.getPropertyValue('--radius').trim(),
              secM: cs('.secribbon').marginTop, varGapLg: root.getPropertyValue('--gap-lg').trim() };
   });
   step('Neue Shop-Bausteine nutzen die Metrik (Hoehe/Radius/Abstand)',
-    shopMetric.promoH >= shopMetric.bannerH && shopMetric.iapR === shopMetric.varR &&
+    shopMetric.bandH >= shopMetric.bannerH && shopMetric.iapR === shopMetric.varR &&
     shopMetric.gemR === shopMetric.varR && shopMetric.secM === shopMetric.varGapLg,
-    shopMetric.promoH + 'px / ' + shopMetric.iapR + ' / ' + shopMetric.secM);
-  // Gold-Tausch bucht echt, Echtgeld ist ein Platzhalter
+    shopMetric.bandH + 'px / ' + shopMetric.iapR + ' / ' + shopMetric.secM);
+  /* Gold-Tausch bucht echt, Echtgeld ist ein Platzhalter.
+     ⚠ UMGESCHRIEBEN (30.07.2026): hier standen +10 500 Gold und −80
+     Gems als feste Zahlen. Mit AAs Staffelung (§27.2) sind es 36 000
+     und 90 — und beim naechsten Preisschritt waeren es wieder andere.
+     Eine eingefrorene Zahl prueft den Preis, nicht die BUCHUNG. Gelesen
+     wird jetzt die Staffel, gegen die geklickt wird; gemessen wird, ob
+     genau sie gebucht wurde. */
   const exchange = await page.evaluate(() => {
-    const before = { gold: window.__proto.gold(), gems: window.__proto.gems() };
-    document.querySelector('#goldShop [data-goldbuy="go1"]').click();
-    return { before, after: { gold: window.__proto.gold(), gems: window.__proto.gems() } };
+    const P = window.__proto;
+    const g = P.GOLD_PACKS.filter(x => !x.free)[0];
+    const before = { gold: P.gold(), gems: P.gems() };
+    document.querySelector('#goldShop [data-goldbuy="' + g.id + '"]').click();
+    return { before, soll: { amt: g.amt, cost: g.cost },
+             after: { gold: P.gold(), gems: P.gems() } };
   });
   await page.waitForTimeout(320);
   step('Gold-Tausch bucht echt: Gems runter, Gold rauf',
-    exchange.after.gold === exchange.before.gold + 10500 &&
-    exchange.after.gems === exchange.before.gems - 80,
+    exchange.after.gold === exchange.before.gold + exchange.soll.amt &&
+    exchange.after.gems === exchange.before.gems - exchange.soll.cost,
     exchange.before.gems + '→' + exchange.after.gems + ' 💎, ' +
-    exchange.before.gold + '→' + exchange.after.gold + ' 🪙');
+    exchange.before.gold + '→' + exchange.after.gold + ' 🪙 (Soll: +' +
+    exchange.soll.amt + ' / −' + exchange.soll.cost + ')');
   const iapNoop = await page.evaluate(() => {
     const before = { gold: window.__proto.gold(), gems: window.__proto.gems() };
     document.querySelector('#arenaPackBox [data-iapbuy]').click();

@@ -29,6 +29,11 @@
  *   PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers node shop_raender.js
  * =================================================================== */
 const { chromium } = require("playwright-core");
+/* ⚠ AM EIGENEN ORT MESSEN (30.07.2026). Hier stand der feste Pfad
+   /home/user/elemental-td/... — laeuft die Suite aus einem Worktree,
+   prueft sie damit die HAUPT-Auscheckung und nicht die Datei, die
+   danebenliegt. Der Pfad haengt jetzt an dieser Datei. */
+const DATEI = "file://" + require("path").resolve(__dirname, "..", "ui_prototype.html");
 
 let ok = 0, fehl = 0;
 const pruef = (n, w, z) => {
@@ -61,7 +66,7 @@ const nah = (h, soll, tol) => h >= 0 && abstand(h, soll) <= tol;
   const p = await b.newPage({ viewport: { width: 390, height: 844 } });
   const jsF = [];
   p.on("pageerror", e => jsF.push(String(e).slice(0, 110)));
-  await p.goto("file:///home/user/elemental-td/arena_patches/ui_prototype.html",
+  await p.goto(DATEI,
                { waitUntil: "load", timeout: 40000 });
   await p.waitForTimeout(2400);
   await p.evaluate(() => {
@@ -79,7 +84,15 @@ const nah = (h, soll, tol) => h >= 0 && abstand(h, soll) <= tol;
       gold:     alle("#viewShop .prodcard.fr-gold").map(rand),
       packs:    alle("#viewShop .packshop .shopcard").map(rand),
       gratisPack: rand(document.querySelector("#packFreeBox .tagesband")),
-      gratisGold: rand(document.querySelector("#goldFreeBox .tagesband")),
+      /* ⚠ UMGESCHRIEBEN (30.07.2026). Hier stand
+         `#goldFreeBox .tagesband` — das Band unter dem Gold-Raster.
+         Es gibt es nicht mehr: AA hat drei Gold-Staffeln, und die
+         erste davon IST die gratis abzuholende (§27.2). Das
+         Gratis-Gold ist damit eine Produktkachel im Raster.
+         Die Zusage bleibt woertlich dieselbe — das Gratis-Gold muss
+         die Gold-Farbe tragen, sonst liest es sich als fremde Ware.
+         Gemessen wird jetzt an der Kachel statt am Band. */
+      gratisGold: rand(document.querySelector("#goldShop [data-goldfree]")),
       vorrat:   rand(document.querySelector("#viewShop .vorratbox")),
       // Die alten Farb-Klassennamen duerfen nicht zurueckkehren.
       altKlassen: alle("[class*='fr-orange'],[class*='fr-green']").length,

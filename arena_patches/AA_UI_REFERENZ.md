@@ -2886,7 +2886,7 @@ Gerät deckt er die Ladezeit ab.
 
 ---
 
-## 27. SHOP — vollständig abgelesen (30.07.2026)
+## 27. SHOP — vollständig abgelesen (30.07.2026) — GEBAUT
 
 > **Quelle:** acht Screenshots des Auftraggebers (IMG_3449–3456), Account **1 200 🏆 / 546 💎 /
 > 39 387 🪙**, also **Arena 5**. Auflösung 1320×2868, alle Zahlen direkt lesbar.
@@ -3003,6 +3003,37 @@ Screenshots ändert:
 dieselben Greenprints kosten bei Arena 2 5 400, bei Arena 4 20 000 und bei Arena 5 **40 000**
 Gold. Auch die Gold-Staffeln skalieren (10 500 → 12 000). Die **Echtgeldpreise der Gem-Staffeln
 skalieren nicht** — die sind Store-Preise und stehen fest.
+
+### 27.4 Was davon gebaut ist (30.07.2026)
+
+Umgesetzt in `ui_prototype.html`, geprüft in `pruefungen/run_shop.js` (53 Schritte) und
+`pruefungen/run_v7.js`:
+
+| §27 sagt | gebaut |
+|---|---|
+| Abschnittsfolge 1–7 | ✅ `data-sec="1"`…`"7"`, Reihenfolge gegen `getClientRects()` geprüft |
+| kein Pass-Banner | ✅ `#shopPromo`, `renderShopPromo()` und `.promobanner` ersatzlos entfernt |
+| kein Banner-Shop | ✅ war nie eigenständig da; die Abwesenheit wird jetzt geprüft |
+| Tresor auf dem Roulette-Platz | ✅ Sektion 5 |
+| GEMS-Preise inkl. **Knick** 0,62 → 0,64 | ✅ übernommen; der Knick wird ausdrücklich eingefordert |
+| GOLD 12 000 / 36 000 / 144 000, gratis / 90 / 288 | ✅ drei Kacheln, die erste gratis (1× pro Tag) |
+| Supplies Chest 300 / 2 680 | ✅ unverändert bestätigt |
+| Explorer 💎 80 | ✅ = unser Silber-Pack |
+| Türme Gems, Baupläne Gold | ✅ Währung hängt jetzt an der Warengruppe, nicht am Tageshash |
+
+**Nicht übernommen und warum:**
+
+- **Werbewege.** AA hängt drei Posten an ein Video (erste Gold-Staffel, Explorer-Truhe,
+  Endless Roulette). Belohnte Werbung ist nicht angebunden (`WERBUNG_VERFUEGBAR = false`).
+  Statt eines Knopfes, der nichts tut, steht unter dem Gold-Raster ein Satz, der das sagt.
+  Die erste Gold-Staffel gibt es dafür einmal am Tag gratis.
+- **Arena-Pack-Preisleiter.** §27.2 hat dazu genau *einen* Messpunkt („Arena 5 Pack",
+  ~~Fr. 20.70~~ Fr. 9, 230 % value). Unsere Leiter hat acht Stufen mit eigenem Inhalt, und
+  das Wertsiegel wird gerechnet, nicht behauptet. Eine Umrechnung auf AAs einen Punkt
+  hieße, sieben Preise zu erfinden — offen für eine eigene Messung.
+- **Violetter Gratis-Posten / diagonales Rabatt-Eckband** in den Tagesangeboten (§27.2).
+  Der Gratis-Posten steht vorne links und trägt einen hellen GRATIS-Knopf; die Färbung
+  und das Eckband fehlen noch.
 
 ---
 

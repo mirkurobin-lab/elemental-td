@@ -22,7 +22,13 @@
 const { chromium } = require('playwright-core');
 const path = require('path');
 
-const FILE = 'file://' + path.resolve('/home/user/elemental-td/arena_patches/ui_prototype.html');
+/* ⚠ AM EIGENEN ORT MESSEN (30.07.2026). Hier stand der feste Pfad
+   /home/user/elemental-td/... — laeuft die Suite aus einem Worktree,
+   prueft sie damit die HAUPT-Auscheckung und nicht die Datei, die
+   danebenliegt. Ein gruener Lauf sagte dann nichts ueber die Aenderung
+   aus, die man gerade gemacht hat. Der Pfad haengt jetzt an dieser
+   Datei, nicht an einer Maschine. */
+const FILE = 'file://' + path.resolve(__dirname, '..', 'ui_prototype.html');
 const errors = [];
 const steps = [];
 function step(name, ok, info) {
@@ -71,29 +77,94 @@ function step(name, ok, info) {
   };
   await go('navShop');
 
-  /* ============ AUFBAU DER SEKTIONEN ============ */
-  const auf = await page.evaluate(() => ({
-    sekt: [...document.querySelectorAll('#viewShop [data-sec]')].map(e => e.dataset.sec).join(','),
-    reihenfolge: ['shopPromo', 'arenaPackBox', 'dealGrid', 'packShop', 'vorratShop',
-                  'vaultShop', 'gemShop', 'goldShop']
-      .map(id => { const e = document.getElementById(id);
-        return e ? [...document.getElementById('viewShop').querySelectorAll('*')].indexOf(e) : -1; }),
-    deals: document.querySelectorAll('#dealGrid .prodcard').length,
-    dealGratis: document.querySelectorAll('#dealGrid [data-gratis]').length,
-    packs: document.querySelectorAll('#packShop .shopcard').length,
-    packSpalten: getComputedStyle(document.getElementById('packShop'))
-      .gridTemplateColumns.trim().split(/\s+/).length,
-    packBronze: document.querySelectorAll('#packShop [data-pack="bronze"]').length,
-    packFrei: document.querySelectorAll('#packFreeBox .tagesband').length,
-    packFreiBadge: document.querySelectorAll('#packFreeBox .freebadge').length,
-    golds: document.querySelectorAll('#goldShop .prodcard').length,
-    goldFrei: document.querySelectorAll('#goldFreeBox .tagesband').length,
-    vorrat: document.querySelectorAll('#vorratShop .vrbtn').length,
-  }));
-  step('Acht Sektionen, lueckenlos 1-8', auf.sekt === '1,2,3,4,5,6,7,8', auf.sekt);
-  step('Inhaltscontainer stehen in derselben Folge im DOM',
+  /* ==================================================================
+   * AUFBAU DER SEKTIONEN — UMGESCHRIEBEN AM 30.07.2026 (§27.1)
+   * ------------------------------------------------------------------
+   * Vorher stand hier „Acht Sektionen, lueckenlos 1-8" mit der Folge
+   *   shopPromo · arenaPackBox · dealGrid · packShop · vorratShop ·
+   *   vaultShop · gemShop · goldShop
+   * Das war die Folge nach §8.1, aus Videostandbildern geschaetzt. §27
+   * ist an acht Screenshots abgelesen und korrigiert zwei Dinge:
+   *   · AA hat an Position 1 KEINEN Banner (weder Werbe- noch
+   *     Pass-Banner) — aus acht Sektionen werden sieben.
+   *   · Die ARCANE SUPPLIES CHEST steht VOR dem Truhenblock, nicht
+   *     dahinter — unser Vorrats-Pack rueckt von 5 auf 3.
+   * Der Schritt wird NICHT geloescht und NICHT aufgeweicht: er prueft
+   * dieselbe Zusage (lueckenlose Nummern, gleiche Folge im DOM) gegen
+   * die neue Vorlage.
+   *
+   * „Vorhandensein ist nicht Sichtbarkeit": gezaehlt wird nur, was
+   * getClientRects() auch ausgibt. Ein `display:none`-Band haette den
+   * alten Schritt bestanden.
+   * ================================================================== */
+  const SOLL_FOLGE = ['arenaPackBox', 'dealGrid', 'vorratShop', 'packShop',
+                      'vaultShop', 'gemShop', 'goldShop'];
+  const auf = await page.evaluate((folge) => {
+    const sichtbar = e => !!(e && e.getClientRects().length);
+    const alle = [...document.getElementById('viewShop').querySelectorAll('*')];
+    return {
+      sekt: [...document.querySelectorAll('#viewShop [data-sec]')]
+        .filter(sichtbar).map(e => e.dataset.sec).join(','),
+      sektRoh: document.querySelectorAll('#viewShop [data-sec]').length,
+      reihenfolge: folge.map(id => {
+        const e = document.getElementById(id);
+        return sichtbar(e) ? alle.indexOf(e) : -1;
+      }),
+      // Was raus musste — beides darf im ganzen Shop nicht mehr auftauchen.
+      passBanner: document.querySelectorAll(
+        '#viewShop #shopPromo, #viewShop .promobanner, #viewShop .passbanner').length,
+      bannerShop: document.querySelectorAll(
+        '#viewShop [data-adfree], #viewShop .adbanner, #viewShop [data-noads]').length,
+      // Der Tresor sitzt auf AAs Roulette-Platz (§27.1 Position 5).
+      tresorSec: (() => {
+        const box = document.getElementById('vaultShop');
+        if (!box) return null;
+        let p = box.previousElementSibling;
+        while (p && !p.hasAttribute('data-sec')) p = p.previousElementSibling;
+        return p ? p.getAttribute('data-sec') : null;
+      })(),
+      tresorSichtbar: sichtbar(document.getElementById('vaultShop')),
+      deals: document.querySelectorAll('#dealGrid .prodcard').length,
+      dealGratis: document.querySelectorAll('#dealGrid [data-gratis]').length,
+      packs: document.querySelectorAll('#packShop .shopcard').length,
+      packSpalten: getComputedStyle(document.getElementById('packShop'))
+        .gridTemplateColumns.trim().split(/\s+/).length,
+      packBronze: document.querySelectorAll('#packShop [data-pack="bronze"]').length,
+      packFrei: document.querySelectorAll('#packFreeBox .tagesband').length,
+      packFreiBadge: document.querySelectorAll('#packFreeBox .freebadge').length,
+      golds: [...document.querySelectorAll('#goldShop .prodcard')].filter(sichtbar).length,
+      goldSpalten: getComputedStyle(document.getElementById('goldShop'))
+        .gridTemplateColumns.trim().split(/\s+/).length,
+      goldGratis: document.querySelectorAll('#goldShop [data-goldfree]').length,
+      gems: [...document.querySelectorAll('#gemShop .prodcard')].filter(sichtbar).length,
+      gemSpalten: getComputedStyle(document.getElementById('gemShop'))
+        .gridTemplateColumns.trim().split(/\s+/).length,
+      vorrat: document.querySelectorAll('#vorratShop .vrbtn').length,
+      // Die ehrliche Werbezeile — sie MUSS sichtbar sein, nicht nur da.
+      werbung: (() => {
+        const e = document.getElementById('werbungNote');
+        return e && e.getClientRects().length ? e.textContent.replace(/\s+/g, ' ').trim() : '';
+      })(),
+    };
+  }, SOLL_FOLGE);
+  step('Sieben sichtbare Sektionen, lueckenlos 1-7 (§27.1)',
+    auf.sekt === '1,2,3,4,5,6,7' && auf.sektRoh === 7,
+    auf.sekt + '  (' + auf.sektRoh + ' markiert)');
+  step('Inhaltscontainer stehen in AAs Folge im DOM',
     auf.reihenfolge.every((v, i) => v >= 0 && (i === 0 || v > auf.reihenfolge[i - 1])),
-    auf.reihenfolge.join(' < '));
+    SOLL_FOLGE.join(' < ') + '  →  ' + auf.reihenfolge.join(' < '));
+  /* Die beiden Streichungen aus §27.1, woertlich vom Auftraggeber:
+     „Der battledpass der im Shop oben ist kann entfernt werden" und
+     „Den Banner Shop braucht es im Shop nicht der ist in AA auch nicht
+     drin." Geprueft wird auf ABWESENHEIT — der haeufigste Rueckfall bei
+     so einer Streichung ist, den Baustein „erstmal auszublenden". */
+  step('Kein Pass-Banner mehr im Shop', auf.passBanner === 0,
+    auf.passBanner + ' gefunden');
+  step('Kein Banner-Shop (Werbe-Entfernen-Banner) im Shop', auf.bannerShop === 0,
+    auf.bannerShop + ' gefunden');
+  step('Der Kristalltresor steht auf AAs Roulette-Platz (Sektion 5)',
+    auf.tresorSec === '5' && auf.tresorSichtbar,
+    'Sektion ' + auf.tresorSec + ', sichtbar ' + auf.tresorSichtbar);
   step('Booster-Packs: 3 kaufbare nebeneinander, kein Bronze im Raster',
     auf.packs === 3 && auf.packSpalten === 3 && auf.packBronze === 0,
     auf.packs + ' Kacheln / ' + auf.packSpalten + ' Spalten / ' +
@@ -101,9 +172,134 @@ function step(name, ok, info) {
   step('Gratis-Tagespack als Band unter dem Raster, mit GRATIS-Zeichen',
     auf.packFrei === 1 && auf.packFreiBadge === 1,
     auf.packFrei + ' Band / ' + auf.packFreiBadge + ' Zeichen');
-  step('Gold-Tausch: 3 kaufbare Staffeln, Gratis-Gold als Band darunter',
-    auf.golds === 3 && auf.goldFrei === 1,
-    auf.golds + ' Kacheln / ' + auf.goldFrei + ' Band');
+  /* ⚠ UMGESCHRIEBEN (30.07.2026). Vorher: „3 kaufbare Staffeln,
+     Gratis-Gold als Band darunter". Das Band war die Antwort auf ein
+     Raster mit vier Posten, von denen einer gratis war. AA hat DREI
+     Gold-Staffeln, und die erste davon IST die gratis abzuholende
+     (§27.2) — es bleibt nichts uebrig, was unter dem Raster stehen
+     koennte. Geprueft wird jetzt AAs Raster: drei Kacheln in einer
+     Reihe, genau eine davon der Gratisposten. */
+  step('Gold: 3 Staffeln in EINER Reihe, die erste ist der Gratisposten',
+    auf.golds === 3 && auf.goldSpalten === 3 && auf.goldGratis === 1,
+    auf.golds + ' Kacheln / ' + auf.goldSpalten + ' Spalten / ' +
+    auf.goldGratis + ' Gratisposten');
+  step('Gems: 6 Staffeln in 3 Spalten (AAs 3 x 2)',
+    auf.gems === 6 && auf.gemSpalten === 3,
+    auf.gems + ' Kacheln / ' + auf.gemSpalten + ' Spalten');
+  /* Belohnte Werbung ist nicht angebunden (WERBUNG_VERFUEGBAR = false).
+     AA haengt drei Posten an ein Video; wo der Weg fehlt, muss die
+     Oberflaeche das SAGEN statt einen toten Knopf zu zeigen. */
+  step('Der fehlende Werbeweg steht sichtbar im Shop',
+    /nicht angebunden/i.test(auf.werbung) && auf.werbung.length > 40,
+    auf.werbung.slice(0, 70));
+  step('Kein Knopf im Shop verspricht ein Werbevideo',
+    (await page.evaluate(() => [...document.querySelectorAll(
+      '#viewShop button')].filter(b => /▶|werbung|video/i.test(b.textContent)).length)) === 0);
+
+  /* ==================================================================
+   * PREISE — GEGEN DIE TABELLE AUS §27.2 GERECHNET
+   * ------------------------------------------------------------------
+   * Die Tabelle steht HIER, weil sie die Vorlage ist; die Zahlen im
+   * Prototyp sind die Kopie. Geprueft wird also nicht „steht da 90?",
+   * sondern „steht da, was abgelesen wurde?". Wer den Preis aendern
+   * will, muss die Vorlage aendern — und merkt dabei, dass er sie
+   * aendert.
+   * ================================================================== */
+  const AA_PREISE = {
+    // [Menge, Preis in Fr.] — GEMS, Echtgeld
+    gems: [[80, 2], [500, 4], [1200, 9], [2500, 18], [6500, 40], [14000, 90]],
+    // [Menge Gold, Preis in Gems] — 0 = gratis (bei AA das Werbevideo)
+    gold: [[12000, 0], [36000, 90], [144000, 288]],
+    vorratX1: 300, vorratX10: 2680,
+    explorer: 80,          // AAs Explorer Chest = unser Silber-Pack
+    supplies1: 300,        // AAs Arcane Supplies Chest x1 = unser Gold-Pack
+  };
+  const preise = await page.evaluate(() => {
+    const P = window.__proto;
+    const zahl = t => {
+      const m = String(t).replace(',', '.').match(/\d+(?:\.\d+)?/);
+      return m ? parseFloat(m[0]) : NaN;
+    };
+    const sichtbar = e => !!(e && e.getClientRects().length);
+    return {
+      gems: P.GEM_PACKS.map(g => [g.amt, zahl(g.price)]),
+      gold: P.GOLD_PACKS.map(g => [g.amt, g.cost]),
+      vorratX1: P.VORRAT.preis1, vorratX10: P.VORRAT.preis10,
+      packs: P.SHOP_PACKS.map(s => [s.key, s.cost]),
+      // und dasselbe noch einmal so, wie es auf dem Schirm steht
+      gemKacheln: [...document.querySelectorAll('#gemShop .prodcard')]
+        .filter(sichtbar).map(k => [
+          zahl(k.querySelector('.pcamt').textContent.replace(/\s/g, '')),
+          zahl(k.querySelector('.pcbuy').textContent)]),
+      goldKacheln: [...document.querySelectorAll('#goldShop .prodcard')]
+        .filter(sichtbar).map(k => [
+          zahl(k.querySelector('.pcamt').textContent.replace(/\s/g, '')),
+          /GRATIS/i.test(k.querySelector('.pcbuy').textContent)
+            ? 0 : zahl(k.querySelector('.pcbuy').textContent)]),
+    };
+  });
+  const gleich = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  step('Gem-Staffeln entsprechen der §27.2-Tabelle (Menge UND Preis)',
+    gleich(preise.gems, AA_PREISE.gems),
+    preise.gems.map(g => g[0] + '=Fr.' + g[1]).join(' · '));
+  step('Die Gem-Preise stehen auch SO auf den Kacheln',
+    gleich(preise.gemKacheln, AA_PREISE.gems),
+    preise.gemKacheln.map(g => g[0] + '=Fr.' + g[1]).join(' · '));
+  step('Gold-Staffeln entsprechen der §27.2-Tabelle',
+    gleich(preise.gold, AA_PREISE.gold),
+    preise.gold.map(g => g[0] + '=' + (g[1] || 'gratis')).join(' · '));
+  step('Die Gold-Preise stehen auch SO auf den Kacheln',
+    gleich(preise.goldKacheln, AA_PREISE.gold),
+    preise.goldKacheln.map(g => g[0] + '=' + (g[1] || 'gratis')).join(' · '));
+  step('Vorrats-Pack: x1 = 300, x10 = 2 680 Gems (§27.2)',
+    preise.vorratX1 === AA_PREISE.vorratX1 && preise.vorratX10 === AA_PREISE.vorratX10,
+    preise.vorratX1 + ' / ' + preise.vorratX10);
+  step('Silber = AAs Explorer (80), Gold = AAs Supplies x1 (300)',
+    preise.packs[0][1] === AA_PREISE.explorer && preise.packs[1][1] === AA_PREISE.supplies1,
+    preise.packs.map(p => p[0] + '=' + p[1]).join(' · '));
+  /* ⚠ DER KNICK. AAs Rappen-je-Gem-Kurve faellt monoton — AUSSER beim
+     letzten Sprung: 0,62 → 0,64. Die teuerste Staffel ist pro Gem
+     minimal SCHLECHTER als die zweitteuerste. Das ist kein Ablesefehler
+     und wird nicht geglaettet: „Trophy" (6 500) gewinnt den Vergleich,
+     „Safe" (14 000) verkauft die Menge. Diese Pruefung verlangt den
+     Knick ausdruecklich — eine geglaettete Kurve ist hier ein FEHLER,
+     kein Fortschritt. */
+  const ct = preise.gems.map(g => Math.round(g[1] / g[0] * 10000) / 100);
+  step('Rappen je Gem fallen bis zur zweitteuersten Staffel',
+    ct.slice(0, -1).every((v, i) => i === 0 || v < ct[i - 1]), ct.join(' → '));
+  step('… und STEIGEN beim letzten Schritt wieder (AAs Anker, §27.2)',
+    ct[5] > ct[4] && ct[4] === 0.62 && ct[5] === 0.64,
+    ct[4] + ' → ' + ct[5] + ' ct je Gem');
+  step('„Bester Wert!" sitzt auf der Staffel, die den Vergleich gewinnt',
+    (await page.evaluate(() => {
+      const k = [...document.querySelectorAll('#gemShop .prodcard')];
+      const i = k.findIndex(e => /BESTER WERT/i.test(e.textContent));
+      return i;
+    })) === ct.indexOf(Math.min(...ct)),
+    'guenstigste Staffel ist Nr. ' + (ct.indexOf(Math.min(...ct)) + 1));
+  /* Gold je Gem STEIGT dagegen durchgehend (400 → 500, §27.2) — hier
+     gibt es keinen Knick, und ein Knick waere hier auch keiner. */
+  const jeGem = preise.gold.filter(g => g[1] > 0).map(g => g[0] / g[1]);
+  step('Gold je Gem steigt mit der Staffel (400 → 500)',
+    jeGem.every((v, i) => i === 0 || v > jeGem[i - 1]) &&
+    jeGem[0] === 400 && jeGem[1] === 500, jeGem.join(' → '));
+  /* WAEHRUNGSREGEL §27.2: „Tuerme kosten Gems, Baupläne Gold." Unsere
+     Essenzen sind AAs Greenprints. Und Gold ist bei uns keine
+     Kaufwaehrung fuer Echtgeld-Ware — es kauft nur Spielsachen. */
+  const waehrung = await page.evaluate(() => {
+    const P = window.__proto;
+    let turmGold = 0, essGems = 0, n = 0;
+    for (let t = 0; t < 200; t++) P.zieheTagesangebote(t).forEach(x => {
+      n++;
+      if (x.turmId && x.cur === 'gold') turmGold++;
+      if (/^ess_/.test(x.id) && x.cur === 'gems') essGems++;
+    });
+    return { turmGold, essGems, n };
+  });
+  step('Tuerme kosten immer Gems, Essenz immer Gold (§27.2)',
+    waehrung.turmGold === 0 && waehrung.essGems === 0,
+    waehrung.n + ' Posten geprueft, ' + waehrung.turmGold + ' Turm-in-Gold, ' +
+    waehrung.essGems + ' Essenz-in-Gems');
 
   /* ==================================================================
    * TAGESANGEBOTE — die Ziehung muss REPRODUZIERBAR sein
@@ -303,8 +499,15 @@ function step(name, ok, info) {
    * Ergebnis (elementFromPoint auf der Knopfmitte liefert den Knopf).
    * Beides zusammen greift auch ohne geladenes Bild.
    * ================================================================== */
+  /* ⚠ UMGESCHRIEBEN (30.07.2026): `#goldFreeBox .tagesband` ist aus
+     dieser Liste gestrichen, weil es das Band nicht mehr gibt — das
+     Gratis-Gold ist die erste der drei Gold-Staffeln im Raster (§27.2)
+     und damit eine Produktkachel, kein Band. Die Zusage der Pruefung
+     bleibt unveraendert und gilt weiter fuer JEDES Band, das es gibt:
+     gleiche Bauform, und das Artwork deckt keinen Knopf zu. Der Fehler,
+     den sie sucht, ist nicht an die Anzahl der Baender gebunden. */
   const baender = await page.evaluate(() => {
-    const sel = ['#packFreeBox .tagesband', '#goldFreeBox .tagesband', '#vaultShop'];
+    const sel = ['#packFreeBox .tagesband', '#vaultShop'];
     const wurzel = getComputedStyle(document.documentElement);
     const bannerH = parseFloat(wurzel.getPropertyValue('--banner-h'));
     return sel.map(s => {
@@ -343,7 +546,7 @@ function step(name, ok, info) {
      Tresor traegt eine Zeile mehr (Fortschrittsbalken). Eine Pruefung auf
      gleiche Pixelhoehe wuerde verlangen, dass alle drei denselben Inhalt
      tragen, und das ist nicht die Zusage. */
-  step('Alle drei Baender sind dieselbe Bauform (Radius, Polster, Bildkasten)',
+  step('Alle Baender sind dieselbe Bauform (Radius, Polster, Bildkasten)',
     baender.every(b => !b.fehlt && b.hoehe >= b.minH) &&
     new Set(baender.map(b => b.radius)).size === 1 &&
     new Set(baender.map(b => b.pad)).size === 1 &&

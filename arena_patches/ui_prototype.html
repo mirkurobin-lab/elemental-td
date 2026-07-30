@@ -3132,31 +3132,24 @@ span.ico{text-align:center}
 .tagesband .freebadge{right:40px;top:8px;pointer-events:none;
   box-shadow:var(--lit),var(--sh-2);letter-spacing:.06em;padding:2px 7px}
 /* ==================================================================
- * SHOP — AA-SEKTIONSREIHENFOLGE (§8.1)
+ * SHOP — AA-SEKTIONSREIHENFOLGE (§27.1, abgelesen 30.07.2026)
  * ------------------------------------------------------------------
- * 1 Promo-Banner · 2 Arena-/Starter-Pack · 3 Tagesangebote · 4 Packs ·
- * 5 Vorrats-Pack (AAs Arcane Supplies Chest, §8.2) ·
- * 6 Kristalltresor (AAs Roulette-Platz) · 7 Gem-Pakete · 8 Gold-Tausch
+ * 1 Arena-Packs · 2 Tagesangebote · 3 Vorrats-Pack (AAs ARCANE
+ * SUPPLIES CHEST) · 4 Booster-Packs (AAs CHEST) · 5 Kristalltresor
+ * (AAs ENDLESS ROULETTE) · 6 Gem-Pakete · 7 Gold-Tausch
  * Alle Hoehen/Radien/Abstaende aus der Metrik (§19.2) — die Sektionen
  * unterscheiden sich in der FARBE und im Inhalt, nie in der Geometrie.
+ * ------------------------------------------------------------------
+ * ⚠ HIER STAND `.promobanner` (30.07.2026 ENTFERNT).
+ * Der Baustein hielt AAs Platz 1 („Buy any offer to remove forced
+ * ads") besetzt und trug bei uns den Season-Pass. Beides ist weg:
+ * AA hat den Werbe-Banner in den Screenshots von §27 nicht mehr, und
+ * den Pass verkaufen wir auf dem Hauptbildschirm — zweimal dasselbe
+ * Angebot ist kein zweites Angebot. Die Regeln stehen nicht als
+ * Karteileiche herum; wer den Baustein wieder braucht, holt ihn aus
+ * der Historie, statt eine tote Klasse zu pflegen.
  * ================================================================== */
-/* 1) Promo-Banner — AAs "Buy any offer to remove forced ads". Wir haben
-      keine Werbung (§19.1), deshalb traegt der Platz bei uns den
-      Season-Pass als staerkstes Dauerangebot. */
-.promobanner{position:relative;display:flex;align-items:center;gap:10px;width:100%;
-  min-height:var(--banner-h);padding:0 var(--pad);border-radius:var(--radius);
-  overflow:hidden;text-align:left;
-  background-image:linear-gradient(110deg,#4a2a7a,#2a1b46 55%,#141d2b);
-  border:1px solid #a45ef255;box-shadow:0 8px 20px -12px #000}
-.promobanner .prs{flex:0 0 auto;font-size:24px}
-.promobanner .prt{flex:1;min-width:0}
-.promobanner .prn{display:block;font-size:14px;line-height:1.15}
-.promobanner .prd{display:block;font-size:9.5px;color:#c6b4ee;margin-top:3px;line-height:1.4}
-.promobanner .prb{flex:0 0 auto;border-radius:var(--radius-sm);padding:8px 12px;
-  font-size:11.5px;font-weight:900;
-  background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);box-shadow:0 3px 0 #6d551a;
-  -webkit-text-fill-color:#3a2b07;color:#3a2b07}
-/* 2) Arena-/Starter-Pack — Echtgeld, Preis in Fr. wie in AAs Store. */
+/* 1) Arena-/Starter-Pack — Echtgeld, Preis in Fr. wie in AAs Store. */
 /* ==================================================================
  * ARENA-PACK-KARUSSELL — an IMG_3382 nachgemessen (1320x2868)
  * ------------------------------------------------------------------
@@ -4233,8 +4226,11 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
   box-shadow:var(--mat-raised),inset 0 1px 0 #b8dcffaa,0 0 0 1px #3d9df233,0 0 16px -6px #3d9df2}
 #packFreeBox .tagesband{border-color:#3d9df2;
   box-shadow:var(--mat-raised-lg),0 0 0 1px #3d9df233,0 0 18px -6px #3d9df2}
-#goldFreeBox .tagesband{border-color:#f2a13d;
-  box-shadow:var(--mat-raised-lg),0 0 0 1px #f2a13d33,0 0 18px -6px #f2a13d}
+/* ⚠ `#goldFreeBox .tagesband` ist am 30.07.2026 entfallen. Das Tages-
+   gold war ein Band UNTER drei kaufbaren Staffeln — das ergab damals
+   vier Gold-Posten. AA hat DREI (§27.2), und die erste davon IST die
+   gratis abzuholende. Damit gibt es nichts mehr, was unter den drei
+   Staffeln stehen koennte; das Gratisstueck ist die erste der drei. */
 
 .bandart{position:relative;overflow:hidden;flex:0 0 64px;width:64px;height:64px;
   display:flex;align-items:center;justify-content:center;font-size:30px;
@@ -6846,49 +6842,54 @@ button.pfplate{cursor:pointer}
     <div class="tbmlist" id="tbMenuList" role="menu"></div>
   </div>
 
-  <!-- ===== VIEW S: SHOP (§8) =====
-       Nach AAs Aufbau (Daily Deals -> Truhen/Packs -> Bundles), aber an
-       UNSERE Systeme angepasst: kein Echtgeld, alles laeuft gegen die
-       Demo-Wallet (Gold/Gems) bzw. ArenaCards. Der Pity-Stand steht OFFEN
-       auf den Packs — AAs Muster (§8.2), statt Prozent-Drop-Raten. -->
-  <!-- ===== VIEW S: SHOP — AA-SEKTIONSREIHENFOLGE (§8.1) =====
-       AAs Store laeuft von oben nach unten:
-         1 Werbe-Entfernen-Banner · 2 ARENA PACK / Starter Pack ·
-         3 DAILY DEALS · 4 Truhen/Packs (darin die ARCANE SUPPLIES
-         CHEST, §8.2) · 5 ENDLESS ROULETTE · 6 Gem-Bundles ·
-         7 Gold-Bundles
-       Wir uebernehmen die REIHENFOLGE 1:1 und ersetzen nur dort, wo wir
-       ein anderes System haben:
-         Platz 1 — wir haben KEINE Werbung (§19.1), der Platz traegt
-                   deshalb den Season-Pass als staerkstes Dauerangebot,
-                   darunter die personalisierte Angebotskette.
-         Platz 4 — AAs Truhenblock ist bei uns AUFGETEILT: die
-                   Booster-Packs (Platz 4) und die Vorrats-Pack
-                   (Platz 5) bekommen je ein eigenes Band, weil die
-                   Truhe eine ganz andere Bedienung hat (x1/x10,
-                   Mitleidszeile, Chancen-Klappe) als eine Pack-Kachel.
-                   Aus AAs sieben Sektionen werden dadurch ACHT.
-         Platz 6 — statt Glücksrad der KRISTALLTRESOR (arena_vault.js):
-                   dieselbe Rolle (Sammel-Zufallsbelohnung), aber ohne
-                   Glücksspiel-Optik.
+  <!-- ===== VIEW S: SHOP — AA-SEKTIONSREIHENFOLGE (§27.1, 30.07.2026) =====
+       ⚠ Diese Abfolge ersetzt die alte nach §8.1. §8 stammte aus
+       Videostandbildern; §27 ist an acht Screenshots (IMG_3449-3456,
+       1320x2868, Account 1 200 🏆 / 546 💎 / 39 387 🪙) abgelesen, alle
+       Zahlen direkt lesbar. Wo beide sich widersprechen, gilt §27.
+
+       AAs Store laeuft von oben nach unten (§27.1):
+         1 ARENA PACK · 2 DAILY DEALS · 3 ARCANE SUPPLIES CHEST ·
+         4 CHEST · 5 ENDLESS ROULETTE · 6 GEMS · 7 GOLD
+       Sieben Sektionen, sieben Baender — nicht mehr acht.
+
+       ZWEI SACHEN SIND RAUSGEFLOGEN, weil AA sie an dieser Stelle NICHT
+       hat (beide woertlich vom Auftraggeber belegt, §27.1):
+         · das Pass-Banner. „Der battledpass der im Shop oben ist kann
+           entfernt werden den brauchen wir an dieser Stelle nicht weil
+           wir ihn schon auf der Battle ansicht (hauptbildschirm) oben
+           verkaufen."  → `#shopPromo` ist ersatzlos weg; der Weg zum
+           Pass laeuft ueber das Banner auf der Startseite.
+         · der Banner-Shop (AAs „remove forced ads"). „Den Banner Shop
+           braucht es im Shop nicht der ist in AA auch nicht drin."
+           §8.1 fuehrte ihn noch auf Platz 1 — in den Screenshots ist er
+           weg. Damit ist auch der letzte Ort verschwunden, an dem der
+           Shop von Werbung sprach.
+
+       WAS SICH GEGENUEBER DER ALTEN FASSUNG VERSCHIEBT:
+         · Arena-Packs ruecken von 2 auf 1 (der Platz davor ist frei).
+         · Das Vorrats-Pack rueckt von 5 auf 3 — AAs ARCANE SUPPLIES
+           CHEST steht VOR dem Truhenblock, nicht dahinter. Genau
+           andersherum als §8.2 vermutet hat.
+         · Der Kristalltresor bleibt auf 5 und steht damit weiterhin auf
+           AAs ENDLESS-ROULETTE-Platz: „Dort wo das endless Roulette ist
+           muss unser Kristall Tresor hin."
+       Die personalisierte Angebotskette (arena_vault.js) steht VOR
+       Sektion 1 und traegt bewusst KEIN data-sec: sie erscheint nur nach
+       einem Ereignis, und eine Sektionsnummer, die mal da ist und mal
+       nicht, waere keine Ordnung mehr.
        Alle Abstaende/Radien/Hoehen aus der Metrik (§19.2). -->
   <section id="viewShop" class="view">
     <h2 class="title">Shop</h2>
 
-    <!-- (1) Promo-Banner — AAs Dauer-Banner an Position 1 -->
-    <button class="promobanner pressable" id="shopPromo" data-sec="1"></button>
-
-    <!-- (2) Echtgeld-Angebote: erst die personalisierte Kette
-             (arena_vault.js — erscheint nur nach einem Ereignis, nie
-             „einfach so“), dann Arena-Pack und Starter-Pack. -->
-    <!-- Die Angebotskette gehoert inhaltlich zu AAs Slot 2 (Echtgeld-
-         Angebote) und traegt deshalb KEIN eigenes data-sec: Es bleiben
-         genau sieben markierte Sektionen. -->
+    <!-- Personalisierte Angebotskette — nur nach einem Ereignis sichtbar,
+         nie „einfach so". Ohne data-sec, siehe Kopfkommentar. -->
     <div class="secribbon" id="offerSec" data-ribbon="ribbon_section_lg"
          style="display:none"><span class="srt">Nur für dich</span></div>
     <div id="offerSlot"></div>
 
-    <div class="secribbon" data-sec="2" data-ribbon="ribbon_section_lg">
+    <!-- (1) ARENA PACK — Karussell, Echtgeld, Punktreihe darunter -->
+    <div class="secribbon" data-sec="1" data-ribbon="ribbon_section_lg">
       <span class="srt">Arena-Packs</span>
       <span class="srx">Echtgeld · Platzhalter</span></div>
     <!-- AAs Karussell (IMG_3382): EINE Karte im Bild, Pfeile links und
@@ -6901,52 +6902,60 @@ button.pfplate{cursor:pointer}
     <div class="apkdots" id="apkDots"></div>
     <div class="iapgrid" id="arenaPackBox"></div>
 
-    <!-- (3) Tagesangebote — deterministisch aus dem Tagesdatum gezogen,
+    <!-- (2) DAILY DEALS — deterministisch aus dem Tagesdatum gezogen,
              siehe zieheTagesangebote(). Der Timer laeuft echt gegen die
-             naechste UTC-Tagesgrenze, er ist kein Text mehr. -->
-    <div class="secribbon" data-sec="3" data-ribbon="ribbon_section_lg">
+             naechste UTC-Tagesgrenze, er ist kein Text mehr.
+             AA zeigt sechs Posten in zwei Reihen zu drei (§27.2). -->
+    <div class="secribbon" data-sec="2" data-ribbon="ribbon_section_lg">
       <span class="srt">Tagesangebote</span>
       <span class="srx" id="dealTimer">—</span></div>
     <div class="prodgrid" id="dealGrid"></div>
 
-    <!-- (4) Booster-Packs — kaufbar sind NUR Silber, Gold, Arkan; alle
-             drei nebeneinander in EINER Reihe. Bronze ist aus dem
-             kaufbaren Angebot raus und lebt als Gratis-Tagespack im
-             Band darunter weiter. -->
+    <!-- (3) ARCANE SUPPLIES CHEST — bei uns das Vorrats-Pack.
+             AAs breite goldene Karte mit den Pity-Zeilen steht VOR dem
+             Truhenblock (§27.1 Platz 3), nicht dahinter. -->
+    <div class="secribbon" data-sec="3" data-ribbon="ribbon_section_lg">
+      <span class="srt">Vorrats-Pack</span>
+      <span class="srx" id="vorratPity">—</span></div>
+    <div class="vorratbox" id="vorratShop"></div>
+
+    <!-- (4) CHEST — bei uns die Booster-Packs. AA hat hier zwei Truhen
+             in zwei Spalten; wir haben drei kaufbare Packs (Silber,
+             Gold, Arkan) und zeigen sie in drei Spalten. Die Spaltenzahl
+             folgt der Anzahl der Waren, nicht AAs Zufall, zwei zu haben.
+             Bronze ist aus dem kaufbaren Angebot raus und lebt als
+             Gratis-Tagespack im Band darunter weiter. -->
     <div class="secribbon" data-sec="4" data-ribbon="ribbon_section_lg">
       <span class="srt">Booster-Packs</span>
       <span class="srx" id="packPity">…</span></div>
     <div class="packshop" id="packShop"></div>
     <div id="packFreeBox"></div>
 
-    <!-- (5) Vorrats-Pack — AAs „Arcane Supplies Chest" (§8.2).
-             Sie sitzt bei AA MIT den Truhen, also direkt hinter den
-             Packs, nicht am Ende des Shops. -->
+    <!-- (5) ENDLESS ROULETTE — bei uns der KRISTALLTRESOR.
+             Dieselbe Rolle (Sammel-Ausschuettung), aber ohne
+             Gluecksspiel-Optik und ohne Zufall: der Tresor zahlt einen
+             vorher sichtbaren Betrag aus. -->
     <div class="secribbon" data-sec="5" data-ribbon="ribbon_section_lg">
-      <span class="srt">Vorrats-Pack</span>
-      <span class="srx" id="vorratPity">—</span></div>
-    <div class="vorratbox" id="vorratShop"></div>
-
-    <!-- (6) Kristalltresor — AAs Roulette-Platz -->
-    <div class="secribbon" data-sec="6" data-ribbon="ribbon_section_lg">
       <span class="srt">Kristalltresor</span>
       <span class="srx" id="vaultTier">—</span></div>
     <div class="vaultbox" id="vaultShop"></div>
 
-    <!-- (7) Gem-Pakete — ORANGE Rahmen (AA-Farbcode fuer Gems) -->
-    <div class="secribbon" data-sec="7" data-ribbon="ribbon_section_lg">
+    <!-- (6) GEMS — sechs Staffeln, 3 x 2. Preise nach §27.2. -->
+    <div class="secribbon" data-sec="6" data-ribbon="ribbon_section_lg">
       <span class="srt">Gem-Pakete</span>
       <span class="srx">Echtgeld · Platzhalter</span></div>
     <div class="prodgrid" id="gemShop"></div>
 
-    <!-- (8) Gold-Tausch — GRUENE Rahmen (AA-Farbcode fuer Gold).
-             Drei kaufbare Staffeln im Raster, das Tagesgold als BAND
-             darunter (Bauform des Kristalltresors). -->
-    <div class="secribbon" data-sec="8" data-ribbon="ribbon_section_lg">
+    <!-- (7) GOLD — drei Staffeln, 3 x 1, bezahlt mit Gems. Preise nach
+             §27.2. Die erste Staffel ist bei AA das Werbevideo-Gratis-
+             paket; bei uns gibt es sie einmal am Tag ohne Werbung.
+             Die Zeile darunter sagt genau das — sie ist keine Fussnote,
+             sondern die Stelle, an der ein fehlender Weg benannt wird. -->
+    <div class="secribbon" data-sec="7" data-ribbon="ribbon_section_lg">
       <span class="srt">Gold-Tausch</span>
       <span class="srx">Gems → Gold</span></div>
     <div class="prodgrid" id="goldShop"></div>
-    <div id="goldFreeBox"></div>
+    <p class="iapnote" id="werbungNote">—</p>
 
     <p class="iapnote" id="iapNote">—</p>
     <p class="fortnote" id="shopNote">—</p>
@@ -12666,6 +12675,12 @@ button.pfplate{cursor:pointer}
 
     return { binde: binde, marke: marke, oeffne: oeffne, zeichne: zeichne,
              _hole: hole, _quick: quick,
+             /* Der Shop muss dieselbe Frage beantworten koennen wie
+                dieses Fenster: „gibt es einen Werbeweg?" Ohne diesen
+                Leser haette der Shop einen ZWEITEN Merker gebraucht —
+                und zwei Merker fuer dieselbe Tatsache laufen
+                auseinander, sobald die Anbindung kommt. */
+             werbungVerfuegbar: function () { return WERBUNG_VERFUEGBAR; },
              _werbung: function (an) { WERBUNG_VERFUEGBAR = !!an; } };
   })();
 
@@ -13555,35 +13570,59 @@ button.pfplate{cursor:pointer}
      Turm-Posten darunter: der Posten steht fest, WELCHE Sorte er heute
      fuehrt, zieht der Tageshash. Drei Posten, acht moegliche Sorten —
      das ist der Grund, morgen nochmal zu schauen. */
+  /* ⚠ WAEHRUNG JE WARENGRUPPE, NICHT JE TAG (30.07.2026, §27.2).
+     Vorher konnte derselbe Posten heute Gold und morgen Gems kosten —
+     der Tageshash entschied. AAs Tagesangebote sind an dieser Stelle
+     eindeutig: „Tuerme kosten Gems, Baupläne Gold." Genau so steht es
+     jetzt in den Daten, indem der jeweils andere Preis auf 0 gesetzt
+     ist (0 = in dieser Waehrung nicht zu haben).
+     Das ist mehr als Kosmetik: eine Ware, deren Waehrung wechselt,
+     laesst sich nicht einpreisen. Der Spieler kann nicht sparen, wenn
+     er nicht weiss, WORAUF.
+     Unsere Essenzen sind AAs Greenprints — der Aufwertungs-Stoff, den
+     man mit erspieltem Gold kauft. Die Karten selbst sind die Tuerme. */
   var DEAL_WAREN = [
-    { id:"ess_gr", essenz:true, zahl:20, gold:3000, gems:120, stueck:3 },
-    { id:"ess_md", essenz:true, zahl:20, gold:3000, gems:120, stueck:3 },
-    { id:"ess_kl", essenz:true, zahl:15, gold:4200, gems:160, stueck:2 },
+    { id:"ess_gr", essenz:true, zahl:20, gold:3000, gems:0, stueck:3 },
+    { id:"ess_md", essenz:true, zahl:20, gold:3000, gems:0, stueck:3 },
+    { id:"ess_kl", essenz:true, zahl:15, gold:4200, gems:0, stueck:2 },
     /* Turm-Posten. Das Bild ist das Artwork DES TURMS, der heute
        drankommt — auch der wird gezogen. „Fuege tower ein" heisst
-       genau das: man sieht, WELCHE Karte im Angebot ist. */
+       genau das: man sieht, WELCHE Karte im Angebot ist.
+       Preisband nach AA (§27.2: 💎 30 / 100 / 300 fuer je einen Turm
+       bei Arena 5). Unsere drei Posten unterscheiden sich zusaetzlich
+       in der Stufe, deshalb liegt der oberste Posten darueber. */
     { id:"turm_gew", turm:true, stufe:"common", name:"Karten", zahl:3,
-      gold:5400, gems:200, stueck:2 },
+      gold:0, gems:100, stueck:2 },
     { id:"turm_gut", turm:true, stufe:"good", name:"Karte", zahl:1,
-      gold:9000, gems:320, stueck:1 },
+      gold:0, gems:300, stueck:1 },
     { id:"turm_sel", turm:true, stufe:"rare", name:"Karte", zahl:1,
       gold:0, gems:640, stueck:1 },
     /* Gold zum Tageskurs. Nur gegen Gems — die Richtung des
-       Gold-Tauschs, nie die Gegenrichtung. */
-    { id:"gold_kl", art:"shop_gold_t1", emoji:"🪙", name:"Münzstapel",
-      zahl:12000, gold:0, gems:85, stueck:2,
-      geben:function(){ setGold(gold() + 12000); } },
-    { id:"gold_gr", art:"shop_gold_t2", emoji:"🪙", name:"Münzbeutel",
-      zahl:34000, gold:0, gems:230, stueck:1,
-      geben:function(){ setGold(gold() + 34000); } },
+       Gold-Tauschs, nie die Gegenrichtung.
+       ⚠ NACHGEZOGEN (30.07.2026). Diese beiden Posten standen auf
+       12 000 Gold fuer 85 und 34 000 fuer 230 Gems — 141 bzw. 148 Gold
+       je Gem. Im Regal daneben gibt es seit der §27-Ablesung 400 bzw.
+       500 Gold je Gem. Das „Tagesangebot" war damit fast dreimal so
+       teuer wie der Dauerpreis zwei Sektionen tiefer: ein Angebot, das
+       bestraft, wer es annimmt. Eine Preisliste zu aendern und die
+       zweite stehen zu lassen ist genau der Fehler, den ein einzelner
+       gemessener Kurs verhindern soll.
+       Jetzt ist es DIESELBE Ware wie im Regal, nur heute guenstiger:
+       −17 % auf beide bezahlten Staffeln, Stueckzahl begrenzt. */
+    { id:"gold_kl", art:"shop_gold_t2", emoji:"🪙", name:"Münzbeutel",
+      zahl:36000, gold:0, gems:75, stueck:2,
+      geben:function(){ setGold(gold() + 36000); } },
+    { id:"gold_gr", art:"shop_gold_t3", emoji:"🪙", name:"Goldpokal",
+      zahl:144000, gold:0, gems:240, stueck:1,
+      geben:function(){ setGold(gold() + 144000); } },
   ];
   /* ---------- Der eine Gratis-Posten des Tages ----------
      „es kann Gold oder gems auch mal kostenlos geben nur 1x pro Tag und
      nicht viel." Genau so: EIN Posten, klein bemessen, einmalig
      abholbar. Die Groessenordnung ist bewusst unter allem, was man
      kaufen kann — 10 Gems sind ein Achtel der kleinsten Gem-Staffel,
-     600 Gold ein Viertel des Tagesgold-Bands. Der Posten ist ein
-     Grund vorbeizuschauen, keine Einnahmequelle. */
+     600 Gold ein Zwanzigstel der ersten Gold-Staffel (12 000, §27.2).
+     Der Posten ist ein Grund vorbeizuschauen, keine Einnahmequelle. */
   var DEAL_GRATIS = [
     { id:"fr_gold", art:"shop_gold_t4", emoji:"🪙", name:"Gold", zahl:600,
       geben:function(){ setGold(gold() + 600); } },
@@ -13596,8 +13635,8 @@ button.pfplate{cursor:pointer}
   /* zieheTagesangebote() → [{id, art, emoji, name, zahl, cur, cost,
    *                          stueck, gratis, geben}]
    * Der Gratis-Posten steht VORNE: er ist der taegliche Anlass, ueber-
-   * haupt in die Sektion zu schauen (dieselbe Begruendung wie beim
-   * Tagesgold, nur dort in Bandform).
+   * haupt in die Sektion zu schauen — und genau so macht es AA (§27.2:
+   * „Der Gratisposten steht vorne links").
    * Gemischt wird mit Fisher-Yates, dessen Wuerfel der Tageshash ist —
    * kein Math.random, sonst waere die Reihe bei jedem Render anders. */
   function zieheTagesangebote(tag) {
@@ -13672,14 +13711,21 @@ button.pfplate{cursor:pointer}
 
   /* Kaufbar sind NUR Silber, Gold und Arkan — alle drei in EINER Reihe.
      Bronze ist raus („bronze fliegt raus brauchen wir nicht") und lebt
-     als Gratis-Tagespack im Band unter dem Raster weiter. */
+     als Gratis-Tagespack im Band unter dem Raster weiter.
+     Die beiden unteren Preise sind mit §27.2 BESTAETIGT: AAs Explorer
+     Chest kostet 💎 80 (= unser Silber), die Arcane Supplies Chest x1
+     kostet 💎 300 (= unser Gold). Arkan hat bei AA keine Entsprechung —
+     der Preis ist unsere eigene Fortschreibung der Staffel.
+     AAs Explorer Chest ist zusaetzlich gegen ein Werbevideo zu haben.
+     Dieser Weg fehlt bei uns; die Zeile unter dem Gold-Raster sagt das
+     ausdruecklich, statt hier einen Knopf zu zeigen, der nichts tut. */
   var SHOP_PACKS = [
     { key:"silver", cost:80,   cur:"gems" },
     { key:"gold",   cost:300,  cur:"gems" },
     { key:"arcane", cost:800,  cur:"gems" },
   ];
 
-  /* ---------- (2) Echtgeld-Bundles (AA §8.1 Pos. 2) ----------
+  /* ---------- (1) Echtgeld-Bundles (AA §27.1 Pos. 1) ----------
      Preise in Fr. wie in AAs Store (Store-Waehrung des Users). Im
      Prototyp sind das PLATZHALTER: ein Klick oeffnet keinen Kauf,
      sondern sagt genau das. Eine Demo-Wallet mit Echtgeld zu fuettern
@@ -13719,11 +13765,30 @@ button.pfplate{cursor:pointer}
   /* Der Wert eines Packs, gerechnet statt behauptet.
      Grundlage sind unsere EIGENEN Einzelpreise: die guenstigste
      Gem-Staffel gibt den Franken-Preis je Gem, der Gold-Tausch den
-     Gem-Preis je Gold. Ein Booster-Pack und eine Essenz haben keinen
-     Direktpreis — sie werden ueber ihren Gem-Gegenwert im Tagesangebot
-     bewertet. Kommt eine Staffel dazu, rechnet sich der Wert von selbst
-     neu; es gibt keine Zahl, die man vergessen kann nachzuziehen. */
-  var WERT_PACK_GEMS = 90;      // ein Booster-Pack, Gegenwert in Gems
+     Gem-Preis je Gold. Kommt eine Staffel dazu, rechnet sich der Wert
+     von selbst neu; es gibt keine Zahl, die man vergessen kann
+     nachzuziehen. */
+  /* ⚠ HIER STAND EINE 90 (bis 30.07.2026): „ein Booster-Pack,
+     Gegenwert in Gems". Sie war geschaetzt, und zwar falsch. Die
+     Arena-Packs enthalten GOLD-Packs — das Karussell zeigt sie mit
+     `pack_gold` an —, und ein Gold-Pack kostet zwei Sektionen tiefer
+     300 Gems. Der Inhalt wurde also mit einem Drittel seines eigenen
+     Ladenpreises bewertet.
+     Aufgefallen ist es erst, als die Gem-Staffeln auf AAs Preise
+     umgestellt wurden (§27.2): mit dem billigeren Gem sanken die
+     gerechneten Werte, und zwei der acht Packs rutschten unter 100 % —
+     sie haetten dem Kaeufer WENIGER geboten, als dieselben Waren
+     einzeln kosten. Der Fehler war vorher schon da, nur von einem zu
+     teuren Gem verdeckt.
+     Jetzt wird der Wert GELESEN statt gesetzt: aus SHOP_PACKS, wo der
+     Preis des Gold-Packs ohnehin steht. Aendert sich der Packpreis,
+     aendert sich das Siegel mit. */
+  function wertPackGems() {
+    for (var i = 0; i < SHOP_PACKS.length; i++) {
+      if (SHOP_PACKS[i].key === "gold") return SHOP_PACKS[i].cost;
+    }
+    return 300;                 // Notwert = AAs Supplies Chest x1 (§27.2)
+  }
   var WERT_ESS_GEMS  = 6;       // eine Essenz, Gegenwert in Gems
   function frankenJeGem() {
     var g = GEM_PACKS[0];
@@ -13750,7 +13815,7 @@ button.pfplate{cursor:pointer}
   }
   function packWert(p) {
     var gems = p.gems + p.gold * gemsJeGold() +
-               p.packs * WERT_PACK_GEMS + p.ess * WERT_ESS_GEMS;
+               p.packs * wertPackGems() + p.ess * WERT_ESS_GEMS;
     var franken = gems * frankenJeGem();
     return Math.max(0, Math.round(franken / p.preis * 100) - 100);
   }
@@ -13771,61 +13836,97 @@ button.pfplate{cursor:pointer}
       items:[["cur_gold","🪙","20 000"],["cur_gem","💚","250"],["pack_gold","🎁","×2"],
              ["card_back","🃏","1 Seltene"]] },
   ];
-  /* ---------- (6) Gem-Pakete (AA §8.1 Pos. 6) ----------
-     Fuenf Staffeln. Die Siegel sitzen bewusst NICHT auf der teuersten
-     und der billigsten Stufe: „Beliebt!" auf der Einstiegsstufe darueber
-     (der Anker), „Bester Wert!" auf der zweitgroessten — genau das
-     Muster, das AAs Staffelung benutzt. */
-  /* Sechs Staffeln — die Produktbilder sind eine ESKALATIONSKETTE
-     (Splitter → Haufen → Kissen → Truhe → Pokal → Tresor). Das Bild
-     erzaehlt die Menge, nicht die Zahl: AAs staerkster Store-Trick
-     (IMG_3306-3308). Reihenfolge = Preisreihenfolge, nie mischen. */
+  /* ==================================================================
+   * (6) GEM-PAKETE — AAs Staffelung, Zahl fuer Zahl abgelesen (§27.2)
+   * ------------------------------------------------------------------
+   * Sechs Staffeln, Reihenfolge = Preisreihenfolge, nie mischen. Die
+   * Produktbilder sind eine ESKALATIONSKETTE (Splitter → Haufen → Berg
+   * → Beutel → Pokal → Tresor): das Bild erzaehlt die Menge, nicht die
+   * Zahl — AAs staerkster Store-Trick (IMG_3306-3308).
+   *
+   * ⚠ DIE KURVE STEIGT AM LETZTEN SCHRITT WIEDER. Rappen je Gem:
+   *     80 → 2,50    500 → 0,80   1 200 → 0,75
+   *   2 500 → 0,72  6 500 → 0,62  14 000 → 0,64
+   * Das grösste Paket ist pro Gem MINIMAL SCHLECHTER als das
+   * zweitgrösste. Das ist KEIN Ablesefehler — beide Zahlen stehen in
+   * den Screenshots gross da — und es wird NICHT geglaettet:
+   *   „Trophy" (6 500) ist der beste Preis je Einheit und traegt
+   *   deshalb „Bester Wert!"; „Safe" (14 000) verkauft nicht den Kurs,
+   *   sondern die MENGE. Genau dieser Knick ist der Anker des ganzen
+   *   Angebots. Wer die Kurve monoton macht, nimmt der teuersten
+   *   Staffel ihren Zweck und der zweitteuersten ihr Argument.
+   * Die Namen folgen AAs eigenen (Some/Pile/Heap/Bag/Trophy/Safe).
+   * „Truhe Gems" ist dabei rausgeflogen — wir haben keine Truhen.
+   *
+   * Die Siegel sitzen bewusst NICHT auf der billigsten Stufe:
+   * „Beliebt!" auf der ersten Stufe darueber (dem Sprung von 2,50 auf
+   * 0,80 Rappen — der grosse Preisnachlass), „Bester Wert!" auf der
+   * Staffel, die den Vergleich tatsaechlich gewinnt.
+   *
+   * Die Echtgeldpreise SKALIEREN NICHT mit der Arena (§27.3): das sind
+   * Store-Preise, im Gegensatz zu den Gold-Preisen der Tagesangebote.
+   * ================================================================== */
   var GEM_PACKS = [
-    { id:"g1", name:"Handvoll Gems",  amt:80,   price:"Fr. 3.–",  art:"shop_gem_t1", seal:null },
-    { id:"g2", name:"Beutel Gems",    amt:500,  price:"Fr. 9.–",  art:"shop_gem_t2", seal:"pop" },
-    { id:"g3", name:"Kissen Gems",    amt:1200, price:"Fr. 19.–", art:"shop_gem_t3", seal:null },
-    { id:"g4", name:"Truhe Gems",     amt:2500, price:"Fr. 39.–", art:"shop_gem_t4", seal:"best" },
-    { id:"g5", name:"Pokal der Gems", amt:4000, price:"Fr. 59.–", art:"shop_gem_t5", seal:null },
-    /* Steht NICHT mehr quer unter dem Raster. Gemessen liess „Pokal der
-       Gems" als fuenfte Kachel rechts ein Loch von 179 x 213 px stehen,
-       waehrend der Tresor als volle Breite darunter lag. Als normale
-       Kachel fuellt er genau dieses Loch: sechs Kacheln, drei volle
-       Reihen, kein Rest. */
-    { id:"g6", name:"Gem-Tresor",     amt:6500, price:"Fr. 89.–", art:"shop_gem_t6", seal:null },
+    { id:"g1", name:"Handvoll Gems",   amt:80,    price:"Fr. 2.–",  art:"shop_gem_t1", seal:null },
+    { id:"g2", name:"Haufen Gems",     amt:500,   price:"Fr. 4.–",  art:"shop_gem_t2", seal:"pop" },
+    { id:"g3", name:"Berg Gems",       amt:1200,  price:"Fr. 9.–",  art:"shop_gem_t3", seal:null },
+    { id:"g4", name:"Beutel Gems",     amt:2500,  price:"Fr. 18.–", art:"shop_gem_t4", seal:null },
+    { id:"g5", name:"Pokal der Gems",  amt:6500,  price:"Fr. 40.–", art:"shop_gem_t5", seal:"best" },
+    { id:"g6", name:"Tresor der Gems", amt:14000, price:"Fr. 90.–", art:"shop_gem_t6", seal:null },
   ];
-  /* ---------- (8) Gold-Tausch (AA §8.1 Pos. 7) ----------
-     Bei uns GEMS → GOLD statt Echtgeld → Gold: Gold ist die Waehrung,
-     die der Spieler ohnehin erspielt (DESIGN_PROGRESSION §B), und der
-     Tausch ist die Bruecke aus der Premium- in die Spielwaehrung.
-     AAs „ein Gold-Paket gratis per Werbevideo" wird bei uns zu einem
-     werbefreien Tages-Gratispaket (§19.1: keine Ads). */
-  /* ⚠ REIHENFOLGE GEAENDERT (Befund IMG_3386): „Mach das free Gold
-     unter die 3 kaufbaren Gold Sachen. In der Groesse des Banners wie
-     den Kristalltresor."
-     Vorher stand das Tagesgold als erste Rasterkachel oben links —
-     Begruendung damals: es sei der taegliche Anlass, in die Sektion zu
-     schauen. Das Argument stimmt weiter, nur die Schlussfolgerung war
-     falsch. Als Kachel unter Kacheln sah das Gratisstueck aus wie eine
-     vierte Preisstufe; als BAND unter dem Raster ist es sofort als
-     etwas anderes erkennbar, und die drei kaufbaren Staffeln bilden
-     endlich eine saubere volle Reihe (vorher: zwei Reihen, in der
-     zweiten rechts ein Loch).
-     Das Tagesgold bleibt trotzdem IN dieser Liste. gemsJeGold() sucht
-     die erste BEZAHLTE Staffel als Massstab fuer packWert(); haette man
-     den Posten herausgeloest, waere die Wertrechnung des Arena-Pack-
-     Karussells still auf ihren Notwert gefallen. Getrennt wird beim
-     Rendern, nicht in den Daten. */
+  /* ==================================================================
+   * (7) GOLD — AAs drei Staffeln, abgelesen (§27.2)
+   * ------------------------------------------------------------------
+   *   Pile of Gold    12 000   ▶ FREE (Werbevideo)
+   *   Bag of Gold     36 000   💎 90
+   *   Trophy of Gold 144 000   💎 288
+   * Mengen exakt x3 je Stufe. Gold je Gem: 400 → 500 — die groessere
+   * Staffel lohnt sich, hier gibt es KEINEN Knick (anders als bei den
+   * Gems, siehe dort).
+   *
+   * BEZAHLT WIRD MIT GEMS, nicht mit Echtgeld — das ist AAs eigener
+   * Aufbau und war nie eine Abweichung von uns (§27.2 streicht die
+   * gegenteilige Annahme aus §19). Die Richtung ist einbahnig: Gems →
+   * Gold, nie zurueck. Gold ist bei uns KEINE Kaufwaehrung fuer
+   * Echtgeld-Ware.
+   *
+   * ⚠ DAS TAGESGOLD IST WIEDER DIE ERSTE KACHEL (30.07.2026).
+   * Zwischendurch stand es als Band UNTER dem Raster („Mach das free
+   * Gold unter die 3 kaufbaren Gold Sachen", IMG_3386). Der Grund
+   * dafuer war, dass es als vierte Kachel wie eine vierte Preisstufe
+   * aussah und das Raster ein Loch hatte. Beides ist mit §27 erledigt:
+   * AA hat DREI Gold-Staffeln, und die erste davon IST die gratis
+   * abzuholende. Drei Kacheln fuellen die Reihe vollstaendig, und eine
+   * vierte Stufe, mit der man sie verwechseln koennte, gibt es nicht
+   * mehr. Das GRATIS-Zeichen auf der Kachel haelt den Unterschied
+   * sichtbar.
+   *
+   * Bei AA haengt diese erste Staffel an einem Werbevideo. Belohnte
+   * Werbung ist bei uns nicht angebunden — sie ist deshalb einmal am
+   * Tag ohne Gegenleistung abzuholen, und die Zeile unter dem Raster
+   * sagt genau das (siehe `#werbungNote` in renderShop).
+   *
+   * Das Tagesgold bleibt IN dieser Liste: gemsJeGold() sucht die erste
+   * BEZAHLTE Staffel als Massstab fuer packWert() — haette man den
+   * Gratisposten herausgeloest, waere die Wertrechnung des Arena-Pack-
+   * Karussells still auf ihren Notwert gefallen.
+   * ================================================================== */
   var GOLD_PACKS = [
-    { id:"go0", name:"Tagesgold",   amt:2500,   cost:0,   free:true,  art:"shop_gold_t4" },
-    { id:"go1", name:"Münzstapel",  amt:10500,  cost:80,  free:false, art:"shop_gold_t1" },
-    { id:"go2", name:"Münzbeutel",  amt:31500,  cost:220, free:false, art:"shop_gold_t2",
+    { id:"go0", name:"Münzstapel", amt:12000,  cost:0,   free:true,  art:"shop_gold_t1" },
+    { id:"go1", name:"Münzbeutel", amt:36000,  cost:90,  free:false, art:"shop_gold_t2",
       seal:"pop" },
-    { id:"go3", name:"Goldschwall", amt:126000, cost:800, free:false, art:"shop_gold_t3",
+    { id:"go2", name:"Goldpokal",  amt:144000, cost:288, free:false, art:"shop_gold_t3",
       seal:"best" },
   ];
 
   /* ==================================================================
-   * VORRATS-TRUHE — AAs „Arcane Supplies Chest" (§8.2)
+   * VORRATS-PACK — AAs „Arcane Supplies Chest" (§8.2, bestaetigt §27.2)
+   * ------------------------------------------------------------------
+   * PLATZ 3, nicht 5 (§27.1). Die Sektion steht bei AA VOR dem
+   * Truhenblock — §8.2 hatte sie dahinter vermutet.
+   * Preise mit den Screenshots BESTAETIGT: x1 = 💎 300, x10 = 💎 2 680.
+   * Ebenso die Pity-Zeilen: „Get Epic in 10 opens", „Get Legendary in
+   * 50 opens" — die 50 waren in §8.2 noch als unsicher markiert.
    * ------------------------------------------------------------------
    * DIE ZAHLEN KOMMEN ALLE VON WOANDERS HER, und das ist der Punkt:
    *   Wahrscheinlichkeiten  ArenaCards.PACKS[pack].weights
@@ -13913,7 +14014,6 @@ button.pfplate{cursor:pointer}
     }).join("");
     renderFreiPack(st);
 
-    renderShopPromo();
     renderArenaPacks();
     renderIapPacks();
     renderVorrat();
@@ -13921,14 +14021,36 @@ button.pfplate{cursor:pointer}
     renderGoldPacks();
 
     hydrateRibbons($("viewShop"));
+    /* ⚠ DIE EHRLICHE ZEILE ZUR WERBUNG. AA haengt drei Posten an ein
+       Werbevideo (§27.2): die erste Gold-Staffel, die Explorer-Truhe
+       und das Endless Roulette. Belohnte Werbung ist bei uns NICHT
+       angebunden — der Schalter dafuer steht an genau einer Stelle
+       (UIOffline, WERBUNG_VERFUEGBAR) und wird hier GEFRAGT, nicht
+       abgeschrieben. Ein zweiter Merker wuerde irgendwann etwas
+       anderes behaupten als der erste.
+       Ein Knopf mit „▶ Gratis", der nichts tut, waere die unehrliche
+       Variante; deshalb steht hier ein Satz und kein Knopf. */
+    var werbungAn = !!(typeof UIOffline !== "undefined" &&
+                       UIOffline.werbungVerfuegbar && UIOffline.werbungVerfuegbar());
+    $("werbungNote").innerHTML = werbungAn
+      ? "Die erste Gold-Staffel gibt es gegen ein Werbevideo."
+      : "<b>Belohnte Werbung ist noch nicht angebunden.</b> AA gibt drei Posten " +
+        "gegen ein Video aus (erste Gold-Staffel, Explorer-Truhe, Endless Roulette). " +
+        "Solange der Weg fehlt, gibt es die erste Gold-Staffel <b>einmal am Tag " +
+        "gratis</b>, und alles andere kostet Kristalle. Es steht hier kein Knopf, " +
+        "der ein Video verspricht und keines zeigt.";
     $("iapNote").innerHTML = "<b>Echtgeld ist im Prototyp ein Platzhalter.</b> Arena-Pack, " +
       "Starter-Pack und die Gem-Pakete zeigen Preise in Fr. wie AAs Store, lösen aber " +
       "keinen Kauf aus — der Gold-Tausch unten läuft dagegen echt gegen die Demo-Wallet.";
-    $("shopNote").innerHTML = "Sektionsreihenfolge nach AA (§8.1): Promo · Arena-Pack · " +
-      "Tagesangebote · Packs · Vorrats-Pack · Kristalltresor · Gems · Gold. Die " +
-      "Tagesangebote werden deterministisch aus dem Datum gezogen (FNV-1a wie in " +
-      "arena_daily.js) und wechseln um 00:00 UTC. Alle Preise und Stückzahlen " +
-      "skalieren im echten Spiel mit dem Fortschritt (§8.4).";
+    $("shopNote").innerHTML = "Sektionsreihenfolge nach AA (§27.1, abgelesen am " +
+      "30.07.2026): Arena-Packs · Tagesangebote · Vorrats-Pack · Booster-Packs · " +
+      "Kristalltresor · Gems · Gold. Pass-Banner und Banner-Shop stehen hier " +
+      "bewusst nicht mehr — AA hat beides an dieser Stelle nicht, und den " +
+      "Season-Pass verkaufen wir auf dem Hauptbildschirm. Die Tagesangebote " +
+      "werden deterministisch aus dem Datum gezogen (FNV-1a wie in " +
+      "arena_daily.js) und wechseln um 00:00 UTC. Die Gold-Preise und die " +
+      "Stückzahlen skalieren im echten Spiel mit dem Fortschritt (§27.3); die " +
+      "Echtgeldpreise der Gem-Staffeln sind Store-Preise und stehen fest.";
 
     Array.prototype.forEach.call($("dealGrid").querySelectorAll("[data-buy]"), function (b) {
       b.addEventListener("click", function () { buyDeal(b.getAttribute("data-buy")); });
@@ -14071,28 +14193,14 @@ button.pfplate{cursor:pointer}
     setTimeout(function () { UIIcon.sweep(root, true); }, 6000);
   }
 
-  /* (1) Promo-Banner. Zeigt den Season-Pass, solange er nicht aktiv
-     ist — danach den naechsten erreichbaren Meilenstein. AAs Platz 1
-     ist immer belegt, deshalb faellt der Banner nie weg. */
-  function renderShopPromo() {
-    var el = $("shopPromo"), st = window.ArenaPass ? window.ArenaPass.state() : null;
-    var active = st && st.premium;
-    el.innerHTML = '<span class="prs">' + ico("hub_pass", "📖", "xl") + "</span>" +
-      '<span class="prt"><span class="prn goldtext">' +
-        (active ? "Premium-Pass aktiv" : "Goldene Fortuna") + "</span>" +
-      '<span class="prd">' + (active
-        ? "Stufe " + st.level + " von " + st.levels + " · alle Premium-Belohnungen offen."
-        : "Der Season-Pass ist das größte Angebot des Monats — " +
-          (st ? st.daysLeft + " Tage" : "30 Tage") + " Laufzeit, " +
-          (st ? st.levels : 50) + " Stufen.") + "</span></span>" +
-      '<span class="prb">' + (active ? "ANSEHEN" : "ZUM PASS") + "</span>";
-    tint(el, "pass");
-    /* Nach tint(): bgArt liest den .tinted-Verlauf aus und behaelt ihn
-       als Farbplatte unter dem Artwork. Umgekehrt wuerde tint() die
-       Ebenen wieder auf eine reduzieren. */
-    bgArt(el, "bg_promo_pass");
-  }
-  /* (2) Arena-/Starter-Pack. */
+  /* ⚠ `renderShopPromo()` ist am 30.07.2026 ersatzlos entfallen (§27.1).
+     Sie zeichnete den Season-Pass auf AAs Platz 1. Der Auftraggeber:
+     „Der battledpass der im Shop oben ist kann entfernt werden den
+     brauchen wir an dieser Stelle nicht weil wir ihn schon auf der
+     Battle ansicht (hauptbildschirm) oben verkaufen."
+     Der Weg zum Pass laeuft jetzt ausschliesslich ueber `#passBanner`
+     auf der Startseite — ein Angebot, ein Ort. */
+  /* (1) Arena-/Starter-Pack. */
   /* ==================================================================
    * Das Arena-Pack-Karussell
    * ------------------------------------------------------------------
@@ -14245,44 +14353,39 @@ button.pfplate{cursor:pointer}
       b.addEventListener("click", function () { buyIap(b.getAttribute("data-gembuy")); });
     });
   }
-  /* (7) Gold-Tausch — GRUENE Rahmen; der EINZIGE Block, der echt bucht. */
+  /* (7) GOLD — GOLDENE Rahmen; der EINZIGE Block, der echt bucht.
+     ALLE drei Staffeln stehen im Raster, auch die gratis abzuholende:
+     AA hat genau diese drei (§27.2), und die erste ist dort das
+     Werbevideo-Paket. Bei uns traegt sie das GRATIS-Zeichen und ist
+     einmal am Tag abzuholen — begruendet oben bei GOLD_PACKS. */
   function renderGoldPacks() {
     var st = tagStand();
-    /* Nur die BEZAHLTEN Staffeln ins Raster — drei Kacheln, eine volle
-       Reihe, kein Rest. Das Tagesgold kommt als Band darunter. */
-    $("goldShop").innerHTML = GOLD_PACKS.filter(function (g) { return !g.free; })
-      .map(function (g) {
+    var weg = !!st.goldGratis;
+    $("goldShop").innerHTML = GOLD_PACKS.map(function (g) {
+      /* Der Gratisposten wird nicht als billigste Preisstufe gelesen,
+         sondern als Gratisposten: heller Knopf (`freeprice`), das Wort
+         GRATIS statt einer Zahl, und nach dem Abholen der Rest des
+         Tages als Wartezeit — dieselbe Sprache wie beim Gratis-Posten
+         der Tagesangebote und beim Gratis-Tagespack. */
+      if (g.free) {
         return prodCard({
-          frame: "gold", art: g.art, emoji: "🪙", seal: g.seal, wide: g.wide,
-          name: g.name, amt: fmt(g.amt), sub: "Gold",
-          btn: ico("cur_gem", "💚") + " " + fmt(g.cost), btnCls: "goldprice",
-          btnAttr: 'data-goldbuy="' + g.id + '"', attr: 'data-gold="' + g.id + '"',
+          frame: "gold", art: g.art, emoji: "🪙", seal: null,
+          name: g.name, amt: fmt(g.amt), sub: weg ? "Morgen wieder" : "1× pro Tag",
+          btn: weg ? restText(shopTagRest(Date.now())) : "GRATIS",
+          btnCls: "freeprice", disabled: weg, sold: weg,
+          btnAttr: 'data-goldbuy="' + g.id + '"',
+          attr: 'data-gold="' + g.id + '" data-goldfree="1"',
         });
-      }).join("");
+      }
+      return prodCard({
+        frame: "gold", art: g.art, emoji: "🪙", seal: g.seal, wide: g.wide,
+        name: g.name, amt: fmt(g.amt), sub: "Gold",
+        btn: ico("cur_gem", "💚") + " " + fmt(g.cost), btnCls: "goldprice",
+        btnAttr: 'data-goldbuy="' + g.id + '"', attr: 'data-gold="' + g.id + '"',
+      });
+    }).join("");
     hydrateProdCards($("goldShop"));
 
-    /* Tagesgold als BAND — dieselbe Bauform wie der Kristalltresor.
-       ⚠ .goldtext waere hier ein Verstoss: das Band ist getoent, der
-       Knopf gruen. Beide Flaechen tragen dunkle bzw. weisse Fuellfarbe
-       aus dem Blatt, keine goldene Schrift. */
-    var box = $("goldFreeBox");
-    var g0 = null;
-    GOLD_PACKS.forEach(function (x) { if (x.free) g0 = x; });
-    if (box && g0) {
-      var weg = !!st.goldGratis;
-      box.innerHTML = tagesband({
-        cls: "tinted", attr: 'data-goldfree="1" style="' + tintStyle("gold") + '"',
-        gratis: !weg, art: g0.art, emoji: "🪙",
-        name: g0.name, amt: fmt(g0.amt) + " Gold",
-        sub: weg ? "Heute abgeholt — morgen wieder."
-                 : "Einmal am Tag, ohne Werbung (§19.1).",
-        btn: weg ? "Wieder in " + restText(shopTagRest(Date.now())) : "ABHOLEN",
-        btnSub: weg ? "" : "1× pro Tag", frei: !weg, disabled: weg,
-        btnAttr: 'data-goldbuy="' + g0.id + '"',
-      });
-      markPressable(box);
-      sweepSoon(box);
-    }
     Array.prototype.forEach.call(
       $("viewShop").querySelectorAll("[data-goldbuy]"), function (b) {
         b.addEventListener("click", function () { buyGold(b.getAttribute("data-goldbuy")); });
@@ -14343,18 +14446,29 @@ button.pfplate{cursor:pointer}
         '" aria-label="Drop-Raten anzeigen">i</span>' +
       '<div class="vorrathead">' +
         /* ⚠ HIER DARF `pack_vorrat` NICHT STEHEN. Das Asset ist eine
-           KULISSE (21:9, §6b) und traegt laut eigener Notiz niemals
-           class="ico" — der Freistell-Filter aus §6h wuerde seine dunkle
-           Bildhaelfte aufloesen, und in einem 1:1-Kasten mit `contain`
-           bliebe von 21:9 ein Briefschlitz uebrig. Die Kulisse liegt
-           unten per bgArt(), wo sie hingehoert.
-           Der Kasten braucht ein EIGENES, quadratisches, freistellbares
-           Truhen-Motiv. Der Schluessel `pack_vorrat_icon`
-           in ASSETS steht, liefert ico() sauber das Emoji — die Kachel
-           ist vollstaendig lesbar, nur eben ohne Grafik. Bewusst KEIN
-           Ersatz-Schluessel aus einer anderen Rolle: ein Bronze-Truhen-
-           bild auf der Vorrats-Pack waere eine Falschaussage. */
-        '<span class="bandart">' + ico("pack_vorrat_icon", "📦") + "</span>" +
+           KULISSE (21:9, §6b) und traegt niemals class="ico" — der
+           Freistell-Filter aus §6h wuerde seine dunkle Bildhaelfte
+           aufloesen, und in einem 1:1-Kasten mit `contain` bliebe von
+           21:9 ein Briefschlitz uebrig. Die Kulisse liegt unten per
+           bgArt(), wo sie hingehoert.
+           ⚠ HIER STAND `pack_vorrat_icon` (bis 30.07.2026), und der
+           Kasten war LEER — im Screenshot ein schwarzes Quadrat. Nicht,
+           weil das Bild fehlte: es laedt (896x1200, naturalWidth 896).
+           Das Motiv ist ein dunkelblauer Foliant auf Schwarz, und genau
+           den loest der Freistell-Filter `#icoFrei` (§6h) auf. Der alte
+           Kommentar hier behauptete, ico() liefere „sauber das Emoji" —
+           das stimmte, solange der Schluessel ins tote CDN zeigte. Seit
+           die Assets lokal liegen, laedt das Bild und verschwindet
+           still. Ein Bild, das laedt und nichts zeigt, ist schlimmer als
+           eines, das fehlt: der Emoji-Rueckfall greift nicht.
+           Gezeigt wird jetzt das Pack, das die Ware TATSAECHLICH ist —
+           `pack_gold`, denn VORRAT.pack ist "gold". Das ist kein
+           Ersatzbild aus einer fremden Rolle, sondern dasselbe Motiv,
+           das im Regal darunter unter demselben Namen steht; es haelt
+           dem Freistell-Filter stand (dort seit jeher sichtbar).
+           Der Schluessel wird ABGELEITET: wechselt VORRAT.pack, wechselt
+           das Bild mit. */
+        '<span class="bandart">' + ico("pack_" + VORRAT.pack, "📦") + "</span>" +
         '<span class="bandtx"><span class="vrnm">Vorrats-Pack</span>' +
           '<span class="vrpr">' + pk.promise + " · " + pk.cardSlots + " Karten, " +
             pk.materialSlots + " Essenz-Posten und Gold je Öffnung.</span></span></div>" +
@@ -18444,7 +18558,9 @@ button.pfplate{cursor:pointer}
     $("apkNext").addEventListener("click", function () { apkZuIndex(apkIndex() + 1); });
   })();
 
-  onNav("shopPromo", "navPass");
+  /* `onNav("shopPromo", "navPass")` ist mit dem Pass-Banner entfallen
+     (30.07.2026, §27.1). Eine Bindung auf ein Element, das es nicht
+     mehr gibt, waere still — onNav() greift auf ein leeres $() zu. */
   /* ==================================================================
    * AUFKLAPP-MENUE OBEN RECHTS — AAs Ort fuer den Guide
    * ------------------------------------------------------------------
@@ -19339,6 +19455,11 @@ button.pfplate{cursor:pointer}
                      shopTagIndex: shopTagIndex, tagStand: tagStand,
                      tagSpeichern: tagSpeichern, DEAL_WAREN: DEAL_WAREN,
                      DEAL_GRATIS: DEAL_GRATIS, SHOP_PACKS: SHOP_PACKS,
+                     /* GEM_PACKS steht seit 30.07.2026 mit hier: die
+                        Preispruefung rechnet gegen die §27.2-Tabelle und
+                        braucht dafuer die Staffeln selbst, nicht nur den
+                        Text auf den Kacheln. */
+                     GEM_PACKS: GEM_PACKS,
                      GOLD_PACKS: GOLD_PACKS, VORRAT: VORRAT,
                      vorratRabatt: vorratRabatt, renderVorrat: renderVorrat,
                      oeffneVorrat: oeffneVorrat, buyPack: buyPack,
