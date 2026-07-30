@@ -178,12 +178,13 @@ async function loopHolen(seite) {
    * CSS-Choreografie (drei kreisende Kopien, Umschlag, Werttafel) muss
    * unveraendert laufen, auch wenn das Video nicht kommt.
    *
-   * Das ist hier keine theoretische Absicherung: die Datei liegt NICHT
-   * im Repo (assets/NICHT_ERREICHBAR.json — *.cloudfront.net ist aus
-   * der Baumaschine gesperrt), und aus dieser Umgebung ist sie nicht
-   * ladbar. Der Fall „Video fehlt" ist also der REGELFALL der Pruefung,
-   * nicht ein herbeigefuehrter Sonderfall — und genau deshalb aussage-
-   * kraeftig.
+   * Das ist hier keine theoretische Absicherung. Die Datei liegt zwar
+   * seit dem 30.07.2026 im Repo (assets/merge_fx.mp4), aber dieser
+   * Chromium hat kein H.264 — sie wird geladen und dann verworfen. Der
+   * Fall „Effekt kommt nicht" ist damit der REGELFALL der Pruefung,
+   * nicht ein herbeigefuehrter Sonderfall, und genau deshalb
+   * aussagekraeftig: gemessen wird, dass die Zeremonie ihn nicht
+   * braucht.
    *
    * ⚠ Geprueft wird NICHT „das Video laeuft" (H.264 fehlt hier ohnehin),
    * sondern: die Zeremonie oeffnet, kreist, schlaegt um — und der Ton

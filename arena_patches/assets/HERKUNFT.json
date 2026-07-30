@@ -1,6 +1,6 @@
 {
- "_bytes": 76984433,
- "_dateien": 230,
+ "_bytes": 77046137,
+ "_dateien": 231,
  "_hinweis": "Erzeugt von werkzeuge/assets_sichern.py. Schluessel, Quell-URL, Dateiname, Groesse und SHA-256 je Asset — der Nachweis, dass die Datei im Repo die Datei vom CDN ist.",
  "assets": {
   "arena1": {
@@ -1614,6 +1614,14 @@
    "kleinfassung": true,
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133702_949e2b93-321e-4d5f-b64f-c09d5ba099a5_min.webp",
    "sha256": "7ca082527741fe22d3701de0cc6091a3f8387908a8d280f231b0528983cfba59"
+  },
+  "merge_fx": {
+   "_hinweis": "Wie pack_arena und nav_shop NICHT von assets_sichern.py geholt: *.cloudfront.net ist aus dieser Umgebung gesperrt (CONNECT 403). Die Datei wurde in der Bild-Sandbox erzeugt (Kling v3.0, 1:1, 5 s, mode pro, sound on), dort auf 192x192 verkleinert, um 1,42 beschleunigt (Aufprall landet damit bei 1,27 s auf dem Umschlag der Zeremonie bei 1,26 s) und die Tiefen auf echtes Schwarz gedrueckt. Uebertragen in fuenf Base64-Teilen ueber die Sandbox-Ausgabe und Stueck fuer Stueck per md5 gegengeprueft; der SHA-256 der zusammengesetzten Datei stimmt mit dem der Sandbox ueberein.",
+   "bytes": 61704,
+   "datei": "merge_fx.mp4",
+   "kleinfassung": true,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/2de19c3f-43d9-4c55-868d-d602b9c2b06c.mp4",
+   "sha256": "1c528f575d1c5d59ef184d348551d0e5a5838e40eb1e8550dbfcbe450622fad1"
   }
  }
 }

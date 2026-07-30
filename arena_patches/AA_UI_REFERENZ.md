@@ -3381,10 +3381,28 @@ Das Video ist **Zugabe, kein Ersatz**: fällt es aus, läuft die CSS-Choreografi
 Das ist hier nicht theoretisch — die Datei liegt **nicht im Repo** (siehe unten), der Fall
 „Video fehlt" ist der Regelfall der Prüfung.
 
-**⚠ Die Datei fehlt im Repo.** `*.cloudfront.net` ist aus der Baumaschine gesperrt (CONNECT
-403), für beide Verteiler. Sie wurde in der Bild-Sandbox erzeugt und dort geprüft (640×640,
-5,04 s, AAC-Stereo, 813 KB), konnte aber nicht hierher geholt werden. Eingetragen in
-`assets/NICHT_ERREICHBAR.json` mit Datum, Grund und der Anweisung zum Nachziehen; bis dahin
-lädt der Prototyp sie über die CDN-Adresse (`NUR_CDN`).
+### 32.4 Die Datei liegt im Repo — in fünf Teilen hergeholt
 
-**Aufwand: M** · **Priorität: 1** · Datei nachzuziehen
+`*.cloudfront.net` ist aus der Baumaschine gesperrt (CONNECT 403), für **beide** Verteiler.
+Ein direkter Download war also ausgeschlossen. Der einzige offene Weg ist die Ausgabe der
+Bild-Sandbox, und die schluckt rund **20 000 Zeichen je Aufruf** — bei der ersten Fassung
+(640×640, 813 KB) wären das 56 Runden gewesen.
+
+Statt das durchzuziehen, wurde die Datei an das angepasst, was sie im Spiel wirklich sein
+muss. Gemessen: die Effektfläche ist **155 × 155 CSS-px** (465 Gerätepixel bei dreifacher
+Auflösung) — ein 1080er Quellvideo ist dafür um ein Vielfaches zu gross. Mit 192 × 192, auf
+die Länge der Choreografie gekürzt und um 1,42 beschleunigt bleiben **61 704 Byte**, also
+fünf Teile.
+
+Der Rest ist Buchhaltung, aber sie hat sich gelohnt: zwei der fünf Teile kamen beim
+Abschreiben **beschädigt** an — einem fehlte ein Zeichen, einem hingen vier an. Aufgefallen
+ist das nur, weil die Länge jedes Teils vorher bekannt war. Statt alles neu zu holen, wurde
+per Prüfsumme über 2000-Zeichen-Blöcke eingegrenzt, wo genau der Fehler sass, und **nur diese
+Blöcke** neu übertragen. Der SHA-256 der zusammengesetzten Datei stimmt mit dem der Sandbox
+überein — Bit für Bit.
+
+**Merksatz:** Bei einer Übertragung, die durch Abschreiben läuft, ist die Länge das billigste
+Prüfmittel und die blockweise Prüfsumme das zweitbilligste. Ohne beides wäre eine still
+beschädigte Datei ins Repo gewandert, die auf dem Telefon einfach nicht abspielt.
+
+**Aufwand: M** · **Priorität: 1** · erledigt

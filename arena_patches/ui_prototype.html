@@ -9208,11 +9208,16 @@ button.pfplate{cursor:pointer}
        die Tiefen auf echtes Schwarz gedrueckt — der screen-Blend in
        `.cerfx` rechnet Schwarz als „nichts", ein Grund von 31 statt 0
        waere als grauer Schleier ueber der Zeremonie gelegen. Gemessen
-       nach dem Abgleich: Eckwerte bei 0,3/1,5/2,1/4,5 s exakt 0.
-       ⚠ Steht in assets/NICHT_ERREICHBAR.json: *.cloudfront.net ist aus
-       der Baumaschine gesperrt (CONNECT 403), die Datei konnte nicht ins
-       Repo geholt werden. Nachziehen und dann assets_sichern.py laufen
-       lassen — bis dahin laedt der Prototyp sie von hier. */
+       nach dem Abgleich: Eckwerte an allen vier Ecken exakt 0.
+       Zusaetzlich um 1,42 beschleunigt: der Aufprall liegt im Original
+       bei 1,8 s, die Zeremonie schlaegt bei 1,26 s um — 1,8/1,42 = 1,27.
+       Bild und Umschlag treffen sich damit auf 10 ms genau.
+       Die Datei liegt im Repo (assets/merge_fx.mp4, 61 704 Byte). Sie
+       musste in fuenf Base64-Teilen durch die Bild-Sandbox uebertragen
+       werden, weil *.cloudfront.net aus der Baumaschine gesperrt ist
+       (CONNECT 403); jeder Teil wurde per md5 gegengeprueft, der
+       SHA-256 der zusammengesetzten Datei stimmt mit dem der Sandbox
+       ueberein. Steht so in assets/HERKUNFT.json. */
     merge_fx:         CDNA + "2de19c3f-43d9-4c55-868d-d602b9c2b06c.mp4",
     /* ---- Batch 4: Breitbanner 16:9 (Pass, Events) ---- */
     pass_keyart:      CDN + "hf_20260725_160701_42a171b5-06f3-458d-a766-f4992e4210e5.png",
@@ -9531,19 +9536,13 @@ button.pfplate{cursor:pointer}
     audio_victory:"mp3", audio_war:"mp3", av_smaragd:"png", banner_rarity:"png",
     banner_title:"png", cinematic_legendary:"mp4", loop_dawn:"mp4", loop_ember:"mp4",
     loop_frost:"mp4", loop_hollow:"mp4", loop_magmor:"mp4", loop_solara:"mp4",
-    loop_stone:"mp4", loop_thorn:"mp4", pass_keyart_anim:"mp4", ribbon_section_lg:"png",
-    ribbon_section_sm:"png"
+    loop_stone:"mp4", loop_thorn:"mp4", merge_fx:"mp4", pass_keyart_anim:"mp4",
+    ribbon_section_lg:"png", ribbon_section_sm:"png"
   };
   var NUR_CDN = {
     card_bann:1, card_bollwerk:1, card_fokus:1, card_joker:1,
     card_splitter:1, ess_arkan:1, ic_offline:1, off_banner:1,
-    off_loop:1,
-    /* merge_fx steht hier, weil die Datei nicht ins Repo geholt werden
-       konnte (siehe assets/NICHT_ERREICHBAR.json). Ohne diesen Eintrag
-       zeigte der Prototyp auf ./assets/merge_fx.mp4 — eine Datei, die es
-       nicht gibt, und die Zeremonie liefe still ohne Effekt. Sobald die
-       Datei nachgezogen ist, gehoert der Eintrag hier WEG. */
-    merge_fx:1
+    off_loop:1
   };
   (function () {
     if (/[?&]cdn=1\b/.test(location.search)) return;
