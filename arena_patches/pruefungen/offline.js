@@ -103,13 +103,68 @@ const gegen = (n, gebrochenErkannt, z) => {
     const m = document.getElementById("tileOfflineBadge");
     return !!m && m.style.display !== "none" && m.getBoundingClientRect().width > 0;
   });
+  /* ⚠ „gesehen" wird hier VORHER gesetzt, und das ist der ganze Punkt
+     dieses Blocks. Seit dem 30.07.2026 ruft die Marke auch dann, wenn der
+     Spieler das Fenster noch nie geoeffnet hat (Entdeckbarkeit, siehe 2b).
+     Dieser Schritt prueft die ANDERE Haelfte derselben Anforderung: sobald
+     er es kennt, haengt die Marke ausschliesslich am Guthaben. Eine Marke,
+     die immer leuchtet, ist nach zwei Tagen Tapete und danach wertlos.
+     Die alte Fassung stand ohne diese Vorbedingung da und haette die
+     Entdeckbarkeit als Fehler gemeldet. */
+  const gesehenSetzen = () => p.evaluate(() => {
+    try { localStorage.setItem("apr_off_gesehen", "1"); } catch (e) {}
+  });
+  await gesehenSetzen();
   await stelle(6);
   const m6 = await markeSichtbar();
   await stelle(0);
   const m0 = await markeSichtbar();
   pruef("nach 6 h Abwesenheit ruft die Marke", m6);
-  pruef("ohne Guthaben ruft sie NICHT", !m0, "sie war sichtbar, obwohl nichts da ist");
+  pruef("ohne Guthaben ruft sie NICHT, sobald der Spieler sie kennt",
+        !m0, "sie war sichtbar, obwohl nichts da ist");
   gegen("Marke", m6 !== m0);
+
+  /* ---------- 2b. DER ERSTZUSTAND ----------
+     ⚠ NEU am 30.07.2026, und der Anlass ist eine Luecke in genau dieser
+     Datei. Der Auftraggeber meldete die Offline-Ertraege als „noch nicht
+     drin". Sie waren drin — aber auf einem frischen Stand unsichtbar:
+     `start()` setzt den Stempel auf JETZT, also null Stunden, keine
+     Marke, nichts abzuholen, und der Einstieg ist ein unbeschriftetes
+     Symbol. Man haette Stunden warten muessen.
+     Warum keine Pruefung es fand: JEDER Schritt hier dreht den Stempel
+     vorher zurueck. Damit wird ausschliesslich der EINGELAUFENE Zustand
+     gemessen. Der erste Start war nie Gegenstand einer Messung — und der
+     erste Start ist der einzige, den jeder Spieler garantiert erlebt.
+     Die Lehre gilt ueber diese Datei hinaus: wer einen Zustand fuer den
+     Test herstellt, prueft nie den Zustand, in dem die Sache ANKOMMT. */
+  const erst = await p.evaluate(() => {
+    try { localStorage.removeItem("apr_off_gesehen"); } catch (e) {}
+    window.ArenaOffline._reset(Date.now());          /* seit = jetzt */
+    window.__proto.offMarke();
+    const m = document.getElementById("tileOfflineBadge");
+    const st = window.ArenaOffline.stand(Date.now());
+    return { ruft: !!m && m.style.display !== "none",
+             gold: st.gold, bereit: st.bereit };
+  });
+  pruef("im Erstzustand ist wirklich nichts angesammelt",
+        erst.gold === 0 && erst.bereit === false,
+        erst.gold + " Gold / bereit=" + erst.bereit);
+  pruef("die Marke ruft TROTZDEM, damit die Funktion entdeckbar ist",
+        erst.ruft, "kein Ruf — die Funktion waere am ersten Tag unsichtbar");
+
+  /* Und sie verstummt, sobald der Spieler sie kennt. Eine Marke, die
+     bleibt, ist nach zwei Tagen Tapete. */
+  const nachSehen = await p.evaluate(() => {
+    window.__proto.offOeffne();
+    window.__proto.offSchliesse && window.__proto.offSchliesse();
+    document.getElementById("offLayer").classList.remove("open");
+    window.__proto.offMarke();
+    const m = document.getElementById("tileOfflineBadge");
+    return !!m && m.style.display !== "none";
+  });
+  pruef("nach dem ersten Oeffnen verstummt sie wieder",
+        !nachSehen, "sie ruft weiter, obwohl nichts da ist");
+  gegen("Entdeckbarkeit", erst.ruft && !nachSehen);
 
   /* ---------- 3. Der Dialog zeigt, was das Modul rechnet ---------- */
   await stelle(6);

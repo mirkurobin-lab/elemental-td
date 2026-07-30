@@ -11022,14 +11022,31 @@ button.pfplate{cursor:pointer}
        damit im Code sichtbar bleibt, dass es sie noch nicht gibt. */
     var WERBUNG_VERFUEGBAR = false;
 
+    /* Wurde das Fenster schon einmal geoeffnet? Ein Schluessel, kein
+       Zaehler — gefragt ist nur „kennt der Spieler die Funktion". */
+    var GESEHEN = "apr_off_gesehen";
+    function schonGesehen() {
+      try { return localStorage.getItem(GESEHEN) === "1"; } catch (e) { return true; }
+    }
+    function merkeGesehen() {
+      try { localStorage.setItem(GESEHEN, "1"); } catch (e) {}
+    }
     function marke() {
       var b = $("tileOfflineBadge");
       if (!b) return;
       var st = AO.stand(jetzt());
-      b.style.display = st.bereit ? "" : "none";
+      /* ⚠ ODER, nicht NUR. Die Marke ruft, wenn es etwas abzuholen gibt
+         — ODER solange der Spieler das Fenster noch nie geoeffnet hat.
+         Ohne den zweiten Fall ist die Funktion am ersten Tag vorhanden
+         und trotzdem unentdeckbar: null Stunden angesammelt heisst keine
+         Marke, und ein unbeschriftetes Symbol sucht niemand ab.
+         Der Auftraggeber hat sie deshalb zu Recht fuer nicht gebaut
+         gehalten. Eine Funktion, die man nicht findet, ist keine. */
+      b.style.display = (st.bereit || !schonGesehen()) ? "" : "none";
     }
 
     function oeffne() {
+      merkeGesehen();
       zeichne();
       $("offLayer").classList.add("open");
       $("offLayer").setAttribute("aria-hidden", "false");
@@ -11090,6 +11107,34 @@ button.pfplate{cursor:pointer}
     function binde() {
       if (!AO) return;
       AO.start(jetzt());
+      /* ==============================================================
+       * ERSTZUSTAND — behoben am 30.07.2026
+       * --------------------------------------------------------------
+       * Befund des Auftraggebers: „die passiven offline Belohnungen sind
+       * noch nicht drin". Sie WAREN drin, aber auf einem frischen Stand
+       * unsichtbar: `start()` setzt den Zeitstempel auf JETZT, also sind
+       * null Stunden angesammelt — keine Marke, nichts abzuholen, der
+       * Abhol-Knopf grau. Der Einstieg ist ein kleines unbeschriftetes
+       * Symbol. Wer die Seite zum ersten Mal oeffnet, muesste STUNDEN
+       * warten, bis ueberhaupt etwas erscheint.
+       * ⚠ Keine Pruefung hat das gemeldet, und der Grund ist lehrreich:
+       * ALLE Schritte drehen den Zeitstempel vorher zurueck
+       * (`_setSeit(now - 6h)`). Sie pruefen damit nur den eingelaufenen
+       * Zustand. Der Erstzustand war nie Gegenstand einer Messung.
+       * Zwei Antworten darauf:
+       *   1. Im TESTMODUS wird der Stempel vorgefuellt, damit die
+       *      Funktion sofort vorzeigbar ist. Dafuer ist der Testlink da.
+       *   2. Im ECHTEN Spiel bleibt der Stempel korrekt bei jetzt — aber
+       *      die Marke ruft auch, solange der Spieler das Fenster noch
+       *      NIE geoeffnet hat. Sonst ist eine Funktion vorhanden und
+       *      trotzdem unentdeckbar, und das ist dasselbe wie fehlend.
+       * ============================================================== */
+      if (typeof TESTMODUS !== "undefined" && TESTMODUS) {
+        /* 6 h zurueck: genug fuer alle vier Materialstufen und eine
+           sichtbare Kartenzahl, aber unter dem Deckel — so sieht man
+           auch, dass der Deckel noch NICHT greift. */
+        try { AO._setSeit(jetzt() - 6 * 3600 * 1000); } catch (e) {}
+      }
       var k = $("icoOffline"); if (k) k.addEventListener("click", oeffne);
       var c = $("offClose"); if (c) c.addEventListener("click", schliesse);
       var cl = $("offClaim"); if (cl) cl.addEventListener("click", hole);
