@@ -2,7 +2,10 @@ const { chromium } = require('playwright-core');
 const path = require('path');
 const fs = require('fs');
 
-const FILE = 'file://' + path.resolve('/home/user/elemental-td/arena_patches/ui_prototype.html');
+/* UMGESCHRIEBEN 30.07.2026: fester Pfad auf /home/user/elemental-td →
+   in einem Worktree prueft die Suite sonst den FREMDEN Baum und laeuft
+   gruen, waehrend die geaenderte Datei ungeprueft bleibt. */
+const FILE = 'file://' + path.resolve(__dirname, '..', 'ui_prototype.html');
 const SHOTS = '/tmp/claude-0/-home-user-elemental-td/4b0a76dd-5b22-5fdf-85e8-579f1b036ae5/scratchpad/ui_shots_v5';
 fs.mkdirSync(SHOTS, { recursive: true });
 
