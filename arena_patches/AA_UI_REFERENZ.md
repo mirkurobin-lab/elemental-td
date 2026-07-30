@@ -3118,3 +3118,101 @@ einem eigenen, viel kleineren Satz, (c) XP aus dem Offline-Ertrag streichen und 
 als Gold verrechnen. Solange das offen ist, verspricht die Vorschau etwas, das nicht kommt.
 
 **Aufwand: S** · **Priorität: 1** (die Vorschau steht heute im Spiel und ist falsch)
+
+---
+
+## 30. Startseite und Battle Deck nachgezogen (30.07.2026)
+
+Vier Befunde aus IMG_3460 bis IMG_3463, in der Reihenfolge, in der sie gemeldet wurden.
+
+### 30.1 Der KAMPF-Knopf saß nicht bündig
+
+> „Der Kampf Banner muss bündig in die Kachel passen."
+
+Das ist Geometrie, kein Geschmack. `btn_primary.webp` ist **1200×896** groß, der Rahmen darin
+aber nur **1028×343** — 85,7 % der Breite und **38,3 % der Höhe**, mit je rund 30 % leerer
+Leinwand oben und unten. Bei `background-size:100% 175%` blieb davon ein sichtbarer Rand
+stehen. Dieselbe Fehlerklasse wie beim Sektionsband (§secribbon), nur an einem anderen Bild.
+
+Beim Nachmessen fiel ein zweiter Fall auf: die **sechs anderen** Knöpfe mit diesen Grafiken
+(`btnToForge`, `btnMergeAll`, `btnMerge`, `btnUpgrade`, `btnClearReq`, `btnUnequip`) standen
+auf `background-size: auto` — eine 1200-px-Grafik in Originalgröße auf einem 100-px-Knopf,
+also ein zufälliger Bildausschnitt. Die Regel `.asset-btn` (210 %) hätte das geregelt, wird
+aber **nirgends verwendet**: tote CSS.
+
+Die Passung steht jetzt in `layer()` statt im CSS, weil sie zum **Bild** gehört und jedes der
+drei Bilder eine andere Geometrie hat:
+
+| Grafik | Inhalt | `background-size` | `position` |
+|---|---|---|---|
+| `btn_primary` | 85,7 % × 38,3 % | 114,4 % 250,8 % | 55,3 % 49,7 % |
+| `btn_secondary` | 85,0 % × 40,4 % | 115,3 % 237,6 % | 50 % 50 % |
+| `btn_danger` | 82,3 % × 35,5 % | 119,0 % 270,5 % | 50 % 50 % |
+
+Gerechnet auf 98 % Breite und 96 % Höhe Füllung — ein Hauch Luft, damit der Eckzierat nicht
+am Radius abgeschnitten wird. `run_v7.js` prüft die **Folge** (füllt der Rahmen 90–100 % der
+Kachelhöhe?), nicht die Schreibweise, mit einer Gegenprobe darauf, dass der alte Wert
+durchfällt (0,383 × 175 % = 67 %).
+
+### 30.2 Die vier Belohnungsplätze zeigten Truhen
+
+> „Die 4 Truhen slots müssen mit neuen boosterpack Images versehen werden wir haben keine
+> Truhen."
+
+Richtig — dort stand `chest_bronze`. Beim Nachsehen benutzten **fünf** Stellen ein
+Truhenbild, wo ein Pack gemeint war: die Slots, der Gratis-Pack-Countdown, ein
+Straßen-Knoten mit der Beschriftung „Bronze-Pack", die Clan-Quest-Karten und die
+Straßen-Marker. Alle fünf tragen jetzt Pack-Bilder.
+
+**Neues Asset `pack_arena`** (Bauart 3 wie die übrigen acht, Glut **smaragdgrün** — die
+einzige Farbe, die in der Familie noch frei war: Bronze braun, Silber eisblau, Gold goldgelb,
+Arkan magenta, Arena-Ikon karminrot, Vorrat bernstein).
+
+**Belegung:** drei Arena-Packs, der **vierte ein Gold-Pack**. Der leere Platz zeigt sein Pack
+**blaß** statt eines „＋": ein Plus sagt „hier fehlt etwas", das blasse Pack sagt „hier kommt
+*dieses* hin" — und beim Gold-Platz ist genau das die Botschaft, auf die man hinspielt.
+
+### 30.3 Der Loot des Arena-Packs
+
+> „Sie sollen vom Inhalt bisschen schlechter wie die Silber booster packs sein." ·
+> „Wir brauchen starke Belohnungen das Leute spielen."
+
+Beides zusammen legt die Stellschraube fest: die **Garantie bleibt bei Selten**, gleich wie
+Silber. Der Boden ist das, was ein Spieler beim Öffnen als Versprechen liest; ihn zu senken
+macht das Pack nicht „ein bisschen" schlechter, sondern zu einem Bronze-Pack mit anderer
+Farbe. Schlechter wird es über **Menge und Quoten**:
+
+| | Bronze | **Arena** | Silber | Gold |
+|---|---:|---:|---:|---:|
+| Kartenslots | 5 | **6** | 7 | 9 |
+| Essenzslots | 2 | **2** | 3 | 4 |
+| Spellslots | 1 | **1** | 2 | 2 |
+| Gold | 400–800 | **900–1 800** | 1 200–2 500 | 4 000–8 000 |
+| Gewöhnlich | 82 % | **70 %** | 62 % | 38 % |
+| Garantie | Gut | **Selten** | Selten | Episch |
+
+Gemessen gegen Silber: **1,2 % Legendär je Pack statt 1,4 %**, **6,0 % Episch statt 9,8 %**.
+Spürbar schwächer, aber immer noch ein Pack, für das man einen Kampf mehr spielt.
+
+Das Arena-Pack ist **nicht käuflich** und darf keine Kristallquelle bekommen: die vier Plätze
+sind die Belohnung fürs Spielen, und ein Pack, das man auch kaufen kann, entwertet sie.
+
+### 30.4 Battle Deck: die Reiter waren da, nur unsichtbar
+
+> „du musst die Tower skills und items Schaltflächen noch einbauen … Deck und Sammlung oben
+> brauchen wir nicht über dem battledeck."
+
+Der erste Teil war ein **Trugschluss meinerseits, kein fehlendes Feature**: die Reiter
+Türme/Spells/Items/Helden und der Schmiede-Knopf gab es längst — sie lagen hinter dem Reiter
+„Sammlung" und waren damit einen Tipp entfernt und unsichtbar. Der Kommentar im Quelltext
+hatte die Trennung sogar *begründet* („ein zweites Reiter-Set nur für denselben Filter wäre
+Redundanz"). Die Begründung war falsch, weil sie das Falsche verglichen hat: AA setzt Deck
+**und** Sammlung auf **einen** Bildschirm, untereinander (IMG_3461/3462/3463). Man sieht sein
+Deck und seinen Vorrat gleichzeitig — das ist der ganze Zweck des Bildschirms.
+
+Umgebaut: kein Umschalter mehr, beide Teile untereinander. Erste Zeile nur Filterreiter,
+zweite Zeile Sortierung links und **Schmiede rechts** (AA-Anordnung) — ein Knopf, der etwas
+*tut*, gehört nicht in eine Reihe mit Umschaltern, die nur filtern. Die Forge-Mechanik war
+vollständig gebaut und musste nur erreichbar werden.
+
+**Aufwand: M** · **Priorität: 1**

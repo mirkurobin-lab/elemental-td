@@ -25,6 +25,9 @@ function step(name, ok, info) {
   steps.push({ name, ok, info });
   console.log((ok ? 'ok   ' : 'FAIL ') + name + (info ? '  — ' + info : ''));
 }
+/* Gegenprobe: eine Behauptung, die FALSCH sein muss. Ein Schritt, der
+   auch bei kaputtem Programm gruen bleibt, ist keine Pruefung. */
+function gegen(name, sollFalschSein, info) { step('gegen: ' + name, !sollFalschSein, info); }
 
 (async () => {
   const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
@@ -736,9 +739,7 @@ function step(name, ok, info) {
      seither zuerst das Deck (§24) — fuer die Galerie-Aufnahme "sammlung"
      erst auf den Sammlung-Reiter wechseln, sonst zeigt der Screenshot
      den falschen Bildschirm unter dem richtigen Namen. */
-  await go('navCollection'); await page.click('#dkTabColl'); await page.waitForTimeout(150);
   await shot('sammlung');
-  await page.click('#dkTabDeck'); await page.waitForTimeout(150);
   await shot('battledeck');   // NEU: das Deck selbst gehoert ebenso in die Galerie
   await page.evaluate(() => window.__proto.openDetail('fire'));
   await page.waitForTimeout(420);
@@ -2032,6 +2033,46 @@ function step(name, ok, info) {
 
   await go('navHome');
   await page.waitForTimeout(300);
+
+  /* ---- KNOPF-PASSUNG (30.07.2026) --------------------------------
+     Befund: „Der Kampf Banner muss buendig in die Kachel passen."
+     Nachgemessen ist das Geometrie, kein Geschmack: btn_primary.webp ist
+     1200x896, der Rahmen darin nur 1028x343 — 38,3 % der Bildhoehe. Bei
+     `background-size:100% 175%` blieb rundherum leere Leinwand stehen.
+     Die sechs anderen Knoepfe mit diesen Grafiken standen sogar auf
+     `auto`, also 1200 px Grafik auf 100 px Knopf.
+     Geprueft wird die FOLGE, nicht die Schreibweise: wie hoch steht der
+     Rahmen im Verhaeltnis zum Knopf? Aus Bildanteil (0,383) mal
+     background-size ergibt sich das direkt. Eine Pruefung auf den
+     Zahlenstring waere wertlos — sie waere auch bei einem Bild mit
+     anderer Geometrie gruen. */
+  const passung = await page.evaluate(() => {
+    const ANTEIL = { btn_primary: 0.383, btn_secondary: 0.404, btn_danger: 0.355 };
+    return ['btnBattle', 'btnToForge', 'btnMergeAll', 'btnMerge', 'btnUpgrade',
+            'btnClearReq', 'btnUnequip'].map(id => {
+      const e = document.getElementById(id);
+      if (!e) return { id: id, fehlt: true };
+      const cs = getComputedStyle(e);
+      const bild = (cs.backgroundImage.match(/assets\/(btn_[a-z]+)\./) || [])[1];
+      const hoehe = (cs.backgroundSize.split(',')[0] || '').trim().split(/\s+/)[1] || '';
+      const proz = parseFloat(hoehe);
+      return { id: id, bild: bild || null, roh: hoehe,
+               /* Anteil der Knopfhoehe, den der Rahmen wirklich fuellt */
+               fuellt: bild && ANTEIL[bild] && proz ? +(ANTEIL[bild] * proz / 100).toFixed(3) : null };
+    });
+  });
+  const mitBild = passung.filter(p => p.bild);
+  const schlecht = mitBild.filter(p => !(p.fuellt >= 0.9 && p.fuellt <= 1.0));
+  step('Knopfgrafiken fuellen ihre Kachel (90-100 % der Hoehe)',
+    mitBild.length >= 1 && schlecht.length === 0,
+    mitBild.map(p => p.id + ' ' + Math.round(p.fuellt * 100) + '%').join(', ') +
+    (schlecht.length ? ' — daneben: ' + schlecht.map(p => p.id + ' "' + p.roh + '"').join(', ') : ''));
+  /* Gegenprobe: der alte Wert MUSS durchfallen. 0,383 x 175 % = 67 % —
+     ein Drittel der Kachel waere leerer Rand. */
+  gegen('der alte Wert 175 % haette den Schritt bestanden',
+    0.383 * 1.75 >= 0.9,
+    'alt: 67 % Fuellung, also ein Drittel leerer Rand');
+
   step('Arena-Diorama auf AAs 54 % Breite',
     heim.diorama && nah(heim.diorama.b, 54.3, 3), heim.diorama ? heim.diorama.b + ' %' : '-');
   step('Arena-Diorama auf AAs 19 % Hoehe',

@@ -107,7 +107,6 @@ function check(label, cond, info) {
      Fach nichts zu sehen war. Abgestuerzt ist erst der Klick danach mit
      „element is not visible". Vorhandensein ist nicht Sichtbarkeit — die
      Regel steht in README.md. */
-  await page.click('#dkTabColl');
   await page.waitForTimeout(200);
   check('das Essenz-Fach ist im Sammlungs-Reiter ueberhaupt sichtbar',
     await page.locator('#matCount').isVisible());

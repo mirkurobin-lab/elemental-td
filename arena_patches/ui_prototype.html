@@ -2933,6 +2933,17 @@ span.ico{text-align:center}
    „wie viel" steht im Fenster, hier zaehlt nur „es liegt etwas da". */
 #tileOfflineBadge{min-width:16px}
 
+/* Der noch nicht verdiente Belohnungsplatz zeigt sein Pack BLASS statt
+   eines „＋" (30.07.2026). Ein Plus sagt „hier fehlt etwas"; das blasse
+   Pack sagt „hier kommt DIESES hin" — und beim vierten, dem Gold-Platz,
+   ist genau das die Botschaft, auf die man hinspielt.
+   `grayscale` UND niedrige Deckkraft: nur blass reicht nicht, ein
+   goldenes Pack bei 30 % liest sich immer noch golden und damit als
+   „schon da". */
+.slot .slotghost{display:flex;align-items:center;justify-content:center;
+  width:100%;height:100%;opacity:.34;filter:grayscale(.72) brightness(.85)}
+.slot .slotghost img,.slot .slotghost .ico{width:66%;height:66%;object-fit:contain}
+
 /* ==================================================================
  * BELOHNUNGS-FENSTER (§29) — was du gerade bekommen hast
  * ------------------------------------------------------------------
@@ -7486,10 +7497,21 @@ button.pfplate{cursor:pointer}
      * Bei uns uebernimmt das schon die Auswahlliste selbst: sie zeigt
      * pro Platz nur, was zu dessen Zone passt (openDeckPick). Ein
      * zweites Reiter-Set nur fuer denselben Filter waere Redundanz. -->
-    <div class="tabs" id="dkMainTabs">
-      <button class="tab on" id="dkTabDeck">Deck</button>
-      <button class="tab" id="dkTabColl">Sammlung</button>
-    </div>
+    <!-- ⚠ HIER STANDEN ZWEI REITER „Deck | Sammlung" (bis 30.07.2026).
+         Befund des Auftraggebers zu IMG_3461: „du musst die Tower,
+         Skills und Items Schaltflaechen noch einbauen … Deck und
+         Sammlung oben brauchen wir nicht ueber dem Battledeck."
+         Der erste Teil war ein Trugschluss MEINERSEITS, kein fehlendes
+         Feature: die Reiter Tuerme/Spells/Items/Helden und der
+         Schmiede-Knopf gab es laengst — sie lagen hinter dem Reiter
+         „Sammlung" und waren damit einen Tipp entfernt und unsichtbar.
+         Der Kommentar, der hier stand, hat die Trennung sogar begruendet
+         („ein zweites Reiter-Set nur fuer denselben Filter waere
+         Redundanz"). Die Begruendung war falsch, weil sie das Falsche
+         verglichen hat: AA setzt Deck UND Sammlung auf EINEN
+         Bildschirm, untereinander. Man sieht sein Deck und den Vorrat
+         gleichzeitig — das ist der ganze Zweck des Bildschirms.
+         Deshalb: kein Umschalter mehr, beide Teile untereinander. -->
 
     <!-- ===== BATTLE DECK — ausgemessen in AA_UI_REFERENZ.md §24 ===== -->
     <div id="deckPane">
@@ -7523,32 +7545,44 @@ button.pfplate{cursor:pointer}
       <div class="hint" id="dkHint"></div>
     </div>
 
-    <!-- ===== SAMMLUNG (bestehend, unveraendert — jetzt ein Reiter) ===== -->
-    <div id="collPane" style="display:none">
+    <!-- ===== SAMMLUNG — steht jetzt UNTER dem Deck, nicht dahinter =====
+         Reihenfolge wie in AA (IMG_3461/3462/3463): Deck, dann die
+         Filterreiter, dann Sortierung links und Schmiede rechts, dann
+         das Raster. Bei „Items" tritt an die Stelle des Rasters die
+         Vorratsliste (RESOURCES / HERO ITEMS im Vorbild). -->
+    <div id="collPane">
+      <!-- Erste Zeile: NUR die Filterreiter. Der Schmiede-Knopf stand
+           bis zum 30.07.2026 hier mit drin; in AA (IMG_3461) traegt die
+           Reiterzeile ausschliesslich Towers|Skills|Items, und „Forge"
+           sitzt eine Zeile tiefer rechts, gegenueber der Sortierung.
+           Das ist nicht Kosmetik: ein Knopf, der etwas TUT, gehoert
+           nicht in eine Reihe mit Umschaltern, die nur filtern. -->
       <div class="tabs">
         <button class="tab on" id="tabTowers">Türme</button>
         <button class="tab" id="tabSpells">Spells</button>
         <button class="tab" id="tabItems">Items</button>
         <button class="tab" id="tabHeroes">Helden</button>
-        <span class="spacer"></span>
-        <button class="forgebtn" id="btnToForge">⚒ SCHMIEDE</button>
       </div>
-      <!-- Sortier-Dropdown (§7: AA hat "By Level" UND "By Rarity", Video 6) -->
+      <!-- Zweite Zeile: Sortierung links, Schmiede rechts (AA-Anordnung).
+           §7: AA hat "By Level" UND "By Rarity" (Video 6). -->
       <div class="tabs">
         <select class="mini sel" id="selSort" aria-label="Sortierung">
           <option value="level">Nach Level</option>
           <option value="tier">Nach Rarität</option>
         </select>
-        <span class="spacer"></span>
         <!-- Essenz-Vorrat. Bis zum 29.07.2026 standen hier DREI Zahlen
              nebeneinander — eine je Sorte. Seit jede Karte ihre eigene
              Essenz hat, waeren es acht, und acht Zahlen passen nicht in
              eine Zeile, die schon ein Sortier-Menue traegt. Hier steht
              deshalb die SUMME; die Aufschluesselung klappt darunter auf.
-             Kein Modal: der Vorrat ist eine Nebenauskunft, kein Vorgang. -->
+             Kein Modal: der Vorrat ist eine Nebenauskunft, kein Vorgang.
+             Er steht LINKS bei der Sortierung, nicht rechts: rechts
+             gehoert dem einen Knopf, der etwas tut. -->
         <span class="mini matchip pressable" id="matCount" role="button" tabindex="0"
           aria-expanded="false" aria-controls="essBank"
           aria-label="Essenz-Vorrat aufklappen">…</span>
+        <span class="spacer"></span>
+        <button class="forgebtn" id="btnToForge">⚒ SCHMIEDE</button>
       </div>
       <div class="essbank" id="essBank" hidden></div>
 
@@ -8793,6 +8827,11 @@ button.pfplate{cursor:pointer}
     card_back:       CDN + "hf_20260725_144624_82b4b51d-f9d3-416d-8212-52e2f3c0c0a1.png",
     cinematic_legendary:
                      CDN + "hf_20260725_141315_94331286-780b-4b74-8ee1-c8a3e15b9dac.mp4",
+    /* Arena-Pack (30.07.2026). Befund: „Die 4 Truhen slots muessen mit
+       neuen boosterpack Images versehen werden wir haben keine Truhen."
+       Bauart 3 wie die uebrigen acht, Glut SMARAGDGRUEN — die einzige
+       Farbe, die in der Familie noch frei war. */
+    pack_arena:      CDN + "hf_20260730_145814_3113fe7c-d431-4e99-be43-206e54f00b6c.png",
   };
   /* ==================================================================
    * ASSET-AUFLOESUNG — erst das Repo, dann das CDN
@@ -9318,7 +9357,39 @@ button.pfplate{cursor:pointer}
     var cur = getComputedStyle(el).backgroundImage;
     if (!cur || cur === "none") cur = "linear-gradient(180deg,#243342,#141d26)";
     el.style.backgroundImage = 'url("' + ASSETS[key] + '"), ' + cur;
+    /* ⚠ PASSUNG (30.07.2026). Befund: „Der Kampf Banner muss buendig in
+       die Kachel passen." Nachgemessen ist das kein Geschmack, sondern
+       Geometrie: `btn_primary.webp` ist 1200x896 gross, der Rahmen darin
+       aber nur 1028x343 — 85,7 % breit und 38,3 % HOCH, mit je ~30 %
+       leerer Leinwand oben und unten. Bei `background-size:100% 175%`
+       blieb davon sichtbar leerer Rand rund um den Rahmen stehen.
+       Dieselbe Klasse Fehler wie beim Band (§secribbon), nur an einem
+       anderen Bild.
+       Und der zweite Teil des Befunds: die sechs anderen Knoepfe mit
+       diesen Grafiken standen auf `background-size:auto` — eine
+       1200x896-Grafik in Originalgroesse auf einem 100-px-Knopf, also
+       ein zufaelliger Bildausschnitt. `.asset-btn` (210 %) haette es
+       geregelt, wird aber nirgends verwendet: tote CSS.
+       Die Zahlen stehen hier statt im CSS, weil sie zum BILD gehoeren,
+       nicht zum Knopf — jedes der drei Bilder hat eine andere Geometrie,
+       und layer() ist die eine Stelle, die den Schluessel kennt.
+       Gerechnet auf 98 % Breite und 96 % Hoehe Fuellung: ein Hauch Luft,
+       damit der Eckzierat nicht am Radius abgeschnitten wird.
+       Erzeugt aus assets/*.webp, nachrechenbar mit werkzeuge/ — wer ein
+       Bild austauscht, misst neu. */
+    var pas = BTN_PASSUNG[key];
+    if (pas) {
+      el.style.backgroundSize = pas[0] + ",100% 100%";
+      el.style.backgroundPosition = pas[1] + ",center";
+      el.style.backgroundRepeat = "no-repeat";
+    }
   }
+  var BTN_PASSUNG = {
+    /* Schluessel: [background-size, background-position] der Bildebene */
+    btn_primary:   ["114.4% 250.8%", "55.3% 49.7%"],
+    btn_secondary: ["115.3% 237.6%", "50% 50%"],
+    btn_danger:    ["119.0% 270.5%", "50% 50%"]
+  };
 
   /* bgArt(el, key) — Kulissen-Artwork als FLAECHE unter Inhalt.
      ------------------------------------------------------------------
@@ -9746,7 +9817,7 @@ button.pfplate{cursor:pointer}
   function nodeReward(t) {
     if (t % 1000 === 0) return { icon: "🥇", ico: "pack_gold",    label: "Gold-Pack",   q: "×1" };
     if (t % 500 === 0)  return { icon: "🥈", ico: "pack_silver",  label: "Silber-Pack", q: "×1" };
-    if (t % 250 === 0)  return { icon: "🥉", ico: "chest_bronze", label: "Bronze-Pack", q: "×1" };
+    if (t % 250 === 0)  return { icon: "🥉", ico: "pack_bronze", label: "Bronze-Pack", q: "×1" };
     var m = (t / stepAt(t)) % 3;
     if (m === 1) return { icon: "🪙", ico: "cur_gold", label: "Gold",
                           q: "×" + fmt(200 + Math.floor(t / 50) * 40) };
@@ -10406,15 +10477,19 @@ button.pfplate{cursor:pointer}
      Wahl fuer die Dauer der Sitzung — wer in der Sammlung stoebert und
      kurz den Helden wechselt, soll nicht bei jedem Tippen auf den
      zweiten Bottom-Nav-Reiter wieder im Deck landen. */
+  /* setDkMain() gibt es weiter, aber es SCHALTET nichts mehr um: seit
+     dem 30.07.2026 stehen Deck und Sammlung untereinander auf einem
+     Bildschirm (siehe HTML-Kommentar oben). Die Funktion zeichnet jetzt
+     beide Teile.
+     Der Name bleibt, weil er an mehreren Stellen aufgerufen wird und ein
+     Umbenennen nichts verbessert — was er tut, steht hier. `dkMain`
+     bleibt als Merker fuer den zuletzt gewaehlten SAMMLUNGS-Reiter
+     erhalten, damit man nach einem Ausflug ins Detailfenster dort
+     weitermacht, wo man war. */
   var dkMain = "deck";
-  function setDkMain(which) {
-    dkMain = which === "coll" ? "coll" : "deck";
-    $("dkTabDeck").classList.toggle("on", dkMain === "deck");
-    $("dkTabColl").classList.toggle("on", dkMain === "coll");
-    $("deckPane").style.display = dkMain === "deck" ? "" : "none";
-    $("collPane").style.display = dkMain === "coll" ? "" : "none";
-    if (dkMain === "deck") renderDeckBoard();
-    else if ($("tabSpells").classList.contains("on")) renderSpells();
+  function setDkMain() {
+    renderDeckBoard();
+    if ($("tabSpells").classList.contains("on")) renderSpells();
     else renderCollection();
   }
 
@@ -13086,23 +13161,61 @@ button.pfplate{cursor:pointer}
     layer($("arenaProg"), "progress_frame");
     layer($("btnBattle"), "btn_primary");
 
-    // Truhen-/Pack-Slots (§14.3). Demo: 2 Bronze-Packs + 2 leere Plätze.
-    // Im Spiel kommt der Bestand aus ArenaProfile (packAwarded jeden
-    // 3. Sieg, siehe arena_cards.js PACKS.bronze.source).
-    var SLOTS = [{ k: "bronze", i: "🥉" }, { k: "bronze", i: "🥉" }, null, null];
+    /* ==============================================================
+     * DIE VIER BELOHNUNGSPLAETZE (§14.3) — 30.07.2026 umgebaut
+     * --------------------------------------------------------------
+     * Befund des Auftraggebers zu IMG_3460: „Die 4 Truhen slots muessen
+     * mit neuen boosterpack Images versehen werden wir haben keine
+     * Truhen." Er hat recht: hier stand `chest_bronze`, eine Truhe.
+     * Truhen kommen in diesem Spiel nirgends vor — die Waehrung des
+     * Fortschritts sind Packs.
+     *
+     * Belegung: drei ARENA-Packs (neue Sorte, arena_cards.js PACKS.arena)
+     * und als vierter ein GOLD-Pack. „Der vierte soll ein Gold back
+     * sein" — und er ist zugleich die Antwort auf „Wir brauchen starke
+     * Belohnungen das Leute spielen": der vierte Platz ist der, auf den
+     * man hinspielt. Ein Gold-Pack traegt 9 Kartenslots und garantiert
+     * Episch; das ist ein sichtbares Ziel und kein Trostpreis.
+     *
+     * Der DEMO-Bestand fuellt zwei Plaetze; die hinteren beiden stehen
+     * leer und zeigen, dass es dort noch etwas zu holen gibt. Im Spiel
+     * kommt der Bestand aus ArenaProfile (packAwarded).
+     * ============================================================== */
+    var SLOTS = [
+      { k: "arena", i: "🟩" }, { k: "arena", i: "🟩" },
+      null, null,
+    ];
+    /* Der vierte Platz ist IMMER der Gold-Platz, auch wenn er noch leer
+       ist — sonst waere die beste Belohnung eine Ueberraschung statt
+       eines Ziels. Sein Titel sagt es, sein Bild zeigt es. */
+    var SLOT_GOLD = 3;
+    function slotPack(k) { return AC.PACKS && AC.PACKS[k] ? AC.PACKS[k] : null; }
     $("packSlots").innerHTML = SLOTS.map(function (s, k) {
+      var art = s ? s.k : (k === SLOT_GOLD ? "gold" : "arena");
+      var p = slotPack(art), name = p ? p.name : "Pack";
+      var bild = ico("pack_" + art, art === "gold" ? "🟨" : "🟩", "big");
       return s
-        ? '<button class="slot full" data-slot="' + k + '" title="Bronze-Pack">' +
-          ico("chest_bronze", s.i, "big") + '<span class="cnt3">1</span></button>'
-        : '<button class="slot empty" data-slot="' + k + '" title="Leerer Platz">＋</button>';
+        ? '<button class="slot full" data-slot="' + k + '" data-pack="' + art +
+          '" title="' + name + '">' + bild + '<span class="cnt3">1</span></button>'
+        /* Der leere Platz zeigt sein Pack BLASS statt eines „＋". Ein Plus
+           sagt „hier fehlt etwas"; das blasse Pack sagt „hier kommt
+           DIESES hin" — und beim Gold-Platz ist genau das die
+           Botschaft. */
+        : '<button class="slot empty" data-slot="' + k + '" data-pack="' + art +
+          '" title="' + name + ' — noch nicht verdient">' +
+          '<span class="slotghost">' + bild + "</span></button>";
     }).join("");
     Array.prototype.forEach.call($("packSlots").querySelectorAll(".slot"), function (b) {
       var full = b.classList.contains("full");
       layer(b, "hex_slot");
       b.style.backgroundSize = "112% 112%, 100% 100%";
+      var art = b.getAttribute("data-pack") || "arena";
+      var p = slotPack(art);
       b.addEventListener("click", function () {
-        if (full) { toast("Bronze-Pack — zur Pack-Ansicht"); show("navPack"); }
-        else toast("Leerer Platz — Packs gibt es für Siege");
+        if (full) { toast((p ? p.name : "Pack") + " — zur Pack-Ansicht"); show("navPack"); }
+        /* Der leere Platz sagt jetzt, WAS dort hinkommt und WOFUER.
+           „Leerer Platz" allein beantwortet keine der beiden Fragen. */
+        else toast((p ? p.name : "Pack") + " — für Siege in der Arena");
       });
     });
     /* Der ERSTE leere Platz zeigt den Gratis-Pack-Countdown — genau dort
@@ -13112,7 +13225,8 @@ button.pfplate{cursor:pointer}
       var pt0 = D0.packTimer();
       var firstEmpty = $("packSlots").querySelector(".slot.empty");
       if (firstEmpty) {
-        firstEmpty.innerHTML = (pt0.ready ? ico("chest_bronze", "🥉", "big") : "＋") +
+        firstEmpty.innerHTML = (pt0.ready ? ico("pack_arena", "🟩", "big")
+            : '<span class="slotghost">' + ico("pack_arena", "🟩", "big") + "</span>") +
           '<span class="tmr">' + (pt0.ready ? pt0.ready + "x frei" : pt0.text) + "</span>";
         if (pt0.ready) firstEmpty.classList.add("full");
       }
@@ -15313,7 +15427,7 @@ button.pfplate{cursor:pointer}
     $("paneQuests").innerHTML = html;
     hydrateRibbons($("paneQuests"));
     Array.prototype.forEach.call($("paneQuests").querySelectorAll(".chestcard"), function (el) {
-      layer(el, "chest_bronze");
+      layer(el, "pack_bronze");
     });
     Array.prototype.forEach.call($("paneQuests").querySelectorAll(".qcard"), function (el) {
       layer(el, "panel");
@@ -17107,7 +17221,7 @@ button.pfplate{cursor:pointer}
     var pt = st.pack;
     html += '<div class="dbonus tinted" style="margin-top:7px;' +
       tintStyle("pack_bronze") + '">' +
-      '<span class="dbs">' + ico("chest_bronze", "🥉") + "</span>" +
+      '<span class="dbs">' + ico("pack_bronze", "🥉") + "</span>" +
       '<span class="dbt">Gratis-Pack<small>' +
         (pt.ready ? pt.ready + " von " + pt.max + " bereit" : "nächstes in " + pt.text + " h") +
         " · alle " + pt.everyText + ", max " + pt.max + "</small></span>" +
@@ -18533,9 +18647,11 @@ button.pfplate{cursor:pointer}
   $("reqDlg").addEventListener("click", function (e) {
     if (e.target === $("reqDlg")) $("reqDlg").classList.remove("open");
   });
-  /* ---------- Battle Deck (§24) ---------- */
-  $("dkTabDeck").addEventListener("click", function () { UISfx.tap(); setDkMain("deck"); });
-  $("dkTabColl").addEventListener("click", function () { UISfx.tap(); setDkMain("coll"); });
+  /* ---------- Battle Deck (§24) ----------
+     Die zwei Umschalter „Deck | Sammlung" sind am 30.07.2026 entfallen —
+     beides steht jetzt untereinander auf einem Bildschirm. Ihre
+     Zuhoerer sind mitgegangen; sie haetten sonst beim Laden auf `null`
+     geworfen und die ganze Verdrahtung darunter abgeschnitten. */
   // Kurzer Hinweis statt einer Drop-Raten-Offenlegung — siehe CSS-
   // Kommentar bei .dkinfo, warum das NICHT ueber .oddsi laeuft.
   $("dkInfo").addEventListener("click", function () {
@@ -19436,7 +19552,7 @@ button.pfplate{cursor:pointer}
         : (m.locked ? '<i class="rwchip">' + ico("ic_lock", "🔒") + "</i>" : "");
       return '<button class="rwmark ' + cls + (m.grand ? " grand" : "") +
         '" data-rwchest="' + scope + ":" + m.at + '" style="left:' + m.pct + '%" title="' +
-        m.reward.long + '">' + ico("chest_bronze", "🎁") + chip +
+        m.reward.long + '">' + ico("pack_bronze", "🎁") + chip +
         "<b>" + m.at + "</b></button>";
     }).join("");
     return '<div class="rwrail">' + headHtml +

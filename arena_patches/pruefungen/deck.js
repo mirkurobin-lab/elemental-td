@@ -110,7 +110,8 @@ const gegen = (n, gebrochenErkannt, z) => {
     return {
       dkMain: window.__proto.dkMain(),
       deckPaneSichtbar: getComputedStyle(document.getElementById("deckPane")).display !== "none",
-      collPaneVersteckt: getComputedStyle(document.getElementById("collPane")).display === "none",
+      collPaneSichtbar: getComputedStyle(document.getElementById("collPane")).display !== "none",
+      umschalterWeg: !document.getElementById("dkTabDeck") && !document.getElementById("dkTabColl"),
       held: an.held, tuerme: an.tuerme, spells: an.spells,
       belegt: an.belegung.belegt, plaetze: an.belegung.plaetze,
       frei: an.frei, aktiv: an.aktiv,
@@ -120,9 +121,19 @@ const gegen = (n, gebrochenErkannt, z) => {
       decks: D.DECKS,
     };
   });
-  pruef("der zweite Bottom-Nav-Reiter zeigt beim ALLERERSTEN Oeffnen das Deck, nicht die Sammlung",
-        erst.dkMain === "deck" && erst.deckPaneSichtbar && erst.collPaneVersteckt,
-        JSON.stringify({ dkMain: erst.dkMain, deckPane: erst.deckPaneSichtbar, collPane: erst.collPaneVersteckt }));
+  /* UMGESCHRIEBEN 30.07.2026. Vorher: „zeigt beim ALLERERSTEN Oeffnen das
+     Deck, NICHT die Sammlung" — das verlangte, dass `collPane` versteckt
+     ist. Diese Bauweise ist abgeschafft: AA setzt Deck UND Sammlung
+     untereinander auf EINEN Bildschirm (IMG_3461), und der Auftraggeber
+     hat genau das verlangt („Deck und Sammlung oben brauchen wir nicht
+     ueber dem battledeck"). Der Schritt wurde rot, weil die Sammlung
+     jetzt sichtbar IST — also wegen der Verbesserung.
+     Geprueft wird jetzt die neue Zusage: beides gleichzeitig da, und der
+     alte Umschalter ist wirklich weg (nicht nur ausgeblendet). */
+  pruef("Deck und Sammlung stehen gleichzeitig auf einem Bildschirm (AA)",
+        erst.deckPaneSichtbar && erst.collPaneSichtbar && erst.umschalterWeg,
+        JSON.stringify({ deckPane: erst.deckPaneSichtbar, collPane: erst.collPaneSichtbar,
+                         umschalterWeg: erst.umschalterWeg }));
   pruef("ein frisches Deck ist wirklich LEER (kein Karten-Rest aus einer Demo)",
         erst.held === null && erst.tuerme.every(x => x === null) && erst.spells.every(x => x === null),
         JSON.stringify({ held: erst.held, tuerme: erst.tuerme, spells: erst.spells }));

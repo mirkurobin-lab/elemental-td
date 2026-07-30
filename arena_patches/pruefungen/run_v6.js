@@ -752,14 +752,17 @@ function step(name, ok, info) {
   await page.waitForTimeout(250);
   await page.click('#navCollection');
   await page.waitForTimeout(200);
-  /* ⚠ ANGEPASST (30.07.2026, Battle-Deck-Umbau): der zweite Bottom-Nav-
-     Reiter zeigt seither ZWEI gleichrangige Reiter dieser View — Deck
-     (Standard) und Sammlung (§24, AA_UI_REFERENZ). `#btnToForge` steckt
-     im Sammlung-Panel; ohne den Klick auf `#dkTabColl` bliebe es hinter
-     `display:none` und Playwright liefe in ein Sichtbarkeits-Timeout —
-     dieselbe Lehre wie beim `.oddsi`-Vorbild: eine View-Struktur zu
-     aendern bricht jeden Test, der bisher nur den EINEN Zustand kannte. */
-  await page.click('#dkTabColl');
+  /* ⚠ ZWEIMAL ANGEPASST, und das ist die eigentliche Notiz.
+     30.07.2026 vormittags: die View bekam zwei Reiter (Deck | Sammlung),
+     `#btnToForge` verschwand hinter `display:none`, und hier musste ein
+     Klick auf `#dkTabColl` davor.
+     30.07.2026 nachmittags: die Reiter sind wieder weg — AA stellt Deck
+     und Sammlung untereinander auf EINEN Bildschirm, und der Auftraggeber
+     hat genau das verlangt. Der Klick ist ersatzlos entfallen.
+     Die Lehre steht in beiden Richtungen: ein Test, der den WEG zu einem
+     Knopf festschreibt statt seine Erreichbarkeit, muss bei jedem Umbau
+     angefasst werden. Geprueft wird deshalb, dass der Knopf sichtbar und
+     klickbar IST — nicht, hinter welchem Reiter er liegt. */
   await page.waitForTimeout(150);
   await page.click('#btnToForge');
   await page.waitForTimeout(250);
@@ -770,7 +773,6 @@ function step(name, ok, info) {
   // ============ 8c. AAA-SWEEP: KARTEN-ARTWORK STATT EMOJI ============
   await page.click('#navCollection');
   await page.waitForTimeout(200);
-  await page.click('#dkTabColl');   // s.o.: Sammlung ist jetzt ein Reiter, kein Automatismus mehr
   await page.waitForTimeout(400);
   /* Battle-Deck-Kachel MIT Artwork: die alte `#deckRow`-Vorschau (vier
      feste Beispiel-Karten, keine Zonen, kein Speicher) ist durch den
@@ -778,7 +780,7 @@ function step(name, ok, info) {
      "eine ausgeruestete Karte traegt echtes Artwork, nicht nur Emoji"
      — gilt jetzt fuer einen ECHTEN Deck-Platz statt einer Deko-Kachel. */
   await page.evaluate(() => {
-    window.__proto.setDkMain('deck');
+    window.__proto.setDkMain();
     window.__proto.ArenaDeck().setze('tuerme', 0, 'fire');
     window.__proto.renderDeckBoard();
   });
@@ -791,7 +793,7 @@ function step(name, ok, info) {
     deckArt.img === 1 && deckArt.emo === 1, JSON.stringify(deckArt));
   await page.evaluate(() => {
     window.__proto.ArenaDeck()._reset();
-    window.__proto.setDkMain('coll');
+    window.__proto.setDkMain();
   });
   await page.waitForTimeout(200);
   const artColl = await page.evaluate(() => ({
@@ -945,7 +947,6 @@ function step(name, ok, info) {
   // ================= 8e. HELDEN =================
   await page.click('#navCollection');
   await page.waitForTimeout(300);
-  await page.click('#dkTabColl');   // Battle-Deck-Umbau: #tabHeroes steckt im Sammlung-Reiter
   await page.waitForTimeout(150);
   await page.click('#tabHeroes');
   await page.waitForTimeout(400);
@@ -1796,7 +1797,6 @@ function step(name, ok, info) {
   // --- Karten-Loops ---
   await page.click('#navCollection');
   await page.waitForTimeout(350);
-  await page.click('#dkTabColl');   // Battle-Deck-Umbau: Sammlung ist ein Reiter (s.o.)
   await page.waitForTimeout(150);
   await page.click('#collGrid .tile');
   await page.waitForTimeout(600);

@@ -1,6 +1,6 @@
 {
- "_bytes": 77002605,
- "_dateien": 229,
+ "_bytes": 77013637,
+ "_dateien": 230,
  "_hinweis": "Erzeugt von werkzeuge/assets_sichern.py. Schluessel, Quell-URL, Dateiname, Groesse und SHA-256 je Asset — der Nachweis, dass die Datei im Repo die Datei vom CDN ist.",
  "assets": {
   "arena1": {
@@ -1080,6 +1080,14 @@
    "kleinfassung": true,
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095739_dad6b23f-bd87-42bb-934a-f0e05d24d4c3_min.webp",
    "sha256": "f670978716e34611ae7821c403cc311cf6fd47cc25421c899dec6c115044cd7f"
+  },
+  "pack_arena": {
+   "_hinweis": "Anders als die uebrigen Kleinfassungen NICHT von assets_sichern.py geholt: *.cloudfront.net ist aus dieser Umgebung gesperrt (CONNECT 403). Die Datei wurde in der Bild-Sandbox aus der Originalgenerierung auf 448x600 verkleinert und als WebP q60 uebertragen. Deshalb weicht sie in Groesse und Qualitaet von den 896x1200-Packs ab — wer sie ersetzen kann, sollte das Original nachziehen.",
+   "bytes": 11032,
+   "datei": "pack_arena.webp",
+   "kleinfassung": true,
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260730_145814_3113fe7c-d431-4e99-be43-206e54f00b6c.png",
+   "sha256": "3b22d3ace02f6aa81709bd5941faeffb00b4c3abffc5cb20bdf2826fc5a6660a"
   },
   "pack_arena_gross": {
    "bytes": 58744,

@@ -307,10 +307,25 @@ function step(name, ok, info) {
      danach („element is not visible"). Genau die Fehlerklasse, die dieses
      Projekt schon mehrfach getroffen hat: Vorhandensein ist nicht
      Sichtbarkeit. Jetzt wird beides geprueft. */
-  step('Battle Deck ist der voreingestellte Reiter (wie in AA)',
-    await page.locator('#dkTabDeck').evaluate(e => e.classList.contains('on')) &&
-    await page.locator('#deckPane').evaluate(e => e.style.display !== 'none'));
-  await page.click('#dkTabColl');
+  /* UMGESCHRIEBEN 30.07.2026. Vorher: „Battle Deck ist der
+     voreingestellte Reiter" — das prueft eine Bauweise, die es nicht
+     mehr gibt. Es gibt keinen Umschalter mehr; Deck UND Sammlung stehen
+     untereinander auf einem Bildschirm, so wie in AA (IMG_3461). Die
+     Zusage lautet jetzt: man sieht beides GLEICHZEITIG, ohne zu tippen.
+     Genau das misst der Schritt — beide Teile im Layout, nicht nur im
+     DOM. Vorhandensein ist nicht Sichtbarkeit. */
+  const beides = await page.evaluate(() => {
+    const d = document.getElementById('deckPane'), c = document.getElementById('collPane');
+    const sicht = e => !!e && e.getClientRects().length > 0 &&
+                       getComputedStyle(e).display !== 'none';
+    return { deck: sicht(d), coll: sicht(c),
+             umschalter: !!document.getElementById('dkTabDeck') ||
+                         !!document.getElementById('dkTabColl') };
+  });
+  step('Deck und Sammlung stehen gleichzeitig auf einem Bildschirm (AA)',
+    beides.deck && beides.coll && !beides.umschalter,
+    'Deck sichtbar: ' + beides.deck + ' · Sammlung sichtbar: ' + beides.coll +
+    ' · alte Umschalter noch da: ' + beides.umschalter);
   await page.waitForTimeout(250);
   const tiles = await page.locator('#collGrid .tile').count();
   /* Genau SECHS: die Sammlung zeigt Tuerme. Solara und Magmor sind Helden

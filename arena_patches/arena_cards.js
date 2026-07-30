@@ -317,6 +317,38 @@
               cardSlots: 7,  materialSlots: 3, spellSlots: 2, gold: [1200, 2500],
               weights: [62, 28, 8.4, 1.4, 0.2], guarantee: 2,
               promise: "Enthält mindestens eine Seltene Karte oder besser" },
+    /* ---------- ARENA-PACK (30.07.2026) ----------
+     * Vorgabe des Auftraggebers zu IMG_3460: die vier Belohnungsplätze auf
+     * der Startseite zeigten TRUHEN — „wir haben keine Truhen". Sie tragen
+     * jetzt Booster-Packs. Drei davon sind dieses hier, der vierte ist ein
+     * Gold-Pack.
+     *
+     * ANSAGE: „Sie sollen vom Inhalt bisschen schlechter wie die Silber
+     * booster packs sein" UND „Wir brauchen starke Belohnungen das Leute
+     * spielen." Beides zusammen legt die Stellschraube fest:
+     *
+     *   Die GARANTIE bleibt bei 2 (mindestens Selten) — gleich wie Silber.
+     *   Der Boden ist das, was ein Spieler beim Öffnen als Versprechen
+     *   liest; ihn zu senken macht das Pack nicht „ein bisschen"
+     *   schlechter, sondern zu einem Bronze-Pack mit anderer Farbe.
+     *   Schlechter wird es über MENGE und QUOTEN: ein Kartenslot weniger,
+     *   ein Essenzslot weniger, ein Spellslot weniger, gut ein Drittel
+     *   weniger Gold, und die Kurve rutscht von Silber Richtung Bronze
+     *   zurück (62→70 % Gewöhnlich).
+     *
+     * Gemessen gegen Silber: 6 statt 7 Kartenslots und die flachere Kurve
+     * ergeben 1,2 % Legendär je Pack statt 1,4 % und 6,0 % Episch statt
+     * 9,8 %. Spürbar schwächer, aber immer noch ein Pack, für das man
+     * einen Kampf mehr spielt — und genau das ist der Zweck.
+     *
+     * Es ist NICHT käuflich. Es gibt keine Kristallquelle dafür und darf
+     * auch keine bekommen: die vier Plätze sind die Belohnung fürs
+     * Spielen, und ein Pack, das man auch kaufen kann, entwertet sie. */
+    arena:  { key: "arena",  name: "Arena-Pack",  color: "#46c46a",
+              source: "Arena-Belohnungsplätze (Siege)",
+              cardSlots: 6,  materialSlots: 2, spellSlots: 1, gold: [900, 1800],
+              weights: [70, 23, 5.8, 1.0, 0.2], guarantee: 2,
+              promise: "Enthält mindestens eine Seltene Karte oder besser" },
     gold:   { key: "gold",   name: "Gold-Pack",   color: "#f2c53d",
               source: "Trophy-Road-Knoten, Rang-Aufstieg",
               cardSlots: 9,  materialSlots: 4, spellSlots: 2, gold: [4000, 8000],
