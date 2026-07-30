@@ -291,7 +291,39 @@ body.nur-waehrung .apphead .headcol{padding:6px 0}
    Die Anforderung dahinter ist messbar und steht in
    pruefungen/bildzustand.js: kein Motiv beruehrt den Rand. */
 .cur i{padding:4.5px}
-.cur .ico{width:100%;height:100%}
+/* ⚠ RUECKFALL vom 30.07.2026, zweite Meldung: „Gold fittet noch immer
+   nicht in den Kreis." Trophaee und Kristall sassen richtig.
+   NACHGEMESSEN, und diesmal war die Geometrie NICHT der Befund:
+   Fassung 24x24, padding 4,5 px, Motivkasten 15x15 mittig, object-fit
+   contain — bei allen drei gleich. Im Chromium ist der Ring frei
+   (Aussenring 0,66 R…R zu 0 % bedeckt, alle drei).
+   DIE ECHTE ABHAENGIGKEIT liegt woanders: der Ring ist nur deshalb
+   frei, weil `filter:url(#icoFrei)` den eingebackenen Grund der PNGs
+   wegschneidet. Ohne diesen Filter zeigt jedes Motiv sein volles
+   Rechteck — und genau dort unterscheiden sich die drei:
+     cur_trophy  Motivanteil 36 %   Grund-Luminanz  8 %
+     cur_gem     Motivanteil 43 %   Grund-Luminanz  7 %
+     cur_gold    Motivanteil 100 %  Grund-Luminanz 13 %
+   Gold ist das einzige randlose Motiv UND das mit dem hellsten Grund.
+   Gemessen mit abgeschaltetem Filter (Differenzbild gegen die leere
+   Fassung): Deckung der Scheibe 19 % -> 35 %, Aussenring 0 % -> 6 %.
+   Im Bild bleiben Pokal und Kristall dabei unauffaellig (ihr Grund ist
+   so dunkel wie die Scheibe), waehrend Gold als helles Quadrat ueber
+   der Scheibe liegt — Wort fuer Wort die Meldung.
+   Der Filter ist also der EINZIGE Grund, warum das Medaillon rund
+   aussieht. Ein SVG-Filter, der an einer Referenz im Dokument haengt,
+   ist keine Zusicherung, die man einer Fassung geben will (die Meldung
+   kommt vom iPhone, gepruefte wird im Chromium).
+   DIE LOESUNG ist geometrisch statt bildabhaengig: das Motiv bekommt
+   seine EIGENE Rundung. 15 px Kreis in 24 px Scheibe laesst 4,5 px
+   Ring frei — in JEDER Richtung, nicht nur auf den Achsen (ein
+   Quadrat stoesst diagonal bis 0,88 R vor). Damit ist der Ring
+   unabhaengig davon, wie das Asset beschnitten ist und ob die
+   Freistellung greift. Nachgemessen ohne Filter: Aussenring 0 %.
+   KEINE Ausnahme fuer c-gold — eine Regel fuer alle drei.
+   Festgehalten in pruefungen/bildzustand.js, Schritt „Waehrungsmotiv
+   beruehrt den Rand nicht" UND „…auch ohne Freistell-Filter". */
+.cur .ico{width:100%;height:100%;border-radius:50%}
 .cur span.ico{font-size:14px;line-height:18px}
 /* Waehrungs-Pillen tragen die Identitaetsfarbe ihrer Waehrung: die Zahl
    und der Rand, nicht die ganze Flaeche — sonst kippt die Lesbarkeit. */
@@ -5739,7 +5771,15 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .avatar{position:relative;flex:0 0 21.7%;max-width:96px;align-self:stretch;
   margin:0;border-radius:0;background:none;
   display:flex;align-items:flex-end;justify-content:center;overflow:visible}
-.avatar i{position:absolute;left:-6%;right:-6%;top:-8px;bottom:-2px;
+/* ⚠ „Der grosse Avatar in der Kopfleiste ragt aus der Leiste heraus"
+   (30.07.2026). Nachgemessen bei 430x932: Kopfleiste y=0…83, das
+   Portrait y=-8…84 — also 8 px OBERHALB der Leiste im schwarzen
+   Bereich und 1 px darunter. Oben ist nichts, in das es hineinragen
+   koennte: dort liegt die Statusleiste des Telefons.
+   Der negative Ueberstand bleibt LINKS und RECHTS (dort steht die
+   Leiste selbst dahinter, das ist die gewollte AA-Optik), senkrecht
+   endet das Portrait jetzt buendig mit der Leiste. */
+.avatar i{position:absolute;left:-6%;right:-6%;top:0;bottom:0;
   border-radius:14px;font-style:normal;font-size:34px;
   display:flex;align-items:center;justify-content:center;
   background:radial-gradient(120% 90% at 50% 22%,#3a4c5c,#0d151c 78%);
@@ -6375,6 +6415,45 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   margin:var(--gap-lg) 14px 0;padding:var(--pad);border-radius:var(--radius);
   border:1px solid var(--line);overflow:hidden;
   background:linear-gradient(135deg,#243547,#16202a 62%,#0e1418)}
+/* ==================================================================
+ * ⚠ PORTRAITFLAECHEN — EINE Regel fuer alle vier Groessen
+ * ------------------------------------------------------------------
+ * Befund vom 30.07.2026: „Das Avatar System funktioniert nicht, wenn
+ * ich einen anderen Avatar waehle kommt wieder der Platzhalter."
+ * Jede Kachel im Profil-Fenster zeigte einen leeren Bilderrahmen; am
+ * rechten Rand blitzte ein schmaler Streifen des echten Artworks
+ * durch. Das sind ZWEI Fehler in derselben Flaeche, beide gemessen
+ * (60-px-Kachel, Viewport 430x932, Bilder ueber HTTP geladen):
+ *
+ * (1) NEBENEINANDER STATT UEBEREINANDER.
+ *     `.avcpic` ist ein FLEX-Kasten; `.avemo` und das <img> lagen
+ *     beide als normale Flex-KINDER darin. Gemessen:
+ *       Kreis   x=40,2  b=60
+ *       Emoji   x=27,2  b=26   (13 px LINKS neben dem Kreis)
+ *       Bild    x=53,2  b=60   (endet 53 px RECHTS daneben)
+ *     Das Portrait sass also um 13 px verschoben, nur 47 seiner 60 px
+ *     lagen ueberhaupt im Kreis. Das ist exakt der Fehler, der am
+ *     selben Tag fuer `.avatar i` behoben wurde (siehe unten bei
+ *     `.avatar i.avmini`) — nur wurde er dort EINZELN behoben, und die
+ *     vier Geschwisterklassen `.avpvpic`, `.avcpic`, `.avcerpic`,
+ *     `.pfpic` behielten ihn. Deshalb steht die Regel jetzt EINMAL
+ *     fuer alle vier.
+ *
+ * (2) DER RAHMEN DECKTE DAS PORTRAIT ZU — siehe bei `.avpvring`.
+ *
+ * Das Emoji liegt UNTEN (z-index 0) und bleibt der Rueckfall, das
+ * Portrait deckt es zu, sobald es laedt (UIIcon.hide raeumt es bei
+ * Ladefehler weg). `.pfelav` ist ausgenommen: das ist kein Portrait,
+ * sondern das Element-Icon fremder Profile mit eigener Groesse.
+ * ================================================================== */
+.avpvpic,.avcpic,.avcerpic,.pfpic{position:relative}
+.avpvpic > img:not(.pfelav),.avcpic > img:not(.pfelav),
+.avcerpic > img:not(.pfelav),.pfpic > img:not(.pfelav){
+  position:absolute;inset:0;z-index:1;
+  width:100%;height:100%;object-fit:cover;border-radius:50%}
+.avpvpic > .avemo,.avcpic > .avemo,.avcerpic > .avemo,.pfpic > .avemo{
+  position:absolute;inset:0;z-index:0;
+  display:flex;align-items:center;justify-content:center}
 /* ⚠ KEIN overflow:hidden auf der Portraitflaeche. Der Rahmenring liegt
    mit negativem inset AUSSERHALB des Kreises; ein Clip auf dem Eltern-
    element hat ihn in der ersten Fassung komplett weggeschnitten — der
@@ -6384,13 +6463,39 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   height:var(--banner-h-lg);border-radius:50%;display:flex;align-items:center;
   justify-content:center;
   background:radial-gradient(circle at 50% 35%,#33475c,#0d151c 72%)}
-.avpvpic img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .avpvpic .avemo{font-size:52px;line-height:1}
 /* Rahmen liegt UEBER dem Portrait und faengt keine Klicks. Ohne Bild
    bleibt der farbige Ring aus --avring stehen — das Portrait wird nie
-   zugedeckt (dieselbe Regel wie bei hydrateFrames). */
-.avpvring{position:absolute;inset:-5%;pointer-events:none;border-radius:50%;
+   zugedeckt (dieselbe Regel wie bei hydrateFrames).
+   ⚠ GENAU DAS STIMMTE NICHT. Die Absicht stand hier, die Umsetzung tat
+   das Gegenteil: die Rahmengrafik lag als `background-image` mit
+   `background-size:contain` ueber der ganzen Flaeche. Nachgemessen an
+   allen sechs `frame_*.webp`: durchgehend ALPHA 255 (kein transparenter
+   Kern) und eine Innenflaeche mit 7–9 % Luminanz. Ueber ein Portrait
+   gelegt ergibt das genau den „leeren Bilderrahmen", den der
+   Auftraggeber gesehen hat — und der schmale Streifen Artwork am
+   rechten Rand war das um 13 px verschobene Portrait aus Fehler (1),
+   das seitlich unter der Grafik hervorschaute.
+   ⚠ elementFromPoint in der Kachelmitte findet diesen Fehler NICHT: die
+   Ringe tragen `pointer-events:none`, der Treffer ist das IMG. Genau so
+   war die Pruefung falsch gruen. Gemessen werden muessen PIXEL.
+   DIE LOESUNG ist das Mittel, das dieses Blatt fuer jede Grafik mit
+   eingebackenem Grund schon benutzt: der Freistell-Filter #icoFrei
+   (§6h) schneidet alles unter 26 % Luminanz weg. 7–9 % liegen klar
+   darunter, die Innenflaeche wird also vollstaendig transparent, das
+   Zierwerk bleibt.
+   Der Filter darf NICHT auf dem Ring selbst sitzen — der traegt den
+   farbigen box-shadow, und der wuerde mitgeschnitten. Die Grafik liegt
+   deshalb auf einer eigenen Malschicht (::before) und kommt ueber die
+   Eigenschaft --avfrm herein, die avPicHTML() setzt. */
+.avpvring,.avcring,.avcerring,.pfring{position:absolute;pointer-events:none;
+  border-radius:50%}
+.avpvring::before,.avcring::before,.avcerring::before,.pfring::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;
+  background-image:var(--avfrm,none);
   background-repeat:no-repeat;background-position:center;background-size:contain;
+  filter:url(#icoFrei)}
+.avpvring{inset:-5%;
   box-shadow:inset 0 0 0 3px var(--avring,#9aa3ad),0 0 14px -4px var(--avring,#9aa3ad)}
 .avpvtxt{flex:1;min-width:0}
 .avpvtxt .avpvn{display:block;font-size:15px;font-weight:900;line-height:1.2}
@@ -6426,11 +6531,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .avcpic{position:relative;width:60px;height:60px;border-radius:50%;display:flex;
   align-items:center;justify-content:center;
   background:radial-gradient(circle at 50% 35%,#2c3d4f,#0d151c 74%)}
-.avcpic img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .avcpic .avemo{font-size:26px;line-height:1}
-.avcring{position:absolute;inset:-6%;pointer-events:none;border-radius:50%;
-  background-repeat:no-repeat;background-position:center;background-size:contain;
-  box-shadow:inset 0 0 0 2px var(--avring,#9aa3ad)}
+.avcring{inset:-6%;box-shadow:inset 0 0 0 2px var(--avring,#9aa3ad)}
 .avcn{font-size:8.5px;font-weight:800;line-height:1.25;color:#cfe0ec;
   overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 /* Bedingung unter der gesperrten Kachel. Sie steht als TEXT da und nicht
@@ -6483,11 +6585,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .avcerpic{position:relative;width:200px;height:200px;margin:16px auto 0;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   background:radial-gradient(circle at 50% 35%,#3a4f66,#0d151c 72%)}
-.avcerpic img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .avcerpic .avemo{font-size:96px;line-height:1}
-.avcerring{position:absolute;inset:-5%;pointer-events:none;border-radius:50%;
-  background-repeat:no-repeat;background-position:center;background-size:contain;
-  box-shadow:inset 0 0 0 4px var(--avring,#9aa3ad)}
+.avcerring{inset:-5%;box-shadow:inset 0 0 0 4px var(--avring,#9aa3ad)}
 .avcerglow{position:absolute;inset:-18%;pointer-events:none;border-radius:50%;
   background:radial-gradient(circle,var(--avring,#9aa3ad)44,transparent 68%)}
 .avcern{margin-top:18px;font-size:24px;font-weight:900;line-height:1.15}
@@ -6791,15 +6890,13 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   display:flex;align-items:center;justify-content:center;font-size:44px;
   background:radial-gradient(circle at 50% 35%,#33475c,#0d151c 72%);
   box-shadow:var(--sh-3)}
-.pfpic img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .pfpic .avemo{font-size:44px;line-height:1}
 /* Fremde Profile tragen kein Portrait-Asset — dort steht das ELEMENT
    des Spielers. Ohne diese Zeile bliebe das Element-Icon bei seiner
    Grundgroesse (1,25 em) und schwaemme klein im 104-px-Kreis. */
 .pfpic .pfelav{width:58%;height:58%;object-fit:contain}
 .pfpic span.pfelav{font-size:44px;line-height:1;width:auto;height:auto}
-.pfring{position:absolute;inset:-5%;pointer-events:none;border-radius:50%;
-  background-repeat:no-repeat;background-position:center;background-size:contain;
+.pfring{inset:-5%;
   box-shadow:inset 0 0 0 3px var(--avring,#9aa3ad),0 0 14px -4px var(--avring,#9aa3ad)}
 /* Der Online-Punkt sitzt bei AA unten rechts am Portrait. */
 .pfdot{position:absolute;right:4%;bottom:8%;width:18px;height:18px;border-radius:50%;
@@ -18937,8 +19034,13 @@ button.pfplate{cursor:pointer}
     var img = eintrag.portraitUrl
       ? '<img src="' + eintrag.portraitUrl + '" alt="' + (eintrag.emoji || "") +
         '" loading="lazy" decoding="async" onerror="UIIcon.hide(this)">' : "";
+    /* ⚠ --avfrm statt background-image: die Rahmengrafik wird auf einer
+       eigenen Malschicht (.…ring::before) gezeichnet und dort durch den
+       Freistell-Filter geschickt. Ohne das deckt ihre vollflaechig
+       deckende Innenflaeche (Alpha 255, Luminanz 7–9 %) das Portrait zu
+       — genau der Befund „ueberall nur ein leerer Bilderrahmen". */
     var ring = '<span class="' + ringCls + '"' +
-      (ringUrl ? ' style="background-image:url(&quot;' + ringUrl + '&quot;)"' : "") + "></span>";
+      (ringUrl ? ' style="--avfrm:url(&quot;' + ringUrl + '&quot;)"' : "") + "></span>";
     return '<span class="' + picCls + '" style="--avring:' + ringFarbe + '">' +
       emo + img + ring + "</span>";
   }
@@ -19056,7 +19158,7 @@ button.pfplate{cursor:pointer}
         '<span class="avemo">' + (e.emoji || "❔") + "</span>" +
         (e.portraitUrl ? '<img src="' + e.portraitUrl + '" alt="' + (e.emoji || "") +
           '" loading="lazy" decoding="async" onerror="UIIcon.hide(this)">' : "") +
-        '<span class="avcerring"' + (ringUrl ? ' style="background-image:url(&quot;' +
+        '<span class="avcerring"' + (ringUrl ? ' style="--avfrm:url(&quot;' +
           ringUrl + '&quot;)"' : "") + "></span>" +
       "</div>" +
       '<div class="avcern">' + e.name + "</div>" +

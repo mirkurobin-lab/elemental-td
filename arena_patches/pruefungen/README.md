@@ -67,7 +67,7 @@ gibt also keine feste Portnummer, die kollidieren kann.
 | `packsprengung.js` | 27 | Die Leinwand-Sprengung: Bruchfächer, Schweif ohne Vorhang, Vorbeiflug, Bildrate — **liest Pixel, braucht deshalb den HTTP-Server** |
 | `deck.js` | 57 | Battle Deck: neun Slots, Auswahlfenster, Tausch, Sammlung |
 | `offline.js` | 46 | Passive Offline-Erträge: Kappung, Abholung, Buchung |
-| `bildzustand.js` | 12 | Der Zustand mit ECHTEN Bildern (`data:`-URI), den örtlich sonst niemand sieht |
+| `bildzustand.js` | 20 | **Der Zustand mit ECHTEN Assets über HTTP, den örtlich sonst niemand sieht.** Währungsmotiv berührt den Rand nicht (Differenzbild, Kreisring ab 66 % Radius) — *auch ohne den Freistell-Filter*; Portrait in der Kachel wirklich SICHTBAR (Pixel, nicht `elementFromPoint`); Avatarwechsel ändert das Bild wirklich (Quelle **und** Pixel); Kopfleisten-Avatar bleibt in der Leiste. Jeder Schritt mit Gegenprobe |
 | `belohnung.js` | 30 | **Das Belohnungsfenster (§29).** Alle drei Wege — normal abholen, Kristalle, Werbung. Kernfrage: stimmt jede Kachel mit dem ueberein, was WIRKLICH gebucht wurde? Gemessen Sorte fuer Sorte gegen `AC.getMaterials()` — **liest Pixel, braucht den HTTP-Server** |
 | `assets_lokal.js` | 12 | **Liegen die Bilder im Repo, und kommen sie an?** Struktur (löst das Manifest auf `./assets/` auf), Platte (existiert jede Datei), Pixel (`naturalWidth > 0` je Ansicht) — plus die Mutationsprobe, dass `?cdn=1` den Schritt rot macht |
 | `assets_vollstaendig.py` | 4 | Jedes benutzte Asset ist verzeichnet, gesichert UND aktuell |
@@ -418,6 +418,44 @@ Icon fällt auf ein Emoji zurück (DESIGNSYSTEM §7b), der Zustand „ein echtes
 Bilder als `data:`-URI ein und macht den Live-Zustand örtlich prüfbar. Beide
 Fehler dieses Tages — das Icon und der glitchende Avatar — waren genau von
 dieser Sorte: live sofort sichtbar, hier strukturell unsichtbar.
+
+### Nachtrag am selben Abend: `bildzustand.js` war grün und beide Fehler kamen zurück
+
+Der Auftraggeber meldete von der Live-Seite: *„Gold fittet noch immer nicht in
+den Kreis"* und *„Avatar System … wenn ich einen anderen Avatar wähle kommt
+wieder der Platzhalter"*. Beides stimmte, beides war nachmessbar — und diese
+Datei war grün. Fünf Gründe, jeder einzeln ausreichend; sie stehen ausführlich
+im Kopf von `bildzustand.js` und hier als **Regeln für jede neue Prüfung**:
+
+1. **Fester Pfad = falscher Baum.** `DATEI` zeigte auf
+   `/home/user/elemental-td/…`; aus einem Worktree misst das einen fremden
+   Stand. **Immer `__dirname`.** (`avatare.js` hatte denselben Fehler.)
+2. **Ersatzbilder messen keine Assets.** Die Datei setzte eigene `data:`-Motive
+   ein und lief über `file://`. Sie hat nie ein Asset aus `assets/` geladen —
+   und dort lagen beide Ursachen: `cur_gold` hat als einziges Motiv einen
+   *hellen* eingebackenen Grund (13 % gegen 8 % und 7 %) und füllt sein Bild
+   randlos (100 % gegen 36 % und 43 %); die `frame_*.webp` sind durchgehend
+   deckend (Alpha 255, Innenfläche 7–9 % Luminanz). **Eigener HTTP-Server,
+   echte Dateien.**
+3. **Wer sein Prüfobjekt selbst schreibt, prüft sich selbst.** Für den Avatar
+   stand hier `i.innerHTML = '<span class="avemo">…</span><img …>'`. Das war
+   genau der eine Kasten, der schon repariert war. Die vier Geschwister
+   `.avcpic`, `.avpvpic`, `.pfpic`, `.avcerpic` trugen den Fehler weiter; das
+   Fenster „Profil bearbeiten" wurde nie geöffnet. **Messen, was die App
+   rendert.**
+4. **Geometrie sieht kein Overlay.** Alle Avatarschritte waren
+   `getBoundingClientRect`. Eine deckende Grafik hat dieselben Rechtecke wie
+   eine durchsichtige. **Pixel messen**, wenn die Frage „sieht man es?" lautet.
+5. **`elementFromPoint` wäre auch grün gewesen.** Die Rahmenringe tragen
+   `pointer-events:none`; der Treffer in der Kachelmitte war das `IMG`, obwohl
+   darüber eine deckende Grafik lag. **Nie als Kriterium für Verdeckung.**
+
+Und eine Lehre zur *Reparatur*: die Fassung war nur deshalb rund, weil
+`filter:url(#icoFrei)` den eingebackenen Grund wegschneidet. Geprüft wird im
+Chromium, gemeldet wird vom iPhone. **Eine Zusicherung, die an einem
+SVG-Filter hängt, ist keine.** Das Motiv trägt jetzt seine eigene Rundung
+(`.cur .ico{border-radius:50%}`), und ein eigener Schritt misst den freien
+Ring *mit abgeschaltetem Filter*.
 
 ## Die Prüfung darf den Messgegenstand nicht anfassen (30.07.2026)
 
