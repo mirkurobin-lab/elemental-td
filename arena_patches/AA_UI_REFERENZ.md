@@ -3482,3 +3482,106 @@ hält die Zeremonie inne") kaputtgemacht: Er sah 5 Tabellenzeilen statt 0. **Mer
 Messung, die Zeit kostet, misst nicht mehr denselben Ablauf. Aufzeichnen statt abfragen.
 
 **Aufwand: S** · **Priorität: 1** · erledigt
+
+## §34 Der CEO-Durchgang: was eine Messung über 16 Ansichten gefunden hat
+
+Auftrag (30.07.2026): *„Schau dir die komplette Ui aus der Sicht eines ceo UI Designers an
+und optimiere alles was nicht sauber läuft(Bugs) … füge überall Schatten + Lichteffekte
+hinzu … Pass alle Farben usw unseren Brand Richtlinien an."*
+
+Der Durchgang war **messend**, nicht meinend. Sechs Fragen, jede über alle 16 Ansichten,
+festgehalten in `pruefungen/qualitaet.js`.
+
+### 34.1 Was gefunden wurde
+
+| Befund | Zahl | Erledigt |
+|---|---|---|
+| Knöpfe unter 40 × 40 px | 69 | 21 alleinstehende Symbolknöpfe auf 44 × 44 Trefferfläche |
+| Über den Bildschirmrand | 2 (Karussellpfeile) | auf `left/right: 2px` |
+| Fläche ohne Tiefe, gesamt | 8,5 % | **2,3 %** |
+| Fläche ohne Tiefe, schwächste Ansicht | **90 %** (Einstellungen) | **8 %** |
+| Handlungsfarbe ohne Token | 15 + 13 Stellen | `--act` / `--act-2` / `--act-sockel` |
+| Abgeschnittener Text | 0 | — |
+| Bilder unter ihrer Anzeigeauflösung | 0 von 52 | — |
+| Leere Bildfelder | 0 | — |
+
+### 34.2 Der eigentliche Fund: die Zusicherung hatte Löcher
+
+Der Materialcheck in `run_v7` lief über **zwölf** Ansichten. Einstellungen, Guide, Freunde
+und Community waren **nie** dabei — und genau dort lag der Schaden: **90 %** der Fläche der
+Einstellungen trug keine Tiefe, während der Check seit Wochen grün stand.
+
+Dasselbe eine Ebene tiefer: der Guide hat **fünf Reiter**, gemessen wurde nur der erste.
+Reiter 4 („Bosse") lag bei **33 %**, weil `.waverow` flach war.
+
+> **Merksatz:** Eine Zusicherung, die nur für eine gepflegte Liste gilt, ist keine
+> Zusicherung — sie vergisst genau die Ansicht, die als nächste dazukommt. Und **eine
+> Ansicht ist nicht ein Bild**: wer nur ihren Startzustand misst, misst ein Fünftel.
+
+`MATVIEWS` läuft jetzt über alle 16.
+
+### 34.3 Die Handlungsfarbe: erst als Fremdkörper gelesen, dann nachgezählt
+
+Auf dem Einstellungs-Screen stehen drei kräftig blaue Knöpfe („Öffnen", „Anzeigen") in einer
+Umgebung aus Purpur und Gold. Der erste Eindruck war: Fremdkörper, gehört umgefärbt.
+
+Die Zählung sagt etwas anderes. `linear-gradient(180deg,#3fa9e8,#1c6ea8)` steht **15-mal**
+wörtlich im Blatt, der Sockelschatten `0 3px 0 #12496f` **13-mal**. Fünfzehn gleiche
+Verwendungen sind kein Ausrutscher — **das ist die Handlungsfarbe des Spiels**. Sie wurde
+deshalb *nicht* umgefärbt, sondern bekam einen Namen.
+
+Nachgemessen, Aufnahme für Aufnahme: **kein einziges Pixel** hat sich geändert.
+
+> **Merksatz:** Bevor man eine Farbe für einen Fehler hält, zählt man, wie oft sie vorkommt.
+> Ein Fehler kommt einmal vor; ein System kommt fünfzehnmal vor.
+
+### 34.4 Der Kontrast-Befund, der keiner war
+
+Eine WCAG-Messung über alle Textknoten meldete Befunde in **16 von 16** Ansichten — der
+Titel „Shop" angeblich mit **1,13 : 1**. Das ist unmöglich, und die Stichprobe erklärt warum:
+
+1. `.goldtext` färbt über einen Verlauf und setzt `-webkit-text-fill-color: transparent`.
+   Gemessen wurde daraufhin das nie gemalte `color`.
+2. Der Untergrund vieler Knöpfe ist ein **Bild**, keine Farbe. Der Sucher lief am Bild vorbei
+   nach oben und fand die dunkle Tafel dahinter — also dunkel auf dunkel.
+
+Genau dieselbe Klasse Fehler wie beim Alpha-Leser (`rgb(5, 8, 9)` als Alpha 9) und beim
+Preisparser („Fr. 2.–"). **Auf diesen Befund wurde deshalb nicht reagiert.** Eine Kennzahl,
+die man nicht erklären kann, ist keine Kennzahl. Ein belastbarer Kontrastwert braucht die
+**gerenderten Pixel**, nicht `getComputedStyle` — das bleibt offen.
+
+### 34.5 Trefferflächen: warum keine Sammelregel
+
+Die Symbole dürfen nicht wachsen — ein 20-px-Kreuz ist an seinem Platz richtig, es ist nur
+schwer zu treffen. Vergrößert wird deshalb allein die unsichtbare Fläche (`::after` mit
+`min-width/min-height: 44px`). Vorher nachgemessen: **keines** der 69 Elemente hat ein
+`::after` oder `::before` mit Inhalt, und **keines** kappt seinen Überlauf — sonst hätte die
+Regel Haken, Abzeichen und Pfeile gelöscht.
+
+Bewusst **keine** Sammelregel auf `button, .pressable`: bei untereinanderliegenden Knöpfen
+mit weniger als 14 px Abstand überlappen sich die Flächen, und dann fängt der im DOM spätere
+Knopf die obere Kante seines Nachbarn ab. Aus der Verbesserung wäre ein Klick-Diebstahl
+geworden. Gemessen: **0 von 140** Knöpfen verdeckt.
+
+### 34.6 Vier eigene Messfehler, alle im Kopf der Suite festgehalten
+
+| Fehler | Falscher Befund |
+|---|---|
+| `elementFromPoint` liefert außerhalb des Fensters `null` | 68 Phantom-Klickdiebstähle |
+| Innere Scrollkästen übersehen (`#passList` steht auf `scrollTop: 240`) | 9 „verdeckte" HOLEN-Knöpfe — widerlegt, indem einer nach `scrollIntoView` angeklickt wurde |
+| `border-radius: inherit` machte die neue Trefferfläche zum **Kreis** | 27 von 28 Zielen scheinbar zu klein (die Ecken angetastet) |
+| `scrollWidth` zählt überstehende Kinder mit, auch das neue `::after` | das „×" des Ausblenden-Knopfes galt als abgeschnitten |
+
+Dazu vier **tote Selektoren** (`.gchip`, `.frtab`, `.socbtn`, `.commcard`), die es im Baum
+gar nicht gibt — geraten statt nachgesehen. Sie kosten keine Leistung, aber sie lügen: wer
+sie liest, glaubt, die Flächen seien versorgt.
+
+### 34.7 Der Bildschirmvergleich braucht einen Rauschboden
+
+Der Nachweis „der Token-Umbau ändert kein Pixel" lief über einen Aufnahmevergleich. Acht von
+16 Ansichten unterscheiden sich aber **zwischen zwei identischen Läufen** — sie animieren.
+Ohne diesen Kontrolllauf hätte der Vergleich acht Änderungen gemeldet, die keine sind.
+
+> **Merksatz:** Ein Bildvergleich ohne Rauschboden misst die Uhr, nicht die Änderung.
+
+**Aufwand: L** · **Priorität: 1** · erledigt

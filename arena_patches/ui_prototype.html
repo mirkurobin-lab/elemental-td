@@ -48,6 +48,19 @@
      Waehrungen. --gem bleibt als Alt-Name bestehen (Altcode liest ihn),
      zeigt aber jetzt auf denselben Gruenton. */
   --gemc:#2fd47a; --gemc-dk:#0d6b3a; --gemc-lt:#b6f7cd; --gem:#2fd47a;
+  /* ⚠ DIE HANDLUNGSFARBE HATTE KEIN TOKEN (30.07.2026, CEO-Durchgang).
+     `linear-gradient(180deg,var(--act),var(--act-2))` stand 15-mal woertlich im
+     Blatt, der zugehoerige Sockelschatten `0 3px 0 var(--act-sockel)` 13-mal —
+     auf „Öffnen", „Anzeigen", „Sieg ansehen", den Kaufknoepfen und
+     einem Dutzend weiterer Stellen. Beim ersten Hinsehen sah das nach
+     einem Fremdkoerper aus (alles ringsum ist Purpur und Gold). Die
+     Zaehlung sagt etwas anderes: 15 gleiche Verwendungen sind KEIN
+     Ausrutscher, das IST die Handlungsfarbe des Spiels. Sie wird
+     deshalb NICHT umgefaerbt — sie bekommt nur endlich einen Namen.
+     Was das aendert: nichts an einem einzigen Pixel (nachgemessen,
+     Aufnahme fuer Aufnahme). Was es kuenftig aendert: wer die
+     Handlungsfarbe verschieben will, fasst eine Zeile an statt 28. */
+  --act:#3fa9e8; --act-2:#1c6ea8; --act-sockel:#12496f;
   /* ================================================================
    * EINHEITLICHE BANNER-METRIK
    * ----------------------------------------------------------------
@@ -783,8 +796,8 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
  * ================================================================== */
 .tbmenu{flex:0 0 34px;width:34px;height:30px;border-radius:9px;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
-  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);
-  box-shadow:var(--mat-raised),0 3px 0 #12496f}
+  background:linear-gradient(180deg,var(--act),var(--act-2));
+  box-shadow:var(--mat-raised),0 3px 0 var(--act-sockel)}
 .tbmenu{position:relative;font-size:16px;line-height:1}
 .tbmenu span{display:block;width:16px;height:2px;border-radius:1px;background:#eaf6ff}
 .tbmenu .nb2{position:absolute;right:-4px;top:-4px;min-width:15px;height:15px;line-height:15px;
@@ -822,9 +835,9 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
 .tbmi{width:232px;display:flex;align-items:center;gap:10px;
   padding:9px 12px;border-radius:12px;font-size:12.5px;font-weight:900;
   letter-spacing:.06em;text-transform:uppercase;
-  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);
+  background:linear-gradient(180deg,var(--act),var(--act-2));
   -webkit-text-fill-color:#eaf6ff;color:#eaf6ff;
-  box-shadow:var(--mat-raised),0 3px 0 #12496f;
+  box-shadow:var(--mat-raised),0 3px 0 var(--act-sockel);
   animation:tbmin var(--t-mid) var(--ease-overshoot) backwards}
 /* ⚠ 24 px, nicht 20. Das Projekt hat eine gemessene Untergrenze: Artwork
    muss bei ≥20 px noch lesbar sein — und „lesbar bei 20" heisst nicht
@@ -943,7 +956,7 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
    rechts und der Anzeige `LvL n/27` in der Mitte. */
 .lvlrow{display:flex;align-items:center;gap:6px;margin-top:8px}
 .lvlrow button{flex:0 0 30px;width:30px;height:30px;border-radius:9px;font-size:15px;
-  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);color:#fff;font-weight:900;
+  background:linear-gradient(180deg,var(--act),var(--act-2));color:#fff;font-weight:900;
   box-shadow:var(--mat-raised),0 2px 0 #12496f}
 .lvlrow button[disabled]{background:linear-gradient(180deg,#3a4a58,#222e39);
   box-shadow:0 2px 0 #16202a;color:#8fa0ad}
@@ -2349,7 +2362,16 @@ footer{padding:6px 12px 14px;text-align:center}
   font-style:normal;font-size:15px;display:flex;align-items:center;
   filter:var(--frei) drop-shadow(0 1px 3px #000c)}
 .progbar .pgico .ico{width:24px;height:24px}
-.progwrap .crestmini{position:absolute;left:50%;bottom:-2px;transform:translateX(-50%);
+/* ⚠ STAND AUF bottom:-2px UND LAG DAMIT AUF DER ZAHL (30.07.2026).
+   Der Kommentar am Markup sagt, der Belohnungs-Chip haenge UNTER dem
+   Balken. Gemessen tat er das nicht: Chip 480-510, Beschriftung 471-491
+   — er deckte die untere Haelfte von „1 136 / 1 200" zu, und auf der
+   Aufnahme las man „1 1?6 / 1 200".
+   Die Beschriftung steht mittig im Balken, der Chip stand mittig unter
+   ihm; zwei Dinge auf derselben Achse, von denen eines das andere
+   verdeckt. -13px setzt die Oberkante des Chips auf die Unterkante der
+   Zahl: er haengt jetzt wirklich unter dem Balken, wie beschrieben. */
+.progwrap .crestmini{position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);
   flex:0 0 30px;z-index:4}
 .progfill{position:absolute;left:2px;top:2px;bottom:2px;border-radius:10px;
   background:linear-gradient(180deg,#f4e3a6,#e0b94a 60%,#a8842a);box-shadow:0 0 10px #e0b94a80}
@@ -2856,13 +2878,13 @@ footer{padding:6px 12px 14px;text-align:center}
   -webkit-text-fill-color:#3a2b07;color:#3a2b07;filter:none}
 .topjump{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:8;
   font-size:13px;padding:7px 22px;border-radius:10px;
-  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);color:#fff;font-weight:900;
-  box-shadow:0 3px 0 #12496f;letter-spacing:.06em}
+  background:linear-gradient(180deg,var(--act),var(--act-2));color:#fff;font-weight:900;
+  box-shadow:0 3px 0 var(--act-sockel);letter-spacing:.06em}
 /* Stand bei left:10px/top:56px genau ueber der ersten Trophaeenzahl
    (x 40-84). Er sitzt jetzt rechts, ausserhalb der Zahlenspalte. */
 .upfloat{position:absolute;right:10px;top:56px;z-index:8;width:38px;height:38px;
   border-radius:10px;font-size:15px;color:#fff;
-  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);box-shadow:0 3px 0 #12496f}
+  background:linear-gradient(180deg,var(--act),var(--act-2));box-shadow:0 3px 0 var(--act-sockel)}
 /* Der Hinweis lag im Live-Screenshot UEBER der rechten Kante des
    Arena-Bandes (das Band ist max-width:330px, zentriert in 390 px, also
    nur 30 px vom Rand entfernt — der 20 px breite Hinweis bei right:6px
@@ -4156,7 +4178,7 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
    Fenstertitel nutzt. Heller Grund, DUNKLE Schrift (nie .goldtext). */
 .sthead{position:relative;margin:-16px auto 0;min-width:60%;padding:9px 30px;
   border-radius:12px;text-align:center;
-  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);
+  background:linear-gradient(180deg,var(--act),var(--act-2));
   border:2px solid #7fd0ff;box-shadow:0 4px 10px #0007}
 .sthead .stt{font-size:15px;font-weight:900;letter-spacing:.1em;color:#fff;
   text-shadow:0 2px 2px #0006}
@@ -5091,7 +5113,7 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
 .socfolg{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;
   min-width:72px;border:0;border-radius:10px;padding:8px 13px;line-height:1;
   font-size:11px;font-weight:900;letter-spacing:.02em;color:#fff;text-decoration:none;
-  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);box-shadow:var(--mat-raised)}
+  background:linear-gradient(180deg,var(--act),var(--act-2));box-shadow:var(--mat-raised)}
 /* WARTEZUSTAND. Ein Knopf, der aussieht, als fuehre er irgendwohin, und
    dann nichts tut, ist schlechter als einer, der ehrlich sagt „kommt
    noch". Der Platzhalter ist deshalb SICHTBAR anders — gedeckt statt
@@ -5197,7 +5219,7 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
 .evbody .evfoot{display:flex;align-items:center;gap:8px;margin-top:9px}
 .evbody .evtime{font-size:10px;font-weight:800;color:var(--gold)}
 .evjoin{margin-left:auto;border-radius:10px;padding:8px 15px;font-size:11.5px;font-weight:900;
-  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);color:#fff;box-shadow:0 3px 0 #12496f}
+  background:linear-gradient(180deg,var(--act),var(--act-2));color:#fff;box-shadow:0 3px 0 var(--act-sockel)}
 .evjoin.soon{background:linear-gradient(180deg,#3a4a58,#222e39);color:#8fa0ad;
   box-shadow:0 3px 0 #16202a}
 
@@ -5257,7 +5279,7 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
   font-size:9.5px;padding:8px;resize:vertical}
 .setbtns{display:flex;gap:8px;margin-top:8px}
 .setbtn{flex:1;border-radius:10px;padding:9px 0;font-size:11.5px;font-weight:900;
-  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);color:#fff;box-shadow:0 3px 0 #12496f}
+  background:linear-gradient(180deg,var(--act),var(--act-2));color:#fff;box-shadow:0 3px 0 var(--act-sockel)}
 .setbtn.danger{background:linear-gradient(180deg,#ff7b6b,#b52b1d);box-shadow:var(--mat-raised),0 3px 0 #6d1710}
 .setbtn.ghost{background:var(--panel);color:#c2cfd9;border:1px solid var(--line);
   box-shadow:var(--mat-raised),none}
@@ -5823,14 +5845,14 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 #chatInput::placeholder{color:#6d8294}
 .chatsend{flex:0 0 78px;height:40px;border-radius:var(--radius-sm);font-size:12.5px;
   font-weight:900;letter-spacing:.03em;
-  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);color:#fff;box-shadow:0 3px 0 #12496f}
+  background:linear-gradient(180deg,var(--act),var(--act-2));color:#fff;box-shadow:0 3px 0 var(--act-sockel)}
 
 /* ---------- Knopfreihe unten (AA: drei gleich breite Knoepfe) ---------- */
 .clanbtns{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);
   margin-top:var(--gap-lg)}
 .clanbtn{border-radius:var(--radius-sm);padding:11px 2px;font-size:11px;font-weight:900;
-  letter-spacing:.02em;background:linear-gradient(180deg,#3fa9e8,#1c6ea8);color:#fff;
-  box-shadow:var(--lit),var(--unlit),0 3px 0 #12496f;line-height:1.2}
+  letter-spacing:.02em;background:linear-gradient(180deg,var(--act),var(--act-2));color:#fff;
+  box-shadow:var(--lit),var(--unlit),0 3px 0 var(--act-sockel);line-height:1.2}
 
 /* ------------------------------------------------------------------
  * MATERIAL-SCHICHT (P1) FUER DIE NEUEN CLAN-FLAECHEN
@@ -5857,7 +5879,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .anfspenden{box-shadow:var(--lit),var(--unlit),0 3px 0 #1f6b09}
 .anfspenden[disabled],.anfspenden.is-disabled{
   box-shadow:var(--lit),var(--unlit),0 3px 0 #16202a}
-.chatsend{box-shadow:var(--lit),var(--unlit),0 3px 0 #12496f}
+.chatsend{box-shadow:var(--lit),var(--unlit),0 3px 0 var(--act-sockel)}
 .clanbtn[disabled]{box-shadow:var(--lit),var(--unlit),0 3px 0 #16202a}
 .clanbtn[disabled]{background:linear-gradient(180deg,#3a4a58,#222e39);color:#8fa0ad;
   box-shadow:0 3px 0 #16202a}
@@ -6045,7 +6067,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .lbrow .ltr .ico{width:12px;height:12px}
 .lbjump{position:sticky;bottom:6px;margin:10px auto 0;display:block;width:70%;
   border-radius:11px;padding:9px 0;font-size:12px;font-weight:900;color:#fff;
-  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);box-shadow:0 3px 0 #12496f}
+  background:linear-gradient(180deg,var(--act),var(--act-2));box-shadow:0 3px 0 var(--act-sockel)}
 .lbnote{margin-top:10px;font-size:10px;color:var(--dim);line-height:1.55}
 
 /* ---------- Hub-Kacheln auf dem Home-Screen ---------- */
@@ -7012,6 +7034,42 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .dkheld,.dktower,.dkspell,.dkselbtn,.dkmenu,.dkinfo,.dkult{box-shadow:var(--mat-raised)}
 /* --- Sektionsbanner: ohne Kante klebt ein Banner auf dem Hintergrund. */
 .secribbon{box-shadow:var(--lit-2),var(--unlit),var(--sh-2)}
+/* --- EINSTELLUNGEN, GUIDE, HELDEN, FESTUNG (30.07.2026) ------------
+   Aufgedeckt beim CEO-Durchgang ueber ALLE 16 Ansichten. Der bisherige
+   Materialcheck lief nur ueber ZWOELF — Einstellungen, Guide, Freunde
+   und Community waren nie dabei. Genau dort lagen die Loecher:
+
+     Einstellungen  90 % ohne Tiefe  (.setgrp allein 78 %)
+     Guide          36 %             (.gtask 23 %)
+     Helden         16 %             (.herostage)
+     Festung        14 %             (.kbuy, .shieldglow)
+
+   ⚠ Das ist dieselbe Bugklasse wie dreimal zuvor (Startseite 64 %,
+   Clan 29 %, Sammlung 80 %) — und sie kam zurueck, weil die PRUEFUNG
+   eine Liste von Ansichten fuehrte statt aller. Eine Zusicherung, die
+   nur fuer die aufgezaehlten Faelle gilt, ist keine Zusicherung. Der
+   Check in run_v7 laeuft deshalb jetzt ueber alle 16.
+
+   Zuordnung nach der Regel des Systems, nicht nach Gefuehl: was man
+   ANFASST, ist erhaben; was etwas ANDERES ENTHAELT, ist eingesenkt. */
+/* ⚠ Hier standen zuerst auch `.gchip`, `.frtab`, `.socbtn` und
+   `.commcard`. Die gibt es im Baum GAR NICHT — geraten statt
+   nachgesehen. Vier Selektoren, die auf nichts zeigen, kosten keine
+   Leistung, aber sie luegen: wer sie liest, glaubt, die Flaechen seien
+   versorgt. Nachgezaehlt und entfernt; Freunde und Community messen
+   ohnehin 0 % ohne Tiefe und brauchten nie etwas. */
+.setgrp,.gtask,.herostage,.kbuy,.esscell,.rchip,.evjoin{box-shadow:var(--mat-raised)}
+/* Der Guide hat FUENF Reiter, und der Materialcheck sah bisher nur den
+   ersten. Ueber alle fünf gemessen: Gegner 29 %, Bosse 33 % — beides
+   allein wegen `.waverow`, der Zeile der Wellentabelle. Eine Tabelle
+   ist eine Reihe von Koerpern, keine Flaeche: erhaben.
+   ⚠ Merksatz: eine Ansicht ist nicht EIN Bild. Wer nur ihren
+   Startzustand misst, misst ein Fuenftel. */
+.waverow,.gcpack,.gclaim,.ma,.mel,.bosslbl{box-shadow:var(--mat-raised)}
+.gpbar{box-shadow:var(--mat-well)}
+/* Behaelter: die Fortschrittsleiste des Guides und die Schildanzeige
+   der Festung halten etwas, sie sind kein Koerper. */
+.gprog,.shieldglow,.savearea{box-shadow:var(--mat-well)}
 /* --- Eine Bewegungssprache fuer alles Anfassbare. --- */
 .pressable{transition:transform var(--t-fast) var(--ease-out),
   box-shadow var(--t-fast) var(--ease-out)}
@@ -7099,8 +7157,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .frbtns{flex:0 0 auto;display:flex;align-items:center;gap:6px}
 /* Duell: blau wie jede neutrale Aktion, weisse Schrift auf dunkelblau. */
 .frduel{border-radius:var(--radius-sm);padding:9px 11px;font-size:11px;font-weight:900;
-  letter-spacing:.04em;color:#fff;background:linear-gradient(180deg,#3fa9e8,#1c6ea8);
-  box-shadow:var(--lit),var(--unlit),0 3px 0 #12496f}
+  letter-spacing:.04em;color:#fff;background:linear-gradient(180deg,var(--act),var(--act-2));
+  box-shadow:var(--lit),var(--unlit),0 3px 0 var(--act-sockel)}
 /* Spenden: gruen wie .anfspenden im Clan — dieselbe Handlung, dieselbe
    Farbe. Die Flaeche ist HELL, die Schrift deshalb DUNKEL (§4). */
 .frgift{width:38px;height:36px;border-radius:var(--radius-sm);
@@ -7118,8 +7176,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .frdec{background:linear-gradient(180deg,#3a4a58,#222e39);color:#dbe6ef;
   box-shadow:var(--lit),var(--unlit),0 3px 0 #16202a}
 .fradd{border-radius:var(--radius-sm);padding:9px 11px;font-size:10.5px;font-weight:900;
-  letter-spacing:.04em;color:#fff;background:linear-gradient(180deg,#3fa9e8,#1c6ea8);
-  box-shadow:var(--lit),var(--unlit),0 3px 0 #12496f}
+  letter-spacing:.04em;color:#fff;background:linear-gradient(180deg,var(--act),var(--act-2));
+  box-shadow:var(--lit),var(--unlit),0 3px 0 var(--act-sockel)}
 .frstate{font-size:10px;font-weight:800;color:var(--dim);padding:0 4px}
 
 /* ---------- Suche und Hinweise ---------- */
@@ -7131,8 +7189,8 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .frinput::placeholder{color:#5d7284}
 .frgo{flex:0 0 auto;border-radius:var(--radius-sm);padding:0 14px;font-size:11.5px;
   font-weight:900;letter-spacing:.04em;color:#fff;
-  background:linear-gradient(180deg,#3fa9e8,#1c6ea8);
-  box-shadow:var(--lit),var(--unlit),0 3px 0 #12496f}
+  background:linear-gradient(180deg,var(--act),var(--act-2));
+  box-shadow:var(--lit),var(--unlit),0 3px 0 var(--act-sockel)}
 .frempty{margin-top:var(--gap);padding:var(--pad);border-radius:var(--radius);
   font-size:10.5px;line-height:1.55;color:var(--dim);background:#0b1116;
   box-shadow:var(--mat-well)}

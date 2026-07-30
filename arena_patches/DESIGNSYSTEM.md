@@ -29,7 +29,15 @@ Bausteine: `--lit` `--lit-2` `--unlit` `--ao` `--rim` `--sunk` `--sunk-2`.
 **Benutzt werden die fertigen Materialien, nicht die Bausteine.**
 
 Gemessen vor dem Durchgang trugen **89 %** der sichtbaren Fläche keine Tiefe,
-danach **5 %** (schwächste einzelne View: 16 %). Das war der eigentliche Abstand zu AA — nicht Bewegung (AAs
+danach **5 %** (schwächste einzelne View: 16 %).
+
+> **Nachtrag 30.07.2026.** Der Check lief über **zwölf** Views — Einstellungen, Guide,
+> Freunde und Community waren nie dabei, und dort lag der Schaden: die Einstellungen
+> trugen auf **90 %** ihrer Fläche keine Tiefe, während der Check grün stand. Dazu hat
+> der Guide **fünf Reiter**, gemessen wurde nur der erste (Reiter „Bosse": 33 %).
+> Jetzt über alle **16** Views: gesamt **2,3 %**, schwächste View **8 %**.
+> Eine Zusicherung, die nur für eine gepflegte Liste gilt, ist keine Zusicherung —
+> und eine View ist nicht ein Bild. Ausführlich in `AA_UI_REFERENZ` §34.2. Das war der eigentliche Abstand zu AA — nicht Bewegung (AAs
 Meta-UI ist praktisch statisch, `AA_UI_REFERENZ` §20.2) und nicht mehr die Icons.
 
 > **Geprüft:** zwei Kennzahlen — „Höchstens 15 % der sichtbaren Fläche ohne
@@ -70,6 +78,9 @@ Zwischenwerte. Begründung der vierten Höhe in `AA_UI_REFERENZ` §19.4.
 
 Basis `--bg` `--panel` `--panel2` `--line` `--txt` `--dim` `--top`.
 Rollen `--up` `--gold` `--danger`.
+Handlung `--act` `--act-2` `--act-sockel` — das Blau der Knöpfe „Öffnen", „Anzeigen",
+„Kaufen". Es stand 15-mal wörtlich im Blatt, bevor es einen Namen bekam; die Zählung ist
+auch der Grund, warum es **nicht** umgefärbt wurde (`AA_UI_REFERENZ` §34.3).
 Währungs-Identität: Gold bleibt Gold, Gems sind **Smaragdgrün** (`--gemc`) —
 bewusste Abgrenzung von AA, wo Gems magenta/blau sind. Dieselbe Farbe trägt
 Icon, Zahl in der Top-Bar, Preis und Produktkarte.
@@ -616,6 +627,7 @@ Zwei Anläufe, beide lehrreich:
 | Paket | Inhalt | Stand |
 |---|---|---|
 | P2 | Zustandsmatrix je Knopfklasse: normal / pressed / disabled / loading / selected | `selected`, `loading`, `hover` gibt es **null** mal |
+| — | **Kontrast belastbar messen.** Eine WCAG-Messung über `getComputedStyle` meldete Befunde in 16 von 16 Ansichten — durchweg Artefakte (Verlaufsschrift mit `-webkit-text-fill-color:transparent`, Untergründe die Bilder statt Farben sind). Ein tragfähiger Wert braucht die **gerenderten Pixel**. Siehe `AA_UI_REFERENZ` §34.4 | offen |
 | P3 | Fassungen als Assets: 9-Slice-Panel-Platte, Kartenrahmen je Rarität, Bannerplatte | **Kartenrahmen und Bänder erledigt** (§6c). Panel-Platte und `progress_frame` noch offen — beide brauchen erst einen Zuschnitt. |
 | P4 | Bewegungssprache: Overshoot, Squash, Hochzählen, Belohnungs-Choreografie | Tokens stehen, Choreografie fehlt |
 | — | Typo-Leiter: 40 Schriftgrößen auf 8 benannte Stufen | offen |

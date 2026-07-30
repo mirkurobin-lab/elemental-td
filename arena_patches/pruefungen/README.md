@@ -4,7 +4,14 @@ Zuletzt vollständig gemessen am **30.07.2026**: 24 Playwright-Suiten laufen hie
 durch. Rot bleibt genau einer — `run_v7.js` „gleiche Drittel" (siehe unten,
 braucht eine Produktentscheidung, kein Code-Fix).
 
-Neu hinzugekommen ist `video_rueckfall.js` (11 Schritte). Die Schrittzahlen der
+Neu hinzugekommen sind `video_rueckfall.js` (11 Schritte) und **`qualitaet.js`**
+(9 Schritte, 30.07.2026). `qualitaet.js` ist der messende Teil des
+CEO-Durchgangs: Trefferflächen ≥ 44 × 44, kein Klick-Diebstahl, kein Überlauf
+über den Bildschirmrand, kein abgeschnittener Text, kein Bild unter seiner
+Anzeigeauflösung, kein leeres Bildfeld — jedes über **alle 16** Ansichten.
+Ihr Kopf hält vier eigene Messfehler fest, die beim Bauen aufgetreten sind;
+wer sie herausnimmt, holt sich falsche Befunde zurück (Einzelheiten in
+`AA_UI_REFERENZ` §34.6). Die Schrittzahlen der
 bestehenden Suiten haben sich am selben Tag mehrfach verschoben — `run_v6.js`
 allein von 320 auf 334 —, deshalb steht hier **keine Gesamtsumme** mehr: eine
 Zahl, die nach jedem Lauf falsch ist, verteidigt nichts. Die Tabelle unten

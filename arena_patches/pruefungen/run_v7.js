@@ -2857,8 +2857,17 @@ function gegen(name, sollFalschSein, info) { step('gegen: ' + name, !sollFalschS
      Der Check laeuft ueber alle Haupt-Views und faellt, sobald jemand
      eine grosse Flaeche ohne Material nachschiebt. */
   await clearLayers();
+  /* ⚠ ALLE Ansichten, nicht eine Auswahl. Diese Liste fuehrte bis zum
+     30.07.2026 zwoelf Namen — Einstellungen, Guide, Freunde und
+     Community fehlten. Beim CEO-Durchgang stellte sich heraus, dass
+     genau dort die Loecher lagen: Einstellungen 90 % der Flaeche ohne
+     Tiefe, Guide 36 %. Der Check stand die ganze Zeit auf gruen.
+     Eine Zusicherung, die nur fuer die aufgezaehlten Faelle gilt, ist
+     keine Zusicherung — und eine Liste, die von Hand gepflegt wird,
+     vergisst genau die Ansicht, die als naechste dazukommt. */
   const MATVIEWS = ['navHome','navShop','navCollection','navForge','navPack','navFortress',
-                    'navClan','navBoard','navPass','navHeroes','navEvents','navMail'];
+                    'navClan','navBoard','navPass','navHeroes','navEvents','navMail',
+                    'navFriends','navSettings','navCommunity','navGuide'];
   let flGes = 0, flOhne = 0;
   const suender = {};
   const jeView = [];

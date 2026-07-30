@@ -717,10 +717,22 @@ function step(name, ok, info) {
       const t = (el.textContent || '').trim();
       if (!t) return;
       if (!el.getClientRects().length) return;              // unsichtbar zaehlt nicht
-      if (el.scrollWidth <= el.clientWidth + 1) return;
+      if (!el.clientWidth) return;
+      /* ⚠ NICHT scrollWidth. Der zaehlt JEDES ueberstehende Kind mit —
+         auch ein absolut gesetztes ::after. Am 30.07.2026 bekamen die
+         Info-Punkte (.anfinfo, 22 px) eine unsichtbare Trefferflaeche
+         von 44 px; scrollWidth sprang damit auf 33, und diese Pruefung
+         meldete das „ⓘ" als abgeschnitten. Es war nie abgeschnitten —
+         es war die eigene Trefferflaeche.
+         Ein Range ueber den Inhalt misst den TEXT und nichts sonst. */
+      const rg = document.createRange();
+      rg.selectNodeContents(el);
+      const tb = rg.getBoundingClientRect();
+      if (rg.detach) rg.detach();
+      if (tb.width <= el.clientWidth + 1) return;
       if (!schneidetAb(el)) return;                         // laeuft ueber, aber lesbar
       raus.push(t.slice(0, 24) + ' [' + (el.className || el.tagName) + '] ' +
-                el.clientWidth + '/' + el.scrollWidth + ' px');
+                el.clientWidth + '/' + Math.round(tb.width) + ' px');
     });
     return raus;
   });
