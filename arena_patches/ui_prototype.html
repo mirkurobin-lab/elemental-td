@@ -1692,10 +1692,31 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
   box-shadow:0 6px 16px #000c, 0 0 14px 1px var(--rar,#c9a24a)}
 /* Ein heller Kern, damit die offene Karte auch bei dunklen
    Raritaetsfarben (Grau) noch als „aufgedeckt" liest. */
-.pkfront::after{content:"";position:absolute;left:18%;right:18%;
-  top:26%;bottom:26%;border-radius:4px;
-  background:linear-gradient(160deg,#ffffff2b,#ffffff08);
-  box-shadow:inset 0 0 0 1px #ffffff2e}
+/* ⚠ KEIN Platzhalter-Kern mehr. Hier lag ein hellgrauer Kasten, damit
+   die offene Karte ueberhaupt „aufgedeckt" aussah — er war der Notnagel,
+   solange die Vorderseite kein Bild hatte. Jetzt traegt sie das echte
+   Artwork; der Kasten wuerde es zudecken. */
+/* Das Kartenbild fuellt die Vorderseite. `artbox` bringt seine eigenen
+   Masse mit, deshalb hier nur die Einpassung. */
+.pkfront .artbox{position:absolute;inset:4%;border-radius:4px;
+  overflow:hidden;display:block}
+.pkfront .artbox img{width:100%;height:100%;object-fit:cover;display:block}
+/* Der Emoji-Rueckfall ist KEIN Bild und ignoriert width/height — ein
+   Glyph skaliert ueber die Schriftgroesse. Ohne diese Regel sass er als
+   winziges Zeichen in der Mitte einer sonst leeren Karte (oertlich immer,
+   auf dem Geraet bei jedem Ladefehler). DESIGNSYSTEM §7b. */
+.pkfront .artbox .ico{width:100%;height:100%;display:flex;
+  align-items:center;justify-content:center;font-size:46px;line-height:1}
+/* Der Raritaetsrahmen liegt UEBER dem Bild, nicht darunter. */
+.pkfront .frm{position:absolute;inset:0;pointer-events:none}
+/* Das Stufenband nennt die Raritaet im Klartext. Ohne es muss der
+   Spieler die Farbe deuten — und Farbe allein ist fuer Farbsehschwache
+   keine Auskunft. */
+.pkstufe{position:absolute;left:6%;right:6%;bottom:5%;
+  text-align:center;font-size:9px;font-weight:900;letter-spacing:.08em;
+  text-transform:uppercase;color:#0d1219;border-radius:4px;padding:2px 0;
+  background:linear-gradient(180deg,#ffffffe0,var(--rar,#c9a24a));
+  box-shadow:0 1px 3px #000a}
 #packLayer.spielt .pkcard{animation:pkkarte 4000ms cubic-bezier(.2,.9,.25,1) forwards}
 
 /* ==================================================================
@@ -10658,7 +10679,7 @@ button.pfplate{cursor:pointer}
         .forEach(function (e) { e.remove(); });
     }
 
-    function spiele(key, anzahl, fertig, rar) {
+    function spiele(key, anzahl, fertig, karten) {
       var lay = $("packLayer"), st = $("pkStage"), art = $("pkArt");
       if (!lay || !st || !art) { fertig(); return; }
       if (laufend) { clearTimeout(laufend); laufend = null; }
@@ -10743,18 +10764,43 @@ button.pfplate{cursor:pointer}
            ganze Szene EINE Zeitachse, die man anhalten und Bild fuer
            Bild ansehen kann (siehe pruefungen/packoeffnung.js). */
         c.style.setProperty("--i", i);
+        /* ---- WELCHE Karte auf diesem Blatt liegt ----
+           ⚠ Umgekehrte Zuordnung, und das ist Absicht. Die Stapelmitte
+           legt i=0 als UNTERSTES Blatt an, und aufgedeckt wird von oben.
+           Das oberste Blatt ist damit das LETZTE Kind. Soll die zuerst
+           gezogene Karte auch zuerst erscheinen, muss sie dorthin —
+           deshalb `karten[n-1-i]` und nicht `karten[i]`. Ohne das
+           deckt der Spieler seine Karten in umgekehrter Reihenfolge auf,
+           was bei einer Legendaeren am Anfang den Aufbau zerstoert. */
+        var kd = karten && karten[liste.length - 1 - i];
+        var tf = kd && AC.tierOf && AC.tierOf(kd.tier);
         /* Die Raritaetsfarbe der WIRKLICH gezogenen Karte, nicht die des
            Packs. Fehlt sie, bleibt der goldene Grundton stehen — eine
            falsche Farbe waere schlimmer als keine. */
-        if (rar && rar[i]) c.style.setProperty("--rar", rar[i]);
+        if (tf && tf.color) c.style.setProperty("--rar", tf.color);
         c.style.width = (p.b * 100).toFixed(1) + "%";
         /* Zwei Seiten auf einem drehenden Traeger. Die Rueckseite liegt
-           oben, bis pkdreh sie wegdreht. */
+           oben, bis pkdreh sie wegdreht.
+           ⚠ Auf der Vorderseite steht das ECHTE Kartenbild samt
+           Raritaetsrahmen — dieselbe Fabrik (`artBox`), aus der auch das
+           Raster nach der Szene zeichnet. Vorher lag hier nur eine
+           raritaetsgefaerbte Flaeche; der Auftraggeber hat das zu Recht
+           beanstandet („wenn man die Karten dreht muss die jeweilige
+           Karte auch angezeigt werden"). Eine Zeremonie, die nicht zeigt,
+           WAS man gezogen hat, ist keine Zeremonie. */
         c.innerHTML = '<div class="pk3d">' +
           '<div class="pkface pkback"></div>' +
-          '<div class="pkface pkfront"></div></div>';
+          '<div class="pkface pkfront">' +
+            (kd ? artBox(kd.cardId, kd.tier, "pkart2") : "") +
+            (tf ? '<span class="pkstufe">' + tf.name + "</span>" : "") +
+          "</div></div>";
         deck.appendChild(c);
       }
+      /* Rahmen und Bilder aufloesen — ohne diese zwei Aufrufe bleibt das
+         Artwork ein leerer Kasten, weil `data-frame` und `data-ico` erst
+         hier zu echten Quellen werden. */
+      hydrateFrames(deck);
+      UIIcon.sweep(deck);
 
       lay.classList.add("on");
       lay.setAttribute("aria-hidden", "false");
@@ -11194,16 +11240,20 @@ button.pfplate{cursor:pointer}
        die Wahrheit sagen. Quelle ist AC.tierInfo — dieselbe Tabelle, aus
        der auch das Raster faerbt; eine zweite Farbliste waere irgendwann
        eine andere Farbliste. */
-    var pkRar = (packResult.cards || []).map(function (k) {
-      var t = AC.tierOf && AC.tierOf(k.tier);
-      return (t && t.color) || null;
+    /* Die GEZOGENEN Karten wandern vollstaendig in die Szene: die
+       Vorderseite zeichnet daraus das echte Artwork und den Rahmen, die
+       Rueckseite ihre Raritaetsglut. Eine zweite, reduzierte Liste (nur
+       Farben) war der Grund, warum die Drehung lange nur eine bunte
+       Flaeche zeigte. */
+    var pkKarten = (packResult.cards || []).map(function (k) {
+      return { cardId: k.cardId, tier: k.tier };
     });
     UIPackOpen.spiele(key, packResult.cards.length, function () {
       renderPack();
       renderPackHeader();
       UISfx.reward();
       toast(packResult.name + " geöffnet — tippe die Karten an");
-    }, pkRar);
+    }, pkKarten);
   }
   function renderPack() {
     markPressableLater();
