@@ -5345,14 +5345,21 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .claimbtn[disabled]{background:linear-gradient(180deg,#3a4a58,#222e39);
   -webkit-text-fill-color:#8fa0ad;color:#8fa0ad;box-shadow:0 3px 0 #16202a}
 
-/* ---------- Spenden ---------- */
-.quotabar{display:flex;align-items:center;gap:8px;margin-top:10px;padding:8px 10px;
-  border-radius:12px;background:#0b1116;border:1px solid var(--line);font-size:10.5px;
-  color:var(--dim)}
-.quotabar b{color:var(--txt);font-size:12px}
-.quotabar .qdots{display:flex;gap:2px;margin-left:auto}
-.quotabar .qd{width:7px;height:12px;border-radius:2px;background:#2b3b47}
-.quotabar .qd.on{background:linear-gradient(180deg,#f2c53d,#a8842a)}
+/* ---------- Spenden ----------
+   Die Kontingentzeile sass bis zum 30.07.2026 als .quotabar EINMAL ueber
+   der ganzen Liste (globales Fenster, 10 Karten / 3 h). Das Kontingent
+   gilt jetzt JE ANFRAGE, also sitzt die Zeile IN der Anfragekarte und
+   heisst .anfquota. Gleiche Bauteile (Punkte, fette Zahl), aber sie
+   gehoert zur Karte: dunkler Fuss unter dem Erhalten-Balken, damit die
+   Karte optisch EIN Block bleibt und nicht in zwei zerfaellt. */
+.anfquota{display:flex;align-items:center;gap:8px;padding:0 11px 9px;
+  font-size:10px;color:var(--dim);
+  background:linear-gradient(180deg,#31424f,#26343f)}
+.anfquota b{color:var(--txt);font-size:11.5px}
+.anfquota .qdots{display:flex;gap:2px;margin-left:auto}
+.anfquota .qd{width:6px;height:11px;border-radius:2px;background:#0b1116;
+  border:1px solid #2b3b47}
+.anfquota .qd.on{background:linear-gradient(180deg,#f2c53d,#a8842a);border-color:#8a6c1f}
 /* ---------- Anfragekarte im AA-Zuschnitt (30.07.2026) ----------
    Vorher war eine Anfrage EINE flache Zeile (.reqrow): 40-px-Kaertchen,
    zwei Textzeilen, 7-px-Balken, kleiner Knopf — alles in 72 px Hoehe.
@@ -5545,8 +5552,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
  * ------------------------------------------------------------------ */
 .anfrage,.anfmarke,.chatblase,.chatav{box-shadow:var(--mat-raised)}
 .anfkopf,.anfbild,.anfinfo,.smileybtn,.smileybtn2{box-shadow:var(--lit),var(--unlit)}
-.anfhast,.anffort .fbar,.smileyfeld,.chatverlauf,#chatInput,
-.quotabar{box-shadow:var(--mat-sunken)}
+.anfhast,.anffort .fbar,.smileyfeld,.chatverlauf,#chatInput{box-shadow:var(--mat-sunken)}
 /* Der Koerper der Anfragekarte ist die HELLE Flaeche unter dem Kopf —
    dort sitzt das Licht als Kante nach oben, nicht als Rahmen. */
 .anfkoerper{box-shadow:inset 0 1px 0 #ffffff1f}
@@ -5607,8 +5613,9 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   100% {transform:translateY(-42px) scale(1);opacity:0}
 }
 /* Der Kontingent-Punkt, der gerade verbraucht wurde, blitzt einmal auf —
-   so wird die 10-pro-3-Stunden-Regel begreifbar statt nur gezaehlt. */
-.quotabar .qd.justused{animation:qdpop 520ms ease-out}
+   so wird die Regel „hoechstens 10 von dir je Anfrage" begreifbar statt
+   nur gezaehlt. Seit 30.07.2026 sitzt er auf der Anfragekarte. */
+.anfquota .qd.justused{animation:qdpop 520ms ease-out}
 @keyframes qdpop{
   0%   {transform:scaleY(1);   box-shadow:0 0 0 0 #f2c53d00}
   30%  {transform:scaleY(1.5); box-shadow:0 0 8px 2px #f2c53dcc}
@@ -5629,11 +5636,6 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   78%  {opacity:1}
   100% {transform:translate(-50%,-64%) scale(1);opacity:0}
 }
-/* Spenden-Knopf mit Icon: das Icon sitzt links vom Wort. */
-/* 20 px ist die Untergrenze, ab der diese Artworks lesbar bleiben — bei
-   14-16 px werden sie zu Kluempchen (im Browsertest mit echtem CDN
-   geprueft). Deshalb tragen nur Knoepfe MIT Flaeche ein Icon. */
-.quotabar img.qico{width:22px;height:22px;object-fit:contain;flex:0 0 22px}
 /* Karten-Wahl im Anfrage-Dialog */
 .pickgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
 .picktile{position:relative;border-radius:10px;border:2px solid #9aa3ad;padding:8px 4px;
@@ -16290,14 +16292,7 @@ button.pfplate{cursor:pointer}
    * ------------------------------------------------------------------ */
   function renderClanDonate(justSent) {
     var CL = CLof(); if (!CL) return;
-    var q = CL.sendQuota(), reqs = CL.requests();
-    var dots = "";
-    for (var i = 0; i < CL.SEND_MAX; i++) {
-      // Der letzte gesetzte Punkt ist der gerade verbrauchte.
-      var used = i < q.used;
-      dots += '<span class="qd' + (used ? " on" : "") +
-        (justSent && used && i === q.used - 1 ? " justused" : "") + '"></span>';
-    }
+    var reqs = CL.requests();
     /* Eigener grauer Bestand je Karte. Ohne ihn koennte der „Du hast"-
        Kasten nicht gefuellt werden — donatableCards() ist die einzige
        Quelle dafuer, und sie liefert nur, was ueberhaupt sendbar ist. */
@@ -16305,21 +16300,30 @@ button.pfplate{cursor:pointer}
     CL.donatableCards().forEach(function (c) { bestand[c.cardId] = c.copies; });
 
     var html = secribbon("Spenden-Anfragen", reqs.length ? String(reqs.length) : "keine");
-    /* Das Sendekontingent bleibt SICHTBAR und wandert nicht mit dem
-       Regeltext ins ⓘ: es ist der einzige Grund, aus dem ein SPENDEN-
-       Knopf grau sein kann. Eine gesperrte Handlung ohne sichtbaren
-       Grund ist ein Fehler, kein aufgeraeumtes Layout. Das Artwork
-       sitzt hier, wo Flaeche ist (22 px), nicht im Knopf. */
-    html += '<div class="quotabar">' + ico("ic_donate", "🤲", "qico") +
-      "<span>Sendekontingent</span>" +
-      "<b>" + q.used + "/" + q.max + "</b>" +
-      "<span>· " + (q.used ? "Reset in " + q.resetText : "voll verfügbar") + "</span>" +
-      '<span class="qdots">' + dots + "</span></div>";
+    /* ⚠ UMGEBAUT 30.07.2026 — die Kontingentleiste stand als EIGENE
+       Zeile ueber der ganzen Ansicht, weil das Kontingent damals global
+       galt (10 Karten / 3 h ueber alle Anfragen). Seit der neuen Vorgabe
+       gilt es JE ANFRAGE. Eine Leiste ueber der Liste koennte gar nicht
+       mehr sagen, WORAUF sich ihre Zahl bezieht — sie stand jetzt nur
+       noch plausibel da und waere falsch. Die zehn Punkte sitzen deshalb
+       AUF der Anfragekarte, wo die Zahl hingehoert: „so viel hast DU
+       DIESER Anfrage gegeben". Der Grund fuer einen grauen Knopf bleibt
+       damit sichtbar — nur eben am richtigen Ort. */
 
     html += reqs.map(function (r) {
       var m = BY_ID[r.cardId] || { art: "❔", color: "#9aa3ad", name: r.cardName };
       var habe = bestand[r.cardId] || 0;
-      var can = !r.mine && !r.closed && q.left > 0 && habe > 0;
+      var can = !r.mine && !r.closed && r.myLeft > 0 && habe > 0;
+      var dots = "";
+      if (!r.mine) {
+        for (var i = 0; i < r.myMax; i++) {
+          // Der letzte gesetzte Punkt ist der gerade verbrauchte.
+          var used = i < r.myDonation;
+          dots += '<span class="qd' + (used ? " on" : "") +
+            (justSent === r.id && used && i === r.myDonation - 1 ? " justused" : "") +
+            '"></span>';
+        }
+      }
       var knopf = r.mine
         ? '<span class="gotpts">' + (r.closed ? "erfüllt" : "deine Anfrage") + "</span>"
         // BEWUSST ohne Icon: ic_donate ist bei 14 px im Knopf ein
@@ -16356,6 +16360,13 @@ button.pfplate{cursor:pointer}
         '<div class="anffort"><span class="fk">Erhalten:</span>' +
           '<span class="fbar"><i style="width:' + (r.pct * 100).toFixed(0) + '%"></i>' +
           '<span class="fnum">' + r.got + "/" + r.need + "</span></span></div>" +
+        /* Die Kontingentzeile DIESER Anfrage. Nur bei fremden Anfragen —
+           zur eigenen kann man nichts beisteuern, eine Reihe leerer
+           Punkte waere dort eine Einladung, die nicht gilt. */
+        (r.mine ? "" :
+          '<div class="anfquota"><span>Dein Beitrag</span>' +
+          "<b>" + r.myDonation + "/" + r.myMax + "</b>" +
+          '<span class="qdots">' + dots + "</span></div>") +
         "</div>";
     }).join("");
 
@@ -16385,7 +16396,10 @@ button.pfplate{cursor:pointer}
     var CL = CLof(); if (!CL) return;
     $("spendInfoTxt").innerHTML = "Es dürfen <b>nur Turmkarten</b> und <b>nur graue " +
       "Basis-Kopien</b> versendet werden — keine Helden, kein Material, kein Gold. " +
-      "<b>10 Karten pro 3 Stunden</b> (rollierendes Fenster). " +
+      "Eine Anfrage umfasst <b>" + CL.REQUEST_SIZE + " Karten</b>; von dir kommen " +
+      "höchstens <b>" + CL.DONATE_MAX_PER_REQUEST + " je Anfrage</b>, und jedes " +
+      "Tippen sendet <b>genau eine</b>. Eine eigene Anfrage ist alle <b>" +
+      Math.round(CL.REQUEST_COOLDOWN_MS / 3600000) + " Stunden</b> möglich. " +
       "Fusionen (3 gleiche → nächste Stufe) macht jeder selbst.<br>" +
       "Belohnung: <b>" + CL.DONATE_GOLD + " Gold</b> und <b>" + CL.DONATE_MATERIAL +
       " Material</b> je gespendeter Karte.";
@@ -16638,11 +16652,13 @@ button.pfplate{cursor:pointer}
     var CL = CLof();
     var r = CL.requests().filter(function (x) { return x.id === reqId; })[0];
     if (!r) { UISfx.deny(); toast("Anfrage nicht gefunden"); return; }
-    // So viel wie sinnvoll: Restbedarf, Restkontingent und eigener Bestand.
-    var have = 0;
-    CL.donatableCards().forEach(function (c) { if (c.cardId === r.cardId) have = c.copies; });
-    var n = Math.min(r.left, CL.sendQuota().left, have);
-    if (n <= 0) n = 1;                              // bewusst in den Fehler laufen lassen —
+    /* GENAU EINE KARTE JE TIPPEN (Vorgabe 30.07.2026). Vorher rechnete
+       das UI hier die groesstmoegliche Menge aus (Restbedarf × Kontingent
+       × Bestand) und schickte sie in einem Zug. Das ist genau das
+       „direkt 10", das die Vorgabe ausschliesst — und es nahm dem
+       Spieler die Entscheidung ab, wie viel er geben will. Die Menge
+       steht nicht mehr im UI: ArenaClan.donateCards() bucht ohne
+       Mengenangabe DONATE_PER_TAP. */
     // Start- und Zielpunkt VOR dem Buchen als KOORDINATEN sichern. Die
     // Zeremonie haengt danach an Zahlen, nicht an DOM-Knoten — deshalb
     // darf sofort neu gerendert werden und der Datenstand (Kontingent,
@@ -16654,13 +16670,17 @@ button.pfplate{cursor:pointer}
     var tgt = rowEl && (rowEl.querySelector(".anfbild") || rowEl);
     var to = tgt ? tgt.getBoundingClientRect() : null;
     try {                                           // die Modul-Meldung erklaert das Warum
-      var res = CL.donateCards(reqId, n);
+      var res = CL.donateCards(reqId);              // eine Karte, ohne Mengenangabe
       track("donation_sent", { card: res.cardId, n: res.count });
       var DYd = DYof(); if (DYd) DYd.reportEvent("donate", res.count);
       setGold(gold() + res.reward.gold);            // Gold bucht der Hub
       UISfx.confirm();
-      toast(res.count + " × " + res.cardName + " gespendet");
-      renderClan(true); renderTop();
+      toast(res.count + " × " + res.cardName + " gespendet (" +
+        res.request.got + "/" + res.request.need + ", dein Beitrag " +
+        res.quota.used + "/" + res.quota.max + ")");
+      // Die ID statt `true`: nur die Karte, an die gerade gespendet
+      // wurde, laesst ihren neuen Punkt aufblitzen.
+      renderClan(reqId); renderTop();
       sendCeremony(reqId, from, to, res.cardId, res.reward, res.request.closed);
     } catch (e) { UISfx.deny(); toast(e.message); }
   }
@@ -16907,8 +16927,10 @@ button.pfplate{cursor:pointer}
     // Der Kriegs-Loop gehoert zum Kriegsboard, nicht zur Clan-Ansicht.
     if (window.ArenaAudio) ArenaAudio.music("audio_theme");
   }
-  /* justSent=true nach einer Spende: der zuletzt verbrauchte
-     Kontingent-Punkt blitzt einmal auf (§20.5, Punkt 4). */
+  /* justSent = ID der eben bespendeten Anfrage: auf DEREN Karte blitzt
+     der zuletzt verbrauchte Kontingent-Punkt einmal auf (§20.5, Punkt 4).
+     Bis 30.07.2026 war das ein `true` — es gab ja nur eine, globale
+     Punktreihe. */
   function renderClan(justSent) {
     var CL = CLof();
     if (!CL) { $("clanNote").textContent = "arena_clan.js nicht geladen."; return; }
@@ -16921,10 +16943,13 @@ button.pfplate{cursor:pointer}
     renderEmotes();
     renderClanFeed();
     setClanTab(clanTab, true);
-    var q = CL.sendQuota();
+    /* Kein globales Kontingent mehr in der Fusszeile (30.07.2026): eine
+       Zahl ohne Anfrage waere hier nicht mehr definiert. Stattdessen die
+       REGEL, die fuer alle Anfragen gilt. */
     $("clanNote").textContent = "Logik: arena_clan.js (localStorage „arenaClan“). " +
       "Bots, Gegnerclan und Rangliste sind berechnet, nicht gespeichert — ein Server " +
-      "ersetzt genau diese Schicht. Sendekontingent " + q.used + "/" + q.max + ".";
+      "ersetzt genau diese Schicht. Eine Anfrage umfasst " + CL.REQUEST_SIZE +
+      " Karten, von dir höchstens " + CL.DONATE_MAX_PER_REQUEST + " je Anfrage.";
     UIBadge.set("clan", CL.notifications().length);
   }
 

@@ -6,13 +6,40 @@
  * Begründung aller Zahlen: arena_patches/DESIGN_CLAN.md
  *
  * DIE BINDENDE USER-VORGABE ZUR SENDEMECHANIK (DESIGN_CLAN.md §0),
- * hier als harte Validierung implementiert:
+ * hier als harte Validierung implementiert.
+ *
+ * ---- GÜLTIGE FASSUNG, 30.07.2026 — wörtlich vom Auftraggeber: ----
+ *   „man darf 30 Karten anfordern. Jeder Spieler darf aber nur maximal
+ *    10 Karten dazu steuern. Es kann auch nur eine gesendet werden nicht
+ *    direkt 10. man darf aber nur alle 5 Stunden Karten anfordern."
+ * In Konstanten:
+ *   · REQUEST_SIZE            = 30   Karten je Anfrage
+ *   · DONATE_MAX_PER_REQUEST  = 10   was EIN Spieler zu EINER Anfrage gibt
+ *   · DONATE_PER_TAP          = 1    Karte je Sendevorgang
+ *   · REQUEST_COOLDOWN_MS     = 5 h  zwischen zwei eigenen Anfragen
+ * Unverändert weiter gültig (die drei anderen bindenden Vorgaben):
  *   · Es dürfen NUR Tower-Karten versendet werden (keine Helden, kein
  *     Material, kein Gold).
- *   · Limit 10 Stück pro 3 Stunden.
  *   · NUR Basis-Kopien (Tier "common"/grau) — KEINE grünen/blauen/
  *     höheren Raritäten. Fusionen (3 gleiche → nächste Stufe) muss
  *     jeder Spieler selbst machen und selbst herausfinden.
+ *   · Die eigene Anfrage kann man nicht selbst bespenden.
+ *
+ * ---- ABGELÖSTE FASSUNG, 26.07.2026 (steht hier, damit nachvollziehbar
+ *      bleibt, was sich wann geändert hat): ----
+ *   „Limit 10 Stück pro 3 Stunden" — ein GLOBALES rollierendes Fenster
+ *   über ALLE Anfragen hinweg (SEND_MAX / SEND_WINDOW_MS / s.sendLog).
+ *   WARUM ES ERSATZLOS ENTFÄLLT und nicht neben der neuen Regel steht:
+ *   beide tragen dieselbe Zahl 10. Nebeneinander hätten sie geheißen —
+ *   wer einem Clankollegen mit 10 Karten hilft, kann drei Stunden lang
+ *   KEINEM ZWEITEN mehr helfen. Das Zeitfenster hätte genau das
+ *   Verhalten bestraft, für das es Clans überhaupt gibt. Verbindlich
+ *   ist deshalb allein die Grenze JE ANFRAGE.
+ *   GEMESSENE FOLGE (dem Auftraggeber gemeldet): der Tagesdeckel steigt
+ *   von 80 auf 120 Karten — 4 Bot-Anfrage-Buckets à 6 h × 3 gleichzeitig
+ *   offene Anfragen × 10 eigene Karten —, der Gold-Zufluss aus Spenden
+ *   damit von 2 000 auf 3 000 🪙/Tag (DONATE_GOLD = 25).
+ *
  * Jeder Verstoß wirft einen Error mit deutscher Klartextmeldung, die
  * direkt als Toast taugt. Die Signatur donateCards(requestId, count)
  * nimmt bewusst KEINEN Tier-Parameter — eine höhere Rarität ist über
@@ -59,17 +86,26 @@
   "use strict";
 
   var KEY = "arenaClan";
-  var STATE_VERSION = 2;
+  /* v3 seit 30.07.2026: `sendLog` (das globale 3-h-Fenster) ist ersatzlos
+     entfallen. Ein Feld, das niemand mehr liest, aber weiter geschrieben
+     wird, ist die teuerste Art von Altlast — es sieht wie eine Regel aus.
+     Die Grenze steckt jetzt vollständig in `donated` ({anfrageId: n}),
+     das es ohnehin schon gab. */
+  var STATE_VERSION = 3;
 
   /* ================= Konstanten (DESIGN_CLAN.md §9) ================= */
 
   var MINUTE = 60000, HOUR = 3600000, DAY = 86400000;
 
-  /* ---- Sendemechanik ---- */
-  var SEND_MAX = 10;                 // Karten pro rollierendem Fenster
-  var SEND_WINDOW_MS = 3 * HOUR;     // Fensterlänge
-  var REQUEST_SIZE = 10;             // Bedarf einer Anfrage
-  var REQUEST_COOLDOWN_MS = 8 * HOUR;
+  /* ---- Sendemechanik (Vorgabe 30.07.2026, Kopfkommentar + §0) ----
+     SEND_MAX/SEND_WINDOW_MS sind BEWUSST GELÖSCHT und nicht als Alias
+     stehengeblieben: ein Aufrufer, der sie noch benutzt, soll laut
+     scheitern statt still mit einer plausiblen falschen Zahl zu rechnen. */
+  var REQUEST_SIZE = 30;             // Bedarf einer Anfrage
+  var DONATE_MAX_PER_REQUEST = 10;   // was EIN Spieler zu EINER Anfrage beitragen darf
+  var DONATE_PER_TAP = 1;            // Karten je Sendevorgang — „nicht direkt 10"
+  var REQUEST_COOLDOWN_MS = 5 * HOUR;
+  var DONATED_KEEP = 40;             // max. Einträge in s.donated (Begründung in get())
   var DONATE_GOLD = 25;              // Gold je gespendeter Karte (nur gemeldet)
   var DONATE_MATERIAL = 1;           // Material je gespendeter Karte (gebucht)
 
@@ -348,8 +384,10 @@
             lastRequestTs: 0, lastEmoteTs: 0 },
       quests: freshQuests(""),
       requests: [],                  // enthält NUR die eigene Anfrage
-      donated: {},                   // {botRequestId: n} — eigene Spenden auf Bot-Anfragen
-      sendLog: [],                   // rollierendes 3-h-Fenster, max SEND_MAX Einträge
+      /* {anfrageId: n} — eigene Spenden je Anfrage. Seit 30.07.2026 ist das
+         nicht mehr nur ein Anzeige-Overlay, sondern die TRAGENDE Struktur
+         der Sendegrenze: n ≤ DONATE_MAX_PER_REQUEST. */
+      donated: {},
       notes: [],
       war: freshWar(""),
       lastWar: null,
@@ -358,15 +396,12 @@
   }
 
   /* ---- Migration v1 → v2 -------------------------------------------
-   * v1 war das COOLDOWN-Modell des Sendelimits: ein Zähler `sent` plus
-   * ein Startzeitstempel `sentSince`. Mit der Entscheidung für das
-   * ROLLIERENDE FENSTER (DESIGN_CLAN.md §1) wird daraus ein Log aus
-   * Einzelzeitstempeln. Die Migration setzt alle `sent` Einträge auf
-   * `sentSince` — im schlimmsten Fall verfallen sie dadurch etwas
-   * früher als im alten Modell. Das ist die spielerfreundliche
-   * Richtung und deshalb bewusst so gewählt.
-   * Ebenfalls v1: `quests` hielt die Zähler flach (quests.wins statt
-   * quests.progress.wins). ------------------------------------------ */
+   * v1 hielt `quests` flach (quests.wins statt quests.progress.wins) und
+   * das Sendelimit als Cooldown-Zähler (`sent` + `sentSince`).
+   * Die Zähler-Umrechnung, die hier bis zum 30.07.2026 stand, ist
+   * ENTFALLEN: v3 kennt kein globales Sendelimit mehr, in das sie
+   * münden könnte (siehe migrateV2toV3). Übrig bleibt die Quest-Form.
+   * ------------------------------------------------------------------ */
   function migrateV1toV2(old) {
     var s = fresh();
     s.joined = !!old.joined;
@@ -382,22 +417,44 @@
     s.quests.claimed = !!oq.claimed;
     s.requests = Array.isArray(old.requests) ? old.requests : [];
     s.donated = (old.donated && typeof old.donated === "object") ? old.donated : {};
-    // Cooldown-Zähler → rollierender Log
-    var n = Math.max(0, Math.min(SEND_MAX, old.sent | 0));
-    var since = ts0(old.sentSince);
-    s.sendLog = [];
-    for (var i = 0; i < n; i++) s.sendLog.push(since);
     s.notes = Array.isArray(old.notes) ? old.notes : [];
     s.war = old.war && typeof old.war === "object" ? old.war : freshWar("");
     s.lastWar = old.lastWar || null;
     if (old.stats && typeof old.stats === "object") {
       for (var sk in s.stats) if (old.stats[sk] !== undefined) s.stats[sk] = old.stats[sk] | 0;
     }
+    s.v = 2;                           // ehrliche Zwischenstufe für den Dispatcher
     return s;
   }
+
+  /* ---- Migration v2 → v3 (30.07.2026) -------------------------------
+   * v2 speicherte das GLOBALE Sendelimit als `sendLog` — ein Feld voller
+   * Zeitstempel, das in v3 niemand mehr liest. Es wird GELÖSCHT statt
+   * mitgeschleppt: ein persistiertes Feld, das wie eine Regel aussieht,
+   * aber keine mehr ist, ist die teuerste Sorte Altlast (und run_v6
+   * misst den State auf < 6 000 Byte).
+   * Ein Rest-Kontingent umzurechnen wäre sinnlos — es gibt kein Fenster
+   * mehr, in das es passen könnte. Wer beim Update mitten im alten
+   * Fenster stand, hat danach volle Anfrage-Kontingente. Das ist die
+   * spielerfreundliche Richtung und NICHT missbrauchbar: die neue
+   * Grenze steckt in `donated`, und das wird 1:1 übernommen — wer einer
+   * Anfrage schon 10 Karten gegeben hat, gibt ihr auch nach dem Update
+   * keine elfte. ------------------------------------------------------ */
+  function migrateV2toV3(old) {
+    var s = old;
+    delete s.sendLog;
+    delete s.sent;                     // v1-Reste, falls sie je durchrutschten
+    delete s.sentSince;
+    s.v = 3;
+    return s;
+  }
+  /* Dispatcher: ein v1-Stand läuft BEIDE Stufen (Muster wie
+     arena_cards.js). Kein v-Feld = Vor-Versionierung, wie v1 behandelt. */
   function migrateState(old) {
-    // Kein v-Feld = Vor-Versionierung; identisch zu v1 behandeln.
-    return migrateV1toV2(old || {});
+    var s = old || {};
+    if ((s.v | 0) < 2) s = migrateV1toV2(s);
+    if ((s.v | 0) < 3) s = migrateV2toV3(s);
+    return s;
   }
 
   /* normClan(c) — Stammdaten heilen. Fremde Presetkeys, zu lange Namen
@@ -440,7 +497,11 @@
     var s;
     try { s = JSON.parse(lsGet() || "{}"); } catch (e) { s = {}; }
     if (!s || typeof s !== "object") s = {};
-    var known = s.clan !== undefined || s.sendLog !== undefined || s.sent !== undefined;
+    /* `sendLog`/`sent` gibt es in v3 nicht mehr — sie bleiben hier
+       trotzdem stehen: sie sind der ERKENNUNGSMERKMAL eines alten
+       Standes, der migriert werden muss. */
+    var known = s.clan !== undefined || s.sendLog !== undefined ||
+                s.sent !== undefined || s.donated !== undefined;
     if (s.v !== STATE_VERSION && known) s = migrateState(s);
     var f = fresh();
     for (var k in f) if (s[k] === undefined) s[k] = f[k];
@@ -459,12 +520,25 @@
     if (!s.quests.progress || typeof s.quests.progress !== "object") s.quests.progress = { wins: 0, packs: 0, trophies: 0 };
     QUEST_KEYS.forEach(function (q) { s.quests.progress[q] = Math.max(0, s.quests.progress[q] | 0); });
     if (!Array.isArray(s.requests)) s.requests = [];
+    /* `donated` HEILEN — es trägt seit 30.07.2026 die Sendegrenze, also
+       muss hier stehen, was dort früher für `sendLog` stand:
+       · jeder Wert ist eine ganze Zahl in [0, DONATE_MAX_PER_REQUEST].
+         Ein manipulierter Eintrag kann die Grenze damit nur SENKEN,
+         nicht heben, und eine „11" aus einem alten Stand wird zu 10.
+       · der Deckel auf ANZAHL der Schlüssel: Bot-Anfragen rotieren alle
+         6 h (SIM_REQ_BUCKET), ihre IDs sind also unbegrenzt viele. Ohne
+         Deckel wüchse der State ewig — run_v6 misst ihn auf < 6 000 Byte.
+         DONATED_KEEP = 40 ≙ gut drei Tage Anfragen (4 Buckets × 3), die
+         ältesten fallen zuerst weg. Ihre Anfragen gibt es dann längst
+         nicht mehr, die Grenze kann also niemand damit umgehen. */
     if (!s.donated || typeof s.donated !== "object") s.donated = {};
-    if (!Array.isArray(s.sendLog)) s.sendLog = [];
-    s.sendLog = s.sendLog.map(ts0)
-                         .filter(function (t) { return t > 0 && t <= now && now - t < SEND_WINDOW_MS; })
-                         .sort(function (a, b) { return a - b; })
-                         .slice(-SEND_MAX);
+    var dkeys = Object.keys(s.donated);
+    for (var di = 0; di < dkeys.length; di++) {
+      var dv = Math.max(0, Math.min(DONATE_MAX_PER_REQUEST, s.donated[dkeys[di]] | 0));
+      if (dv > 0) s.donated[dkeys[di]] = dv; else delete s.donated[dkeys[di]];
+    }
+    dkeys = Object.keys(s.donated);
+    for (var dj = 0; dj < dkeys.length - DONATED_KEEP; dj++) delete s.donated[dkeys[dj]];
     if (!Array.isArray(s.notes)) s.notes = [];
     if (!s.war || typeof s.war === "string") s.war = f.war;
     if (!s.war.attacks || typeof s.war.attacks !== "object") s.war.attacks = {};
@@ -1078,21 +1152,35 @@
     try { assertSendable(cardId, tierKey); return true; } catch (e) { return false; }
   }
 
-  /* sendQuota(now) → {used, max, left, resetAt, resetIn, resetText}
-   * ROLLIERENDES 3-h-FENSTER (Entscheidung + Begründung: §1).
-   * `resetIn` nennt den Moment, in dem der ÄLTESTE Eintrag verfällt —
-   * also wann der NÄCHSTE Slot frei wird, nicht wann alle frei werden. */
-  function sendQuota(now) {
+  /* sendQuota(anfrageId [, now]) → {requestId, used, max, left, perTap, full}
+   * ------------------------------------------------------------------
+   * SEIT 30.07.2026 IST DAS KONTINGENT ANFRAGEBEZOGEN, NICHT ZEITBEZOGEN.
+   * Es beantwortet genau eine Frage: „wie viele Karten habe ICH zu DIESER
+   * Anfrage schon beigesteuert, und wie viele darf ich noch?" Es gibt
+   * keinen Reset und keine Restzeit mehr — die alten Felder resetAt/
+   * resetIn/resetText/windowMs sind deshalb WEG statt auf 0 gesetzt: ein
+   * Feld, das immer 0 sagt, liest sich wie „gleich frei" und lügt.
+   *
+   * DIE SIGNATUR HAT SICH GEDREHT (Anfrage-ID zuerst, `now` wie überall
+   * sonst im Modul zuletzt). Ein Altaufruf sendQuota(now) übergäbe eine
+   * ZAHL — das fangen wir ab und werfen, statt eine plausible falsche
+   * Zahl zurückzugeben. Eine stille 0/10 wäre der schlimmste Ausgang:
+   * das UI hätte weiter etwas gezeichnet und niemand hätte es gemerkt. */
+  function sendQuota(requestId, now) {
+    if (typeof requestId !== "string" || !requestId) {
+      throw new Error("sendQuota() braucht seit 30.07.2026 die Anfrage-ID: " +
+        "sendQuota(anfrageId, now). Das Sendekontingent gilt JE ANFRAGE " +
+        "(höchstens " + DONATE_MAX_PER_REQUEST + " Karten von dir), nicht mehr " +
+        "global pro Zeitfenster.");
+    }
     now = nowMs(now);
     var s = get(now);
-    var log = s.sendLog.filter(function (t) { return t <= now && now - t < SEND_WINDOW_MS; });
-    var used = log.length, left = Math.max(0, SEND_MAX - used);
-    var resetAt = used ? log[0] + SEND_WINDOW_MS : 0;
-    var resetIn = resetAt ? Math.max(0, resetAt - now) : 0;
+    var used = Math.max(0, Math.min(DONATE_MAX_PER_REQUEST, s.donated[requestId] | 0));
+    var left = Math.max(0, DONATE_MAX_PER_REQUEST - used);
     return {
-      used: used, max: SEND_MAX, left: left,
-      windowMs: SEND_WINDOW_MS,
-      resetAt: resetAt, resetIn: resetIn, resetText: hhmm(resetIn),
+      requestId: requestId,
+      used: used, max: DONATE_MAX_PER_REQUEST, left: left,
+      perTap: DONATE_PER_TAP,
       full: left <= 0,
     };
   }
@@ -1103,7 +1191,8 @@
     return h + ":" + (m < 10 ? "0" : "") + m;
   }
 
-  /* requestCards(cardId) → Anfrage. Max 1 aktive, Cooldown 8 h. */
+  /* requestCards(cardId) → Anfrage über REQUEST_SIZE (30) Karten.
+   * Max 1 aktive, Abklingzeit REQUEST_COOLDOWN_MS (5 h). */
   function requestCards(cardId, now) {
     now = nowMs(now);
     assertSendable(cardId, "common");
@@ -1117,7 +1206,7 @@
     var since = now - ts0(s.me.lastRequestTs);
     if (s.me.lastRequestTs && since < REQUEST_COOLDOWN_MS) {
       throw new Error("Neue Anfrage erst in " + hhmm(REQUEST_COOLDOWN_MS - since) +
-        " möglich (eine alle 8 Stunden).");
+        " möglich (eine alle " + Math.round(REQUEST_COOLDOWN_MS / HOUR) + " Stunden).");
     }
     var req = {
       id: "me:" + now, ownerId: "me", cardId: String(cardId),
@@ -1188,14 +1277,19 @@
     var mine = myRequestAny(s);
     if (mine) out.push(viewRequest(mine, s, now));
     Sim.requests(s.clan, now).forEach(function (r) {
-      var extra = s.donated[r.id] | 0;
+      var extra = Math.min(DONATE_MAX_PER_REQUEST, s.donated[r.id] | 0);
       var got = Math.min(r.need, r.simGot + extra);
       out.push({
         id: r.id, ownerId: r.ownerId, ownerName: r.ownerName, mine: false,
         cardId: r.cardId, cardName: r.cardName,
         need: r.need, got: got, left: Math.max(0, r.need - got),
         pct: got / r.need, ts: r.ts, ageMs: now - r.ts,
-        closed: got >= r.need, myDonation: extra,
+        closed: got >= r.need,
+        /* myDonation/myMax/myLeft = das Kontingent JE ANFRAGE, direkt an
+           der Anfrage. Das UI zeichnet daraus die zehn Punkte auf der
+           Karte und muss dafür nicht je Karte sendQuota() rufen. */
+        myDonation: extra, myMax: DONATE_MAX_PER_REQUEST,
+        myLeft: Math.max(0, DONATE_MAX_PER_REQUEST - extra),
       });
     });
     return out;
@@ -1206,22 +1300,36 @@
       cardId: r.cardId, cardName: cardLabel(r.cardId),
       need: r.need, got: r.got, left: Math.max(0, r.need - r.got),
       pct: r.got / r.need, ts: r.ts, ageMs: now - r.ts,
-      closed: !!r.closed, myDonation: 0,
+      // Die eigene Anfrage ist nicht selbst bespendbar → myLeft ist 0,
+      // nicht 10. Der Knopf darf daraus gar nicht erst entstehen.
+      closed: !!r.closed, myDonation: 0, myMax: DONATE_MAX_PER_REQUEST, myLeft: 0,
     };
   }
 
-  /* donateCards(requestId, count [, tierKey])
+  /* donateCards(requestId [, count] [, tierKey] [, now])
    * ------------------------------------------------------------------
-   * Der dritte Parameter existiert AUSSCHLIESSLICH, um ihn abzulehnen:
-   * Es gibt keinen Aufrufpfad, über den eine höhere Rarität adressierbar
+   * EIN SENDEVORGANG = GENAU EINE KARTE (Vorgabe 30.07.2026: „Es kann
+   * auch nur eine gesendet werden nicht direkt 10"). `count` bleibt in
+   * der Signatur, weil zwei Aufrufer es übergeben (ArenaFriends.giftCards,
+   * das UI) — es darf aber nur noch DONATE_PER_TAP sein, alles andere
+   * wirft. Der Parameter ist damit kein Mengenregler mehr, sondern eine
+   * Sicherung: ein Aufrufer, der noch 10 auf einen Griff schicken will,
+   * merkt es sofort statt still zehnmal zu buchen.
+   * Der Tier-Parameter existiert AUSSCHLIESSLICH, um ihn abzulehnen: Es
+   * gibt keinen Aufrufpfad, über den eine höhere Rarität adressierbar
    * wäre. Default ist "common"; alles andere wirft.
    * → {ok, count, cardId, request, quota, reward:{gold, material, materialType}} */
   function donateCards(requestId, count, tierKey, now) {
     now = nowMs(now);
     var s = get(now);
     if (!s.joined) throw new Error("Du bist in keinem Clan.");
-    var n = Math.floor(Number(count == null ? 1 : count) || 0);
+    var n = Math.floor(Number(count == null ? DONATE_PER_TAP : count) || 0);
     if (n <= 0) throw new Error("Spende mindestens eine Karte.");
+    if (n > DONATE_PER_TAP) {
+      throw new Error("Es geht genau " + (DONATE_PER_TAP === 1 ? "eine Karte" :
+        DONATE_PER_TAP + " Karten") + " je Sendevorgang — tippe mehrfach, " +
+        "wenn du mehr geben willst.");
+    }
 
     // --- Anfrage auflösen ---
     var all = requests(now), req = null;
@@ -1233,15 +1341,18 @@
     // --- Vorgabe 1 + 3: nur Tower, nur graue Basis-Kopien ---
     assertSendable(req.cardId, tierKey === undefined ? "common" : tierKey);
 
-    // --- Vorgabe 2: 10 Stück pro 3 Stunden (rollierendes Fenster) ---
-    var q = sendQuota(now);
+    /* --- Vorgabe 2: höchstens 10 Karten von EINEM Spieler je Anfrage ---
+       Die Meldung sagt ausdrücklich, dass die Anfrage weiterläuft. Sonst
+       liest sich die Sperre wie „hier ist nichts mehr zu holen", dabei
+       ist das Gegenteil gemeint: der Rest gehört den anderen 29. */
+    var q = sendQuota(req.id, now);
     if (q.full) {
-      throw new Error("Sendelimit erreicht: " + SEND_MAX + " Karten pro 3 Stunden. " +
-        "Nächster Slot frei in " + q.resetText + ".");
+      throw new Error("Du hast dieser Anfrage schon " + q.max + " Karten gegeben — mehr " +
+        "darf ein einzelner Spieler nicht beisteuern. Den Rest holen die anderen im Clan.");
     }
     if (n > q.left) {
-      throw new Error("Du kannst nur noch " + q.left + " Karte" + (q.left === 1 ? "" : "n") +
-        " senden (" + SEND_MAX + " pro 3 Stunden).");
+      throw new Error("Du kannst dieser Anfrage nur noch " + q.left + " Karte" +
+        (q.left === 1 ? "" : "n") + " geben (höchstens " + q.max + " je Anfrage).");
     }
     if (n > req.left) {
       throw new Error("Die Anfrage braucht nur noch " + req.left + " Karte" +
@@ -1254,10 +1365,6 @@
     //     Bot; sein "Konto" ist der Overlay-Zähler. Ein Server bucht hier
     //     auf die echte Kartenbank des Mitglieds. ---
     s.donated[req.id] = (s.donated[req.id] | 0) + n;
-
-    // --- Sendelog fortschreiben (n Einträge, einer je Karte) ---
-    for (var k = 0; k < n; k++) s.sendLog.push(now);
-    s.sendLog = s.sendLog.slice(-SEND_MAX);
     s.stats.donatedTotal = (s.stats.donatedTotal | 0) + n;
 
     // --- Spender-Belohnung: Material gebucht, Gold nur gemeldet ---
@@ -1273,10 +1380,14 @@
         req.ownerName + " gespendet.", now);
     }
     save(s);
+    /* sendQuota() erst NACH save() — es liest den State frisch. Der
+       Aufrufer bekommt damit den Stand, den auch das nächste Rendern
+       sieht (Fortschritt 4/30, eigenes Kontingent 1/10). */
     return {
       ok: true, count: n, cardId: req.cardId, cardName: cardLabel(req.cardId),
-      request: { id: req.id, ownerName: req.ownerName, got: got, need: req.need, closed: closed },
-      quota: sendQuota(now),
+      request: { id: req.id, ownerName: req.ownerName, got: got, need: req.need,
+                 closed: closed, myDonation: s.donated[req.id] | 0 },
+      quota: sendQuota(req.id, now),
       reward: { gold: gold, material: mat, materialType: matType },
     };
   }
@@ -1584,8 +1695,13 @@
     // Konstanten
     STATE_VERSION: STATE_VERSION,
     TOWER_IDS: TOWER_IDS, CARD_NAME: CARD_NAME,
-    SEND_MAX: SEND_MAX, SEND_WINDOW_MS: SEND_WINDOW_MS,
-    REQUEST_SIZE: REQUEST_SIZE, REQUEST_COOLDOWN_MS: REQUEST_COOLDOWN_MS,
+    /* SEND_MAX/SEND_WINDOW_MS sind am 30.07.2026 ERSATZLOS entfallen —
+       kein Alias, keine 0. Wer sie noch liest, bekommt `undefined` und
+       damit sofort ein sichtbares Problem statt einer falschen Zahl. */
+    REQUEST_SIZE: REQUEST_SIZE,
+    DONATE_MAX_PER_REQUEST: DONATE_MAX_PER_REQUEST,
+    DONATE_PER_TAP: DONATE_PER_TAP,
+    REQUEST_COOLDOWN_MS: REQUEST_COOLDOWN_MS,
     DONATE_GOLD: DONATE_GOLD, DONATE_MATERIAL: DONATE_MATERIAL,
     MAX_MEMBERS: MAX_MEMBERS, MAX_ELDERS: MAX_ELDERS, ROLES: ROLES,
     BADGE_COLORS: BADGE_COLORS, BADGE_SYMBOLS: BADGE_SYMBOLS, EMOTES: EMOTES,
@@ -1922,8 +2038,14 @@
     console.log("\nAnfragen:");
     var req = requestCards("water");
     console.log("  Anfrage gestellt: " + req.need + " × " + req.cardName);
-    check("requestCards() legt Anfrage an (10 Kopien)",
-      req.mine === true && req.need === REQUEST_SIZE && req.got === 0);
+    /* UMGESCHRIEBEN 30.07.2026: hieß „(10 Kopien)" und prüfte gegen die
+       KONSTANTE — der Name log also, die Prüfung war schon richtig.
+       Jetzt steht die Zusage im Namen UND wird gegen die Konstante
+       geprüft, plus die Zahl selbst an EINER Stelle (30 ist die
+       Vorgabe, nicht nur „was REQUEST_SIZE gerade sagt"). */
+    check("requestCards() legt eine Anfrage über 30 Karten an",
+      req.mine === true && req.need === REQUEST_SIZE && REQUEST_SIZE === 30 &&
+      req.got === 0, req.need + " Karten");
     check("max 1 aktive Anfrage",
       throws(function () { requestCards("fire"); }, "schon eine offene Anfrage").ok);
     check("Anfrage für einen Helden ist unmöglich", (function () {
@@ -1931,23 +2053,41 @@
       var t = throws(function () { requestCards("solara"); }, "Nur Turmkarten");
       return t.ok;
     })());
-    check("Anfrage-Cooldown 8 h greift",
+    /* UMGESCHRIEBEN 30.07.2026: die Abklingzeit ist von 8 h auf 5 h
+       gesetzt worden. Die Schritte prüfen deshalb ZWEISEITIG und gegen
+       REQUEST_COOLDOWN_MS statt gegen eine eingetippte Zahl — kurz
+       davor abgelehnt, kurz danach erlaubt. Eine einseitige Prüfung
+       („wirft") wäre auch bei 8 h grün geblieben und hätte die alte
+       Zahl still konserviert. */
+    check("Anfrage-Abklingzeit greift (5 h, gegen die Konstante geprüft)",
+      REQUEST_COOLDOWN_MS === 5 * HOUR &&
       throws(function () { requestCards("fire"); }, "Neue Anfrage erst in").ok);
-    check("nach 8 h wieder möglich", (function () {
-      setT(MON + 8 * HOUR + MINUTE);
+    check("kurz VOR Ablauf der 5 h weiter abgelehnt", (function () {
+      setT(MON + REQUEST_COOLDOWN_MS - MINUTE);
+      var t = throws(function () { requestCards("fire"); }, "Neue Anfrage erst in");
+      return t.ok && /alle 5 Stunden/.test(t.msg);
+    })(), throws(function () { requestCards("fire"); }).msg);
+    check("nach 5 h wieder möglich", (function () {
+      setT(MON + REQUEST_COOLDOWN_MS + MINUTE);
       var r = requestCards("fire");
       return r.need === REQUEST_SIZE;
     })());
     // Bots füllen die eigene Anfrage über die Zeit → Karten kommen an
     check("Bots füllen die eigene Anfrage über die Zeit", (function () {
       var have0 = commonCopies("fire");
-      setT(MON + 10 * HOUR);                    // ~2 h nach der Anfrage
+      /* ZEITPUNKT RELATIV ZUR ANFRAGE, nicht absolut (30.07.2026): der
+         Aufsetzer davor wartet REQUEST_COOLDOWN_MS ab, und die Anfrage
+         füllt sich in 4 h. Ein fester Wert („MON + 10 h") war an die
+         alte 8-h-Abklingzeit gebunden und hätte bei 5 h eine BEREITS
+         VOLLE Anfrage gemessen — der Schritt wäre rot geworden, ohne
+         dass am Produkt etwas falsch ist. */
+      setT(MON + REQUEST_COOLDOWN_MS + 2 * HOUR);   // ~2 h nach der Anfrage
       var mineR = requests()[0];
       return mineR.mine === true && mineR.got > 0 && mineR.got < mineR.need &&
              (!AC || commonCopies("fire") > have0);
     })(), "got " + requests()[0].got + "/" + REQUEST_SIZE + ", Bestand " + commonCopies("fire"));
     check("erfüllte eigene Anfrage bleibt sichtbar (verschwindet nicht im Erfolg)", (function () {
-      setT(MON + 20 * HOUR);
+      setT(MON + REQUEST_COOLDOWN_MS + 12 * HOUR);   // dreifache Füllzeit
       var mineR = requests()[0];
       return mineR.mine === true && mineR.closed === true && mineR.got === mineR.need;
     })());
@@ -1957,101 +2097,126 @@
       return notifications().some(function (n) { return n.kind === "filled"; });
     })());
 
-    /* --- Spenden + Kontingent --- */
-    console.log("\nSpenden + Sendekontingent (rollierendes 3-h-Fenster):");
+    /* --- Spenden + Kontingent JE ANFRAGE (Vorgabe 30.07.2026) ---
+       KOMPLETT UMGESCHRIEBEN. Vorher stand hier das globale rollierende
+       3-h-Fenster: „10 Karten, dann drei Stunden Pause". Das Fenster
+       gibt es nicht mehr (Begründung im Kopfkommentar), und die Schritte
+       sind auf die NEUE Zusage umgeschrieben statt gelöscht:
+         alt „genau 10 Karten gehen durch"      → 10 je ANFRAGE
+         alt „die 11. Karte in 3 h abgelehnt"   → die 11. an DIESELBE Anfrage
+         alt „nach 3 h ist das Fenster frei"    → die NÄCHSTE Anfrage
+                                                  hat sofort volle 10
+         alt „Kontingent zählt jede Karte"      → ein Tippen = eine Karte
+       Geprüft wird durchweg gegen die KONSTANTEN. */
+    console.log("\nSpenden + Sendekontingent (10 je Anfrage, 1 je Sendevorgang):");
     reset(); setT(MON); seedDemoClan();
-    if (AC) { AC._reset(); AC.addDrop("fire", "common", 60); AC.addDrop("water", "common", 40);
-              AC.addDrop("earth", "good", 5); }
+    if (AC) { AC._reset(); TOWER_IDS.forEach(function (id) { AC.addDrop(id, "common", 200); }); }
     var botReqs = requests().filter(function (r) { return !r.mine; });
     check("Bot-Anfragen sind sichtbar (3 offene)", botReqs.length === 3,
       botReqs.map(function (r) { return r.cardName + " " + r.got + "/" + r.need; }).join(" · "));
-    var q0 = sendQuota();
-    check("Kontingent startet bei 0/10", q0.used === 0 && q0.left === 10 && q0.max === SEND_MAX);
+    check("jede Anfrage geht über 30 Karten",
+      botReqs.every(function (r) { return r.need === REQUEST_SIZE; }) && REQUEST_SIZE === 30,
+      botReqs.map(function (r) { return r.need; }).join("/"));
+    var target = botReqs.filter(function (r) { return r.left >= DONATE_MAX_PER_REQUEST + 1; })[0] ||
+                 botReqs[0];
+    var q0 = sendQuota(target.id);
+    check("Kontingent startet bei 0/10 — und zwar JE ANFRAGE",
+      q0.used === 0 && q0.left === DONATE_MAX_PER_REQUEST &&
+      q0.max === DONATE_MAX_PER_REQUEST && q0.requestId === target.id,
+      q0.used + "/" + q0.max + " für " + q0.requestId);
+    /* GEGENPROBE zur Signatur: der alte Aufruf sendQuota(now) übergibt
+       eine ZAHL. Er MUSS werfen — eine stille 0/10 wäre die gefährlichste
+       Antwort, weil das UI damit weitergezeichnet hätte. */
+    check("alte Signatur sendQuota(now) wirft statt zu raten",
+      throws(function () { sendQuota(nowMs()); }, "braucht seit 30.07.2026 die Anfrage-ID").ok &&
+      throws(function () { sendQuota(); }, "Anfrage-ID").ok);
 
-    // Zielanfrage mit genug Platz suchen; sonst eine eigene Karte spenden
-    var target = null;
-    for (var bi = 0; bi < botReqs.length; bi++) {
-      if (botReqs[bi].left >= 4 && commonCopies(botReqs[bi].cardId) >= 4) { target = botReqs[bi]; break; }
-    }
-    if (!target) { // Bestand für die vorhandene Anfrage auffüllen
-      target = botReqs[0];
-      if (AC) AC.addDrop(target.cardId, "common", 40);
-    }
-    var dTake = Math.min(4, target.left);
+    /* --- EIN SENDEVORGANG = GENAU EINE KARTE --- */
     var haveBefore = commonCopies(target.cardId);
-    var don = donateCards(target.id, dTake);
+    var gotBefore = target.got;
+    var don = donateCards(target.id);
     console.log("  " + don.count + " × " + don.cardName + " an " + don.request.ownerName +
       " → +" + don.reward.gold + " Gold, +" + don.reward.material + " " +
       don.reward.materialType + "-Material");
-    check("Spende zieht Kopien beim Spender ab",
-      commonCopies(target.cardId) === haveBefore - dTake,
-      haveBefore + " → " + commonCopies(target.cardId));
+    check("ein Sendevorgang bucht GENAU eine Karte",
+      don.count === DONATE_PER_TAP && DONATE_PER_TAP === 1 &&
+      commonCopies(target.cardId) === haveBefore - 1 &&
+      don.request.got === gotBefore + 1,
+      "Bestand " + haveBefore + " → " + commonCopies(target.cardId) +
+      ", Anfrage " + gotBefore + " → " + don.request.got + "/" + don.request.need);
+    /* GEGENPROBE: „nicht direkt 10". Der Mengen-Parameter existiert nur
+       noch, um Mengen ABZULEHNEN. */
+    check("10 auf einen Griff werden abgelehnt (deutscher Klartext)", (function () {
+      var t = throws(function () { donateCards(target.id, DONATE_MAX_PER_REQUEST); },
+        "je Sendevorgang");
+      return t.ok && /genau eine Karte/.test(t.msg) && /tippe mehrfach/.test(t.msg);
+    })(), throws(function () { donateCards(target.id, 10); }).msg);
     check("Spende schreibt beim Empfänger gut",
       requests().filter(function (r) { return r.id === target.id; })[0].got >= don.request.got);
     check("Spender-Belohnung: 25 Gold + 1 Material je Karte",
-      don.reward.gold === DONATE_GOLD * dTake && don.reward.material === DONATE_MATERIAL * dTake);
+      don.reward.gold === DONATE_GOLD && don.reward.material === DONATE_MATERIAL);
     check("Material kommt in der SORTE der Karte",
       !AC || don.reward.materialType === AC.materialTypeOf(target.cardId),
       don.reward.materialType);
-    check("Kontingent zählt jede Karte einzeln",
-      sendQuota().used === dTake && sendQuota().left === SEND_MAX - dTake,
-      sendQuota().used + "/" + SEND_MAX);
+    check("Kontingent der Anfrage steht danach auf 1/10",
+      sendQuota(target.id).used === 1 && sendQuota(target.id).left === DONATE_MAX_PER_REQUEST - 1,
+      sendQuota(target.id).used + "/" + sendQuota(target.id).max);
+    /* GEGENPROBE zur alten Fenstersperre: ZWEI Sendevorgänge direkt
+       hintereinander, ohne jeden Zeitsprung. Unter dem alten Modell war
+       das erlaubt, solange das Fenster Platz hatte — der Schritt prüft
+       hier aber, dass die Uhr GAR KEINE Rolle mehr spielt. */
+    check("zwei Sendevorgänge direkt hintereinander sind erlaubt", (function () {
+      var vorher = sendQuota(target.id).used;
+      donateCards(target.id);                    // KEIN setT dazwischen
+      donateCards(target.id);
+      return sendQuota(target.id).used === vorher + 2;
+    })(), sendQuota(target.id).used + "/" + DONATE_MAX_PER_REQUEST + " nach 3 Tippen");
 
-    /* --- DAS 11.-KARTE-LIMIT --- */
-    console.log("\n  Limit-Test: 10 Karten in 3 h, die 11. muss scheitern");
+    /* --- DIE 11. KARTE AN DIESELBE ANFRAGE --- */
+    console.log("\n  Grenze je Anfrage: 10 gehen durch, die 11. muss scheitern");
     reset(); setT(MON); seedDemoClan();
     if (AC) { AC._reset(); TOWER_IDS.forEach(function (id) { AC.addDrop(id, "common", 200); }); }
+    var gross = requests().filter(function (r) {
+      return !r.mine && r.left >= DONATE_MAX_PER_REQUEST + 1;
+    })[0];
+    check("Anfrage mit Platz für mehr als 10 Karten vorhanden", !!gross,
+      gross ? gross.cardName + " " + gross.got + "/" + gross.need : "keine");
     var sent = 0, guard = 0;
-    while (sent < SEND_MAX && guard++ < 40) {
-      var rs2 = requests().filter(function (r) { return !r.mine && r.left > 0; });
-      if (!rs2.length) break;
-      var want = Math.min(rs2[0].left, SEND_MAX - sent, sendQuota().left);
-      if (want <= 0) break;
-      try { donateCards(rs2[0].id, want); sent += want; }
-      catch (e) { break; }
+    while (guard++ < 40) {
+      try { donateCards(gross.id); sent++; } catch (e) { break; }
     }
-    console.log("    " + sent + " Karten gespendet, Kontingent " + sendQuota().used + "/" + SEND_MAX);
-    check("genau 10 Karten gehen durch", sent === SEND_MAX && sendQuota().full === true, sent);
-    var open11 = requests().filter(function (r) { return !r.mine && r.left > 0; });
-    var t11 = throws(function () { donateCards(open11[0].id, 1); }, "Sendelimit erreicht");
+    console.log("    " + sent + " Karten an dieselbe Anfrage, Kontingent " +
+      sendQuota(gross.id).used + "/" + DONATE_MAX_PER_REQUEST);
+    check("genau 10 Karten gehen an EINE Anfrage durch",
+      sent === DONATE_MAX_PER_REQUEST && sendQuota(gross.id).full === true, sent);
+    var t11 = throws(function () { donateCards(gross.id); }, "schon " + DONATE_MAX_PER_REQUEST);
     console.log("    11. Karte → " + t11.msg);
-    check("die 11. Karte innerhalb 3 h wird ABGELEHNT", t11.ok, t11.msg);
-    check("Fehlermeldung nennt Limit und Restzeit",
-      /10 Karten pro 3 Stunden/.test(t11.msg) && /Nächster Slot frei in \d+:\d\d/.test(t11.msg));
-    check("Menge über dem Restkontingent wird abgelehnt", (function () {
-      setT(MON + SEND_WINDOW_MS + MINUTE);       // Fenster ganz durch
-      var rs3 = requests().filter(function (r) { return !r.mine && r.left >= 3; });
-      if (!rs3.length) return true;
-      // 8 verbrauchen, dann 5 auf einmal versuchen
-      var used = 0;
-      while (used < 8) {
-        var rr = requests().filter(function (r) { return !r.mine && r.left > 0; })[0];
-        if (!rr) break;
-        var w = Math.min(rr.left, 8 - used, sendQuota().left);
-        if (w <= 0) break;
-        donateCards(rr.id, w); used += w;
-      }
-      var rr2 = requests().filter(function (r) { return !r.mine && r.left >= 3; })[0];
-      if (!rr2) return true;
-      return throws(function () { donateCards(rr2.id, 5); }, "nur noch").ok;
+    check("die 11. Karte an DIESELBE Anfrage wird ABGELEHNT", t11.ok, t11.msg);
+    check("Meldung nennt die Grenze und dass der Rest den anderen gehört",
+      /schon 10 Karten gegeben/.test(t11.msg) && /anderen im Clan/.test(t11.msg));
+    check("die Anfrage bleibt dabei OFFEN (10 < 30)", (function () {
+      var g2 = requests().filter(function (r) { return r.id === gross.id; })[0];
+      return g2 && !g2.closed && g2.left > 0;
+    })(), (function () {
+      var g2 = requests().filter(function (r) { return r.id === gross.id; })[0];
+      return g2 ? g2.got + "/" + g2.need : "weg";
     })());
-    check("nach 3 h ist das Fenster wieder frei (rollierend)", (function () {
-      setT(MON + 2 * SEND_WINDOW_MS + 2 * MINUTE);
-      return sendQuota().used === 0 && sendQuota().left === SEND_MAX;
-    })());
-    check("rollierend, NICHT Cooldown: Slots tröpfeln einzeln nach", (function () {
-      reset(); setT(MON); seedDemoClan();
-      if (AC) { AC._reset(); TOWER_IDS.forEach(function (id) { AC.addDrop(id, "common", 200); }); }
-      var rq = requests().filter(function (r) { return !r.mine && r.left >= 2; })[0];
-      donateCards(rq.id, 2);                     // 2 Karten bei t0
-      setT(MON + HOUR);
-      var rq2 = requests().filter(function (r) { return !r.mine && r.left >= 3; })[0];
-      donateCards(rq2.id, 3);                    // 3 Karten bei t0+1h
-      var before = sendQuota().used;             // 5
-      setT(MON + SEND_WINDOW_MS + MINUTE);       // nur die ERSTEN 2 verfallen
-      var after = sendQuota().used;              // 3
-      return before === 5 && after === 3;
-    })(), "5 → 3 statt 5 → 0");
+    /* DIE ENTSCHEIDENDE GEGENPROBE ZUM WEGFALL DES ZEITFENSTERS:
+       ausgereizte Anfrage, KEIN Zeitsprung — eine ANDERE Anfrage muss
+       trotzdem sofort volle 10 annehmen. Unter dem alten Modell wäre
+       hier drei Stunden lang gar nichts mehr gegangen. */
+    check("andere Anfrage nimmt SOFORT wieder 10 — ohne Zeitsprung", (function () {
+      var andere = requests().filter(function (r) {
+        return !r.mine && r.id !== gross.id && r.left >= DONATE_MAX_PER_REQUEST;
+      })[0];
+      if (!andere) return false;
+      if (sendQuota(andere.id).left !== DONATE_MAX_PER_REQUEST) return false;
+      var n2 = 0;
+      for (var z = 0; z < DONATE_MAX_PER_REQUEST; z++) { donateCards(andere.id); n2++; }
+      return n2 === DONATE_MAX_PER_REQUEST &&
+             sendQuota(andere.id).used === DONATE_MAX_PER_REQUEST &&
+             sendQuota(gross.id).used === DONATE_MAX_PER_REQUEST;
+    })(), "20 Karten in derselben Minute, auf zwei Anfragen verteilt");
 
     /* --- Bestands- und Zustandsprüfungen --- */
     console.log("\n  Weitere Sperren:");
@@ -2066,8 +2231,15 @@
       });
     }
     if (lightReq) {
-      var tb = throws(function () { donateCards(lightReq.id, 3); }, "Du hast nur 2 graue");
-      console.log("    Bestand 2 grau, 3 gefordert → " + tb.msg);
+      /* UMGESCHRIEBEN 30.07.2026: hier stand `donateCards(id, 3)` bei
+         zwei Kopien Bestand. Mit „eine Karte je Sendevorgang" ist die
+         Menge 3 gar nicht mehr adressierbar — der Schritt hätte an der
+         Mengensperre gehalten und die BESTANDSSPERRE nie erreicht.
+         Jetzt werden die zwei Kopien einzeln verschenkt, und erst der
+         dritte Sendevorgang läuft in den Bestandsfehler. */
+      donateCards(lightReq.id); donateCards(lightReq.id);
+      var tb = throws(function () { donateCards(lightReq.id); }, "Du hast nur 0 graue");
+      console.log("    Bestand leer, eine weitere Karte gefordert → " + tb.msg);
       check("zu wenig graue Kopien → Fehler mit Bestandsangabe", tb.ok, tb.msg);
       check("grüne Kopien werden NICHT angetastet",
         !AC || AC.get().cards.light.copies.good === 9);
@@ -2088,14 +2260,38 @@
       var rr = requests().filter(function (r) { return !r.mine; })[0];
       return throws(function () { donateCards(rr.id, 0); }, "mindestens eine Karte").ok;
     })());
+    /* UMGESCHRIEBEN 30.07.2026: vorher wurde die Anfrage mit EINER
+       Spende über das Restkontingent gefüllt. Beides geht nicht mehr —
+       eine Anfrage braucht 30 Karten, ein Spieler darf 10 geben, und
+       ein Sendevorgang bucht eine. Gesucht wird deshalb eine Anfrage,
+       die die Bots schon so weit gefüllt haben, dass die eigenen
+       Karten sie SCHLIESSEN können (left ≤ 10). Findet sich in den
+       ersten Buckets keine, ist das ein Mangel des AUFBAUS und muss als
+       Fehlschlag dastehen, nicht als bestandener Test. */
     check("erfüllte Anfrage nimmt nichts mehr an", (function () {
       reset(); setT(MON); seedDemoClan();
-      if (AC) { AC._reset(); TOWER_IDS.forEach(function (id) { AC.addDrop(id, "common", 60); }); }
-      var rr = requests().filter(function (r) { return !r.mine && r.left > 0; })[0];
-      donateCards(rr.id, Math.min(rr.left, sendQuota().left));
+      if (AC) { AC._reset(); TOWER_IDS.forEach(function (id) { AC.addDrop(id, "common", 200); }); }
+      var rr = null;
+      /* GEMESSEN: Bots füllen eine Anfrage in ihrem 6-h-Bucket auf
+         höchstens floor(30 · 0,9 · frac). `left` sinkt also erst GEGEN
+         ENDE eines Buckets unter 10 — im Messlauf frühestens bei
+         frac ≈ 0,93. Deshalb wird in HALBSTUNDENSCHRITTEN gesucht und
+         nicht im Bucket-Raster: MON ist 09:00, die Buckets hängen aber
+         an der Wochengrenze (00:00). Jedes von MON aus gerechnete
+         Bucket-Raster trifft immer dieselbe Stelle im Bucket
+         (frac ≈ 0,48) und findet NIE eine fast volle Anfrage — genau
+         daran ist die erste Fassung dieses Schritts gescheitert. */
+      for (var bk2 = 0; bk2 < 144 && !rr; bk2++) {
+        setT(MON + bk2 * 30 * MINUTE);
+        requests().forEach(function (r) {
+          if (!r.mine && !r.closed && r.left > 0 && r.left <= DONATE_MAX_PER_REQUEST && !rr) rr = r;
+        });
+      }
+      if (!rr) return false;                     // Aufbau untauglich → rot
+      for (var f = 0; f < rr.left; f++) donateCards(rr.id);
       var again = requests().filter(function (r) { return r.id === rr.id; })[0];
-      if (!again.closed) return true;            // noch offen → Test nicht anwendbar
-      return throws(function () { donateCards(rr.id, 1); }, "bereits erfüllt").ok;
+      if (!again.closed) return false;
+      return throws(function () { donateCards(rr.id); }, "bereits erfüllt").ok;
     })());
     check("Benachrichtigung „Deine Spende hat … geholfen“", (function () {
       return get().notes.some(function (n) { return n.kind === "help"; }) ||
@@ -2364,9 +2560,16 @@
     check("Feed-Einträge liegen nie in der Zukunft",
       fd.every(function (f) { return f.ts <= nowMs(); }));
 
-    /* ================= 9. Migration v1 → v2 ================= */
+    /* ================= 9. Migration v1/v2 → v3 =================
+       UMGESCHRIEBEN 30.07.2026. Der Block prüfte, dass der v1-Zähler
+       `sent: 7` als 7 Einträge im rollierenden Log ankommt und dass das
+       Kontingent danach auf 7/10 steht. Beides ist keine Zusage mehr:
+       das globale Sendelimit ist ersatzlos entfallen. Gelöscht wird der
+       Block deshalb NICHT — er prüft jetzt die neue Zusage, und die ist
+       schärfer: der alte Zähler darf NICHT als Rest-Sperre überleben,
+       das tragende Feld `donated` dagegen MUSS unverändert durchkommen. */
     console.log("\n" + "=".repeat(66));
-    console.log("MIGRATION v1 → v2 (Cooldown-Zähler → rollierender Log)");
+    console.log("MIGRATION v1/v2 → v3 (globales Sendelimit fällt weg)");
     console.log("=".repeat(66));
     (function () {
       setT(MON);
@@ -2379,29 +2582,31 @@
         me: { id: "me", role: "elder", joinedTs: MON - 20 * DAY, lastRequestTs: MON - 9 * HOUR },
         quests: { week: weekKeyOf(MON), wins: 14, packs: 3, trophies: 220, claimed: false },
         sent: 7, sentSince: MON - HOUR,          // ← das alte Cooldown-Modell
+        donated: { "r:alt:0:0": 6 },             // ← die neue, tragende Grenze
         notes: [{ ts: MON - HOUR, kind: "donate", text: "alte Notiz" }],
         stats: { donatedTotal: 41, receivedTotal: 12, warPointsTotal: 830 },
       };
       lsSet(JSON.stringify(v1));
       var s = get();
-      console.log("  v1 { sent: 7, sentSince: t−1h }  →  v2 sendLog[" + s.sendLog.length + "]");
-      check("State-Version auf 2 gehoben", s.v === 2);
+      console.log("  v1 { sent: 7, sentSince: t−1h }  →  v3 " +
+        (s.sendLog === undefined ? "ohne sendLog" : "MIT sendLog?!"));
+      check("State-Version auf 3 gehoben", s.v === 3);
       check("Clan-Stammdaten übernommen",
         s.clan.name === "Alter Bund" && s.clan.badge.sym === "crown" && s.clan.seed === 777);
       check("eigene Rolle übernommen", s.me.role === "elder");
       check("flache Quest-Zähler → quests.progress",
         s.quests.progress.wins === 14 && s.quests.progress.packs === 3 &&
         s.quests.progress.trophies === 220);
-      check("Cooldown-Zähler → 7 Einträge im rollierenden Log",
-        s.sendLog.length === 7 && s.sendLog.every(function (t) { return t === MON - HOUR; }));
-      check("Kontingent nach Migration: 7/10 benutzt",
-        sendQuota().used === 7 && sendQuota().left === 3, sendQuota().used + "/10");
-      check("migrierte Einträge verfallen 3 h nach sentSince", (function () {
-        setT(MON - HOUR + SEND_WINDOW_MS + MINUTE);
-        var q3 = sendQuota();
-        setT(MON);
-        return q3.used === 0;
-      })());
+      check("alter Sendezähler ist WEG (sent/sentSince/sendLog)",
+        s.sendLog === undefined && s.sent === undefined && s.sentSince === undefined,
+        JSON.stringify({ sendLog: s.sendLog, sent: s.sent }));
+      check("die tragende Grenze `donated` kommt UNVERÄNDERT durch",
+        s.donated["r:alt:0:0"] === 6 && sendQuota("r:alt:0:0").used === 6 &&
+        sendQuota("r:alt:0:0").left === DONATE_MAX_PER_REQUEST - 6,
+        sendQuota("r:alt:0:0").used + "/" + DONATE_MAX_PER_REQUEST);
+      check("eine unbeschriebene Anfrage startet nach der Migration bei 0/10",
+        sendQuota("r:neu:0:0").used === 0 &&
+        sendQuota("r:neu:0:0").left === DONATE_MAX_PER_REQUEST);
       check("Kriegs-Serie 3 → Silber-Rahmen (aus v1 abgeleitet)",
         s.clan.warBadge === "silver", s.clan.warBadge);
       check("alte Notizen bleiben erhalten",
@@ -2410,13 +2615,22 @@
       check("Migration ist idempotent (zweites get() ändert nichts)", (function () {
         save(get());
         var s2 = get();
-        return s2.v === 2 && s2.sendLog.length === 7 && s2.quests.progress.wins === 14;
+        return s2.v === 3 && s2.sendLog === undefined && s2.quests.progress.wins === 14 &&
+               s2.donated["r:alt:0:0"] === 6;
       })());
       // State ohne v-Feld (Vor-Versionierung)
       lsSet(JSON.stringify({ joined: true, clan: { name: "Uralt", seed: 5 }, sent: 2, sentSince: MON }));
       var s3 = get();
       check("State OHNE v-Feld wird wie v1 behandelt",
-        s3.v === 2 && s3.clan.name === "Uralt" && s3.sendLog.length === 2);
+        s3.v === 3 && s3.clan.name === "Uralt" && s3.sendLog === undefined);
+      // Reiner v2-Stand: nur der Sprung 2 → 3
+      lsSet(JSON.stringify({ v: 2, joined: true, clan: { name: "Zwoter", seed: 9 },
+        sendLog: [MON - MINUTE, MON - 2 * MINUTE], donated: { "r:x:0:1": 10 } }));
+      var s4 = get();
+      check("reiner v2-Stand: sendLog fällt, donated bleibt",
+        s4.v === 3 && s4.sendLog === undefined && s4.donated["r:x:0:1"] === 10 &&
+        sendQuota("r:x:0:1").full === true,
+        "10/10 bleibt gesperrt");
     })();
 
     /* ================= 10. Robustheit ================= */
@@ -2424,7 +2638,8 @@
     check("Müll im Speicher → frischer State, kein Crash", (function () {
       lsSet("{kaputt,,,");
       var s = get();
-      return s.v === 2 && s.joined === false && Array.isArray(s.sendLog);
+      return s.v === STATE_VERSION && s.joined === false &&
+             s.donated && typeof s.donated === "object";
     })());
     check("kaputter State wird geheilt", (function () {
       lsSet(JSON.stringify({
@@ -2441,17 +2656,35 @@
              s.clan.badge.sym === BADGE_SYMBOLS[0].key && s.clan.minTrophies === 0 &&
              s.clan.warStreak === 0 && s.clan.anchor >= 100 &&
              s.me.role === "member" && s.quests.progress.wins === 0 &&
-             s.quests.progress.packs === 0 && s.sendLog.length === 1 &&
+             s.quests.progress.packs === 0 && s.sendLog === undefined &&
              Array.isArray(s.requests) && Array.isArray(s.notes) &&
              typeof s.donated === "object" && typeof s.war === "object";
     })(), JSON.stringify(get().clan.badge));
-    check("Zukunfts-Zeitstempel im sendLog werden verworfen", (function () {
+    /* ERSETZT den alten Schritt „Zukunfts-Zeitstempel im sendLog werden
+       verworfen" (30.07.2026). Es gibt keine Zeitstempel mehr zu heilen —
+       zu heilen ist jetzt `donated`, und zwar in der Richtung, die zählt:
+       ein manipulierter Eintrag darf die Grenze nur SENKEN, nie heben. */
+    check("manipuliertes `donated` wird auf 0…10 geklemmt", (function () {
       reset(); setT(MON); seedDemoClan();
       var s = get();
-      s.sendLog = [MON + 10 * DAY, MON - 10 * DAY, MON - MINUTE];
+      s.donated = { "r:a:0:0": 99, "r:b:0:0": -4, "r:c:0:0": 3.7 };
       save(s);
-      return sendQuota().used === 1;
-    })(), "1 von 3");
+      var g = get();
+      return sendQuota("r:a:0:0").used === DONATE_MAX_PER_REQUEST &&   // 99 → 10, gesperrt
+             g.donated["r:b:0:0"] === undefined &&                     // −4 → weg
+             sendQuota("r:c:0:0").used === 3;                          // 3,7 → 3
+    })(), "99 → 10, −4 → weg, 3,7 → 3");
+    check("`donated` wächst nicht endlos (Deckel " + DONATED_KEEP + " Einträge)", (function () {
+      reset(); setT(MON); seedDemoClan();
+      var s = get();
+      for (var i = 0; i < DONATED_KEEP + 25; i++) s.donated["r:alt:" + i + ":0"] = 2;
+      save(s);
+      var n = Object.keys(get().donated).length;
+      // Die JÜNGSTEN bleiben — die ältesten Anfragen gibt es längst nicht mehr.
+      return n === DONATED_KEEP &&
+             get().donated["r:alt:" + (DONATED_KEEP + 24) + ":0"] === 2 &&
+             get().donated["r:alt:0:0"] === undefined;
+    })(), Object.keys(get().donated).length + " Einträge");
     check("Aktionen ohne Clan werfen klare Meldungen", (function () {
       reset();
       return throws(function () { requestCards("fire"); }, "in keinem Clan").ok &&
@@ -2467,7 +2700,7 @@
       var keep = globalThis.ArenaCards;
       delete globalThis.ArenaCards;
       var rr = requests().filter(function (r) { return !r.mine && r.left > 0; })[0];
-      var okQuota = sendQuota().used === 0;
+      var okQuota = sendQuota(rr.id).used === 0;
       var okList = donatableCards().every(function (c) { return c.copies === 0 && !c.sendable; });
       var t = throws(function () { donateCards(rr.id, 1); });
       globalThis.ArenaCards = keep;
@@ -2499,8 +2732,8 @@
     })());
     check("reset() nullt alles", (function () {
       var s = reset();
-      return s.joined === false && s.sendLog.length === 0 && s.notes.length === 0 &&
-             s.quests.progress.wins === 0;
+      return s.joined === false && Object.keys(s.donated).length === 0 &&
+             s.notes.length === 0 && s.quests.progress.wins === 0;
     })());
 
     /* ================= 11. Vollständigkeit der API ================= */

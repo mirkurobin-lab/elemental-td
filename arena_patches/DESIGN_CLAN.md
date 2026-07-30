@@ -1,6 +1,6 @@
 # Clan-System, Ghost-Clankrieg, Karten-Sendemechanik & Leaderboard
 
-**Status:** Design-Spezifikation **Stufe 1** (State **v2**), implementiert in
+**Status:** Design-Spezifikation **Stufe 1** (State **v3**), implementiert in
 `arena_patches/arena_clan.js` (Logik-Modul mit Selbsttest via `node arena_patches/arena_clan.js`)
 und sichtbar in `arena_patches/ui_prototype.html` (Views **Clan** und **Rangliste**).
 Alle Zahlen in diesem Dokument sind die **Quelle der Wahrheit** für das Modul — Änderungen hier
@@ -19,16 +19,67 @@ Alle Zahlen in diesem Dokument sind die **Quelle der Wahrheit** für das Modul �
 
 Diese Vorgabe ist **wörtlich** festgehalten und gilt als **harte Constraint**. Sie ist im Code
 nicht als Empfehlung, sondern als **Validierung mit Fehlerwurf** implementiert
-(`arena_clan.js` → `donateCards()` / `requestCards()`):
+(`arena_clan.js` → `donateCards()` / `requestCards()`). Derselbe Text steht als Kopfkommentar
+in `arena_clan.js`.
+
+### 0.0 Fassung vom **30.07.2026** — GÜLTIG
+
+Wörtlich vom Auftraggeber:
+
+> „man darf 30 Karten anfordern. Jeder Spieler darf aber nur maximal 10 Karten dazu steuern.
+> Es kann auch nur eine gesendet werden nicht direkt 10. man darf aber nur alle 5 Stunden
+> Karten anfordern."
+
+Das sind vier Regeln, im Code vier Konstanten:
+
+| Regel | Konstante | Wert |
+|---|---|---|
+| Eine Anfrage umfasst 30 Karten | `REQUEST_SIZE` | **30** |
+| Ein einzelner Spieler steuert höchstens 10 zu **einer** Anfrage bei | `DONATE_MAX_PER_REQUEST` | **10** |
+| Ein Sendevorgang bucht **eine** Karte — nicht 10 auf einen Griff | `DONATE_PER_TAP` | **1** |
+| Neue eigene Anfrage frühestens alle 5 h | `REQUEST_COOLDOWN_MS` | **5 h** |
+
+Unverändert weiter gültig (die drei anderen bindenden Vorgaben, Begründung in §0.1):
+
+> - Es dürfen **NUR Tower-Karten** versendet werden (keine Helden, kein Material, kein Gold).
+> - **NUR Basis-Kopien (Tier "common"/grau)** dürfen versendet werden — **KEINE
+>   grünen/blauen/höheren Raritäten**. Fusionen (3 gleiche → nächste Stufe) muss **jeder Spieler
+>   selbst machen und selbst herausfinden**. Das ist eine bewusste **Progressions-Schutzregel**.
+> - Die **eigene Anfrage** kann man **nicht selbst bespenden**.
+
+**Die eine Entscheidung, die dabei zu treffen war** (getroffen am 30.07.2026, dem Auftraggeber
+gemeldet): Das alte **globale Zeitfenster** („10 Karten pro 3 h über alle Anfragen hinweg",
+§0.2) und die neue Grenze („höchstens 10 je Anfrage") tragen **dieselbe Zahl 10**. Nebeneinander
+hätten sie bedeutet: *wer einem Clankollegen mit 10 Karten hilft, kann drei Stunden lang keinem
+zweiten mehr helfen.* Das Zeitfenster hätte genau das Verhalten bestraft, für das es Clans gibt.
+Es entfällt deshalb **ersatzlos**; verbindlich ist allein die Grenze **je Anfrage**.
+
+**Gemessene Nebenwirkung, offen ausgewiesen:** Der Tagesdeckel steigt von **80 auf 120 Karten**
+(4 Bot-Anfrage-Buckets à 6 h × 3 gleichzeitig offene Anfragen × 10 eigene Karten). Der
+Gold-Zufluss aus Spenden damit von **2 000 auf 3 000 🪙/Tag**. Weiterhin gilt: Der Deckel setzt
+120 *überzählige* graue Kopien pro Tag voraus und ist praktisch unerreichbar (§4.3). Sollte die
+Zahl später doch stören, ist der richtige Hebel `DONATE_MAX_PER_REQUEST` oder die Zahl der
+gleichzeitig offenen Anfragen — **nicht** die Rückkehr des Zeitfensters, das die Kooperation
+bestraft statt den Transfer.
+
+### 0.2 Fassung vom **26.07.2026** — ABGELÖST (steht hier zur Nachvollziehbarkeit)
+
+Ursprünglicher Wortlaut, so lange gültig, bis ihn die Fassung vom 30.07.2026 ersetzt hat:
 
 > - Es dürfen **NUR Tower-Karten** versendet werden (keine Helden, kein Material, kein Gold).
 > - Limit: **10 Stück pro 3 Stunden** (rollierendes Fenster oder Cooldown-Timer — entscheide
 >   dich, dokumentiere).
 > - **NUR Basis-Kopien (Tier "common"/grau)** dürfen versendet werden — **KEINE
->   grünen/blauen/höheren Raritäten**. Fusionen (3 gleiche → nächste Stufe) muss **jeder Spieler
->   selbst machen und selbst herausfinden**. Das ist eine bewusste **Progressions-Schutzregel**.
+>   grünen/blauen/höheren Raritäten**.
 
-### 0.1 Warum das die richtige Regel ist
+Umgesetzt war das als rollierendes 3-h-Fenster (§1) mit den Konstanten `SEND_MAX = 10`,
+`SEND_WINDOW_MS = 3 h`, dem persistierten `sendLog` und `REQUEST_SIZE = 10` /
+`REQUEST_COOLDOWN_MS = 8 h`. Alle vier sind seit dem 30.07.2026 **aus dem Code entfernt** —
+bewusst ohne Alias: ein Aufrufer, der sie noch liest, bekommt `undefined` und scheitert laut,
+statt still mit einer plausiblen falschen Zahl zu rechnen. Der State ist dafür von **v2 auf v3**
+gehoben worden; die Migration löscht `sendLog` und übernimmt `donated` unverändert.
+
+### 0.3 Warum die drei unveränderten Regeln richtig sind
 
 Ein Spendensystem ist die gefährlichste Stelle jedes Sammel-Metas, weil es die
 Fortschrittskurve **umgehen** kann. Drei Angriffe sind zu erwarten, alle drei sind durch die
@@ -45,7 +96,7 @@ Der zweite Teil der Vorgabe — *„selbst machen und selbst herausfinden"* — 
 Spieler das System *begreift*. Wer eine fertige grüne Karte geschenkt bekommt, hat diesen Moment
 nie. Der Clan liefert deshalb **Rohstoff**, nicht **Ergebnis**.
 
-### 0.2 Was der Code garantiert
+### 0.4 Was der Code garantiert
 
 `donateCards()` wirft bei jedem Verstoß einen `Error` mit **deutscher Klartextmeldung**
 (direkt als Toast anzeigbar):
@@ -54,8 +105,10 @@ nie. Der Clan liefert deshalb **Rohstoff**, nicht **Ergebnis**.
 |---|---|
 | Karten-ID ist kein Tower (`solara`, `magmor`, Skills, Items, Unbekanntes) | `Nur Turmkarten dürfen gespendet werden — SOLARA ist keine.` |
 | Rarität ≠ `common` (Tier-Index 0) | `Nur graue Basis-Kopien dürfen gespendet werden — „Gut" (Grün) ist gesperrt. Fusionen macht jeder selbst.` |
-| Sendelimit erschöpft | `Sendelimit erreicht: 10 Karten pro 3 Stunden. Nächster Slot frei in 1:23.` |
-| Menge über dem Rest-Kontingent | `Du kannst nur noch 4 Karten senden (10 pro 3 Stunden).` |
+| Grenze je Anfrage erreicht | `Du hast dieser Anfrage schon 10 Karten gegeben — mehr darf ein einzelner Spieler nicht beisteuern. Den Rest holen die anderen im Clan.` |
+| Menge über dem Rest-Kontingent | `Du kannst dieser Anfrage nur noch 4 Karten geben (höchstens 10 je Anfrage).` |
+| Mehr als eine Karte je Sendevorgang | `Es geht genau eine Karte je Sendevorgang — tippe mehrfach, wenn du mehr geben willst.` |
+| Neue Anfrage zu früh | `Neue Anfrage erst in 3:12 möglich (eine alle 5 Stunden).` |
 | Nicht genug eigene graue Kopien | `Du hast nur 2 graue EMBER-Kopien.` |
 | Anfrage geschlossen/unbekannt/eigene | `Diese Anfrage ist bereits erfüllt.` / `Anfrage nicht gefunden.` / `Du kannst deine eigene Anfrage nicht bespenden.` |
 
@@ -65,34 +118,43 @@ adressierbar* wäre — die Validierung ist die zweite Verteidigungslinie, nicht
 
 ---
 
-## 1) Entscheidung: rollierendes Fenster, kein Cooldown-Timer
+## 1) Entscheidung: Kontingent JE ANFRAGE, kein Zeitfenster
 
-Die Vorgabe lässt beide Modelle zu. **Gewählt: rollierendes 3-Stunden-Fenster.**
+**Stand 30.07.2026. Gewählt: das Kontingent hängt an der Anfrage, nicht an der Uhr.**
 
-**So funktioniert es:** Jede gespendete Karte schreibt einen Zeitstempel in den persistierten
-Log `sendLog`. Vor jeder Spende werden Einträge älter als 3 h **verworfen**. Erlaubt sind
-`10 − len(sendLog)` Karten. Der Anzeigetext „Reset in h:mm" nennt den Moment, in dem der
-**älteste** Eintrag verfällt — also wann der **nächste** Slot frei wird, nicht wann alle frei
-werden.
+**So funktioniert es:** `donated` (persistiert, `{anfrageId: n}`) hält, wie viele Karten *ich*
+zu *dieser* Anfrage beigetragen habe. `sendQuota(anfrageId)` liest daraus `used/10`, jede Spende
+erhöht `n` um genau 1. Es gibt keinen Reset und keine Restzeit — deshalb liefert `sendQuota`
+auch keine Felder `resetAt`/`resetIn`/`resetText` mehr: ein Feld, das immer 0 sagt, liest sich
+wie „gleich frei" und lügt.
 
-**Warum nicht der Cooldown-Timer** (Modell: nach der ersten Spende startet ein 3-h-Timer, in dem
-insgesamt 10 Karten erlaubt sind, danach Vollreset):
+**Die Signatur hat sich gedreht:** `sendQuota(anfrageId, now)` statt `sendQuota(now)`. Der alte
+Aufruf übergäbe eine **Zahl** als Anfrage-ID; das wird abgefangen und wirft mit Klartext.
+Bewusst so: eine stille `0/10` wäre der schlimmste Ausgang — das UI hätte weitergezeichnet und
+niemand hätte es gemerkt.
 
-| | Rollierendes Fenster | Cooldown-Timer |
+**Warum nicht zusätzlich ein Zeitfenster** (das alte Modell, §0.2):
+
+| | Kontingent je Anfrage | zusätzlich globales 3-h-Fenster |
 |---|---|---|
-| Spieler spendet **1** Karte und schaut später wieder rein | nach 3 h wieder 10 Slots — der freundliche Impuls kostet nichts | 3 h für **eine** Karte blockiert; das System **bestraft kleine Hilfe** |
-| Spieler spendet **10** Karten auf einmal | 3 h Pause, dann tröpfeln Slots einzeln nach | 3 h Pause, dann alles auf einmal |
-| Missbrauchsdeckel | exakt 10 pro beliebigem 3-h-Intervall — **härter** | 10 pro Timer-Zyklus, aber Zyklen lassen sich durch geschicktes Timing überlappen |
-| Erklärbarkeit im UI | „7/10 · nächster Slot in 0:42" | „7/10 · Reset in 0:42" |
+| Spieler hilft **einem** Kollegen mit 10 Karten | kann sofort dem nächsten helfen | drei Stunden lang **keinem zweiten** — das System bestraft die Hilfsbereitschaft, für die es Clans gibt |
+| Massentransfer an **einen** Account | hart gedeckelt: 10 je Anfrage, egal wie oft man tippt | ebenfalls gedeckelt, aber die Grenze je Anfrage tut die Arbeit bereits |
+| Erklärbarkeit im UI | zehn Punkte **auf der Anfragekarte**: „so viel hast du DIESER Anfrage gegeben" | eine Leiste über der Liste, die nicht sagen kann, worauf sich ihre Zahl bezieht |
+| Uhr-Manipulation (Systemzeit) | **wirkungslos** — es gibt keine Zeitkomponente mehr | umgehbar, solange kein Server die Zeitstempel setzt |
 
-Das rollierende Fenster ist zugleich **großzügiger für kooperatives Verhalten** und **strenger
-gegen Massentransfer**. Der einzige Nachteil — die Anzeige ist minimal erklärungsbedürftiger —
-ist mit einer Zeile Text erledigt. Entscheidung damit eindeutig.
+Die Grenze je Anfrage ist zugleich **freundlicher zum kooperativen Spieler** und **robuster**
+(sie kennt keine Uhr, die man stellen kann). Der einzige Preis ist der höhere Tagesdeckel —
+offen ausgewiesen in §0.0 und §4.3.
 
-**Nebenwirkung, bewusst in Kauf genommen:** Der Log wächst maximal auf 10 Einträge
-(alte verfallen), ist also kein Speicherproblem. Bei Uhrzeit-Manipulation (Systemzeit
-zurückstellen) würde das Fenster umgangen — das ist in **Stufe 1 ohne Server hinnehmbar** und
-verschwindet, sobald der Server die Zeitstempel setzt (siehe §7).
+**Was die Grenze NICHT deckt, bewusst:** ein Spieler kann in derselben Minute drei offene
+Anfragen mit je 10 Karten bedienen. Genau das ist gewollt — es ist Hilfe an *drei verschiedene*
+Mitglieder, nicht Transfer an eines. Der Kanal „alles an einen Account" bleibt bei 10 Karten je
+Anfrage geschlossen, und die eigene Anfrage ist ohnehin nicht selbst bespendbar.
+
+**Ein Sendevorgang = eine Karte.** `donateCards()` nimmt `count` nur noch entgegen, um Mengen
+> 1 **abzulehnen**. Das ist keine Schikane, sondern die dritte Regel der Vorgabe: die
+Entscheidung, wie viel man gibt, bleibt beim Spieler und wird nicht vom UI vorweggenommen (das
+rechnete vorher „Restbedarf × Kontingent × Bestand" aus und schickte alles in einem Zug).
 
 ---
 
@@ -100,11 +162,12 @@ verschwindet, sobald der Server die Zeitstempel setzt (siehe §7).
 
 ### 2.1 Datenmodell
 
-Persistiert unter `localStorage["arenaClan"]`, State-Version **2**:
+Persistiert unter `localStorage["arenaClan"]`, State-Version **3** (v2 → v3 am 30.07.2026:
+`sendLog` entfällt, siehe §0.2):
 
 ```
 {
-  v: 2,
+  v: 3,
   joined:  bool,                       // ist der Spieler in einem Clan?
   clan: {
     id, name,                          // Name: 3-20 Zeichen
@@ -119,7 +182,9 @@ Persistiert unter `localStorage["arenaClan"]`, State-Version **2**:
   me:      { id:"me", role, joinedTs, lastActive, lastRequestTs },
   quests:  { week, progress:{wins,packs,trophies}, claimed },
   requests:[ {id, ownerId, cardId, need, got, ts, closed, donors:{id:n}} ],
-  sendLog: [ts, ...],                  // rollierendes Fenster, max 10 Einträge
+  donated: { anfrageId: n },           // eigene Spenden JE ANFRAGE, n ≤ 10 —
+                                       // trägt seit v3 die Sendegrenze,
+                                       // max DONATED_KEEP Einträge
   notes:   [ {ts, kind, text} ],       // Benachrichtigungen + Aktivitäts-Feed (max 40)
   war:     { week, points, attacks:{targetId:n}, log:[], resolved, won }
 }
@@ -266,15 +331,22 @@ Signatur).
 ### 4.1 Anfragen
 
 - `requestCards(cardId)` — Mitglied stellt eine Anfrage für **eine** Turmkarte.
-- **Bedarf pro Anfrage: 10 Kopien** (`REQUEST_SIZE`). Gleich dem 3-h-Kontingent eines einzelnen
-  Spenders — eine Anfrage ist damit theoretisch von einer Person füllbar, praktisch fast immer
-  von mehreren. Das ist die Menge, die sich „nach Hilfe" anfühlt, ohne einen einzelnen Spender
-  leerzuräumen.
+- **Bedarf pro Anfrage: 30 Kopien** (`REQUEST_SIZE`, Vorgabe 30.07.2026). Das **Dreifache**
+  dessen, was ein einzelner Spender beisteuern darf — eine Anfrage ist damit **nie** von einer
+  Person allein füllbar. Genau das ist der Zweck: die Anfrage ist eine Bitte an den **Clan**,
+  nicht an einen Wohltäter.
+- **Höchstens 10 Kopien von EINEM Spieler** je Anfrage (`DONATE_MAX_PER_REQUEST`). Die restlichen
+  20 kommen von anderen. Die Fehlermeldung sagt das ausdrücklich mit („Den Rest holen die
+  anderen im Clan"), sonst liest sich die Sperre wie „hier ist nichts mehr zu holen".
+- **Eine Karte je Sendevorgang** (`DONATE_PER_TAP`). Der SPENDEN-Knopf sendet genau eine; wer
+  mehr geben will, tippt mehrfach.
 - **Max 1 aktive Anfrage** pro Spieler. Wer noch eine offene hat, muss sie erfüllt sehen oder
   zurückziehen (`cancelRequest()`).
-- **Neue Anfrage frühestens alle 8 h** (`REQUEST_COOLDOWN_MS`). Das begrenzt den Zufluss auf
-  **max. 30 Karten/Tag** pro Spieler (3 Anfragen × 10) und liegt damit unter dem, was ein Spieler
-  über Packs selbst erwirtschaftet — der Clan ergänzt, er ersetzt nicht.
+- **Neue Anfrage frühestens alle 5 h** (`REQUEST_COOLDOWN_MS`, Vorgabe 30.07.2026). Das begrenzt
+  den Zufluss auf **max. 4 Anfragen/Tag ≈ 120 Karten/Tag** pro Spieler — theoretisch, denn die
+  Anfrage füllt sich über ~4 h und wird selten voll ausgeschöpft. Vorher waren es 3 Anfragen à
+  10 Karten (30/Tag); der Zufluss steigt also deutlich. Er bleibt gedeckelt durch das, was der
+  **Clan** überhaupt spenden kann — 29 andere Mitglieder mit je 10 Karten je Anfrage.
 - Anfragen sind für **alle** Mitglieder sichtbar (im UI eine Kartenreihe mit Spenden-Button).
 - Validierung auch hier hart: **nur Tower, nur `common`** — eine Anfrage für `solara` ist genauso
   unmöglich wie eine Spende von `solara`.
@@ -287,11 +359,12 @@ Signatur).
 2. Karten-ID gegen `TOWER_IDS` prüfen → sonst Fehler.
 3. Tier ist implizit `common` (Index 0) — nicht parametrisierbar; `assertCommon()` prüft
    zusätzlich jeden explizit übergebenen Tier-Wert und wirft bei ≠ 0.
-4. Sendekontingent prüfen (rollierendes Fenster, §1) → sonst Fehler mit Restzeit.
-5. Eigenen Bestand prüfen: `ArenaCards.get().cards[id].copies.common ≥ count`.
-6. **Abziehen beim Spender**, **gutschreiben beim Empfänger** (bei `me` als Empfänger über
-   `ArenaCards.addDrop(id, "common", n)`).
-7. Zeitstempel × `count` in `sendLog` schreiben.
+4. Menge prüfen: genau `DONATE_PER_TAP` (= 1) → sonst Fehler.
+5. Kontingent **dieser Anfrage** prüfen (`sendQuota(requestId)`, §1) → sonst Fehler mit der
+   Grenze im Klartext.
+6. Eigenen Bestand prüfen: `ArenaCards.get().cards[id].copies.common ≥ count`.
+7. **Abziehen beim Spender**, **gutschreiben beim Empfänger** (bei `me` als Empfänger über
+   `ArenaCards.addDrop(id, "common", n)`); `donated[requestId] += n`.
 8. Spender-Belohnung buchen (§4.3).
 9. Ist die Anfrage voll → schließen und **Benachrichtigung** an alle Spender.
 
@@ -302,9 +375,12 @@ Signatur).
 | Gold | **25 🪙** |
 | Upgrade-Material | **1 ⚗** — in der **Sorte der gespendeten Karte** (`ArenaCards.materialTypeOf`) |
 
-**Maximum:** 10 Karten / 3 h → 80 Karten/Tag → **2 000 🪙 + 80 ⚗** täglich. Das klingt viel, ist
-aber praktisch unerreichbar: Es setzt 80 **überzählige** graue Kopien pro Tag voraus (ein
-Bronze-Pack liefert 5 Karten, davon ~4 grau). Realistisch für einen aktiven Spieler:
+**Maximum (Stand 30.07.2026):** 10 Karten je Anfrage × 3 gleichzeitig offene Anfragen ×
+4 Anfrage-Buckets à 6 h → **120 Karten/Tag** → **3 000 🪙 + 120 ⚗** täglich. Vorher (globales
+3-h-Fenster): 80 Karten/Tag → 2 000 🪙. Der Deckel steigt also um **50 %** — offen ausgewiesen,
+weil er die Folge der Entscheidung in §0.0 ist. Praktisch unerreichbar bleibt er trotzdem: Er
+setzt 120 **überzählige** graue Kopien pro Tag voraus (ein Bronze-Pack liefert 5 Karten, davon
+~4 grau). Realistisch für einen aktiven Spieler unverändert:
 **10–20 Karten/Tag ≈ 250–500 🪙 + 10–20 ⚗.**
 
 Ein Level-Up im Bereich Lv 8–12 kostet 4 500 🪙 (`GOLD_BANDS`); die Spenden-Belohnung ist damit
@@ -482,7 +558,7 @@ persistiert nichts.**
 
 | | **ClanState** (persistiert) | **ClanSim** (berechnet) |
 |---|---|---|
-| Inhalt | Entscheidungen und Besitz **des Spielers**: Clan-Stammdaten, eigene Rolle, eigener Quest-Beitrag, eigene Anfrage, `sendLog`, eigene Kriegspunkte, eigene Notizen | alles über **andere**: 29 Mitspieler, deren Trophäen/Aktivität/Rollen, deren Anfragen, deren Quest-Beitrag, Gegnerclan + 30 Ghost-Builds, beide Kriegsverläufe, Leaderboard-Population, Bot-Feed |
+| Inhalt | Entscheidungen und Besitz **des Spielers**: Clan-Stammdaten, eigene Rolle, eigener Quest-Beitrag, eigene Anfrage, `donated` (eigene Spenden je Anfrage), eigene Kriegspunkte, eigene Notizen | alles über **andere**: 29 Mitspieler, deren Trophäen/Aktivität/Rollen, deren Anfragen, deren Quest-Beitrag, Gegnerclan + 30 Ghost-Builds, beide Kriegsverläufe, Leaderboard-Population, Bot-Feed |
 | Speicherort | `localStorage["arenaClan"]` | nirgends — aus `clan.seed` + `weekKey` + `now` |
 | Größe | wenige KB, konstant | 0 Byte |
 
@@ -542,10 +618,13 @@ Ein Emote-Cooldown von 60 s verhindert Spam im Feed.
 ## 9) Formelübersicht (Quelle der Wahrheit für den Code)
 
 ```
-SEND_MAX             = 10          Karten pro rollierendem Fenster
-SEND_WINDOW_MS       = 3 h         Fensterlänge
-REQUEST_SIZE         = 10          Bedarf einer Anfrage
-REQUEST_COOLDOWN_MS  = 8 h         zwischen zwei eigenen Anfragen
+REQUEST_SIZE           = 30        Bedarf einer Anfrage
+DONATE_MAX_PER_REQUEST = 10        was EIN Spieler zu EINER Anfrage beiträgt
+DONATE_PER_TAP         = 1         Karten je Sendevorgang
+REQUEST_COOLDOWN_MS    = 5 h       zwischen zwei eigenen Anfragen
+DONATED_KEEP           = 40        max. Einträge in donated (State-Deckel)
+                                   (SEND_MAX / SEND_WINDOW_MS: am 30.07.2026
+                                    ersatzlos entfallen, siehe §0.2 und §1)
 DONATE_GOLD          = 25          Gold je gespendeter Karte
 DONATE_MATERIAL      = 1           Material je gespendeter Karte (Sorte der Karte)
 MAX_MEMBERS          = 30          Spieler + 29 Bots
@@ -576,8 +655,12 @@ LB_AROUND            = ±25 Ränge
 
 ## 10) Offene Punkte (Stufe 2+)
 
-1. **Serverseitige Zeit.** Das rollierende Fenster hängt in Stufe 1 an der Gerätezeit. Behoben,
-   sobald der Server die Spenden-Zeitstempel setzt.
+1. **Serverseitige Buchung der Spenden.** Erledigt sich für das Sendekontingent seit dem
+   30.07.2026 von selbst: es hängt an der Anfrage, nicht an der Uhr, und ist durch Verstellen
+   der Gerätezeit **nicht** mehr zu umgehen. Offen bleibt die Abklingzeit für eine EIGENE
+   Anfrage (`REQUEST_COOLDOWN_MS`, 5 h) — die hängt weiter an der Gerätezeit und ist erst
+   dicht, wenn der Server `lastRequestTs` setzt. Ebenso offen: `donated` liegt lokal, ein
+   echter Server führt es je Mitglied.
 2. **`ArenaCards` hat keine Entnahme-API.** `donateCards()` zieht Kopien über
    `get()` → mutieren → `_write()` ab. Sauberer wäre ein `ArenaCards.removeDrop(id, tier, n)`
    mit derselben Normalisierung wie `addDrop()`. Bewusst **nicht** in diesem Schritt ergänzt, um
