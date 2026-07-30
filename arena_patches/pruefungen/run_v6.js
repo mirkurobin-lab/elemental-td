@@ -1834,30 +1834,36 @@ function step(name, ok, info) {
   await page.evaluate(() => window.__proto.show('navPack'));
   await page.waitForTimeout(300);
   await page.click('#btnOpenBronze');
-  await page.waitForTimeout(400);
-  const firstCard = await page.evaluate(() => {
-    const el = [...document.querySelectorAll('#packGrid .pcard')]
-      .find(e => +e.getAttribute('data-tier') >= 0);
-    if (el) el.click();
-    return !!el;
-  });
-  await page.waitForTimeout(1200);
+  // ⚠ 30.07.2026: Hier stand „400 ms warten, dann die erste Kachel im
+  // Raster anklicken". Das Raster entsteht aber erst, wenn die
+  // Oeffnungsszene fertig ist (Bruch bei 2200 ms) — nach 400 ms waren es
+  // NULL Kacheln, und der Schritt meldete „0 Loop(s) auf 0 Karte(n)". Der
+  // Kommentar zwei Zeilen weiter unten wusste das sogar („Oeffnungsszene
+  // laeuft laenger als dieser Test wartet") und hat die Ebene hinterher
+  // von Hand weggeraeumt, statt die Ursache zu beheben.
+  // Dazu ist der Klick auf die Kachel seit dem stillen Buchen ueberfluessig:
+  // die SZENE deckt auf, das Raster zeichnet fertig offen. Geprueft wird
+  // also der Weg, den ein Spieler geht — Zeremonie ueberspringen, Szene
+  // schliessen, dann muss die offene Karte ihren Loop tragen. Genau dafuer
+  // haengt `attachLoop()` jetzt am Zeichnen und nicht mehr am Drehen.
+  await page.waitForTimeout(600);
+  await page.click('#pkSkip');
+  await page.waitForTimeout(250);
+  await page.mouse.click(195, 300);
+  await page.waitForTimeout(700);
   const packLoop = await page.evaluate(() => ({
+    offen: !!document.querySelector('#packLayer.on'),
+    karten: document.querySelectorAll('#packGrid .pcard').length,
     flipped: document.querySelectorAll('#packGrid .pcard.flipped').length,
     vids: document.querySelectorAll('#packGrid .pcfront video.cvid').length,
     poster: !!document.querySelector('#packGrid .pcfront video.cvid') &&
             !!document.querySelector('#packGrid .pcfront video.cvid').poster,
   }));
+  step('Oeffnungsszene ist nach dem Ueberspringen geschlossen', !packLoop.offen);
   step('Aufgedeckte Pack-Karte geht in ihren Loop ueber',
-    firstCard && packLoop.flipped >= 1 && packLoop.vids >= 1,
-    packLoop.vids + ' Loop(s) auf ' + packLoop.flipped + ' Karte(n)');
+    packLoop.karten > 0 && packLoop.flipped === packLoop.karten && packLoop.vids >= 1,
+    packLoop.vids + ' Loop(s) auf ' + packLoop.flipped + '/' + packLoop.karten + ' Karte(n)');
   step('Auch dort bleibt das Standbild als poster', packLoop.poster);
-  // s.o.: Oeffnungsszene laeuft laenger als dieser Test wartet (§23) —
-  // Ebene selbst schliessen, statt auf eine erratene Wartezeit zu setzen.
-  await page.evaluate(() => {
-    const pl = document.getElementById('packLayer');
-    if (pl) pl.classList.remove('on', 'spielt');
-  });
 
   // --- Audio ---
   await page.click('#navHome');

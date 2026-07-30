@@ -226,6 +226,16 @@ function check(label, cond, info) {
   await clearLayers();
   await page.evaluate(() => window.__proto.show('navCollection'));
   await page.waitForTimeout(350);
+  /* ⚠ 30.07.2026: Der zweite Bottom-Nav-Platz fuehrt jetzt auf zwei
+     gleichrangige Reiter — Battle Deck (voreingestellt, wie in AA §24) und
+     Sammlung. Ohne den Wechsel liegt das Turmraster hinter `display:none`.
+     Der Schritt darunter zaehlte nur Knoten und blieb deshalb gruen;
+     abgestuerzt ist erst der Klick auf `#tabSpells` mit „element is not
+     visible". Vorhandensein ist nicht Sichtbarkeit — siehe README.md. */
+  await page.click('#dkTabColl');
+  await page.waitForTimeout(200);
+  check('das Sammlungs-Raster ist im richtigen Reiter sichtbar',
+    await page.locator('#collGrid').isVisible());
   const tuerme = await page.evaluate(() => {
     const AC = window.ArenaCards;
     return [...document.querySelectorAll('#collGrid .tile')]

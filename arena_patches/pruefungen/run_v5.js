@@ -258,12 +258,29 @@ function step(name, ok, info) {
   await page.click('#navCollection');
   await page.waitForTimeout(350);
   step('Sammlung offen', await page.locator('#viewCollection').evaluate(e => e.classList.contains('active')));
+  /* ⚠ 30.07.2026: Der zweite Bottom-Nav-Platz fuehrt jetzt auf ZWEI
+     gleichrangige Reiter — Battle Deck und Sammlung — und das Deck ist der
+     Voreingestellte (AA hat auf diesem Platz das Deck, §24). Das
+     Sammlungs-Raster liegt damit hinter `display:none`, bis der Reiter
+     gewechselt wird.
+     Der Schritt darunter zaehlte NUR die Knoten und war deshalb GRUEN,
+     waehrend die Kacheln unsichtbar waren; abgestuerzt ist erst der Klick
+     danach („element is not visible"). Genau die Fehlerklasse, die dieses
+     Projekt schon mehrfach getroffen hat: Vorhandensein ist nicht
+     Sichtbarkeit. Jetzt wird beides geprueft. */
+  step('Battle Deck ist der voreingestellte Reiter (wie in AA)',
+    await page.locator('#dkTabDeck').evaluate(e => e.classList.contains('on')) &&
+    await page.locator('#deckPane').evaluate(e => e.style.display !== 'none'));
+  await page.click('#dkTabColl');
+  await page.waitForTimeout(250);
   const tiles = await page.locator('#collGrid .tile').count();
   /* Genau SECHS: die Sammlung zeigt Tuerme. Solara und Magmor sind Helden
      und stehen im Helden-Reiter — vorher lief beides ueber POOL_IDS und
      die Erwartung war >= 8. */
   step('Sammlung rendert das Turm-Raster (6 Tuerme, keine Helden)',
     tiles === 6, String(tiles));
+  step('und die Kacheln sind wirklich SICHTBAR, nicht nur vorhanden',
+    tiles > 0 && await page.locator('#collGrid .tile').first().isVisible());
   await page.screenshot({ path: SHOTS + '/collection.png', fullPage: true });
 
   // ================= 3. DETAILKARTE =================
@@ -664,26 +681,70 @@ function step(name, ok, info) {
   const pbBg = await page.locator('#btnOpenBronze').evaluate(e => e.style.backgroundImage);
   step('Pack-Button: Asset + Fallback', /url\(/.test(pbBg) && /gradient/.test(pbBg));
   await page.click('#btnOpenBronze');
-  // 29.07.2026: Zwischen Klick und Kartenraster liegt jetzt die
-  // Oeffnungsszene (2,35 s, gemessen aus dem Drive-Video). Die alte
-  // Fassung wartete 500 ms und griff ins leere Raster — sie schrieb
-  // die Bauart „Klick zeigt sofort die Karten" fest, die es absichtlich
-  // nicht mehr gibt. Die Anforderung DAHINTER — Karten liegen verdeckt,
-  // nichts deckt sich von selbst auf — wird unveraendert weiter geprueft.
-  // Ein Tipp bricht die Szene ab; dass das geht, prueft packoeffnung.js.
-  await page.waitForTimeout(200);
-  if (await page.locator('#packLayer.on').count()) {
-    await page.mouse.click(195, 300);
-    await page.waitForTimeout(200);
-  }
-  step('Oeffnungsszene ist danach geschlossen',
+  // ⚠ DRITTE FASSUNG, 30.07.2026. Der Block darueber lautete:
+  //   „ein Tipp bricht die Szene ab" → dann Raster pruefen, Karten
+  //   muessen VERDECKT liegen.
+  // Beides ist seit dem Umbau der Szene falsch, und der Test ist genau
+  // deshalb mit einem TypeError abgestuerzt (`#packGrid .pcard` war null):
+  //   · Ein Tipp bricht die Szene NICHT mehr ab. Er deckt genau EINE
+  //     Karte auf — das Zeitschloss ist absichtlich weg, damit ein
+  //     zufaelliger Tap niemandem den Legendaer-Moment nimmt. Die Szene
+  //     blieb also offen und das Raster war nie erreichbar.
+  //   · „Karten liegen verdeckt" ist die Anforderung von VORHER. Heute
+  //     ist die SZENE der Reveal; das Raster holt danach nur noch auf.
+  //     Ein Raster, das nach der Zeremonie erneut zum Antippen auffordert,
+  //     laesst denselben Spieler dasselbe Geschenk zweimal auspacken —
+  //     ein echter Fehler, der beim Neuschreiben dieses Blocks aufgefallen
+  //     ist und im Prototyp behoben wurde.
+  // Geprueft wird jetzt der WEG, den ein Spieler wirklich geht.
+  await page.waitForTimeout(400);
+  step('Oeffnungsszene laeuft nach dem Klick',
+    (await page.locator('#packLayer.on').count()) === 1);
+  // Ein einzelner Tipp darf die Zeremonie NICHT beenden. Das ist die
+  // Anforderung, die den alten Schritt ersetzt — und sie ist das
+  // Gegenteil von dem, was dort stand.
+  await page.mouse.click(195, 300);
+  await page.waitForTimeout(150);
+  step('ein einzelner Tipp beendet die Zeremonie NICHT',
+    (await page.locator('#packLayer.on').count()) === 1);
+  // Der Weg heraus fuer wen es eilig hat: der Überspringen-Knopf.
+  await page.click('#pkSkip');
+  await page.waitForTimeout(250);
+  step('Überspringen zeigt die Beute-Uebersicht',
+    (await page.locator('.pkfinale').count()) === 1);
+  await page.mouse.click(195, 300);
+  await page.waitForTimeout(400);
+  step('danach schliesst ein Tipp die Szene',
     (await page.locator('#packLayer.on').count()) === 0);
-  await page.waitForTimeout(300);
 
   const nCards = await page.locator('#packGrid .pcard').count();
-  step('Karten liegen VERDECKT (kein Auto-Reveal)',
-    nCards > 0 && (await page.locator('#packGrid .pcard.flipped').count()) === 0,
-    nCards + ' Karten, 0 aufgedeckt');
+  // Die SZENE war der Reveal. Das Raster zeigt danach dasselbe Ergebnis,
+  // es fragt nicht noch einmal.
+  const nachSzene = await page.evaluate(() => ({
+    flipped: document.querySelectorAll('#packGrid .pcard.flipped').length,
+    alle: document.querySelectorAll('#packGrid .pcard').length,
+    summe: document.getElementById('packSummary').style.display !== 'none',
+  }));
+  step('kein zweites Aufdecken: das Raster ist nach der Szene fertig',
+    nCards > 0 && nachSzene.flipped === nachSzene.alle && nachSzene.summe,
+    nachSzene.flipped + '/' + nachSzene.alle + ' aufgedeckt, Zusammenfassung ' +
+    (nachSzene.summe ? 'da' : 'fehlt'));
+
+  // ---- Die Flip-Mechanik selbst ----
+  // Sie ist ueber den normalen Weg nicht mehr erreichbar (das Raster ist
+  // nach der Szene schon offen), bleibt aber eine echte Anforderung: das
+  // Raster traegt sie beim Nachholen und beim Wiederansehen. Geprueft
+  // wird sie darum ueber die Testklappe `setPackState`, die genau dafuer
+  // da ist — nicht ueber einen Umweg, der die Szene austrickst.
+  await page.evaluate(() => {
+    const echt = window.__proto.packState();
+    window.__proto.setPackState(echt.map(s => ({ ...s, done: false, busy: false })));
+  });
+  await page.waitForTimeout(200);
+  step('Raster neu gesetzt: Karten liegen verdeckt (kein Auto-Reveal)',
+    (await page.locator('#packGrid .pcard').count()) > 0 &&
+    (await page.locator('#packGrid .pcard.flipped').count()) === 0,
+    (await page.locator('#packGrid .pcard').count()) + ' Karten, 0 aufgedeckt');
   const struct = await page.evaluate(() => {
     const c = document.querySelector('#packGrid .pcard');
     const back = c.querySelector('.pc3d > .pcside.pcback');

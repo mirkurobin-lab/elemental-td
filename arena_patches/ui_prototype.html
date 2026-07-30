@@ -11234,7 +11234,21 @@ button.pfplate{cursor:pointer}
       });
     }
 
-    function fxStart(anzahlKarten, farbe, bildEl) {
+    /* beimErstenBild — wird gerufen, sobald der ERSTE Rahmen der Sprengung
+       wirklich auf dem Schirm steht. Nicht beim Start.
+       Der Unterschied ist der Grund, warum es diesen Rueckruf gibt: das
+       DOM-Pack muss in dem Augenblick verschwinden, in dem die Splitter
+       erscheinen. Wer es beim Start ausblendet, bekommt ein Loch — in
+       dieser Umgebung 200 ms, weil sie in Software rastert. Wer es der
+       Zeittabelle im Blatt ueberlaesst, bekommt das Gegenteil: gemessen
+       stand `#pkArt` 50 ms NACH dem Bruch noch auf Deckkraft 1 und erst
+       bei 2700 ms auf 0 — eine halbe Sekunde lang lagen das ganze Pack
+       und seine eigenen Bruchstuecke uebereinander. Das liest sich als
+       Effekt UEBER einem Pack, nicht als Pack, das bricht.
+       (Die Keyframes stammen aus der Fassung, in der das Pack SELBST
+       aufquoll und verblasste — dort war das Verblassen der Effekt. Jetzt
+       sind die Splitter das Pack, also gehoert das Bild weg.) */
+    function fxStart(anzahlKarten, farbe, bildEl, beimErstenBild) {
       var FX = window.ArenaPackFX, c = $("pkFx"), c2 = $("pkFx2");
       if (!FX || !c || !c.getContext || !c2 || !c2.getContext) return;
       var g = c.getContext("2d"), g2 = c2.getContext("2d");
@@ -11271,7 +11285,7 @@ button.pfplate{cursor:pointer}
          sieht dasselbe Pack immer gleich aus und ein Standbildvergleich
          bleibt moeglich. */
       var teile = FX.erzeuge(anzahlKarten, 1000 + anzahlKarten * 37);
-      var vorher = 0, ende = false;
+      var vorher = 0, ende = false, ersterFertig = false;
       var hatBild = !!(bildEl && bildEl.complete && bildEl.naturalWidth > 0);
 
       /* ==============================================================
@@ -11530,6 +11544,15 @@ button.pfplate{cursor:pointer}
         }
 
         g.globalAlpha = 1;
+        g2.globalAlpha = 1;
+
+        /* Erst JETZT — die Splitter stehen in diesem Rahmen. Siehe den
+           Kommentar bei `fxStart`. */
+        if (!ersterFertig) {
+          ersterFertig = true;
+          if (beimErstenBild) { try { beimErstenBild(); } catch (e) {} }
+        }
+
         if (lebend > 0) { fxLauf = requestAnimationFrame(bild); }
         else { ende = true; fxStop(); }
       }
@@ -11713,7 +11736,16 @@ button.pfplate{cursor:pointer}
            Element, das der Spieler gerade sieht. Fehlt das Bild (kein
            CDN), zeichnet das Modul volle Flaechen in der Packfarbe —
            die Bewegung bleibt dieselbe. */
-        fxStart(n, farbe, (art.style.visibility === "hidden") ? null : art);
+        var hatte = art.style.visibility !== "hidden";
+        fxStart(n, farbe, hatte ? art : null, function () {
+          /* `visibility` und nicht `opacity`: `pkbeben` ANIMIERT die
+             Deckkraft, und eine laufende Animation schlaegt eine
+             Inline-Angabe fuer dieselbe Eigenschaft. `visibility` steht in
+             keinem Keyframe, also greift sie zuverlaessig.
+             Zurueckgesetzt wird sie beim naechsten Pack — `spiele()` setzt
+             sie oben aus der Bildquelle neu. */
+          art.style.visibility = "hidden";
+        });
       }, BRUCH);
 
       function schliessen() {
@@ -12282,10 +12314,40 @@ button.pfplate{cursor:pointer}
       return { cardId: k.cardId, tier: k.tier };
     });
     UIPackOpen.spiele(key, packResult.cards.length, function () {
+      /* ==============================================================
+       * DER DOPPELTE REVEAL (Fix vom 30.07.2026)
+       * --------------------------------------------------------------
+       * Hier stand `toast("... — tippe die Karten an")`, und das war seit
+       * dem Umbau der Oeffnungsszene falsch. Der Ablauf war: der Spieler
+       * deckt in der Szene JEDE Karte einzeln auf, sieht danach die
+       * Beute-Uebersicht — und wird dann im Raster gebeten, DIESELBEN
+       * Karten noch einmal anzutippen. Zweimal dasselbe Geschenk
+       * auspacken. Die Szene hat den Reveal uebernommen, das Raster hat
+       * es nicht mitbekommen.
+       * ⚠ Und es reicht NICHT, die Kacheln als „aufgedeckt" zu zeichnen:
+       * `doFlip()` ist nicht nur Kosmetik, es ist die BUCHUNG (AC.addDrop,
+       * AC.addMaterial, setGold). Wer hier `done = true` setzt, ohne zu
+       * buchen, nimmt dem Spieler den Inhalt des Packs weg — ein
+       * stiller Datenverlust, der in keinem Bildvergleich auftaucht.
+       * Erster Versuch war `revealAll()`. Das bucht richtig, spielt aber
+       * die ganze Kaskade noch einmal — neun Drehungen mit Ton und
+       * Partikeln, nachdem der Spieler jede Karte schon einzeln aufgedeckt
+       * UND in der Beute-Uebersicht gesehen hat. Also ein DRITTER
+       * Reveal-Takt statt eines zweiten. Die Pruefung hat es gemeldet
+       * („3/9 aufgedeckt"), weil die Kaskade noch lief.
+       * Richtig ist der stille Weg: `flip(i, null)` bucht jeden Posten
+       * ohne Element und damit ohne Drehung, Ton und Partikel — dieser
+       * Zweig steckt schon in `doFlip()` und war nur nie benutzt. Danach
+       * zeichnet `renderPack()` die Kacheln offen, und die
+       * Zusammenfassung stellt sich von selbst ein (`allDone`).
+       * ⚠ Reihenfolge: BUCHEN, dann zeichnen. Umgekehrt zeichnet das
+       * Raster den Stand von vorher — alle Kacheln verdeckt.
+       * ============================================================== */
+      for (var bi = 0; bi < packState.length; bi++) flip(bi, null);
       renderPack();
       renderPackHeader();
       UISfx.reward();
-      toast(packResult.name + " geöffnet — tippe die Karten an");
+      toast(packResult.name + " geöffnet");
     }, pkKarten);
   }
   function renderPack() {
@@ -12356,6 +12418,26 @@ button.pfplate{cursor:pointer}
           flip(parseInt(el.getAttribute("data-i"), 10), el);
         });
       })(els[i]);
+    }
+    /* ⚠ Der Loop fuer SCHON aufgedeckte Karten. Fix vom 30.07.2026.
+       Bisher haengte `attachLoop()` nur in `doFlip()`, also am Moment der
+       Drehung. Das reichte, solange eine Karte im Raster nur durch eine
+       Drehung offen werden konnte. Seit die Oeffnungsszene den Reveal
+       uebernimmt, werden die Posten STILL gebucht (`flip(i, null)`) und
+       das Raster zeichnet sie fertig offen — ohne Drehung, also ohne
+       Loop. run_v6 hat es gemeldet („0 Loop(s) auf 0 Karte(n)"): eine
+       aufgedeckte Karte stand als Standbild da, wo eine bewegte gehoert.
+       Der Loop gehoert damit ans ZEICHNEN und nicht ans Drehen — jede
+       offene Karte bekommt ihn, egal wie sie offen geworden ist. */
+    for (var li = 0; li < packState.length; li++) {
+      var ls = packState[li];
+      if (!ls || !ls.done || ls.kind !== "card") continue;
+      var lel = $("packGrid").querySelector('[data-i="' + li + '"]');
+      if (!lel) continue;
+      var box = lel.querySelector(".pcfront .artbox");
+      /* Nicht doppelt anhaengen: `doFlip()` setzt ihn beim Drehen selbst,
+         und zwei Videos im selben Kasten waeren zwei Tonquellen. */
+      if (box && !box.querySelector("video")) attachLoop(box, ls.d.cardId);
     }
   }
 

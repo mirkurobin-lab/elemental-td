@@ -613,6 +613,147 @@ das Panel existiert, drängt sich aber nicht auf.
 
 ---
 
+## 11. Pack-Sprengung — GEBAUT am 30.07.2026
+
+Vorgabe: „der pack wird perfekt angezeigt nur die Animation passt nicht. wie
+bekommen wir das genau so hin wie blizzard das macht?"
+
+### 11.1 Warum es ein Werkzeugwechsel war und kein besserer Prompt
+
+Drei Wege standen offen, zwei davon sind geprüft und verworfen:
+
+| Weg | Warum er nicht reicht |
+|---|---|
+| **Kling** (Video) | Erfindet Bewegung aus einer Beschreibung. Man kann ihm nicht sagen „bei Bild 42 zerbricht das Pack in 40 Stücke". Jede Generierung ist eine Lotterie — für einen Ambient-Loop ideal (`off_loop` ist so entstanden), für eine taktgenaue, wiederholbare Zeremonie unbrauchbar. |
+| **CSS** | Kann **kein additives Blending**. Das ist der eigentliche Grund, warum die alte Fassung milchig aussah statt heiß: überlappende Lichter müssen sich zu Weiß aufaddieren, und CSS kann Elemente übereinanderlegen, ihre Helligkeit aber nicht summieren. Dazu bricht es ab etwa 50 bewegten Knoten ein. |
+| **Canvas** | Beides plus echte Physik, Tiefensortierung und Bewegungsunschärfe. Der Weg, auf dem Mobile-Games diese Effekte tatsächlich ausliefern. |
+
+Der Kern des Griffs steckt in der Vorgabe selbst: das Pack **wird** perfekt
+angezeigt. Also wird es nicht weggeblendet, sondern **zerlegt** — die Leinwand
+schneidet genau das angezeigte Packbild in Bruchstücke. Deshalb sieht die
+Sprengung nach *unserem* Pack aus und nicht nach einem Effekt von der Stange.
+
+### 11.2 Die Bestandteile
+
+| Art | Rolle | Warum sie nötig ist |
+|---|---|---|
+| **Splitter** | Stücke des Packbildes | Tragen das Artwork. Ohne sie ist es ein Effekt über dem Pack, nicht das Pack. |
+| **Funke** | schneller heller Streifen mit Schweif | Kein Gewicht — Licht fällt nicht. Das ist der Unterschied zu Konfetti. |
+| **Glut** | langsam, schwer, fällt | Gibt der Szene Boden. |
+| **Staub** | fast unsichtbar, treibt | Nimmt der Luft die Leere. |
+| **Welle** | genau **eine** Druckwelle | Zwei Wellen lesen sich als Fehler, nicht als Wucht. |
+
+Eine Sprengung nur aus Funken liest sich als Feuerwerk, eine nur aus Splittern
+als Unfall. Erst die Mischung liest sich als „etwas Wertvolles bricht auf".
+
+### 11.3 Der Bruchfächer
+
+Die erste Zerlegung war ein **Raster** — rechteckige Ausschnitte. Alle
+Messungen grün, und es sah aus wie Konfetti: **Glas bricht nicht in
+Rechtecke.** Jetzt laufen vom Einschlagpunkt Risse nach außen, mit einem
+Ringriss dazwischen; je Sektor drei Dreiecke, die den Sektor lückenlos
+abdecken. Die Sektorgrenzen sind ungleich gestreut (ein gleichmäßiger Fächer
+gäbe Tortenstücke) und der Ringriss liegt je Sektor auf einem anderen Radius
+(ein fester Radius zeichnet einen sichtbaren Kreis mitten durchs Bild). Jedes
+Stück bekommt eine aufgehellte **Bruchkante** — der eine Strich, der aus einer
+Fläche ein Stück Material macht.
+
+Die Wucht kommt aus dem **Abstand zum Einschlag**, nicht aus dem Zufall: ein
+Randstück fliegt mit 1,30, das Mittelstück mit 0,49.
+
+### 11.4 Der Vorbeiflug — der teuerste Griff
+
+Ein Fünftel der Stücke fliegt **an der Kamera vorbei**: ein Stück des Packs
+wird kurz bildschirmgroß und ist weg. Das holt den Zuschauer in die Szene,
+statt sie ihm vorzuspielen.
+
+Zwei Zahlen daran sehen falsch aus und sind es nicht:
+
+* Die Vorwärtsgeschwindigkeit steht bei **7 bis 11,5**, nicht bei 2. Der
+  Luftwiderstand von 0,88 je Sechzigstel bremst so hart, dass der gesamte Weg
+  nach vorn nur `vz / 7,67` beträgt. Beim ersten Versuch (1,5 bis 2,4)
+  erreichte **kein einziges** Stück die Kamera.
+* Die Seitwärtsgeschwindigkeit der Vorbeiflieger ist auf **22 %** gebremst.
+  Grund ist die Projektion: dieselbe Perspektivskala, die ein Stück groß
+  macht, schiebt seine Bildlage nach außen. Ohne die Bremse war jedes Stück
+  aus dem Bild heraus, *bevor* es groß wurde — der Effekt war messbar
+  vorhanden und auf dem Bildschirm nicht zu sehen.
+
+### 11.5 Zwei Ebenen, zwei Räumarten
+
+| Ebene | Inhalt | Räumung |
+|---|---|---|
+| `#pkFx` | Licht (Funken, Glut, Staub) | Schweif: `destination-out` löscht 34 % Deckkraft je Bild |
+| `#pkFx2` | Material (Splitter, Welle) | jedes Bild vollständig gelöscht |
+
+Ein Funke ohne Schweif ist ein Punkt; ein Splitter *mit* Schweif hinterlässt
+einen Stapel hartkantiger Kopien, der wie eine ruckelnde Bildrate aussieht.
+Gebrochenes Glas ist scharf, nicht verschmiert.
+
+Der Schweif lief zuerst als **dunkles Rechteck** über die ganze Leinwand. Nach
+drei Bildern war die Leinwand praktisch undurchsichtig, und weil sie über der
+Bühne liegt, war die Szene ab 2,4 s ein schwarzes Loch — die einfliegenden
+Karten, also genau das, wofür das Pack gekauft wurde, lagen dahinter.
+`destination-out` **löscht** Deckkraft statt Dunkel aufzutragen; wo nichts
+ist, bleibt die Leinwand durchsichtig.
+
+### 11.6 Bildrate
+
+Der Zeitschritt war bei 0,05 s gedeckelt. Bricht die Bildrate unter 20 ein,
+konnte die Szene je Bild nur 0,05 s Teilchenzeit aufholen und lief damit in
+**Zeitlupe** bis hinter die Kartenlandung — sie verlor Tempo statt Bilder,
+also die falsche Richtung. Der Deckel liegt jetzt bei 0,25 s. Möglich ist das
+erst durch **exakte Wegintegration** statt eines Euler-Schritts: für
+`v(t) = v₀·k^t` ist der Weg `v₀·(k^Δt − 1)/ln k`. Die Abweichung zwischen 15
+und 60 Bildern je Sekunde liegt damit bei 0,000000 statt 0,079.
+
+Dazu drei Sparmaßnahmen: vorgerechnete Lichtpunkt- und Streifen-Vorlagen statt
+eines Verlaufsobjekts je Teilchen je Bild (rund 230 Stück, sechzigmal je
+Sekunde), Leinwandüberstand von 150 % auf 120 % (−36 % Bildpunkte) und
+Gerätepixel-Deckel von 2 auf 1,5 (−44 %). Vertretbar ist der Deckel nur hier,
+weil auf dieser Ebene ausschließlich weiche Lichter und bewegte Bruchstücke
+liegen — für Schrift oder Rahmen wäre er falsch.
+
+**Nicht belegt:** eine Bildrate auf dem Gerät. Die Entwicklungsumgebung hat
+keine Grafikeinheit und rastert in Software; ihre Zahlen (20 bzw. 3 Bilder je
+Sekunde) sagen über ein Telefon mit GPU nichts aus. Belegt ist nur die
+**Reihenfolge** der Kosten: was ganzflächig je Bild passiert, dominiert. Eine
+echte Zahl braucht ein echtes Gerät.
+
+### 11.7 Zwei Nebenfunde
+
+**„Überspringen" war ein toter Knopf.** Er stand seit dem ersten Entwurf im
+Markup, gestylt und sichtbar, ohne jeden Zuhörer. Aufgefallen, als die Prüfung
+die Szene mitten im Flug schließen wollte und keinen Weg dafür fand. Er
+überspringt jetzt die **Zeremonie**, nicht die Belohnung: Deck sofort
+schwebend, alle Karten offen, Beute-Übersicht — schließen tut der Spieler
+selbst.
+
+**Der doppelte Reveal.** Nach dem Umbau der Szene deckte der Spieler jede
+Karte einzeln auf, sah die Beute-Übersicht — und wurde dann im Raster
+gebeten, *dieselben* Karten noch einmal anzutippen. Die Szene hatte den
+Reveal übernommen, das Raster hatte es nicht mitbekommen. Wichtig dabei:
+`doFlip()` ist nicht nur Kosmetik, sondern die **Buchung**; wer die Kacheln
+nur als aufgedeckt zeichnet, nimmt dem Spieler den Inhalt des Packs weg. Der
+stille Buchungszweig (`flip(i, null)`) steckte schon im Code und war nie
+benutzt.
+
+### 11.8 Prüfung
+
+`arena_packfx.js` prüft die Physik ohne Browser (28 Schritte, `node
+arena_packfx.js`); `pruefungen/packsprengung.js` das Zusammenspiel mit Szene
+und Bild (25 Schritte). Determinismus ist Pflicht, nicht Komfort: kein
+`Math.random()`, der Zufall kommt aus einem Startwert. Sonst ist ein
+Standbildvergleich unmöglich, und ein Fehler, der nur bei einer bestimmten
+Streuung auftritt, nicht reproduzierbar.
+
+Sechs der oben beschriebenen Fehler waren **gemessen grün** und sind erst beim
+Ansehen bei dreifacher Auflösung aufgefallen; zwei umgekehrt nur durch Zählen
+und nie durch Ansehen. Beide Richtungen stehen als Schritte in den Prüfungen,
+und beide Suiten sind gegen sechs Mutationen gehalten.
+
+---
+
 ## Übersicht
 
 | # | Thema | Beleg | Aufwand | Priorität |

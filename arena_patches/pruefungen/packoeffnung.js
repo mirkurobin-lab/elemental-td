@@ -812,6 +812,26 @@ async function durchtippen(p, max) {
      Spieler wartet, gibt es ueberhaupt keine richtige Wartezeit mehr.
      Also wird getippt statt gewartet. */
   await durchtippen(p);
+  /* ⚠ DRITTE Nachbesserung an derselben Stelle, 30.07.2026 — diesmal aus
+     einem anderen Grund als die zwei darueber. Seit die Szene den Reveal
+     uebernimmt, bucht der Prototyp die Posten am Ende der Zeremonie STILL
+     und zeichnet das Raster fertig offen (sonst muesste der Spieler
+     dieselben Karten zweimal antippen). Ein Klick auf eine offene Kachel
+     steigt in `flip()` sofort wieder aus — `.turning`, `.r<stufe>` und
+     `--pcdur` entstehen also nie mehr, und der Schritt meldete „traegt
+     ihre Stufenklasse nicht" bei voellig richtigem Verhalten.
+     Die Anforderung bleibt: die Raritaets-Leiter muss AM ELEMENT
+     ankommen, nicht nur in JS. Sie gilt weiter fuer jede Drehung im
+     Raster (Nachholen ueber „Alle aufdecken", Wiederansehen). Geprueft
+     wird sie darum ueber die Testklappe `setPackState`, die das Raster
+     zurueck auf verdeckt setzt — dieselbe Loesung wie in run_v5.js.
+     Das ist keine Umgehung: der Klick, die Drehung und die Klassen sind
+     danach genau die echten. */
+  await p.evaluate(() => {
+    const echt = window.__proto.packState();
+    window.__proto.setPackState(echt.map(s => ({ ...s, done: false, busy: false })));
+  });
+  await p.waitForTimeout(200);
   const amElement = await p.evaluate(async () => {
     const karten = [...document.querySelectorAll("#packGrid .pcard")];
     const treffer = [];

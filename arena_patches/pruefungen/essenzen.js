@@ -98,6 +98,19 @@ function check(label, cond, info) {
   /* ================= 2. Essenz-Fach in der Sammlung ================= */
   console.log('\n== 2. Kopfleiste zeigt die Summe, das Fach die Einzelbestände ==');
   await go('navCollection');
+  /* ⚠ 30.07.2026: Der zweite Bottom-Nav-Platz fuehrt jetzt auf zwei
+     gleichrangige Reiter — Battle Deck (voreingestellt, wie in AA §24) und
+     Sammlung. Das Essenz-Fach liegt im Sammlungs-Reiter, also hinter
+     `display:none`, bis umgeschaltet wird.
+     Die drei Schritte darunter lasen nur Attribute (`hidden`,
+     `aria-expanded`, `textContent`) und blieben deshalb GRUEN, obwohl vom
+     Fach nichts zu sehen war. Abgestuerzt ist erst der Klick danach mit
+     „element is not visible". Vorhandensein ist nicht Sichtbarkeit — die
+     Regel steht in README.md. */
+  await page.click('#dkTabColl');
+  await page.waitForTimeout(200);
+  check('das Essenz-Fach ist im Sammlungs-Reiter ueberhaupt sichtbar',
+    await page.locator('#matCount').isVisible());
   const zu = await page.evaluate(() => ({
     txt: document.getElementById('matCount').textContent.replace(/\s+/g, ' ').trim(),
     hidden: document.getElementById('essBank').hidden,

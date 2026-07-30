@@ -390,6 +390,66 @@ Bilder als `data:`-URI ein und macht den Live-Zustand örtlich prüfbar. Beide
 Fehler dieses Tages — das Icon und der glitchende Avatar — waren genau von
 dieser Sorte: live sofort sichtbar, hier strukturell unsichtbar.
 
+## Die Prüfung darf den Messgegenstand nicht anfassen (30.07.2026)
+
+Beim Bau von `packsprengung.js` sind zwei Prüfungsfehler entstanden, die
+beide dieselbe Wurzel haben: die Messung hat verändert, was sie messen
+wollte. Sie stehen als Warnung in der Datei und hier als Regel.
+
+**Die Gegenprobe hat die Szene kaputtgemacht.** Der Schritt „die
+Vorhangmessung würde einen echten Vorhang finden" hat ein deckendes Rechteck
+auf `#pkFx` gemalt — auf die *echte* Leinwand. Der nächste Schritt („nachher
+ist nichts mehr da") sah daraufhin 100 % Deckung und wurde rot. Nicht wegen
+des Codes, sondern wegen der Prüfung davor. Eine Gegenprobe gehört auf eine
+eigene, lose Leinwand.
+
+**`getImageData` bremst, was es messen soll.** Jeder Aufruf zieht die
+Bilddaten von der Grafikeinheit in den Hauptspeicher zurück und legt die
+Zeichenkette lahm. Eine Messung, die alle 100 ms zwei große Leinwände
+ausliest, hat 1,5 Bilder je Sekunde gemessen — nicht die Szene, sondern sich
+selbst. Erst eine Zählung *ohne* Rückfrage hat die echte Zahl gezeigt.
+
+Daraus folgt eine Regel, die über Leinwände hinausgeht: **kein Schritt darf
+auf einem festen Zeitpunkt „x ms nach dem Ereignis" stehen, wenn die
+Prüfungsumgebung selbst die Uhr verbiegt.** Zwei Schritte in
+`packsprengung.js` waren genau so gebaut und rot, obwohl der Code stimmte.
+Richtig ist: auf den Zustand *warten*, mit Obergrenze — dann bleibt der
+Schritt rot, wenn der Zustand ausbleibt, und grün, wenn er nur spät kommt.
+Was in *Teilchenzeit* wie lange dauert, prüft der Selbsttest des Moduls
+ohne Browser; dort verbiegt niemand die Uhr.
+
+## Vorhandensein ist nicht Sichtbarkeit (30.07.2026, Deck-Reiter)
+
+`run_v5.js` zählte die Kacheln der Sammlung mit
+`locator('#collGrid .tile').count()` — sechs, grün. Sichtbar war keine
+einzige: der zweite Bottom-Nav-Platz führt seit dem Battle Deck auf zwei
+gleichrangige Reiter, und das Deck ist der voreingestellte, also lag das
+Sammlungs-Raster hinter `display:none`. Gemeldet hat es erst der *Klick* im
+Schritt danach, mit „element is not visible" — als Absturz, nicht als
+Fehlschlag.
+
+`count()` fragt das DOM, nicht den Bildschirm. Wo ein Schritt behauptet,
+etwas werde *gezeigt*, muss `isVisible()` dabei sein. Der Schritt ist
+entsprechend erweitert.
+
+## Ein Test, der eine abgeschaffte Bauweise einfriert (30.07.2026, dritter Fall)
+
+`run_v5.js` prüfte nach dem Pack-Öffnen: „ein Tipp bricht die Szene ab" und
+danach „die Karten im Raster liegen verdeckt". Beides war die Anforderung von
+*vorher*. Das Zeitschloss der Szene ist absichtlich weg — ein Tipp deckt
+genau eine Karte auf —, also blieb die Szene offen, das Raster war nie
+erreichbar, und der Test starb an einem `TypeError` auf `null`.
+
+Beim Neuschreiben ist ein echter Fehler aufgefallen, den kein Schritt
+gemeldet hatte: der Spieler wurde nach der Zeremonie im Raster gebeten,
+**dieselben Karten noch einmal anzutippen**. Zweimal dasselbe Geschenk
+auspacken. Das ist der vierte Beleg an einem Tag für dieselbe Sache — der
+Fehler lag zwischen zwei Teilen, die jeder für sich grün waren.
+
+Merke: eine abgestürzte Prüfung ist kein Umbauhindernis, sondern ein
+Hinweis darauf, dass in der Nähe eine Anforderung veraltet ist. Nur den
+Selektor zu reparieren hätte den doppelten Reveal nicht gefunden.
+
 ## Was hier NICHT liegt
 
 Die Wegwerf-Skripte aus der Arbeit am Prototyp (`diag*.js`, `mess*.js`,

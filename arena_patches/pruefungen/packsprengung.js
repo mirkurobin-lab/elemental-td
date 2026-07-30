@@ -225,6 +225,13 @@ const KLASSIERER = (r, g, b) => {
   await neuOeffnen("arcane");
   await seite.waitForTimeout(Math.max(400, (bruchCss || 2200) - 350));
   const vorher = await deckung();
+  /* Hier — noch VOR dem Bruch — wird festgehalten, dass das Packbild
+     ueberhaupt zu sehen war. Der Wert traegt die Gegenprobe weiter unten,
+     ohne dass dort eine neue Szene gestartet werden muss. */
+  const vorPack = await seite.evaluate(() => {
+    const a = document.getElementById("pkArt");
+    return { vis: getComputedStyle(a).visibility, inline: a.style.visibility };
+  });
   pruef("vor dem Bruch sind beide Leinwaende leer",
     vorher.pkFx.deckt === 0 && vorher.pkFx2.deckt === 0,
     JSON.stringify(vorher));
@@ -236,6 +243,40 @@ const KLASSIERER = (r, g, b) => {
     losErst.stand.pkFx.deckt > 0.2, JSON.stringify(losErst.stand.pkFx));
   gegen("die Deckungsmessung unterscheidet ueberhaupt",
     vorher.pkFx2.deckt === 0 && losErst.stand.pkFx2.deckt > 0);
+
+  /* ==============================================================
+   * DAS PACK IST WEG, SOBALD DIE SPLITTER DA SIND
+   * --------------------------------------------------------------
+   * Der Fehler, der diesen Schritt erzwungen hat: gemessen stand
+   * `#pkArt` 50 ms NACH dem Bruch noch auf Deckkraft 1 und erst bei
+   * 2700 ms auf 0. Eine halbe Sekunde lang lagen das ganze Pack und
+   * seine eigenen Bruchstuecke uebereinander — es sah aus wie ein
+   * Effekt UEBER einem Pack statt wie ein Pack, das bricht. Kein
+   * Schritt hat das gemeldet; gefunden wurde es beim Ansehen des
+   * ganzen Telefonbildes, nicht des Buehnenausschnitts.
+   * Geprueft wird die Gleichzeitigkeit: in dem Augenblick, in dem die
+   * Splitter auf der Leinwand stehen, muss das Bild verborgen sein.
+   * ⚠ `visibility` und nicht `opacity`: `pkbeben` animiert die
+   * Deckkraft weiter (sie faellt ohnehin), und eine laufende
+   * Animation schlaegt eine Inline-Angabe. Die Sichtbarkeit steht in
+   * keinem Keyframe und ist damit die belastbare Groesse.
+   * ============================================================== */
+  const packWeg = await seite.evaluate(() => {
+    const a = document.getElementById("pkArt");
+    return { vis: getComputedStyle(a).visibility, inline: a.style.visibility };
+  });
+  pruef("mit dem ersten Splitter-Rahmen ist das ganze Packbild verborgen",
+    packWeg.vis === "hidden", JSON.stringify(packWeg));
+  /* Gegenprobe: VOR dem Bruch war es sichtbar — sonst wuerde der Schritt
+     auch bei einem Pack gruen, das nie zu sehen war (etwa ohne CDN).
+     ⚠ Der Wert stammt aus der LAUFENDEN Szene, gelesen weiter oben. Erster
+     Versuch hat dafuer ein frisches Pack geoeffnet — und damit die Szene
+     ersetzt, die die naechsten Schritte messen wollten: zwei davon wurden
+     rot („Deck steht bereit", „Rueckfall greift"). Dieselbe Falle wie bei
+     der Vorhang-Gegenprobe, die auf die echte Leinwand malte. Eine
+     Gegenprobe darf den Ablauf nicht anfassen. */
+  gegen("das Packbild war vor dem Bruch ueberhaupt sichtbar",
+    vorPack.vis === "visible", JSON.stringify(vorPack));
   pruef("die Einsatzzeit steht im Blatt und ist nicht 0",
     bruchCss !== null && bruchCss > 1000, String(bruchCss));
 
