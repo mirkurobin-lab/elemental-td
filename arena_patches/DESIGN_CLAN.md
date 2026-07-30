@@ -505,9 +505,22 @@ Bot-Daten** — der Simulationsanteil verschwindet einfach. Das ist der Grund f�
 
 ---
 
-## 8) Emotes statt Chat
+## 8) Emotes — und seit 30.07.2026 zusätzlich ein Chat
 
-**Kein Freitext-Chat.** Sechs Preset-Sprüche mit Emoji, die im Aktivitäts-Feed erscheinen:
+> **NACHTRAG 30.07.2026 (User-Vorgabe, überschreibt den Absatz „Begründung" unten).**
+> Der Clan hat einen **Chat mit Freitext und Smiley-Auswahl** bekommen: Knopf „Chat" in der
+> Clan-Ansicht → `#chatLayer` in `ui_prototype.html`. Er ist **rein lokal**
+> (localStorage `arenaClanChat`, `{v:1, msgs:[…]}`) und **berührt `arena_clan.js` nicht** —
+> das Modul kennt weiterhin nur Emotes. Die Nachrichten der Mitglieder sind **Demo-Daten**
+> (`CHAT_DEMO`), und es gibt **bewusst keinen Bot, der auf den Spieler antwortet**;
+> ein Hinweis im Fenster sagt das offen.
+> Die Emotes bleiben unverändert bestehen (Clanhalle → Reiter „Aktivität"): sie schreiben in
+> den **Feed**, der Chat in seinen **eigenen Verlauf**. Zwei Kanäle, zwei Zwecke.
+> Die Moderationsfrage unten ist damit **nicht erledigt, sondern vertagt** — sie fällt an,
+> sobald der Chat einen Server bekommt, und gehört dann in Stufe 2.
+
+**Ursprünglicher Stand (Stufe 1): kein Freitext-Chat.** Sechs Preset-Sprüche mit Emoji, die im
+Aktivitäts-Feed erscheinen:
 
 | Key | Text | Emoji |
 |---|---|---|

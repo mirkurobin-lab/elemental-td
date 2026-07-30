@@ -11,7 +11,13 @@ const { chromium } = require('playwright-core');
 const path = require('path');
 const fs = require('fs');
 
-const FILE = 'file://' + path.resolve('/home/user/elemental-td/arena_patches/ui_prototype.html');
+/* UMGESCHRIEBEN 30.07.2026: Der Pfad war auf /home/user/elemental-td
+   festgenagelt. In einem Worktree pruefte die Suite damit den FREMDEN
+   Baum — sie lief gruen, waehrend die geaenderte Datei ungeprueft blieb.
+   Das ist die gefaehrlichste Sorte Pruefung: eine, die etwas anderes
+   misst als das, was man gerade gebaut hat. Jetzt haengt sie an ihrem
+   eigenen Verzeichnis und prueft immer den Baum, in dem sie liegt. */
+const FILE = 'file://' + path.resolve(__dirname, '..', 'ui_prototype.html');
 const SHOTS = '/tmp/claude-0/-home-user-elemental-td/4b0a76dd-5b22-5fdf-85e8-579f1b036ae5/scratchpad/ui_shots_v6';
 fs.mkdirSync(SHOTS, { recursive: true });
 
@@ -126,10 +132,37 @@ function step(name, ok, info) {
   await page.waitForTimeout(350);
   step('Bottom-Nav-Tab oeffnet den Clan-View',
     await page.locator('#viewClan').evaluate(e => e.classList.contains('active')));
+  /* UMGESCHRIEBEN 30.07.2026 — die alte Zusage lautete „Name,
+     Trophaeen-Schnitt, Mitglieder 30/30" und schrieb damit die
+     Chip-Reihe fest, die die Kopfkarte ueberladen hat. Nach dem AA-
+     Vorbild traegt die Kopfkarte GENAU DREI Angaben: Clanname, die
+     Online-Zeile mit gruenem Punkt und rechts die Trophaeensumme.
+     Ø-Trophaeen, 30/30, Kriegsserie und Phase sind NICHT verschwunden —
+     sie stehen vollstaendig in der Clanhalle (#clanHallStats) und
+     werden dort weiter unten geprueft. Der Schritt misst also dieselbe
+     Sache an ihrem neuen Ort, aufgeteilt in zwei Zusagen. */
   const head = await page.locator('#clanHead').textContent();
-  step('Clan-Header: Name, Trophaeen-Schnitt, Mitglieder 30/30',
-    /Prisma-Orden/.test(head) && /30\/30/.test(head) && /Ø/.test(head),
-    head.replace(/\s+/g, ' ').trim().slice(0, 90));
+  const trofSumme = await page.evaluate(() => {
+    let s = 0; window.ArenaClan.members().forEach(m => s += m.trophies); return s;
+  });
+  // \D weg statt nur Leerzeichen: faellt das Pokal-Bild aus, steht das
+  // Emoji als Rueckfall im selben Element (UIIcon.fail).
+  const trofTxt = (await page.locator('#clanHead .ctro').textContent()).replace(/\D/g, '');
+  step('Kopfkarte: Clanname, Online-Zeile und Trophaeensumme',
+    /Prisma-Orden/.test(head) && /Mitglieder online:\s*\d+/.test(head) &&
+    trofTxt === String(trofSumme),
+    head.replace(/\s+/g, ' ').trim().slice(0, 90) + ' | Σ' + trofTxt);
+  /* „Vorhandensein ist nicht Sichtbarkeit": der gruene Punkt ist ein
+     leeres <i>, ein querySelector haette ihn auch gefunden, wenn er
+     0 px breit waere. */
+  const punkt = await page.locator('#clanHead .odot').evaluate(e => ({
+    sicht: e.getClientRects().length > 0,
+    breite: Math.round(e.getBoundingClientRect().width),
+    farbe: getComputedStyle(e).backgroundColor,
+  }));
+  step('Gruener Online-Punkt ist sichtbar (8 px, gruen)',
+    punkt.sicht && punkt.breite === 8 && punkt.farbe === 'rgb(72, 226, 34)',
+    JSON.stringify(punkt));
   const bannerBg = await page.locator('#clanHead .cbanner').evaluate(e => e.style.background);
   step('Banner traegt die Preset-Farben (Gradient)', /gradient/.test(bannerBg), bannerBg.slice(0, 46));
   const frameCls = await page.locator('#clanHead .cbanner').evaluate(e => e.className);
@@ -144,10 +177,276 @@ function step(name, ok, info) {
   });
   step('Clan-Wappen traegt eine eigene Klasse (.cbanner)',
     bannerSizes.clan === 60 && bannerSizes.clip === 'polygon', JSON.stringify(bannerSizes));
-  const tabs = await page.locator('#viewClan [data-clantab]').count();
-  step('Drei Clan-Tabs (Quests / Spenden / Krieg)', tabs === 3, String(tabs));
+  /* UMGESCHRIEBEN 30.07.2026 — der Schritt hiess „Drei Clan-Tabs
+     (Quests / Spenden / Krieg)" und schrieb genau die Reiterleiste
+     fest, die den View ueberladen hat. AAs Clan-Ansicht hat KEINE
+     Reiter, sondern einen durchgehenden Scroll. Die Zusage lautet jetzt
+     umgekehrt: im View steht keine Reiterleiste mehr. Dass die drei
+     Inhalte noch da sind, prueft der Block „CLANHALLE" weiter unten —
+     die Funktionen sind umgezogen, nicht gestrichen. */
+  const reiterImView = await page.locator('#viewClan [data-clantab], #viewClan .tabs').count();
+  step('Clan-Ansicht traegt KEINE Reiterleiste mehr (AA: ein Scroll)',
+    reiterImView === 0, String(reiterImView));
 
-  // ================= 3. TAB QUESTS =================
+  // ---- 2b. AA-REIHENFOLGE: Band → Kopfkarte → Anfragen → Chat → Knoepfe
+  /* Reihenfolge ueber die tatsaechliche Y-Position gemessen, nicht ueber
+     die DOM-Reihenfolge: nur die Position sagt, was der Spieler zuerst
+     sieht. getClientRects().length > 0 filtert nebenbei alles aus, was
+     zwar im DOM steht, aber nicht gezeichnet wird. */
+  const reihenfolge = await page.evaluate(() => {
+    const sel = ['#viewClan h2.title', '#clanHead', '#paneDonate',
+                 '#clanChat', '#viewClan .clanbtns'];
+    return sel.map(s => {
+      const e = document.querySelector(s);
+      return { id: s.replace('#viewClan ', '').replace('#', ''),
+               sicht: !!e && e.getClientRects().length > 0,
+               top: e ? Math.round(e.getBoundingClientRect().top) : -1 };
+    });
+  });
+  step('AA-Reihenfolge: Band, Kopfkarte, Anfragen, Chat, Knopfreihe — alle sichtbar',
+    reihenfolge.every(r => r.sicht) &&
+    reihenfolge.every((r, i) => i === 0 || r.top > reihenfolge[i - 1].top),
+    reihenfolge.map(r => r.id + '@' + r.top).join(' < '));
+  /* Das Titelband ist das h2.title der Kopfzeile — hydrateArt() legt dort
+     banner_title als 9-Slice unter und setzt Goldschrift. Ein zweites
+     Band per secribbon("CLAN") war die erste Fassung und stand als
+     sichtbare Dopplung im Screenshot; genau diesen Fehler haelt der
+     zweite Teil dieses Schrittes jetzt fest. */
+  const baender = await page.$$eval('#viewClan h2.title, #viewClan .secribbon',
+    els => els.filter(e => /^\s*CLAN\s*$/i.test(e.textContent)).length);
+  const bandTxt = (await page.locator('#viewClan h2.title').textContent()).trim();
+  step('GENAU EIN Titelband „CLAN" ueber der Ansicht',
+    /CLAN/i.test(bandTxt) && baender === 1, bandTxt + ' (' + baender + '×)');
+
+  // ---- 2c. DIE DREI KNOEPFE: sichtbar UND klickbar
+  /* „Vorhandensein ist nicht Sichtbarkeit" — deshalb je Knopf
+     getClientRects(), Groesse und elementFromPoint: ein Knopf, ueber dem
+     etwas anderes liegt, ist nicht klickbar, auch wenn er sichtbar ist. */
+  // Erst ins Bild rollen: elementFromPoint misst NUR im Sichtfenster.
+  // Ohne das meldet der Treffertest „verdeckt", obwohl nichts verdeckt
+  // ist — die Knoepfe stehen am Ende eines langen Scrolls.
+  await page.locator('#viewClan .clanbtns').scrollIntoViewIfNeeded();
+  await page.waitForTimeout(200);
+  const dreiKnoepfe = await page.evaluate(() => {
+    return ['btnAskCards', 'btnClanDuel', 'btnClanChat'].map(id => {
+      const e = document.getElementById(id);
+      if (!e) return { id, sicht: false };
+      const r = e.getBoundingClientRect();
+      const oben = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      return { id, sicht: e.getClientRects().length > 0,
+               breite: Math.round(r.width), hoehe: Math.round(r.height),
+               gesperrt: e.disabled === true,
+               frei: !!oben && (oben === e || e.contains(oben)),
+               txt: e.textContent.trim() };
+    });
+  });
+  step('Drei Knoepfe unten: Anfragen · Freundschaftskampf · Chat',
+    dreiKnoepfe.map(k => k.txt).join('|') === 'Anfragen|Freundschaftskampf|Chat',
+    dreiKnoepfe.map(k => k.txt).join(' · '));
+  step('Alle drei sind sichtbar, frei und klickbar (nicht nur im DOM)',
+    dreiKnoepfe.every(k => k.sicht && k.frei && !k.gesperrt &&
+      k.breite > 90 && k.hoehe > 30),
+    dreiKnoepfe.map(k => k.id + ' ' + k.breite + '×' + k.hoehe +
+      (k.frei ? '' : ' VERDECKT')).join(' · '));
+  const chatBlasen = await page.locator('#clanChat .chatblase').count();
+  const chatErste = (await page.locator('#clanChat .chatzeile').first().textContent())
+    .replace(/\s+/g, ' ').trim();
+  step('Chat-Vorschau: Avatar + Blase mit Name, Rolle, Text und Zeit',
+    chatBlasen === 3 &&
+    (await page.locator('#clanChat .chatzeile .chatav').count()) === chatBlasen &&
+    /(Anführer|Ältester|Mitglied)/.test(chatErste) && /vor \d+ Stunde/.test(chatErste),
+    chatErste.slice(0, 80));
+  step('Die Vorschau ist im UI als Beispiel gekennzeichnet',
+    /Beispiel/.test(await page.locator('#clanChat .chatdemo').textContent()));
+  await page.screenshot({ path: SHOTS + '/clan_ansicht.png', fullPage: true });
+
+  // ================= 2d. CLAN-CHAT (Nachtrag 30.07.2026) =================
+  /* Der Chat wird GEBAUT, nicht angedeutet — die frühere Zusage („der
+     Knopf sagt, dass es keinen Chat gibt") ist damit überholt und der
+     Schritt dazu ersetzt. Was bleibt, ist die EHRLICHKEIT: es gibt
+     keinen Server. Deshalb prüft dieser Block ausdrücklich auch, dass
+     NIEMAND auf die eigene Nachricht antwortet. Ein Chat, der antwortet,
+     obwohl niemand da ist, wäre der schlimmere Fehler als gar keiner. */
+  await page.click('#btnClanChat');
+  await page.waitForTimeout(320);
+  const chatOffen = await page.locator('#chatLayer').evaluate(e => ({
+    klasse: e.classList.contains('open'),
+    sicht: e.getClientRects().length > 0,
+    blattSicht: (() => { const s = e.querySelector('.chatsheet');
+      return !!s && s.getClientRects().length > 0 &&
+        s.getBoundingClientRect().width > 200; })(),
+  }));
+  step('Chat-Knopf oeffnet das Chat-Fenster (sichtbar, nicht nur vorhanden)',
+    chatOffen.klasse && chatOffen.sicht && chatOffen.blattSicht, JSON.stringify(chatOffen));
+  step('Das Fenster sagt offen, dass der Chat nur lokal laeuft',
+    /nur lokal/.test(await page.locator('#chatLokal').textContent()));
+  const verlauf0 = await page.locator('#chatVerlauf .chatzeile').count();
+  step('Verlauf zeigt die Demo-Nachrichten der Mitglieder', verlauf0 === 3, String(verlauf0));
+  const rollen = await page.$$eval('#chatVerlauf .crolle', els => els.map(e => e.textContent));
+  step('Jede Blase traegt eine Rolle (Anführer / Ältester / Mitglied)',
+    rollen.length === 3 && rollen.every(r => /^(Anführer|Ältester|Mitglied)$/.test(r)),
+    rollen.join('/'));
+  const zeiten = await page.$$eval('#chatVerlauf .czeit', els => els.map(e => e.textContent));
+  step('Jede Blase traegt eine ausgeschriebene Zeit („vor 15 Minuten")',
+    zeiten.every(z => /^(gerade eben|vor \d+ (Minuten?|Stunden?|Tagen?))$/.test(z.trim())),
+    zeiten.join(' · '));
+
+  // --- Leere Nachricht wird NICHT gesendet ---
+  await page.click('#btnChatSend');
+  await page.waitForTimeout(240);
+  step('Leere Nachricht wird nicht gesendet',
+    (await page.locator('#chatVerlauf .chatzeile').count()) === verlauf0);
+  // Gegenprobe: nur Leerzeichen ist derselbe Fall.
+  await page.fill('#chatInput', '     ');
+  await page.click('#btnChatSend');
+  await page.waitForTimeout(240);
+  step('Auch eine Nachricht aus lauter Leerzeichen wird nicht gesendet',
+    (await page.locator('#chatVerlauf .chatzeile').count()) === verlauf0 &&
+    (await page.locator('#chatVerlauf .chatzeile.ich').count()) === 0);
+
+  // --- Smiley-Auswahl ---
+  await page.fill('#chatInput', '');
+  await page.click('#btnSmiley');
+  await page.waitForTimeout(260);
+  const smAuf = await page.locator('#smileyFeld').evaluate(e => ({
+    sicht: e.getClientRects().length > 0,
+    zeichen: e.querySelectorAll('[data-smiley]').length,
+    gruppen: e.querySelectorAll('.smileygrp').length,
+  }));
+  step('Smiley-Knopf klappt eine kuratierte Auswahl auf (Gruppen, 24–32 Zeichen)',
+    smAuf.sicht && smAuf.zeichen >= 24 && smAuf.zeichen <= 32 && smAuf.gruppen >= 3,
+    smAuf.zeichen + ' Zeichen in ' + smAuf.gruppen + ' Gruppen');
+  /* Mit offener Auswahl ist das Fenster am hoechsten. Wenn es hier nicht
+     mehr passt, rutscht die Eingabezeile aus dem Bild — der Knopf, den
+     man gerade braucht. Gemessen statt gehofft. */
+  const passt = await page.evaluate(() => {
+    const b = document.querySelector('#chatLayer .chatsheet').getBoundingClientRect();
+    const z = document.querySelector('.chateingabe').getBoundingClientRect();
+    return { blatt: Math.round(b.height), fenster: window.innerHeight,
+             zeileUnten: Math.round(z.bottom) };
+  });
+  step('Fenster passt mit offener Auswahl ins Bild, Eingabezeile bleibt sichtbar',
+    passt.blatt <= passt.fenster && passt.zeileUnten <= passt.fenster,
+    passt.blatt + ' px Blatt in ' + passt.fenster + ' px, Zeile endet bei ' + passt.zeileUnten);
+  /* Ein Tippen fuegt GENAU EIN Zeichen ein — nicht zwei, nicht den
+     ganzen Namen — und die Auswahl bleibt offen, weil man selten genau
+     ein Zeichen setzen will. Gezaehlt wird in Codepoints, nicht in
+     UTF-16-Einheiten: 👍 ist zwei .length-Einheiten und wuerde als
+     „zwei Zeichen" durchgehen. */
+  await page.click('#smileyFeld [data-smiley]');
+  await page.waitForTimeout(220);
+  const nachEinem = await page.evaluate(() => ({
+    wert: document.getElementById('chatInput').value,
+    zeichen: Array.from(document.getElementById('chatInput').value).length,
+    nochOffen: document.getElementById('smileyFeld').getClientRects().length > 0,
+  }));
+  step('Ein Tippen fuegt GENAU EIN Zeichen ein, die Auswahl bleibt offen',
+    nachEinem.zeichen === 1 && nachEinem.nochOffen,
+    JSON.stringify(nachEinem));
+  // Cursorposition: das zweite Zeichen landet HINTER dem ersten.
+  await page.click('#smileyFeld [data-smiley]');
+  await page.waitForTimeout(200);
+  step('Zwei Smileys hintereinander gehen ohne Zwischenschritt',
+    (await page.evaluate(() =>
+      Array.from(document.getElementById('chatInput').value).length)) === 2);
+  await page.click('#btnSmiley');            // Auswahl wieder zuklappen
+  await page.waitForTimeout(220);
+
+  // --- Echte Nachricht senden ---
+  const MEIN_TEXT = 'Ich sammle Frost — Anfrage steht oben!';
+  await page.fill('#chatInput', MEIN_TEXT);
+  await page.click('#btnChatSend');
+  await page.waitForTimeout(320);
+  const nachSenden = await page.evaluate(() => {
+    const zeilen = Array.from(document.querySelectorAll('#chatVerlauf .chatzeile'));
+    const letzte = zeilen[zeilen.length - 1];
+    return { n: zeilen.length, ich: document.querySelectorAll('#chatVerlauf .chatzeile.ich').length,
+             txt: letzte ? letzte.querySelector('.ctext').textContent : '',
+             feldLeer: document.getElementById('chatInput').value === '' };
+  });
+  step('Gesendete Nachricht steht sofort im Verlauf und ist als eigene abgesetzt',
+    nachSenden.n === verlauf0 + 1 && nachSenden.ich === 1 &&
+    nachSenden.txt === MEIN_TEXT && nachSenden.feldLeer,
+    JSON.stringify(nachSenden).slice(0, 110));
+  const abgesetzt = await page.locator('#chatVerlauf .chatzeile.ich').evaluate(e => ({
+    richtung: getComputedStyle(e).flexDirection,
+    farbe: getComputedStyle(e.querySelector('.chatblase')).borderTopColor,
+  }));
+  step('Eigene Blase steht auf der anderen Seite UND hat eine andere Farbe',
+    abgesetzt.richtung === 'row-reverse' && abgesetzt.farbe !== 'rgb(38, 52, 63)',
+    JSON.stringify(abgesetzt));
+  await page.click('#chatClose');
+  await page.waitForTimeout(300);
+  const vorschauTxt = (await page.locator('#clanChat').textContent()).replace(/\s+/g, ' ');
+  step('Die Nachricht steht auch in der Vorschau der Hauptansicht',
+    vorschauTxt.indexOf(MEIN_TEXT) >= 0 &&
+    (await page.locator('#clanChat .chatzeile.ich').count()) === 1,
+    vorschauTxt.slice(-90).trim());
+  /* KEINE ANTWORT. Zwei Sekunden warten und nachzaehlen: waere hier ein
+     Bot verdrahtet, wuerde er genau in diesem Fenster zuschlagen. */
+  await page.waitForTimeout(2000);
+  const keineAntwort = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('arenaClanChat')).msgs.length);
+  step('Niemand antwortet — es gibt keinen Bot, der Anwesenheit vortaeuscht',
+    keineAntwort === verlauf0 + 1, keineAntwort + ' Nachrichten im Speicher');
+  const speicher = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('arenaClanChat')));
+  step('Eigener Speicherschluessel „arenaClanChat" mit Version im Datensatz',
+    speicher.v === 1 && Array.isArray(speicher.msgs),
+    JSON.stringify({ v: speicher.v, n: speicher.msgs.length }));
+  step('Demo-Zeilen sind IM DATENSATZ als Demo gekennzeichnet',
+    speicher.msgs.filter(m => m.demo === true).length === 3 &&
+    speicher.msgs.filter(m => m.ich === true).every(m => m.demo === false),
+    speicher.msgs.map(m => (m.demo ? 'demo' : 'ich')).join('/'));
+
+  // --- Reload: die Nachricht muss ueberleben ---
+  await page.reload();
+  await page.waitForTimeout(900);
+  if (await page.locator('#loginLayer.open').count()) {
+    await page.click('#loginLater');
+    await page.waitForTimeout(350);
+  }
+  await page.click('#navClan');
+  await page.waitForTimeout(400);
+  const nachReload = (await page.locator('#clanChat').textContent()).replace(/\s+/g, ' ');
+  await page.click('#btnClanChat');
+  await page.waitForTimeout(320);
+  const verlaufReload = await page.evaluate(txt => {
+    const zeilen = Array.from(document.querySelectorAll('#chatVerlauf .chatzeile'));
+    return { n: zeilen.length,
+             treffer: zeilen.some(z => z.querySelector('.ctext').textContent === txt) };
+  }, MEIN_TEXT);
+  step('Nachricht ueberlebt den Reload — im Verlauf UND in der Vorschau',
+    verlaufReload.n === verlauf0 + 1 && verlaufReload.treffer &&
+    nachReload.indexOf(MEIN_TEXT) >= 0,
+    verlaufReload.n + ' Zeilen');
+  await page.screenshot({ path: SHOTS + '/clan_chat.png' });
+  await page.click('#chatClose');
+  await page.waitForTimeout(280);
+
+  // ================= 3. CLANHALLE: TAB QUESTS =================
+  /* UMGESCHRIEBEN 30.07.2026 — Quests, Krieg und Aktivitaet standen als
+     Reiter im View und waren ohne Klick erreichbar. Sie liegen jetzt
+     hinter EINEM Zugang (Knopf „Clanhalle" in der Kopfkarte). Alle
+     folgenden Inhaltspruefungen sind unveraendert; davor steht nur der
+     Weg dorthin. Der Zugang selbst ist eine neue Zusage und wird
+     mitgeprueft. */
+  const hallKnopf = await page.locator('#clanHead #btnClanHall').evaluate(e => ({
+    sicht: e.getClientRects().length > 0, txt: e.textContent.trim() }));
+  step('Kopfkarte traegt EINEN beschrifteten Zugang zum Rest',
+    hallKnopf.sicht && /Clanhalle/.test(hallKnopf.txt), hallKnopf.txt);
+  await page.click('#btnClanHall');
+  await page.waitForTimeout(300);
+  step('Clanhalle oeffnet',
+    await page.locator('#clanHallDlg').evaluate(e => e.classList.contains('open')));
+  const hallTabs = await page.locator('#clanHallDlg [data-clantab]').count();
+  step('Clanhalle traegt die drei Reiter (Quests / Krieg / Aktivitaet)',
+    hallTabs === 3, String(hallTabs));
+  /* Die alten Kopf-Kennzahlen — vollstaendig, nur eine Ebene tiefer. */
+  const hallStats = (await page.locator('#clanHallStats').textContent()).replace(/\s+/g, ' ');
+  step('Verdraengte Kennzahlen stehen vollstaendig in der Clanhalle',
+    /Ø/.test(hallStats) && /30\/30/.test(hallStats) && /Serie/.test(hallStats) &&
+    /(Sammelphase|Kriegsphase)/.test(hallStats), hallStats.trim().slice(0, 95));
   const qcards = await page.locator('#paneQuests .qcard').count();
   step('3 Wochenquests als Karten', qcards === 3, String(qcards));
   const qtxt = await page.locator('#paneQuests').textContent();
@@ -217,25 +516,102 @@ function step(name, ok, info) {
     !claimStyle.gold && /rgb\((?:\d+), (?:\d+), (?:\d+)\)/.test(claimStyle.fill), claimStyle.fill);
   await page.screenshot({ path: SHOTS + '/clan_quests.png', fullPage: true });
 
-  // ================= 4. TAB SPENDEN =================
-  await page.click('#ctabDonate');
+  // ================= 4. SPENDEN (jetzt die HAUPTANSICHT) =================
+  /* UMGESCHRIEBEN 30.07.2026 — es gibt keinen Spenden-Reiter mehr, weil
+     das Spenden bei AA die Hauptansicht IST. Der Klick auf #ctabDonate
+     entfaellt ersatzlos; die Clanhalle wird vorher geschlossen, damit
+     wieder der View gemessen wird und nicht das Fenster darueber. */
+  await page.click('#clanHallClose');
   await page.waitForTimeout(250);
-  step('Spenden-Tab aktiv',
-    await page.locator('#paneDonate').evaluate(e => e.style.display !== 'none'));
+  step('Spenden-Anfragen stehen ohne Umweg im View',
+    await page.locator('#paneDonate').evaluate(e =>
+      e.getClientRects().length > 0 && e.closest('.modal') === null));
   const quota0 = (await page.locator('#paneDonate .quotabar').textContent()).replace(/\s+/g, ' ').trim();
   step('Sendekontingent-Anzeige "X/10 · Reset in h:mm"',
     /0\/10/.test(quota0) && /(Reset in|voll verf)/.test(quota0), quota0);
   const dots = await page.locator('#paneDonate .quotabar .qd').count();
   step('10 Kontingent-Punkte', dots === 10, String(dots));
-  const reqs0 = await page.locator('#paneDonate .reqrow').count();
-  step('Aktive Anfragen als Kartenreihe (3 Bot-Anfragen)', reqs0 >= 3, String(reqs0));
-  const tierLabels = await page.$$eval('#paneDonate .reqcard .rtier', els => els.map(e => e.textContent));
-  step('Jede Anfrage ist als GRAU (Basis-Kopie) markiert',
-    tierLabels.length >= 3 && tierLabels.every(t => t === 'GRAU'), tierLabels.join('/'));
-  const note = await page.locator('#paneDonate .sendnote').textContent();
+  /* UMGESCHRIEBEN 30.07.2026 — Waehler .reqrow → .anfrage. Die Anfrage
+     ist keine flache Zeile mehr, sondern die zweiteilige AA-Karte; der
+     alte Klassenname haette die alte Bauweise festgeschrieben. Die
+     Zusage (mindestens drei offene Bot-Anfragen) ist unveraendert. */
+  const reqs0 = await page.locator('#paneDonate .anfrage').count();
+  step('Aktive Anfragen als Karten (3 Bot-Anfragen)', reqs0 >= 3, String(reqs0));
+  /* ERGAENZT 30.07.2026 um die SICHTBARKEIT. Der Schritt las nur den
+     Text — und genau das hat einen echten Fehler durchgelassen: die
+     GRAU-Marke lag unter dem Rahmen-Overlay (.frm, z-index 3) und war
+     im Screenshot nicht zu sehen, waehrend der Schritt gruen blieb.
+     Jetzt wird auch gemessen, dass sie oben liegt und Flaeche hat. */
+  const tierLabels = await page.$$eval('#paneDonate .anfbild .rtier', els => els.map(e => {
+    const cs = getComputedStyle(e);
+    const rahmen = e.parentElement.querySelector('.frm');
+    return { t: e.textContent, sicht: e.getClientRects().length > 0,
+             hoehe: Math.round(e.getBoundingClientRect().height),
+             ueberRahmen: !rahmen || (+cs.zIndex > +getComputedStyle(rahmen).zIndex) };
+  }));
+  step('Jede Anfrage ist als GRAU (Basis-Kopie) markiert — und man SIEHT es',
+    tierLabels.length >= 3 &&
+    tierLabels.every(x => x.t === 'GRAU' && x.sicht && x.hoehe >= 8 && x.ueberRahmen),
+    tierLabels.map(x => x.t + '(' + x.hoehe + 'px' + (x.ueberRahmen ? '' : ', VERDECKT') + ')').join('/'));
+  /* NEU 30.07.2026 — die fuenf Teile der AA-Anfragekarte. Gemessen wird
+     an einer FREMDEN Anfrage: die eigene traegt statt des SPENDEN-Knopfs
+     den Hinweis „deine Anfrage", und das ist richtig so. */
+  const teile = await page.evaluate(() => {
+    const k = document.querySelector('#paneDonate .anfrage:not(.mine)');
+    if (!k) return null;
+    const sicht = s => {
+      const e = k.querySelector(s);
+      return !!e && e.getClientRects().length > 0;
+    };
+    return {
+      marke: sicht('.anfmarke'), kopfName: sicht('.anfkopf .anfname'),
+      kopfFrage: sicht('.anfkopf .anffrage'), info: sicht('.anfinfo'),
+      bild: sicht('.anfbild'), hast: sicht('.anfhast'),
+      knopf: sicht('.anfspenden'), balken: sicht('.anffort .fbar'),
+      zahl: sicht('.anffort .fnum'),
+      frageTxt: (k.querySelector('.anffrage') || {}).textContent || '',
+      hastTxt: (k.querySelector('.anfhast') || {}).textContent || '',
+      erhalten: (k.querySelector('.anffort') || {}).textContent || '',
+      knopfTxt: (k.querySelector('.anfspenden') || {}).textContent || '',
+      knopfBreite: Math.round(
+        (k.querySelector('.anfspenden') || { getBoundingClientRect: () => ({ width: 0 }) })
+          .getBoundingClientRect().width),
+      markeTxt: (k.querySelector('.anfmarke') || {}).textContent || '',
+    };
+  });
+  step('Anfragekarte hat alle fuenf Teile — und alle sind SICHTBAR',
+    !!teile && teile.marke && teile.kopfName && teile.kopfFrage && teile.info &&
+    teile.bild && teile.hast && teile.knopf && teile.balken && teile.zahl,
+    teile ? JSON.stringify(teile).slice(0, 120) : 'keine fremde Anfrage gefunden');
+  step('Kopf: „Fragt nach <Karte>!" · Koerper: „Du hast" · Balken: „Erhalten: n/30"',
+    /^Fragt nach .+!$/.test(teile.frageTxt.trim()) &&
+    // Leerraum ganz weg: „Du hast" und die Zahl sind zwei Elemente,
+    // dazwischen steht der Zeilenumbruch des Markups.
+    /^Duhast\d+$/.test(teile.hastTxt.replace(/\s+/g, '')) &&
+    /^Erhalten:\d+\/\d+$/.test(teile.erhalten.replace(/\s+/g, '')),
+    [teile.frageTxt, teile.hastTxt, teile.erhalten].map(s => s.replace(/\s+/g, ' ').trim()).join(' | '));
+  step('Runde Marke traegt die Zahl der offenen Spenden',
+    /^\d+$/.test(teile.markeTxt.trim()), teile.markeTxt.trim());
+  /* Der Knopf war als .donbtn 62 px breit; AAs Knopf ist der groesste
+     Treffer der Karte. 96 px sind im CSS gesetzt und hier nachgemessen. */
+  step('SPENDEN-Knopf ist gross statt fitzelig', teile.knopfTxt.trim() === 'SPENDEN' &&
+    teile.knopfBreite >= 90, teile.knopfBreite + ' px');
+  /* UMGESCHRIEBEN 30.07.2026 — der Regeltext stand als sechszeiliger
+     Block unter der Liste und war der groesste Einzelposten des
+     „cluttered"-Befunds. Er ist NICHT gestrichen: er steht hinter dem ⓘ
+     der Anfragekarte, das AAs Vorbild dort ohnehin hat. Der Schritt
+     prueft denselben Wortlaut, nur einen Klick weiter — und nebenbei,
+     dass das ⓘ ueberhaupt funktioniert. */
+  await page.click('#paneDonate .anfrage:not(.mine) .anfinfo');
+  await page.waitForTimeout(250);
+  step('ⓘ der Anfragekarte oeffnet die Spenden-Regeln',
+    await page.locator('#spendInfoDlg').evaluate(e => e.classList.contains('open')));
+  const note = await page.locator('#spendInfoDlg .sendnote').textContent();
   step('Regeltext nennt: nur Turmkarten, nur grau, 10 pro 3 h, Fusionen selbst',
     /nur Turmkarten/i.test(note) && /graue/.test(note) && /10 Karten pro 3 Stunden/.test(note) &&
     /Fusionen/.test(note));
+  await page.click('#spendInfoClose');
+  await page.waitForTimeout(200);
 
   // --- Spenden-Flow: SPENDEN klicken ---
   const goldBefore = await page.evaluate(() => parseInt(localStorage.getItem('arenaHubGold') || '0', 10));
@@ -300,8 +676,9 @@ function step(name, ok, info) {
   await page.waitForTimeout(320);
   step('Dialog schliesst nach der Wahl',
     await page.locator('#reqDlg').evaluate(e => !e.classList.contains('open')));
-  const mineRow = await page.locator('#paneDonate .reqrow.mine').count();
-  const mineTxt = mineRow ? await page.locator('#paneDonate .reqrow.mine').first().textContent() : '';
+  // Waehler .reqrow.mine → .anfrage.mine (30.07.2026, neue Kartenbauweise)
+  const mineRow = await page.locator('#paneDonate .anfrage.mine').count();
+  const mineTxt = mineRow ? await page.locator('#paneDonate .anfrage.mine').first().textContent() : '';
   step('Eigene Anfrage erscheint hervorgehoben in der Liste',
     mineRow === 1 && /FROST/.test(mineTxt), mineTxt.replace(/\s+/g, ' ').trim().slice(0, 60));
   const askDisabled = await page.locator('#btnAskCards').evaluate(e => e.disabled);
@@ -353,7 +730,12 @@ function step(name, ok, info) {
     /Sendelimit erreicht/.test(limit.msg || '') && /Nächster Slot frei in \d+:\d\d/.test(limit.msg || ''),
     limit.msg);
 
-  // ================= 5. TAB KRIEG =================
+  // ================= 5. CLANHALLE: TAB KRIEG =================
+  /* UMGESCHRIEBEN 30.07.2026 — der Kriegsreiter liegt in der Clanhalle.
+     Der Inhalt der Pruefung ist unveraendert, nur der Weg dorthin ist
+     jetzt zwei Klicks statt einem. */
+  await page.click('#btnClanHall');
+  await page.waitForTimeout(280);
   await page.click('#ctabWar');
   await page.waitForTimeout(250);
   const warPre = await page.locator('#paneWar').textContent();
@@ -414,7 +796,15 @@ function step(name, ok, info) {
   step('Angriffs-Knopf: kein goldtext auf goldener Flaeche', !atkStyle.gold, atkStyle.fill);
   await page.screenshot({ path: SHOTS + '/clan_krieg.png', fullPage: true });
 
-  // ================= 6. EMOTES + FEED =================
+  // ================= 6. EMOTES + FEED (Clanhalle, Reiter „Aktivitaet") ===
+  /* UMGESCHRIEBEN 30.07.2026 — Emote-Leiste und Feed standen fest unter
+     den Reitern im View und waren immer sichtbar. Sie liegen jetzt im
+     dritten Reiter der Clanhalle. Der Klick davor ist der einzige
+     Unterschied; die Zusagen darunter sind woertlich dieselben. */
+  await page.click('#ctabFeed');
+  await page.waitForTimeout(250);
+  step('Reiter „Aktivitaet" zeigt Emote-Leiste und Feed',
+    await page.locator('#paneFeed').evaluate(e => e.getClientRects().length > 0));
   const emos = await page.locator('#emoteBar [data-emote]').count();
   step('Emote-Leiste mit 6 Preset-Spruechen (kein Freitext)', emos === 6, String(emos));
   const feedBefore = await page.locator('#clanFeed .fe').count();
@@ -425,8 +815,31 @@ function step(name, ok, info) {
   const botFeed = await page.locator('#clanFeed .fe').count();
   step('Feed mischt Bot-Ereignisse und eigene Eintraege',
     botFeed >= feedBefore && botFeed > 3, botFeed + ' Eintraege');
-  const noFreeText = await page.locator('#viewClan input[type=text], #viewClan textarea').count();
-  step('Kein Freitext-Eingabefeld im Clan-View', noFreeText === 0);
+  /* UMGESCHRIEBEN 30.07.2026 (Nachtrag). Die alte Zusage war „kein
+     Freitext-Eingabefeld im Clan-View" und stammte aus der Zeit, als
+     Emotes den Chat ERSETZEN sollten (DESIGN_CLAN.md §8). Der Chat ist
+     jetzt gebaut — die Zusage waere damit schlicht falsch. Was bleibt,
+     ist der Kern dahinter: die EMOTE-Leiste ist Preset-only, und
+     Freitext gibt es an GENAU EINER Stelle, naemlich im Chat-Fenster.
+     Zwei Wege, dasselbe zu sagen, waeren wieder Unordnung. */
+  const freitextAussenrum = await page.locator(
+    '#viewClan input[type=text], #viewClan textarea, ' +
+    '#clanHallDlg input[type=text], #clanHallDlg textarea').count();
+  const freitextChat = await page.locator(
+    '#chatLayer input[type=text], #chatLayer textarea').count();
+  step('Freitext gibt es GENAU im Chat-Fenster — Emote-Leiste bleibt Preset-only',
+    freitextAussenrum === 0 && freitextChat === 1,
+    'aussen ' + freitextAussenrum + ' · Chat ' + freitextChat);
+  /* NEU 30.07.2026: die Clan-Rangliste ist aus der Clanhalle erreichbar.
+     Sie war die vierte Clan-Funktion, die AAs Hauptansicht nicht zeigt;
+     ohne diesen Weg waere sie beim Umbau untergegangen. */
+  await page.click('#clanHallBoard');
+  await page.waitForTimeout(420);
+  step('Clanhalle fuehrt auf die Clan-Rangliste',
+    (await page.locator('#viewBoard').evaluate(e => e.classList.contains('active'))) &&
+    (await page.locator('#ltabClan').evaluate(e => e.classList.contains('on'))));
+  await page.click('#navClan');
+  await page.waitForTimeout(300);
 
   // ================= 7. RANGLISTE =================
   await page.click('#clanBack');
@@ -442,6 +855,15 @@ function step(name, ok, info) {
   await page.waitForTimeout(400);
   step('Menue-Eintrag oeffnet die Rangliste',
     await page.locator('#viewBoard').evaluate(e => e.classList.contains('active')));
+  /* ERGAENZT 30.07.2026: Der Reiter wird jetzt ausdruecklich auf Global
+     gestellt. Die Rangliste hat seit dem Clan-Umbau einen ZWEITEN
+     Einstieg (Clanhalle → „Clan-Rangliste"), der bewusst den Clan-Reiter
+     vorwaehlt. Die folgenden Schritte messen die GLOBALE Liste; sie
+     duerfen sich nicht darauf verlassen, dass vorher niemand den Reiter
+     angefasst hat — sonst prueft der Schritt die Reihenfolge der
+     Pruefung statt das Produkt. */
+  await page.click('#ltabGlobal');
+  await page.waitForTimeout(300);
   const lbTabs = await page.locator('#viewBoard [data-lbtab]').count();
   step('Drei Ranglisten-Tabs (Global / Clan / Umgebung)', lbTabs === 3, String(lbTabs));
   const gRows = await page.locator('#lbList .lbrow').count();
@@ -1912,16 +2334,27 @@ function step(name, ok, info) {
     audioToggle.before + ' → ' + audioToggle.offMusic + ' → ' + audioToggle.onAgain);
   step('Sound-Schalter schaltet Musik UND Klaenge ab',
     audioToggle.offAll.music === null && audioToggle.offAll.sfx === false);
+  /* UMGESCHRIEBEN 30.07.2026 — das Kriegsboard liegt seit dem AA-Umbau
+     in der Clanhalle, nicht mehr im View. Der Kriegs-Loop haengt deshalb
+     am REITER, nicht am View: das blosse Betreten des Clans darf ihn
+     nicht mehr starten (sonst liefe Kriegsmusik ueber einer Ansicht, auf
+     der kein Krieg zu sehen ist). Genau das wird jetzt zusaetzlich
+     geprueft — der Weg ist der echte: Halle auf, Reiter waehlen. */
   const audioSwitch = await page.evaluate(() => {
     const A = window.ArenaAudio;
     window.__proto.show('navClan');
+    const beimBetreten = A.current();
+    window.__proto.openClanHall();
     window.__proto.setClanTab('war');
     const war = A.current();
     window.__proto.setClanTab('quests');
     const back = A.current();
+    window.__proto.closeClanHall();
     window.__proto.show('navHome');
-    return { war, back };
+    return { war, back, beimBetreten };
   });
+  step('Clan-Ansicht selbst startet KEINEN Kriegs-Loop',
+    audioSwitch.beimBetreten === 'audio_theme', String(audioSwitch.beimBetreten));
   await page.waitForTimeout(300);
   step('Kriegsboard wechselt auf den Kriegs-Loop',
     audioSwitch.war === 'audio_war' && audioSwitch.back === 'audio_theme',

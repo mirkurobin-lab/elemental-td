@@ -17,7 +17,10 @@ const fs = require('fs');
    prueft sie damit die HAUPT-Auscheckung und nicht die Datei, die
    danebenliegt. Ein gruener Lauf sagte dann nichts ueber die Aenderung
    aus, die man gerade gemacht hat. Der Pfad haengt jetzt an dieser
-   Datei, nicht an einer Maschine. */
+   Datei, nicht an einer Maschine.
+   Zwei Bearbeiter sind an EINEM Tag unabhaengig darueber gestolpert —
+   ein deutlicheres Zeichen, dass der feste Pfad ein Konstruktionsfehler
+   war und keine Bequemlichkeit, gibt es kaum. */
 const FILE = 'file://' + path.resolve(__dirname, '..', 'ui_prototype.html');
 /* Galerie-Ordner. ui_shots_v7 bleibt als Stand VOR dem AAA-Icon-Sweep
    erhalten; die aktuelle Galerie ist v8. */
