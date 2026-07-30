@@ -6,7 +6,19 @@ const { chromium } = require('playwright-core');
 const path = require('path');
 const fs = require('fs');
 
-const FILE = 'file://' + path.resolve(process.env.FRHTML || '/home/user/elemental-td/arena_patches/ui_prototype.html');
+/* ⚠ AM EIGENEN ORT MESSEN (30.07.2026) — derselbe Konstruktionsfehler,
+   den run_v6.js schon behoben hat, stand hier noch: ein FESTER Pfad auf
+   /home/user/elemental-td/... Laeuft die Suite aus einem git-worktree,
+   prueft sie damit die HAUPT-Auscheckung statt der Datei, die daneben
+   liegt — ein gruener Lauf sagt dann nichts ueber die eigene Aenderung
+   aus. GEMESSEN an genau diesem Tag: die Suite blieb gruen, waehrend die
+   geaenderte Datei einen Schritt rot gemacht haette (Menge > 1 ging
+   durch, weil das alte Modul geladen war).
+   Der Standard haengt jetzt an DIESER Datei; FRHTML bleibt der Ausweg
+   fuer den seltenen Fall, dass man bewusst einen fremden Baum misst. */
+const FILE = 'file://' + (process.env.FRHTML
+  ? path.resolve(process.env.FRHTML)
+  : path.resolve(__dirname, '..', 'ui_prototype.html'));
 const SHOTS = process.env.FRSHOTS || '/tmp/ui_shots_friends';
 fs.mkdirSync(SHOTS, { recursive: true });
 
@@ -206,16 +218,30 @@ function step(name, ok, info) {
     let have = FR.list().filter(f => f.memberId === req.ownerId)[0];
     if (!have) have = FR.addFromClan(req.ownerId).friend;
     window.ArenaCards.addDrop(req.cardId, 'common', 3);
-    const used0 = CL.sendQuota().used;
+    /* UMGESCHRIEBEN 30.07.2026: `sendQuota()` braucht seit der neuen
+       Vorgabe die Anfrage-ID — das Kontingent gilt je Anfrage, nicht mehr
+       global. Die Zusage dieses Schritts ist unveraendert: eine
+       Freundesspende laeuft durch ArenaClan und wird DORT abgerechnet,
+       es gibt keinen zweiten Kanal. */
+    const used0 = CL.sendQuota(req.id).used;
     const g = FR.giftCards(have.id, 1);
-    return { msg, used0, used1: CL.sendQuota().used, via: g.via, paid: g.reward.gold,
+    let zuViel = null;
+    try { FR.giftCards(have.id, 5); } catch (e) { zuViel = e.message; }
+    return { msg, used0, used1: CL.sendQuota(req.id).used, via: g.via, paid: g.reward.gold,
+             menge: g.count, zuViel, max: g.quota.max,
              name: g.friendName, card: g.cardName };
   });
   step('Eine Spende an einen Nicht-Clan-Freund wird mit Begruendung abgelehnt',
     /Clan/.test(gift.msg), gift.msg.slice(0, 70));
-  step('Die Spende an einen Clankameraden verbraucht das CLAN-Sendekontingent',
-    gift.used1 === gift.used0 + 1 && gift.via === 'ArenaClan.donateCards',
-    gift.card + ' an ' + gift.name + ' · Kontingent ' + gift.used0 + ' → ' + gift.used1);
+  step('Die Spende an einen Clankameraden verbraucht das Kontingent DIESER Anfrage',
+    gift.used1 === gift.used0 + 1 && gift.menge === 1 &&
+    gift.via === 'ArenaClan.donateCards',
+    gift.card + ' an ' + gift.name + ' · Kontingent ' + gift.used0 + ' → ' +
+    gift.used1 + '/' + gift.max);
+  /* GEGENPROBE: auch ueber die Freundesliste geht nur EINE Karte je
+     Sendevorgang — sonst waere sie der Umweg um „nicht direkt 10". */
+  step('Auch als Freundesspende geht keine Menge > 1 durch',
+    /je Sendevorgang/.test(gift.zuViel || ''), gift.zuViel);
 
   // ================= 7. Anfragen und Suche =================
   await page.click('#frTabReq');

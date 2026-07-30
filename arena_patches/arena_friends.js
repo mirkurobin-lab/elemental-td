@@ -52,7 +52,8 @@
  *
  * B) KARTENSPENDE NUR UNTER CLAN-MITGLIEDERN. Karten wandern
  *    ausschließlich über die Anfragetafel des Clans, mit dessen
- *    Sendekontingent (10 Stück / 3 h), dessen Tier-Sperre (nur graue
+ *    Sendekontingent (seit 30.07.2026: höchstens 10 Karten von DIR je
+ *    Anfrage, eine je Sendevorgang), dessen Tier-Sperre (nur graue
  *    Basis-Kopien) und dessen Bestandsprüfung. Eine direkte
  *    Freundesspende wäre ein zweiter Kanal am Clan-System vorbei — und
  *    damit dessen Limits ausgehebelt. giftCards() DELEGIERT deshalb an
@@ -955,18 +956,22 @@
       return { ok: false, reason: "Clan-Anfragen nicht lesbar." };
     }
     if (!req) {
+      /* OHNE ANFRAGE GIBT ES KEIN KONTINGENT (30.07.2026): das Kontingent
+         hängt seit der neuen Vorgabe AN DER ANFRAGE. Hier `quota: null`
+         zu liefern ist ehrlicher als irgendeine Zahl — es gibt nichts,
+         worauf sie sich beziehen könnte. */
       return { ok: false, reason: (m.name || e.name) + " hat gerade keine offene Kartenanfrage.",
-               quota: safeQuota(C, now) };
+               quota: null };
     }
-    var q = safeQuota(C, now);
+    var q = safeQuota(C, req.id, now);
     if (q && q.left <= 0) {
-      return { ok: false, reason: "Sendekontingent aufgebraucht — nächster Slot in " +
-        q.resetText + ".", request: req, quota: q };
+      return { ok: false, reason: "Du hast dieser Anfrage schon " + q.max +
+        " Karten gegeben — den Rest holen die anderen im Clan.", request: req, quota: q };
     }
     return { ok: true, request: req, quota: q, max: Math.min(req.left, q ? q.left : req.left) };
   }
-  function safeQuota(C, now) {
-    try { return C.sendQuota(now); } catch (e) { return null; }
+  function safeQuota(C, requestId, now) {
+    try { return C.sendQuota(requestId, now); } catch (e) { return null; }
   }
 
   /* giftableFriends(now) → wer JETZT Karten empfangen kann, mit Grund
@@ -1442,15 +1447,25 @@
         cg.ok === true && cg.request.ownerId === ownerId, cg.request && cg.request.cardName);
       // Bestand beim Spender herstellen (das bucht ArenaCards, nicht wir).
       if (AC) AC.addDrop(cg.request.cardId, "common", 5);
-      var qBefore = CL.sendQuota().used;
-      var g = giftCards(fr.friend.id, 2);
+      /* UMGESCHRIEBEN 30.07.2026: hier standen 2 Karten in EINEM Aufruf
+         und ein globales `sendQuota()`. Beides ist entfallen — ein
+         Sendevorgang bucht genau eine Karte, und das Kontingent hängt an
+         der Anfrage. Geprüft wird weiter DASSELBE: dass die Spende über
+         ArenaClan läuft und dort abgerechnet wird, kein zweiter Kanal. */
+      var qBefore = CL.sendQuota(cg.request.id).used;
+      var g = giftCards(fr.friend.id, 1);
       console.log("  " + g.count + " × " + g.cardName + " an " + g.friendName +
         " · Kontingent " + g.quota.used + "/" + g.quota.max + " · über " + g.via);
       check("Spende läuft über ArenaClan.donateCards()", g.via === "ArenaClan.donateCards");
-      check("das CLAN-Sendekontingent wird verbraucht (kein zweiter Kanal)",
-        CL.sendQuota().used === qBefore + 2, qBefore + " → " + CL.sendQuota().used);
+      check("ein Sendevorgang bucht genau eine Karte", g.count === 1);
+      check("Mengen > 1 lehnt ArenaClan ab (kein zweiter Weg daran vorbei)",
+        throws(function () { giftCards(fr.friend.id, 2); }, "je Sendevorgang").ok);
+      giftCards(fr.friend.id, 1);                 // zweite Karte, zweiter Vorgang
+      check("das CLAN-Sendekontingent DIESER ANFRAGE wird verbraucht (kein zweiter Kanal)",
+        CL.sendQuota(cg.request.id).used === qBefore + 2,
+        qBefore + " → " + CL.sendQuota(cg.request.id).used);
       check("Belohnung kommt unverändert von ArenaClan",
-        g.reward.gold === CL.DONATE_GOLD * 2 && g.reward.material === CL.DONATE_MATERIAL * 2,
+        g.reward.gold === CL.DONATE_GOLD && g.reward.material === CL.DONATE_MATERIAL,
         JSON.stringify(g.reward));
       check("dieses Modul bucht selbst nichts — es zählt nur mit",
         get().stats.gifted === 2, get().stats.gifted);

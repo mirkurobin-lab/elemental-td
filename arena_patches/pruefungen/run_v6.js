@@ -534,11 +534,41 @@ function step(name, ok, info) {
   step('Spenden-Anfragen stehen ohne Umweg im View',
     await page.locator('#paneDonate').evaluate(e =>
       e.getClientRects().length > 0 && e.closest('.modal') === null));
-  const quota0 = (await page.locator('#paneDonate .quotabar').textContent()).replace(/\s+/g, ' ').trim();
-  step('Sendekontingent-Anzeige "X/10 · Reset in h:mm"',
-    /0\/10/.test(quota0) && /(Reset in|voll verf)/.test(quota0), quota0);
-  const dots = await page.locator('#paneDonate .quotabar .qd').count();
-  step('10 Kontingent-Punkte', dots === 10, String(dots));
+  /* UMGESCHRIEBEN 30.07.2026 — die beiden Schritte massen die GLOBALE
+     Kontingentleiste („X/10 · Reset in h:mm") ueber der Liste. Das
+     Kontingent gilt seit der neuen Vorgabe je Anfrage; eine Leiste ueber
+     der Liste koennte gar nicht mehr sagen, worauf sich ihre Zahl
+     bezieht. Die Zusage bleibt dieselbe — der Spieler sieht, wie viel er
+     noch geben darf —, sie wird nur dort gemessen, wo sie jetzt steht:
+     auf jeder Anfragekarte. Gegen die Konstante, nicht gegen eine
+     eingetippte 10. */
+  const kontingent = await page.evaluate(() => {
+    const max = window.ArenaClan.DONATE_MAX_PER_REQUEST;
+    const karten = Array.prototype.map.call(
+      document.querySelectorAll('#paneDonate .anfrage:not(.mine)'), k => {
+        const q = k.querySelector('.anfquota');
+        // Leerraum ganz weg: „Dein Beitrag" und die Zahl sind zwei
+        // Elemente, dazwischen steht nur der Umbruch des Markups.
+        return { txt: (q ? q.textContent : '').replace(/\s+/g, ''),
+                 sicht: !!q && q.getClientRects().length > 0,
+                 punkte: k.querySelectorAll('.anfquota .qd').length,
+                 punkteSicht: Array.prototype.filter.call(
+                   k.querySelectorAll('.anfquota .qd'),
+                   e => e.getClientRects().length > 0).length };
+      });
+    return { max, karten, globalDa: document.querySelectorAll('#viewClan .quotabar').length };
+  });
+  step('Jede fremde Anfragekarte traegt ihre eigene Kontingentzeile — sichtbar',
+    kontingent.karten.length >= 3 &&
+    kontingent.karten.every(k => k.sicht && /^DeinBeitrag0\/\d+$/.test(k.txt)),
+    kontingent.karten.map(k => k.txt).join(' | '));
+  step('10 Kontingent-Punkte je Anfrage (gegen DONATE_MAX_PER_REQUEST)',
+    kontingent.karten.every(k => k.punkte === kontingent.max &&
+                                 k.punkteSicht === kontingent.max),
+    kontingent.karten.map(k => k.punkteSicht + '/' + k.punkte).join(' · ') +
+    ' bei Grenze ' + kontingent.max);
+  step('Keine globale Kontingentleiste mehr ueber der Liste',
+    kontingent.globalDa === 0, kontingent.globalDa + ' gefunden');
   /* UMGESCHRIEBEN 30.07.2026 — Waehler .reqrow → .anfrage. Die Anfrage
      ist keine flache Zeile mehr, sondern die zweiteilige AA-Karte; der
      alte Klassenname haette die alte Bauweise festgeschrieben. Die
@@ -589,6 +619,12 @@ function step(name, ok, info) {
       bild: sicht('.anfbild'), hast: sicht('.anfhast'),
       knopf: sicht('.anfspenden'), balken: sicht('.anffort .fbar'),
       zahl: sicht('.anffort .fnum'),
+      // NEU 30.07.2026: die Kontingentzeile DIESER Anfrage
+      quota: sicht('.anfquota'), qpunkte: k.querySelectorAll('.anfquota .qd').length,
+      qpunkteSicht: Array.prototype.filter.call(k.querySelectorAll('.anfquota .qd'),
+        e => e.getClientRects().length > 0).length,
+      qAn: k.querySelectorAll('.anfquota .qd.on').length,
+      quotaTxt: (k.querySelector('.anfquota') || {}).textContent || '',
       frageTxt: (k.querySelector('.anffrage') || {}).textContent || '',
       hastTxt: (k.querySelector('.anfhast') || {}).textContent || '',
       erhalten: (k.querySelector('.anffort') || {}).textContent || '',
@@ -612,6 +648,27 @@ function step(name, ok, info) {
     [teile.frageTxt, teile.hastTxt, teile.erhalten].map(s => s.replace(/\s+/g, ' ').trim()).join(' | '));
   step('Runde Marke traegt die Zahl der offenen Spenden',
     /^\d+$/.test(teile.markeTxt.trim()), teile.markeTxt.trim());
+  /* NEU 30.07.2026 — die Kontingentleiste ist von einer eigenen Zeile
+     ueber der ganzen Ansicht AUF DIE ANFRAGEKARTE gewandert, weil das
+     Kontingent seit der neuen Vorgabe je Anfrage gilt. Geprueft wird
+     gegen die KONSTANTE (DONATE_MAX_PER_REQUEST), nicht gegen eine
+     eingetippte 10 — und „Vorhandensein ist nicht Sichtbarkeit": jeder
+     einzelne Punkt muss getClientRects() haben. */
+  const maxProAnfrage = await page.evaluate(() => window.ArenaClan.DONATE_MAX_PER_REQUEST);
+  step('Kontingentpunkte sitzen AUF der Anfragekarte, einer je erlaubter Karte',
+    teile.quota && teile.qpunkte === maxProAnfrage &&
+    teile.qpunkteSicht === maxProAnfrage,
+    teile.qpunkte + ' Punkte, ' + teile.qpunkteSicht + ' sichtbar (Grenze ' +
+    maxProAnfrage + ')');
+  step('Die Zeile nennt den EIGENEN Beitrag zu DIESER Anfrage',
+    /^DeinBeitrag\d+\/\d+$/.test(teile.quotaTxt.replace(/\s+/g, '')) &&
+    teile.qAn === 0,      // noch nichts gespendet → kein Punkt an
+    teile.quotaTxt.replace(/\s+/g, ' ').trim() + ', ' + teile.qAn + ' Punkte an');
+  /* GEGENPROBE: Es gibt KEINE globale Kontingentleiste mehr. Bliebe sie
+     stehen, zeigte sie eine Zahl ohne Bezug — das faellt sonst niemandem
+     auf, weil sie plausibel aussieht. */
+  step('Keine globale Kontingentleiste mehr in der Ansicht',
+    await page.locator('#viewClan .quotabar').count() === 0);
   /* Der Knopf war als .donbtn 62 px breit; AAs Knopf ist der groesste
      Treffer der Karte. 96 px sind im CSS gesetzt und hier nachgemessen. */
   step('SPENDEN-Knopf ist gross statt fitzelig', teile.knopfTxt.trim() === 'SPENDEN' &&
@@ -627,9 +684,25 @@ function step(name, ok, info) {
   step('ⓘ der Anfragekarte oeffnet die Spenden-Regeln',
     await page.locator('#spendInfoDlg').evaluate(e => e.classList.contains('open')));
   const note = await page.locator('#spendInfoDlg .sendnote').textContent();
-  step('Regeltext nennt: nur Turmkarten, nur grau, 10 pro 3 h, Fusionen selbst',
-    /nur Turmkarten/i.test(note) && /graue/.test(note) && /10 Karten pro 3 Stunden/.test(note) &&
-    /Fusionen/.test(note));
+  /* UMGESCHRIEBEN 30.07.2026: der Regeltext sagte „10 Karten pro 3
+     Stunden". Diese Regel gibt es nicht mehr. Geprueft wird jetzt die
+     NEUE Zusage — und zwar vollstaendig, alle vier Zahlen, jede gegen
+     die Konstante des Moduls statt gegen eine eingetippte Ziffer. */
+  const regeln = await page.evaluate(() => ({
+    size: window.ArenaClan.REQUEST_SIZE,
+    max: window.ArenaClan.DONATE_MAX_PER_REQUEST,
+    tap: window.ArenaClan.DONATE_PER_TAP,
+    cdH: Math.round(window.ArenaClan.REQUEST_COOLDOWN_MS / 3600000),
+  }));
+  step('Regeltext nennt: nur Turmkarten, nur grau, 30 je Anfrage, 10 von dir, 1 je Tippen, 5 h',
+    /nur Turmkarten/i.test(note) && /graue/.test(note) &&
+    new RegExp(regeln.size + ' Karten').test(note) &&
+    new RegExp(regeln.max + ' je Anfrage').test(note) &&
+    /genau eine/.test(note) && new RegExp(regeln.cdH + ' Stunden').test(note) &&
+    /Fusionen/.test(note),
+    note.replace(/\s+/g, ' ').trim().slice(0, 150));
+  step('Der Regeltext friert keine alte Zahl ein (kein „pro 3 Stunden", kein „8 Stunden")',
+    !/pro 3 Stunden/.test(note) && !/8 Stunden/.test(note));
   await page.click('#spendInfoClose');
   await page.waitForTimeout(200);
 
@@ -642,23 +715,59 @@ function step(name, ok, info) {
   });
   await page.click('#paneDonate [data-donate]');
   await page.waitForTimeout(320);
-  const afterDon = await page.evaluate(cid => {
-    const c = window.ArenaCards.get().cards[cid];
-    return { copies: c.copies.common, quota: window.ArenaClan.sendQuota(),
+  const afterDon = await page.evaluate(id => {
+    const r = window.ArenaClan.requests().filter(x => x.id === id)[0];
+    const c = window.ArenaCards.get().cards[r.cardId];
+    return { copies: c.copies.common, quota: window.ArenaClan.sendQuota(id), req: r,
              gold: parseInt(localStorage.getItem('arenaHubGold') || '0', 10) };
-  }, copiesBefore.cardId);
-  step('Spende zieht graue Kopien beim Spender ab',
-    afterDon.copies < copiesBefore.copies,
-    copiesBefore.copies + ' → ' + afterDon.copies + ' (' + copiesBefore.cardId + ')');
-  step('Sendekontingent zaehlt jede Karte einzeln',
-    afterDon.quota.used === copiesBefore.copies - afterDon.copies && afterDon.quota.used > 0,
-    afterDon.quota.used + '/10');
+  }, copiesBefore.id);
+  /* UMGESCHRIEBEN 30.07.2026. Vorher hiess der Schritt „Sendekontingent
+     zaehlt jede Karte einzeln" und war zufrieden, wenn IRGENDEINE Zahl
+     > 0 herauskam — damals schickte ein Klick bis zu 10 Karten. Die neue
+     Zusage ist schaerfer und wird deshalb GENAU geprueft: ein Klick =
+     eine Karte, nicht mehr und nicht weniger. */
+  step('Ein Klick auf SPENDEN bucht GENAU eine Karte',
+    afterDon.copies === copiesBefore.copies - 1 &&
+    afterDon.req.got === copiesBefore.got + 1,
+    'Bestand ' + copiesBefore.copies + ' → ' + afterDon.copies +
+    ', Anfrage ' + copiesBefore.got + ' → ' + afterDon.req.got + '/' + afterDon.req.need);
+  step('Das Kontingent DIESER Anfrage steht danach auf 1/10',
+    afterDon.quota.used === 1 && afterDon.quota.max === maxProAnfrage &&
+    afterDon.quota.requestId === copiesBefore.id,
+    afterDon.quota.used + '/' + afterDon.quota.max);
   step('Spender-Belohnung: Gold gutgeschrieben (25 je Karte)',
-    afterDon.gold === goldBefore + 25 * afterDon.quota.used,
-    goldBefore + ' → ' + afterDon.gold);
-  const quota1 = (await page.locator('#paneDonate .quotabar').textContent()).replace(/\s+/g, ' ').trim();
-  step('Anzeige aktualisiert sich auf "X/10 · Reset in h:mm"',
-    new RegExp(afterDon.quota.used + '\\/10').test(quota1) && /Reset in \d+:\d\d/.test(quota1), quota1);
+    afterDon.gold === goldBefore + 25, goldBefore + ' → ' + afterDon.gold);
+  /* SOFORT SICHTBAR: die Karte muss den neuen Stand schon tragen, ohne
+     Ansichtswechsel. Gemessen wird der TEXT IM DOM, nicht der
+     Modulzustand — genau das war die Anforderung. */
+  const kachel = await page.evaluate(id => {
+    const k = document.querySelector('[data-req="' + id + '"]');
+    if (!k) return null;
+    const q = k.querySelector('.anfquota');
+    return { fort: (k.querySelector('.anffort .fnum') || {}).textContent || '',
+             quota: (q || {}).textContent || '',
+             an: k.querySelectorAll('.anfquota .qd.on').length,
+             sicht: !!q && q.getClientRects().length > 0 };
+  }, copiesBefore.id);
+  step('Die Anfragekarte zeigt den neuen Stand SOFORT (Fortschritt + eigenes Kontingent)',
+    !!kachel && kachel.sicht && kachel.an === 1 &&
+    kachel.fort.replace(/\s+/g, '') === afterDon.req.got + '/' + afterDon.req.need &&
+    kachel.quota.replace(/\s+/g, '') === 'DeinBeitrag1/' + maxProAnfrage,
+    kachel ? kachel.fort + ' · ' + kachel.quota.replace(/\s+/g, ' ').trim() +
+      ' · ' + kachel.an + ' Punkt(e) an' : 'Kachel weg');
+  /* GEGENPROBE zum Wegfall des Zeitfensters: ein ZWEITER Klick, sofort,
+     ohne jede Wartezeit. Der Schritt haelt fest, dass die Uhr gar nicht
+     mehr mitspielt — die alte Fenstersperre ist wirklich weg. */
+  await page.click('#paneDonate [data-donate]');
+  await page.waitForTimeout(320);
+  const nach2 = await page.evaluate(id => {
+    const q = window.ArenaClan.sendQuota(id);
+    const k = document.querySelector('[data-req="' + id + '"]');
+    return { used: q.used, an: k ? k.querySelectorAll('.anfquota .qd.on').length : -1 };
+  }, copiesBefore.id);
+  step('Zwei Sendevorgaenge direkt hintereinander gehen durch (keine Zeitsperre)',
+    nach2.used === 2 && nach2.an === 2,
+    nach2.used + '/' + maxProAnfrage + ', ' + nach2.an + ' Punkte an');
 
   // --- Harte Validierung im Browser nachweisen ---
   const guards = await page.evaluate(() => {
@@ -703,52 +812,101 @@ function step(name, ok, info) {
     mineRow === 1 && /FROST/.test(mineTxt), mineTxt.replace(/\s+/g, ' ').trim().slice(0, 60));
   const askDisabled = await page.locator('#btnAskCards').evaluate(e => e.disabled);
   step('Zweite Anfrage gesperrt (max 1 aktiv)', askDisabled === true);
+  /* NEU 30.07.2026 — GEGENPROBE zur Kontingentzeile: die EIGENE Anfrage
+     traegt keine. Man kann zur eigenen nichts beisteuern; zehn leere
+     Punkte waeren dort eine Einladung, die nicht gilt. */
+  const mineQuota = await page.locator('#paneDonate .anfrage.mine .anfquota').count();
+  step('Die eigene Anfrage traegt KEINE Kontingentzeile', mineQuota === 0,
+    mineQuota + ' gefunden');
   const cd = await page.evaluate(() => {
     try { window.ArenaClan.requestCards('fire'); return null; }
     catch (e) { return e.message; }
   });
   step('Anfrage-Cooldown/Einzelanfrage wirft deutsche Meldung',
     /offene Anfrage|Neue Anfrage erst in/.test(cd || ''), cd);
+  /* NEU 30.07.2026 — die Abklingzeit fuer eine EIGENE Anfrage ist von
+     8 h auf 5 h gesetzt. Geprueft wird ZWEISEITIG und gegen
+     REQUEST_COOLDOWN_MS: kurz davor abgelehnt, kurz danach erlaubt. Eine
+     einseitige Pruefung („wirft") waere auch bei 8 h gruen geblieben und
+     haette die alte Zahl still konserviert. Die eigene Anfrage wird dafuer
+     zurueckgezogen, sonst greift die Sperre „max 1 aktiv" statt der
+     Abklingzeit — und der Schritt haette gemessen, was er nicht meint. */
+  const cool = await page.evaluate(() => {
+    const CL = window.ArenaClan;
+    const CD = CL.REQUEST_COOLDOWN_MS;
+    /* Bezugspunkt ist der ZEITSTEMPEL DER LETZTEN ANFRAGE aus dem State,
+       nicht irgendein fester Termin: die Anfrage von eben ist mit der
+       echten Uhr entstanden. Ein fester Termin lag davor, und dann misst
+       man die Restzeit bis zu einer Anfrage aus der Zukunft (gemessen:
+       „erst in 31:01") statt die Abklingzeit. */
+    const t0 = JSON.parse(localStorage.getItem('arenaClan')).me.lastRequestTs;
+    CL.cancelRequest(t0 + 1000);                   // Platz fuer eine neue Anfrage
+    const grab = t => { try { CL.requestCards('fire', t); return null; }
+                        catch (e) { return e.message; } };
+    const zuFrueh = grab(t0 + CD - 60000);         // eine Minute vor Ablauf
+    const spaeter = grab(t0 + CD + 60000);         // eine Minute danach
+    return { cdH: Math.round(CD / 3600000), zuFrueh, spaeter,
+             offen: CL.requests(t0 + CD + 60000).some(r => r.mine && !r.closed) };
+  });
+  step('Neue Anfrage vor Ablauf der 5 h abgelehnt, danach erlaubt',
+    cool.cdH === 5 && /Neue Anfrage erst in/.test(cool.zuFrueh || '') &&
+    /alle 5 Stunden/.test(cool.zuFrueh || '') && cool.spaeter === null && cool.offen === true,
+    'vorher: ' + cool.zuFrueh + ' | danach: ' + (cool.spaeter || 'angelegt'));
   await page.screenshot({ path: SHOTS + '/clan_spenden.png', fullPage: true });
 
-  // --- Limit: bis 10 fuellen, dann muss die 11. scheitern ---
+  /* --- Grenze je Anfrage: 10 fuellen, die 11. muss scheitern ---
+     UMGESCHRIEBEN 30.07.2026. Der Block fuellte das GLOBALE 3-h-Fenster
+     ueber mehrere Anfragen hinweg auf und prueft jetzt die neue Zusage:
+     10 Karten von MIR an EINE Anfrage, die 11. abgelehnt, eine ANDERE
+     Anfrage nimmt sofort wieder 10. Der feste Zeitpunkt bleibt (die
+     Begruendung dafuer gilt unveraendert), die Mengenangabe faellt weg —
+     `donateCards` bucht genau eine Karte je Aufruf. */
   const limit = await page.evaluate(() => {
     const CL = window.ArenaClan, AC = window.ArenaCards;
     /* ⚠ FESTER ZEITPUNKT. Vorher lief das gegen Date.now() — und wie
        viele fremde Anfragen offen sind, haengt am Zeitpunkt: `get(now)`
        erzeugt und schliesst sie ueber die Zeit. Reichten sie gerade
-       nicht fuer zehn Karten, brach die Schleife bei `if (!r) break`
-       ab und die Pruefung meldete 9/10 — ein Fehler, den es im Produkt
-       nie gab. Sie war an ihre eigene Laufzeit gebunden.
-       sendQuota, requests und donateCards nehmen alle ein `now`
-       entgegen; die Pruefung hat es nur nie benutzt. */
+       nicht, brach die Schleife ab und die Pruefung meldete 9/10 — ein
+       Fehler, den es im Produkt nie gab. Sie war an ihre eigene Laufzeit
+       gebunden. sendQuota, requests und donateCards nehmen alle ein
+       `now` entgegen; die Pruefung hat es nur nie benutzt. */
     const JETZT = Date.UTC(2026, 6, 29, 12);   // Mittwochmittag
+    const MAX = CL.DONATE_MAX_PER_REQUEST;
     CL.TOWER_IDS.forEach(id => AC.addDrop(id, 'common', 60));
     const offen = () => CL.requests(JETZT).filter(x => !x.mine && !x.closed && x.left > 0);
-    const kapazitaet = offen().reduce((s, r) => s + r.left, 0);
-    let guard = 0;
-    while (CL.sendQuota(JETZT).left > 0 && guard++ < 40) {
-      const r = offen()[0];
-      if (!r) break;
-      const n = Math.min(r.left, CL.sendQuota(JETZT).left);
-      try { CL.donateCards(r.id, n, 'common', JETZT); } catch (e) { break; }
+    const ziel = offen().filter(r => r.left > MAX)[0] || offen()[0];
+    const kapazitaet = ziel ? ziel.left : 0;
+    let sent = 0, guard = 0, msg = null;
+    while (guard++ < 40) {
+      try { CL.donateCards(ziel.id, undefined, 'common', JETZT); sent++; }
+      catch (e) { msg = e.message; break; }
     }
-    const r2 = offen()[0];
-    let msg = null;
-    if (r2) { try { CL.donateCards(r2.id, 1, 'common', JETZT); } catch (e) { msg = e.message; } }
-    const q = CL.sendQuota(JETZT);
-    return { used: q.used, full: q.full, msg, kapazitaet };
+    // Eine ANDERE Anfrage, im selben Augenblick — muss volle 10 annehmen.
+    const andere = offen().filter(r => r.id !== ziel.id && r.left >= MAX)[0];
+    let sent2 = 0;
+    if (andere) {
+      for (let i = 0; i < MAX; i++) {
+        try { CL.donateCards(andere.id, undefined, 'common', JETZT); sent2++; } catch (e) { break; }
+      }
+    }
+    return { sent, sent2, msg, kapazitaet, max: MAX,
+             full: CL.sendQuota(ziel.id, JETZT).full,
+             offenDanach: CL.requests(JETZT).filter(r => r.id === ziel.id)[0].closed === false };
   });
-  /* Das Limit ist nur pruefbar, wenn ueberhaupt zehn Karten Nachfrage
-     da sind. Fehlt sie, ist das ein Mangel des AUFBAUS und muss als
-     solcher dastehen — nicht als Produktfehler getarnt. */
-  step('Genug offene Anfragen, um das Sendelimit zu pruefen',
-    limit.kapazitaet >= 10, limit.kapazitaet + ' Karten Nachfrage');
-  step('Genau 10 Karten pro 3 h gehen durch', limit.used === 10 && limit.full === true,
-    limit.used + '/10');
-  step('Die 11. Karte wird abgelehnt (Limit + Restzeit in der Meldung)',
-    /Sendelimit erreicht/.test(limit.msg || '') && /Nächster Slot frei in \d+:\d\d/.test(limit.msg || ''),
+  /* Die Grenze ist nur pruefbar, wenn die Anfrage ueberhaupt mehr als 10
+     Karten Platz hat. Fehlt der, ist das ein Mangel des AUFBAUS und muss
+     als solcher dastehen — nicht als Produktfehler getarnt. */
+  step('Anfrage mit Platz fuer mehr als 10 Karten vorhanden',
+    limit.kapazitaet > limit.max, limit.kapazitaet + ' Karten Bedarf');
+  step('Genau 10 Karten gehen an EINE Anfrage durch',
+    limit.sent === limit.max && limit.full === true, limit.sent + '/' + limit.max);
+  step('Die 11. Karte an dieselbe Anfrage wird abgelehnt (Grenze in der Meldung)',
+    /schon 10 Karten gegeben/.test(limit.msg || '') && /anderen im Clan/.test(limit.msg || ''),
     limit.msg);
+  step('Die Anfrage bleibt dabei offen — 10 von 30 sind erst ein Drittel',
+    limit.offenDanach === true);
+  step('Eine ANDERE Anfrage nimmt im selben Augenblick wieder 10 (kein Zeitfenster mehr)',
+    limit.sent2 === limit.max, limit.sent2 + '/' + limit.max + ' ohne jede Wartezeit');
 
   // ================= 5. CLANHALLE: TAB KRIEG =================
   /* UMGESCHRIEBEN 30.07.2026 — der Kriegsreiter liegt in der Clanhalle.
@@ -2478,40 +2636,48 @@ function step(name, ok, info) {
     // Die eigene Zeile ("Du") gehoert selbstverstaendlich in den State.
     const names = window.ArenaClan.members().filter(m => !m.me).map(m => m.name);
     const pop = window.ArenaClan.leaderboard('global').rows.filter(r => !r.me).map(r => r.name);
-    return { size: raw.length, v: s.v, joined: s.joined, sendLog: s.sendLog.length,
+    return { size: raw.length, v: s.v, joined: s.joined,
+             sendLogWeg: s.sendLog === undefined,
+             donated: Object.keys(s.donated || {}).length,
+             donatedMax: Math.max(0, ...Object.values(s.donated || {}).map(n => n | 0)),
              warPoints: s.war.points, members: names.length,
              inCore: names.filter(n => core.indexOf(n) >= 0).length,
              popInCore: pop.filter(n => core.indexOf(n) >= 0).length };
   });
-  step('State unter localStorage "arenaClan", Version 2',
-    persisted.v === 2 && persisted.joined === true, JSON.stringify({ v: persisted.v }));
-  /* ⚠ GEAENDERT, mit Absicht. Die alte Fassung forderte an dieser
-     Stelle Eintraege im Sendelog. Das kann hier nicht mehr stimmen:
-     das Sendekontingent laeuft in einem rollierenden Fenster von 3 h,
-     und `get(now)` streicht aeltere Eintraege beim Normalisieren
-     dauerhaft weg (arena_clan.js, Z. 463-467). Weiter oben stellt die
-     Pruefung selbst die Demo-Uhr auf Samstag (#btnWarDemo) — damit
-     liegen die Spenden von vorhin Tage zurueck und fallen aus dem
-     Fenster. Gemessen an genau dieser Stelle: Kontingent 10/10 direkt
-     nach dem Spenden, danach 0 und Log leer.
-     Das ist richtiges Verhalten, keine kaputte Persistenz. Geprueft
-     wird deshalb, was der State wirklich zusagt: die Kriegspunkte
-     ueberleben, und das Sendefenster raeumt sich selbst auf. */
-  step('Kriegspunkte persistiert, Sendefenster hat sich geraeumt',
-    persisted.warPoints > 0 && persisted.sendLog === 0,
-    persisted.sendLog + ' Log-Eintraege (0 ist richtig, Demo-Uhr steht auf Samstag), ' +
-    persisted.warPoints + ' Punkte');
-  /* Dass das Sendelog ueberhaupt schreibt, wird dort geprueft, wo die
-     Uhr noch stimmt: unmittelbar nach dem Spenden weiter oben stand das
-     Kontingent auf 10/10. Hier ginge es nur noch um das Fenster. */
-  const fenster = await page.evaluate(() => {
-    const q = window.ArenaClan.sendQuota();
-    return { used: q.used, left: q.left, max: window.ArenaClan.SEND_MAX,
-             fensterH: window.ArenaClan.SEND_WINDOW_MS / 3600000 };
+  /* UMGESCHRIEBEN 30.07.2026: State-Version 2 → 3. Der Sprung IST die
+     Aenderung — mit dem globalen Sendefenster faellt `sendLog` weg. */
+  const modulVersion = await page.evaluate(() => window.ArenaClan.STATE_VERSION);
+  step('State unter localStorage "arenaClan", Version 3 (gegen die Konstante)',
+    persisted.v === modulVersion && modulVersion === 3 && persisted.joined === true,
+    JSON.stringify({ v: persisted.v, modul: modulVersion }));
+  /* ⚠ ZWEIMAL GEAENDERT, beide Male mit Absicht.
+     (1) Die urspruengliche Fassung forderte Eintraege im Sendelog.
+     (2) Die zweite pruefte, dass das rollierende 3-h-Fenster sich
+         selbst raeumt (die Demo-Uhr steht auf Samstag, die Spenden von
+         vorhin lagen also ausserhalb).
+     Seit dem 30.07.2026 gibt es weder Log noch Fenster: das Kontingent
+     haengt an der Anfrage und steht in `donated`. Geprueft wird
+     deshalb, was der State JETZT zusagt — die Kriegspunkte ueberleben,
+     das tote Feld ist wirklich weg, und kein Eintrag in `donated`
+     ueberschreitet die Grenze. */
+  const maxProAnfrage2 = await page.evaluate(() => window.ArenaClan.DONATE_MAX_PER_REQUEST);
+  step('Kriegspunkte persistiert, totes Sendelog-Feld ist weg',
+    persisted.warPoints > 0 && persisted.sendLogWeg === true,
+    'sendLog ' + (persisted.sendLogWeg ? 'nicht mehr im State' : 'STEHT NOCH DRIN') +
+    ', ' + persisted.warPoints + ' Punkte');
+  step('Die Spenden stehen je Anfrage im State, keine ueber der Grenze',
+    persisted.donated > 0 && persisted.donatedMax <= maxProAnfrage2,
+    persisted.donated + ' Anfragen, hoechstens ' + persisted.donatedMax +
+    '/' + maxProAnfrage2 + ' je Anfrage');
+  /* GEGENPROBE zur Signatur: `sendQuota` OHNE Anfrage-ID muss werfen.
+     Eine stille Zahl waere hier das gefaehrlichste Ergebnis — sie sieht
+     richtig aus und bezieht sich auf nichts. */
+  const altSig = await page.evaluate(() => {
+    try { window.ArenaClan.sendQuota(Date.now()); return null; }
+    catch (e) { return e.message; }
   });
-  step('Sendekontingent nach Fensterablauf wieder voll',
-    fenster.used === 0 && fenster.left === fenster.max,
-    fenster.used + '/' + fenster.max + ' benutzt, Fenster ' + fenster.fensterH + ' h');
+  step('sendQuota ohne Anfrage-ID wirft statt zu raten',
+    /Anfrage-ID/.test(altSig || '') && /je Anfrage/i.test(altSig || ''), altSig);
   step('Bot-Schicht persistiert NICHTS (ausser eigenen Ereignisprotokollen)',
     persisted.inCore === 0 && persisted.popInCore === 0 && persisted.size < 6000,
     persisted.inCore + '/' + persisted.members + ' Mitglieder, ' +
