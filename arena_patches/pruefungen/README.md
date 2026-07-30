@@ -1,9 +1,14 @@
 # Prüfungen
 
-Zuletzt vollständig gemessen am **30.07.2026**: 23 Playwright-Suiten laufen hier
-durch, zusammen **1 378 Schritte**, davon **1 377 grün**. Rot bleibt genau einer
-— `run_v7.js` „gleiche Drittel" (siehe unten, braucht eine Produktentscheidung,
-kein Code-Fix).
+Zuletzt vollständig gemessen am **30.07.2026**: 24 Playwright-Suiten laufen hier
+durch. Rot bleibt genau einer — `run_v7.js` „gleiche Drittel" (siehe unten,
+braucht eine Produktentscheidung, kein Code-Fix).
+
+Neu hinzugekommen ist `video_rueckfall.js` (11 Schritte). Die Schrittzahlen der
+bestehenden Suiten haben sich am selben Tag mehrfach verschoben — `run_v6.js`
+allein von 320 auf 334 —, deshalb steht hier **keine Gesamtsumme** mehr: eine
+Zahl, die nach jedem Lauf falsch ist, verteidigt nichts. Die Tabelle unten
+führt die Suiten einzeln auf; maßgeblich ist der Lauf, nicht der Kopf.
 
 `iconfrei.js` und `sicht.js` sind nicht mitgezählt: sie prüfen die
 **ausgelieferte** Seite und brauchen das volle `playwright`-Modul, das in diesem

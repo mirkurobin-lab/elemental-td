@@ -2060,5 +2060,13 @@
   "job": "949e2b93-321e-4d5f-b64f-c09d5ba099a5",
   "type": "teaser",
   "url": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133702_949e2b93-321e-4d5f-b64f-c09d5ba099a5.png"
+ },
+ "merge_fx": {
+  "batch": 13,
+  "beschreibung": "Verschmelzungs-Effekt fuer die Merge-Zeremonie: drei Prismensplitter kreisen ein, prallen zusammen, Schockwelle, Funkenabklang. MIT TONSPUR (AAC, Stereo). Erzeugt mit Kling v3.0 (1:1, 5 s, mode pro, sound on), danach auf 640x640 verkleinert und die Tiefen auf echtes Schwarz gedrueckt, damit der screen-Blend keinen Schleier zeigt.",
+  "job": "46137d54-a056-4a52-a47e-39599dfd666a",
+  "size": "640x640",
+  "type": "fx",
+  "url": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/2de19c3f-43d9-4c55-868d-d602b9c2b06c.mp4"
  }
 }

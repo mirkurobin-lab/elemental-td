@@ -3306,3 +3306,85 @@ Eine Schwelle darauf wäre geraten gewesen. Lieber ein ehrliches „nicht gemess
 ein grüner Balken, der nichts weiß.
 
 **Aufwand: S** · **Priorität: 2**
+
+---
+
+## §32 „Nicht animiert" — zwei Fragen, zwei verschiedene Antworten
+
+> „Die merge/fusion Funktion funktioniert hat aber keine Animation. Wenn möglich mit Kling 3.0
+> erstellen damit wir auf der Animation auch Sound haben.
+> Im battledeck sind die Tower und Helden nicht animiert, zuvor waren sie es wieso nicht?"
+
+### 32.1 Das Battle Deck: sie waren dort nie animiert
+
+Nachgesehen statt vermutet:
+
+| Prüfung | Ergebnis |
+|---|---|
+| `attachLoop`-Aufrufe im Deck-Raster | **keine** — die Aufrufstellen sind Detailkarte, Pack-Enthüllung, Heldenbühne |
+| `attachLoop`-Vorkommen über die letzten 25 Commits | 8 → 10, also **nichts entfernt**, nur ergänzt |
+| Videos in `#viewCollection`, gemessen | **0** bei 6 Artboxen |
+
+Der Quelltext sagt es sogar selbst: der Loop steht „nur dort, wo die Karte **groß** zu sehen
+ist … und nicht in jeder 60-px-Kachel". Das war eine Leistungsentscheidung — acht Loops à
+3,7–6,7 MB gleichzeitig in einem scrollenden Raster zu dekodieren ist auf dem Telefon teuer.
+Bewegt hat sich immer die **Detailkarte** (Turm antippen), nicht die Kachel.
+
+### 32.2 Was aber wirklich kaputt war: der fehlende Rückfall
+
+Ein Video, dessen Quelle fehlschlägt, wurde **sofort und endgültig versteckt**
+(`UIIcon.hide(v)` im ersten `error`). Solange die Loops vom CDN kamen, fiel das nie auf. Seit
+sie aus dem Repo geladen werden (§13), ist es der Unterschied zwischen „läuft" und „läuft nie
+mehr" — aus Gründen, die **nichts mit der Datei zu tun haben**:
+
+- Wird die Seite als reine Datei geöffnet (`file://`), verweigern mehrere mobile Browser
+  Video aus relativen Pfaden, während Bilder anstandslos laden. Genau dieses Bild — Bilder da,
+  Türme still — entsteht dabei, und es entstand **erst mit der Umstellung auf lokale Pfade**.
+- Ein Browser ohne H.264 meldet `MEDIA_ERR_SRC_NOT_SUPPORTED`, obwohl die Datei mit **200**
+  ausgeliefert wird.
+
+`ASSETS_CDN` hält die Originaladressen ohnehin bereit. `videoRueckfall()` schaltet jetzt
+einmal darauf um und versteckt erst, wenn **auch** die scheitert. Das Standbild darunter bleibt
+in jedem Fall stehen.
+
+**⚠ Ehrlich zur Reichweite dieser Aussage:** Der Chromium dieser Umgebung hat **kein H.264**
+(`canPlayType('video/mp4; codecs="avc1.42E01E"') === ""`). Ein laufender Loop ist hier
+grundsätzlich nicht herstellbar — ich kann den gemeldeten Zustand also **weder nachstellen noch
+ausschließen**. Geprüft ist deshalb nur, was messbar ist: dass zuerst die lokale Quelle
+versucht wird und bei Fehlschlag auf die Originalquelle umgeschaltet wird
+(`pruefungen/video_rueckfall.js`).
+
+### 32.3 Der Verschmelzungs-Effekt: eine Animation gab es, der **Ton** fehlte
+
+Die Zeremonie hat eine an AA gemessene Choreografie — drei kreisende Kopien, Einsaugen bei
+1130 ms, Umschlag bei 1260 ms, Werttafel. Was fehlte, war die **Wucht des Aufpralls** und der
+**Ton**.
+
+Erzeugt mit **Kling v3.0** (1:1, 5 s, `mode: pro`, `sound: on`), danach auf 640×640 verkleinert
+und die Tiefen auf echtes Schwarz gedrückt. Der letzte Schritt ist keine Kosmetik: Das Video
+hat **keinen Alphakanal**, es wird mit `mix-blend-mode: screen` einkomponiert, und `screen`
+rechnet Schwarz als „nichts". Gemessen vorher: Eckwerte bis **31** — das wäre als grauer
+Schleier über der ganzen Zeremonie gelegen. Nachher: **0** an allen vier Ecken zu 0,3 / 1,5 /
+2,1 / 4,5 s.
+
+Zwei Regeln, die der Ton mitbringt:
+
+1. **Doppelter Ton ist schlimmer als keiner.** Läuft das Video hörbar, wird der synthetische
+   Blip (`UISfx.legend`/`reward`) unterdrückt. Startet es nicht, kommt der Blip wie bisher.
+   Entschieden wird das an `CER.fxTon` — gesetzt, wenn `play()` **ungestummt** durchging, also
+   gemessen statt vermutet.
+2. **Ton ohne Zutun ist gesperrt.** Die Zeremonie startet immer aus einer Tippgeste, also ist
+   die Wiedergabe erlaubt. Wird sie trotzdem abgelehnt, folgt ein stummer zweiter Versuch —
+   dann übernimmt wieder der Blip.
+
+Das Video ist **Zugabe, kein Ersatz**: fällt es aus, läuft die CSS-Choreografie unverändert.
+Das ist hier nicht theoretisch — die Datei liegt **nicht im Repo** (siehe unten), der Fall
+„Video fehlt" ist der Regelfall der Prüfung.
+
+**⚠ Die Datei fehlt im Repo.** `*.cloudfront.net` ist aus der Baumaschine gesperrt (CONNECT
+403), für beide Verteiler. Sie wurde in der Bild-Sandbox erzeugt und dort geprüft (640×640,
+5,04 s, AAC-Stereo, 813 KB), konnte aber nicht hierher geholt werden. Eingetragen in
+`assets/NICHT_ERREICHBAR.json` mit Datum, Grund und der Anweisung zum Nachziehen; bis dahin
+lädt der Prototyp sie über die CDN-Adresse (`NUR_CDN`).
+
+**Aufwand: M** · **Priorität: 1** · Datei nachzuziehen

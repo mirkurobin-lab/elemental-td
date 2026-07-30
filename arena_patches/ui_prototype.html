@@ -2345,6 +2345,37 @@ footer{padding:6px 12px 14px;text-align:center}
 #mergeCeremony .cersheet.tiefer{background:#05090cee}
 .certitle{font-size:27px;text-align:center;line-height:1.1}
 
+/* ---------- Effektvideo der Verschmelzung (Kling v3.0, MIT TON) ----------
+   Nutzer-Vorgabe (30.07.2026): „Die merge/fusion Funktion funktioniert hat
+   aber keine Animation. Wenn möglich mit Kling 3.0 erstellen damit wir auf
+   der Animation auch Sound haben."
+
+   ⚠ `mix-blend-mode:screen` ist hier kein Effekt, sondern die ganze
+   Bautechnik. Das Video hat KEINEN Alphakanal — es ist eine Lichtplatte
+   auf schwarzem Grund. `screen` rechnet Schwarz als „nichts" und laesst
+   nur das Leuchten stehen; ohne das laege ein schwarzes Quadrat ueber der
+   Zeremonie. Deshalb wurden beim Erzeugen die Tiefen auf echtes Schwarz
+   gedrueckt (gemessen: Eckwerte bei 0,3/1,5/2,1/4,5 s exakt 0). Ein Grund
+   von 31 statt 0 waere als grauer Schleier sichtbar gewesen.
+
+   z-index 1: ueber der Buehne, aber UNTER der enthuellten Karte (z 3) —
+   der Effekt umspielt die Karte, er verdeckt sie nie.
+
+   pointer-events:none, damit der Knopf darunter erreichbar bleibt.
+
+   Die Flaeche ist bewusst groesser als die Buehne (140 %): der Aufprall
+   soll ueber den Rand hinausstrahlen statt in einem Kaestchen zu sitzen. */
+.cerfx{position:absolute;left:50%;top:50%;width:140%;height:140%;
+  transform:translate(-50%,-50%);z-index:1;pointer-events:none;
+  object-fit:contain;mix-blend-mode:screen;opacity:0;
+  transition:opacity .18s linear}
+.cerfx.laeuft{opacity:1}
+/* Wer Bewegung reduziert haben will, bekommt sie auch hier nicht — das
+   Video wird dann gar nicht erst gestartet (siehe cerFxStart). Die Regel
+   steht trotzdem, damit ein bereits laufendes Video beim Umschalten der
+   Systemeinstellung sofort verschwindet. */
+@media (prefers-reduced-motion: reduce){ .cerfx{display:none} }
+
 /* ---------- Fusions-Choreografie (Nutzer-Vorgabe) ----------
    „das bei der Fusion dann 3 gleiche Karten je nach Tower welcher
    fusioniert wird sich im kreis dreht und miteinander verschmilzt,
@@ -8388,6 +8419,13 @@ button.pfplate{cursor:pointer}
          Werte. Alle Ebenen liegen übereinander, die Choreografie schaltet
          sie um — kein Umbau des Baums während der Animation. -->
     <div class="cerstage" id="cerStage">
+      <!-- Effektvideo mit Tonspur (Kling v3.0). Liegt als ZUGABE ueber der
+           CSS-Choreografie, nicht an ihrer Stelle: faellt es aus — kein
+           Netz, kein Codec, Datensparmodus —, laeuft die Zeremonie
+           unveraendert weiter. Deshalb kein `poster` und keine Flaeche,
+           die leer bleiben koennte. Der Ton ist der Grund, warum es
+           ueberhaupt ein Video ist; stumm taete es die CSS-Fassung. -->
+      <video id="cerFx" class="cerfx" playsinline preload="none"></video>
       <div class="cerring" id="cerRing"></div>
       <div class="cerflash" id="cerFlash"></div>
       <div class="cercard" id="cerCard"><span id="cerArt">✨</span>
@@ -9165,6 +9203,17 @@ button.pfplate{cursor:pointer}
     ic_offline:       CDN + "hf_20260729_183611_6ec00abf-bb37-46ee-bf1e-bdbd96fa100e.png",
     off_banner:       CDN + "hf_20260729_183312_b5ed5e95-949d-4afa-9d95-89dc879e789b.png",
     off_loop:         CDN + "hf_20260729_183559_eba25a01-0562-4020-a017-7c81e7ac853c.mp4",
+    /* Verschmelzungs-Effekt der Merge-Zeremonie, MIT TONSPUR (Kling v3.0,
+       1:1, 5 s, mode pro, sound on). Danach auf 640x640 verkleinert und
+       die Tiefen auf echtes Schwarz gedrueckt — der screen-Blend in
+       `.cerfx` rechnet Schwarz als „nichts", ein Grund von 31 statt 0
+       waere als grauer Schleier ueber der Zeremonie gelegen. Gemessen
+       nach dem Abgleich: Eckwerte bei 0,3/1,5/2,1/4,5 s exakt 0.
+       ⚠ Steht in assets/NICHT_ERREICHBAR.json: *.cloudfront.net ist aus
+       der Baumaschine gesperrt (CONNECT 403), die Datei konnte nicht ins
+       Repo geholt werden. Nachziehen und dann assets_sichern.py laufen
+       lassen — bis dahin laedt der Prototyp sie von hier. */
+    merge_fx:         CDNA + "2de19c3f-43d9-4c55-868d-d602b9c2b06c.mp4",
     /* ---- Batch 4: Breitbanner 16:9 (Pass, Events) ---- */
     pass_keyart:      CDN + "hf_20260725_160701_42a171b5-06f3-458d-a766-f4992e4210e5.png",
     event_tournament: CDN + "hf_20260725_160704_9fb36583-0558-4407-a96c-83275fc4c95e.png",
@@ -9488,7 +9537,13 @@ button.pfplate{cursor:pointer}
   var NUR_CDN = {
     card_bann:1, card_bollwerk:1, card_fokus:1, card_joker:1,
     card_splitter:1, ess_arkan:1, ic_offline:1, off_banner:1,
-    off_loop:1
+    off_loop:1,
+    /* merge_fx steht hier, weil die Datei nicht ins Repo geholt werden
+       konnte (siehe assets/NICHT_ERREICHBAR.json). Ohne diesen Eintrag
+       zeigte der Prototyp auf ./assets/merge_fx.mp4 — eine Datei, die es
+       nicht gibt, und die Zeremonie liefe still ohne Effekt. Sobald die
+       Datei nachgezogen ist, gehoert der Eintrag hier WEG. */
+    merge_fx:1
   };
   (function () {
     if (/[?&]cdn=1\b/.test(location.search)) return;
@@ -9621,6 +9676,49 @@ button.pfplate{cursor:pointer}
     if (!m) { AC.MATERIALS.forEach(function (x) { if (x.key === sorte) m = x; }); }
     return m ? m.name : "Essenz";
   }
+  /* ==================================================================
+   * videoRueckfall(v, schluessel) — ein Fehlschlag ist nicht das Aus
+   * ------------------------------------------------------------------
+   * ⚠ Eingefuehrt am 30.07.2026. Vorher stand an jeder Videostelle nur
+   * `UIIcon.hide(v)`: der erste Fehler hat das Video endgueltig
+   * versteckt. Seit die Assets aus dem Repo statt vom CDN kommen, ist
+   * das der Unterschied zwischen „laeuft" und „laeuft nie mehr" — und
+   * zwar aus Gruenden, die NICHTS mit der Datei zu tun haben:
+   *
+   *   · Wird die Seite als reine Datei geoeffnet (file://), verweigern
+   *     mehrere mobile Browser das Abspielen von Video aus relativen
+   *     Pfaden, waehrend Bilder anstandslos laden. Genau dieses Bild
+   *     („die Tuerme sind nicht mehr animiert, vorher schon") entsteht
+   *     dabei — und es entstand erst mit der Umstellung auf lokale
+   *     Pfade, weil vorher eine https-Adresse dastand.
+   *   · Ein Browser ohne H.264 meldet MEDIA_ERR_SRC_NOT_SUPPORTED,
+   *     obwohl die Datei mit 200 ausgeliefert wird. Der Chromium dieser
+   *     Pruefumgebung ist so einer (canPlayType('…avc1…') === ""), die
+   *     Loops sind hier deshalb NICHT nachstellbar. Auf dem Telefon
+   *     laufen sie.
+   *
+   * ASSETS_CDN haelt die Originaladressen ohnehin bereit — sie werden
+   * beim Umschalten auf lokale Pfade gefuellt. Also einmal darauf
+   * zurueckfallen und erst verstecken, wenn AUCH die scheitert.
+   *
+   * Das Standbild darunter bleibt in jedem Fall stehen: der Loop war
+   * immer Zugabe, nie Traeger der Information.
+   * ================================================================== */
+  function videoRueckfall(v, schluessel) {
+    var zweiterVersuch = false;
+    v.addEventListener("error", function () {
+      var aus = ASSETS_CDN[schluessel];
+      if (!zweiterVersuch && aus && aus !== v.src) {
+        zweiterVersuch = true;
+        v.src = aus;
+        var p = v.play();
+        if (p && p.catch) p.catch(function () {});
+        return;
+      }
+      UIIcon.hide(v);
+    });
+    return v;
+  }
   function attachLoop(box, id) {
     if (!box || !ASSETS[CARD_LOOP[id]]) return null;
     var old = box.querySelector("video.cvid");
@@ -9633,7 +9731,27 @@ button.pfplate{cursor:pointer}
     v.setAttribute("autoplay", ""); v.setAttribute("playsinline", "");
     v.playsInline = true; v.preload = "auto";
     if (ASSETS[CARD_ART[id]]) v.poster = ASSETS[CARD_ART[id]];
-    v.addEventListener("error", function () { UIIcon.hide(v); });
+    /* ⚠ EIN FEHLSCHLAG DARF NICHT SOFORT DAS AUS SEIN (30.07.2026).
+       Vorher stand hier nur `UIIcon.hide(v)`: der erste Fehler hat das
+       Video endgueltig versteckt. Seit die Assets aus dem Repo statt vom
+       CDN kommen, ist das der Unterschied zwischen „laeuft" und „laeuft
+       nie mehr" — und zwar aus Gruenden, die NICHTS mit der Datei zu tun
+       haben:
+         · Wird die Seite als reine Datei geoeffnet (file://), verweigern
+           mehrere mobile Browser das Abspielen von Video aus relativen
+           Pfaden, waehrend Bilder anstandslos laden. Genau dieses Bild
+           („die Tuerme sind nicht mehr animiert, vorher schon") entsteht
+           dabei.
+         · Ein Browser ohne H.264 meldet MEDIA_ERR_SRC_NOT_SUPPORTED,
+           obwohl die Datei mit 200 ausgeliefert wird. Der Chromium
+           dieser Pruefumgebung ist so einer — hier ist der Loop
+           deshalb NICHT nachstellbar, auf dem Telefon laeuft er.
+       ASSETS_CDN haelt die Originaladressen ohnehin bereit (sie werden
+       beim Umschalten auf lokale Pfade gefuellt). Also: einmal auf die
+       Originalquelle zurueckfallen, und erst wenn AUCH die scheitert,
+       verstecken. Das Standbild darunter bleibt in jedem Fall stehen —
+       der Loop war immer schon Zugabe, nie Traeger der Information. */
+    videoRueckfall(v, CARD_LOOP[id]);
     v.src = ASSETS[CARD_LOOP[id]];
     box.appendChild(v);
     var pr = v.play();
@@ -11591,13 +11709,75 @@ button.pfplate{cursor:pointer}
     return out;
   }
 
-  var CER = { raf: 0, timer: 0, zaehler: [] };
+  var CER = { raf: 0, timer: 0, zaehler: [], fxTon: false };
   function cerStopp() {
     if (CER.raf) { cancelAnimationFrame(CER.raf); CER.raf = 0; }
     if (CER.timer) { clearTimeout(CER.timer); CER.timer = 0; }
     CER.zaehler.forEach(function (t) { clearInterval(t); });
     CER.zaehler = [];
     if (window.__cerTimer) { clearInterval(window.__cerTimer); window.__cerTimer = null; }
+    cerFxStopp();
+  }
+
+  /* ==================================================================
+   * DAS EFFEKTVIDEO DER VERSCHMELZUNG (Kling v3.0, mit Tonspur)
+   * ------------------------------------------------------------------
+   * Vorgabe (30.07.2026): „Die merge/fusion Funktion funktioniert hat
+   * aber keine Animation. Wenn möglich mit Kling 3.0 erstellen damit wir
+   * auf der Animation auch Sound haben."
+   *
+   * ⚠ ZUR EINORDNUNG: Eine Animation gab es. Die Zeremonie hat eine an
+   * AA gemessene Choreografie (drei kreisende Kopien, Einsaugen,
+   * Umschlag, Werttafel) — was fehlte, war der TON und die Wucht des
+   * Aufpralls. Das Video ersetzt die Choreografie deshalb NICHT, es legt
+   * sich darueber. Faellt es aus, sieht der Spieler genau das, was er
+   * vorher sah — kein leeres Feld, kein Loch im Ablauf.
+   *
+   * ⚠ DER TON IST DER GRUND FUER DAS VIDEO, und er bringt zwei Regeln
+   * mit:
+   *   1. Doppelter Ton ist schlimmer als keiner. Laeuft das Video mit
+   *      Ton, wird der synthetische Blip (UISfx.legend/reward)
+   *      UNTERDRUECKT — sonst klingen zwei Belohnungsgeraeusche
+   *      uebereinander. Startet das Video nicht, kommt der Blip wie
+   *      bisher. Diese Entscheidung faellt in `enthuellen()` anhand von
+   *      CER.fxTon, nicht anhand einer Vermutung.
+   *   2. Ton ohne Zutun des Spielers ist in jedem Browser gesperrt. Die
+   *      Zeremonie startet aber IMMER aus einer Tippgeste heraus (der
+   *      Fusionsknopf), also ist die Wiedergabe erlaubt. Scheitert sie
+   *      trotzdem — manche Browser zaehlen die Geste nicht mit —, wird
+   *      stumm ein zweites Mal versucht; dann uebernimmt wieder der Blip.
+   *
+   * Bei „Bewegung reduzieren" laeuft das Video gar nicht erst an.
+   * ================================================================== */
+  function cerFxStopp() {
+    var v = $("cerFx"); if (!v) return;
+    v.classList.remove("laeuft");
+    try { v.pause(); v.currentTime = 0; } catch (e) {}
+    CER.fxTon = false;
+  }
+  function cerFxStart(ruhig) {
+    CER.fxTon = false;
+    var v = $("cerFx");
+    if (!v || ruhig || !ASSETS.merge_fx) return;
+    if (v.src !== ASSETS.merge_fx) {
+      videoRueckfall(v, "merge_fx");
+      v.src = ASSETS.merge_fx;
+    }
+    try { v.currentTime = 0; } catch (e) {}
+    v.muted = false; v.volume = 1;
+    v.classList.add("laeuft");
+    var p = v.play();
+    if (p && p.then) {
+      p.then(function () { CER.fxTon = true; }).catch(function () {
+        /* Mit Ton abgelehnt → stumm nachsetzen. Das Bild ist dann immer
+           noch da, und der Blip springt ein, weil CER.fxTon false bleibt. */
+        v.muted = true;
+        var p2 = v.play();
+        if (p2 && p2.catch) p2.catch(function () { v.classList.remove("laeuft"); });
+      });
+    } else {
+      CER.fxTon = !v.muted;
+    }
   }
 
   /* Fusions-Zeremonie, Zeitachse an AA gemessen (Screenrecording
@@ -11655,6 +11835,10 @@ button.pfplate{cursor:pointer}
     hydrateFrames(ring);
 
     box.classList.add("open");
+    // Das Effektvideo laeuft ueber die ganze Zeremonie, nicht erst ab dem
+    // Umschlag: seine ersten 1,8 s sind das Einkreisen und decken sich mit
+    // der CSS-Choreografie. Start deshalb hier, nicht in enthuellen().
+    cerFxStart(ruhig);
     karte.classList.remove("zeigen");
     karte.classList.add("warten");
     flash.classList.remove("go");
@@ -11672,7 +11856,12 @@ button.pfplate{cursor:pointer}
       karte.classList.add("zeigen");
       // UISfx hat kein play(name) — die Blips heißen einzeln. Der Stufen-
       // aufstieg bekommt das Crescendo, eine reine Kopie den Reward-Akkord.
-      if (window.UISfx) (copyOnly ? UISfx.reward : UISfx.legend)();
+      // ⚠ NUR, wenn das Effektvideo NICHT hoerbar laeuft: sonst liegen
+      // zwei Belohnungsgeraeusche uebereinander, und das klingt schlechter
+      // als jedes einzelne von beiden. CER.fxTon wird in cerFxStart()
+      // gesetzt, wenn play() ungestummt durchgegangen ist — gemessen,
+      // nicht angenommen.
+      if (window.UISfx && !CER.fxTon) (copyOnly ? UISfx.reward : UISfx.legend)();
       // Zweite Verdunklungsstufe genau im Moment des Umschlags (AA: -14 %).
       $("cerSheet").classList.add("tiefer");
       // 260 ms Enthuellung + 280 ms Stillstand. Die Pause ist der Punkt, an
@@ -17580,7 +17769,7 @@ button.pfplate{cursor:pointer}
     var pv = $("passVid");
     if (pv && ASSETS.pass_keyart_anim && !pv.src) {
       pv.poster = ASSETS.pass_keyart || "";
-      pv.addEventListener("error", function () { UIIcon.hide(pv); });
+      videoRueckfall(pv, "pass_keyart_anim");
       pv.src = ASSETS.pass_keyart_anim;
       var prp = pv.play(); if (prp && prp.catch) prp.catch(function () {});
     }
@@ -20574,6 +20763,11 @@ button.pfplate{cursor:pointer}
                      demoMatchResult: demoMatchResult,
                      tint: tint, tintStyle: tintStyle, TINTS: TINTS, ambient: ambient,
                      attachLoop: attachLoop, CARD_LOOP: CARD_LOOP,
+                     /* CER traegt fxTon: ob das Effektvideo HOERBAR laeuft.
+                        Nur so laesst sich pruefen, dass der synthetische
+                        Blip genau dann einspringt, wenn er gebraucht wird —
+                        und genau dann schweigt, wenn nicht. */
+                     CER: CER,
                      AU: function () { return window.ArenaAudio; },
                      renderGuide: renderGuide, renderManual: renderManual,
                      guideTab: guideTab, gTab: function () { return gTab; },
