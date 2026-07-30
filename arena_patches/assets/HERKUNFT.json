@@ -1,5 +1,5 @@
 {
- "_bytes": 77013637,
+ "_bytes": 76984433,
  "_dateien": 230,
  "_hinweis": "Erzeugt von werkzeuge/assets_sichern.py. Schluessel, Quell-URL, Dateiname, Groesse und SHA-256 je Asset — der Nachweis, dass die Datei im Repo die Datei vom CDN ist.",
  "assets": {
@@ -1005,11 +1005,12 @@
    "sha256": "489503a98a2bb5351aed8cde3e0824d841d79e5aadbadca640f37cc96cd0f61a"
   },
   "nav_shop": {
-   "bytes": 37944,
+   "_hinweis": "Ersetzt am 30.07.2026: das alte Motiv war eine offene Schatztruhe mit Schluesselloch — in der festen Fussleiste, also auf JEDEM Bildschirm sichtbar. „Wir haben keine Truhen\" (Auftraggeber, 30.07.2026) gilt auch hier. Neues Motiv: ein Marktstand mit violettem Baldachin und einem leuchtenden Prisma auf dem Tresen. Wie pack_arena NICHT von assets_sichern.py geholt (*.cloudfront.net ist aus dieser Umgebung gesperrt, CONNECT 403), sondern in der Bild-Sandbox auf 448x448 verkleinert und als WebP q74 uebertragen — deshalb kleiner als die 1024er Geschwister.",
+   "bytes": 8740,
    "datei": "nav_shop.webp",
    "kleinfassung": true,
-   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260726_042736_4eff429b-94e3-4111-a941-b3f16335b644_min.webp",
-   "sha256": "70d26516e2b1915a76e8ebbc4839427a173c345be8ed44eca92e53a1c862585f"
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260730_185224_0b4c6629-b832-4ce5-9b3b-8bd528b7576c.png",
+   "sha256": "5616b7641731f6880f080039e44f379cba36a292d5637f113e808df37c5976d8"
   },
   "nav_start": {
    "bytes": 46464,
