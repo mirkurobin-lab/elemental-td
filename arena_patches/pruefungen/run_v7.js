@@ -12,16 +12,21 @@ const { chromium } = require('playwright-core');
 const path = require('path');
 const fs = require('fs');
 
-/* ⚠ AM EIGENEN ORT MESSEN (30.07.2026). Hier stand der feste Pfad
-   /home/user/elemental-td/... — laeuft die Suite aus einem Worktree,
-   prueft sie damit die HAUPT-Auscheckung und nicht die Datei, die
-   danebenliegt. Ein gruener Lauf sagte dann nichts ueber die Aenderung
-   aus, die man gerade gemacht hat. Der Pfad haengt jetzt an dieser
-   Datei, nicht an einer Maschine.
-   Zwei Bearbeiter sind an EINEM Tag unabhaengig darueber gestolpert —
-   ein deutlicheres Zeichen, dass der feste Pfad ein Konstruktionsfehler
-   war und keine Bequemlichkeit, gibt es kaum. */
-const FILE = 'file://' + path.resolve(__dirname, '..', 'ui_prototype.html');
+/* ⚠ AM EIGENEN ORT MESSEN (30.07.2026).
+   Hier stand ein FESTER Pfad auf /home/user/elemental-td/... Laeuft die
+   Suite aus einem git-worktree, prueft sie damit die HAUPT-Auscheckung
+   statt der Datei, die danebenliegt: ein gruener Lauf sagt dann nichts
+   ueber die Aenderung aus, die man gerade gemacht hat.
+   DREI Bearbeiter sind an EINEM Tag unabhaengig voneinander darueber
+   gestolpert, zwei davon mit einem falsch-gruenen Ausgangslauf. Damit
+   ist es kein Bedienfehler, sondern ein Konstruktionsfehler.
+   Der Standard haengt jetzt an DIESER Datei. `UI_DATEI` bleibt als
+   Ausweg fuer den seltenen Fall, dass man bewusst einen fremden Baum
+   messen will — aber eben als Ausnahme, nicht als Normalzustand: ein
+   Standard, den man sich merken muss, wird vergessen. */
+const FILE = 'file://' + (process.env.UI_DATEI
+  ? path.resolve(process.env.UI_DATEI)
+  : path.resolve(__dirname, '..', 'ui_prototype.html'));
 /* Galerie-Ordner. ui_shots_v7 bleibt als Stand VOR dem AAA-Icon-Sweep
    erhalten; die aktuelle Galerie ist v8. */
 const SHOTS = '/tmp/claude-0/-home-user-elemental-td/4b0a76dd-5b22-5fdf-85e8-579f1b036ae5/scratchpad/ui_shots_v8';
@@ -811,6 +816,96 @@ function gegen(name, sollFalschSein, info) { step('gegen: ' + name, !sollFalschS
   await page.evaluate(() => window.__proto.setFortLayout('constell', true));
   await page.evaluate(() => window.__proto.renderFortress());
   await shot('festung_konstellation');
+
+  /* ================= BURG: ALLES AUF EINEN BILDSCHIRM (30.07.2026) =====
+     Auftraggeber woertlich: „alles sollte auf eine Seite passen nicht ewig
+     zum scrollen." Gemessen VORHER bei 430x932 / deviceScaleFactor 2:
+       #fortTracks 948 px · #viewFortress 1483 px · Dokument 1530 px
+       ⇒ 598 px Scroll-Ueberhang gegenueber dem Bildschirm.
+     Ursache waren die ausgeschriebenen Stufenlisten (3 x 21 Knoten der
+     Form „Stufe 27 · +3.28 %"). Sie liegen jetzt in einem eigenen Fenster
+     hinter dem ⓘ; die Zeile zeigt — Auftraggeber: „immer nur den aktuellen
+     anzeigen und den naechsten" — genau zwei Werte, dazu Stufenstand,
+     Meilenstein-Angabe und den Preis.
+     Gemessen NACHHER: #fortTracks 268 px · Dokument 932 px · 0 px
+     Ueberhang (Inhaltsunterkante 748 px, Bottom-Nav ab 863 px).
+     Der Schritt haelt das fest — mit 8 px Toleranz gegen Rundung. */
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(220);
+  const burg = await page.evaluate(() => {
+    const sicht = e => !!e && e.getClientRects().length > 0;
+    const zeilen = Array.prototype.map.call(
+      document.querySelectorAll('#fortTracks .branch'), b => ({
+        key: b.getAttribute('data-track'),
+        h: Math.round(b.getBoundingClientRect().height),
+        stat: ((b.querySelector('.bstat') || {}).textContent || '').replace(/\s+/g, ' ').trim(),
+        statSicht: sicht(b.querySelector('.bstat')),
+        msSicht: sicht(b.querySelector('.bms')),
+        preis: ((b.querySelector('.kbuy') || {}).textContent || '').replace(/\s+/g, ' ').trim(),
+        aktion: sicht(b.querySelector('.kbuy')) || sicht(b.querySelector('.kgate')) ||
+                sicht(b.querySelector('.kmax')),
+        info: sicht(b.querySelector('.binfo')),
+        listeSicht: sicht(b.querySelector('.branchrail')),
+        knoten: b.querySelectorAll('.knot').length,
+        // Wie viele Prozentwerte stehen in der Zeile? Zusage: GENAU ZWEI —
+        // der aktuelle und der naechste. Eine dritte waere der Rueckfall
+        // in die alte Stufenliste.
+        werte: (((b.querySelector('.bstat') || {}).textContent || '')
+                 .match(/\+\d+,\d+ %/g) || []).length,
+      }));
+    const nav = document.querySelector('nav.bottom');
+    const letzte = document.getElementById('fortNote');
+    return { zeilen,
+             liste: Math.round(document.getElementById('fortTracks').getBoundingClientRect().height),
+             unterkante: Math.round(letzte.getBoundingClientRect().bottom),
+             navOben: Math.round(nav.getBoundingClientRect().top),
+             dok: document.documentElement.scrollHeight,
+             fenster: window.innerHeight };
+  });
+  step('Je Upgrade sind aktueller Wert UND naechster Zuwachs sichtbar',
+    burg.zeilen.length === 3 && burg.zeilen.every(z => z.statSicht &&
+      /\+\d+,\d+ %/.test(z.stat) && /→ \+\d+,\d+ %/.test(z.stat)),
+    burg.zeilen.map(z => z.stat).join(' | '));
+  step('Jede Upgrade-Zeile traegt eine sichtbare Aktion mit Preis',
+    burg.zeilen.every(z => z.aktion) &&
+    burg.zeilen.filter(z => z.preis).every(z => /\d/.test(z.preis.replace(/\s/g, ''))),
+    burg.zeilen.map(z => z.preis || '(Tor/MAX)').join(' | '));
+  // Meilensteine sind echte Mechanik — sie duerfen aus der LISTE fallen,
+  // aber nicht aus der Ansicht.
+  step('Naechster Meilenstein bleibt je Zeile ablesbar',
+    burg.zeilen.every(z => z.msSicht),
+    burg.zeilen.map(z => z.key).join(','));
+  step('Je Upgrade stehen GENAU zwei Stufenwerte in der Zeile',
+    burg.zeilen.every(z => z.werte === 2),
+    burg.zeilen.map(z => z.werte).join('/'));
+  const knotenImView = await page.locator('#viewFortress .knot').count();
+  step('KEINE ausgeschriebene Stufenliste im Layout',
+    burg.zeilen.every(z => z.listeSicht === false && z.knoten === 0) && knotenImView === 0,
+    '#fortTracks ' + burg.liste + ' px (vorher 948 px), ' + knotenImView +
+    ' Knoten im View, Zeilen: ' +
+    burg.zeilen.map(z => z.key + ':' + z.knoten + '/' + z.listeSicht).join(' '));
+  gegen('eine Stufenliste steckt noch in der Upgrade-Zeile',
+    burg.zeilen.some(z => z.listeSicht || z.knoten > 0));
+  step('Upgrade-Zeile bleibt unter 84 px',
+    burg.zeilen.every(z => z.h <= 84), burg.zeilen.map(z => z.h + 'px').join('/'));
+  step('Ganze Festungs-Ansicht passt in eine Bildschirmhoehe (430x932)',
+    burg.dok <= burg.fenster + 8 && burg.unterkante <= burg.navOben,
+    'Dokument ' + burg.dok + ' px / Fenster ' + burg.fenster + ' px, Inhalt endet bei ' +
+    burg.unterkante + ' px, Bottom-Nav ab ' + burg.navOben + ' px');
+  // Gegenprobe: die Leiter ist nicht geloescht, sie liegt hinter dem ⓘ.
+  step('Jede Zeile bietet ein ⓘ', burg.zeilen.every(z => z.info));
+  await page.click('#fortTracks .branch[data-track="hp"] .binfo');
+  await page.waitForTimeout(340);
+  const nachTipp = await page.evaluate(() => {
+    const l = document.getElementById('fsList');
+    return { sicht: l.getClientRects().length > 0, knoten: l.querySelectorAll('.knot').length };
+  });
+  step('Das ⓘ holt die volle Stufenleiter in ein eigenes Fenster',
+    nachTipp.sicht && nachTipp.knoten >= 15, nachTipp.knoten + ' Knoten');
+  await shot('festung_stufenleiter');
+  await page.click('#fsClose');
+  await page.waitForTimeout(280);
+
   await page.evaluate(() => window.__proto.setFortLayout('banner'));
   await page.waitForTimeout(400);
   await shot('festung_banner');

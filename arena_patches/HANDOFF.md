@@ -857,7 +857,7 @@ Der View trägt oben rechts einen Segment-Umschalter (`[data-fortlay]`):
 
 | Segment | Layout | Aufbau |
 |---|---|---|
-| **Konstellation** (Standard) | Variante 1, „1+3 kombiniert" | lebende Burg + drei Knoten-Äste |
+| **Konstellation** (Standard) | Variante 1, „1+3 kombiniert" | lebende Burg + drei kompakte Upgrade-Zeilen |
 | **Banner** | Variante 2, „Banner-Stapel" | drei Banner über die volle Breite, Burg als abgedunkelter Parallax dahinter |
 
 * Die Wahl liegt in **`localStorage["arenaFortLayout"]`** (`"constell"` \| `"banner"`),
@@ -907,9 +907,26 @@ kalibriert, AA-Referenz §16.6); die View ist reine Präsentation und liest auss
   werden Strahlbreite/-höhe/-glow (`#fxBeam`), Schild-Radius (`#fxShield`) und Anzahl der
   Mauer-Kristalle (`#castleFx[data-walls]`) berechnet; `prismRate` steuert die
   `animation-duration` des Strahlpulses.
-* `renderConstellation(tracks)` — drei Äste, ein Knoten je Stufe, Fenster um die aktuelle
-  Stufe (`WINDOW_BEFORE = 6`, `WINDOW_AFTER = 14`). **Die Knoten sind Daten** — mehr Stufen
-  ändern am Layout nichts.
+* `renderConstellation(tracks)` — **seit 30.07.2026 drei kompakte Zeilen statt drei
+  Knoten-Äste.** Auftraggeber wörtlich: „ohne die ganzen % Zahlen mach nur immer die
+  aktuellen % rein und die die die nächste ist zum Upgraden alles sollte auf eine Seite
+  passen nicht ewig zum scrollen." — präzisiert: „jeder Upgrade Schritt soll immer nur den
+  aktuellen anzeigen und den nächsten."
+  Eine Zeile (`.branch > .branchhead`, gemessen **83 px**) zeigt: Emblem · Name +
+  einzeiliger Zweck · `Lv x/100` · ⓘ · **genau zwei Werte: aktueller Wert → Zuwachs der
+  nächsten Stufe** · Meilenstein-Angabe (`.bms`, aus `decadeOf()` — dieselbe Rechnung wie
+  im Banner-Layout) · rechts `.kbuy` mit Preis bzw. `.kgate` (Trophäen-Tor) / `.kmax`
+  (Vollausbau).
+  Die **ausgeschriebene Stufenleiter** (`WINDOW_BEFORE = 6`, `WINDOW_AFTER = 14`) ist nicht
+  gelöscht, klappt aber **nicht in der Zeile auf** — sie liegt im eigenen Fenster
+  `#fortStepsDlg` hinter dem ⓘ (`openFortSteps(key)` / `closeFortSteps()`). Das Fenster
+  hängt am `body`, nicht im View: die Views bekommen beim Wischen ein `transform`, und ein
+  transformierter Vorfahr macht aus `position:fixed` eine Falle.
+  **Gemessen 430x932 / deviceScaleFactor 2:** `#fortTracks` 948 → **264 px**,
+  `#viewFortress` 1483 → **885 px**, Dokument 1530 → **932 px**, Scroll-Überhang
+  598 → **0 px**. Inhaltsunterkante 744 px, Bottom-Nav ab 863 px. Festgehalten in
+  `pruefungen/run_v7.js` („Ganze Festungs-Ansicht passt in eine Bildschirmhöhe").
+  **Die Knoten bleiben Daten** — mehr Stufen ändern am Layout nichts.
 * `buyFort(key, ev)` → `fireBuyRay(ev)` (Lichtstrahl vom Knopf zur Burg) + `.justbought`
   (Glow-Puls) + `renderFortress()`.
 
