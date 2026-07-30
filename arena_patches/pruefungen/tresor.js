@@ -167,6 +167,111 @@ function ladenKurve(staffel, menge) {
       daten.preisText);
   }
 
+  /* ==================================================================
+   * (4) DER TRESORKASTEN DARF KEIN FENSTER SEIN
+   * ------------------------------------------------------------------
+   * Gefunden am 30.07.2026 durch HINSEHEN, nicht durch Messen: der
+   * Tresorkopf im Laden sah aus wie ein Darstellungsfehler — ein
+   * schwarzer Block, daneben Kristalle der Kulisse, quer darueber eine
+   * harte helle Naht.
+   *
+   * ⚠ ZUR ENTSTEHUNG DIESES SCHRITTS — er stand hier zuerst FALSCH.
+   * Meine erste Erklaerung lautete: „die Fuellstands-Saeule liegt mit
+   * z-index 0 HINTER dem deckenden Motiv und ist deshalb unsichtbar."
+   * Der Quelltext behauptete dasselbe („Saeule als Ebene DAHINTER").
+   * Beides ist falsch, und die GEGENPROBE hat es aufgedeckt: ein
+   * positioniertes Kind mit z-index 0 wird IMMER ueber dem Hintergrund
+   * seines Elternteils gezeichnet — der Hintergrund kommt in der
+   * Malreihenfolge zuerst. Die Saeule lag also nie hinter dem Motiv.
+   * Die Pruefung, die ich zuerst gebaut hatte („bei 0 % und 70 % muss
+   * sich die Motivflaeche unterscheiden"), war deshalb wertlos: sie war
+   * fuer den kaputten wie fuer den reparierten Aufbau gruen.
+   *
+   * WAS WIRKLICH KAPUTT WAR, sind drei Dinge:
+   *   (a) `background` als Kurzform setzt die Hintergrundfarbe auf
+   *       transparent. renderVault() ueberschreibt danach nur
+   *       background-IMAGE. offer_vault_bank.webp ist 896x1200 (3:4),
+   *       der Kasten 1:1 — `contain` laesst links und rechts je 8 px
+   *       frei, und durch diese Streifen sah man die Kulisse der Karte.
+   *       Der Kasten war ein Fenster.
+   *   (b) Die Saeule deckte mit opacity .5 und normalem Mischen das
+   *       Motiv zu einer flachen Platte zu.
+   *   (c) Es gab keinen Pegelstrich, also las sich die Kante als Naht.
+   *
+   * GEMESSEN WIRD HIER NUR (a). Das ist Absicht und keine Nachlaessig-
+   * keit: (b) und (c) sind Fragen der Lesbarkeit, und die braucht
+   * Bildpunkte. In dieser Umgebung gibt es keinen PNG-Decoder, und
+   * `getImageData` scheidet aus, weil `file://` jede Leinwand
+   * verunreinigt. Ich habe die Bytegroesse der Aufnahme als Ersatzmass
+   * ausprobiert und VERWORFEN — sie unterscheidet nicht: neuer Aufbau
+   * 1,099, alter Aufbau 1,101, voll deckende Saeule 0,983 gegenueber
+   * der ungefuellten Flaeche. Eine Schwelle darauf waere geraten
+   * gewesen. (b) und (c) sind deshalb per Augenschein abgenommen und
+   * in AA_UI_REFERENZ.md §31 als solche vermerkt — nicht als Messung
+   * ausgegeben.
+   *
+   * (a) dagegen ist hart pruefbar, war tatsaechlich kaputt, und faellt
+   * bei jedem kuenftigen `background:`-Kurzform-Griff sofort auf.
+   * ================================================================== */
+  await seite.evaluate(() => {
+    ["loginLayer", "dailyLayer", "offerLayer", "confirmDlg", "reqDlg", "detailModal",
+     "bonusDlg", "mergeCeremony", "roadLayer", "cineLayer", "avCerLayer", "mmLayer"]
+      .forEach(id => { const e = document.getElementById(id); if (e) e.classList.remove("open"); });
+    window.__proto.show("navShop");
+  });
+  await seite.waitForTimeout(600);
+
+  const krug = await seite.$("#vaultShop .vaultjar") || await seite.$(".vaultjar");
+  if (!krug) {
+    pruef("der Tresorkrug ist auffindbar", false, "kein .vaultjar im Laden");
+  } else {
+    /* Deckkraft aus der GERECHNETEN Farbe, nicht aus dem Blatt: nur so
+       faellt auch auf, wenn jemand die Farbe spaeter per Kurzform oder
+       inline wieder wegnimmt — genau der Weg, auf dem sie verloren ging. */
+    const lies = () => seite.evaluate(() => {
+      const j = document.querySelector("#vaultShop .vaultjar") ||
+                document.querySelector(".vaultjar");
+      return getComputedStyle(j).backgroundColor;
+    });
+    /* `rgb(...)` ohne vierten Wert ist deckend. Ein naiver Griff nach
+       „der letzten Zahl in der Klammer" liefert hier den Blauanteil und
+       nennt rgb(5,8,9) durchsichtig — derselbe Fehlertyp wie beim
+       Preisparser weiter oben, deshalb ausdruecklich getrennt. */
+    const deckkraft = (f) => {
+      if (/^transparent$/i.test(f)) return 0;
+      const m = /^rgba\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+\s*,\s*([\d.]+)\s*\)$/.exec(f);
+      return m ? parseFloat(m[1]) : 1;
+    };
+    const grund = await lies();
+    pruef("der Tresorkasten ist deckend — die Randstreifen sind kein Fenster",
+      deckkraft(grund) === 1,
+      grund + " → Deckkraft " + deckkraft(grund) +
+      "; das Motiv ist 3:4 im 1:1-Kasten, links und rechts bleiben je 8 px Kastenfarbe");
+
+    /* Gegenprobe: der kaputte Zustand wird wiederhergestellt. Meldet
+       die Ablesung ihn nicht, prueft der Schritt darueber nichts. */
+    await seite.evaluate(() => {
+      const j = document.querySelector("#vaultShop .vaultjar") ||
+                document.querySelector(".vaultjar");
+      j.style.backgroundColor = "transparent";
+    });
+    const kaputt = await lies();
+    gegen("ein durchsichtiger Kasten wuerde auffallen",
+      deckkraft(kaputt) === 0,
+      kaputt + " → Deckkraft " + deckkraft(kaputt) + " (erkannt)");
+    /* Und die Ablesung darf nicht einfach alles fuer durchsichtig
+       halten: rgb() ohne vierten Wert muss deckend herauskommen. */
+    gegen("die Ablesung haelt rgb(5, 8, 9) nicht faelschlich fuer durchsichtig",
+      deckkraft("rgb(5, 8, 9)") === 1 && deckkraft("rgba(5, 8, 9, 0.4)") === 0.4,
+      "rgb→1, rgba(…,0.4)→0.4");
+
+    await seite.evaluate(() => {
+      const j = document.querySelector("#vaultShop .vaultjar") ||
+                document.querySelector(".vaultjar");
+      j.style.backgroundColor = "";
+    });
+  }
+
   pruef("keine JS-Fehler", jsFehler.length === 0,
     jsFehler.length ? jsFehler.slice(0, 2).join(" | ") : "keine");
 

@@ -4379,18 +4379,64 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
    wurde das Quadrat zusaetzlich hochkant gequetscht. Genau das meinte
    „muss aber schoener aussehen, braucht ein sauberes Bild".
    Jetzt: derselbe quadratische, eingesenkte Bildkasten wie ueberall
-   (.bandart), das Artwork ungeschnitten und mittig darin, die
-   Fuellstands-Saeule als Ebene DAHINTER (z 0) — sie zeigt weiterhin
-   den Stand, auch wenn das CDN ausfaellt. */
+   (.bandart), das Artwork ungeschnitten und mittig darin.
+
+   ⚠ FASSUNG 4 (30.07.2026). Der Kopf sah im Laden aus wie ein
+   Darstellungsfehler: ein schwarzer Block, daneben Kristalle der
+   Kulisse, quer darueber eine harte helle Naht.
+
+   ⚠ ZUERST HABE ICH DIE URSACHE FALSCH BENANNT — und der Absatz
+   darueber hatte denselben Denkfehler: „die Saeule liegt als Ebene
+   DAHINTER (z 0)". Das stimmt nicht. Ein positioniertes Kind mit
+   z-index 0 wird IMMER ueber dem Hintergrund seines Elternteils
+   gezeichnet; der Elternhintergrund kommt in der Malreihenfolge
+   zuerst. Die Saeule lag nie hinter dem Motiv, und ein „Freistellen"
+   des Packs haette daran nichts geaendert. Aufgefallen ist mir das
+   erst an der Gegenprobe in pruefungen/tresor.js, die den angeblich
+   kaputten Zustand nicht wiedererkennen konnte.
+
+   DIE TATSAECHLICHEN URSACHEN, gemessen:
+     (a) `background:` als KURZFORM setzt background-color auf
+         `transparent`. renderVault() ueberschreibt danach nur
+         background-IMAGE, die Farbe blieb also weg.
+         offer_vault_bank.webp ist 896x1200 (3:4), der Kasten ist 1:1 —
+         `contain` legt links und rechts je 8 px frei, und durch diese
+         Streifen sah man die Kulisse der Karte. Der Kasten war ein
+         Fenster. (Die Behauptung „das Motiv ist 1:1" weiter oben war
+         beim Schreiben richtig und ist es heute nicht mehr.)
+     (b) Die Saeule deckte mit opacity .5 und normalem Mischen das
+         Motiv zu einer flachen Platte zu.
+     (c) Ohne Pegelstrich las sich die Kante als Naht, nicht als Stand.
+
+   Behoben: eine eigene, fast schwarze Kastenfarbe (a); `screen` bei
+   geringer Deckkraft, damit das Motiv unter der Faerbung lesbar bleibt
+   (b); ein Pegelstrich als INNERER Schatten (c) — kein `border-top`,
+   der wuerde die Elementhoehe vergroessern und damit genau den Wert
+   verfaelschen, den er anzeigt.
+
+   ⚠ Nur (a) ist in tresor.js gemessen. (b) und (c) sind Lesbarkeit und
+   brauchen Bildpunkte; hier gibt es keinen PNG-Decoder, und `file://`
+   verunreinigt jede Leinwand. Die Bytegroesse der Aufnahme als Ersatz
+   habe ich ausprobiert und verworfen (kaputt 1,101 gegen repariert
+   1,099 — sie unterscheidet nicht). Beides ist per Augenschein
+   abgenommen, siehe AA_UI_REFERENZ.md §31. */
 .vaultjar{position:relative;overflow:hidden;flex:0 0 64px;width:64px;height:64px;
   display:flex;align-items:center;justify-content:center;
   border-radius:12px;border:1px solid #43307a;
-  background:linear-gradient(180deg,#16202a,#0a1017);
+  /* Eigene, fast schwarze Flaeche: `background` als Kurzform setzt die
+     Farbe sonst auf `transparent`, und weil renderVault() nur
+     background-IMAGE ueberschreibt, schien in den beiden Randstreifen
+     die Kulisse der Karte durch. Der Streifen las sich als Loch. Diese
+     Farbe trifft den Bildhintergrund, damit der Rand zum Motiv gehoert. */
+  background-color:#050809;
+  background-image:linear-gradient(180deg,#16202a,#0a1017);
   box-shadow:var(--mat-well);
   background-repeat:no-repeat;background-position:center;background-size:contain}
-.vaultjar .fill{position:absolute;left:0;right:0;bottom:0;z-index:0;
+.vaultjar .fill{position:absolute;left:0;right:0;bottom:0;z-index:1;
   background:linear-gradient(180deg,#7fd8ff,#3fa9e8 45%,#1c6ea8);
-  opacity:.5;transition:height var(--t-slow) var(--ease-out)}
+  opacity:.34;mix-blend-mode:screen;pointer-events:none;
+  box-shadow:inset 0 2px 0 rgba(190,238,255,.92);
+  transition:height var(--t-slow) var(--ease-out)}
 .vaultjar .gem{position:relative;z-index:2;font-size:26px;
   filter:drop-shadow(0 2px 5px #000c)}
 .vaultbox.full .vaultjar .fill{background:linear-gradient(180deg,#fff7d6,#f2c53d 45%,#a8842a)}
@@ -9062,13 +9108,18 @@ button.pfplate{cursor:pointer}
        einziges Unterscheidungsmerkmal und muss deshalb auf 20 px noch
        lesbar sein; deswegen quer ueber die ganze Breite und nicht als
        kleines Schloss in der Ecke. Die alte Glas-Amphore ist damit weg:
-       die Fuellstandssaeule ist eine CSS-Ebene HINTER dem Bild (siehe
-       `.vaultjar`, z 0), und durch das GLAS sah man sie. Ein deckender
-       Pack verdeckt sie in seiner Flaeche; nach dem Freistellen bleibt
-       sie nur noch RUND UM den Pack sichtbar. Das ist weniger, aber
-       nicht nichts — wer den vollen Stand zurueck will, legt die Saeule
-       UEBER den Pack statt darunter. Nachtrag: bis dahin gilt der
-       Zahlenwert daneben als fuehrende Anzeige. */
+       die Fuellstandssaeule ist eine CSS-Ebene, und durch das GLAS sah
+       man sie.
+       ⚠ NACHTRAG 30.07.2026: der Satz „ein deckender Pack verdeckt sie
+       in seiner Flaeche" stimmt nicht. Die Saeule ist ein
+       positioniertes Kind und wird immer UEBER dem Hintergrundbild des
+       Elternteils gezeichnet — verdeckt wurde sie nie. Was den Kopf
+       kaputt aussehen liess, war die fehlende Kastenfarbe (Kurzform
+       `background:`) zusammen mit dem Seitenverhaeltnis der Datei:
+       896x1200 (3:4) in einem 1:1-Kasten, also 8 px offene Streifen
+       links und rechts, durch die die Kulisse schien. Ausfuehrlich im
+       Blatt bei `.vaultjar`. Der Zahlenwert daneben bleibt die
+       fuehrende Anzeige. */
     offer_starter:         CDN + "hf_20260729_093545_9c7815bd-4e00-449e-a02e-0c60a9f4e6db.png",
     offer_vault_bank:      CDN + "hf_20260729_093410_046b5c20-96cb-4330-9bdc-4717f37a47d4.png",
     frame_card_orange:     CDN + "hf_20260726_042716_5bf79216-8800-472c-ab73-d9f93ea05991.png",
@@ -17960,13 +18011,13 @@ button.pfplate{cursor:pointer}
          .tinted-Koerper bleibt darunter und traegt weiter den Zustand
          „voll" (Gold statt Smaragd). */
       bgArt(el, "bg_vault");
-      /* Das Tresor-Artwork liegt UEBER der Fuellstands-Saeule: Die
-         Saeule zeigt den Stand, das Artwork gibt ihr das Gefaess. Faellt
-         das Bild aus, bleibt die reine CSS-Saeule sichtbar.
-         ⚠ `background-size:contain` steht im Blatt bei `.vaultjar` und
-         ist Teil des Fixes: das Motiv ist 1:1, der Kasten ist es jetzt
-         auch, also wird nichts mehr gequetscht und nichts mehr von einer
-         clip-path-Kante abgeschnitten. */
+      /* Die Fuellstands-Saeule faerbt den gefuellten Teil des Packs ein
+         (Fassung 4, Begruendung im Blatt bei `.vaultjar`). Faellt das
+         Bild aus, bleibt die reine CSS-Saeule sichtbar.
+         ⚠ `background-size:contain` steht im Blatt bei `.vaultjar`: das
+         Motiv wird ungeschnitten und ungequetscht eingepasst. Es ist
+         allerdings 3:4 und der Kasten 1:1 — es bleiben links und rechts
+         je 8 px Rand, die `background-color` des Kastens traegt. */
       Array.prototype.forEach.call(el.querySelectorAll("[data-vaultart]"), function (j) {
         var k = j.getAttribute("data-vaultart");
         if (ASSETS[k]) j.style.backgroundImage = 'url("' + ASSETS[k] + '")';

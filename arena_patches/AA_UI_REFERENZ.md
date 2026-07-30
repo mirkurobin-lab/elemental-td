@@ -3247,3 +3247,62 @@ zweite Zeile Sortierung links und **Schmiede rechts** (AA-Anordnung) — ein Kno
 vollständig gebaut und musste nur erreichbar werden.
 
 **Aufwand: M** · **Priorität: 1**
+
+---
+
+## §31 Der Tresorkopf: wie ein Darstellungsfehler aussah, was es wirklich war
+
+Beim Nachsehen im Laden (30.07.2026) sah der Kopf des **Kristalltresors** kaputt aus: ein
+schwarzer Block oben links, daneben Kristalle der Kulisse, quer darüber eine harte helle
+Naht. Keine der 23 Prüfungen hat etwas gemeldet — alle Bildprüfungen fragten „ist das Bild
+da?", und das war es.
+
+### 31.1 Meine erste Erklärung war falsch
+
+Ich habe zuerst geschrieben, die Füllstands-Säule liege mit `z-index: 0` **hinter** dem
+deckenden Packmotiv und sei deshalb unsichtbar. Der Quelltext behauptete an zwei Stellen
+dasselbe („Säule als Ebene DAHINTER"). Das ist ein CSS-Irrtum: ein **positioniertes Kind mit
+`z-index: 0` wird immer über dem Hintergrund seines Elternteils gezeichnet** — der
+Elternhintergrund steht in der Malreihenfolge ganz vorn. Die Säule lag nie hinter dem Motiv.
+
+Aufgefallen ist es nur, weil die neue Prüfung eine **Gegenprobe** hatte, die den angeblich
+kaputten Zustand wiederherstellt. Sie konnte ihn nicht wiedererkennen — weil es ihn nie gab.
+Ohne diese Gegenprobe wäre eine Prüfung entstanden, die für den kaputten wie für den
+reparierten Aufbau grün ist, und dazu ein Kommentar, der künftigen Lesern einen falschen
+CSS-Merksatz beibringt. *Die Gegenprobe hat hier nicht den Code geprüft, sondern mich.*
+
+### 31.2 Die tatsächlichen Ursachen
+
+| | Ursache | Messbar? |
+|---|---|---|
+| **a** | `background:` als **Kurzform** setzt `background-color` auf `transparent`. `renderVault()` überschreibt danach nur `background-image`, die Farbe blieb also weg. `offer_vault_bank.webp` ist **896×1200 (3:4)**, der Kasten **1:1** — `contain` lässt links und rechts je 8 px frei, und durch diese Streifen schien die Kulisse der Karte. **Der Kasten war ein Fenster.** | **ja** |
+| **b** | Die Säule deckte mit `opacity:.5` und normalem Mischen das Motiv zu einer flachen Platte zu. | nein |
+| **c** | Ohne Pegelstrich las sich die Kante als Naht, nicht als Stand. | nein |
+
+Die Behauptung „das Motiv ist 1:1", die als Begründung für `contain` im Blatt stand, war beim
+Schreiben richtig und ist es heute nicht mehr — das Bild wurde später gegen ein 3:4-Motiv
+getauscht, der Kommentar blieb stehen. **Ein Kommentar, der eine Maßangabe behauptet, ist ein
+Versprechen mit Verfallsdatum.**
+
+### 31.3 Was gemessen wird und was nicht
+
+`pruefungen/tresor.js` misst **nur (a)**: die gerechnete Hintergrundfarbe des Kastens muss
+deckend sein. Mit zwei Gegenproben — der durchsichtige Zustand muss erkannt werden, und die
+Ablesung darf `rgb(5, 8, 9)` nicht fälschlich für durchsichtig halten (derselbe Fehlertyp wie
+der Preisparser in §14, deshalb ausdrücklich abgesichert).
+
+**(b) und (c) sind nicht gemessen, sondern per Augenschein abgenommen.** Lesbarkeit braucht
+Bildpunkte; in dieser Umgebung gibt es keinen PNG-Decoder, und `file://` verunreinigt jede
+Leinwand, also fällt `getImageData` aus. Die **Bytegröße der Aufnahme** als Ersatzmaß habe ich
+ausprobiert und **verworfen** — sie unterscheidet nicht:
+
+| Aufbau | Größe gegenüber der ungefüllten Fläche |
+|---|---|
+| repariert (`screen`, .34) | 1,099 |
+| alt (`normal`, .5) | 1,101 |
+| voll deckende Säule | 0,983 |
+
+Eine Schwelle darauf wäre geraten gewesen. Lieber ein ehrliches „nicht gemessen" im Text als
+ein grüner Balken, der nichts weiß.
+
+**Aufwand: S** · **Priorität: 2**
