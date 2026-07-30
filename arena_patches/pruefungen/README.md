@@ -1,7 +1,7 @@
 # Prüfungen
 
-Zuletzt vollständig gemessen am **30.07.2026**: 22 Playwright-Suiten laufen hier
-durch, zusammen **1 348 Schritte**, davon **1 347 grün**. Rot bleibt genau einer
+Zuletzt vollständig gemessen am **30.07.2026**: 23 Playwright-Suiten laufen hier
+durch, zusammen **1 378 Schritte**, davon **1 377 grün**. Rot bleibt genau einer
 — `run_v7.js` „gleiche Drittel" (siehe unten, braucht eine Produktentscheidung,
 kein Code-Fix).
 
@@ -10,7 +10,7 @@ kein Code-Fix).
 Container nicht liegt (`Cannot find module 'playwright'`). Das ist eine
 Umgebungsgrenze, kein Befund.
 
-Die Tabelle unten führt alle 22 auf und summiert sich auf die 1 348. Jede Zahl
+Die Tabelle unten führt alle 23 auf und summiert sich auf die 1 378. Jede Zahl
 in der Spalte „Schritte" ist gemessen, nicht geschätzt — wer sie ändert, hat die
 Suite laufen lassen. (Vier Suiten fehlten bis zum 30.07.2026 ganz in dieser
 Tabelle, drei weitere trugen veraltete Zahlen. Eine Übersicht, die nicht stimmt,
@@ -36,8 +36,8 @@ Die meisten Suiten laden
 `file:///home/user/elemental-td/arena_patches/ui_prototype.html` direkt — kein
 Server, kein Build.
 
-**Zwei starten einen eigenen HTTP-Server** (`assets_lokal.js`,
-`packsprengung.js`), und das ist kein Komfort, sondern notwendig. Sie lesen
+**Drei starten einen eigenen HTTP-Server** (`assets_lokal.js`,
+`packsprengung.js`, `belohnung.js`), und das ist kein Komfort, sondern notwendig. Sie lesen
 Pixel von einer Leinwand, auf die das Packbild gezeichnet wird. Unter `file://`
 gilt jede Datei als eigener, undurchsichtiger Ursprung: das Bild „taintet" die
 Leinwand und `getImageData` wirft `SecurityError`. Über HTTP teilen Seite und
@@ -68,6 +68,7 @@ gibt also keine feste Portnummer, die kollidieren kann.
 | `deck.js` | 57 | Battle Deck: neun Slots, Auswahlfenster, Tausch, Sammlung |
 | `offline.js` | 46 | Passive Offline-Erträge: Kappung, Abholung, Buchung |
 | `bildzustand.js` | 12 | Der Zustand mit ECHTEN Bildern (`data:`-URI), den örtlich sonst niemand sieht |
+| `belohnung.js` | 30 | **Das Belohnungsfenster (§29).** Alle drei Wege — normal abholen, Kristalle, Werbung. Kernfrage: stimmt jede Kachel mit dem ueberein, was WIRKLICH gebucht wurde? Gemessen Sorte fuer Sorte gegen `AC.getMaterials()` — **liest Pixel, braucht den HTTP-Server** |
 | `assets_lokal.js` | 12 | **Liegen die Bilder im Repo, und kommen sie an?** Struktur (löst das Manifest auf `./assets/` auf), Platte (existiert jede Datei), Pixel (`naturalWidth > 0` je Ansicht) — plus die Mutationsprobe, dass `?cdn=1` den Schritt rot macht |
 | `assets_vollstaendig.py` | 4 | Jedes benutzte Asset ist verzeichnet, gesichert UND aktuell |
 
@@ -525,6 +526,34 @@ Fehler verhindern soll. Er misst jetzt nur, was im Layout steht, nachdem die
 Ansicht gezeigt und durchgerollt wurde. Dazu die Mutationsprobe: mit `?cdn=1`
 **muss** der Pixel-Schritt hier rot werden (20/20 leer). Bliebe er grün, wäre
 der gemeldete Fehler auch an dieser Suite vorbeigelaufen.
+
+## Eine Klasse, die es schon gab (30.07.2026, Belohnungsfenster)
+
+Das neue Belohnungsfenster (§29) bekam die Namen `#rwLayer`, `.rwcell`, `.rwpop` — „rw"
+für *reward*, naheliegend und sauber gewählt. Beim ersten Lauf von `belohnung.js` waren
+zwei Schritte rot:
+
+* der Kachelrand trug `rgb(38,52,63)` statt der Raritätsfarbe,
+* ein Tap in den ersten Millisekunden schloss das Fenster, obwohl eine Sperre dagegen steht.
+
+Zwei sehr verschiedene Symptome, eine Ursache: **beide Namen waren längst vergeben.**
+`.rwcell` ist die Belohnungskachel des Season-Pass (35 Verwendungen), und `#rwLayer` war
+bereits die Belohnungs-Ebene der Trophäenstraße. Es gab also **zwei Elemente mit derselben
+ID** — `$("rwLayer")` traf meins, der fremde Klick-Handler rief `closeRewards()` und schloss
+es an der Sperre vorbei. Und meine `.rwcell`-Regeln, darunter `opacity:0` plus Einflug-
+Animation, lagen ab sofort auch auf den Pass-Kacheln.
+
+Die Lehre ist nicht „besser aufpassen", sondern:
+
+> **Vor einem neuen Klassen- oder ID-Präfix einmal `grep -oE '\bprefix[A-Za-z]+'` laufen
+> lassen.** Zehn Sekunden gegen eine Kollision, die sich als drei unabhängige Fehler tarnt.
+
+Bemerkenswert ist, was die Kollision NICHT ausgelöst hat: keine Konsolenmeldung, kein
+ungültiges HTML nach außen, keine der 22 bestehenden Suiten rot. Ein doppeltes `id` ist in
+HTML zwar ungültig, aber Browser reparieren es still — `getElementById` nimmt einfach das
+erste. Gefunden hat es allein der Schritt, der die Randfarbe gegen `AC.TIERS` **nachrechnet**
+statt sie nur vorhanden zu finden. Eine Prüfung, die „hat einen Rand" gefragt hätte, wäre
+grün geblieben.
 
 ## Was hier NICHT liegt
 

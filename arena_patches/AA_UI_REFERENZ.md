@@ -3034,3 +3034,87 @@ Ein Vollbild-Overlay, das den Hintergrund stark abdunkelt. Von oben nach unten:
    Laufzeit hineingeschrieben, damit ein Bild für alle Level reicht.
 4. Optik „clean wie der Shop" (Auftraggeber) — also dieselbe Bandtypografie, dieselben
    Kachelrahmen, dieselben Icon-Schlüssel wie im übrigen Spiel.
+
+---
+
+## 29. BELOHNUNGS-Fenster nach dem Abholen (IMG_3459, 30.07.2026) — GEBAUT
+
+**Auftrag:** „Wenn man die offline earnings abholt muss sich so ein Fenster öffnen. Bau es
+mit unseren icons und Design. Jeweils wenn man mit Kristallen kauft, Ad anschaut oder
+normal abholt."
+
+### Was auf dem Bild steht
+
+| Element | Beschreibung |
+|---|---|
+| **Lage** | eigenes Blatt **über** dem Offline-Fenster; das darunter bleibt sichtbar abgedunkelt stehen |
+| **Titel** | Band „REWARDS" mit Linie und Rauten links/rechts — bei uns `secribbon("BELOHNUNGEN")` |
+| **Raster** | vier Kacheln je Reihe in einem eingefassten, rollbaren Feld |
+| **Kachel** | runder Rahmen in **Raritätsfarbe**, Artwork mittig, Glanzpunkt oben links, Menge `×N` unten rechts |
+| **Einflug** | die Kacheln poppen **gestaffelt** auf — auf dem Bild sind zwei mitten im Flug und deshalb blass |
+| **Abschluss** | „TAP TO CLOSE" ganz unten, **außerhalb** des Blattes; kein ✕ |
+
+### Umsetzung
+
+`window.UIBelohnung.zeige(titel, posten, opts)` — **eine** Bauform, bewusst allgemein, damit
+das Level-auf-Fenster (§28), Tagesbelohnung und Straßen-Knoten dasselbe Fenster benutzen
+können. Zwei Fenster, die dasselbe versprechen, driften auseinander.
+
+Ein Posten ist `{ art, id, tier, menge }` mit `art ∈ {gold, gem, xp, mat, karte}`. Der
+Kachelrand nimmt seine Farbe aus `AC.TIERS` — dieselbe Quelle wie überall sonst, damit eine
+neue Raritätsstufe hier nicht vergessen wird. Der Ton ist `UISfx.flip(stufe)` je Kachel,
+**mit** ihrer Rarität: acht Essenzen klingen anders als eine legendäre Karte.
+
+### Die Regel, an der alles hängt
+
+> **Das Fenster zeigt, was GEBUCHT wurde — nicht die Vorschau, nicht die Rate, nicht die
+> Absicht.**
+
+Praktisch heißt das: die Essenz-Kacheln kommen aus dem Unterschied von `AC.getMaterials()`
+vor und nach der Buchung, nicht aus der Zahl, die hineingereicht wurde. `addMaterial(60)`
+verteilt per Round-Robin auf acht Sorten (8,8,8,8,7,7,7,7); welche Sorte wie viel bekommt,
+weiß nur der Speicher — und genau das ist die Information, für die der Spieler das Fenster
+aufmacht. `pruefungen/belohnung.js` misst diese Gleichheit Sorte für Sorte gegen den
+Speicher, mit einer Gegenprobe darauf, dass die Mengen **nicht** alle gleich sind (sonst
+käme die Liste aus einer Tabelle).
+
+Ohne Posten öffnet sich **nichts**. Ein leeres Belohnungsfenster ist eine Lüge mit Rahmen.
+
+### Die drei Wege
+
+| Weg | Titel | Inhalt | Satz darunter |
+|---|---|---|---|
+| Normal abholen | BELOHNUNGEN | Gold + Essenzen je Sorte + die wirklich gezogenen Karten | „Aus **6 h** Abwesenheit." |
+| Mit Kristallen | SCHNELL-ERTRAG | Zuwachs im **Topf** (Gold, Essenz-Summe, Kartenrückseite) | „**+120 Minuten** … liegt jetzt im Fenster bereit" |
+| Werbung | WERBE-BONUS | dasselbe | dasselbe |
+
+Beim Schnell-Ertrag sind die Kacheln bewusst **unbestimmt**: `quick()` bucht nur Zeit,
+gewürfelt wird erst beim Abholen. Die Karten-Kachel zeigt deshalb die **Rückseite** und
+behauptet keine ID, und die Essenz steht als Summe (`ESS_SAMMEL`) statt nach Sorten. Der
+Satz darunter sagt ausdrücklich, dass es im Topf liegt und nicht im Beutel.
+
+### Zwei Befunde, die beim Bauen aufgefallen sind
+
+**1. Kristalle für nichts (behoben).** `stand()` rechnet `msGut = min(msRoh + quickMs,
+DECKEL)`. Steht der Topf schon am Deckel, ändert gekaufte Zeit **nichts** — `quick("gems")`
+hätte 40 Kristalle abgebucht und exakt null geliefert. Der Knopf war trotzdem aktiv; seine
+einzige Bedingung war „heute noch Versuche übrig". Aufgefallen ist es erst, weil das neue
+Fenster zeigen *muss*, was dabei herauskommt: bei vollem Topf wäre es leer geblieben. Ein
+Kauf, der nichts bringt, wird jetzt abgelehnt, **bevor** er etwas kostet — auch der
+Werbeweg, denn ein Video für nichts ist genauso verbrannt und kostet zusätzlich einen
+Tagesversuch.
+
+**2. XP wird versprochen und nirgends gebucht (OFFEN).** `AO.claim()` liefert `xp`
+(**140/h**, §10), aber `hole()` bucht es nicht — es gibt **kein Spieler-XP-Konto**. Der
+Season-Pass ist es nicht: der läuft über Ereignisse (win/pack/trophy) mit 100 XP je Stufe;
+acht Stunden Offline wären dort 1 120 XP und damit **elf Stufen auf einen Griff**. Das
+Belohnungsfenster zeigt XP deshalb **nicht** — ein Posten darin ist ein Versprechen, und
+dieses könnte niemand einlösen. Die Vorschau im Offline-Fenster zeigt es weiter; das ist
+die eigentliche Unstimmigkeit.
+
+**Zu entscheiden:** in welches Konto geht das Offline-XP? Drei Möglichkeiten:
+(a) ein neues Spieler-Level (dann gehört §28 daran gekoppelt), (b) in den Season-Pass mit
+einem eigenen, viel kleineren Satz, (c) XP aus dem Offline-Ertrag streichen und die 140/h
+als Gold verrechnen. Solange das offen ist, verspricht die Vorschau etwas, das nicht kommt.
+
+**Aufwand: S** · **Priorität: 1** (die Vorschau steht heute im Spiel und ist falsch)

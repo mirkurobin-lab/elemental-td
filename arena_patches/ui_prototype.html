@@ -2933,6 +2933,106 @@ span.ico{text-align:center}
    „wie viel" steht im Fenster, hier zaehlt nur „es liegt etwas da". */
 #tileOfflineBadge{min-width:16px}
 
+/* ==================================================================
+ * BELOHNUNGS-FENSTER (§29) — was du gerade bekommen hast
+ * ------------------------------------------------------------------
+ * Vorlage: IMG_3459. Ueber dem abgedunkelten Offline-Fenster liegt ein
+ * eigenes Blatt: Titelband, Kachelraster zu vier je Reihe, darunter
+ * ausserhalb des Blattes der Hinweis zum Schliessen.
+ *
+ * Es liegt bei z-index 292 — UEBER #offLayer/#qkLayer (289), damit das
+ * Fenster darunter sichtbar abgedunkelt stehen bleibt statt zu
+ * verschwinden. Genau so steht es in der Vorlage, und es ist auch die
+ * ehrlichere Reihenfolge: die Belohnung ist eine ANTWORT auf das
+ * Fenster darunter, kein neuer Ort.
+ *
+ * Die Kacheln fliegen GESTAFFELT ein (--i je Kachel). Das ist nicht
+ * Zierde: bei acht gleichzeitig erscheinenden Kacheln liest man eine
+ * Flaeche, bei acht nacheinander zaehlt man Posten. In der Vorlage
+ * sieht man den Zustand mitten im Einflug (zwei blasse Kacheln).
+ * ================================================================== */
+#belLayer{position:fixed;inset:0;z-index:292;display:none;
+  background:#04070acc;align-items:center;justify-content:center;padding:18px}
+#belLayer.open{display:flex}
+.belpop{width:100%;max-width:352px;display:flex;flex-direction:column;
+  align-items:center;gap:14px}
+.belsheet{position:relative;width:100%;border-radius:16px;background:var(--panel);
+  border:1px solid #ffffff1a;box-shadow:var(--mat-raised-lg);padding:0 0 16px;
+  animation:offerpop .34s cubic-bezier(.2,1.4,.4,1)}
+/* Das Band liegt mit seiner Mitte auf der Blattoberkante — dieselbe
+   Bauart wie bei #itemLayer, damit beide Fenster EINE Handschrift
+   haben und nicht zwei. */
+.belband{margin:-22px 0 0;position:relative;z-index:2}
+.belbody{padding:22px 14px 0}
+/* Der Rollbereich. In der Vorlage ist er sichtbar eingefasst, und das
+   ist noetig: bei acht Essenz-Sorten plus Gold plus Karten passt das
+   Raster nicht mehr auf ein Handy-Blatt. Ohne feste Hoehe waechst das
+   Blatt sonst aus dem Bild heraus. */
+.belscroll{max-height:266px;overflow-y:auto;border-radius:12px;padding:10px;
+  background:#0b121ab8;border:1px solid #ffffff12}
+.belgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+/* Die Kachel. Der Raritaetsrand ist EINE Farbe aus AC.TIERS — dieselbe
+   Quelle wie ueberall sonst, damit eine neue Stufe hier nicht vergessen
+   wird. `--tf` setzt jede Kachel selbst. */
+.belcell{position:relative;aspect-ratio:1;border-radius:11px;
+  background:linear-gradient(165deg,#1d2836,#121a24);
+  border:2px solid var(--tf,#9aa3ad);
+  box-shadow:0 0 0 1px #00000066, 0 0 11px -2px var(--tf,#9aa3ad),
+             inset 0 1px 0 #ffffff1f;
+  display:flex;align-items:center;justify-content:center;font-size:23px;
+  opacity:0;transform:scale(.42);
+  animation:belpop .42s cubic-bezier(.2,1.5,.45,1) forwards;
+  animation-delay:calc(var(--i,0) * 70ms)}
+.belcell img,.belcell .ico{width:66%;height:66%;object-fit:contain}
+/* ⚠ Kartenbilder brauchen eine eigene Zeile, und der Grund ist beim
+   Ansehen aufgefallen, nicht beim Messen: `img.cart` traegt
+   `position:absolute;inset:0;width:100%` — als Kartenkachel gedacht, wo
+   das Artwork die Flaeche FUELLEN soll. In dieser Kachel lief es damit
+   randlos in die Ecken und legte sich ueber die Menge; „×1" war
+   unsichtbar. Gleiche Spezifitaet wie `.belcell img` haette nicht
+   gereicht (spaetere Regel gewinnt), deshalb `.belcell .cart`.
+   Der Emoji-Rueckfall liegt an derselben Stelle, sonst springt das
+   Motiv, wenn ein Bild fehlt. */
+.belcell .cart,.belcell .cartemo{position:absolute;inset:17%;width:66%;height:66%;
+  border-radius:7px;object-fit:contain;font-size:25px}
+/* Menge ueber allem, Glanzpunkt ueber dem Bild — sonst verschwindet
+   beides unter einem randlosen Artwork. */
+.belcell::before{z-index:2}
+.belcell b{z-index:3}
+/* Der Glanzpunkt oben links, wie in der Vorlage. Rein dekorativ und
+   deshalb pointer-events-frei. */
+.belcell::before{content:"";position:absolute;left:7%;top:6%;width:26%;height:26%;
+  border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle at 40% 40%,#ffffffd9,#ffffff00 68%)}
+.belcell b{position:absolute;right:4px;bottom:2px;font-size:11px;font-weight:900;
+  color:#fff;text-shadow:0 1px 3px #000,0 0 6px #000c;letter-spacing:.01em}
+/* Der XP-Stern als Eigenbau — es gibt kein XP-Bild, und ein Emoji
+   waere hier das falsche Gewicht. */
+.belcell .xpstar{display:flex;align-items:center;justify-content:center;
+  width:66%;height:66%;border-radius:50%;font-style:normal;
+  font-size:13px;font-weight:900;color:#0b1a2b;
+  background:linear-gradient(180deg,#7fd4ff,#3d9df2)}
+.belnote{margin:13px 4px 0;font-size:11px;line-height:1.5;color:var(--dim);
+  text-align:center}
+.belnote b{color:#7fe08a;font-weight:900}
+/* Der Schliess-Hinweis steht AUSSERHALB des Blattes — in der Vorlage
+   auch. Er gehoert zum Bildschirm, nicht zum Fenster. */
+.belhint{font-size:12px;font-weight:900;letter-spacing:.13em;color:#ffffffb0;
+  text-shadow:0 1px 4px #000;animation:belhint 1.9s ease-in-out infinite}
+@keyframes belpop{
+  0%  {opacity:0;transform:scale(.42) translateY(9px)}
+  62% {opacity:1;transform:scale(1.09) translateY(0)}
+  100%{opacity:1;transform:scale(1)}}
+@keyframes belhint{0%,100%{opacity:.5}50%{opacity:1}}
+/* Wer Bewegung abbestellt hat, bekommt denselben Inhalt ohne Flug.
+   Die Kacheln muessen dann SOFORT sichtbar sein — eine Animation, die
+   nicht laeuft, laesst `opacity:0` sonst stehen, und das Fenster waere
+   leer. Das ist der klassische Fehler an dieser Stelle. */
+@media (prefers-reduced-motion: reduce){
+  .belcell{animation:none;opacity:1;transform:none}
+  .belsheet{animation:none}
+  .belhint{animation:none;opacity:.85}}
+
 #itemLayer{position:fixed;inset:0;z-index:288;display:none;
   background:#04070ac2;align-items:center;justify-content:center;padding:18px}
 #itemLayer.open{display:flex}
@@ -7899,6 +7999,24 @@ button.pfplate{cursor:pointer}
   </div>
 </div>
 
+<!-- ===== Belohnungs-Fenster (§29) =====
+     Eine Bauform fuer JEDE Ausschuettung. Es steht bewusst nicht im
+     Offline-Block: dasselbe Fenster soll spaeter Tagesbelohnung, Pass
+     und Strassen-Knoten tragen. Wer eine zweite Bauform anlegt, hat
+     zwei Fenster zu pflegen, die dasselbe versprechen. -->
+<div id="belLayer" aria-hidden="true">
+  <div class="belpop">
+    <div class="belsheet" role="dialog" aria-modal="true" aria-live="polite">
+      <div class="belband" id="belBand"></div>
+      <div class="belbody">
+        <div class="belscroll"><div class="belgrid" id="belGrid"></div></div>
+        <div class="belnote" id="belNote"></div>
+      </div>
+    </div>
+    <div class="belhint" id="belHint">TIPPEN ZUM SCHLIESSEN</div>
+  </div>
+</div>
+
 <div id="itemLayer" aria-hidden="true">
   <div class="itempop">
     <!-- aria-label statt aria-labelledby: die Bandueberschrift kommt aus
@@ -11977,6 +12095,146 @@ button.pfplate{cursor:pointer}
    * eine falsche Offenlegung ist schlimmer als gar keine.
    * ================================================================= */
   /* ==================================================================
+   * UIBelohnung — „das hast du gerade bekommen" (§29, 30.07.2026)
+   * ------------------------------------------------------------------
+   * Vorlage: IMG_3459 (AA, „REWARDS" ueber den Offline-Ertraegen).
+   * Vorgabe: „Wenn man die offline earnings abholt muss sich so ein
+   * Fenster oeffnen … jeweils wenn man mit Kristallen kauft, Ad
+   * anschaut oder normal abholt."
+   *
+   * EINE Bauform fuer alle drei Wege und bewusst allgemein gehalten,
+   * damit spaeter Tagesbelohnung, Pass-Stufe und Strassen-Knoten
+   * dasselbe Fenster benutzen. Zwei Fenster, die dasselbe versprechen,
+   * driften auseinander — das ist in diesem Projekt schon passiert.
+   *
+   * ⚠ DIE EISERNE REGEL DIESES FENSTERS: es zeigt, was GEBUCHT WURDE.
+   * Nicht die Vorschau, nicht die Rate, nicht die Absicht. Der Aufrufer
+   * uebergibt deshalb Posten, die er aus dem TATSAECHLICHEN Vorher/
+   * Nachher gebildet hat — bei den Essenzen zum Beispiel aus dem
+   * Unterschied von AC.getMaterials(), nicht aus der Zahl, die er
+   * hineingereicht hat. Der Unterschied ist nicht theoretisch: der
+   * Round-Robin verteilt „40 Essenz" auf acht Sorten, und welche wie
+   * viel bekommt, weiss nur der Speicher.
+   *
+   * Wenn nichts gebucht wurde, oeffnet sich NICHTS. Ein leeres
+   * Belohnungsfenster ist eine Luege mit Rahmen.
+   *
+   * posten: [{ art, id, tier, menge }]
+   *   art  "gold" | "gem" | "xp" | "mat" | "karte"
+   *   id   bei "mat"/"karte" die Karten-ID (die Essenz-Sorte IST eine)
+   *   tier Raritaetsschluessel aus AC.TIERS — faerbt Rand und Ton
+   * ================================================================== */
+  window.UIBelohnung = (function () {
+    var offen = false, schliessBar = false, aufZu = null, timer = null;
+
+    function tierFarbe(k) {
+      var t = AC && AC.tierOf ? AC.tierOf(k || "common") : null;
+      return (t && t.color) || "#9aa3ad";
+    }
+    function tierIndex(k) {
+      var t = AC && AC.tierOf ? AC.tierOf(k || "common") : null;
+      return t ? (t.index | 0) : 0;
+    }
+
+    /* Das Bild einer Kachel. Jede Art hat genau EINE Quelle, und keine
+       davon ist ein neuer Bildauftrag: Gold und Kristall haben ihre
+       Waehrungs-Icons, eine Essenz traegt das Artwork ihrer Karte
+       (matIco, seit dem 29.07.2026 die Regel), eine Karte ihr eigenes. */
+    function bild(p) {
+      if (p.art === "gold") return ico("cur_gold", "🪙");
+      if (p.art === "gem")  return ico("cur_gem", "💎");
+      if (p.art === "xp")   return '<i class="xpstar">XP</i>';
+      /* Ohne Sorte ist die SUMME ueber alle Sorten gemeint — dafuer und
+         nur dafuer gibt es ESS_SAMMEL. Das ist der Fall beim
+         Schnell-Ertrag: dort waechst der Topf, gewuerfelt wird erst
+         beim Abholen. */
+      if (p.art === "mat")  return p.id ? matIco(p.id) : ico(ESS_SAMMEL, "⚗");
+      /* Dieselbe Ehrlichkeit bei Karten: steht noch nicht fest, WELCHE
+         es werden, zeigt die Kachel die Rueckseite. Ein konkretes
+         Artwork waere hier eine Zusage, die niemand gemacht hat. */
+      if (p.art === "karte") return p.id ? cardArtHTML(p.id) : ico("card_back", "🃏");
+      return ico(ESS_SAMMEL, "⚗");
+    }
+
+    function zelle(p, i) {
+      return '<div class="belcell" style="--i:' + i + ';--tf:' + tierFarbe(p.tier) + '"' +
+        ' data-art="' + p.art + '"' + (p.id ? ' data-id="' + p.id + '"' : "") +
+        ' data-tier="' + (p.tier || "common") + '" data-menge="' + p.menge + '">' +
+        bild(p) + "<b>×" + fmt(p.menge) + "</b></div>";
+    }
+
+    /* zeige(titel, posten, opts)
+       opts.note   Satz unter dem Raster (schon fertiges HTML)
+       opts.zurueck  Rueckruf beim Schliessen — z. B. „und jetzt das
+                     Offline-Fenster zumachen". */
+    function zeige(titel, posten, opts) {
+      opts = opts || {};
+      posten = (posten || []).filter(function (p) { return p && p.menge > 0; });
+      /* Kein Posten, kein Fenster. Siehe Kopf. */
+      if (!posten.length) return false;
+
+      $("belBand").innerHTML = secribbon(titel || "BELOHNUNGEN");
+      $("belGrid").innerHTML = posten.map(zelle).join("");
+      $("belNote").innerHTML = opts.note || "";
+      hydrateIcons($("belLayer"));
+      hydrateRibbons($("belLayer"));
+
+      aufZu = typeof opts.zurueck === "function" ? opts.zurueck : null;
+      offen = true;
+      /* ⚠ NICHT sofort schliessbar. Ohne diese Sperre schluckt derselbe
+         Tap, der „Abholen" ausgeloest hat, das Fenster gleich wieder —
+         auf dem Telefon ist das ein Doppelereignis von unter 100 ms, und
+         der Spieler sieht seine Belohnung nie. Der Fehler ist in diesem
+         Projekt bei der Pack-Szene schon einmal aufgetreten. */
+      schliessBar = false;
+      clearTimeout(timer);
+      timer = setTimeout(function () { schliessBar = true; }, 420);
+
+      $("belLayer").classList.add("open");
+      $("belLayer").setAttribute("aria-hidden", "false");
+
+      /* Ton: EIN Fanfarenlauf fuers Fenster, dann je Kachel ein Anschlag
+         MIT ihrer Raritaet. `UISfx.flip(stufe)` steigt mit der Stufe —
+         damit hoert man den Unterschied zwischen acht Essenzen und einer
+         legendaeren Karte, statt ihn nur zu sehen. Die Staffelung ist
+         dieselbe wie im Bild (70 ms), sonst laufen Ton und Kachel
+         auseinander. */
+      UISfx.reward();
+      posten.slice(0, 12).forEach(function (p, i) {
+        setTimeout(function () {
+          if (offen) UISfx.flip(tierIndex(p.tier));
+        }, 120 + i * 70);
+      });
+      track("belohnung_zeigen", { titel: titel, posten: posten.length });
+      return true;
+    }
+
+    function schliesse() {
+      if (!offen || !schliessBar) return;
+      offen = false;
+      $("belLayer").classList.remove("open");
+      $("belLayer").setAttribute("aria-hidden", "true");
+      var z = aufZu; aufZu = null;
+      if (z) z();
+    }
+
+    function binde() {
+      var l = $("belLayer");
+      if (!l) return;
+      /* Tippen ueberall schliesst — so steht es in der Vorlage
+         („TAP TO CLOSE"), und es ist bei einem Fenster ohne Entscheidung
+         auch das richtige Verhalten. */
+      l.addEventListener("click", schliesse);
+      document.addEventListener("keydown", function (e) {
+        if (offen && (e.key === "Escape" || e.key === "Enter" || e.key === " ")) schliesse();
+      });
+    }
+
+    return { zeige: zeige, binde: binde, schliesse: schliesse,
+             istOffen: function () { return offen; } };
+  })();
+
+  /* ==================================================================
    * UIOffline — Offline-Ertraege (30.07.2026)
    * ------------------------------------------------------------------
    * Nachgebaut aus IMG_3442/3443. Die Rechnung steckt vollstaendig in
@@ -12136,27 +12394,103 @@ button.pfplate{cursor:pointer}
       $("offLayer").classList.remove("zu");
     }
 
+    /* postenAus(vorher, r, karten) — die Kachelliste fuer das
+       Belohnungsfenster, gebildet aus dem TATSAECHLICHEN Unterschied.
+       ------------------------------------------------------------------
+       Warum nicht einfach `r.material` als eine Kachel: `addMaterial(40)`
+       verteilt per Round-Robin auf acht Sorten, und WELCHE wie viel
+       bekommt, weiss nur der Speicher — der Zeiger `matRR` wandert
+       zwischen den Aufrufen. Eine Kachel „×40 Essenz" waere deshalb
+       zwar nicht falsch, aber sie verschweigt genau die Information,
+       fuer die der Spieler das Fenster aufmacht: was liegt jetzt in
+       welchem Fach.
+
+       ⚠ XP HAT HIER KEINE KACHEL, und das ist Absicht, kein Vergessen.
+       `AO.claim()` liefert `xp` (140/h, §10), aber `hole()` bucht es
+       nirgends — es gibt kein Spieler-XP-Konto. Der Season-Pass ist es
+       nicht: der laeuft ueber Ereignisse (win/pack/trophy) mit 100 XP je
+       Stufe, acht Stunden Offline waeren dort 1 120 XP und damit elf
+       Stufen auf einen Griff. Solange offen ist, WOHIN das XP gehoert,
+       zeigt dieses Fenster es nicht. Ein Posten im Belohnungsfenster ist
+       ein Versprechen, und dieses koennte niemand einloesen.
+       Der Befund steht in GAMEPLAY_OPTIMIERUNG §29. */
+    function postenAus(vorherMat, r, karten) {
+      var p = [];
+      if (r.gold > 0) p.push({ art: "gold", tier: "common", menge: r.gold });
+      var nachher = AC.getMaterials();
+      AC.MATERIALS.forEach(function (m) {
+        var d = (nachher[m.key] | 0) - (vorherMat[m.key] | 0);
+        if (d > 0) p.push({ art: "mat", id: m.key, tier: "good", menge: d });
+      });
+      /* Gleiche Karte in gleicher Stufe wird zu EINER Kachel mit Anzahl —
+         drei Kacheln „Ember ×1" nebeneinander liest niemand als drei. */
+      var bnd = {};
+      karten.forEach(function (k) {
+        var s = k.id + "|" + k.tier;
+        if (!bnd[s]) { bnd[s] = { art: "karte", id: k.id, tier: k.tier, menge: 0 }; p.push(bnd[s]); }
+        bnd[s].menge++;
+      });
+      return p;
+    }
+
     function hole() {
       var r = AO.claim(jetzt());
       if (!r.ok) { UISfx.deny(); toast("Es liegt noch nichts bereit."); return; }
+      var vorherMat = AC.getMaterials();
       setGold(gold() + r.gold);
       /* Material ohne Sortenangabe: der Round-Robin verteilt es ueber
          die Basis-Sorten. Spell-Essenz kommt bewusst NICHT von hier —
          die hat ihre eigene Quelle (Spell-Slots). */
       if (r.material) AC.addMaterial(r.material);
+      var karten = [];
       if (r.karten) {
         for (var i = 0; i < r.karten; i++) {
-          AC.addDrop(POOL_IDS[Math.floor(Math.random() * POOL_IDS.length)], "common", 1);
+          var id = POOL_IDS[Math.floor(Math.random() * POOL_IDS.length)];
+          AC.addDrop(id, "common", 1);
+          karten.push({ id: id, tier: "common" });
         }
       }
-      UISfx.reward();
       track("offline_claim", { gold: r.gold, stunden: Math.round(r.gutH) });
-      toast("+" + fmt(r.gold) + " Gold aus " + stundenText(r.gutH) + " Abwesenheit");
-      schliesse();
       renderTop();
+      /* Erst das Fenster darunter zu, dann die Belohnung darueber. Das
+         Belohnungsfenster liegt hoeher (z 292) und dunkelt selbst ab —
+         beide gleichzeitig offen waeren zwei Abdunklungen uebereinander. */
+      schliesse();
+      var gezeigt = UIBelohnung.zeige("BELOHNUNGEN",
+        postenAus(vorherMat, r, karten),
+        { note: "Aus <b>" + stundenText(r.gutH) + "</b> Abwesenheit." });
+      /* Faellt das Fenster aus (kein Posten — theoretisch, denn `bereit`
+         verlangt gold > 0), bleibt der alte Weg: eine Meldung. Lieber
+         eine Zeile zu viel als eine stille Gutschrift. */
+      if (!gezeigt) {
+        UISfx.reward();
+        toast("+" + fmt(r.gold) + " Gold aus " + stundenText(r.gutH) + " Abwesenheit");
+      }
     }
 
     function quick(art) {
+      var vorher = AO.stand(jetzt());
+      /* ==============================================================
+       * DECKEL-SPERRE — gefunden am 30.07.2026 beim Bau des
+       * Belohnungsfensters.
+       * --------------------------------------------------------------
+       * `stand()` rechnet msGut = min(msRoh + quickMs, DECKEL). Steht
+       * der Topf schon am Deckel, aendert zusaetzliche Zeit NICHTS —
+       * `quick("gems")` haette dann 40 Kristalle abgebucht und exakt
+       * null geliefert. Der Knopf war trotzdem aktiv: seine einzige
+       * Bedingung war „heute noch Versuche uebrig".
+       * Aufgefallen ist es erst, weil das neue Fenster zeigen MUSS, was
+       * dabei herauskommt — bei vollem Topf waere es leer geblieben.
+       * Ein Kauf, der nichts bringt, wird hier deshalb abgelehnt,
+       * BEVOR er etwas kostet. Dasselbe gilt fuer den Werbeweg: ein
+       * Video fuer nichts ist genauso verbrannt wie Kristalle fuer
+       * nichts, und es verbraucht zusaetzlich einen Tagesversuch.
+       * ============================================================== */
+      if (vorher.voll) {
+        UISfx.deny();
+        toast("Der Ertrag steht schon am Deckel — hol ihn erst ab.");
+        return;
+      }
       var opts = art === "gratis" ? { werbungGesehen: WERBUNG_VERFUEGBAR }
                                   : { gems: gems() };
       var r = AO.quick(art, jetzt(), opts);
@@ -12169,12 +12503,35 @@ button.pfplate{cursor:pointer}
         return;
       }
       if (r.gemKosten) setGems(gems() - r.gemKosten);
-      UISfx.reward();
       track("offline_quick", { art: art });
-      toast("+" + r.minuten + " Minuten Offline-Ertrag");
       schliesseQuick();
       zeichne();
       renderTop();
+
+      /* Was der Kauf WIRKLICH gebracht hat: der Unterschied im Topf,
+         nicht die Tabellenzahl aus quickStand(). Die beiden gehen
+         auseinander, sobald die gekaufte Zeit teilweise ueber den
+         Deckel laeuft — dann bekommt der Spieler weniger als auf dem
+         Knopf stand, und dieses Fenster sagt es ihm.
+         ⚠ Diese Posten liegen im TOPF, nicht im Beutel. Der Satz
+         darunter sagt das ausdruecklich; ohne ihn waere die Kachel
+         „×550 Gold" eine Gutschrift, die es noch nicht gibt. */
+      var n = r.stand, p = [];
+      if (n.gold - vorher.gold > 0)
+        p.push({ art: "gold", tier: "common", menge: n.gold - vorher.gold });
+      if (n.material - vorher.material > 0)
+        p.push({ art: "mat", tier: "good", menge: n.material - vorher.material });
+      if (n.karten - vorher.karten > 0)
+        p.push({ art: "karte", tier: "common", menge: n.karten - vorher.karten });
+
+      var gezeigt = UIBelohnung.zeige(
+        art === "gems" ? "SCHNELL-ERTRAG" : "WERBE-BONUS", p,
+        { note: "<b>+" + r.minuten + " Minuten</b> Offline-Ertrag. " +
+                "Liegt jetzt im Fenster bereit — abholen nicht vergessen." });
+      if (!gezeigt) {
+        UISfx.reward();
+        toast("+" + r.minuten + " Minuten Offline-Ertrag");
+      }
     }
 
     function binde() {
@@ -12233,7 +12590,8 @@ button.pfplate{cursor:pointer}
     }
 
     return { binde: binde, marke: marke, oeffne: oeffne, zeichne: zeichne,
-             _quick: quick, _werbung: function (an) { WERBUNG_VERFUEGBAR = !!an; } };
+             _hole: hole, _quick: quick,
+             _werbung: function (an) { WERBUNG_VERFUEGBAR = !!an; } };
   })();
 
   var UIQuoten = (function () {
@@ -18774,6 +19132,7 @@ button.pfplate{cursor:pointer}
   applySettings();          // Sound-Schalter wirkt ab dem ersten Frame
   if (window.ArenaAudio) ArenaAudio.music("audio_theme");   // startet beim 1. Tap
   renderDaily();
+  UIBelohnung.binde();      // Tippen-zum-Schliessen am Belohnungsfenster
   UIOffline.binde();        // startet den Zeitstempel und setzt die Marke
   setNav("navHome");
   markPressable();         // EINE Interaktions-Schicht fuer alles Klickbare
@@ -18826,6 +19185,13 @@ button.pfplate{cursor:pointer}
                      setPackState: function (arr) { packState = arr; renderPack(); },
                      SPELL_IDS: SPELL_IDS, renderSpells: renderSpells,
                      offOeffne: UIOffline.oeffne, offMarke: UIOffline.marke,
+                     /* Belohnungsfenster (§29). `offHole` und `offQuick`
+                        gehen als Funktionen heraus, damit die Pruefung die
+                        drei Wege einzeln ausloesen kann, ohne sich durch
+                        Klickfolgen zu hangeln — der Weg ueber die Knoepfe
+                        misst sonst die Knoepfe und nicht die Buchung. */
+                     UIBelohnung: UIBelohnung,
+                     offHole: UIOffline._hole, offQuickWeg: UIOffline._quick,
                      offWerbung: UIOffline._werbung,
                      /* Fuer den Pruefstand: die Marken-Fabrik und die Tabelle.
                         Ohne sie liesse sich nicht messen, ob die sieben Pfade
