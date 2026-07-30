@@ -1,14 +1,27 @@
 /* Avatar-Auswahl: fuenf zur Wahl, Helden am Besitz.
-   Oertlich ohne CDN faellt jedes Portrait aufs Emoji zurueck — geprueft
-   wird deshalb der ZUSTAND und die Geometrie, nicht das Bild. */
+   Geprueft wird hier der ZUSTAND des Moduls (Katalog, Freischaltungen,
+   Auswahl) und die Geometrie — bewusst NICHT das Bild.
+   ⚠ Dass der Zustand stimmt, heisst nicht, dass man etwas sieht. Am
+   30.07.2026 war diese Datei gruen („ein Klick im Raster wechselt den
+   Avatar"), waehrend auf dem Schirm jede Kachel einen leeren Rahmen
+   zeigte. Ob das BILD wechselt, misst bildzustand.js in den Schritten
+   „das Portrait ist in der Kachel wirklich SICHTBAR" und „ein
+   Avatarwechsel aendert die Vorschau auch auf dem SCHIRM". Die beiden
+   Dateien gehoeren zusammen; wer hier etwas am Avatarsystem aendert,
+   laesst auch bildzustand.js laufen.
+   ⚠ PFAD: __dirname, nicht fest verdrahtet. Der feste Pfad hat aus einem
+   Worktree heraus den falschen Baum gemessen — heute dreimal die Ursache
+   falsch-gruener Laeufe. */
 const { chromium } = require("playwright-core");
+const path = require("path");
+const DATEI = "file://" + path.resolve(__dirname, "..", "ui_prototype.html");
 let ok = 0, fehl = 0;
 const pruef = (n, w, z) => { if (w) ok++; else { fehl++; console.log("  FEHL " + n + (z ? " -> " + z : "")); } };
 (async () => {
   const b = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium-1194/chrome-linux/chrome" });
   const p = await b.newPage({ viewport: { width: 390, height: 844 } });
   const jsF = []; p.on("pageerror", e => jsF.push(String(e).slice(0, 110)));
-  await p.goto("file:///home/user/elemental-td/arena_patches/ui_prototype.html", { waitUntil: "load", timeout: 40000 });
+  await p.goto(DATEI, { waitUntil: "load", timeout: 40000 });
   await p.waitForTimeout(2200);
 
   const kat = await p.evaluate(() => {
