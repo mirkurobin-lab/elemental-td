@@ -2359,7 +2359,18 @@ footer{padding:6px 12px 14px;text-align:center}
 .mergepreview .free{margin-top:6px;color:var(--up);font-weight:800;font-size:10.5px;
   letter-spacing:.04em}
 #mergeCeremony .cersheet{background:#05090ceb;align-items:center;justify-content:center;
-  padding:24px 18px;gap:14px;transition:background var(--t-mid) var(--ease-out)}
+  padding:24px 18px;gap:14px;transition:background var(--t-mid) var(--ease-out);
+  /* ⚠ Die Deckkraft bleibt bei #eb — sie steht fuer AAs gemessenen
+     Helligkeitsabfall (90,9 -> 25,6) und wird NICHT angefasst. Das
+     Problem war ein anderes: bei 93 % scheinen 7 % durch, und 7 % von
+     einer hellen Kachel sind auf schwarzem Grund gut zu erkennen. In der
+     Aufnahme der Zeremonie las man den Startbildschirm mit — Arenatitel,
+     Pack-Zelt, Essenz-Sechsecke — waehrend die Fusion lief. Ein Geist
+     der alten Ansicht im wichtigsten Moment des Spiels.
+     Die Unschaerfe nimmt die FORMEN weg, ohne die Helligkeit zu aendern:
+     die gemessene Beziehung bleibt, das Wiedererkennen hoert auf. */
+  -webkit-backdrop-filter:blur(13px) saturate(.75);
+  backdrop-filter:blur(13px) saturate(.75)}
 /* AA nimmt den Hintergrund im Moment des Umschlags ein zweites Mal zurueck.
    Gemessen am Screenrecording (07-27-2026, 60 fps, 1320x2868): die Helligkeit
    einer inhaltsfreien Ecke faellt beim Klick von 90,9 auf 25,6 und beim
@@ -2432,7 +2443,12 @@ footer{padding:6px 12px 14px;text-align:center}
   100%{opacity:1;transform:scale(1) translateY(0)}}
 .cerstage{position:relative;width:100%;height:236px;display:flex;
   align-items:center;justify-content:center}
-.cerring{position:absolute;inset:0;pointer-events:none}
+/* Ausdrueckliches z-index statt `auto`: die Wucht-Ebenen liegen teils
+   davor (Funken, Splitter) und teils dahinter (Kern, Lichtsaeule,
+   Strahlenkranz). Mit `auto` entscheidet die DOM-Reihenfolge, und die
+   haengt daran, wann ein Effekt erzeugt wurde — das ist keine
+   Stapelordnung, das ist Zufall. */
+.cerring{position:absolute;inset:0;pointer-events:none;z-index:2}
 .orbcard{position:absolute;left:50%;top:50%;width:84px;aspect-ratio:3/4;
   margin:-56px 0 0 -42px;border-radius:10px;border:2px solid #35485a;overflow:hidden;
   background:linear-gradient(160deg,#243342,#0e1418);
@@ -2453,6 +2469,184 @@ footer{padding:6px 12px 14px;text-align:center}
 .cerflash.go{animation:cerflash .18s var(--ease-out) forwards}
 @keyframes cerflash{0%{opacity:0;transform:scale(1)}
   22%{opacity:.9;transform:scale(8)}100%{opacity:0;transform:scale(12)}}
+
+/* ==================================================================
+ * WUCHT-EBENEN — „Muss episch wirken es ist ein besonderer Moment"
+ * ------------------------------------------------------------------
+ * Nutzer-Vorgabe (30.07.2026). Bis hierher war die Zeremonie exakt an
+ * AA nachgemessen; AA ist an dieser Stelle aber sehr zurueckhaltend
+ * (kein Weissblitz, Rahmenwechsel in EINEM Bild). Das war eine bewusst
+ * getroffene Entscheidung — und sie wird hier ebenso bewusst
+ * ueberstimmt: Der Auftraggeber will mehr Wucht als das Referenzspiel.
+ *
+ * ⚠ Deshalb steht hier NICHT „AA macht das so", sondern die Begruendung
+ * fuer die Abweichung. Wer spaeter misst und eine Differenz zu AA
+ * findet, hat keinen Fehler gefunden.
+ *
+ * Aufbau in drei Wellen, damit es eine Dramaturgie hat und nicht nur
+ * viel ist:
+ *   1. AUFLADUNG  (waehrend des Kreisens) — Kern glimmt auf, Energie-
+ *      punkte werden nach innen gezogen, die Quellkarten ziehen Spuren.
+ *   2. AUFPRALL   (im Moment des Umschlags) — Schockwellen, Lichtsaeule,
+ *      Funkenflug, ein kurzer Ruck der ganzen Buehne.
+ *   3. TRIUMPH    (nach der Enthuellung) — Strahlenkranz dreht sich
+ *      hinter der Karte, ab Episch faellt Glanz.
+ *
+ * ⚠ ALLES hier ist Zugabe. Faellt eine Ebene aus, laeuft die Zeremonie
+ * unveraendert — genau wie beim Effektvideo. Und alles traegt
+ * pointer-events:none, damit der Knopf darunter erreichbar bleibt: die
+ * Ebenen liegen ueber der ganzen Buehne, ein vergessenes
+ * pointer-events wuerde den „Weiter"-Knopf unklickbar machen.
+ *
+ * Die Staerke haengt an --wucht (0,6 gewoehnlich bis 1,3 suprem) und
+ * die Farbe an --tierfarbe. Ein Aufstieg auf Suprem MUSS sich anders
+ * anfuehlen als einer auf Gruen, sonst ist die Zeremonie ein Ritual
+ * ohne Aussage.
+ * ================================================================== */
+
+/* --- 1. AUFLADUNG ------------------------------------------------- */
+/* Der Kern. Waechst nicht in Keyframes, sondern wird aus derselben
+   rAF-Schleife gefahren wie die Kreisbahn — so laeuft er GARANTIERT
+   synchron zum Einsaugen und nicht auf einer zweiten Uhr. */
+.ceraura{position:absolute;left:50%;top:50%;width:210px;height:210px;
+  margin:-105px 0 0 -105px;border-radius:50%;pointer-events:none;z-index:0;
+  background:radial-gradient(circle,var(--tierfarbe,#e0b94a) 0%,
+    rgba(var(--tf,224,185,74),.45) 34%,transparent 68%);
+  opacity:0;transform:scale(.2);mix-blend-mode:screen;will-change:opacity,transform}
+/* Energiepunkte, die nach innen gezogen werden. Startwinkel und -radius
+   setzt JS als Custom Properties; der Weg selbst laeuft in CSS, damit
+   die rAF-Schleife nicht 12 zusaetzliche Elemente je Bild anfassen muss. */
+.cermote{position:absolute;left:50%;top:50%;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;
+  border-radius:50%;pointer-events:none;z-index:1;
+  background:radial-gradient(circle,#fff 0%,var(--tierfarbe,#e0b94a) 55%,transparent 72%);
+  animation:cermote var(--dauer,.62s) var(--ease-in-out) forwards;mix-blend-mode:screen}
+@keyframes cermote{
+  0%{opacity:0;transform:translate(var(--mx),var(--my)) scale(.5)}
+  22%{opacity:1}
+  100%{opacity:0;transform:translate(0,0) scale(1.4)}}
+/* Bewegungsspur der Quellkarten. Liegt HINTER der Karte (z-index unter
+   .orbcard, das keins hat und in DOM-Reihenfolge nach der Spur kommt). */
+.orbcard::after{content:"";position:absolute;inset:-6px;border-radius:12px;
+  pointer-events:none;
+  box-shadow:0 0 18px 3px rgba(var(--tf,127,216,255),.85),
+    0 0 34px 8px rgba(var(--tf,127,216,255),.35);
+  opacity:var(--spur,0);transition:opacity .12s linear}
+
+/* --- 2. AUFPRALL --------------------------------------------------- */
+/* Schockwelle: ein duenner Ring, der nach aussen laeuft und dabei
+   ausduennt. Zwei Stueck versetzt — eine einzelne Welle liest als
+   „Kreis", zwei lesen als „Druckwelle". */
+.cerwave{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px 0 0 -30px;
+  border-radius:50%;pointer-events:none;z-index:1;opacity:0;
+  border:3px solid var(--tierfarbe,#e0b94a);
+  box-shadow:0 0 22px rgba(var(--tf,224,185,74),.70),
+    inset 0 0 18px rgba(var(--tf,224,185,74),.45);
+  animation:cerwave var(--dauer,.62s) var(--ease-out) var(--verzug,0s) forwards}
+@keyframes cerwave{
+  0%{opacity:0;transform:scale(.15);border-width:4px}
+  12%{opacity:.95}
+  100%{opacity:0;transform:scale(var(--weit,4.6));border-width:1px}}
+/* Lichtsaeule. Sie faehrt von der Kartenmitte nach oben und unten auf
+   und macht aus dem Umschlag ein Ereignis mit Richtung statt nur einem
+   Aufleuchten. */
+.cerbeam{position:absolute;left:50%;top:50%;width:120px;height:300px;
+  margin:-150px 0 0 -60px;pointer-events:none;z-index:0;opacity:0;
+  background:linear-gradient(180deg,transparent 0%,
+    rgba(var(--tf,224,185,74),.55) 26%,
+    #ffffffcc 50%,
+    rgba(var(--tf,224,185,74),.55) 74%,transparent 100%);
+  filter:blur(7px);mix-blend-mode:screen;
+  animation:cerbeam .54s var(--ease-out) forwards}
+@keyframes cerbeam{
+  0%{opacity:0;transform:scaleY(.05) scaleX(.5)}
+  18%{opacity:.9;transform:scaleY(1) scaleX(1)}
+  100%{opacity:0;transform:scaleY(1.05) scaleX(.25)}}
+/* Funken. Jeder bekommt Zielpunkt und Dauer von JS; der Fall nach unten
+   steckt im zweiten translate, damit die Bahn einen Bogen macht statt
+   sternfoermig gerade zu sein — gerade Strahlen lesen als Grafik, ein
+   Bogen liest als Physik. */
+.cerspark{position:absolute;left:50%;top:50%;width:var(--gr,5px);height:var(--gr,5px);
+  margin:calc(var(--gr,5px) / -2) 0 0 calc(var(--gr,5px) / -2);
+  border-radius:50%;pointer-events:none;z-index:3;
+  background:radial-gradient(circle,#fff 0%,var(--tierfarbe,#e0b94a) 60%,transparent 76%);
+  box-shadow:0 0 8px rgba(var(--tf,224,185,74),.80);
+  animation:cerspark var(--dauer,.8s) var(--ease-out) forwards;mix-blend-mode:screen}
+@keyframes cerspark{
+  0%{opacity:0;transform:translate(0,0) scale(.4)}
+  10%{opacity:1;transform:translate(calc(var(--zx) * .18),calc(var(--zy) * .18)) scale(1.15)}
+  100%{opacity:0;transform:translate(var(--zx),calc(var(--zy) + var(--fall,26px))) scale(.25)}}
+/* Der Ruck. Kurz, klein und NUR einmal — ein langer Ruck ist kein
+   Aufprall mehr, sondern ein Wackelbild. Die Auslenkung haengt an
+   --wucht, damit Suprem spuerbar haerter einschlaegt als Gruen. */
+.cersheet.ruck{animation:cerruck .26s var(--ease-out)}
+@keyframes cerruck{
+  0%{transform:translate(0,0)}
+  15%{transform:translate(calc(var(--wucht,1) * -4px),calc(var(--wucht,1) * 3px))}
+  32%{transform:translate(calc(var(--wucht,1) * 4px),calc(var(--wucht,1) * -2px))}
+  52%{transform:translate(calc(var(--wucht,1) * -3px),calc(var(--wucht,1) * -2px))}
+  74%{transform:translate(calc(var(--wucht,1) * 2px),calc(var(--wucht,1) * 1px))}
+  100%{transform:translate(0,0)}}
+
+/* --- 3. TRIUMPH ---------------------------------------------------- */
+/* Strahlenkranz hinter der Ergebniskarte. Ein conic-gradient mit harten
+   Kanten, langsam drehend — der Standardgriff fuer „das hier ist die
+   Belohnung" (Supercell benutzt ihn bei jeder Karte, die etwas wert
+   ist). Er bleibt bewusst schwach: er soll die Karte tragen, nicht mit
+   ihr um Aufmerksamkeit streiten. */
+.cerrays{position:absolute;left:50%;top:50%;width:340px;height:340px;
+  margin:-170px 0 0 -170px;border-radius:50%;pointer-events:none;z-index:1;opacity:0;
+  background:conic-gradient(from 0deg,
+    rgba(var(--tf,224,185,74),.62) 0deg 7deg,transparent 7deg 30deg,
+    rgba(var(--tf,224,185,74),.62) 30deg 35deg,transparent 35deg 60deg,
+    rgba(var(--tf,224,185,74),.62) 60deg 68deg,transparent 68deg 90deg,
+    rgba(var(--tf,224,185,74),.62) 90deg 95deg,transparent 95deg 120deg,
+    rgba(var(--tf,224,185,74),.62) 120deg 128deg,transparent 128deg 150deg,
+    rgba(var(--tf,224,185,74),.62) 150deg 155deg,transparent 155deg 180deg,
+    rgba(var(--tf,224,185,74),.62) 180deg 187deg,transparent 187deg 210deg,
+    rgba(var(--tf,224,185,74),.62) 210deg 215deg,transparent 215deg 240deg,
+    rgba(var(--tf,224,185,74),.62) 240deg 248deg,transparent 248deg 270deg,
+    rgba(var(--tf,224,185,74),.62) 270deg 275deg,transparent 275deg 300deg,
+    rgba(var(--tf,224,185,74),.62) 300deg 308deg,transparent 308deg 330deg,
+    rgba(var(--tf,224,185,74),.62) 330deg 335deg,transparent 335deg 360deg);
+  /* Weich nach aussen auslaufen lassen — eine harte Kreiskante wuerde
+     den Kranz als Scheibe zeigen statt als Licht. */
+  -webkit-mask-image:radial-gradient(circle,#000 18%,#0009 42%,transparent 70%);
+  mask-image:radial-gradient(circle,#000 18%,#0009 42%,transparent 70%);
+  mix-blend-mode:screen;will-change:transform}
+.cerrays.an{animation:cerraysauf .5s var(--ease-out) forwards,
+  cerraysdreh 15s linear infinite}
+@keyframes cerraysauf{0%{opacity:0}100%{opacity:var(--zielopa,.5)}}
+@keyframes cerraysdreh{to{transform:rotate(360deg)}}
+/* Glanzsplitter ab Episch. Sie fallen von oben durch das Bild — der
+   Unterschied zwischen „gute Karte" und „seltener Moment". */
+/* Glanzsplitter, nicht Konfetti. Der Unterschied steckt in drei
+   Details: schmal statt breit (Verhaeltnis 1:3,4), ein Lichtkern in der
+   Mitte statt einer Vollfarbe, und ein Schein darum. Ohne die drei sieht
+   es aus wie Papierschnipsel aus einer Partytuete — gemessen an der
+   ersten Fassung, die genau so aussah. */
+.cershard{position:absolute;left:50%;top:0;width:var(--gr,5px);height:calc(var(--gr,5px) * 3.4);
+  border-radius:50%;pointer-events:none;z-index:3;opacity:0;
+  background:linear-gradient(180deg,rgba(var(--tf,224,185,74),0) 0%,
+    rgba(var(--tf,224,185,74),.9) 24%,#fff 44%,
+    rgba(var(--tf,224,185,74),.95) 62%,rgba(var(--tf,224,185,74),0) 100%);
+  box-shadow:0 0 7px rgba(var(--tf,224,185,74),.75);
+  mix-blend-mode:screen;
+  animation:cershard var(--dauer,1.5s) var(--verzug,0s) linear forwards}
+@keyframes cershard{
+  0%{opacity:0;transform:translate(var(--sx),-30px) rotate(0deg)}
+  12%{opacity:.95}
+  85%{opacity:.95}
+  100%{opacity:0;transform:translate(calc(var(--sx) + var(--drift,10px)),270px) rotate(var(--dreh,420deg))}}
+
+/* Wer Bewegung reduziert haben will, bekommt von alldem nichts. Die
+   Ebenen werden dann gar nicht erst erzeugt (siehe wuchtAufprall) — die
+   Regel steht als zweiter Riegel, falls die Systemeinstellung waehrend
+   einer laufenden Zeremonie umgestellt wird. */
+@media (prefers-reduced-motion:reduce){
+  .ceraura,.cermote,.cerwave,.cerbeam,.cerspark,.cerrays,.cershard{display:none}
+  .cersheet.ruck{animation:none}
+  .orbcard::after{display:none}
+}
 /* Vor der Enthüllung ist die Ergebniskarte nicht da — sonst stünde sie
    die ganze Kreisbewegung über schon im Bild und die Fusion hätte kein
    Ergebnis mehr zu zeigen. */
@@ -11764,14 +11958,193 @@ button.pfplate{cursor:pointer}
     return out;
   }
 
-  var CER = { raf: 0, timer: 0, zaehler: [], fxTon: false };
+  var CER = { raf: 0, timer: 0, zaehler: [], fxTon: false, wucht: [], mote: 0 };
   function cerStopp() {
     if (CER.raf) { cancelAnimationFrame(CER.raf); CER.raf = 0; }
     if (CER.timer) { clearTimeout(CER.timer); CER.timer = 0; }
     CER.zaehler.forEach(function (t) { clearInterval(t); });
     CER.zaehler = [];
     if (window.__cerTimer) { clearInterval(window.__cerTimer); window.__cerTimer = null; }
+    wuchtRaeumen();
     cerFxStopp();
+  }
+
+  /* ==================================================================
+   * DIE WUCHT-EBENEN DER ZEREMONIE
+   * ------------------------------------------------------------------
+   * Vorgabe (30.07.2026): „Füg der animation noch paar Effekte hinzu.
+   * Muss episch wirken es ist ein besonderer Moment für Spieler."
+   *
+   * Drei Wellen — Aufladung, Aufprall, Triumph. Die Begruendung, warum
+   * das bewusst ueber AAs Zurueckhaltung hinausgeht, steht im Blatt bei
+   * `.ceraura`.
+   *
+   * ⚠ ALLES, was hier erzeugt wird, traegt die Klasse `.wuchtteil` und
+   * wird von wuchtRaeumen() wieder abgeraeumt. Ein zweiter Merge in
+   * derselben Sitzung darf nicht auf den Resten des ersten laufen —
+   * genau diese Klasse Fehler hat die Zeremonie schon zweimal gehabt
+   * (die Verdunklungsstufe und der Neustart der Enthuellungs-Animation).
+   * Deshalb raeumt cerStopp() mit, und cerStopp() laeuft am ANFANG jeder
+   * Zeremonie, nicht nur am Ende.
+   * ================================================================== */
+
+  /* Wieviel Wucht traegt welche Stufe. Ein Aufstieg auf Suprem muss sich
+     anders anfuehlen als einer auf Gruen — sonst ist die Zeremonie ein
+     Ritual ohne Aussage. Index nach ArenaCards.TIERS. */
+  var WUCHT = [0.62, 0.74, 0.88, 1.0, 1.15, 1.3];
+  /* Die Stufenfarbe als KANAELE ("242,161,61"), nicht als Hex. Der Grund
+     ist Durchsichtigkeit: `rgba(var(--tf), .6)` gibt jeder Ebene ihre
+     eigene Deckkraft aus EINER Variable. Mit einem Hex-Wert braeuchte es
+     entweder eine Variable je Deckkraft oder `color-mix()`, und das
+     letztere ist eine junge Funktion — faellt sie aus, ist die ganze
+     Deklaration ungueltig und der Funke hat gar keine Farbe mehr.
+     Die alte `--tierfarbe` bleibt daneben stehen: Rahmen und Saum
+     brauchen die volle Farbe und werden anderswo gesetzt. */
+  function tfKanaele(hex) {
+    var h = String(hex || "").replace("#", "");
+    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    if (h.length !== 6 || /[^0-9a-f]/i.test(h)) return "224,185,74";  // Gold als Notnagel
+    return parseInt(h.slice(0, 2), 16) + "," + parseInt(h.slice(2, 4), 16) + "," +
+           parseInt(h.slice(4, 6), 16);
+  }
+  function wuchtGrad(tier) {
+    var i = tier && typeof tier.index === "number" ? tier.index : 3;
+    return WUCHT[Math.max(0, Math.min(WUCHT.length - 1, i))];
+  }
+  /* Ein Bauteil erzeugen, beschriften und in die Buehne haengen. Die
+     Liste in CER.wucht ist der Grund, warum wuchtRaeumen() nicht ueber
+     querySelectorAll gehen muss: sie kennt genau die Knoten, die diese
+     Zeremonie erzeugt hat. */
+  function wuchtTeil(buehne, klasse, stil, nachHinten) {
+    var d = document.createElement("div");
+    d.className = klasse + " wuchtteil";
+    if (stil) for (var k in stil) d.style.setProperty(k, stil[k]);
+    /* ⚠ z-index allein reicht hier NICHT. Die Buehne enthaelt Elemente
+       mit `z-index:auto` (der Kartenring) — und die werden mit z-index:0
+       in EINER Gruppe in DOM-Reihenfolge gemalt. Ein spaeter angehaengter
+       Kern mit z-index:0 lag deshalb VOR den kreisenden Karten statt
+       hinter ihnen. Wer nach hinten gehoert, wird vorn eingehaengt. */
+    if (nachHinten && buehne.firstChild) buehne.insertBefore(d, buehne.firstChild);
+    else buehne.appendChild(d);
+    CER.wucht.push(d);
+    return d;
+  }
+  function wuchtRaeumen() {
+    if (CER.mote) { clearInterval(CER.mote); CER.mote = 0; }
+    CER.wucht.forEach(function (e) { if (e.parentNode) e.parentNode.removeChild(e); });
+    CER.wucht = [];
+    var sheet = $("cerSheet");
+    if (sheet) sheet.classList.remove("ruck");
+    var ring = $("cerRing");
+    if (ring) { ring.style.removeProperty("--spur"); ring.style.removeProperty("--tf"); }
+  }
+
+  /* --- Welle 1: Aufladung -------------------------------------------
+     Der Kern bekommt KEINE eigene Animation. Er wird aus derselben
+     rAF-Schleife gefahren wie die Kreisbahn (siehe wuchtAuraSetzen) —
+     nur so ist garantiert, dass er im selben Bild seinen Hoehepunkt
+     erreicht, in dem die Karten im Zentrum ankommen. Zwei Uhren waeren
+     zwei Uhren, und die driften. */
+  function wuchtAufladung(buehne, farbe, wucht) {
+    var aura = wuchtTeil(buehne, "ceraura", { "--tf": tfKanaele(farbe) }, true);
+    /* Energiepunkte in den Kern ziehen. Ein Intervall statt eines
+       Punktes je Bild: 60 Punkte je Sekunde waeren Nebel, ~11 ueber die
+       Aufladung sind ein Sog. */
+    CER.mote = setInterval(function () {
+      var w = Math.random() * Math.PI * 2;
+      var r = 78 + Math.random() * 46;
+      wuchtTeil(buehne, "cermote", {
+        "--tf": tfKanaele(farbe),
+        "--mx": (Math.cos(w) * r).toFixed(1) + "px",
+        "--my": (Math.sin(w) * r).toFixed(1) + "px",
+        "--dauer": (0.5 + Math.random() * 0.3).toFixed(2) + "s"
+      });
+    }, Math.round(80 / wucht));
+    return aura;
+  }
+  /* Aus der rAF-Schleife: 0 am Anfang des Kreisens, 1 im Moment des
+     Umschlags. */
+  function wuchtAuraSetzen(aura, ladung, wucht) {
+    if (!aura) return;
+    /* Hochgezogen von 0,85 auf 1,15: in der ersten Fassung war der Kern
+       bei Gewoehnlich nur noch ein Hauch (gemessen 0,27 Deckkraft bei
+       einer Farbe, die selbst schon Grau ist). Der Sog soll man sehen. */
+    aura.style.opacity = Math.min(1, Math.pow(ladung, 1.5) * 1.15 * wucht).toFixed(3);
+    aura.style.transform = "scale(" + (0.2 + ladung * 0.9).toFixed(3) + ")";
+  }
+
+  /* --- Welle 2: Aufprall --------------------------------------------- */
+  function wuchtAufprall(buehne, farbe, wucht) {
+    if (CER.mote) { clearInterval(CER.mote); CER.mote = 0; }
+    /* Zwei versetzte Schockwellen. Eine einzelne liest als „Kreis",
+       zwei lesen als Druckwelle. */
+    var kan = tfKanaele(farbe);
+    wuchtTeil(buehne, "cerwave", { "--tf": kan, "--tierfarbe": farbe,
+      "--dauer": "0.62s", "--weit": (3.9 + wucht * 0.9).toFixed(2), "--verzug": "0s" });
+    wuchtTeil(buehne, "cerwave", { "--tf": kan, "--tierfarbe": farbe,
+      "--dauer": "0.52s", "--weit": (2.6 + wucht * 0.6).toFixed(2), "--verzug": "0.09s" });
+    wuchtTeil(buehne, "cerbeam", { "--tf": kan }, true);
+    /* Funken. Die Zahl haengt an der Wucht (11 bei Gewoehnlich, 23 bei
+       Suprem) — nicht die Groesse: grosse Funken lesen als Klekse. */
+    var n = Math.round(9 + wucht * 11);
+    for (var i = 0; i < n; i++) {
+      /* Gleichmaessig verteilte Startwinkel plus Streuung. Rein
+         zufaellige Winkel klumpen sichtbar; gleichmaessig plus Streuung
+         sieht zufaellig aus und ist es gerade genug. */
+      var w = (i / n) * Math.PI * 2 + (Math.random() - 0.5) * 0.55;
+      var r = (58 + Math.random() * 74) * wucht;
+      wuchtTeil(buehne, "cerspark", {
+        "--tf": kan, "--tierfarbe": farbe,
+        "--zx": (Math.cos(w) * r).toFixed(1) + "px",
+        "--zy": (Math.sin(w) * r).toFixed(1) + "px",
+        "--fall": (16 + Math.random() * 30).toFixed(0) + "px",
+        "--gr": (3 + Math.random() * 3.5).toFixed(1) + "px",
+        "--dauer": (0.62 + Math.random() * 0.4).toFixed(2) + "s"
+      });
+    }
+    /* Der Ruck. Neustart erzwingen, sonst laeuft er beim zweiten Merge
+       in derselben Sitzung nicht wieder an — dieselbe Falle wie bei der
+       Enthuellung. */
+    var sheet = $("cerSheet");
+    if (sheet) {
+      sheet.style.setProperty("--wucht", wucht.toFixed(2));
+      sheet.classList.remove("ruck"); void sheet.offsetWidth; sheet.classList.add("ruck");
+    }
+  }
+
+  /* --- Welle 3: Triumph ---------------------------------------------- */
+  function wuchtTriumph(buehne, farbe, wucht, stufe) {
+    /* Der Kranz liegt hinter der Karte und dreht sich langsam weiter,
+       solange die Zeremonie offen ist. Seine Deckkraft steigt mit der
+       Stufe, bleibt aber unter 0,6: er soll die Karte tragen, nicht mit
+       ihr um Aufmerksamkeit streiten. */
+    var kranz = wuchtTeil(buehne, "cerrays", {
+      "--tf": tfKanaele(farbe),
+      "--zielopa": Math.min(0.58, 0.3 + wucht * 0.22).toFixed(2) }, true);
+    void kranz.offsetWidth;
+    kranz.classList.add("an");
+    /* Glanzsplitter erst ab Episch (Index 3). Wenn jede Verschmelzung
+       Konfetti bekommt, heisst Konfetti nichts mehr. */
+    if (stufe >= 3) {
+      var n = 8 + (stufe - 3) * 5;
+      for (var i = 0; i < n; i++) {
+        wuchtTeil(buehne, "cershard", {
+          /* ⚠ --tf NICHT vergessen. Genau das war hier zuerst der Fall:
+             das Blatt zeichnet den Splitter aus rgba(var(--tf)), und ohne
+             gesetzten Wert griff der Notnagel — Gold. In der Aufnahme
+             eines SUPREM-Aufstiegs (Kartenrahmen rot) regnete es
+             goldene Splitter. Eine Farbe, die aus einer Variable kommt,
+             muss ueberall gesetzt werden, wo das Teil erzeugt wird. */
+          "--tf": tfKanaele(farbe),
+          "--sx": ((Math.random() - 0.5) * 300).toFixed(0) + "px",
+          "--drift": ((Math.random() - 0.5) * 60).toFixed(0) + "px",
+          "--dreh": (200 + Math.random() * 500).toFixed(0) + "deg",
+          "--gr": (4 + Math.random() * 4).toFixed(1) + "px",
+          "--dauer": (1.2 + Math.random() * 0.9).toFixed(2) + "s",
+          "--verzug": (Math.random() * 0.5).toFixed(2) + "s"
+        });
+      }
+    }
   }
 
   /* ==================================================================
@@ -11860,10 +12233,13 @@ button.pfplate{cursor:pointer}
   function playCeremony(id, fromTierKey, newTierKey, lvl, copyOnly) {
     var from = tierOf(fromTierKey), to = tierOf(newTierKey), m = BY_ID[id];
     var box = $("mergeCeremony"), karte = $("cerCard"), ring = $("cerRing");
-    var flash = $("cerFlash"), tafel = $("cerTable");
+    var flash = $("cerFlash"), tafel = $("cerTable"), buehne = $("cerStage");
     var ruhig = window.matchMedia &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     cerStopp();
+    /* Wucht und Farbe der ERREICHTEN Stufe — die Zeremonie feiert das
+       Ziel, nicht die Herkunft. */
+    var wucht = wuchtGrad(to);
 
     $("cerTitle").textContent = copyOnly ? "Verschmolzen!" : "Perfekte Verschmelzung!";
     $("cerArt").className = "artbox";
@@ -11909,6 +12285,9 @@ button.pfplate{cursor:pointer}
       // Merge in derselben Sitzung nicht wieder an.
       karte.classList.remove("zeigen"); void karte.offsetWidth;
       karte.classList.add("zeigen");
+      // Welle 3: der Strahlenkranz startet MIT der Enthuellung, nicht
+      // davor — er soll die Karte begruessen, nicht auf sie warten.
+      if (!ruhig) wuchtTriumph(buehne, to.color, wucht, to.index | 0);
       // UISfx hat kein play(name) — die Blips heißen einzeln. Der Stufen-
       // aufstieg bekommt das Crescendo, eine reine Kopie den Reward-Akkord.
       // ⚠ NUR, wenn das Effektvideo NICHT hoerbar laeuft: sonst liegen
@@ -11978,6 +12357,17 @@ button.pfplate{cursor:pointer}
     var R = 66, T_AUF = 280, T_KRS = 850, T_SAU = 130;
     var T1 = T_AUF + T_KRS;              // 1130 — Ende des Kreisens
     var T2 = T1 + T_SAU, start = 0;      // 1260 — Umschlag (AA: 1267 ms)
+    // Welle 1: der Sog beginnt mit dem Kreisen und laedt bis zum Umschlag auf.
+    var aura = ruhig ? null : wuchtAufladung(buehne, to.color, wucht);
+    /* ⚠ Die Spur traegt die ZIEL-Farbe, nicht die Herkunft. Erster
+       Anlauf nahm from.color — und bei einer Verschmelzung von
+       Gewoehnlich ist das #9aa3ad, ein Grau. Auf schwarzem Grund war die
+       Spur damit unsichtbar; gemessen in der Aufnahme der Aufladung war
+       an den Quellkarten kein Leuchten zu sehen.
+       Inhaltlich ist die Zielfarbe ohnehin die richtige: was da an den
+       Karten zieht, ist die Energie, die gleich das neue Ergebnis wird.
+       Die Spur kuendigt an, worauf es hinauslaeuft. */
+    ring.style.setProperty("--tf", tfKanaele(to.color));
     function schritt(ts) {
       if (!start) start = ts;
       var t = ts - start;
@@ -12011,10 +12401,21 @@ button.pfplate{cursor:pointer}
         karten[i].style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) +
           "px) scale(" + sk.toFixed(3) + ")";
         karten[i].style.opacity = q > 0.6 ? String(Math.max(0, (1 - q) / 0.4)) : "1";
+        // Die Spur zieht mit der Bahngeschwindigkeit an: am Anfang steht
+        // die Karte, am Ende rast sie. Eine konstante Spur waere ein
+        // Leuchtrahmen und keine Bewegung.
+        karten[i].style.setProperty("--spur", (kreisen * 0.85).toFixed(2));
       }
+      // Der Kern laedt auf derselben Uhr auf wie die Bahn: 0 beim ersten
+      // Bild des Kreisens, 1 im Moment des Einsaugens.
+      wuchtAuraSetzen(aura, Math.min(1, t / T1), wucht);
       if (t < T2) { CER.raf = requestAnimationFrame(schritt); return; }
       CER.raf = 0;
       flash.classList.remove("go"); void flash.offsetWidth; flash.classList.add("go");
+      // Welle 2: der Aufprall. Die Aura hat ihren Zweck erfuellt und geht
+      // im Blitz auf — sie bleibt nicht als Fleck stehen.
+      if (aura) { aura.style.opacity = "0"; aura.style.transition = "opacity .2s linear"; }
+      wuchtAufprall(buehne, to.color, wucht);
       enthuellen();
     }
     CER.raf = requestAnimationFrame(schritt);
@@ -20837,6 +21238,16 @@ button.pfplate{cursor:pointer}
                         Blip genau dann einspringt, wenn er gebraucht wird —
                         und genau dann schweigt, wenn nicht. */
                      CER: CER,
+                     /* Die Zeremonie direkt aufrufbar. Ohne das koennte
+                        eine Pruefung nur die Stufe messen, die die
+                        Demo-Sammlung gerade hergibt — und genau die
+                        Extreme (Gewoehnlich und Suprem), an denen die
+                        Wucht-Staffel steht oder faellt, kaemen nie dran.
+                        WUCHT geht als Tabelle mit heraus, damit die
+                        Pruefung die Staffel gegen die QUELLE haelt und
+                        keine Zahlen einfriert. */
+                     playCeremony: playCeremony, closeCeremony: closeCeremony,
+                     WUCHT: WUCHT, wuchtGrad: wuchtGrad, tfKanaele: tfKanaele,
                      AU: function () { return window.ArenaAudio; },
                      renderGuide: renderGuide, renderManual: renderManual,
                      guideTab: guideTab, gTab: function () { return gTab; },
