@@ -11,7 +11,12 @@ const { chromium } = require('playwright-core');
 const path = require('path');
 const fs = require('fs');
 
-const FILE = 'file://' + path.resolve('/home/user/elemental-td/arena_patches/ui_prototype.html');
+/* Standardziel bleibt die Datei im Hauptcheckout. UI_DATEI erlaubt es,
+   dieselbe Suite gegen einen git-worktree laufen zu lassen — ohne den
+   Schalter misst ein Worktree-Durchlauf die Datei von NEBENAN und
+   meldet gruen, was dort nie geaendert wurde (30.07.2026). */
+const FILE = 'file://' + path.resolve(process.env.UI_DATEI ||
+  '/home/user/elemental-td/arena_patches/ui_prototype.html');
 const SHOTS = '/tmp/claude-0/-home-user-elemental-td/4b0a76dd-5b22-5fdf-85e8-579f1b036ae5/scratchpad/ui_shots_v6';
 fs.mkdirSync(SHOTS, { recursive: true });
 
@@ -520,10 +525,29 @@ function step(name, ok, info) {
   // Variante 1 muss der Default sein und weiter funktionieren.
   step('Festung startet in Variante 1 (Konstellation)',
     !(await page.locator('#viewFortress').evaluate(e => e.classList.contains('lay-banner'))));
+  /* ⚠ UMGESCHRIEBENE ZUSAGE, 30.07.2026. Hier stand „Konstellation
+     weiterhin da: 3 Aeste mit Knoten" (`#fortTracks .knot` > 20). Genau
+     diese 63 Knoten waren der Befund des Auftraggebers („sehr cluttered"):
+     gemessen 948 px Liste, 1483 px Gesamtansicht, 598 px Scroll-Ueberhang
+     bei 430x932. Vorgabe: „jeder Upgrade Schritt soll immer nur den
+     aktuellen anzeigen und den naechsten."
+     Die Stufenleiter ist nicht geloescht, sondern in ein eigenes Fenster
+     hinter dem ⓘ gewandert (#fortStepsDlg). Der Schritt prueft deshalb das
+     NEUE Versprechen — und zwar strenger als vorher: drei Zeilen, je zwei
+     Werte, ein ⓘ, und KEIN Knoten mehr im View. */
   const branchesV1 = await page.locator('#fortTracks .branch').count();
-  const knotsV1 = await page.locator('#fortTracks .knot').count();
-  step('Konstellation weiterhin da: 3 Aeste mit Knoten',
-    branchesV1 === 3 && knotsV1 > 20, branchesV1 + ' Aeste / ' + knotsV1 + ' Knoten');
+  const zeilenV1 = await page.evaluate(() => Array.prototype.map.call(
+    document.querySelectorAll('#fortTracks .branch'), b => ({
+      werte: (((b.querySelector('.bstat') || {}).textContent || '')
+               .match(/\+\d+,\d+ %/g) || []).length,
+      info: !!b.querySelector('.binfo') && b.querySelector('.binfo').getClientRects().length > 0,
+    })));
+  const knotsV1 = await page.locator('#viewFortress .knot').count();
+  step('Konstellation weiterhin da: 3 kompakte Upgrade-Zeilen (aktuell + naechste)',
+    branchesV1 === 3 && knotsV1 === 0 &&
+    zeilenV1.every(z => z.werte === 2 && z.info),
+    branchesV1 + ' Zeilen / ' + zeilenV1.map(z => z.werte).join('-') + ' Werte / ' +
+    knotsV1 + ' Knoten im View');
   const segs = await page.locator('#viewFortress [data-fortlay]').count();
   step('Layout-Umschalter mit zwei Segmenten vorhanden', segs === 2, String(segs));
 
@@ -705,7 +729,9 @@ function step(name, ok, info) {
     (await page.evaluate(() => localStorage.getItem('arenaFortLayout'))) === 'constell');
   const backV1 = await page.evaluate(() => ({
     branches: document.querySelectorAll('#fortTracks .branch').length,
-    knots: document.querySelectorAll('#fortTracks .knot').length,
+    // `knots` gestrichen (30.07.2026): die Stufenleiter liegt nicht mehr im
+    // View, sondern im ⓘ-Fenster. Ein Zaehler, der nur noch 0 liefert, ist
+    // keine Messung.
     gates: document.querySelectorAll('#fortTracks .kgate').length,
     stage: getComputedStyle(document.querySelector('#viewFortress .castlestage')).display,
     banners: getComputedStyle(document.getElementById('fortBanners')).display,

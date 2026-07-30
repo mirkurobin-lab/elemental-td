@@ -4018,29 +4018,122 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
 @keyframes rayfly{0%{opacity:0;transform:scaleY(.2)}35%{opacity:1}100%{opacity:0;transform:scaleY(1)}}
 
 /* ==================================================================
- * KRISTALL-KONSTELLATION (Layout "1+3", Teil B)
+ * FESTUNGS-UPGRADES — EINE KOMPAKTE ZEILE JE AUSBAU (Umbau 30.07.2026)
  * ------------------------------------------------------------------
- * Die drei Tracks als Äste mit einem Kristall-KNOTEN pro Stufe, die zur
- * Burg hinaufführen. Vertikal scrollbar, gleiches Muster wie die
- * Trophäenstraße. Skaliert auf 100 Stufen/Track: die Knoten sind Daten,
- * das Layout ist generisch.
+ * WARUM DER UMBAU. Vorher trug jeder der drei Äste eine AUSGESCHRIEBENE
+ * Stufenliste (21 Knoten der Form „Stufe 27 · +3.28 %"). Gemessen bei
+ * 430x932 / deviceScaleFactor 2:
+ *     #fortTracks           948 px
+ *     #viewFortress        1483 px   (Dokument 1530 px)
+ *     Bildschirm            932 px   ⇒ 598 px Scroll-Überhang
+ * Der Spieler scrollte also an rund sechzig Prozentzahlen vorbei, von
+ * denen er genau EINE kaufen kann — die nächste. Auftraggeber wörtlich:
+ * „ohne die ganzen % Zahlen … alles sollte auf eine Seite passen".
+ *
+ * WAS EINE ZEILE JETZT ZEIGT (und nur das) — Auftraggeber präzisiert
+ * am 30.07.2026: „jeder Upgrade Schritt soll immer nur den aktuellen
+ * anzeigen und den nächsten. So war das gemeint."
+ *     Emblem · Name + einzeiliger Zweck + Lv x/100 + ⓘ
+ *            · GENAU ZWEI ZAHLEN: aktueller Wert → Zuwachs der nächsten
+ *              Stufe. Keine dritte, keine Vorschau auf die übernächste.
+ *            · kurzer Meilenstein-Hinweis (echte Mechanik, darf nicht
+ *              ersatzlos wegfallen — aber als ANGABE, nicht als Stufe)
+ *     rechts · Kaufknopf mit Preis (oder Trophäen-Tor / MAX)
+ *
+ * DIE STUFENLISTE IST NICHT GELÖSCHT, aber sie klappt NICHT in der Zeile
+ * auf — sie liegt in einem EIGENEN FENSTER hinter dem ⓘ (#fortStepsDlg).
+ * Die Zeile selbst bleibt damit unter allen Umständen zweizahlig.
+ *
+ * ZIELMASS: Zeile ≤ 84 px, drei Zeilen + Abstände ≤ 260 px. Der
+ * Nachmessschritt in run_v7.js („Festungs-Ansicht passt in eine
+ * Bildschirmhöhe") hält das fest.
  * ================================================================== */
-.constell{margin-top:14px}
-.branch{margin-top:var(--gap-lg);border-radius:var(--radius);border:1px solid var(--line);
+.constell{margin-top:var(--gap-lg)}
+.branch{margin-top:var(--gap);border-radius:var(--radius);border:1px solid var(--line);
   background:linear-gradient(180deg,#18222c,#111a21);overflow:hidden}
-.branchhead{display:flex;align-items:center;gap:10px;padding:10px 11px;
+.branch:first-child{margin-top:0}
+/* Die kompakte Zeile. 8 px Innenabstand oben/unten + vier einzeilige
+   Textzeilen ergeben gemessene 83 px Zeilenhöhe — vorher war allein das
+   Emblem 96 px hoch. */
+.branchhead{display:flex;align-items:center;gap:9px;padding:8px 9px;
   background:linear-gradient(180deg,#22303d,#18222c)}
-.branchhead .bico{flex:0 0 33%;max-width:96px;aspect-ratio:1/1;border-radius:12px;
+.branchhead .bico{flex:0 0 46px;width:46px;height:46px;border-radius:11px;
   background-repeat:no-repeat;background-position:center;background-size:contain,contain;
   background-image:radial-gradient(circle,#2c3a4b,#131c25 72%);
-  display:flex;align-items:center;justify-content:center;font-size:30px;
+  display:flex;align-items:center;justify-content:center;font-size:24px;
   box-shadow:inset 0 0 0 1px #e0b94a3d}
 .branchhead .btx{flex:1;min-width:0}
-.branchhead .bnm{font-size:14.5px;font-weight:900}
-.branchhead .bsub{font-size:10px;color:var(--dim);margin-top:2px;line-height:1.4}
-.branchhead .bstat{margin-top:4px;font-size:11px;font-weight:900}
+/* Alle vier Textzeilen sind EINZEILIG mit Ellipse. Ein Umbruch würde die
+   gemessene Zeilenhöhe kippen und die Seite wieder aus dem Bildschirm
+   schieben — genau der Fehler, den der Banner-Stapel heute noch zeigt. */
+.branchhead .bnm,.branchhead .bsub,.branchhead .bstat,.branchhead .bms{
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Kopfzeile = Name + Stufenstand. Die Stufe steht BEWUSST hier und nicht
+   hinter dem Prozentwert: gemessen wurde „Prisma-Schaden +148,8 % →
+   +4,60 % · Lv…" — bei 226 px Textspalte fiel genau die Stufe der Ellipse
+   zum Opfer, also die Angabe, die der Auftraggeber ausdrücklich verlangt. */
+.branchhead .brow1{display:flex;align-items:center;gap:6px;min-width:0}
+.branchhead .bnm{flex:1;min-width:0;font-size:13.5px;font-weight:900;line-height:1.15}
+.branchhead .blv{flex:0 0 auto;font-size:9.5px;font-weight:900;color:#c6b4ee;
+  letter-spacing:.03em}
+/* ⓘ — der EINZIGE Weg zur ausgeschriebenen Stufenleiter. Bewusst klein und
+   am Zeilenkopf: die Zeile darf nicht selbst aufklappen, sonst stünde die
+   Liste doch wieder im Layout (Vorgabe 30.07.2026). */
+.branchhead .binfo{flex:0 0 auto;width:20px;height:20px;border-radius:50%;font-size:11px;
+  font-weight:900;line-height:1;color:#9fb3c1;background:#0e1418a6;
+  border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+.branchhead .bsub{font-size:9.5px;color:var(--dim);margin-top:1px;line-height:1.3}
+/* Der aktuelle Wert ist die Hauptzahl (weiß), der nächste Zuwachs steht
+   in Aufwärts-Grün daneben — beide zusammen sind die Kaufentscheidung. */
+.branchhead .bstat{margin-top:3px;font-size:11px;font-weight:900;color:#9fb3c1;
+  line-height:1.25}
+.branchhead .bstat b{color:#fff}
 .branchhead .bstat em{font-style:normal;color:var(--up)}
-.branchrail{position:relative;padding:10px 10px 12px 30px;max-height:190px;overflow-y:auto}
+/* Meilenstein-Hinweis. Ersetzt die Zeilen „Stufe 30 · Meilenstein" aus
+   der alten Liste: die Mechanik bleibt sichtbar, die 21 Zeilen nicht. */
+.branchhead .bms{margin-top:3px;font-size:9px;color:#a9bccb;line-height:1.3}
+.branchhead .bms b{color:var(--gold)}
+.bact{flex:0 0 auto;display:flex;flex-direction:column;align-items:stretch;justify-content:center;
+  min-width:94px}
+/* Kaufknopf: GOLD ⇒ dunkle Schriftfüllung (Goldtext-Regel, s. .tb-buy). */
+.kbuy{border-radius:var(--radius-sm);padding:8px 9px;font-size:12.5px;font-weight:900;
+  line-height:1.15;text-align:center;
+  background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);
+  box-shadow:0 2px 0 #6d551a;-webkit-text-fill-color:#3a2b07;color:#3a2b07}
+.kbuy small{display:block;font-size:8.5px;font-weight:800;opacity:.82;margin-top:1px;
+  -webkit-text-fill-color:#3a2b07}
+.kbuy .ico{width:12px;height:12px;vertical-align:-2px}
+.kbuy.poor{filter:grayscale(.35) brightness(.88)}
+/* Trophäen-Tor und Vollausbau nehmen den Platz des Kaufknopfs ein. */
+.kgate,.kmax{border-radius:var(--radius-sm);padding:8px 9px;font-size:11.5px;font-weight:900;
+  line-height:1.15;text-align:center}
+.kgate{color:#e0b94a;background:linear-gradient(180deg,#3a4a58,#222e39);
+  box-shadow:0 2px 0 #16202a}
+.kgate small{display:block;font-size:8.5px;font-weight:800;color:#9fb3c1;margin-top:1px}
+.kgate .ico{width:12px;height:12px;vertical-align:-2px}
+.kmax{background:linear-gradient(180deg,#7ad14f,#3aad16);box-shadow:0 2px 0 #1f6b09;
+  -webkit-text-fill-color:#0a2404;color:#0a2404}
+.kmax small{display:block;font-size:8.5px;font-weight:800;margin-top:1px;
+  -webkit-text-fill-color:#0a2404}
+/* ------------------------------------------------------------------
+ * DIE STUFENLEITER ALS EIGENES FENSTER (#fortStepsDlg)
+ * Sie steht NICHT mehr im Layout und klappt auch nicht in der Zeile auf.
+ * Wer die ganze Kurve sehen will, tippt das ⓘ — für alle anderen bleibt
+ * die Ansicht bei zwei Zahlen je Upgrade.
+ * ------------------------------------------------------------------ */
+#fortStepsDlg{align-items:center;background:#060a0dd1}
+#fortStepsDlg .fsbox{width:min(340px,88vw);max-height:72vh;display:flex;flex-direction:column;
+  border-radius:var(--radius);border:1px solid var(--line);
+  background:linear-gradient(180deg,#18222c,#111a21);box-shadow:0 18px 40px -14px #000e;
+  overflow:hidden}
+#fortStepsDlg .fshead{display:flex;align-items:center;gap:8px;padding:10px 10px 9px 12px;
+  background:linear-gradient(180deg,#22303d,#18222c);border-bottom:1px solid var(--line)}
+#fortStepsDlg .fshead .fsnm{flex:1;min-width:0;font-size:14px;font-weight:900;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#fortStepsDlg .fshead .fssub{font-size:9.5px;color:var(--dim);font-weight:800;margin-top:1px}
+#fortStepsDlg .fsclose{flex:0 0 auto;width:28px;height:28px;border-radius:8px;
+  background:var(--panel);font-size:15px;font-weight:900;color:#c6d3dd}
+.branchrail{position:relative;padding:10px 10px 12px 30px;overflow-y:auto;flex:1;min-height:0}
 .branchrail::before{content:"";position:absolute;left:14px;top:0;bottom:0;width:4px;
   border-radius:2px;background:linear-gradient(180deg,#8a6a1f,#e0b94a 45%,#3a4a58)}
 .knot{position:relative;display:flex;align-items:center;gap:8px;margin-bottom:6px}
@@ -4056,13 +4149,9 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
 .knot .kl{flex:1;min-width:0;font-size:10.5px;color:#9fb3c1;font-weight:700;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .knot.done .kl{color:#dbe6ef}
-.knot .kbuy{border-radius:8px;padding:5px 10px;font-size:11px;font-weight:900;
-  background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);color:#3a2b07;
-  box-shadow:0 2px 0 #6d551a}
-.knot .kgate{font-size:10px;font-weight:900;color:#e0b94a;background:#0e1418a6;
-  border:1px solid #e0b94a44;border-radius:8px;padding:3px 8px;white-space:nowrap}
+.knot.next .kl{color:#8fd0ff}
 .knot.milestone .kl{color:#fff7d6;font-weight:900}
-.skinbar{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:10.5px;
+.skinbar{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:10.5px;
   color:var(--dim)}
 .skinbar select{flex:0 0 auto}
 
@@ -7853,6 +7942,23 @@ button.pfplate{cursor:pointer}
       <button class="btn ghost" id="btnUnequip">Ablegen</button>
       <button class="btn up" id="btnUpgrade">UPGRADE<small id="dUpCost">🪙 0</small></button>
     </div>
+  </div>
+</div>
+
+<!-- ===== FESTUNG: STUFENLEITER EINES TRACKS (Umbau 30.07.2026) =====
+     Die ausgeschriebene Liste stand vorher OFFEN unter jedem Upgrade und
+     hat die Ansicht auf 1483 px getrieben (Bildschirm 932 px). Sie ist
+     nicht geloescht, sondern hierher gewandert: erreichbar ueber das ⓘ in
+     der Upgrade-Zeile, sonst unsichtbar. Die Zeile selbst zeigt nur die
+     aktuelle und die naechste Stufe. -->
+<div class="modal" id="fortStepsDlg">
+  <div class="fsbox">
+    <div class="fshead">
+      <div><div class="fsnm goldtext" id="fsName">—</div>
+        <div class="fssub" id="fsSub">—</div></div>
+      <button class="fsclose pressable" id="fsClose" aria-label="Schließen">×</button>
+    </div>
+    <div class="branchrail" id="fsList"></div>
   </div>
 </div>
 
@@ -15064,58 +15170,129 @@ button.pfplate{cursor:pointer}
     $("castleFx").setAttribute("data-walls", nWalls);
   }
 
-  /* B) KRISTALL-KONSTELLATION — ein Knoten je Stufe, generisch aus Daten. */
-  var WINDOW_BEFORE = 6, WINDOW_AFTER = 14;   // sichtbarer Ausschnitt je Ast
+  /* ==================================================================
+   * B) UPGRADE-ZEILEN (früher „Kristall-Konstellation") — Umbau 30.07.2026
+   * ------------------------------------------------------------------
+   * Auftraggeber wörtlich: „ohne die ganzen % Zahlen mach nur immer die
+   * aktuellen % rein und die die die nächste ist zum Upgraden alles
+   * sollte auf eine Seite passen nicht ewig zum scrollen."
+   *
+   * VORHER (gemessen 430x932/dsf2): drei Äste × 21 ausgeschriebene
+   * Knoten ⇒ #fortTracks 948 px, ganze Ansicht 1483 px, 598 px Überhang.
+   * NACHHER: drei Zeilen à ~80 px.
+   *
+   * PRÄZISIERUNG DES AUFTRAGGEBERS (30.07.2026): „jeder Upgrade Schritt
+   * soll immer nur den aktuellen anzeigen und den nächsten." Die Zeile
+   * zeigt deshalb GENAU ZWEI Stufenwerte und klappt NICHTS auf. Die volle
+   * Stufenleiter liegt in einem eigenen Fenster hinter dem ⓘ
+   * (#fortStepsDlg / openFortSteps) — gelöscht ist sie nicht.
+   *
+   * Was in der Zeile bleibt und WARUM:
+   *   · aktueller Wert   — sagt, wo der Spieler steht
+   *   · nächster Zuwachs — die einzige Stufe, die er kaufen kann
+   *   · Lv x/100         — Restlaufzeit des Tracks
+   *   · Meilenstein-Hinweis — die Dekaden-Meilensteine sind echte Mechanik
+   *     (renderBanners nutzt dieselbe decadeOf-Rechnung). Er steht als
+   *     kurze ANGABE da („Meilenstein bei Lv 40"), nicht als Stufenzeile.
+   *   · Kaufknopf mit PREIS (bzw. Trophäen-Tor / MAX)
+   * ================================================================== */
+  var WINDOW_BEFORE = 6, WINDOW_AFTER = 14;   // Ausschnitt der Stufenleiter im ⓘ-Fenster
+  /* Prozentzahlen auf DEUTSCH: Komma statt Punkt (Projektregel). */
+  function prozent(v, k) { return v.toFixed(k == null ? 2 : k).replace(".", ","); }
   function renderConstellation(tracks) {
-    var AF = AFof();
     $("fortTracks").innerHTML = tracks.map(function (t) {
-      var from = Math.max(1, t.lvl - WINDOW_BEFORE);
-      var to = Math.min(t.maxLvl, t.lvl + WINDOW_AFTER);
-      var knots = "";
-      for (var n = from; n <= to; n++) {
-        var done = n <= t.lvl, isNext = n === t.lvl + 1;
-        var ms = n % 10 === 0;
-        var bonus = AF ? AF.bonusAt(t.key, n) : 0;
-        var cls = "knot" + (done ? " done" : "") + (isNext && !t.locked ? " next" : "") +
-                  (ms ? " milestone" : "");
-        var right = "";
-        if (isNext && t.locked) {
-          right = '<span class="kgate">' + ico("icon_lock", "🔒") + " " + fmt(t.lockAt) + " " +
-                  ico("cur_trophy", "🏆") + "</span>";
-        } else if (isNext && !t.maxed) {
-          right = '<button class="kbuy" data-buyfort="' + t.key + '">' +
-                  ico("cur_gold", "🪙") + " " + fmt(t.nextCost) + "</button>";
-        }
-        knots += '<div class="' + cls + '" data-knot="' + t.key + ":" + n + '">' +
-          '<span class="kd"></span>' +
-          '<span class="kl">Stufe ' + n + (ms ? " · Meilenstein" : "") +
-            "  ·  +" + (bonus * 100).toFixed(2) + " %</span>" + right + "</div>";
+      /* --- Meilenstein-Hinweis: Ende der laufenden Zehner-Dekade --- */
+      var dec = decadeOf(t.lvl, t.maxLvl);
+      var msLeft = Math.max(0, dec.to - t.lvl);
+      var msTxt = t.maxed
+        ? "Vollausbau erreicht — Stufe " + t.maxLvl + "."
+        : "◆ Meilenstein bei <b>Lv " + dec.to + "</b> · noch " + msLeft + " Stufe" +
+          (msLeft === 1 ? "" : "n");
+
+      /* --- rechte Spalte: Kaufknopf MIT PREIS, Tor oder Vollausbau --- */
+      var act;
+      if (t.maxed || t.capReached) {
+        act = '<div class="kmax">MAX<small>Stufe ' + t.maxLvl + "</small></div>";
+      } else if (t.locked) {
+        act = '<div class="kgate">' + ico("icon_lock", "🔒") + " " + fmt(t.lockAt) + " " +
+          ico("cur_trophy", "🏆") + "<small>" + t.lockLabel + "</small></div>";
+      } else {
+        act = '<button class="kbuy pressable' + (gold() < t.nextCost ? " poor" : "") +
+          '" data-buyfort="' + t.key + '">' + ico("cur_gold", "🪙") + " " + fmt(t.nextCost) +
+          "<small>Power +" + fmt(t.nextPower) + "</small></button>";
       }
-      var head = '<div class="branchhead">' +
+
+      /* --- die Zeile selbst: Emblem · Text · Aktion --- */
+      return '<div class="branch" data-track="' + t.key + '">' +
+        '<div class="branchhead">' +
         '<div class="bico" data-bico="' + TRACK_VIS[t.key] + '">' + TRACK_EMO[t.key] + "</div>" +
-        '<div class="btx"><div class="bnm goldtext">' + t.name + "</div>" +
-        '<div class="bsub">' + t.desc + "</div>" +
-        '<div class="bstat">' + t.stat + ": +" + t.totalPct.toFixed(1) + " %" +
-          (t.maxed ? "" : '  →  <em>+' + t.nextPct.toFixed(2) + " %</em>") +
-          '  ·  Lv ' + t.lvl + "/" + t.maxLvl + "</div></div></div>";
-      return '<div class="branch" data-track="' + t.key + '">' + head +
-        '<div class="branchrail">' + knots + "</div></div>";
+        '<div class="btx">' +
+          '<div class="brow1"><div class="bnm goldtext">' + t.name + "</div>" +
+            '<div class="blv">Lv ' + t.lvl + "/" + t.maxLvl + "</div>" +
+            '<button class="binfo" data-fortinfo="' + t.key +
+              '" aria-label="Alle Stufen von ' + t.name + '">ⓘ</button></div>' +
+          '<div class="bsub">' + t.desc + "</div>" +
+          '<div class="bstat">' + t.stat + " <b>+" + prozent(t.totalPct, 1) + " %</b>" +
+            (t.maxed ? "" : ' <em>→ +' + prozent(t.nextPct) + " %</em>") + "</div>" +
+          '<div class="bms">' + msTxt + "</div>" +
+        "</div>" +
+        '<div class="bact">' + act + "</div></div></div>";
     }).join("");
-    // Ast-Köpfe: die drei großen Track-Embleme.
+
+    // Ast-Köpfe: die drei Track-Embleme.
     Array.prototype.forEach.call($("fortTracks").querySelectorAll("[data-bico]"), function (el) {
       layer(el, el.getAttribute("data-bico"));
-    });
-    // Sichtfenster auf den nächsten Knoten schieben.
-    Array.prototype.forEach.call($("fortTracks").querySelectorAll(".branchrail"), function (r) {
-      var nx = r.querySelector(".knot.next") || r.querySelector(".knot.done:last-child");
-      if (nx) r.scrollTop = Math.max(0, nx.offsetTop - r.clientHeight * 0.45);
     });
     Array.prototype.forEach.call($("fortTracks").querySelectorAll("[data-buyfort]"), function (b) {
       b.addEventListener("click", function (e) {
         buyFort(b.getAttribute("data-buyfort"), e);
       });
     });
+    // ⓘ — der EINZIGE Weg zur ausgeschriebenen Stufenleiter.
+    Array.prototype.forEach.call($("fortTracks").querySelectorAll("[data-fortinfo]"), function (b) {
+      b.addEventListener("click", function () {
+        openFortSteps(b.getAttribute("data-fortinfo"));
+      });
+    });
   }
+
+  /* ------------------------------------------------------------------
+   * DAS ⓘ-FENSTER: die volle Stufenleiter EINES Tracks.
+   * Es liegt bewusst NICHT im View, sondern als `.modal` am Dokument:
+   * die Views bekommen beim Wischen ein `transform`, und ein
+   * transformierter Vorfahr macht aus `position:fixed` eine Falle.
+   * ------------------------------------------------------------------ */
+  function openFortSteps(key) {
+    var AF = AFof();
+    if (!AF) return;
+    var t = AF.trackInfo(key, DEMO_TROPHIES);
+    if (!t) return;
+    $("fsName").textContent = t.name;
+    $("fsSub").textContent = t.stat + " · Stufe " + t.lvl + " von " + t.maxLvl +
+      " · Bonus pro Stufe sinkt";
+    var from = Math.max(1, t.lvl - WINDOW_BEFORE);
+    var to = Math.min(t.maxLvl, t.lvl + WINDOW_AFTER);
+    var knots = "";
+    for (var n = from; n <= to; n++) {
+      var done = n <= t.lvl, isNext = n === t.lvl + 1;
+      var ms = n % 10 === 0;
+      var bonus = AF.bonusAt(t.key, n);
+      knots += '<div class="knot' + (done ? " done" : "") +
+        (isNext && !t.locked ? " next" : "") + (ms ? " milestone" : "") +
+        '" data-knot="' + t.key + ":" + n + '">' +
+        '<span class="kd"></span>' +
+        '<span class="kl">Stufe ' + n + (ms ? " · Meilenstein" : "") +
+          "  ·  +" + prozent(bonus * 100) + " %</span></div>";
+    }
+    var list = $("fsList");
+    list.innerHTML = knots;
+    $("fortStepsDlg").classList.add("open");
+    // Erst nach dem Öffnen scrollen — vorher ist clientHeight 0.
+    var nx = list.querySelector(".knot.next") || list.querySelector(".knot.done:last-child");
+    if (nx) list.scrollTop = Math.max(0, nx.offsetTop - list.clientHeight * 0.45);
+    markPressable($("fortStepsDlg"));
+  }
+  function closeFortSteps() { $("fortStepsDlg").classList.remove("open"); }
   /* ==================================================================
    * B2) BANNER-STAPEL — Layout-Variante 2
    * ------------------------------------------------------------------
@@ -18389,6 +18566,13 @@ button.pfplate{cursor:pointer}
   Array.prototype.forEach.call(document.querySelectorAll("[data-fortlay]"), function (b) {
     b.addEventListener("click", function () { setFortLayout(b.getAttribute("data-fortlay")); });
   });
+  /* ⓘ-Fenster mit der Stufenleiter (30.07.2026). Tippen neben das Fenster
+     schliesst es — sonst waere das kleine × auf dem Telefon der einzige
+     Ausweg. */
+  $("fsClose").addEventListener("click", closeFortSteps);
+  $("fortStepsDlg").addEventListener("click", function (e) {
+    if (e.target === $("fortStepsDlg")) closeFortSteps();
+  });
   $("skinSel").addEventListener("change", function () {
     window.CastleSkins.set($("skinSel").value);
     UISfx.confirm(); renderFortress(); toast("Burg-Skin gewechselt");
@@ -19344,6 +19528,12 @@ button.pfplate{cursor:pointer}
                      oeffneVorrat: oeffneVorrat, buyPack: buyPack,
                      renderFortress: renderFortress, buyDeal: buyDeal, buyFort: buyFort,
                      setFortLayout: setFortLayout, renderBanners: renderBanners,
+                     /* Exportiert seit 30.07.2026: die Stufenleiter liegt
+                        in einem eigenen Fenster hinter dem ⓘ. Ohne diesen
+                        Export koennte eine Pruefung das Fenster nur ueber
+                        Koordinaten erreichen — und damit ihr eigenes
+                        Ergebnis vom Layout abhaengig machen. */
+                     openFortSteps: openFortSteps, closeFortSteps: closeFortSteps,
                      fortLayout: function () { return fortLayout; },
                      decadeOf: decadeOf, setGold: setGold, gold: gold,
                      markPressable: markPressable, ico: ico, CastleSkins: window.CastleSkins,

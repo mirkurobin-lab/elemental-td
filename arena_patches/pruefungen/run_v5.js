@@ -2,7 +2,12 @@ const { chromium } = require('playwright-core');
 const path = require('path');
 const fs = require('fs');
 
-const FILE = 'file://' + path.resolve('/home/user/elemental-td/arena_patches/ui_prototype.html');
+/* Standardziel bleibt die Datei im Hauptcheckout. UI_DATEI erlaubt es,
+   dieselbe Suite gegen einen git-worktree laufen zu lassen — ohne den
+   Schalter misst ein Worktree-Durchlauf die Datei von NEBENAN und
+   meldet gruen, was dort nie geaendert wurde (30.07.2026). */
+const FILE = 'file://' + path.resolve(process.env.UI_DATEI ||
+  '/home/user/elemental-td/arena_patches/ui_prototype.html');
 const SHOTS = '/tmp/claude-0/-home-user-elemental-td/4b0a76dd-5b22-5fdf-85e8-579f1b036ae5/scratchpad/ui_shots_v5';
 fs.mkdirSync(SHOTS, { recursive: true });
 
@@ -13,6 +18,10 @@ function step(name, ok, info) {
   steps.push({ name, ok, info });
   console.log((ok ? 'ok   ' : 'FAIL ') + name + (info ? '  — ' + info : ''));
 }
+/* Gegenprobe (uebernommen aus run_v7.js, 30.07.2026): eine Behauptung, die
+   FALSCH sein MUSS. Ein Schritt, der auch bei kaputtem Programm gruen
+   bleibt, ist keine Pruefung. */
+function gegen(name, sollFalschSein, info) { step('gegen: ' + name, !sollFalschSein, info); }
 
 (async () => {
   const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
@@ -657,34 +666,115 @@ function step(name, ok, info) {
     anchorPct.sl === anchorPct.sx,
     'Strahl ' + anchorPct.bl + '/' + anchorPct.bt + ', Schild ' + anchorPct.sl);
 
-  // --- B) KRISTALL-KONSTELLATION ---
+  /* --- B) UPGRADE-ZEILEN (frueher „Kristall-Konstellation") ---
+     ⚠ UMGESCHRIEBENE ZUSAGE, 30.07.2026. Hier stand:
+       · „Knoten je Stufe mit Zustaenden done/next/milestone" (>= 30 Knoten
+         OFFEN im Layout)
+       · „Naechste Stufe zeigt Kostenknopf ODER Trophaeen-Tor" (Knopf IM
+         Knoten)
+       · „Aeste sind vertikal scrollbar (skaliert auf 100 Stufen)"
+     Diese drei Schritte haben die ausgeschriebene Stufenliste FESTGESCHRIEBEN
+     — genau das, was der Auftraggeber als „sehr cluttered" beanstandet hat:
+     gemessen 948 px Liste, 1483 px Gesamtansicht, 598 px Scroll-Ueberhang bei
+     430x932. Auftraggeber praezisiert: „jeder Upgrade Schritt soll immer nur
+     den aktuellen anzeigen und den naechsten."
+     Die Liste ist nicht geloescht, sondern in ein EIGENES FENSTER hinter dem
+     ⓘ gewandert (#fortStepsDlg); der Kauf sitzt jetzt in der Zeile.
+     Die Zusagen werden deshalb NICHT weicher, sondern praeziser: geprueft
+     wird ab jetzt, dass im View KEINE Stufenliste liegt (getClientRects()
+     .length === 0 — Vorhandensein ist nicht Sichtbarkeit), dass die Zeile
+     genau zwei Werte zeigt, und dass das ⓘ die volle Leiter hervorholt. */
   const branches = await page.locator('#fortTracks .branch').count();
-  step('Drei Aeste gerendert', branches === 3, String(branches));
+  step('Drei Upgrade-Zeilen gerendert', branches === 3, String(branches));
   const bicos = await page.locator('#fortTracks .branchhead .bico').evaluateAll(
     els => els.filter(e => /url\(/.test(e.style.backgroundImage) &&
                            /gradient/.test(e.style.backgroundImage)).length);
-  step('Ast-Koepfe tragen die drei grossen Track-Embleme (+ Fallback)', bicos === 3, String(bicos));
-  const knotStats = await page.evaluate(() => {
+  step('Zeilen tragen die drei Track-Embleme (+ Fallback)', bicos === 3, String(bicos));
+  const zeile = await page.evaluate(() => {
     const r = document.getElementById('fortTracks');
-    return { all: r.querySelectorAll('.knot').length,
-             done: r.querySelectorAll('.knot.done').length,
-             next: r.querySelectorAll('.knot.next').length,
-             ms: r.querySelectorAll('.knot.milestone').length,
-             buy: r.querySelectorAll('.knot .kbuy').length,
-             gate: r.querySelectorAll('.knot .kgate').length };
+    const sicht = e => !!e && e.getClientRects().length > 0;
+    return Array.prototype.map.call(r.querySelectorAll('.branch'), b => ({
+      key: b.getAttribute('data-track'),
+      stat: (b.querySelector('.bstat') || {}).textContent || '',
+      statSicht: sicht(b.querySelector('.bstat')),
+      lv: ((b.querySelector('.blv') || {}).textContent || '').trim(),
+      lvSicht: sicht(b.querySelector('.blv')),
+      ms: ((b.querySelector('.bms') || {}).textContent || '').trim(),
+      msSicht: sicht(b.querySelector('.bms')),
+      kauf: (b.querySelector('.kbuy') || {}).textContent || '',
+      kaufSicht: sicht(b.querySelector('.kbuy')),
+      tor: sicht(b.querySelector('.kgate')), max: sicht(b.querySelector('.kmax')),
+      listeSicht: sicht(b.querySelector('.branchrail')),
+      knoten: b.querySelectorAll('.knot').length,
+      infoKnopf: sicht(b.querySelector('.binfo')),
+    }));
   });
-  step('Knoten je Stufe mit Zustaenden done/next/milestone',
-    knotStats.all >= 30 && knotStats.done > 0 && knotStats.next > 0 && knotStats.ms > 0,
-    JSON.stringify(knotStats));
-  step('Naechste Stufe zeigt Kostenknopf ODER Trophaeen-Tor',
-    knotStats.buy + knotStats.gate === knotStats.next,
-    knotStats.buy + ' Kaufknoepfe, ' + knotStats.gate + ' Tore');
-  const scrollable = await page.locator('#fortTracks .branchrail').evaluateAll(
-    els => els.filter(e => e.scrollHeight > e.clientHeight + 4).length);
-  step('Aeste sind vertikal scrollbar (skaliert auf 100 Stufen)', scrollable === 3,
-    scrollable + '/3');
+  // AKTUELLER Wert (fett) UND naechster Zuwachs (gruen) muessen beide da sein.
+  step('Je Upgrade: aktueller Wert UND naechster Zuwachs sichtbar',
+    zeile.length === 3 && zeile.every(z => z.statSicht &&
+      /\+\d+,\d+ %/.test(z.stat) && /→ \+\d+,\d+ %/.test(z.stat)),
+    zeile.map(z => z.stat.replace(/\s+/g, ' ').trim()).join(' | '));
+  step('Je Upgrade: Stufenstand „Lv x/100" sichtbar',
+    zeile.every(z => z.lvSicht && /^Lv \d+\/100$/.test(z.lv)),
+    zeile.map(z => z.lv).join(' | '));
+  step('Je Upgrade genau EINE Aktion: Kaufknopf ODER Tor ODER MAX',
+    zeile.every(z => (z.kaufSicht ? 1 : 0) + (z.tor ? 1 : 0) + (z.max ? 1 : 0) === 1),
+    zeile.map(z => z.key + ':' + (z.kaufSicht ? 'Kauf' : z.tor ? 'Tor' : 'MAX')).join(' '));
+  step('Kaufknopf traegt einen Preis',
+    zeile.filter(z => z.kaufSicht).every(z => /\d/.test(z.kauf.replace(/\s/g, ''))),
+    zeile.map(z => z.kauf.replace(/\s+/g, ' ').trim()).join(' | '));
+  // Der Meilenstein ist echte Mechanik — er darf aus der LISTE verschwinden,
+  // aber nicht aus der Ansicht.
+  step('Je Upgrade: naechster Meilenstein bleibt sichtbar',
+    zeile.every(z => z.msSicht && /Meilenstein bei Lv \d+|Vollausbau/.test(z.ms)),
+    zeile.map(z => z.ms).join(' | '));
+  /* Der harte Punkt: die Zeile zeigt GENAU ZWEI Stufenwerte. Waere die
+     Stufenleiter noch in der Zeile (auch zugeklappt), koennte ein Tipp sie
+     dort aufziehen — die Zusage lautet aber „nur der aktuelle und der
+     naechste". Deshalb wird gemessen, dass im View ueberhaupt KEIN .knot
+     und KEINE .branchrail liegt. */
+  step('KEINE ausgeschriebene Stufenliste im Layout',
+    zeile.every(z => z.listeSicht === false && z.knoten === 0) &&
+    (await page.locator('#viewFortress .knot').count()) === 0,
+    zeile.map(z => z.key + ':' + z.knoten + ' Knoten').join(' '));
+  gegen('Stufenliste steht in der Upgrade-Zeile',
+    zeile.some(z => z.listeSicht || z.knoten > 0));
+  step('Jede Zeile bietet ein ⓘ fuer die volle Stufenleiter',
+    zeile.every(z => z.infoKnopf));
+  // Gegenprobe: das ⓘ muss die Leiter WIRKLICH hervorholen, sonst waere
+  // die Information ersatzlos geloescht statt verlagert.
+  await page.click('#fortTracks .branch[data-track="hp"] .binfo');
+  await page.waitForTimeout(340);
+  const fenster = await page.evaluate(() => {
+    const d = document.getElementById('fortStepsDlg');
+    const l = document.getElementById('fsList');
+    return { offen: d.classList.contains('open'), sicht: l.getClientRects().length > 0,
+             name: document.getElementById('fsName').textContent.trim(),
+             knoten: l.querySelectorAll('.knot').length,
+             done: l.querySelectorAll('.knot.done').length,
+             next: l.querySelectorAll('.knot.next').length,
+             ms: l.querySelectorAll('.knot.milestone').length,
+             hoehe: Math.round(l.getBoundingClientRect().height) };
+  });
+  // Die Leiter muss VOLLSTAENDIG sein (erledigte, naechste und Meilenstein-
+  // Stufen); ob sie scrollt, haengt an der Fensterhoehe und ist keine Zusage.
+  step('Das ⓘ oeffnet ein eigenes Fenster mit der vollen Stufenleiter',
+    fenster.offen && fenster.sicht && /Burg-Stabilit/.test(fenster.name) &&
+    fenster.knoten >= 15 && fenster.done > 0 && fenster.next > 0 && fenster.ms > 0,
+    JSON.stringify(fenster));
+  await page.click('#fsClose');
+  await page.waitForTimeout(300);
+  step('Das Fenster schliesst wieder',
+    await page.evaluate(() => document.getElementById('fsList').getClientRects().length === 0));
 
-  // --- Kauf-Klick: Overlays muessen WACHSEN ---
+  /* --- Kauf-Klick: Overlays muessen WACHSEN ---
+     ⚠ GEAENDERTE MESSSTELLE, 30.07.2026. Geklickt wurde bisher
+     `.knot.next .kbuy` — der Kaufknopf sass IM naechsten Listenknoten und
+     setzte damit voraus, dass die ganze Stufenliste offen im Layout steht.
+     Seit dem Entruempeln sitzt der Kaufknopf in der Zeile selbst
+     (`.branchhead .kbuy`); die Liste ist zugeklappt. Die Zusage bleibt
+     woertlich dieselbe (ein Kauf laesst die Burg-Overlays wachsen), nur der
+     Griff daran ist der, den ein Spieler heute wirklich benutzt. */
   const fxSnap = () => page.evaluate(() => {
     const b = document.getElementById('fxBeam');
     return { w: b.style.width, h: b.style.height, dur: b.style.animationDuration,
@@ -702,7 +792,7 @@ function step(name, ok, info) {
   const before = await fxSnap();
   const pw0 = (await page.locator('#fortPower').textContent()).replace(/\s|\u00a0/g, '');
   const g0 = (await page.locator('#curGold').textContent()).replace(/\s|\u00a0/g, '');
-  await page.click('#fortTracks .branch[data-track="prismDmg"] .knot.next .kbuy');
+  await page.click('#fortTracks .branch[data-track="prismDmg"] .branchhead .kbuy');
   await page.waitForTimeout(450);
   const after = await fxSnap();
   const pw1 = (await page.locator('#fortPower').textContent()).replace(/\s|\u00a0/g, '');
@@ -719,9 +809,9 @@ function step(name, ok, info) {
     await page.locator('#castleStage').evaluate(e => e.classList.contains('justbought')));
 
   // HP-Track kaufen -> Schild + Mauer-Kristalle reagieren
-  const hpBuy = await page.locator('#fortTracks .branch[data-track="hp"] .knot.next .kbuy').count();
+  const hpBuy = await page.locator('#fortTracks .branch[data-track="hp"] .branchhead .kbuy').count();
   if (hpBuy) {
-    await page.click('#fortTracks .branch[data-track="hp"] .knot.next .kbuy');
+    await page.click('#fortTracks .branch[data-track="hp"] .branchhead .kbuy');
     await page.waitForTimeout(400);
   }
   const afterHp = await fxSnap();
@@ -734,9 +824,9 @@ function step(name, ok, info) {
     nCryst + ' Kristalle / data-walls=' + afterHp.walls);
 
   // Tempo-Track -> Puls-Tempo des Strahls
-  const rtBuy = await page.locator('#fortTracks .branch[data-track="prismRate"] .knot.next .kbuy').count();
+  const rtBuy = await page.locator('#fortTracks .branch[data-track="prismRate"] .branchhead .kbuy').count();
   if (rtBuy) {
-    await page.click('#fortTracks .branch[data-track="prismRate"] .knot.next .kbuy');
+    await page.click('#fortTracks .branch[data-track="prismRate"] .branchhead .kbuy');
     await page.waitForTimeout(400);
   }
   const durAfter = await page.locator('#fxBeam').evaluate(e => e.style.animationDuration);
