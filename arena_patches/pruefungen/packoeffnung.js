@@ -51,6 +51,15 @@ let ok = 0, fehl = 0;
 const pruef = (n, w, z) => {
   if (w) { ok++; } else { fehl++; console.log("  FEHL " + n + (z ? " -> " + z : "")); }
 };
+/* gegen(name, erkannt) — die Gegenprobe. Ein Schritt, der nicht rot
+   werden KANN, ist wertlos; das ist an diesem Tag zweimal passiert (ein
+   `object-fit`-Fix, der ein No-op war, und ein Dauer-Filter, der ins
+   Leere griff). Die Gegenprobe belegt, dass die Messung ueberhaupt
+   unterscheidet. Gleiche Bauart wie in offline.js und bildzustand.js. */
+const gegen = (n, erkannt, z) => {
+  if (erkannt) { ok++; }
+  else { fehl++; console.log("  FEHL Gegenprobe " + n + " haette rot sein muessen" + (z ? " -> " + z : "")); }
+};
 
 /* durchtippen(p) — die Szene so beenden, wie ein Spieler es tut.
    Seit dem Deck-Umbau (30.07.2026) gibt es KEIN Zeitschloss mehr: die
@@ -643,9 +652,85 @@ async function durchtippen(p, max) {
   }));
   pruef("die Szene laesst sich durch Tippen beenden", !danach.offen,
     tipps + " Tipps fuer " + zuDecken + " Karten");
-  pruef("dafuer braucht es genau ein Tippen je Karte plus den Schluss",
-    tipps === zuDecken + 1, tipps + " statt " + (zuDecken + 1));
+  /* ⚠ +2, nicht +1. Seit dem 30.07.2026 zeigt die Szene nach der letzten
+     Karte die BEUTE-UEBERSICHT („zeig alle Karten die im booster waren
+     nebeneinander"), und erst der Tap danach schliesst. Ein Tipp je Karte,
+     einer fuer die Beute, einer zum Schluss. */
+  pruef("ein Tippen je Karte, eines fuer die Beute, eines zum Schluss",
+    tipps === zuDecken + 2, tipps + " statt " + (zuDecken + 2));
   pruef("danach steht das Kartenraster", danach.raster > 0, danach.raster + " Karten");
+
+  /* ---------- 5b. DIE AUFGEDECKTE KARTE RAEUMT DAS FELD ----------
+     ⚠ NEU am 30.07.2026 nach einem Befund des Auftraggebers: „die
+     aufgedeckte Karte geht nicht vom Deck weg damit man die naechste
+     sieht". Der Zustandswechsel im JS war korrekt — die Klasse `.weg`
+     wurde gesetzt. Trotzdem blieb die Karte stehen, weil die GEWINNENDE
+     Animation `pkkarte` hiess: `#packLayer.spielt .pkcard` traegt eine ID
+     und schlaegt `.pkcard.weg`. Die Abgangsanimation lief nie.
+     DIE LEHRE FUER DIESE DATEI: eine Pruefung auf die KLASSE haette den
+     Fehler nicht gefunden. Gemessen werden muss, was der Browser am Ende
+     wirklich tut — welche Animation gewinnt und wie deckend die Karte
+     danach ist. Klassen sind Absichten, keine Wirkung. */
+  await p.evaluate(() => { window.__proto.openPackKey("bronze"); });
+  await p.waitForFunction(() => {
+    const d = document.getElementById("pkDeck");
+    return d && d.classList.contains("schwebt");
+  }, null, { timeout: 9000 });
+  await p.evaluate(() => document.getElementById("packLayer")
+    .dispatchEvent(new PointerEvent("pointerdown", { bubbles: true })));
+  await p.waitForTimeout(1400);   /* Drehung + Abgang komplett */
+  const abgang = await p.evaluate(() => {
+    const k = document.querySelector("#pkDeck .pkcard.weg");
+    if (!k) return { da: false };
+    const cs = getComputedStyle(k);
+    return { da: true, animation: cs.animationName, deckkraft: +cs.opacity };
+  });
+  pruef("die aufgedeckte Karte bekommt ihren Abgang", abgang.da);
+  pruef("und die ABGANGS-Animation gewinnt, nicht der Einflug",
+    abgang.animation === "pkweg", abgang.animation);
+  pruef("danach ist sie wirklich weg, nicht nur markiert",
+    abgang.deckkraft < 0.05, "Deckkraft " + abgang.deckkraft);
+  gegen("Abgang", abgang.animation === "pkweg" && abgang.deckkraft < 0.05);
+
+  /* ---------- 5c. DAS FINALE ZEIGT DIE GANZE BEUTE ----------
+     Vorgabe: „Sobald alle aufgedeckt wurden zeig alle Karten die im
+     booster waren nebeneinander fuer den Spieler." Geprueft wird gegen
+     die Zahl der Karten IM DECK, nicht gegen eine feste Anzahl — sonst
+     waere der Schritt beim naechsten Packformat rot. */
+  const imDeck = await p.evaluate(() =>
+    document.querySelectorAll("#pkDeck .pkcard").length);
+  /* ⚠ Tippen, BIS die Beute steht — nicht eine feste Anzahl. Eine feste
+     Zahl tippte einmal zu oft, schloss damit die Szene und `raeumen()`
+     nahm die Uebersicht gleich mit; gemessen wurde dann „kein Finale",
+     obwohl es da gewesen war. Der Deckel (Karten + 2) bleibt als Schutz
+     gegen eine Endlosschleife. */
+  for (let i = 0; i < imDeck + 2; i++) {
+    const st = await p.evaluate(() => ({
+      offen: document.getElementById("packLayer").classList.contains("on"),
+      finale: !!document.querySelector(".pkfinale") }));
+    if (!st.offen || st.finale) break;
+    await p.evaluate(() => document.getElementById("packLayer")
+      .dispatchEvent(new PointerEvent("pointerdown", { bubbles: true })));
+    await p.waitForTimeout(1080);
+  }
+  const finale = await p.evaluate(() => {
+    const f = document.querySelector(".pkfinale");
+    return { da: !!f,
+             kacheln: f ? f.querySelectorAll(".pkfin").length : 0,
+             mitBild: f ? [...f.querySelectorAll(".pkfin")]
+               .filter(c => c.querySelector(".artbox")).length : 0,
+             nochOffen: document.getElementById("packLayer").classList.contains("on") };
+  });
+  pruef("nach der letzten Karte erscheint die Beute-Uebersicht", finale.da);
+  pruef("sie zeigt JEDE Karte des Packs",
+    finale.kacheln === imDeck + 1 || finale.kacheln === imDeck,
+    finale.kacheln + " Kacheln fuer " + imDeck + " Karten");
+  pruef("und jede traegt ihr Artwork",
+    finale.kacheln > 0 && finale.mitBild === finale.kacheln,
+    finale.mitBild + " von " + finale.kacheln);
+  pruef("die Szene bleibt dafuer offen — der Blick gehoert zur Zeremonie",
+    finale.nochOffen);
+
 
   /* ---------- 6. Die Raritaets-Leiter der Aufdeckung ----------
    * Anlass: bis zum 29.07.2026 war die Aufdeckung BINAER — ab Episch

@@ -1775,7 +1775,18 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
 /* Abgang: die aufgedeckte Karte raeumt das Feld fuer die naechste. Sie
    verschwindet NICHT in ein Raster — das Raster kommt nach der Szene als
    Quittung, und zweimal dasselbe zu zeigen entwertet beides. */
-.pkcard.weg{animation:pkweg 420ms cubic-bezier(.4,0,.7,.4) forwards}
+/* ⚠ DER WAEHLER BRAUCHT DIE ID, und das ist kein Schoenheitsfehler,
+   sondern der Fix eines vom Auftraggeber gefundenen Fehlers (30.07.2026):
+   „die aufgedeckte Karte geht nicht vom Deck weg damit man die naechste
+   sieht". Nachgemessen: die Klasse `.weg` WAR gesetzt, aber die
+   gewinnende Animation hiess `pkkarte` und die Deckkraft stand auf 1.
+   Grund ist die Spezifitaet — `#packLayer.spielt .pkcard` traegt eine ID
+   und schlaegt `.pkcard.weg`. Die Abgangsanimation lief also nie, obwohl
+   der Zustandswechsel im JS korrekt war. Eine Klassenpruefung („traegt
+   die Karte .weg?") haette den Fehler NICHT gefunden; gemessen werden
+   muss die gewinnende Animation und die Deckkraft. Genau das prueft
+   packoeffnung.js jetzt. */
+#packLayer.spielt .pkcard.weg{animation:pkweg 420ms cubic-bezier(.4,0,.7,.4) forwards}
 /* ⚠ Der 0-%-Stop MUSS `transform` mitsetzen. Ohne ihn interpoliert der
    Browser vom aktuellen Wert ueber die GANZE Animation dorthin — die
    Karte beginnt also sofort wegzugleiten, statt erst am Ende. Genau
@@ -1926,6 +1937,55 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
   0%,100%{transform:scale(.86);opacity:.75}
   50%{transform:scale(1.06);opacity:.5}}
 
+/* ==================================================================
+ * DAS FINALE — alle Karten nebeneinander (30.07.2026)
+ * ------------------------------------------------------------------
+ * Vorgabe: „Sobald alle aufgedeckt wurden zeig alle Karten die im
+ * booster waren nebeneinander fuer den Spieler."
+ * WARUM DAS NOETIG IST: beim Aufdecken sieht man jede Karte einzeln,
+ * und jede fliegt danach weg. Wer elf Karten aufgedeckt hat, hat sie
+ * elfmal einzeln gesehen und am Ende nichts in der Hand. Das Finale ist
+ * die Quittung — der Blick auf die ganze Beute.
+ * Es liegt IN der Szene, nicht erst im Raster danach: der Moment gehoert
+ * noch zur Zeremonie, und ein Bildschirmwechsel dazwischen bricht sie.
+ * Das Raster kommt trotzdem noch — es ist die Stelle, an der man die
+ * Karten ANTIPPEN und lesen kann. Hier geht es nur um den Anblick.
+ * ================================================================== */
+.pkfinale{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);
+  display:flex;flex-wrap:wrap;align-content:center;justify-content:center;
+  gap:5px;padding:0 4%;z-index:6;
+  opacity:0;pointer-events:none}
+.pkfinale.an{animation:pkfinauf 520ms cubic-bezier(.2,.8,.25,1) forwards}
+@keyframes pkfinauf{
+  0%{opacity:0;transform:translateY(-50%) scale(.86)}
+  100%{opacity:1;transform:translateY(-50%) scale(1)}}
+/* Die Breite kommt aus der ANZAHL, nicht aus einer festen Zahl: bei fuenf
+   Karten darf jede gross sein, bei elf muessen sie sich teilen. `--fb`
+   setzt das JS. */
+.pkfin{position:relative;flex:0 0 var(--fb,28%);aspect-ratio:.72;
+  border-radius:6px;overflow:hidden;
+  border:2px solid var(--rar,#c9a24a);
+  background:linear-gradient(165deg,var(--rar,#c9a24a),#101a28 88%);
+  box-shadow:0 4px 12px #000b, 0 0 10px -2px var(--rar,#c9a24a);
+  /* Gestaffeltes Auftauchen: alle gleichzeitig waere ein Schlag, einer
+     nach dem anderen ist eine Aufzaehlung. 45 ms liegt dazwischen. */
+  opacity:0;animation:pkfinein 320ms ease-out forwards;
+  animation-delay:calc(var(--i,0) * 45ms)}
+@keyframes pkfinein{
+  0%{opacity:0;transform:translateY(9px) scale(.9)}
+  100%{opacity:1;transform:none}}
+.pkfin .artbox{position:absolute;inset:3%;border-radius:4px;overflow:hidden;display:block}
+.pkfin .artbox img{width:100%;height:100%;object-fit:cover;display:block}
+/* Der Rueckfall skaliert ueber die Schriftgroesse, nicht ueber
+   width/height — ein Glyph ist kein Bild. Bei 22 px sass er als
+   Stecknadelkopf in einer sonst leeren Karte. */
+.pkfin .artbox .ico{width:100%;height:100%;display:flex;
+  align-items:center;justify-content:center;font-size:34px;line-height:1}
+.pkfin .frm{position:absolute;inset:0;pointer-events:none}
+/* Ein Wort zur Beute, damit das Finale auch etwas SAGT. */
+.pkfintitel{flex:0 0 100%;text-align:center;font-size:12px;font-weight:900;
+  letter-spacing:.1em;text-transform:uppercase;color:#f4e3a6;
+  margin:0 0 8px;text-shadow:0 2px 6px #000c}
 .pkskip{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);
   border-radius:11px;padding:9px 20px;font-size:12px;font-weight:900;
   background:#0e1418c4;border:1px solid #e0b94a66;color:#f4e3a6}
@@ -10670,12 +10730,24 @@ button.pfplate{cursor:pointer}
        die Pruefung sie gegen beide, nicht gegen eine eingefrorene
        Konstante. */
     var DAUER = 4000, laufend = null;
+    /* ⚠ Der aktuell haengende Tipp-Zuhoerer, modulweit gemerkt.
+       Fehler vom 30.07.2026, von der Pruefung gefunden: `spiele()` hat
+       Timer und DOM geraeumt, aber den `pointerdown`-Zuhoerer der VORIGEN
+       Szene stehen gelassen. Wer ein Pack oeffnet, waehrend die alte
+       Szene noch offen ist, hat danach ZWEI Zuhoerer — ein Tap deckt eine
+       Karte auf UND schliesst gleichzeitig die Szene. Im Prueflauf
+       brauchte ein 11-Karten-Pack dadurch genau EINEN Tap statt dreizehn.
+       Fuer den Spieler heisst derselbe Fehler: die Zeremonie bricht beim
+       ersten Antippen ab, und die Beute ist weg, bevor er sie gesehen
+       hat. Ein aufraeumender Zustandswechsel muss ALLES aufraeumen, was
+       er angelegt hat — auch das, was man nicht sieht. */
+    var haengenderTipp = null;
 
     function raeumen() {
       var st = $("pkStage"); if (!st) return;
       [].slice.call(st.querySelectorAll(".pkcard")).forEach(function (c) { c.remove(); });
       var d = $("pkDeck"); if (d) d.remove();
-      [].slice.call(st.querySelectorAll(".pkfunken,.pkstaub"))
+      [].slice.call(st.querySelectorAll(".pkfunken,.pkstaub,.pkfinale"))
         .forEach(function (e) { e.remove(); });
     }
 
@@ -10683,6 +10755,10 @@ button.pfplate{cursor:pointer}
       var lay = $("packLayer"), st = $("pkStage"), art = $("pkArt");
       if (!lay || !st || !art) { fertig(); return; }
       if (laufend) { clearTimeout(laufend); laufend = null; }
+      if (haengenderTipp) {
+        lay.removeEventListener("pointerdown", haengenderTipp);
+        haengenderTipp = null;
+      }
       raeumen();
 
       var farbe = GLUT[key] || GLUT.bronze;
@@ -10817,6 +10893,7 @@ button.pfplate{cursor:pointer}
         lay.classList.remove("spielt", "on");
         lay.setAttribute("aria-hidden", "true");
         lay.removeEventListener("pointerdown", tipp);
+        if (haengenderTipp === tipp) haengenderTipp = null;
         raeumen();
         fertig();
       }
@@ -10866,13 +10943,52 @@ button.pfplate{cursor:pointer}
         }, 520);
         return true;
       }
+      /* ---- Das Finale: alle Karten nebeneinander ----
+         Vorgabe: „Sobald alle aufgedeckt wurden zeig alle Karten die im
+         booster waren nebeneinander fuer den Spieler." Beim Aufdecken
+         sieht man jede Karte einzeln, und jede fliegt danach weg — wer
+         elf Karten aufgedeckt hat, haelt am Ende nichts in der Hand.
+         Die Breite je Karte kommt aus der ANZAHL: bei fuenf darf jede
+         gross sein, bei elf muessen sie sich teilen. Feste Prozente
+         wuerden bei einem Arkan-Pack ueberlaufen. */
+      var finaleGezeigt = false;
+      function zeigeFinale() {
+        finaleGezeigt = true;
+        deck.classList.remove("schwebt");
+        var spalten = n <= 3 ? n : (n <= 6 ? 3 : (n <= 8 ? 4 : 5));
+        var breite = (100 / spalten) - 4;
+        var h = '<div class="pkfintitel">Deine Beute</div>';
+        for (var f = 0; f < (karten ? karten.length : 0); f++) {
+          var k = karten[f];
+          var t = AC.tierOf && AC.tierOf(k.tier);
+          h += '<div class="pkfin" style="--i:' + f + ';--fb:' + breite.toFixed(1) + '%' +
+               (t && t.color ? ';--rar:' + t.color : "") + '">' +
+               artBox(k.cardId, k.tier) + "</div>";
+        }
+        var box = document.createElement("div");
+        box.className = "pkfinale an";
+        box.innerHTML = h;
+        st.appendChild(box);
+        /* Ohne diese zwei Aufrufe bleibt jedes Artwork ein leerer Kasten
+           — `data-frame` und `data-ico` sind bis dahin nur Absichten. */
+        hydrateFrames(box);
+        UIIcon.sweep(box);
+        UISfx && UISfx.reward && UISfx.reward();
+      }
+
       function tipp() {
         /* Solange der Aufbau laeuft, ist noch nichts aufzudecken. Ein Tap
            in dieser Zeit soll die Szene NICHT ueberspringen — der Bruch
            ist der Moment, fuer den das Pack gekauft wurde. */
-        if (!deck.classList.contains("schwebt")) return;
-        if (!deckeAuf()) schliessen();
+        if (!deck.classList.contains("schwebt") && !finaleGezeigt) return;
+        if (deckeAuf()) return;
+        /* Keine Karte mehr: erst die Beute zeigen, DANN schliesst der
+           naechste Tap. Sonst waere die Zeremonie mit dem letzten
+           Umdrehen vorbei und der Blick auf das Ganze faellt aus. */
+        if (!finaleGezeigt) { zeigeFinale(); return; }
+        schliessen();
       }
+      haengenderTipp = tipp;
       lay.addEventListener("pointerdown", tipp);
 
       /* Der Stapel schwebt, sobald der Flug durch ist. 75 % von DAUER ist
