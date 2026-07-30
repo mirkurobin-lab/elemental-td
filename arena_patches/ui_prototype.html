@@ -3564,8 +3564,14 @@ span.ico{text-align:center}
   color:#e8eef3;background:linear-gradient(180deg,#22303ce0,#101922e0);
   border:1px solid #33455480;box-shadow:var(--mat-raised);
   display:flex;align-items:center;justify-content:center}
-.apknav.l{left:-4px}
-.apknav.r{right:-4px}
+/* ⚠ Standen auf -4px und hingen damit 4 px UEBER DEN BILDSCHIRMRAND
+   hinaus (gemessen: linker Pfeil von -4 bis 22, rechter bis 434 bei 430
+   Breite). Auf dem Telefon schneidet der Bildschirmrand sie an; kein
+   Elternteil kappt vorher, es ist also echter Ueberlauf und keine
+   Messkulisse. 2px legt sie buendig an den Rand, ohne die Absicht
+   aufzugeben, dass sie ueber der Kachel liegen. */
+.apknav.l{left:2px}
+.apknav.r{right:2px}
 .apknav[disabled]{opacity:.28;pointer-events:none}
 .apkdots{display:flex;gap:6px;justify-content:center;margin-top:2px}
 .apkdots i{width:6px;height:6px;border-radius:50%;background:#33455e;
@@ -7418,6 +7424,54 @@ button.pfplate{cursor:pointer}
    Rolle wie .frnote in der Freundesliste. */
 .pfnote{margin-top:var(--gap-lg);font-size:10px;line-height:1.55;color:#1b2531cc;
   border-left:2px solid #1b253159;padding-left:8px;text-align:left}
+
+/* ==================================================================
+ * TREFFERFLAECHEN — 44 px, ohne dass sich etwas sichtbar aendert
+ * ------------------------------------------------------------------
+ * Gemessen ueber alle 16 Ansichten: 69 Knoepfe liegen unter 40x40 px.
+ * Die kleinsten sind 20x20 (Angebot ausblenden, Info-Punkte) — das ist
+ * weniger als die Haelfte dessen, was Apple (44 pt) und Google (48 dp)
+ * verlangen, und man trifft sie auf dem Telefon schlicht nicht.
+ *
+ * Die Icons duerfen deswegen NICHT wachsen: ein 20-px-Kreuz ist an
+ * seinem Platz richtig, es ist nur schwer zu treffen. Vergroessert wird
+ * darum allein die unsichtbare Flaeche, ueber die der Klick geht.
+ *
+ * ⚠ Warum ::after gefahrlos ist: nachgemessen ueber alle 16 Ansichten
+ * hat KEINES dieser 69 Elemente ein ::after oder ::before mit Inhalt,
+ * und KEINES kappt seinen Ueberlauf (69 von 69). Das war die Frage, an
+ * der die Idee haette scheitern koennen — ein ueberschriebenes ::after
+ * loescht sonst einen Haken, ein Abzeichen oder einen Pfeil.
+ *
+ * ⚠ Warum nur diese Liste und kein `button, .pressable`: die Flaeche
+ * waechst NUR in der zu kleinen Richtung (min-width/min-height auf einer
+ * ansonsten 100 % grossen Box). Bei nebeneinanderliegenden Reitern ist
+ * das harmlos. Bei UNTEREINANDER liegenden Knoepfen mit weniger als
+ * 14 px Abstand ueberlappen sich die Flaechen aber — und dann faengt
+ * der im DOM spaetere Knopf die obere Kante seines Nachbarn ab. Aus
+ * einer Verbesserung waere ein Klick-Diebstahl geworden. Deshalb steht
+ * hier eine benannte Liste alleinstehender Symbolknoepfe, und die
+ * Pruefung tastet jeden davon an fuenf Punkten an.
+ * ================================================================== */
+.backbtn,.dkinfo,.dkmenu,.crestmini,.apknav,.oddsi,.binfo,.anfinfo,
+.dkselbtn,.offerx,.iconbtn,.pfcopy,#btnReset{position:relative}
+.backbtn::after,.dkinfo::after,.dkmenu::after,.crestmini::after,
+.apknav::after,.oddsi::after,.binfo::after,.anfinfo::after,
+.dkselbtn::after,.offerx::after,.iconbtn::after,.pfcopy::after,
+#btnReset::after{
+  content:"";position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  width:100%;height:100%;min-width:44px;min-height:44px;
+  /* Nichts Sichtbares — nur Flaeche. */
+  background:none;
+  /* ⚠ NICHT border-radius:inherit. Das stand hier zuerst, und bei den
+     runden Knoepfen (.oddsi, .offerx: border-radius 50 %) wurde die
+     Trefferflaeche damit zu einem KREIS von 44 px — die Ecken des
+     Quadrats blieben tot. Beim Nachmessen fielen 27 von 28 Zielen
+     durch, weil genau diese Ecken angetastet wurden. Ein fester,
+     massvoller Radius laesst die Ecken mitspielen und sieht ohnehin
+     niemand: die Flaeche ist unsichtbar. */
+  border-radius:10px}
 
 </style>
 </head>
