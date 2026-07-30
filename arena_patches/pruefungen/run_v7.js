@@ -34,6 +34,18 @@ function step(name, ok, info) {
   page.on('console', m => {
     if (m.type() !== 'error') return;
     const t = m.text();
+    /* Seit 30.07.2026 liegen die Assets im Repo (arena_patches/assets/,
+       Nachweis in assets/HERKUNFT.json). Ein Fehler mit `/assets/` im Text
+       ist damit KEIN Umgebungsrauschen mehr, sondern eine fehlende Datei —
+       genau der Fall, den der alte Sammelfilter mitgedeckt hat, als das
+       Manifest noch aufs CDN zeigte. Er geht deshalb VOR den Filter. */
+    if (/\/assets\//.test(t) && !/PRUEFUNG_FEHLT_ABSICHTLICH/.test(t)) {
+      /* PRUEFUNG_FEHLT_ABSICHTLICH ist der erzwungene Ausfall der
+         Rueckfall-Gegenprobe. Sie MUSS 404 liefern, sonst prueft sie
+         nichts — sie hier mitzuzaehlen waere eine Messung, die ihr
+         eigenes Werkzeug als Befund meldet. */
+      errors.push('fehlende lokale Datei: ' + t); return;
+    }
     if (/ERR_|net::|Failed to load resource|cloudfront|\.png|\.mp4|\.webm|\.mp3/i.test(t)) { imgFails.push(t); return; }
     errors.push('console.error: ' + t);
   });
@@ -1980,23 +1992,43 @@ function step(name, ok, info) {
     shopMass.menge + ' Mengen-Chips');
   /* Der Rueckfall-Grund der Baender darf NUR bei echtem Ladefehler da
      sein — „die Banner sind noch immer mit leicht schwarzem Hintergrund,
-     dieser sollte transparent sein". Oertlich ist das CDN nicht
-     erreichbar, .bandfehlt ist also RICHTIG gesetzt; gemessen wird
-     deshalb die Kopplung, nicht der Zustand. */
+     dieser sollte transparent sein".
+     ------------------------------------------------------------------
+     UMGESCHRIEBEN 30.07.2026. Die alte Sonde SETZTE `bandfehlt` nicht,
+     sondern verliess sich darauf, dass die Klasse wegen des toten CDN
+     ohnehin dranhaengt („.bandfehlt ist also RICHTIG gesetzt"). Seit die
+     Baender aus dem Repo laden, nimmt `probe.onload` die Klasse weg — die
+     Sonde hat damit ZWEIMAL den Zustand „ohne Fehler" gemessen und der
+     Schritt wurde rot, obwohl die Kopplung stimmt.
+     Jetzt setzt sie beide Zustaende selbst und stellt den Ausgangszustand
+     danach wieder her: eine Pruefung, die den Messgegenstand veraendert
+     zurueck laesst, faerbt spaeter einen fremden Schritt rot.
+     Dazu ein Schritt, der vorher gar nicht moeglich war: das Band soll im
+     Normalfall UEBERHAUPT nicht auf dem Rueckfall stehen. */
   const bandKopplung = await page.evaluate(() => {
     const rb = document.querySelector('.secribbon');
-    const px = 'data:image/svg+xml;base64,' + btoa(
-      '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="44">' +
-      '<rect width="120" height="44" fill="#5b3fa0"/></svg>');
-    const mitFehler = getComputedStyle(rb).backgroundImage !== 'none';
+    if (!rb) return { fehlt: true };
+    const vorher = rb.classList.contains('bandfehlt');
+    const rand = getComputedStyle(rb).borderImageSource;
+    rb.classList.add('bandfehlt');
+    const mitFehler = getComputedStyle(rb).backgroundImage;
     rb.classList.remove('bandfehlt');
     const ohneFehler = getComputedStyle(rb).backgroundImage;
-    rb.classList.add('bandfehlt');
-    return { mitFehler: mitFehler, ohneFehler: ohneFehler };
+    if (vorher) rb.classList.add('bandfehlt');      /* Ausgangszustand zurueck */
+    return { vorher: vorher, rand: rand, mitFehler: mitFehler, ohneFehler: ohneFehler };
   });
   step('Band traegt seinen Grund NUR bei Ladefehler',
-    bandKopplung.mitFehler && bandKopplung.ohneFehler === 'none',
-    'mit Fehler: Platte da · ohne: ' + bandKopplung.ohneFehler);
+    !bandKopplung.fehlt && /gradient/.test(bandKopplung.mitFehler) &&
+      bandKopplung.ohneFehler === 'none',
+    bandKopplung.fehlt ? '.secribbon fehlt'
+      : 'mit .bandfehlt: ' + bandKopplung.mitFehler.slice(0, 30) +
+        '… · ohne: ' + bandKopplung.ohneFehler);
+  step('Band laedt sein Bild wirklich, steht also nicht auf dem Rueckfall',
+    !bandKopplung.fehlt && bandKopplung.vorher === false &&
+      /url\(/.test(bandKopplung.rand),
+    bandKopplung.fehlt ? '.secribbon fehlt'
+      : '.bandfehlt: ' + bandKopplung.vorher + ' · border-image: ' +
+        (bandKopplung.rand || '').split('/').pop().slice(0, 28));
 
   await go('navHome');
   await page.waitForTimeout(300);
@@ -2057,20 +2089,45 @@ function step(name, ok, info) {
   });
   /* Die Nav-Illustrationen sind deckende PNGs mit eingebackenem dunklem
      Grund. Auf der helleren Platte des aktiven Reiters stand darum um
-     jedes Icon ein dunkles Rechteck. `lighten` laesst den Untergrund
-     gewinnen, wo das Bild dunkler ist. */
-  const navBlend = await page.evaluate(() => {
+     jedes Icon ein dunkles Rechteck.
+     ------------------------------------------------------------------
+     UMGESCHRIEBEN 30.07.2026. Der Schritt verlangte `mix-blend-mode:
+     lighten` am Bild. Diese Bauweise ist ABGESCHAFFT, und der Kommentar
+     im Prototyp begruendet es nachgemessen: `lighten` hilft nur, solange
+     der Untergrund HELLER ist als der eingebackene Grund — die Leiste
+     misst L 0,027, `nav_clan` bringt L 0,192 mit, also gewinnt das
+     Rechteck (dE bis 166,8). Dazu traegt `.navpop` selbst ein `filter:`
+     und bildet damit eine eigene Mischgruppe, in der ein Mischmodus des
+     Kindes ohnehin ins Leere laeuft. An seiner Stelle steht die
+     Freistellung `img.ico{filter:url(#icoFrei)}`.
+     Gruen blieb der alte Schritt nur, weil oertlich nie ein `img.navimg`
+     entstand: der Emoji-Rueckfall machte `'kein img'` daraus, und der
+     Vergleich lief leer durch. Seit die Bilder aus dem Repo laden, gibt es
+     das `<img>` — und der Schritt verlangte eine Loesung, die aus gutem
+     Grund nicht mehr da ist. Geprueft wird jetzt die Loesung, die gilt. */
+  const navFrei = await page.evaluate(() => {
     const i = document.querySelector('nav.bottom .navpop img.navimg');
     const sp = document.querySelector('nav.bottom .navpop span.navimg');
-    return { bild: i ? getComputedStyle(i).mixBlendMode : 'kein img',
-             emoji: sp ? getComputedStyle(sp).mixBlendMode : 'kein span' };
+    return { img: !!i,
+             ico: i ? i.classList.contains('ico') : null,
+             filter: i ? getComputedStyle(i).filter : null,
+             pixel: i ? (i.complete && i.naturalWidth > 0) : null,
+             emojiFilter: sp ? getComputedStyle(sp).filter : 'kein span' };
   });
-  step('Nav-Illustration blendet ihren eingebackenen Grund weg',
-    navBlend.bild === 'lighten' || navBlend.bild === 'kein img',
-    JSON.stringify(navBlend));
-  step('Das Emoji blendet NICHT (sonst frisst der Modus seine dunklen Teile)',
-    navBlend.emoji === 'normal' || navBlend.emoji === 'kein span',
-    navBlend.emoji);
+  step('Nav-Illustration ist freigestellt (icoFrei), nicht gemischt',
+    navFrei.img
+      ? (navFrei.ico && /url\(/.test(navFrei.filter) && navFrei.pixel)
+      : true,
+    navFrei.img
+      ? 'class ico: ' + navFrei.ico + ' · filter: ' + navFrei.filter +
+        ' · Pixel: ' + navFrei.pixel
+      : 'kein img.navimg — Emoji-Rueckfall, dann greift der Schritt nicht');
+  /* Der Emoji-Rueckfall darf die Freistellung NICHT tragen: der Filter
+     wuerde die dunklen Teile des Emojis wegschneiden. `img.ico` als
+     Selektor leistet das schon, der Schritt haelt es fest. */
+  step('Das Emoji traegt die Freistellung NICHT',
+    navFrei.emojiFilter === 'kein span' || navFrei.emojiFilter === 'none',
+    String(navFrei.emojiFilter));
 
   step('Die Hervorhebung wandert zum neuen Ziel',
     nav2.id === 'navClan' && nav2.lbl > 12 && nav2.anzahlAktiv === 1,

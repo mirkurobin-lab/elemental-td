@@ -25,6 +25,18 @@ function step(name, ok, info) {
   page.on('console', m => {
     if (m.type() !== 'error') return;
     const t = m.text();
+    /* Seit 30.07.2026 liegen die Assets im Repo (arena_patches/assets/,
+       Nachweis in assets/HERKUNFT.json). Ein Fehler mit `/assets/` im Text
+       ist damit KEIN Umgebungsrauschen mehr, sondern eine fehlende Datei —
+       genau der Fall, den der alte Sammelfilter mitgedeckt hat, als das
+       Manifest noch aufs CDN zeigte. Er geht deshalb VOR den Filter. */
+    if (/\/assets\//.test(t) && !/PRUEFUNG_FEHLT_ABSICHTLICH/.test(t)) {
+      /* PRUEFUNG_FEHLT_ABSICHTLICH ist der erzwungene Ausfall der
+         Rueckfall-Gegenprobe. Sie MUSS 404 liefern, sonst prueft sie
+         nichts — sie hier mitzuzaehlen waere eine Messung, die ihr
+         eigenes Werkzeug als Befund meldet. */
+      errors.push('fehlende lokale Datei: ' + t); return;
+    }
     if (/ERR_|net::|Failed to load resource|cloudfront|\.png/i.test(t)) { imgFails.push(t); return; }
     errors.push('console.error: ' + t);
   });
@@ -115,12 +127,39 @@ function step(name, ok, info) {
   });
   step('Arenaname ist weiss, nicht gold (AA, IMG_3344)',
     !nameWeiss.gold && /255,\s*255,\s*255/.test(nameWeiss.fill), nameWeiss.fill);
-  // ---- Kristall-Icons + Emoji-Fallback ----
+  // ---- Kristall-Icons + Emoji-Rueckfall ----
   const icoTotal = await page.locator('img.ico, span.ico').count();
-  const icoFell  = await page.locator('span.ico').count();
   step('Kristall-Icons im Einsatz (>20)', icoTotal > 20, icoTotal + ' Icons');
-  step('Emoji-Fallback greift bei blockiertem CDN', icoFell > 10,
-    icoFell + ' von ' + icoTotal + ' auf Emoji zurückgefallen');
+  /* UMGESCHRIEBEN 30.07.2026. Vorher hiess dieser Schritt „Emoji-Fallback
+     greift bei blockiertem CDN" und verlangte `span.ico > 10`. Damit hat er
+     den KAPUTTEN Zustand als Anforderung festgeschrieben: er war nur gruen,
+     solange keine Bilder ankamen. Seit die Assets im Repo liegen, laden sie
+     — und der Schritt wurde rot, obwohl genau das die Verbesserung war.
+     Ein Schritt, der eine Verbesserung als Fehler meldet, wird beim
+     naechsten roten Balken weggeklickt und schuetzt danach nichts mehr.
+     Geprueft wird jetzt die ZUSAGE — „faellt ein Icon aus, steht sein Emoji
+     an seiner Stelle" — mit ERZWUNGENEM Ausfall statt mit gesperrtem Netz.
+     Das misst die Absicherung, nicht die Umgebung.
+     Der Klon haengt an einem LOSGELOESTEN Kasten: eine Gegenprobe, die die
+     laufende Seite anfasst, faerbt den naechsten Schritt rot — dieser
+     Fehler ist in packsprengung.js schon einmal passiert. */
+  const rueck = await page.evaluate(async () => {
+    const orig = document.querySelector('img.ico[alt]');
+    if (!orig) return { kein: true };
+    const kasten = document.createElement('div');
+    const klon = orig.cloneNode(true);
+    kasten.appendChild(klon);
+    klon.src = './assets/PRUEFUNG_FEHLT_ABSICHTLICH.webp';
+    await new Promise(r => { klon.onerror = r; klon.onload = r; setTimeout(r, 2500); });
+    window.UIIcon.sweep(kasten);
+    const sp = kasten.querySelector('span.ico');
+    return { alt: orig.getAttribute('alt'), text: sp ? sp.textContent : null,
+             bildWeg: !kasten.querySelector('img') };
+  });
+  step('Emoji-Rueckfall: ausgefallenes Icon wird durch sein Emoji ersetzt',
+    !rueck.kein && rueck.bildWeg && rueck.text === rueck.alt,
+    rueck.kein ? 'kein img.ico im Dokument'
+      : 'alt="' + rueck.alt + '" → "' + rueck.text + '", <img> entfernt: ' + rueck.bildWeg);
   // ---- Interaktions-Ebene ----
   const pressables = await page.locator('.pressable').count();
   step('.pressable auf allen klickbaren Elementen (>15)', pressables > 15, String(pressables));
@@ -331,9 +370,31 @@ function step(name, ok, info) {
      ist jetzt definiert. */
   await page.evaluate(() => { if (window.UIIcon && UIIcon.sweep) UIIcon.sweep(); });
   await page.waitForTimeout(120);
-  const upCost = (await page.locator('#dUpCost').textContent()).trim();
+  /* UMGESCHRIEBEN 30.07.2026, gleicher Grund wie beim Emoji-Rueckfall oben:
+     der Schritt las `textContent` und verlangte darin ein 🪙. Dieses Zeichen
+     stand dort nur, weil das Gold-Icon auf sein Emoji zurueckgefallen war.
+     Jetzt liegt an derselben Stelle das echte Bild:
+       <img class="ico" src="./assets/cur_gold.webp" alt="🪙"> 9 500
+     — nachgemessen naturalWidth 1024. Der Text enthaelt also nur noch die
+     Zahl, und der alte Schritt wurde rot, obwohl die Kosten sichtbarer sind
+     als vorher. Die Zusage lautet „neben der Zahl steht ein Waehrungs-
+     zeichen", nicht „im Text steht ein Emoji"; beide Bauformen erfuellen
+     sie, und der Schritt akzeptiert jetzt beide — beim Bild aber nur, wenn
+     es wirklich Pixel traegt. Ein leeres <img alt="🪙"> ist kein Zeichen. */
+  const upCost = await page.evaluate(() => {
+    const e = document.getElementById('dUpCost');
+    if (!e) return { fehlt: true };
+    const img = e.querySelector('img.ico');
+    return { text: e.textContent.trim(),
+             marke: img ? (img.getAttribute('alt') || '') : '',
+             pixel: !!img && img.complete && img.naturalWidth > 0 };
+  });
   step('Upgrade-Kosten mit Waehrungszeichen sichtbar',
-    /🪙/.test(upCost) && /\d/.test(upCost), upCost);
+    !upCost.fehlt && /\d/.test(upCost.text) &&
+      (/🪙/.test(upCost.text) || (upCost.marke === '🪙' && upCost.pixel)),
+    upCost.fehlt ? '#dUpCost fehlt'
+      : upCost.text + '  · Zeichen: ' + (upCost.marke || '(im Text)') +
+        (upCost.marke ? ' als Bild mit Pixeln: ' + upCost.pixel : ''));
   await page.screenshot({ path: SHOTS + '/detail.png', fullPage: true });
   await page.click('#btnDetailClose');
   await page.waitForTimeout(250);

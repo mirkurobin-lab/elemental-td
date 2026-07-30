@@ -26,6 +26,18 @@ function step(name, ok, info) {
   page.on('console', m => {
     if (m.type() !== 'error') return;
     const t = m.text();
+    /* Seit 30.07.2026 liegen die Assets im Repo (arena_patches/assets/,
+       Nachweis in assets/HERKUNFT.json). Ein Fehler mit `/assets/` im Text
+       ist damit KEIN Umgebungsrauschen mehr, sondern eine fehlende Datei —
+       genau der Fall, den der alte Sammelfilter mitgedeckt hat, als das
+       Manifest noch aufs CDN zeigte. Er geht deshalb VOR den Filter. */
+    if (/\/assets\//.test(t) && !/PRUEFUNG_FEHLT_ABSICHTLICH/.test(t)) {
+      /* PRUEFUNG_FEHLT_ABSICHTLICH ist der erzwungene Ausfall der
+         Rueckfall-Gegenprobe. Sie MUSS 404 liefern, sonst prueft sie
+         nichts — sie hier mitzuzaehlen waere eine Messung, die ihr
+         eigenes Werkzeug als Befund meldet. */
+      errors.push('fehlende lokale Datei: ' + t); return;
+    }
     if (/ERR_|net::|Failed to load resource|cloudfront|\.png|\.mp4|\.webm|\.mp3/i.test(t)) { imgFails.push(t); return; }
     errors.push('console.error: ' + t);
   });

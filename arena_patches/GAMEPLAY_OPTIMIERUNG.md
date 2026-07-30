@@ -867,3 +867,89 @@ derselben Einheit wie die `CARDS`-Stats. Wer die Turmzahlen mit einem Faktor
 multipliziert, multipliziert die Spells automatisch mit.
 
 **Aufwand: M** · **Priorität: 1** (blockiert jeden belastbaren Playtest)
+
+---
+
+## 13. Die UI hing an einem fremden Host (30.07.2026)
+
+**Befund vom Auftraggeber:** „Wieso sind Images und icons nicht in der Version?
+Es muss irgendwo eine fertige Version mit Icon Images und Videos sein."
+
+Beides war richtig. Die fertigen Bilder gab es — sie lagen nur nicht dort, wo die
+Seite sie gesucht hat.
+
+### Was gemessen wurde
+
+`ui_prototype.html` löste sein Asset-Manifest auf `https://…cloudfront.net/…` auf:
+**226 Einträge, davon 218 auf einen fremden Host** — Icons, Rahmen, Kartenbilder,
+Bandgrafiken, die zehn `.mp4` und die sechs `.mp3`. Gleichzeitig lagen **229
+dieser Dateien byte-geprüft im Repo**, unter `arena_patches/assets/`, mit Quell-URL,
+Größe und SHA-256 je Datei in `assets/HERKUNFT.json`.
+
+Der Kommentar über dem Manifest beschrieb den Umbau sogar schon:
+
+> „Für die echte App die Dateien nach `public/assets/` herunterladen und
+> `ASSET_BASE` unten auf `./assets/` umstellen."
+
+Die Dateien wurden geholt. Der Schalter wurde nie umgelegt. Damit entschied ein
+Dritter darüber, ob die UI Bilder hat — auf der Higgsfield-Vorschau kamen sie an,
+auf GitHub Pages nicht.
+
+### Warum es so lange unentdeckt blieb
+
+Das ist der interessantere Teil. **Jede** Prüfung in `pruefungen/` hatte den Satz
+„örtlich lädt kein Bild (kein CDN)" als Normalzustand eingebaut und filterte
+Konsolenfehler mit `.png`, `.mp4`, `.mp3` oder `cloudfront` im Text weg. Das war
+richtig, solange die Bilder gar nicht im Repo lagen. Ab dem Moment, in dem sie
+dort lagen, war es ein Filter, der echte 404 verschluckt.
+
+Zwei Prüfschritte gingen weiter und schrieben den kaputten Zustand als
+**Anforderung** fest:
+
+* `run_v5.js`: „Emoji-Fallback greift bei blockiertem CDN" verlangte
+  `span.ico > 10` — grün nur, solange keine Bilder ankamen.
+* `run_v5.js`: „Upgrade-Kosten mit Währungszeichen sichtbar" suchte 🪙 im
+  `textContent`. Das Zeichen stand dort nur als Emoji-Rückfall.
+
+Beide wurden rot, als die Bilder zu laden begannen — also **wegen der
+Verbesserung**. Ein Schritt, der eine Verbesserung als Fehler meldet, wird beim
+nächsten roten Balken weggeklickt und schützt danach nichts mehr. Beide sind
+umgeschrieben: sie prüfen jetzt die Zusage („fällt ein Icon aus, steht sein Emoji
+da"; „neben der Zahl steht ein Währungszeichen") mit **erzwungenem** Ausfall statt
+mit gesperrtem Netz.
+
+### Der Umbau
+
+`ASSET_BASE = "./assets/"`, danach löst eine Schleife jeden Schlüssel auf
+`./assets/<schlüssel>.<endung>` auf. Das geht ohne zweite 227-zeilige Tabelle,
+weil `assets_sichern.py` jede Datei nach ihrem Schlüssel benennt; die **21**
+Nicht-`.webp`-Endungen stehen in `ENDUNG`.
+
+Drei Dinge sind Absicht:
+
+1. **`NUR_CDN`** — die 8 Schlüssel, die nicht gesichert werden konnten, behalten
+   ihre CDN-Adresse und bleiben genau so zerbrechlich wie vorher. Jeder Eintrag
+   ist in `assets/NICHT_ERREICHBAR.json` datiert und begründet. Die Prüfung
+   verlangt diese Begründung, damit die Liste nicht still wächst.
+2. **`?cdn=1`** schaltet zurück aufs CDN. Fehlt ein Bild, unterscheidet dieser
+   Schalter in einem Griff „Datei fehlt im Repo" von „Bild ist auch an der Quelle
+   kaputt".
+3. **`ASSETS_CDN`** behält die Originaladressen im Speicher — die Herkunft
+   verschwindet nicht aus dem laufenden Programm.
+
+### Was daran messbar besser ist
+
+| | vorher | nachher |
+|---|---|---|
+| Bilder mit Pixeln, Shop | 0 von 89 | **89 von 89** |
+| Bilder mit Pixeln, 6 Ansichten | 0 | **170 von 170** |
+| Assets von einem fremden Host | 218 | **8** (alle begründet) |
+| Funktioniert offline / ohne CDN | nein | **ja** |
+
+75 MB liegen damit im Repo, 56 MB davon die zehn Videos. Für GitHub Pages
+unkritisch (Grenze 1 GB). **Offen und bewusst nicht angefasst:** die
+Karten-Loops sind 3,5–6,4 MB pro Datei. Auf dem Mobilfunknetz ist das viel für
+eine Kachelanimation; sobald echte Nutzer messbar sind, gehört das gegen die
+Ladezeit gerechnet — nicht vorher nach Gefühl.
+
+**Aufwand: S** · **Priorität: 1** (war der sichtbarste Fehler der Live-Fassung)

@@ -74,9 +74,20 @@
 </ul>
 
 <div class="hin">
-  <b>Die Artworks kommen von einem CDN.</b> Auf einer Verbindung, die das nicht
-  erreicht, fallen alle Bilder auf Emoji zurück — die Bühne funktioniert dann,
-  sieht aber nackt aus. Das ist kein Fehler im Prototyp.
+  <b>Die Artworks liegen jetzt im Repo</b> (seit 30.07.2026), unter
+  <code>arena_patches/assets/</code> — 218 Dateien, dazu die zehn Videos und die
+  sechs Tonspuren. Vorher zeigte das Manifest auf ein fremdes CDN; erreichte der
+  Browser das nicht, war die Bühne nackt. Genau das war der Befund „Images und
+  icons fehlen“.
+  <br><br>
+  Acht Assets hängen noch am CDN, weil sie von der Baumaschine aus nicht
+  erreichbar waren — jedes datiert und begründet in
+  <code>assets/NICHT_ERREICHBAR.json</code>. Bei denen greift weiter der
+  Emoji-Rückfall.
+  <br><br>
+  <code>?cdn=1</code> schaltet zurück auf das CDN. Fehlt ein Bild, unterscheidet
+  das in einem Griff „Datei fehlt im Repo“ von „Bild ist auch an der Quelle
+  kaputt“.
 </div>
 
 </body>

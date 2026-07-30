@@ -8329,7 +8329,6 @@ button.pfplate{cursor:pointer}
        Bildsprache und verschwammen bei 20 px. Die Keys bleiben unter
        *_v1 registriert, damit die Job-Historie nachvollziehbar ist; die
        gueltigen Definitionen stehen weiter unten in Batch 7. */
-    cur_trophy_v1:   CDN + "hf_20260725_132705_cc44c539-2646-40d1-b0ff-6b81510c0307.png",
     cur_gem_v1:      CDN + "hf_20260725_132708_f9dde68c-0307-479c-ad15-ca6f547df349.png",
     cur_gold_v1:     CDN + "hf_20260725_132711_78da253c-5269-46c7-9d6a-eb30eb27bb56.png",
     ess_attack:      CDN + "hf_20260725_132812_0dd1e9db-ca2f-4d32-9132-8de9d1d1e9f6.png",
@@ -8677,6 +8676,60 @@ button.pfplate{cursor:pointer}
     cinematic_legendary:
                      CDN + "hf_20260725_141315_94331286-780b-4b74-8ee1-c8a3e15b9dac.mp4",
   };
+  /* ==================================================================
+   * ASSET-AUFLOESUNG — erst das Repo, dann das CDN
+   * ------------------------------------------------------------------
+   * Bis hierher zeigt jeder Eintrag oben aufs Higgsfield-CDN. Fuer einen
+   * Prototyp am eigenen Rechner war das richtig. Fuer eine Fassung, die
+   * jemand aufruft, ist es falsch: dann entscheidet ein fremder Host, ob
+   * die UI Bilder hat. Genau das ist eingetreten — auf dem Testserver
+   * blieben Icons, Rahmen, Kartenbilder und Video-Loops leer, obwohl
+   * jede dieser Dateien im Repo liegt.
+   *
+   * werkzeuge/assets_sichern.py hat die Dateien nach arena_patches/assets/
+   * geholt und je Datei Quell-URL, Groesse und SHA-256 in
+   * assets/HERKUNFT.json hinterlegt — der Nachweis, dass die Datei im
+   * Repo die Datei vom CDN ist. Jede gesicherte Datei heisst
+   * <schluessel>.<endung>: von den 218 hier lokal aufgeloesten Schluesseln
+   * sind 197 .webp, die 21 Ausnahmen stehen in ENDUNG. Diese
+   * Namenskonvention ist der Grund, warum hier keine 218-zeilige zweite
+   * Tabelle steht, die beim naechsten Asset stillschweigend veraltet.
+   *
+   * NUR_CDN sind die Schluessel, die NICHT gesichert werden konnten. Sie
+   * behalten ihre CDN-Adresse und bleiben damit genau so zerbrechlich wie
+   * vorher. Jeder Eintrag ist in assets/NICHT_ERREICHBAR.json datiert und
+   * begruendet; die Liste ist kein Ablagefach, sondern eine Schuld.
+   *
+   * ?cdn=1 schaltet zurueck aufs CDN. Das ist keine Kosmetik: fehlt ein
+   * Bild, unterscheidet dieser Schalter in einem Griff „Datei fehlt im
+   * Repo" von „Bild ist auch an der Quelle kaputt".
+   *
+   * pruefungen/assets_lokal.js haelt das fest — es liest dieses Manifest
+   * und verlangt fuer JEDEN aufgeloesten Pfad eine Datei auf der Platte.
+   * ================================================================== */
+  var ASSET_BASE = "./assets/";
+  var ASSETS_CDN = {};                 /* Originaladressen, s. HERKUNFT.json */
+  var ENDUNG = {
+    audio_battle:"mp3", audio_defeat:"mp3", audio_pack_fanfare:"mp3", audio_theme:"mp3",
+    audio_victory:"mp3", audio_war:"mp3", av_smaragd:"png", banner_rarity:"png",
+    banner_title:"png", cinematic_legendary:"mp4", loop_dawn:"mp4", loop_ember:"mp4",
+    loop_frost:"mp4", loop_hollow:"mp4", loop_magmor:"mp4", loop_solara:"mp4",
+    loop_stone:"mp4", loop_thorn:"mp4", pass_keyart_anim:"mp4", ribbon_section_lg:"png",
+    ribbon_section_sm:"png"
+  };
+  var NUR_CDN = {
+    card_bann:1, card_bollwerk:1, card_fokus:1, card_joker:1,
+    card_splitter:1, ess_arkan:1, ic_offline:1, off_banner:1,
+    off_loop:1
+  };
+  (function () {
+    if (/[?&]cdn=1\b/.test(location.search)) return;
+    for (var k in ASSETS) {
+      if (NUR_CDN[k]) continue;
+      ASSETS_CDN[k] = ASSETS[k];
+      ASSETS[k] = ASSET_BASE + k + "." + (ENDUNG[k] || "webp");
+    }
+  })();
   /* ==================================================================
    * ico() — Kristall-Icon mit Emoji-Fallback
    * ------------------------------------------------------------------
@@ -18788,6 +18841,12 @@ button.pfplate{cursor:pointer}
                      SOC_LINKS: SOC_LINKS, renderCommunity: renderCommunity,
                      setSort: setSort, sortedIds: sortedIds,
                      ASSETS: ASSETS, ARENA_TIERS: ARENA_TIERS, renderHome: renderHome,
+                     /* Asset-Aufloesung nach aussen: pruefungen/assets_lokal.js
+                        vergleicht die aufgeloesten Pfade mit den Dateien auf der
+                        Platte. Ohne diese drei muesste es das Manifest aus dem
+                        HTML-Quelltext parsen — und wuerde dann den Quelltext
+                        pruefen statt das, was im Browser wirklich gilt. */
+                     ASSET_BASE: ASSET_BASE, ASSETS_CDN: ASSETS_CDN, NUR_CDN: NUR_CDN,
                      openRoad: openRoad, closeRoad: closeRoad, nodeList: nodeList,
                      LEAGUE_GATES: LEAGUE_GATES, renderShop: renderShop,
                      /* Shop-Tagessystem — fuer Pruefungen offengelegt:

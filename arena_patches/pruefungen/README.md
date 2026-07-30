@@ -1,7 +1,20 @@
 # Prüfungen
 
-Siebzehn Playwright-Suiten mit zusammen **1 172 Schritten**, plus zwei
-Sonderprüfungen, die nur mit tatsächlich geladenen Bildern laufen.
+Zuletzt vollständig gemessen am **30.07.2026**: 22 Playwright-Suiten laufen hier
+durch, zusammen **1 348 Schritte**, davon **1 347 grün**. Rot bleibt genau einer
+— `run_v7.js` „gleiche Drittel" (siehe unten, braucht eine Produktentscheidung,
+kein Code-Fix).
+
+`iconfrei.js` und `sicht.js` sind nicht mitgezählt: sie prüfen die
+**ausgelieferte** Seite und brauchen das volle `playwright`-Modul, das in diesem
+Container nicht liegt (`Cannot find module 'playwright'`). Das ist eine
+Umgebungsgrenze, kein Befund.
+
+Die Tabelle unten führt alle 22 auf und summiert sich auf die 1 348. Jede Zahl
+in der Spalte „Schritte" ist gemessen, nicht geschätzt — wer sie ändert, hat die
+Suite laufen lassen. (Vier Suiten fehlten bis zum 30.07.2026 ganz in dieser
+Tabelle, drei weitere trugen veraltete Zahlen. Eine Übersicht, die nicht stimmt,
+ist schlimmer als keine: sie beendet das Nachzählen.)
 
 ## Aufruf
 
@@ -19,14 +32,24 @@ einem frisch gestarteten Container gibt es kein lokales `node_modules` —
 ohne die Zeile scheitert **jede** Suite sofort mit `MODULE_NOT_FOUND`, und
 das sieht aus wie ein kaputter Prototyp statt einer fehlenden Umgebung.
 
-Die Suiten laden `file:///home/user/elemental-td/arena_patches/ui_prototype.html`
-direkt — kein Server, kein Build.
+Die meisten Suiten laden
+`file:///home/user/elemental-td/arena_patches/ui_prototype.html` direkt — kein
+Server, kein Build.
+
+**Zwei starten einen eigenen HTTP-Server** (`assets_lokal.js`,
+`packsprengung.js`), und das ist kein Komfort, sondern notwendig. Sie lesen
+Pixel von einer Leinwand, auf die das Packbild gezeichnet wird. Unter `file://`
+gilt jede Datei als eigener, undurchsichtiger Ursprung: das Bild „taintet" die
+Leinwand und `getImageData` wirft `SecurityError`. Über HTTP teilen Seite und
+Bild einen Ursprung — und gemessen wird obendrein die Auslieferungsform, die auf
+GitHub Pages wirklich läuft. Der Server bindet auf `127.0.0.1` mit Port 0, es
+gibt also keine feste Portnummer, die kollidieren kann.
 
 | Datei | Schritte | Gegenstand |
 |---|---:|---|
-| `run_v5.js` | 108 | Grundgerüst, Navigation, Sammlung, Festung, Packs |
-| `run_v6.js` | 281 | Clan, Ghost-Clankrieg, Spenden, Rangliste, Post |
-| `run_v7.js` | 334 | Startseite, Banner-Metrik, Pass, Guide, Profil, Avatare, Shop-Maße |
+| `run_v5.js` | 114 | Grundgerüst, Navigation, Sammlung, Festung, Packs |
+| `run_v6.js` | 283 | Clan, Ghost-Clankrieg, Spenden, Rangliste, Post |
+| `run_v7.js` | 337 | Startseite, Banner-Metrik, Pass, Guide, Profil, Avatare, Shop-Maße |
 | `run_friends.js` | 25 | Freundesliste, Anfragen, Suche |
 | `run_shop.js` | 36 | Tagesangebote, Booster-Packs, Gold, Tresor, Vorrats-Truhe |
 | `avatare.js` | 12 | Fünf zur Wahl, Helden am Besitz, Auswahl im Raster |
@@ -36,11 +59,16 @@ direkt — kein Server, kein Build.
 | `shop_raender.js` | 20 | Randfarben: Inhalt (Kristall/Gold) und Produktfamilie (Packs) |
 | `flug.js` | 12 | Sammel-Animation — aus JEDEM Fenster, nicht nur aus dem Shop |
 | `community.js` | 89 | Community-Reiter: Marken, echte Ziele |
-| `spells.js` | 36 | Die vier Spells (Variante B): eine gemeinsame Arkan-Essenz, gleiche Caps/Kurven wie Türme, Fusion 3→nächste Rarität, **eigene Pack-Slots** ohne Berührung der Essenz-Slots, eigener Reiter, ehrliches Detail |
-| `packoeffnung.js` | 60 | Pack-Öffnung: Zeitkurve **gekoppelt statt eingefroren**, Farbausströmung, sichtbare Karten, Abbruch, Neustart, **Raritäts-Leiter der Aufdeckung** |
+| `spells.js` | 37 | Die vier Spells (Variante B): eine gemeinsame Arkan-Essenz, gleiche Caps/Kurven wie Türme, Fusion 3→nächste Rarität, **eigene Pack-Slots** ohne Berührung der Essenz-Slots, eigener Reiter, ehrliches Detail |
+| `packoeffnung.js` | 70 | Pack-Öffnung: Zeitkurve **gekoppelt statt eingefroren**, Farbausströmung, sichtbare Karten, Abbruch, Neustart, **Raritäts-Leiter der Aufdeckung** |
 | `quoten.js` | 48 | Drop-Raten hinter dem ⓘ — Auflage nach Apple 3.1.1 / Google Play |
-| `essenzen.js` | 33 | Eine Essenz je Karte: Sortenliste == Kartenliste, Ankündigung == Buchung, Fach/Detail/Shop/Pass |
+| `essenzen.js` | 36 | Eine Essenz je Karte: Sortenliste == Kartenliste, Ankündigung == Buchung, Fach/Detail/Shop/Pass |
 | `guide.js` | 36 | Defenders Guide: bewegbare Reiterleiste, großes Icon am offenen Reiter, Gegner/Boss als eigene Reiter, kein Booster-Reiter |
+| `packsprengung.js` | 27 | Die Leinwand-Sprengung: Bruchfächer, Schweif ohne Vorhang, Vorbeiflug, Bildrate — **liest Pixel, braucht deshalb den HTTP-Server** |
+| `deck.js` | 57 | Battle Deck: neun Slots, Auswahlfenster, Tausch, Sammlung |
+| `offline.js` | 46 | Passive Offline-Erträge: Kappung, Abholung, Buchung |
+| `bildzustand.js` | 12 | Der Zustand mit ECHTEN Bildern (`data:`-URI), den örtlich sonst niemand sieht |
+| `assets_lokal.js` | 12 | **Liegen die Bilder im Repo, und kommen sie an?** Struktur (löst das Manifest auf `./assets/` auf), Platte (existiert jede Datei), Pixel (`naturalWidth > 0` je Ansicht) — plus die Mutationsprobe, dass `?cdn=1` den Schritt rot macht |
 | `assets_vollstaendig.py` | 4 | Jedes benutzte Asset ist verzeichnet, gesichert UND aktuell |
 
 `assets_vollstaendig.py` ist die einzige Prüfung hier, die kein Playwright
@@ -449,6 +477,54 @@ Fehler lag zwischen zwei Teilen, die jeder für sich grün waren.
 Merke: eine abgestürzte Prüfung ist kein Umbauhindernis, sondern ein
 Hinweis darauf, dass in der Nähe eine Anforderung veraltet ist. Nur den
 Selektor zu reparieren hätte den doppelten Reveal nicht gefunden.
+
+## Ein Filter, der einen Fehler jahrelang deckt (30.07.2026, `assets_lokal.js`)
+
+Der schwerste Befund dieses Tages kam vom Auftraggeber, nicht von hier: „Wieso
+sind Images und icons nicht in der Version?" Das Manifest in
+`ui_prototype.html` löste 218 von 226 Assets auf ein fremdes CDN auf, während
+dieselben Dateien byte-geprüft im Repo lagen.
+
+Warum keine der 24 Suiten das gesehen hat, ist die Lektion. **Fünf** von ihnen
+tragen dieselbe Zeile:
+
+```js
+if (/ERR_|net::|Failed to load resource|cloudfront|\.png|\.mp4|\.mp3/i.test(t)) return;
+```
+
+Die Zeile war richtig, als sie geschrieben wurde: das CDN ist von hier gesperrt,
+jedes Bild scheiterte, ohne Filter wäre jede Suite dauerrot gewesen. Ab dem
+Moment, in dem die Dateien ins Repo wanderten, war derselbe Filter ein Sieb für
+echte 404. Er hat nicht gelogen — er hat aufgehört, die Wahrheit zu sagen, ohne
+sich dabei zu ändern.
+
+Zwei Schritte gingen weiter und machten den Ausfall zur **Anforderung**:
+„Emoji-Fallback greift bei blockiertem CDN" verlangte `span.ico > 10`, und die
+Upgrade-Kosten wurden über ein 🪙 im `textContent` geprüft — das dort nur stand,
+weil das Gold-Icon zurückgefallen war. Als die Bilder zu laden begannen, wurden
+beide rot. Nicht wegen eines Fehlers: **wegen der Verbesserung.**
+
+Drei Regeln daraus:
+
+1. **Ein Filter braucht ein Ablaufdatum in Form einer Bedingung.** Nicht
+   „Bildfehler ignorieren", sondern „Fehler an *diesem* Host ignorieren, solange
+   er in `NICHT_ERREICHBAR.json` steht". Die fünf Suiten prüfen jetzt zuerst auf
+   `/assets/` und melden das als echten Fehler.
+2. **Nie den Umgebungsdefekt als Zusage formulieren.** „Bei blockiertem CDN
+   greift der Rückfall" ist keine Anforderung an das Produkt, sondern eine
+   Beschreibung dieser Baumaschine. Die Zusage lautet „fällt ein Icon aus, steht
+   sein Emoji da" — und die prüft man mit einem **erzwungenen** Ausfall.
+3. **Wenn ein Schritt rot wird, erst fragen, ob er das Richtige verlangt.** Hier
+   waren zwei rote Schritte das Symptom einer Reparatur.
+
+Und ein vierter Punkt, der `assets_lokal.js` selbst betrifft: die erste Fassung
+meldete 34 leere Bilder. Alle 34 waren `loading="lazy"` in einer Ansicht mit
+`display:none` — Chromium lädt die zu Recht nicht. Der Schritt hat also
+korrektes Verhalten angeschwärzt, und zwar in der Datei, die genau diese Sorte
+Fehler verhindern soll. Er misst jetzt nur, was im Layout steht, nachdem die
+Ansicht gezeigt und durchgerollt wurde. Dazu die Mutationsprobe: mit `?cdn=1`
+**muss** der Pixel-Schritt hier rot werden (20/20 leer). Bliebe er grün, wäre
+der gemeldete Fehler auch an dieser Suite vorbeigelaufen.
 
 ## Was hier NICHT liegt
 

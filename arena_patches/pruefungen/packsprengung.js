@@ -57,6 +57,53 @@
  * =================================================================== */
 const { chromium } = require("playwright-core");
 const { execFileSync } = require("child_process");
+const http = require("http");
+const fs = require("fs");
+const pfad = require("path");
+
+/* ==================================================================
+ * WARUM DIESE DATEI EINEN SERVER STARTET (30.07.2026)
+ * ------------------------------------------------------------------
+ * Sie liest Pixel von der Leinwand (`getImageData`) — ohne das gaebe es
+ * hier nichts zu messen. Genau das geht nur, solange die Leinwand nicht
+ * „getaintet" ist: sobald ein Bild von einem FREMDEN Ursprung darauf
+ * gezeichnet wird, sperrt der Browser das Auslesen.
+ *
+ * Bis zum 30.07.2026 lief diese Datei ueber `file://` und war gruen —
+ * aber nur, weil das CDN aus dieser Umgebung gesperrt ist. Es kam nie ein
+ * Bild an, also wurde nie eines gezeichnet, also war nichts getaintet.
+ * Die Pruefung war gruen fuer den Zustand „Pack ohne Bild". Seit die
+ * Assets im Repo liegen, laedt das Packbild wirklich — und unter
+ * `file://` gilt jede Datei als eigener, undurchsichtiger Ursprung.
+ * Ergebnis: `SecurityError`, die Suite starb an ihrer ersten Messung.
+ *
+ * Das ist KEIN Fehler der App: sie zeichnet nur (`drawImage`), und
+ * Zeichnen ist auf einer getainteten Leinwand erlaubt. Kein einziger
+ * `getImageData`-Aufruf steht im Anwendungscode — nachgesehen. Die
+ * Sprengung funktioniert fuer Spieler unveraendert.
+ *
+ * Der Ausweg ist derselbe wie in assets_lokal.js und obendrein naeher an
+ * der Wirklichkeit: ueber HTTP ausliefern. Dann teilen Seite und Bild
+ * einen Ursprung, die Leinwand bleibt lesbar — und gemessen wird die
+ * Auslieferungsform, die auf GitHub Pages auch wirklich laeuft.
+ * ================================================================== */
+const WURZEL = pfad.resolve(__dirname, "..");
+const TYP = { ".html":"text/html", ".js":"text/javascript", ".json":"application/json",
+  ".webp":"image/webp", ".png":"image/png", ".jpg":"image/jpeg", ".mp4":"video/mp4",
+  ".mp3":"audio/mpeg", ".css":"text/css", ".svg":"image/svg+xml" };
+function starteServer() {
+  const s = http.createServer((q, r) => {
+    const rein = decodeURIComponent(q.url.split("?")[0]);
+    const p = pfad.join(WURZEL, pfad.normalize(rein).replace(/^(\.\.[/\\])+/, ""));
+    if (!p.startsWith(WURZEL) || !fs.existsSync(p) || fs.statSync(p).isDirectory()) {
+      r.writeHead(404); r.end("nicht da"); return;
+    }
+    r.writeHead(200, { "content-type": TYP[pfad.extname(p)] || "application/octet-stream" });
+    fs.createReadStream(p).pipe(r);
+  });
+  return new Promise((fertig) =>
+    s.listen(0, "127.0.0.1", () => fertig({ s: s, basis: "http://127.0.0.1:" + s.address().port + "/" })));
+}
 
 let ok = 0, fehl = 0;
 const pruef = (n, w, z) => {
@@ -120,7 +167,8 @@ const KLASSIERER = (r, g, b) => {
   const seite = await b.newPage({ viewport: { width: 412, height: 892 }, deviceScaleFactor: 3 });
   const seitenfehler = [];
   seite.on("pageerror", (e) => seitenfehler.push(e.message));
-  await seite.goto("file://" + __dirname.replace(/\/pruefungen$/, "") + "/ui_prototype.html");
+  const srv = await starteServer();
+  await seite.goto(srv.basis + "ui_prototype.html");
   await seite.waitForTimeout(1200);
 
   console.log("\npacksprengung.js — die Leinwand-Sprengung\n");
@@ -519,5 +567,6 @@ const KLASSIERER = (r, g, b) => {
   console.log("\n" + ok + " ok, " + fehl + " fehl — " +
     (fehl === 0 ? "ALLE SCHRITTE GRUEN" : "ROT") + "\n");
   await b.close();
+  srv.s.close();
   if (fehl) process.exitCode = 1;
 })();
