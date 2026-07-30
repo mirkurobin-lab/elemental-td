@@ -48,7 +48,55 @@
    * Stufe (3,3 ct → 2,5 ct) — wer dranbleibt, wird besser behandelt.
    * Das ist die einzige Preisdynamik, die ein Spieler als fair empfindet. */
   var VAULT_CAPS = [150, 300, 600, 1200, 2400];
-  var VAULT_PRICES = [4.99, 9.49, 17.99, 32.99, 59.99];
+  /* ==================================================================
+   * TRESOR-PREISE — 30.07.2026 neu gesetzt
+   * ------------------------------------------------------------------
+   * Vorgabe des Auftraggebers: „dieser Beutel soll im Verhaeltnis
+   * bisschen guenstiger sein wie ein normaler Kristall Kauf weil man fuer
+   * den Beutel auch aktiv spielen muss zum fuellen (animiert um mehr zu
+   * spielen und macht den Beutel attraktiver)."
+   *
+   * Das war vorher GENAU UMGEKEHRT, und zwar deutlich. Nachgerechnet
+   * gegen die Ladenstaffel (ui_prototype GEM_PACKS, §27.2):
+   *
+   *   Kapazitaet   Tresor alt      Laden bei dieser Paketgroesse
+   *      150       3,33 ct              1,69 ct
+   *      300       3,16 ct              1,10 ct
+   *      600       3,00 ct              0,79 ct
+   *     1200       2,75 ct              0,75 ct
+   *     2400       2,50 ct              0,72 ct
+   *
+   * Der Tresor war an JEDER Stufe das schlechteste Geschaeft im Spiel —
+   * fuer Kristalle, die der Spieler sich vorher erspielt hat. Das ist die
+   * Umkehrung des Versprechens, auf dem die ganze Mechanik steht („deine
+   * bereits verdienten Gems"), und es bestraft genau das Verhalten, das
+   * die Mechanik belohnen soll.
+   *
+   * DIE REGEL, die jetzt gilt und die pruefungen/tresor.js einfordert:
+   * der Preis je Kristall liegt an JEDER Stufe UNTER dem, was der Laden
+   * fuer eine Packung derselben Groesse nimmt (log-log-Interpolation der
+   * Ladenkurve), und er SINKT mit jeder Stufe — so steht es auch im Kopf
+   * dieses Moduls („der Gem-Preis SINKT dabei").
+   *
+   *   Kapazitaet   Preis     ct/Gem   Laden    Vorteil   Siege zum Fuellen
+   *      150      Fr. 1.90    1,27     1,69     −25 %          ~43
+   *      300      Fr. 2.90    0,97     1,10     −12 %          ~86
+   *      600      Fr. 3.90    0,65     0,79     −18 %         ~172
+   *     1200      Fr. 6.90    0,58     0,75     −23 %         ~343
+   *     2400      Fr. 13.50   0,56     0,72     −22 %         ~686
+   *
+   * ⚠ WAEHRUNG: vorher Euro, waehrend der ganze Shop in Franken rechnet.
+   * Zwei Waehrungen auf einem Bildschirm sind kein Detail — sie machen
+   * jeden Preisvergleich, den der Spieler anstellt, falsch.
+   *
+   * ⚠ OFFEN, und keine Preisfrage: die Fuellzeit. Bei 2-5 Gems je Sieg
+   * braucht die oberste Stufe rund 480-686 Siege. Ein Angebot, das kaum
+   * je erscheint, ist unabhaengig vom Preis wirkungslos. Entweder steigt
+   * der Zuwachs je Sieg mit der Stufe, oder die oberen Kapazitaeten
+   * sinken. Das ist eine Produktentscheidung und steht in
+   * GAMEPLAY_OPTIMIERUNG.
+   * ================================================================== */
+  var VAULT_PRICES = [1.90, 2.90, 3.90, 6.90, 13.50];
   var VAULT_TIER_MAX = VAULT_CAPS.length - 1;
 
   /* Gems je Sieg, gestaffelt nach Arena-Stufe (2 … 5).
@@ -231,7 +279,7 @@
       pct: cap ? s.gems / cap : 0,
       pctText: Math.round((cap ? s.gems / cap : 0) * 100) + " %",
       full: s.gems >= cap,
-      price: VAULT_PRICES[s.tier], priceText: VAULT_PRICES[s.tier].toFixed(2).replace(".", ",") + " €",
+      price: VAULT_PRICES[s.tier], priceText: VAULT_PRICES[s.tier].toFixed(2).replace(".", ",") + " Fr.",
       perGemCt: Math.round(VAULT_PRICES[s.tier] / cap * 10000) / 100,
       perWin: gemsPerWin(trophiesOverride),
       opened: s.opened,
@@ -259,7 +307,7 @@
     save(s);
     return {
       ok: true, gems: gems, price: price,
-      priceText: price.toFixed(2).replace(".", ",") + " €",
+      priceText: price.toFixed(2).replace(".", ",") + " Fr.",
       tier: tier, nextTier: s.tier, nextCap: VAULT_CAPS[s.tier],
       placeholder: true,      // ⚠ kein echter Kauf
     };
@@ -280,7 +328,7 @@
       used: !!o.used, shown: !!o.shown, clicked: !!o.clicked, hidden: !!o.hidden,
       active: left > 0 && !o.used && !o.hidden,
       tier: o.tier, content: content,
-      price: price, priceText: price.toFixed(2).replace(".", ",") + " €",
+      price: price, priceText: price.toFixed(2).replace(".", ",") + " Fr.",
       value: contentValue(content),
     };
   }
@@ -539,7 +587,7 @@
     console.log("Kapazitäts- und Preisstaffel:");
     VAULT_CAPS.forEach(function (c, i) {
       console.log("  Stufe " + i + ": " + padL(fmt(c), 6) + " Gems   " +
-        padL(VAULT_PRICES[i].toFixed(2).replace(".", ","), 6) + " €   " +
+        padL(VAULT_PRICES[i].toFixed(2).replace(".", ","), 6) + " Fr.  " +
         (VAULT_PRICES[i] / c * 100).toFixed(2) + " ct/Gem");
     });
     check("5 Kapazitätsstufen mit passender Preisleiter",
@@ -574,7 +622,7 @@
     var v0 = vault();
     check("frisch: leer, Stufe 0, Kapazität 150",
       v0.gems === 0 && v0.tier === 0 && v0.cap === 150 && v0.full === false);
-    check("Preisangabe im deutschen Format", v0.priceText === "4,99 €", v0.priceText);
+    check("Preisangabe im deutschen Format und in Franken", v0.priceText === "1,90 Fr.", v0.priceText);
     var w1 = reportEvent("win", 1);
     check("ein Sieg legt Gems in den Tresor",
       w1.counted === true && w1.gained === 2 && vault().gems === 2, vault().gems);
@@ -603,15 +651,22 @@
     var op = open();
     console.log("\nTresor geöffnet: " + op.gems + " Gems für " + op.priceText +
       " → nächste Kapazität " + op.nextCap);
-    check("open() liefert Gems und Preis", op.gems === 150 && op.price === 4.99);
+    /* ⚠ NICHT gegen eine eingetippte Zahl pruefen (30.07.2026). Hier stand
+       `op.price === 4.99`; beim Neusetzen der Staffel wurde der Schritt rot,
+       obwohl open() voellig richtig arbeitete — er verteidigte einen Preis,
+       keine Zusage. Die Zusage lautet: open() liefert die Kapazitaet der
+       aktuellen Stufe und DEREN Preis. */
+    check("open() liefert Gems und Preis der aktuellen Stufe",
+      op.gems === VAULT_CAPS[0] && op.price === VAULT_PRICES[0],
+      op.gems + " Gems / " + op.price);
     check("open() ist als PLATZHALTER markiert", op.placeholder === true);
     check("Tresor startet neu und steigt eine Stufe",
       vault().gems === 0 && vault().tier === 1 && vault().cap === 300);
-    check("neuer Preis passt zur neuen Stufe", vault().priceText === "9,49 €", vault().priceText);
+    check("neuer Preis passt zur neuen Stufe", vault().priceText === "2,90 Fr.", vault().priceText);
     check("leerer Tresor lässt sich nicht öffnen",
       throws(function () { open(); }, "ist leer").ok);
     check("Statistik mitgeführt",
-      get().stats.gemsTaken === 150 && get().stats.spent === 4.99,
+      get().stats.gemsTaken === VAULT_CAPS[0] && get().stats.spent === VAULT_PRICES[0],
       JSON.stringify(get().stats));
     check("vault_full feuert nach dem Öffnen wieder", (function () {
       TRACKED.length = 0;
@@ -630,7 +685,7 @@
     OFFER_KEYS.forEach(function (k) {
       var d = OFFER_DEFS[k];
       console.log("  " + d.sym + " " + pad(d.name, 20) + pad(d.trigger, 42) +
-        pad((d.windowMs / HOUR) + " h", 6) + d.price.toFixed(2).replace(".", ",") + " €");
+        pad((d.windowMs / HOUR) + " h", 6) + d.price.toFixed(2).replace(".", ",") + " Fr.");
     });
     check("drei Angebote definiert", OFFER_KEYS.length === 3);
     check("nur das Starter-Bundle ist einmalig",
@@ -736,7 +791,7 @@
       active().length === 0 && get().lossStreak === 2);
     var cb = reportEvent("loss", 1);
     console.log("\nComeback nach 3 Niederlagen: " + (cb.offer ? "ausgelöst" : "FEHLT") +
-      " · " + OFFER_DEFS.comeback.price.toFixed(2).replace(".", ",") + " €");
+      " · " + OFFER_DEFS.comeback.price.toFixed(2).replace(".", ",") + " Fr.");
     check("die 3. Niederlage löst das Comeback-Angebot aus",
       !!cb.offer && cb.offer.key === "comeback" && cb.offer.price === 1.99);
     check("12-h-Fenster", Math.abs(cb.offer.msLeft - 12 * HOUR) < 1000, cb.offer.leftText);

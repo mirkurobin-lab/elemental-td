@@ -953,3 +953,64 @@ eine Kachelanimation; sobald echte Nutzer messbar sind, gehört das gegen die
 Ladezeit gerechnet — nicht vorher nach Gefühl.
 
 **Aufwand: S** · **Priorität: 1** (war der sichtbarste Fehler der Live-Fassung)
+
+---
+
+## 14. Der Kristalltresor war das schlechteste Geschäft im Spiel (30.07.2026)
+
+**Vorgabe des Auftraggebers:** „dieser Beutel soll im Verhältnis bisschen günstiger sein wie
+ein normaler Kristall Kauf weil man für den Beutel auch aktiv spielen muss zum füllen
+(animiert um mehr zu spielen und macht den Beutel attraktiver)."
+
+### Der Befund
+
+Nachgerechnet gegen die Ladenstaffel (§27.2), Preis je Kristall:
+
+| Kapazität | Tresor **alt** | Laden bei dieser Paketgröße |
+|---:|---:|---:|
+| 150 | 3,33 ct | 1,69 ct |
+| 300 | 3,16 ct | 1,10 ct |
+| 600 | 3,00 ct | 0,79 ct |
+| 1 200 | 2,75 ct | 0,75 ct |
+| 2 400 | 2,50 ct | 0,72 ct |
+
+Der Tresor war an **jeder** Stufe das teuerste Angebot im Spiel — für Kristalle, die der
+Spieler sich vorher **selbst erspielt** hat. Das ist nicht nur ein Preisfehler, es ist die
+Umkehrung der Mechanik: `arena_vault.js` beschreibt sie im Kopf als *„nicht ‚möchtest du
+Gems?', sondern ‚möchtest du DEINE bereits erspielten Gems?'"*. Wer dafür mehr verlangt als
+der Laden, bestraft genau das Verhalten, das die Mechanik anregen soll.
+
+Dazu rechnete der Tresor in **€**, während der ganze Shop in **Fr.** rechnet. Zwei Währungen
+auf einem Bildschirm sind kein Schönheitsfehler — sie machen jeden Preisvergleich falsch,
+den der Spieler anstellt.
+
+### Die neue Staffel
+
+| Kapazität | Preis | ct/Kristall | Laden | Vorteil | Siege zum Füllen |
+|---:|---:|---:|---:|---:|---:|
+| 150 | Fr. 1.90 | 1,27 | 1,69 | −25 % | ~43 |
+| 300 | Fr. 2.90 | 0,97 | 1,10 | −12 % | ~86 |
+| 600 | Fr. 3.90 | 0,65 | 0,79 | −18 % | ~172 |
+| 1 200 | Fr. 6.90 | 0,57 | 0,75 | −23 % | ~343 |
+| 2 400 | Fr. 13.50 | 0,56 | 0,72 | −22 % | ~686 |
+
+Die Regel dahinter, und **so misst `pruefungen/tresor.js` sie auch**: der Preis je Kristall
+liegt an jeder Stufe unter dem, was der Laden für eine Packung **derselben Größe** nimmt, und
+er sinkt mit jeder Stufe. Die Ladenkurve wird dabei nicht abgeschrieben, sondern aus
+`GEM_PACKS` gelesen und log-log interpoliert — ändert jemand die Ladenpreise, wandert die
+Prüfung mit. Eine abgeschriebene Kurve wäre beim ersten Preiswechsel eine Lüge mit grünem
+Balken.
+
+### Offen — und keine Preisfrage: die Füllzeit
+
+Bei 2–5 Kristallen je Sieg braucht die oberste Stufe rund **480–686 Siege**. Ein Angebot,
+das kaum je erscheint, ist unabhängig vom Preis wirkungslos. Zwei Wege:
+
+1. Der Zuwachs je Sieg steigt mit der Tresorstufe (die Mechanik hat dafür schon eine
+   Arena-Staffelung, sie müsste nur an die Stufe gekoppelt werden).
+2. Die oberen Kapazitäten sinken.
+
+Das ist eine Produktentscheidung. Solange sie offen ist, sind die Stufen 3 und 4 rechnerisch
+korrekt und praktisch unerreichbar.
+
+**Aufwand: S** (erledigt) · **Priorität: 1** · Füllzeit offen

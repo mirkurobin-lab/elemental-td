@@ -1701,7 +1701,26 @@ function step(name, ok, info) {
   step('Fuellstand als Balkenhoehe', parseFloat(v0.fill) > 0, v0.fill);
   step('Zeigt Gems je Sieg und "noch N Siege"',
     /\+\d Gems je Sieg/.test(v0.sub) && /noch \d+ Siege/.test(v0.sub), v0.sub);
-  step('Preis im deutschen Format auf dem Knopf', /\d+,\d\d €/.test(v0.btn), v0.btn.slice(0, 24));
+  /* ⚠ DIE WAEHRUNG NICHT EINFRIEREN (30.07.2026 berichtigt).
+     Hier stand dreimal `/\d+,\d\d €/` — das Euro-Zeichen als Literal. Der
+     Tresor rechnete frueher in Euro, der uebrige Shop in Franken; als die
+     Preise vereinheitlicht wurden, fielen alle drei Schritte um, obwohl
+     genau das die Reparatur war. Sie verteidigten ein Symbol, keine
+     Zusage.
+     Die Zusage lautet: der Preis steht im deutschen Format (Komma) UND in
+     derselben Waehrung wie der uebrige Shop. Die Waehrung wird deshalb aus
+     der Ladenstaffel GELESEN — wechselt der Shop sie, wandern diese
+     Schritte mit. */
+  const waehrung = await page.evaluate(() => {
+    const packs = (window.__proto && window.__proto.GEM_PACKS) || [];
+    const m = String((packs[0] || {}).price || "").match(/[^\d\s.,–-]+/);
+    return m ? m[0] : null;
+  });
+  const preisMuster = new RegExp('\\d+,\\d\\d\\s*' +
+    String(waehrung || 'Fr').replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  step('die Waehrung ist aus dem Shop ableitbar', !!waehrung, String(waehrung));
+  step('Preis im deutschen Format und in der Shop-Waehrung auf dem Knopf',
+    preisMuster.test(v0.btn), v0.btn.slice(0, 24) + '  (erwartet: Zahl + ' + waehrung + ')');
 
   // --- Tresor fuellt sich per Demo-Sieg ---
   const vWin = await page.evaluate(() => {
@@ -1975,7 +1994,7 @@ function step(name, ok, info) {
   step('Shop zeigt den Angebots-Abschnitt', offerUi.sec !== 'none' && offerUi.cards === 3,
     offerUi.cards + ' Angebote');
   step('Jedes Angebot mit Preis und Restlaufzeit',
-    offerUi.prices.every(p => /\d+,\d\d €/.test(p)) &&
+    offerUi.prices.every(p => preisMuster.test(p)) &&
     offerUi.timers.every(t => /noch/.test(t)), offerUi.prices.join(' · '));
   step('Shop hat einen eigenen Tresor-Abschnitt',
     offerUi.vault && /Stufe \d\/\d/.test(offerUi.tier), offerUi.tier);
@@ -2000,7 +2019,7 @@ function step(name, ok, info) {
   step('Angebots-Popup offen mit Titel, Begruendung und vier Positionen',
     pop.open && pop.title.length > 3 && pop.why.length > 20 && pop.items === 4, pop.title);
   step('Popup nennt Restlaufzeit und Preis',
-    /Nur noch/.test(pop.timer) && /\d+,\d\d €/.test(pop.btn), pop.timer + ' · ' + pop.btn);
+    /Nur noch/.test(pop.timer) && preisMuster.test(pop.btn), pop.timer + ' · ' + pop.btn);
   step('Popup weist auf den Demo-Charakter hin', /keine Zahlung/.test(pop.note));
   step('Popup zeigt das am kuerzesten laufende Angebot zuerst',
     pop.key.indexOf('comeback') >= 0, pop.key.join(','));
