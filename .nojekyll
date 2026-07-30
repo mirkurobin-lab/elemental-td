@@ -1,0 +1,16 @@
+Diese Datei schaltet die Jekyll-Verarbeitung von GitHub Pages ab.
+
+Warum sie nötig ist: Pages laesst jedes Repo standardmaessig durch Jekyll
+laufen, und Jekyll IGNORIERT alles, was mit einem Unterstrich beginnt. Im Baum
+liegt `arena_patches/werkzeuge/__pycache__` — und kuenftig kann jederzeit ein
+weiterer Ordner oder eine Datei mit Unterstrich dazukommen. Ohne diese Datei
+werden solche Pfade stillschweigend nicht ausgeliefert: kein Fehler, keine
+Meldung, die Datei ist einfach 404. Genau die Fehlerklasse, die in diesem
+Projekt schon mehrfach Stunden gekostet hat.
+
+Ausserdem laesst Jekyll bei manchen Dateinamen und bei geschweiften Klammern im
+HTML den Inhalt durch seine Vorlagensprache laufen. `ui_prototype.html` ist ein
+17 000-Zeiler mit CSS-Variablen und JavaScript — dort hat eine Vorlagensprache
+nichts zu suchen.
+
+Der Inhalt dieser Datei ist beliebig; allein ihre Existenz zaehlt.

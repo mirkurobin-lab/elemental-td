@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arcane Prism — Testbau</title>
+<!-- ===================================================================
+     WARUM DIESE SEITE EXISTIERT
+     GitHub Pages liefert Verzeichnisse nur aus, wenn ein index.html darin
+     liegt — sonst gibt `/arena_patches/` einen 404. Diese Seite ist die
+     Einstiegstuer: eine Adresse, die man sich merken und auf dem Telefon
+     als Lesezeichen ablegen kann, statt jedes Mal den vollen Dateinamen
+     zu tippen.
+     Sie ist BEWUSST kein Weiterleiter. Ein automatischer Sprung nimmt die
+     Moeglichkeit, den Stand zu lesen, bevor man den 1-MB-Prototyp laedt —
+     und auf dem Telefon ist das ein Unterschied.
+     ⚠ Das index.html im WURZELVERZEICHNIS ist das bestehende Spiel (PWA
+     mit Manifest). Es wird hier nicht angefasst.
+     =================================================================== -->
+<style>
+  :root{color-scheme:dark}
+  *{box-sizing:border-box}
+  body{margin:0;padding:26px 20px 60px;background:#0b1014;color:#e6edf3;
+    font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    max-width:640px;margin-inline:auto}
+  h1{font-size:22px;margin:0 0 4px;letter-spacing:.2px}
+  .sub{color:#8b98a5;font-size:13px;margin:0 0 26px}
+  a.knopf{display:block;text-decoration:none;text-align:center;
+    background:linear-gradient(180deg,#efd167,#c9a227);
+    color:#1a1206;font-weight:800;font-size:17px;padding:16px 20px;
+    border-radius:13px;box-shadow:0 6px 18px -6px #000c;margin:0 0 10px}
+  a.knopf.zweit{background:#1a232b;color:#cfe0ee;border:1px solid #2b3946;
+    font-weight:600;font-size:15px;box-shadow:none}
+  h2{font-size:14px;text-transform:uppercase;letter-spacing:.9px;
+    color:#8b98a5;margin:30px 0 10px;font-weight:700}
+  ul{margin:0;padding-left:20px}
+  li{margin:0 0 7px}
+  code{background:#161f27;padding:1px 6px;border-radius:5px;font-size:13px}
+  .hin{border-left:3px solid #c9a227;background:#161f2799;padding:11px 14px;
+    border-radius:0 8px 8px 0;font-size:14px;color:#c3cfda;margin:22px 0 0}
+</style>
+</head>
+<body>
+
+<h1>Arcane Prism — Testbau</h1>
+<p class="sub">Zweig <code>claude/arcane-arena-optimization-zi8vxb</code></p>
+
+<a class="knopf" href="./ui_prototype.html">UI-Prototyp öffnen</a>
+<a class="knopf zweit" href="../index.html">Zum Spiel (Elemental TD)</a>
+
+<h2>In diesem Stand drin</h2>
+<ul>
+  <li><b>Pack-Sprengung</b> — das Packbild wird in Dreiecke zerlegt und durch
+      die Kamera geschleudert, Leinwand mit additivem Blending
+      (<code>arena_packfx.js</code>)</li>
+  <li><b>Battle Deck</b> — Deck-Ansicht auf der Datenschicht
+      <code>arena_deck.js</code>, Deck und Sammlung als zwei Reiter, Deck ist
+      der voreingestellte</li>
+  <li><b>Offline-Erträge</b> — passive Einnahmen mit Abhol-Dialog</li>
+  <li><b>Beute-Übersicht</b> nach dem Aufdecken, und „Überspringen“ tut
+      endlich etwas</li>
+</ul>
+
+<h2>Wenn du testest</h2>
+<ul>
+  <li><b>Battle Deck:</b> zweiter Platz in der unteren Leiste. Der Deck-Reiter
+      ist vorne, die Sammlung liegt daneben.</li>
+  <li><b>Offline-Erträge:</b> auf dem Hauptbildschirm oben. Beim ersten Start
+      steht der Zähler auf null — die Erträge laufen erst, wenn Zeit vergangen
+      ist.</li>
+  <li><b>Pack öffnen:</b> über eine gefüllte Truhe auf dem Hauptbildschirm.
+      Jeder Tipp deckt <i>eine</i> Karte auf; „Überspringen“ zeigt alles
+      sofort.</li>
+</ul>
+
+<div class="hin">
+  <b>Die Artworks kommen von einem CDN.</b> Auf einer Verbindung, die das nicht
+  erreicht, fallen alle Bilder auf Emoji zurück — die Bühne funktioniert dann,
+  sieht aber nackt aus. Das ist kein Fehler im Prototyp.
+</div>
+
+</body>
+</html>
