@@ -1597,12 +1597,168 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
    fliegen zwar, aber man sieht keine einzige. Gemerkt habe ich es erst,
    als ich die Einzelbilder ANGESEHEN habe statt sie nur zu messen —
    die Messung war ueber den Fehler hinweggelaufen. */
+/* ==================================================================
+ * ENTHUELLUNG — Rueckseite, Umdrehen, Raritaets-Glut (30.07.2026)
+ * ------------------------------------------------------------------
+ * Auftrag: „schau dir genau das Video auf dem Drive an die Oeffnung
+ * sollte gleich aussehen". Das Referenzvideo wurde Bild fuer Bild
+ * vermessen (858 Bilder, 60 fps, 1320x2868). Was daraus BELEGT ist:
+ *
+ *   1. RASTER, nicht Bogen. Bei zehn Karten zwei Reihen zu fuenf.
+ *      ⚠ Damit ist der frueher hier geplante „Bogen statt Raster"
+ *      WIDERLEGT — er waere eine Verschlechterung gewesen. Das
+ *      bestehende `plaetze()` bleibt.
+ *   2. Die Karten liegen mit GLASARTIGER RUECKSEITE und goldenem
+ *      Zierrahmen und drehen sich NACHEINANDER um. Genau dieser
+ *      Enthuellungsmoment fehlte bei uns komplett — die Karten
+ *      erschienen sofort mit dem Gesicht nach oben. Das ist der Grund,
+ *      warum die Szene „nichtmal close" an Blizzard war.
+ *   3. Raritaet wird VOR dem Umdrehen angedeutet (Glut am Rand) und
+ *      nach dem Umdrehen bestaetigt.
+ *
+ * WAS DAS VIDEO NICHT HERGIBT, und das ist wichtig fuer den naechsten
+ * Leser: es ist ein WERBECLIP mit Webcam-Einsatz unten rechts und
+ * harten Schnitten. Bei 950 ms springen alle Kartenfelder in EINEM
+ * Bild von dunkel auf hell — ein Schnitt aus einem vorgerenderten
+ * Intro in die Spieloberfläche, die Karten liegen danach schon offen.
+ * Der Takt zwischen den Umdrehungen ist darin weggeschnitten und
+ * konnte NICHT gemessen werden.
+ * ⚠ KORREKTUR einer aelteren Herleitung: der grosse Helligkeitssprung
+ * bei 2066 ms, auf den unsere Zeittabelle den „Bruch" gelegt hat, ist
+ * NICHT das Aufreissen des Packs, sondern der LEGENDAER-AUSBRUCH
+ * (nachgemessen: jede Rasterzelle wird 4- bis 9-fach heller, R1c1 von
+ * 14 auf 144, Abklingen ueber 1,8 s). Das Referenzvideo hat gar kein
+ * Pack, das aufreisst — es ist ein 10er-Zug. Unsere Aufbauzeiten
+ * lassen sich daraus also NICHT belegen; sie bleiben unveraendert
+ * stehen, aber ohne den Anspruch, gemessen zu sein.
+ *
+ * ABGELEITETE TAKTUNG, offen als Entscheidung markiert:
+ * Belegt ist nur das TEMPO im Ganzen — von „Karten sichtbar" (950 ms)
+ * bis zum Moment (2066 ms) liegen 1,12 s. Daraus: alle Karten muessen
+ * in deutlich unter einer Sekunde durch sein. 90 ms Versatz und 380 ms
+ * Drehung heisst bei fuenf Karten: die letzte startet bei 360 ms und
+ * ist bei 740 ms fertig. Das laesst Luft fuer den Moment danach.
+ * ================================================================== */
 .pkcard{position:absolute;left:50%;top:50%;width:19%;aspect-ratio:.72;
   margin:0;border-radius:7px;opacity:0;
-  background:linear-gradient(160deg,#2f4f86,#16233d);
-  border:2px solid #c9a24a;box-shadow:0 6px 14px #000000aa;
+  background:none;border:0;box-shadow:none;
+  perspective:640px;
   transform:translate(-50%,-50%) scale(.3)}
+/* Der Traeger dreht, nicht die Karte selbst: sonst wuerde die
+   Flugbewegung (pkkarte) mit der Drehung um dieselbe Eigenschaft
+   streiten und eine von beiden verschwinden. */
+.pk3d{position:absolute;inset:0;transform-style:preserve-3d}
+.pkface{position:absolute;inset:0;border-radius:7px;overflow:hidden;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  border:2px solid #c9a24a;box-shadow:0 6px 14px #000000aa}
+/* ⚠ DER UNTERSCHIED ZWISCHEN DEN SEITEN IST DIE GANZE POINTE.
+   Erste Fassung hatte hinten und vorne fast dasselbe Blau. Die Drehung
+   lief nachweislich korrekt (gemessen: rotateY 79° / 103° / 131° als
+   saubere Staffel), war aber UNSICHTBAR — im Standbild sah 2500 ms aus
+   wie 3050 ms. Gefunden nur durch ANSEHEN der Einzelbilder; jede
+   Messung war gruen.
+   Im Vorbild steht eine glasartige Rueckseite gegen ein Charakterbild,
+   also ein maximaler Kontrast. Weil unser Kartenbild erst im Raster
+   NACH der Szene kommt, muss der Kontrast hier aus Helligkeit und
+   Farbe kommen: hinten kuehl und dunkel, vorne die Raritaetsfarbe. */
+/* Rueckseite: kuehles Glas mit Streiflicht und Prismenzeichen. */
+.pkback{background:
+    linear-gradient(150deg,#ffffff30 0%,#ffffff0a 34%,#0000 48%),
+    linear-gradient(160deg,#24385c,#0d1522 74%)}
+.pkback::before{content:"◆";position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:150%;color:#ffffff26}
+/* Die Glut traegt die Raritaetsfarbe und deutet an, was kommt, ohne es
+   zu verraten — deshalb nur am RAND, nicht auf der Flaeche. */
+.pkback::after{content:"";position:absolute;inset:0;border-radius:5px;
+  box-shadow:inset 0 0 12px 2px var(--rar,#c9a24a);opacity:.85}
+/* Vorderseite: die Raritaetsfarbe traegt die Flaeche, nicht nur den
+   Rand. Deutlich heller als hinten — das ist der Umschlag, den das Auge
+   als „umgedreht" liest. */
+.pkfront{transform:rotateY(180deg);
+  background:
+    radial-gradient(120% 80% at 50% 18%,#ffffff42,#0000 62%),
+    linear-gradient(165deg,var(--rar,#c9a24a),#101a28 88%);
+  border-color:#f4e3a6;
+  box-shadow:0 6px 16px #000c, 0 0 14px 1px var(--rar,#c9a24a)}
+/* Ein heller Kern, damit die offene Karte auch bei dunklen
+   Raritaetsfarben (Grau) noch als „aufgedeckt" liest. */
+.pkfront::after{content:"";position:absolute;left:18%;right:18%;
+  top:26%;bottom:26%;border-radius:4px;
+  background:linear-gradient(160deg,#ffffff2b,#ffffff08);
+  box-shadow:inset 0 0 0 1px #ffffff2e}
 #packLayer.spielt .pkcard{animation:pkkarte 4000ms cubic-bezier(.2,.9,.25,1) forwards}
+
+/* ==================================================================
+ * DECK STATT RASTER — Auftraggeber, 30.07.2026
+ * ------------------------------------------------------------------
+ * Woertlich: „da wir in manchen booster sehr viele Karten haben und das
+ * dann beim opening den Bildschirm cluttert. Wie waere die Idee:
+ * opening sequence dannach fliegen die Karten werden in ein Deck
+ * geschuffelt (Karten liegen buendig uebereinander) dann schwebt das
+ * Deck in der Mitte des Bildschirms und dann muss jede Karte
+ * nacheinander geklickt werden diese drehen sich dann und geben den
+ * farbigen glow bei legendaer dann das cinematic".
+ *
+ * WARUM DAS BESSER IST ALS DAS RASTER, das hier vorher stand: ein
+ * Arkan-Pack zieht eelf Karten. Elf Karten gleichzeitig sind keine
+ * Zeremonie, sondern eine Tabelle — und das Raster musste die Karten
+ * dafuer auf 14,5 % Breite schrumpfen. Ein Stapel ist von der ANZAHL
+ * unabhaengig: eine Karte oder zwanzig sehen gleich gut aus, und jede
+ * einzelne bekommt ihren eigenen Moment.
+ *
+ * WAS DAVON UEBERNOMMEN IST: Rueckseite, Vorderseite, Raritaetsglut und
+ * die Drehung selbst bleiben unveraendert — nur das ZIEL des Fluges
+ * (Stapelmitte statt Rasterplatz) und der AUSLOESER der Drehung (Tippen
+ * statt Zeitversatz) sind neu. Deshalb steht `plaetze()` nicht mehr im
+ * Einsatz, aber `pkkarte` und `pkdreh` unveraendert.
+ * ================================================================== */
+/* Der Stapel schwebt als GANZES. Bobbte jede Karte einzeln, lieferte
+   schon ein halbes Pixel Abweichung einen ausgefransten Rand statt
+   eines buendigen Decks. */
+#pkDeck{position:absolute;left:50%;top:50%;width:100%;height:100%;
+  transform:translate(-50%,-50%)}
+#packLayer.spielt #pkDeck.schwebt{animation:pkschweb 3200ms ease-in-out infinite}
+@keyframes pkschweb{
+  0%,100%{transform:translate(-50%,calc(-50% - 6px))}
+  50%{transform:translate(-50%,calc(-50% + 6px))}}
+/* Die oberste Karte laedt zum Tippen ein: eine Spur groesser und mit
+   einem wandernden Schein. Ohne diesen Hinweis weiss niemand, dass er
+   tippen SOLL — der Auftrag sagt „muss geklickt werden", also muss die
+   Aufforderung sichtbar sein. */
+.pkcard.oben{cursor:pointer}
+.pkcard.oben .pkback{box-shadow:0 0 0 2px #f4e3a6aa, 0 10px 26px #000d}
+.pkcard.oben .pkback::after{animation:pkpuls 1400ms ease-in-out infinite}
+@keyframes pkpuls{
+  0%,100%{opacity:.55}
+  50%{opacity:1}}
+/* Die Drehung haengt jetzt an einer KLASSE, nicht an einer Verzoegerung.
+   Damit bestimmt der Spieler den Takt, und die Szene hat kein Ende, das
+   ihm die Karten wegnimmt. */
+.pkcard.auf .pk3d{animation:pkdreh 420ms cubic-bezier(.3,.8,.2,1) forwards}
+@keyframes pkdreh{
+  0%{transform:rotateY(0) scale(1)}
+  /* Zug zur Kamera in der Mitte der Drehung — ohne ihn liest sich das
+     Umdrehen flach, mit ihm greift die Karte nach vorn. */
+  50%{transform:rotateY(90deg) scale(1.12)}
+  100%{transform:rotateY(180deg) scale(1)}}
+/* Abgang: die aufgedeckte Karte raeumt das Feld fuer die naechste. Sie
+   verschwindet NICHT in ein Raster — das Raster kommt nach der Szene als
+   Quittung, und zweimal dasselbe zu zeigen entwertet beides. */
+.pkcard.weg{animation:pkweg 420ms cubic-bezier(.4,0,.7,.4) forwards}
+/* ⚠ Der 0-%-Stop MUSS `transform` mitsetzen. Ohne ihn interpoliert der
+   Browser vom aktuellen Wert ueber die GANZE Animation dorthin — die
+   Karte beginnt also sofort wegzugleiten, statt erst am Ende. Genau
+   dieser Fehler ist in dieser Szene schon einmal passiert (siehe
+   `pkbeben` weiter oben) und wurde hier von packoeffnung.js beim ersten
+   Lauf gemeldet. */
+@keyframes pkweg{
+  0%{opacity:1;
+    transform:translate(calc(-50% + var(--zx)),calc(-50% + var(--zy)))
+      scale(1) rotate(var(--zr))}
+  100%{opacity:0;
+    transform:translate(calc(-50% + var(--zx)),calc(-50% + var(--zy) - 42%))
+      scale(.82) rotate(var(--zr))}}
 @keyframes pkkarte{
   0%,60.00%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(0)}
   66.00%{opacity:1;transform:translate(calc(-50% + var(--zx)*.62),calc(-50% + var(--zy)*.62))
@@ -10326,6 +10482,28 @@ button.pfplate{cursor:pointer}
       }
       return raus;
     }
+    /* stapel(n) — die Zielpunkte fuer den STAPEL (30.07.2026).
+       Buendig heisst NICHT deckungsgleich: ein Deck, dessen Karten exakt
+       aufeinander liegen, sieht wie EINE Karte aus. Ein bis zwei Pixel
+       Versatz je Blatt lassen die Dicke sehen, ohne den Rand
+       auszufransen. Der Versatz ist deterministisch aus dem Platz
+       gerechnet, nicht gewuerfelt — sonst sieht der Stapel bei jedem
+       Oeffnen anders aus, und ein Standbildvergleich wird unmoeglich.
+       Die Obergrenze 24 statt 16 ist die eigentliche Dividende dieses
+       Umbaus: ein Stapel wird von der Anzahl nicht breiter. */
+    function stapel(n) {
+      var raus = [], i;
+      for (i = 0; i < n; i++) {
+        /* Von unten nach oben leicht nach oben links wandernd. i=0 ist
+           das unterste Blatt, i=n-1 das oberste — genau die Reihenfolge,
+           in der spaeter aufgedeckt wird (oben zuerst). */
+        raus.push({ x: (i * 1.1 - n * 0.55) / 100,
+                    y: (i * -1.4 + n * 0.7) / 100,
+                    r: (i % 2 ? 1 : -1) * (0.6 + (i % 3) * 0.5),
+                    b: 0.34 });
+      }
+      return raus;
+    }
     /* 4000 statt 3000 (29.07.2026). Der Grund steht im Blatt bei der
        Zeittabelle: gemessen am Referenzvideo dauert die Ausstroemung
        dort 2,40 s und endet bei 4,00 s. Bei 3000 ms war sie nach
@@ -10337,9 +10515,10 @@ button.pfplate{cursor:pointer}
     function raeumen() {
       var st = $("pkStage"); if (!st) return;
       [].slice.call(st.querySelectorAll(".pkcard")).forEach(function (c) { c.remove(); });
+      var d = $("pkDeck"); if (d) d.remove();
     }
 
-    function spiele(key, anzahl, fertig) {
+    function spiele(key, anzahl, fertig, rar) {
       var lay = $("packLayer"), st = $("pkStage"), art = $("pkArt");
       if (!lay || !st || !art) { fertig(); return; }
       if (laufend) { clearTimeout(laufend); laufend = null; }
@@ -10359,16 +10538,35 @@ button.pfplate{cursor:pointer}
          Arkan-Pack (11) gibt es nicht. Keine untere Grenze ausser 1 —
          ein Pack ohne Karten wäre ein Fehler weiter oben, den diese
          Szene nicht kaschieren soll. */
-      var n = Math.max(1, Math.min(16, anzahl || 5));
-      var liste = plaetze(n);
+      var n = Math.max(1, Math.min(24, anzahl || 5));
+      var liste = stapel(n);
+      /* Ein eigener Traeger fuer den Stapel: nur so kann das Deck als
+         GANZES schweben, ohne dass die Karten gegeneinander wandern. */
+      var deck = document.createElement("div");
+      deck.id = "pkDeck";
+      st.appendChild(deck);
       for (var i = 0; i < liste.length; i++) {
         var p = liste[i], c = document.createElement("div");
         c.className = "pkcard";
         c.style.setProperty("--zx", Math.round(p.x * breite) + "px");
         c.style.setProperty("--zy", Math.round(p.y * breite) + "px");
         c.style.setProperty("--zr", p.r + "deg");
+        /* --i ist der Platz in der Reihe und steuert den Versatz der
+           Drehung. Er steht im CSS, nicht hier als Timer: so bleibt die
+           ganze Szene EINE Zeitachse, die man anhalten und Bild fuer
+           Bild ansehen kann (siehe pruefungen/packoeffnung.js). */
+        c.style.setProperty("--i", i);
+        /* Die Raritaetsfarbe der WIRKLICH gezogenen Karte, nicht die des
+           Packs. Fehlt sie, bleibt der goldene Grundton stehen — eine
+           falsche Farbe waere schlimmer als keine. */
+        if (rar && rar[i]) c.style.setProperty("--rar", rar[i]);
         c.style.width = (p.b * 100).toFixed(1) + "%";
-        st.appendChild(c);
+        /* Zwei Seiten auf einem drehenden Traeger. Die Rueckseite liegt
+           oben, bis pkdreh sie wegdreht. */
+        c.innerHTML = '<div class="pk3d">' +
+          '<div class="pkface pkback"></div>' +
+          '<div class="pkface pkfront"></div></div>';
+        deck.appendChild(c);
       }
 
       lay.classList.add("on");
@@ -10385,15 +10583,74 @@ button.pfplate{cursor:pointer}
         if (laufend) { clearTimeout(laufend); laufend = null; }
         lay.classList.remove("spielt", "on");
         lay.setAttribute("aria-hidden", "true");
-        lay.removeEventListener("pointerdown", schliessen);
+        lay.removeEventListener("pointerdown", tipp);
         raeumen();
         fertig();
       }
-      lay.addEventListener("pointerdown", schliessen);
-      /* +180 ms, damit die letzte Karte wirklich liegt, bevor der
-         Vorhang fällt. Ohne den Zuschlag schneidet der Wechsel die
-         Landung ab — und die Landung ist die Auflösung. */
-      laufend = setTimeout(schliessen, DAUER + 180);
+
+      /* ==============================================================
+       * AUFDECKEN VON HAND (30.07.2026)
+       * --------------------------------------------------------------
+       * Vorher lag hier ein Zeitschloss: `setTimeout(schliessen, DAUER)`
+       * und „jeder Tap schliesst". Damit war die Szene nach 4,18 s vorbei,
+       * egal was der Spieler wollte — und ein zufaelliger Tap auf dem Weg
+       * zum Knopf hat ihm den Legendaer-Moment weggenommen.
+       * Jetzt fuehrt der Spieler: jeder Tap deckt GENAU EINE Karte auf,
+       * oberste zuerst. Erst wenn keine mehr liegt, schliesst der
+       * naechste Tap die Szene. Das ist die Vorgabe „dann muss jede Karte
+       * nacheinander geklickt werden" — und es macht die Zeremonie
+       * unabhaengig von der Kartenzahl, was der ganze Punkt des Stapels
+       * ist.
+       * ⚠ Der Aufbau (Bruch, Ausstroemung) bleibt auf DAUER und laeuft
+       * weiter automatisch. Nur das Aufdecken wartet.
+       * ============================================================== */
+      var offen = 0;
+      function obersteKarte() {
+        var k = deck.querySelectorAll(".pkcard:not(.auf)");
+        return k.length ? k[k.length - 1] : null;   /* letztes = oberstes */
+      }
+      function markiereOberste() {
+        [].slice.call(deck.querySelectorAll(".pkcard.oben"))
+          .forEach(function (c) { c.classList.remove("oben"); });
+        var k = obersteKarte();
+        if (k) k.classList.add("oben");
+      }
+      function deckeAuf() {
+        var k = obersteKarte();
+        if (!k) return false;
+        k.classList.remove("oben");
+        k.classList.add("auf");
+        offen++;
+        UISfx && UISfx.flip && UISfx.flip();
+        /* Nach der Drehung raeumt die Karte das Feld — aber erst DANN,
+           sonst sieht man das Ergebnis nie. 420 ms ist die Drehdauer aus
+           dem Blatt; sie steht dort und hier, deshalb prueft
+           packoeffnung.js die Kopplung. */
+        setTimeout(function () {
+          if (beendet) return;
+          k.classList.add("weg");
+          markiereOberste();
+        }, 520);
+        return true;
+      }
+      function tipp() {
+        /* Solange der Aufbau laeuft, ist noch nichts aufzudecken. Ein Tap
+           in dieser Zeit soll die Szene NICHT ueberspringen — der Bruch
+           ist der Moment, fuer den das Pack gekauft wurde. */
+        if (!deck.classList.contains("schwebt")) return;
+        if (!deckeAuf()) schliessen();
+      }
+      lay.addEventListener("pointerdown", tipp);
+
+      /* Der Stapel schwebt, sobald der Flug durch ist. 75 % von DAUER ist
+         der Zeitpunkt, an dem pkkarte die Karten gelegt hat (siehe
+         Keyframes); +120 ms Luft, damit die Landung nicht angeschnitten
+         wirkt. */
+      laufend = setTimeout(function () {
+        if (beendet) return;
+        deck.classList.add("schwebt");
+        markiereOberste();
+      }, Math.round(DAUER * 0.75) + 120);
     }
 
     return { spiele: spiele, GLUT: GLUT };
@@ -10744,12 +11001,21 @@ button.pfplate{cursor:pointer}
     /* Erst die Szene, dann das Raster. Die Reihenfolge ist die ganze
        Absicht: der Bruch ist der Moment, das Raster ist die Quittung.
        Wer das Raster vorher zeigt, hat den Moment schon verschenkt. */
+    /* Die Raritaetsfarben der GEZOGENEN Karten wandern in die Szene,
+       damit die Glut auf der Rueckseite und der Rahmen nach dem Umdrehen
+       die Wahrheit sagen. Quelle ist AC.tierInfo — dieselbe Tabelle, aus
+       der auch das Raster faerbt; eine zweite Farbliste waere irgendwann
+       eine andere Farbliste. */
+    var pkRar = (packResult.cards || []).map(function (k) {
+      var t = AC.tierOf && AC.tierOf(k.tier);
+      return (t && t.color) || null;
+    });
     UIPackOpen.spiele(key, packResult.cards.length, function () {
       renderPack();
       renderPackHeader();
       UISfx.reward();
       toast(packResult.name + " geöffnet — tippe die Karten an");
-    });
+    }, pkRar);
   }
   function renderPack() {
     markPressableLater();

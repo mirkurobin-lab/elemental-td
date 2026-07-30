@@ -52,6 +52,31 @@ const pruef = (n, w, z) => {
   if (w) { ok++; } else { fehl++; console.log("  FEHL " + n + (z ? " -> " + z : "")); }
 };
 
+/* durchtippen(p) — die Szene so beenden, wie ein Spieler es tut.
+   Seit dem Deck-Umbau (30.07.2026) gibt es KEIN Zeitschloss mehr: die
+   Szene wartet auf den Spieler. Jede Stelle, die frueher `waitForTimeout
+   (DAUER + x)` benutzt hat, muss stattdessen durchtippen — sonst liegt
+   die Oeffnungsebene noch ueber dem Raster und der eigentliche
+   Pruefschritt misst eine Kachel, die gar nicht erreichbar ist. Genau
+   dieser Fehler ist in dieser Datei schon zweimal passiert, beide Male
+   als falsche Wartezeit. Deshalb hier EIN Helfer statt verstreuter
+   Zahlen. */
+async function durchtippen(p, max) {
+  await p.waitForFunction(() => {
+    const d = document.getElementById("pkDeck");
+    return d && d.classList.contains("schwebt");
+  }, null, { timeout: 9000 }).catch(() => {});
+  for (let i = 0; i < (max || 30); i++) {
+    const offen = await p.evaluate(() =>
+      document.getElementById("packLayer").classList.contains("on"));
+    if (!offen) return i;
+    await p.evaluate(() => document.getElementById("packLayer")
+      .dispatchEvent(new PointerEvent("pointerdown", { bubbles: true })));
+    await p.waitForTimeout(620);
+  }
+  return -1;
+}
+
 (async () => {
   const b = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium-1194/chrome-linux/chrome" });
   const p = await b.newPage({ viewport: { width: 390, height: 844 } });
@@ -126,6 +151,19 @@ const pruef = (n, w, z) => {
            — der Name steht HINTEN. Wer auf die Schreibweise aus der
            Quelle prueft, findet nichts und meldet „keine Dauer". */
         if (!/\bpk[a-z0-9]+\b/.test(rule.cssText)) continue;
+        /* ⚠ NACHGEZOGEN 30.07.2026. Dieser Schritt sammelte JEDE Dauer
+           unter `#packLayer.spielt` ein und verlangte, dass es genau eine
+           gibt. Das war richtig, solange die Szene EINE Zeitachse hatte.
+           Seit die Karten von HAND aufgedeckt werden, gibt es bewusst
+           zweierlei: die Aufbau-Ebenen laufen weiter auf DAUER, die
+           Karten-Ebenen (Drehen, Schweben, Pulsen, Abgang) haengen an
+           KLASSEN und muessen eigene Dauern haben — eine Drehung, die
+           4000 ms braucht, waere unbenutzbar.
+           Die Anforderung dahinter bleibt aber gueltig und wird weiter
+           geprueft: die Ebenen, die auf der SZENEN-Zeitachse liegen,
+           muessen dieselbe Dauer tragen wie das JS. Laufen die
+           auseinander, faellt der Vorhang mitten in der Bewegung. */
+        if (/\b(pkdreh|pkschweb|pkpuls|pkweg)\b/.test(rule.cssText)) continue;
         const m = /(\d+)ms/.exec(rule.cssText);
         if (m) raus.add(+m[1]);
       }
@@ -300,6 +338,14 @@ const pruef = (n, w, z) => {
     const warOffen = lay.classList.contains("on");
     if (!warOffen) lay.classList.add("on");
     const d = document.createElement("div");
+    /* ⚠ Die Sonde muss die ECHTE Bauart nachbilden, sonst misst sie eine
+       Karte, die es so nicht gibt. Seit dem Deck-Umbau traegt `.pkcard`
+       selbst weder Fuellung noch Rand — beides sitzt auf den zwei
+       Seiten. Eine nackte Sonde meldete deshalb „nichts zu sehen",
+       obwohl mehr zu sehen war als vorher. */
+    d.innerHTML = '<div class="pk3d">' +
+      '<div class="pkface pkback"></div>' +
+      '<div class="pkface pkfront"></div></div>';
     d.className = "pkcard";
     st.appendChild(d);
     const cs = getComputedStyle(d);
@@ -314,6 +360,22 @@ const pruef = (n, w, z) => {
       grund: cs.backgroundImage !== "none" || !/, 0\)$/.test(cs.backgroundColor),
       rand: parseFloat(cs.borderTopWidth) || 0,
     };
+    /* ⚠ NACHGEZOGEN 30.07.2026. Fuellung und Rand sitzen nicht mehr auf
+       `.pkcard`, sondern auf den beiden SEITEN `.pkface` — die Karte
+       selbst ist seit dem Umbau nur noch der drehbare Traeger und
+       absichtlich unsichtbar. Der Schritt hat das als „nichts zu sehen"
+       gemeldet, obwohl mehr zu sehen war als vorher.
+       Die Anforderung dahinter ist die alte und die wichtigste dieser
+       Datei: eine Karte, die fliegt, muss man SEHEN. Genau daran ist die
+       Szene einmal gescheitert, ohne dass eine Messung es meldete.
+       Gemessen wird deshalb jetzt die Seite, die oben liegt. */
+    const seite = d.querySelector(".pkback") || d.querySelector(".pkface");
+    if (seite) {
+      const sc = getComputedStyle(seite);
+      raus.grund = raus.grund ||
+        sc.backgroundImage !== "none" || !/, 0\)$/.test(sc.backgroundColor);
+      raus.rand = Math.max(raus.rand, parseFloat(sc.borderTopWidth) || 0);
+    }
     d.remove();
     if (!warOffen) lay.classList.remove("on");
     return raus;
@@ -444,22 +506,46 @@ const pruef = (n, w, z) => {
   await p.evaluate(() => { window.__proto.openPackKey("bronze"); });
   await p.waitForTimeout(150);
 
-  /* ---------- 3. Ein Tipp bricht ab ---------- */
+  /* ---------- 3. Ein Tipp deckt auf ----------
+     ⚠ Erst warten, bis der Stapel schwebt. Vorher ist absichtlich nichts
+     aufzudecken: ein Tipp waehrend des Aufbaus darf den Bruch NICHT
+     ueberspringen, dafuer wurde das Pack gekauft. Wer hier zu frueh
+     tippt, misst genau diese Sperre und haelt sie faelschlich fuer einen
+     Fehler. */
+  await p.waitForFunction(() => {
+    const d = document.getElementById("pkDeck");
+    return d && d.classList.contains("schwebt");
+  }, null, { timeout: 9000 });
   await p.mouse.click(195, 300);
-  await p.waitForTimeout(120);
+  await p.waitForTimeout(160);
   const nachTipp = await p.evaluate(() => {
     const l = document.getElementById("packLayer");
     return {
       offen: l.classList.contains("on"),
       karten: document.getElementById("pkStage").querySelectorAll(".pkcard").length,
+      auf: document.querySelectorAll("#pkStage .pkcard.auf").length,
       raster: document.querySelectorAll("#packGrid .pcard").length,
     };
   });
-  pruef("ein Tipp schliesst die Szene sofort", !nachTipp.offen);
-  pruef("die Flugkarten sind danach aufgeraeumt", nachTipp.karten === 0,
-    nachTipp.karten + " uebrig");
-  /* Abbrechen darf NICHT heissen, dass man den Packinhalt verliert. */
-  pruef("das Kartenraster ist trotz Abbruch gefuellt", nachTipp.raster > 0,
+  /* ⚠ UMGESCHRIEBEN 30.07.2026. Hier stand „ein Tipp schliesst die Szene
+     sofort". Das war die alte Zusage und ist durch eine ausdrueckliche
+     Ansage des Auftraggebers ersetzt worden: „dann muss jede Karte
+     nacheinander geklickt werden diese drehen sich dann". Ein Tipp deckt
+     jetzt GENAU EINE Karte auf; geschlossen wird erst, wenn keine mehr
+     liegt.
+     Die Anforderung dahinter — der Spieler kommt aus der Szene wieder
+     heraus und verliert dabei nichts — bleibt und wird weiter geprueft,
+     nur ueber den neuen Weg. Der alte Schritt haette den Umbau als
+     Fehler gemeldet, obwohl er der Auftrag war. */
+  pruef("ein Tipp schliesst die Szene NICHT, sondern deckt auf",
+    nachTipp.offen, "Ebene war zu");
+  pruef("und dabei ist genau eine Karte umgedreht",
+    nachTipp.auf === 1, nachTipp.auf + " umgedreht");
+  /* Abbrechen darf NICHT heissen, dass man den Packinhalt verliert.
+     ⚠ Seit dem Umbau steht das Raster erst, wenn die Szene durch ist —
+     also NACH dem letzten Tipp, nicht schon beim ersten. Geprueft wird
+     das jetzt weiter unten, wo wirklich durchgeklickt wird. */
+  pruef("beim ersten Tipp steht das Raster noch nicht", nachTipp.raster === 0,
     nachTipp.raster + " Karten");
 
   /* ---------- 4. Zweites Pack startet wirklich neu ---------- */
@@ -473,14 +559,39 @@ const pruef = (n, w, z) => {
   await p.mouse.click(195, 300);
   await p.waitForTimeout(120);
 
-  /* ---------- 5. Sie endet von allein ---------- */
+  /* ---------- 5. Sie endet, wenn der Spieler durch ist ----------
+     ⚠ UMGESCHRIEBEN 30.07.2026, gleicher Grund wie oben: die Szene hat
+     kein Zeitschloss mehr. Vorher stand hier „die Szene endet ohne
+     Zutun" — das war genau das Verhalten, das dem Spieler den
+     Legendaer-Moment wegnehmen konnte. Geprueft wird jetzt, dass er sie
+     durch Tippen zuverlaessig BEENDEN kann und dabei nichts verliert.
+     Ein Deckel gegen Endlosschleifen bleibt: mehr Tipps als Karten plus
+     Reserve duerfen nie noetig sein. */
   await p.evaluate(() => { window.__proto.openPackKey("arcane"); });
-  await p.waitForTimeout(DAUER + 500);   // Szene + 180 ms Zuschlag + Luft
+  await p.waitForFunction(() => {
+    const d = document.getElementById("pkDeck");
+    return d && d.classList.contains("schwebt");
+  }, null, { timeout: 9000 });
+  const zuDecken = await p.evaluate(() =>
+    document.querySelectorAll("#pkDeck .pkcard").length);
+  let tipps = 0;
+  while (tipps < zuDecken + 3) {
+    const offen = await p.evaluate(() =>
+      document.getElementById("packLayer").classList.contains("on"));
+    if (!offen) break;
+    await p.evaluate(() => document.getElementById("packLayer")
+      .dispatchEvent(new PointerEvent("pointerdown", { bubbles: true })));
+    tipps++;
+    await p.waitForTimeout(620);
+  }
   const danach = await p.evaluate(() => ({
     offen: document.getElementById("packLayer").classList.contains("on"),
     raster: document.querySelectorAll("#packGrid .pcard").length,
   }));
-  pruef("die Szene endet ohne Zutun", !danach.offen);
+  pruef("die Szene laesst sich durch Tippen beenden", !danach.offen,
+    tipps + " Tipps fuer " + zuDecken + " Karten");
+  pruef("dafuer braucht es genau ein Tippen je Karte plus den Schluss",
+    tipps === zuDecken + 1, tipps + " statt " + (zuDecken + 1));
   pruef("danach steht das Kartenraster", danach.raster > 0, danach.raster + " Karten");
 
   /* ---------- 6. Die Raritaets-Leiter der Aufdeckung ----------
@@ -556,11 +667,13 @@ const pruef = (n, w, z) => {
 
   /* Und die Karte traegt die Stufe nach dem Aufdecken auch am Element. */
   await p.evaluate(() => { window.__proto.openPackKey("bronze"); });
-  /* ⚠ Hier standen 3400 ms fest. Seit die Szene 4000 ms laeuft, lag die
-     Oeffnungsebene beim Klicken noch ueber dem Raster — eine Karte kam
-     nie durch, und die Meldung lautete „traegt ihre Stufenklasse nicht".
-     Der Fehler war nicht in der Karte, sondern in der Wartezeit. */
-  await p.waitForTimeout(DAUER + 500);
+  /* ⚠ Hier standen erst 3400 ms fest, dann DAUER + 500. Beide Male war
+     die Oeffnungsebene beim Klicken noch ueber dem Raster und die
+     Meldung lautete „traegt ihre Stufenklasse nicht" — der Fehler war nie
+     in der Karte, sondern in der Wartezeit. Seit die Szene auf den
+     Spieler wartet, gibt es ueberhaupt keine richtige Wartezeit mehr.
+     Also wird getippt statt gewartet. */
+  await durchtippen(p);
   const amElement = await p.evaluate(async () => {
     const karten = [...document.querySelectorAll("#packGrid .pcard")];
     const treffer = [];
