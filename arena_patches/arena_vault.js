@@ -89,20 +89,50 @@
    * Zwei Waehrungen auf einem Bildschirm sind kein Detail — sie machen
    * jeden Preisvergleich, den der Spieler anstellt, falsch.
    *
-   * ⚠ OFFEN, und keine Preisfrage: die Fuellzeit. Bei 2-5 Gems je Sieg
-   * braucht die oberste Stufe rund 480-686 Siege. Ein Angebot, das kaum
-   * je erscheint, ist unabhaengig vom Preis wirkungslos. Entweder steigt
-   * der Zuwachs je Sieg mit der Stufe, oder die oberen Kapazitaeten
-   * sinken. Das ist eine Produktentscheidung und steht in
-   * GAMEPLAY_OPTIMIERUNG.
+   * ⚠ FUELLZEIT — am 30.07.2026 entschieden, vorher offen.
    * ================================================================== */
   var VAULT_PRICES = [1.90, 2.90, 3.90, 6.90, 13.50];
   var VAULT_TIER_MAX = VAULT_CAPS.length - 1;
 
-  /* Gems je Sieg, gestaffelt nach Arena-Stufe (2 … 5).
+  /* Gems je Sieg, gestaffelt nach Arena-Stufe (8 … 30).
    * BEWUSST OHNE ZUFALL: Ein schwankender Zuwachs macht den Tresor
-   * unlesbar ("wie lange noch?") und lädt zum Nachrechnen ein. */
-  var WIN_GEMS_MIN = 2, WIN_GEMS_MAX = 5;
+   * unlesbar ("wie lange noch?") und lädt zum Nachrechnen ein.
+   *
+   * ⚠ WAS DIESE ZAHL STEUERT — und was nicht.
+   * Sie aendert NICHTS am Gegenwert: Preis und Kapazitaet je Stufe
+   * bleiben, der Tresor kostet weiter 1,27 ct (Stufe 0) bis 0,56 ct
+   * (Stufe 4) je Kristall. Sie steuert allein, WIE OFT das Angebot
+   * ueberhaupt erscheint.
+   *
+   * Vorher 2 … 5. Gerechnet mit 3-4 Siegen je Sitzung (die Zahl steht
+   * in DESIGN_CLAN §6.2 und traegt dort schon das ±25-Fenster der
+   * Rangliste) und zwei Sitzungen am Tag:
+   *
+   *   Stufe  Kap.   Preis    alt 2-5           neu 8-30
+   *     0     150   1,90   75 Siege ~11 Tg   19 Siege ~2,7 Tg
+   *     1     300   2,90  100 Siege ~14 Tg   21 Siege ~3,1 Tg
+   *     2     600   3,90  150 Siege ~21 Tg   29 Siege ~4,1 Tg
+   *     3    1200   6,90  300 Siege ~43 Tg   50 Siege ~7,1 Tg
+   *     4    2400  13,50  480 Siege ~69 Tg   80 Siege ~11,4 Tg
+   *
+   * Die oberste Stufe war praktisch unerreichbar: ein Angebot, das
+   * zweimal im Jahr erscheint, ist unabhaengig vom Preis wirkungslos.
+   *
+   * ⚠ WARUM 30 NICHT FLACH GILT, sondern nur als OBERES Ende.
+   * Bei flach 30 fuellt sich Stufe 0 in FUENF Siegen — anderthalb
+   * Sitzungen. Der Spieler steht danach dauerhaft am Anschlag, und dort
+   * gilt „jeder weitere Sieg verpufft": die Mechanik, die das Spielen
+   * belohnen soll, bestraft es dann die meiste Zeit. Ausgerechnet in
+   * Stufe 0 lernt der Spieler aber erst, was der Tresor ist.
+   * Massgeblich ist ohnehin das obere Ende: die Stufen 0-3 durchlaeuft
+   * man EINMAL, in Stufe 4 lebt man dauerhaft. Dort steht jetzt genau
+   * die gewuenschte 30 — 2400/30 = 80 Siege, also rund alle elf Tage
+   * ein 13,50-Angebot. Das ist die Taktung, die zaehlt.
+   *
+   * Die Staffelung nach Arena war schon da und musste nur gespreizt
+   * werden — GAMEPLAY_OPTIMIERUNG §14 hatte genau diesen Weg als
+   * Option 1 benannt. */
+  var WIN_GEMS_MIN = 8, WIN_GEMS_MAX = 30;
   // Arena-Schwellen wie im restlichen Projekt (AA-Beleg, ui_prototype §14.1)
   var ARENA_AT = [0, 300, 600, 900, 1200, 1500, 2000, 2500];
 
@@ -604,7 +634,11 @@
     console.log("\nGems je Sieg nach Arena:");
     var row = ARENA_AT.map(function (at, i) { return "A" + (i + 1) + ":" + gemsPerWin(at); });
     console.log("  " + row.join("  "));
-    check("Gems je Sieg laufen von 2 (Arena 1) bis 5 (Arena 8)",
+    /* Die Zahlen NICHT in den Namen schreiben: der Schritt liest sie aus
+       WIN_GEMS_MIN/MAX und wandert damit mit. Ein Name, der „2 bis 5"
+       behauptet, waehrend die Pruefung 8 bis 30 misst, ist eine
+       gruen angezeigte Falschaussage — genau so stand es hier. */
+    check("Gems je Sieg laufen von WIN_GEMS_MIN (Arena 1) bis WIN_GEMS_MAX (Arena 8)",
       gemsPerWin(0) === WIN_GEMS_MIN && gemsPerWin(2500) === WIN_GEMS_MAX);
     check("Zuwachs ist monoton, nie zufällig", (function () {
       var last = 0;
@@ -623,18 +657,27 @@
     check("frisch: leer, Stufe 0, Kapazität 150",
       v0.gems === 0 && v0.tier === 0 && v0.cap === 150 && v0.full === false);
     check("Preisangabe im deutschen Format und in Franken", v0.priceText === "1,90 Fr.", v0.priceText);
+    /* ⚠ Diese vier Schritte standen bis 30.07.2026 mit der Zahl 2 fest
+       verdrahtet da („gained === 2", „Math.ceil(148 / 2)", „→ 82 Gems",
+       „+ 5"). Beim Anheben des Zuwachses waren sie alle vier rot, ohne
+       dass am Tresor etwas kaputt war — sie hatten den Zustand
+       eingefroren statt die Zusage geprueft. Jetzt rechnen sie gegen
+       WIN_GEMS_MIN/MAX, also gegen die Quelle. */
     var w1 = reportEvent("win", 1);
     check("ein Sieg legt Gems in den Tresor",
-      w1.counted === true && w1.gained === 2 && vault().gems === 2, vault().gems);
+      w1.counted === true && w1.gained === WIN_GEMS_MIN &&
+      vault().gems === WIN_GEMS_MIN, vault().gems);
     check("„noch N Siege“ wird ausgerechnet",
-      vault().winsLeft === Math.ceil(148 / 2), vault().winsLeft + " Siege");
-    reportEvent("win", 40);
-    check("40 weitere Siege → 82 Gems", vault().gems === 82, vault().gems);
+      vault().winsLeft === Math.ceil((VAULT_CAPS[0] - WIN_GEMS_MIN) / WIN_GEMS_MIN),
+      vault().winsLeft + " Siege");
+    reportEvent("win", 10);
+    check("10 weitere Siege → 11× der Zuwachs",
+      vault().gems === 11 * WIN_GEMS_MIN, vault().gems);
     check("höhere Arena bringt mehr je Sieg", (function () {
       TROPH = 2500;
       var before = vault().gems;
       reportEvent("win", 1);
-      return vault().gems === before + 5;
+      return vault().gems === before + WIN_GEMS_MAX;
     })(), "Arena 8: +" + gemsPerWin(2500));
     TROPH = 0;
     check("Tresor läuft NICHT über die Kapazität", (function () {
@@ -841,9 +884,18 @@
     console.log("\nstate(): Tresor " + stt.vault.gems + "/" + stt.vault.cap + " (" +
       stt.vault.pctText + "), " + stt.active.length + " aktive Angebote, Badge " + stt.badge);
     // 10 Siege lösen zusätzlich das Starter-Bundle aus → zwei Angebote.
+    /* ⚠ Die Badge-Zahl stand hier als 2 fest. Sie war nur deshalb 2,
+       weil 10 Siege beim alten Zuwachs (2-5) den Tresor nicht fuellten;
+       das war eine ungesagte Annahme, keine Zusage. Beim neuen Zuwachs
+       fuellen 10 Siege Stufe 0, der volle Tresor zaehlt mit, und der
+       Schritt war rot, ohne dass etwas kaputt war. Jetzt steht die
+       Zusage selbst da: die Badge ist die Zahl der Angebote plus eins,
+       wenn der Tresor voll ist. */
     check("state() liefert Tresor, Angebote und Badge",
-      !!stt.vault && Array.isArray(stt.offers) && stt.active.length === 2 && stt.badge === 2,
-      stt.active.map(function (o) { return o.key; }).join("+"));
+      !!stt.vault && Array.isArray(stt.offers) && stt.active.length === 2 &&
+      stt.badge === stt.active.length + (stt.vault.full ? 1 : 0),
+      stt.active.map(function (o) { return o.key; }).join("+") +
+      ", Badge " + stt.badge + ", Tresor " + (stt.vault.full ? "voll" : "nicht voll"));
     check("Badge zählt vollen Tresor zusätzlich mit", (function () {
       reportEvent("win", 200);
       return state().badge === 3 && state().vault.full === true;

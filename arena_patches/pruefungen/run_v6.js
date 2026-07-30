@@ -1699,8 +1699,12 @@ function step(name, ok, info) {
   }));
   step('Kristalltresor-Widget auf Home', v0.dom && /\d+ \/ \d+/.test(v0.txt), v0.txt);
   step('Fuellstand als Balkenhoehe', parseFloat(v0.fill) > 0, v0.fill);
+  /* ⚠ `\d` statt `\d+` — die Zahl war einstellig, weil der Zuwachs 2-5
+     betrug. Als er am 30.07.2026 auf 8-30 stieg, war der Schritt rot bei
+     „+17 Gems je Sieg": er hatte die STELLENZAHL eingefroren, nicht die
+     Zusage. Die Zusage ist, dass beide Angaben ueberhaupt dastehen. */
   step('Zeigt Gems je Sieg und "noch N Siege"',
-    /\+\d Gems je Sieg/.test(v0.sub) && /noch \d+ Siege/.test(v0.sub), v0.sub);
+    /\+\d+ Gems je Sieg/.test(v0.sub) && /noch \d+ Siege/.test(v0.sub), v0.sub);
   /* ⚠ DIE WAEHRUNG NICHT EINFRIEREN (30.07.2026 berichtigt).
      Hier stand dreimal `/\d+,\d\d €/` — das Euro-Zeichen als Literal. Der
      Tresor rechnete frueher in Euro, der uebrige Shop in Franken; als die

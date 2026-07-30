@@ -18066,7 +18066,20 @@ button.pfplate{cursor:pointer}
     if (localStorage.getItem(LOOP_SEED_KEY)) return;
     // Arena-Stand bekannt machen, ohne ein Aufstiegs-Angebot auszuloesen.
     V.reportEvent("arena", V.arenaIndexFor(DEMO_TROPHIES), { trophies: DEMO_TROPHIES });
-    V.reportEvent("win", 34, { trophies: DEMO_TROPHIES });
+    /* ⚠ Hier stand „34 Siege". Diese Zahl ergab NUR beim alten Zuwachs
+       (2-5 je Sieg) den gewuenschten Stand 102/150 — also gut zwei
+       Drittel. Als der Zuwachs am 30.07.2026 auf 8-30 stieg, fuellten
+       dieselben 34 Siege den Tresor sofort ganz, und die Demo zeigte
+       statt des Fuellstands dauerhaft „VOLL — jeder weitere Sieg
+       verpufft". Der interessante Zustand war damit nicht mehr zu
+       sehen — im Prototyp wie in jeder Vorfuehrung.
+       Der Seed nennt jetzt das ZIEL (gut zwei Drittel der ersten Stufe)
+       und rechnet die Siege daraus aus. Er wandert mit jedem kuenftigen
+       Zuwachs mit, statt ihn stillschweigend vorauszusetzen. */
+    var vZiel = Math.round(V.VAULT_CAPS[0] * 0.68);
+    var vProSieg = Math.max(1, V.vault(null, DEMO_TROPHIES).perWin);
+    V.reportEvent("win", Math.max(1, Math.round(vZiel / vProSieg)),
+      { trophies: DEMO_TROPHIES });
     D.reportEvent("win", 2);
     D.reportEvent("pack", 1);
     localStorage.setItem(LOOP_SEED_KEY, "1");
