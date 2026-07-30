@@ -1321,8 +1321,17 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
 .pkdisc{position:absolute;inset:6%;border-radius:50%;
   background:radial-gradient(circle at 50% 44%,#1b2230,#0a0e15 68%,#070a10);
   box-shadow:inset 0 2px 0 #ffffff10,inset 0 -12px 26px #00000090,0 0 0 1px #ffffff08}
+/* ⚠ Kein harter Strich. Ein 2-px-`border` bei .16 Deckkraft ist bei
+   dreifacher Aufloesung als CSS-Rahmen erkennbar und war beim
+   AAA-Durchgang (30.07.2026) das letzte offensichtlich billige Element
+   der Szene. Eine Glutbande hat stattdessen einen weichen Kern und
+   Streulicht nach beiden Seiten — dieselbe Geometrie, aber sie liest
+   sich als Licht statt als Linie. */
 .pkring{position:absolute;inset:2%;border-radius:50%;
-  border:2px solid currentColor;opacity:.16;
+  border:1px solid color-mix(in srgb, currentColor 45%, transparent);
+  opacity:.5;
+  box-shadow:0 0 12px 2px currentColor, inset 0 0 16px 2px currentColor;
+  filter:blur(.7px);
   animation:pkspin 5.2s linear infinite}
 @keyframes pkspin{to{transform:rotate(360deg)}}
 /* Der Schein. `currentColor` ist die Glutfarbe des jeweiligen Packs —
@@ -1767,6 +1776,135 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
         scale(1) rotate(var(--zr))}
   100%{opacity:1;transform:translate(calc(-50% + var(--zx)),calc(-50% + var(--zy)))
         scale(1) rotate(var(--zr))}}
+/* ==================================================================
+ * AAA-DURCHGANG (30.07.2026)
+ * ------------------------------------------------------------------
+ * Auftrag: „schau mit einem Blick eines CEO Designers auf das ganze ist
+ * es wuerdig fuer ein AAA Game oder ist es zu billig? ... vielleicht
+ * noch paar Effekte einbauen funken/Glitzer Shake".
+ *
+ * BEFUND bei dreifacher Aufloesung, ehrlich: nein, war es nicht.
+ *   · Die Ausstroemung las sich als FARBRAD — gleich breite Pastellkeile
+ *     in gleichmaessigem Abstand, wie ein Ladekringel. Es fehlte der
+ *     weissgluehende Kern GENAU im Moment des Bruchs; die Mitte war
+ *     grau-braun, also ein Loch dort, wo die Energie herkommt.
+ *   · Null Partikel. Kein Funke, kein Staub, kein Glitzer.
+ *   · Kein Aufprall — der Bruch hatte keine koerperliche Wirkung.
+ *   · Das ◆ auf der Rueckseite war ein TEXTZEICHEN und bei 3x als
+ *     flacher grauer Rhombus mit harten Kanten erkennbar.
+ *   · Der Goldrand war ein flacher 2-px-Strich ohne Metallverlauf.
+ *   · Dem Deck fehlte ein Schlagschatten — es schwebte ohne Masse.
+ *
+ * Was hier dagegen steht. Grundsatz: KEIN Effekt um seiner selbst
+ * willen. Jeder Zusatz haengt an einem der drei Momente (Aufbau,
+ * Bruch, Enthuellung) und ist ausserhalb davon unsichtbar.
+ * ================================================================== */
+
+/* ---------- 1. AUFPRALL: die Buehne wackelt beim Bruch ----------
+   Kurz und hart, nicht lang und weich: 260 ms, danach absolut ruhig.
+   Ein Shake, der laenger laeuft als der Ton, wirkt wie ein Wackelbild
+   statt wie ein Schlag. Der Versatz bleibt unter 7 px — darueber
+   liest es sich als Fehler, nicht als Wucht. */
+/* ⚠ 2200 ms, NICHT 2060. Hier stand zuerst 2060 — die Zahl stammte aus
+   dem Referenzvideo, wo bei 2066 ms der grosse Helligkeitssprung liegt.
+   Nachgemessen ist das aber der LEGENDAER-AUSBRUCH eines 10er-Zugs und
+   nicht das Aufreissen eines Packs. UNSER Bruch steht bei 55 % von
+   4000 ms, siehe die Zeittabelle bei `pkblitz` („2200 — Hoehepunkt").
+   Der Aufprall waere sonst 140 ms VOR dem Blitz gekommen, und ein
+   Schlag, den man vor dem Licht spuert, liest sich als Fehler.
+   Die Pruefung haelt Aufprall und Blitz deshalb aneinander gekoppelt. */
+#packLayer.spielt #pkStage{
+  animation:pkschlag 260ms cubic-bezier(.36,.07,.19,.97) both;
+  animation-delay:2200ms}
+@keyframes pkschlag{
+  0%{transform:translate(0,0) scale(1)}
+  12%{transform:translate(-6px,3px) scale(1.035)}
+  26%{transform:translate(5px,-4px) scale(1.025)}
+  42%{transform:translate(-4px,-2px) scale(1.015)}
+  58%{transform:translate(3px,3px) scale(1.008)}
+  74%{transform:translate(-2px,1px) scale(1.003)}
+  100%{transform:translate(0,0) scale(1)}}
+
+/* ---------- 2. FUNKEN: der Bruch wirft Material ----------
+   Echte Elemente, keine Textur: nur so hat jeder Funke eine eigene
+   Richtung, Weite und Zeit. Der Schweif entsteht aus einem gestreckten
+   Verlauf, der ZUR Flugrichtung zeigt — ein runder Punkt sieht aus wie
+   Konfetti, ein Schweif wie Energie. */
+.pkfunken{position:absolute;inset:0;pointer-events:none;overflow:hidden;
+  border-radius:50%;z-index:3}
+/* Die Dicke variiert mit (--fh). Gleich dicke Striche verraten sich als
+   generiert — echte Funken sind unterschiedlich schwer. Der Schweif
+   verjuengt zusaetzlich ueber `scaleY` im Flug. */
+.pkfunke{position:absolute;left:50%;top:50%;width:var(--fl,26px);
+  height:var(--fh,2px);
+  margin:calc(var(--fh,2px) / -2) 0 0 0;transform-origin:0 50%;opacity:0;
+  border-radius:var(--fh,2px);
+  background:linear-gradient(90deg,#fff 0%,#fff 12%,currentColor 40%,transparent 100%);
+  filter:drop-shadow(0 0 5px currentColor)}
+#packLayer.spielt .pkfunke{
+  animation:pkfunkeflug var(--fd,620ms) cubic-bezier(.12,.72,.3,1) forwards;
+  animation-delay:calc(2200ms + var(--fv,0ms))}
+@keyframes pkfunkeflug{
+  0%{opacity:0;transform:rotate(var(--fa,0deg)) translateX(2%) scale(.3,1)}
+  10%{opacity:1;transform:rotate(var(--fa,0deg)) translateX(12%) scale(1,1)}
+  70%{opacity:1}
+  100%{opacity:0;transform:rotate(var(--fa,0deg)) translateX(var(--fw,150%)) scale(.45,.4)}}
+
+/* ---------- 3. GLITZER: das Deck lebt ----------
+   Waehrend der Stapel schwebt, treiben feine Motten nach oben. Sie sind
+   BEWUSST langsam und wenige — Glitzer, der flimmert, wirkt billig;
+   Glitzer, den man kaum bemerkt, wirkt teuer. */
+.pkstaub{position:absolute;inset:0;pointer-events:none;overflow:hidden;
+  border-radius:50%;z-index:2;opacity:0;transition:opacity 600ms ease}
+#pkDeck.schwebt ~ .pkstaub,.pkstaub.an{opacity:1}
+.pkmotte{position:absolute;width:3px;height:3px;border-radius:50%;
+  background:radial-gradient(circle,#fff,currentColor 60%,transparent 72%);
+  left:var(--mx,50%);top:104%;opacity:0;
+  animation:pkmotte var(--md,4200ms) linear infinite;
+  animation-delay:var(--mv,0ms)}
+@keyframes pkmotte{
+  0%{opacity:0;transform:translateY(0) scale(.6)}
+  14%{opacity:.9}
+  76%{opacity:.7}
+  100%{opacity:0;transform:translateY(-118%) translateX(var(--mdx,0px)) scale(1)}}
+
+/* ---------- 4. METALL statt Strich ----------
+   Ein Rand aus EINER Farbe ist der sicherste Weg, billig auszusehen.
+   Echtes Metall hat oben Licht und unten Reflexion. Zwei Schatten
+   innen erzeugen genau das, ohne ein Bild zu brauchen. */
+.pkface{border-color:#e8c76a}
+.pkback,.pkfront{
+  box-shadow:
+    inset 0 1px 0 #fff6d0aa,
+    inset 0 -2px 3px #6b4a12aa,
+    0 10px 22px #000000b0}
+/* Die Rueckseite bekommt eine GRAVUR statt eines Textzeichens: zwei
+   gedrehte Quadrate als Prisma, plus ein feines Linienraster. Das ◆ war
+   bei 3x als Glyphe erkennbar — der haeufigste Grund, warum eine sonst
+   saubere Karte billig wirkt. */
+.pkback::before{content:"";position:absolute;left:50%;top:50%;
+  width:34%;aspect-ratio:1;margin:-17% 0 0 -17%;
+  transform:rotate(45deg);
+  background:linear-gradient(145deg,#ffffff26,#ffffff05 52%,#0000 70%);
+  box-shadow:inset 0 0 0 1px #ffffff2e,0 0 14px #ffffff14;
+  border-radius:4px;font-size:0}
+.pkback{background:
+    repeating-linear-gradient(58deg,#ffffff08 0 1px,#0000 1px 9px),
+    linear-gradient(150deg,#ffffff30 0%,#ffffff0a 34%,#0000 48%),
+    linear-gradient(160deg,#24385c,#0d1522 74%)}
+
+/* ---------- 5. MASSE: das Deck wirft einen Schatten ----------
+   Ohne Kontaktschatten schwebt ein Objekt nicht, es klebt. Der Schatten
+   atmet mit der Schwebe: weiter oben heisst kleiner und dunkler. */
+#pkDeck::after{content:"";position:absolute;left:50%;top:74%;
+  width:34%;height:5%;margin-left:-17%;border-radius:50%;
+  background:radial-gradient(ellipse,#000000cc,#0000 70%);
+  animation:pkschatten 3200ms ease-in-out infinite}
+#pkDeck:not(.schwebt)::after{opacity:0}
+@keyframes pkschatten{
+  0%,100%{transform:scale(.86);opacity:.75}
+  50%{transform:scale(1.06);opacity:.5}}
+
 .pkskip{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);
   border-radius:11px;padding:9px 20px;font-size:12px;font-weight:900;
   background:#0e1418c4;border:1px solid #e0b94a66;color:#f4e3a6}
@@ -10516,6 +10654,8 @@ button.pfplate{cursor:pointer}
       var st = $("pkStage"); if (!st) return;
       [].slice.call(st.querySelectorAll(".pkcard")).forEach(function (c) { c.remove(); });
       var d = $("pkDeck"); if (d) d.remove();
+      [].slice.call(st.querySelectorAll(".pkfunken,.pkstaub"))
+        .forEach(function (e) { e.remove(); });
     }
 
     function spiele(key, anzahl, fertig, rar) {
@@ -10540,6 +10680,53 @@ button.pfplate{cursor:pointer}
          Szene nicht kaschieren soll. */
       var n = Math.max(1, Math.min(24, anzahl || 5));
       var liste = stapel(n);
+      /* ---- Funken und Glitzer (AAA-Durchgang 30.07.2026) ----
+         Beides wird HIER erzeugt und nicht ins Markup geschrieben: die
+         Anzahl haengt am Pack, und ein fester Satz im HTML waere bei
+         einem Bronze-Pack zu viel und bei Arkan zu wenig.
+         ⚠ Die Streuung ist DETERMINISTISCH aus dem Index gerechnet, nicht
+         gewuerfelt. Math.random() saehe beim ersten Blick lebendiger aus,
+         macht aber jeden Standbildvergleich unmoeglich — und genau
+         darueber laeuft die Pruefung dieser Szene. */
+      var fx = document.createElement("div");
+      fx.className = "pkfunken";
+      /* Mehr Karten, mehr Wucht: ein Arkan-Pack darf sichtbar heftiger
+         aufreissen als ein Bronze-Pack. 7 Funken je Karte, gedeckelt. */
+      var nF = Math.min(64, 14 + n * 7);
+      for (var f = 0; f < nF; f++) {
+        var sp = document.createElement("i");
+        sp.className = "pkfunke";
+        /* Der goldene Winkel streut gleichmaessig, ohne Muster zu bilden
+           — ein gleichmaessiges Kreisraster haette wieder die Speichen
+           ergeben, die wir gerade losgeworden sind. */
+        var w = (f * 137.508) % 360;
+        var lang = 18 + ((f * 37) % 5) * 9;          /* 18..54 px */
+        var weit = 120 + ((f * 53) % 7) * 16;        /* 120..216 % */
+        sp.style.setProperty("--fa", w.toFixed(1) + "deg");
+        sp.style.setProperty("--fl", lang + "px");
+        /* 1..3 px, deterministisch. Ein Funke, der so dick ist wie der
+           naechste, sieht wie ein Strich aus statt wie Material. */
+        sp.style.setProperty("--fh", (1 + ((f * 43) % 3)) + "px");
+        sp.style.setProperty("--fw", weit + "%");
+        sp.style.setProperty("--fd", (480 + ((f * 29) % 6) * 70) + "ms");
+        sp.style.setProperty("--fv", ((f * 17) % 9) * 26 + "ms");
+        fx.appendChild(sp);
+      }
+      st.appendChild(fx);
+
+      var staub = document.createElement("div");
+      staub.className = "pkstaub";
+      for (var m = 0; m < 16; m++) {
+        var mo = document.createElement("i");
+        mo.className = "pkmotte";
+        mo.style.setProperty("--mx", (8 + ((m * 41) % 84)) + "%");
+        mo.style.setProperty("--md", (3400 + ((m * 23) % 5) * 520) + "ms");
+        mo.style.setProperty("--mv", ((m * 31) % 12) * 340 + "ms");
+        mo.style.setProperty("--mdx", (((m % 2) ? 1 : -1) * (6 + (m % 5) * 5)) + "px");
+        staub.appendChild(mo);
+      }
+      st.appendChild(staub);
+
       /* Ein eigener Traeger fuer den Stapel: nur so kann das Deck als
          GANZES schweben, ohne dass die Karten gegeneinander wandern. */
       var deck = document.createElement("div");
@@ -10649,6 +10836,7 @@ button.pfplate{cursor:pointer}
       laufend = setTimeout(function () {
         if (beendet) return;
         deck.classList.add("schwebt");
+        staub.classList.add("an");
         markiereOberste();
       }, Math.round(DAUER * 0.75) + 120);
     }

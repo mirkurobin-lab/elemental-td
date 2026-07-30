@@ -211,8 +211,15 @@ const gegen = (n, gebrochenErkannt, z) => {
     return { ok: r.ok, restGold: st.gold, restH: st.abwesendH, bereit: st.bereit };
   });
   pruef("das Abholen greift", nachher.ok === true);
+  /* ⚠ restH wird NICHT auf exakt 0 geprueft. Zwischen Abholen und
+     Ablesen vergehen Mikrosekunden, und die stehen als 2,8e-7 h in der
+     Rechnung — das ist keine gutgeschriebene Zeit, sondern die Uhr.
+     Eine Gleichheitspruefung auf einer Bruchzahl macht den Schritt
+     zufaellig rot und sagt dann "Fehler" zu einer korrekten Rechnung.
+     Gefragt ist die Anforderung: es bleibt NICHTS ZAEHLBARES stehen.
+     Eine Sekunde ist die Grenze; darunter kann kein Gold entstehen. */
   pruef("nach dem Abholen ist der Ueberhang WEG, nicht gutgeschrieben",
-        nachher.restGold === 0 && nachher.restH === 0,
+        nachher.restGold === 0 && nachher.restH < 1 / 3600,
         "Rest " + nachher.restGold + " Gold / " + nachher.restH + " h");
   pruef("und der Knopf faellt zu", nachher.bereit === false);
   await p.evaluate(() => window.__proto.offMarke());

@@ -163,7 +163,18 @@ async function durchtippen(p, max) {
            geprueft: die Ebenen, die auf der SZENEN-Zeitachse liegen,
            muessen dieselbe Dauer tragen wie das JS. Laufen die
            auseinander, faellt der Vorhang mitten in der Bewegung. */
-        if (/\b(pkdreh|pkschweb|pkpuls|pkweg)\b/.test(rule.cssText)) continue;
+        /* ⚠ Ausschluss ueber den WAEHLER, nicht ueber den Regeltext.
+           Chromium serialisiert die Kurzschreibweise `animation:` mit
+           `var()` darin nicht zuverlaessig — ein Textfilter auf den
+           Animationsnamen greift dann ins Leere und die Dauer rutscht
+           doch in den Satz. Das ist genau hier passiert. */
+        if (/#pkStage|\.pkfunke|\.pkmotte|#pkDeck|\.pkcard\.(auf|weg|oben)/
+            .test(rule.selectorText)) continue;
+        /* Aufprall und Funken liegen zwar AUF der Szenen-Zeitachse, sind
+           aber Ereignisse an einem PUNKT und keine Ebenen ueber die ganze
+           Dauer — ein Schlag, der 4000 ms braucht, waere kein Schlag.
+           Ihre Dauer ist deshalb frei; ihr ZEITPUNKT ist gebunden und
+           wird unten eigens geprueft. Sie stehen im Waehler-Ausschluss. */
         const m = /(\d+)ms/.exec(rule.cssText);
         if (m) raus.add(+m[1]);
       }
@@ -173,6 +184,48 @@ async function durchtippen(p, max) {
   pruef("alle pk-Ebenen laufen auf EINER Dauer", dauerCss.length === 1,
     dauerCss.join(" / "));
   const DAUER = dauerCss[0] || 4000;
+
+  /* ---------- Der Aufprall sitzt AUF dem Bruch ----------
+     Neu am 30.07.2026. Anlass: der Shake lag zuerst bei 2060 ms, weil
+     die Zahl aus dem Referenzvideo uebernommen war — dort liegt bei
+     2066 ms der Legendaer-Ausbruch eines 10er-Zugs, nicht das
+     Aufreissen eines Packs. Er kam damit 140 ms VOR dem Blitz, und ein
+     Schlag vor dem Licht liest sich als Fehler.
+     Geprueft wird nicht die Zahl, sondern die KOPPLUNG: der Aufprall
+     muss dort liegen, wo `pkblitz` seinen Hoehepunkt hat. Verschiebt
+     jemand den Bruch, wandert die Anforderung mit. */
+  const aufprall = await p.evaluate(() => {
+    /* Am ECHTEN Element gemessen statt aus dem Regeltext geparst: nur
+       so steht da, was der Browser wirklich tut. Die Szene muss dafuer
+       kurz laufen — `.spielt` setzt die Animationen. */
+    const lay = document.getElementById("packLayer");
+    const warOffen = lay.classList.contains("on");
+    lay.classList.add("on", "spielt");
+    const st = document.getElementById("pkStage");
+    const schlagMs = parseFloat(getComputedStyle(st).animationDelay) * 1000;
+    if (!warOffen) lay.classList.remove("on", "spielt");
+    let blitzProz = null;
+    for (const bl of document.styleSheets) {
+      let rs; try { rs = bl.cssRules; } catch (e) { continue; }
+      for (const r of rs) {
+        if (r.type === CSSRule.KEYFRAMES_RULE && r.name === "pkblitz") {
+          let best = -1;
+          for (const k of r.cssRules) {
+            const o = parseFloat(k.style.opacity);
+            const pz = parseFloat(k.keyText);
+            if (!isNaN(o) && !isNaN(pz) && o > best) { best = o; blitzProz = pz; }
+          }
+        }
+      }
+    }
+    return { schlagMs, blitzProz };
+  });
+  const blitzMs = aufprall.blitzProz != null
+    ? Math.round(DAUER * aufprall.blitzProz / 100) : null;
+  pruef("der Aufprall liegt auf dem Hoehepunkt des Blitzes",
+    aufprall.schlagMs != null && blitzMs != null &&
+      Math.abs(aufprall.schlagMs - blitzMs) <= 60,
+    aufprall.schlagMs + " ms gegen Blitz " + blitzMs + " ms");
   const quelle = require("fs").readFileSync(
     "/home/user/elemental-td/arena_patches/ui_prototype.html", "utf8");
   const jsDauer = /var DAUER = (\d+)/.exec(quelle);
