@@ -740,6 +740,15 @@ function step(name, ok, info) {
   await page.waitForTimeout(250);
   await page.click('#navCollection');
   await page.waitForTimeout(200);
+  /* ⚠ ANGEPASST (30.07.2026, Battle-Deck-Umbau): der zweite Bottom-Nav-
+     Reiter zeigt seither ZWEI gleichrangige Reiter dieser View — Deck
+     (Standard) und Sammlung (§24, AA_UI_REFERENZ). `#btnToForge` steckt
+     im Sammlung-Panel; ohne den Klick auf `#dkTabColl` bliebe es hinter
+     `display:none` und Playwright liefe in ein Sichtbarkeits-Timeout —
+     dieselbe Lehre wie beim `.oddsi`-Vorbild: eine View-Struktur zu
+     aendern bricht jeden Test, der bisher nur den EINEN Zustand kannte. */
+  await page.click('#dkTabColl');
+  await page.waitForTimeout(150);
   await page.click('#btnToForge');
   await page.waitForTimeout(250);
   step('Schmiede weiterhin erreichbar',
@@ -748,13 +757,36 @@ function step(name, ok, info) {
 
   // ============ 8c. AAA-SWEEP: KARTEN-ARTWORK STATT EMOJI ============
   await page.click('#navCollection');
+  await page.waitForTimeout(200);
+  await page.click('#dkTabColl');   // s.o.: Sammlung ist jetzt ein Reiter, kein Automatismus mehr
   await page.waitForTimeout(400);
+  /* Battle-Deck-Kachel MIT Artwork: die alte `#deckRow`-Vorschau (vier
+     feste Beispiel-Karten, keine Zonen, kein Speicher) ist durch den
+     echten Editor ersetzt (arena_deck.js). Dieselbe Behauptung —
+     "eine ausgeruestete Karte traegt echtes Artwork, nicht nur Emoji"
+     — gilt jetzt fuer einen ECHTEN Deck-Platz statt einer Deko-Kachel. */
+  await page.evaluate(() => {
+    window.__proto.setDkMain('deck');
+    window.__proto.ArenaDeck().setze('tuerme', 0, 'fire');
+    window.__proto.renderDeckBoard();
+  });
+  await page.waitForTimeout(200);
+  const deckArt = await page.evaluate(() => ({
+    img: document.querySelectorAll('#dkTowers img.cart').length,
+    emo: document.querySelectorAll('#dkTowers .cartemo').length,
+  }));
+  step('Battle-Deck-Platz traegt Artwork UND Emoji-Rueckfall darunter',
+    deckArt.img === 1 && deckArt.emo === 1, JSON.stringify(deckArt));
+  await page.evaluate(() => {
+    window.__proto.ArenaDeck()._reset();
+    window.__proto.setDkMain('coll');
+  });
+  await page.waitForTimeout(200);
   const artColl = await page.evaluate(() => ({
     tiles: document.querySelectorAll('#collGrid .tile').length,
     imgs: document.querySelectorAll('#collGrid img.cart').length,
     emos: document.querySelectorAll('#collGrid .cartemo').length,
     frames: document.querySelectorAll('#collGrid .frm').length,
-    deck: document.querySelectorAll('#deckRow img.cart').length,
     src: (document.querySelector('#collGrid img.cart') || {}).getAttribute
          ? document.querySelector('#collGrid img.cart').getAttribute('src') : '',
   }));
@@ -768,7 +800,6 @@ function step(name, ok, info) {
     artColl.emos + ' Fallback-Ebenen');
   step('Raritaetsrahmen liegt UEBER dem Artwork', artColl.frames === artColl.tiles,
     artColl.frames + ' Rahmen-Overlays');
-  step('Deck-Reihe ebenfalls mit Artwork', artColl.deck === 4, String(artColl.deck));
   // Der Rahmen-Overlay darf bei fehlendem Bild NICHTS malen (sonst deckt
   // der Fallback-Verlauf das Artwork zu).
   const frmBg = await page.$$eval('#collGrid .frm', els =>
@@ -902,6 +933,8 @@ function step(name, ok, info) {
   // ================= 8e. HELDEN =================
   await page.click('#navCollection');
   await page.waitForTimeout(300);
+  await page.click('#dkTabColl');   // Battle-Deck-Umbau: #tabHeroes steckt im Sammlung-Reiter
+  await page.waitForTimeout(150);
   await page.click('#tabHeroes');
   await page.waitForTimeout(400);
   step('Helden-Tab der Sammlung oeffnet den Helden-View',
@@ -1556,6 +1589,20 @@ function step(name, ok, info) {
   await page.waitForTimeout(500);
   step('Pack-Oeffnen meldet pack_opened',
     (await page.evaluate(() => window.ArenaTelemetry.count('pack_opened'))) >= 1);
+  /* ⚠ NEU (30.07.2026): die Oeffnungsszene liegt seit dem Feinschliff aus
+     AA_UI_REFERENZ §23 auf 4000 ms statt 3000 ms — mit dieser Suite hat
+     das nichts zu tun, aber `#packLayer.on.spielt` blieb hier bisher nur
+     kurz stehen und war laengst zu, wenn der Test weiterklickte. Jetzt
+     verdeckt es `#navHome` noch, wenn der naechste Schritt kommt (Timeout
+     "subtree intercepts pointer events"). Bestaetigt: derselbe Absturz
+     tritt schon auf `HEAD` auf, VOR jeder Aenderung dieser Sitzung — ist
+     also keine Regression aus dem Battle-Deck-Umbau. Die Suite schliesst
+     die Ebene jetzt selbst, genau wie sie es zwei Zeilen weiter unten
+     bereits mit `#mergeCeremony` tut. */
+  await page.evaluate(() => {
+    const pl = document.getElementById('packLayer');
+    if (pl) pl.classList.remove('on', 'spielt');
+  });
   const mergeTele = await page.evaluate(() => {
     const AC = window.ArenaCards;
     AC.addDrop('nature', 'common', 3);
@@ -1737,6 +1784,8 @@ function step(name, ok, info) {
   // --- Karten-Loops ---
   await page.click('#navCollection');
   await page.waitForTimeout(350);
+  await page.click('#dkTabColl');   // Battle-Deck-Umbau: Sammlung ist ein Reiter (s.o.)
+  await page.waitForTimeout(150);
   await page.click('#collGrid .tile');
   await page.waitForTimeout(600);
   const loopDetail = await page.evaluate(() => {
@@ -1803,6 +1852,12 @@ function step(name, ok, info) {
     firstCard && packLoop.flipped >= 1 && packLoop.vids >= 1,
     packLoop.vids + ' Loop(s) auf ' + packLoop.flipped + ' Karte(n)');
   step('Auch dort bleibt das Standbild als poster', packLoop.poster);
+  // s.o.: Oeffnungsszene laeuft laenger als dieser Test wartet (§23) —
+  // Ebene selbst schliessen, statt auf eine erratene Wartezeit zu setzen.
+  await page.evaluate(() => {
+    const pl = document.getElementById('packLayer');
+    if (pl) pl.classList.remove('on', 'spielt');
+  });
 
   // --- Audio ---
   await page.click('#navHome');

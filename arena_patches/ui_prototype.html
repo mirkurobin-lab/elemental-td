@@ -451,12 +451,88 @@ body.nur-waehrung .apphead .headcol{padding:6px 0}
 h2.title{font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
   margin:2px 0 10px;font-weight:800}
 
-/* ---------- Deck-Zeile (§7) ---------- */
-.deckrow{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gap);margin-bottom:var(--gap-lg)}
-.deckslot{position:relative;aspect-ratio:3/4;border-radius:10px;border:2px solid var(--line);
-  background:var(--panel);display:flex;align-items:center;justify-content:center;font-size:30px}
-.deckslot .lvl{position:absolute;left:0;right:0;bottom:0;background:#0009;font-size:10px;
-  text-align:center;padding:2px 0;font-weight:800;letter-spacing:.04em}
+/* ==================================================================
+ * BATTLE DECK — ausgemessen in AA_UI_REFERENZ.md §24 (30.07.2026)
+ * ------------------------------------------------------------------
+ * Ersetzt die alte `.deckrow`/`.deckslot`-Vorschau (vier Kacheln ohne
+ * Zonen, ohne Sperre, ohne Speicher — reine Deko vor arena_deck.js).
+ * Die Prozentwerte unten sind aus dem Referenzvideo abgelesen (§24.2),
+ * bezogen auf die 430-px-Buehne = die Breite von #app. Unsere Views
+ * tragen 12 px Randabstand (`.view{padding:12px}`, §-weit einheitlich);
+ * das Referenzbild hatte an dieser Stelle 18/14 px. Die DIFFERENZ dieser
+ * Raender wird bewusst NICHT nachgebaut — ein Sonderrand nur fuer diese
+ * eine View waere genau die Uneinheitlichkeit, die die Banner-Metrik-
+ * Leiter oben (§EINHEITLICHE BANNER-METRIK) verhindern soll. Die
+ * VERHAELTNISSE (35,8 % / 17,2 % / 12,6 %) sind das, was AA hier zeigt,
+ * und die werden 1:1 uebernommen; siehe Nachtrag AA_UI_REFERENZ §24.5. */
+.dkboard{display:grid;grid-template-columns:35.8% 1fr;
+  /* 10 px = 2,3 % von 430 px, die gemessene Luecke Held/Turmraster
+     (x172 -> x182, §24.2). Kein Wert aus der --gap-Leiter, weil die
+     Leiter hier keine Zwischenstufe fuer 2,3 % kennt und ein Rundfehler
+     an dieser einen Stelle nicht ins Auge faellt. */
+  column-gap:10px}
+.dkheld{grid-column:1;grid-row:1/span 2;position:relative;
+  border-radius:var(--radius);border:2px solid var(--line);
+  background:linear-gradient(160deg,#243342,#0e1418 70%);overflow:hidden;
+  display:flex;align-items:center;justify-content:center;font-size:34px}
+.dkheld .artbox{inset:2px;border-radius:10px}
+/* Skill-Marke in der Ecke (§24.1 "◆"). Rein informativ — WELCHE Ult-
+   Daten hier eines Tages stehen, ist laut §24.4 "noch nicht abgelesen"
+   und wird nicht geraten. `pointer-events:none`, damit sie den Tipp auf
+   den Heldenplatz nicht stiehlt (Trefferflaeche bleibt EIN Button). */
+.dkult{position:absolute;top:4px;right:4px;z-index:4;width:22px;height:22px;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:11px;background:#0b1116cc;border:1px solid #ffffff2e;
+  box-shadow:var(--sh-1);pointer-events:none}
+.dktowers{grid-column:2;grid-row:1/span 2;display:grid;
+  grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:var(--gap)}
+/* 74x94 (§24.2) = Seitenverhaeltnis 1:1,27 — exakter als "aspect-ratio:3/4". */
+.dktower{position:relative;aspect-ratio:74/94;border-radius:10px;
+  border:2px solid var(--line);background:var(--panel);overflow:hidden;
+  display:flex;align-items:center;justify-content:center;font-size:26px}
+.dktower .artbox{inset:2px;border-radius:8px}
+.dkheld .lvl,.dktower .lvl{position:absolute;left:0;right:0;bottom:0;z-index:2;
+  background:#0009;font-size:10px;text-align:center;padding:2px 0;
+  font-weight:800;letter-spacing:.04em}
+.dkplus{width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  color:var(--dim);font-size:20px;opacity:.6}
+/* Spell-Sechsecke UNTER dem Helden + Deck-Wahl unter den Tuermen, EINE
+   Zeile (§24.1: "⬡ ⬡  [1][2][3🔒][4🔒] [≡]" liegt auf einer Hoehe). Die
+   Spaltenbreiten wiederholen die von .dkboard, damit beide Zeilen
+   buendig untereinanderstehen. */
+.dkbottom{display:grid;grid-template-columns:35.8% 1fr;column-gap:10px;
+  margin-top:var(--gap)}
+.dkspells{display:flex;align-items:center;justify-content:center;gap:10px}
+/* Sechseck-Zuschnitt ist BAUGLEICH mit `.pfhexs` (Profil-Fenster, die
+   Merge-Bonus-Sockel unter der Heldenkarte) — dieselbe Form fuer
+   dieselbe Aussage "Sechseck-Slot unter einer Heldenkarte", keine
+   zweite Handschrift dafuer. 12,6 % der BUEHNE (§24.2), bezogen auf
+   diese 35,8-%-Spalte macht das 12,6/35,8 ≈ 35,2 % Spaltenbreite. */
+.dkspell{position:relative;flex:0 0 35.2%;aspect-ratio:1;border:0;
+  clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
+  background:linear-gradient(180deg,#3a4c63,#141d26);overflow:hidden;
+  display:flex;align-items:center;justify-content:center;font-size:20px}
+.dkspell .artbox{inset:0;border-radius:0}
+.dkspell .lvl{position:absolute;left:0;right:0;bottom:8%;z-index:2;
+  text-align:center;font-size:8.5px;font-weight:900;color:#fff;
+  text-shadow:0 1px 2px #000}
+.dksel{display:flex;align-items:center;gap:6px}
+.dkselbtn{position:relative;width:30px;height:30px;border-radius:8px;
+  border:2px solid var(--line);background:var(--panel2);color:var(--txt);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:900}
+.dkselbtn.on{border-color:var(--gold);background:#f2a13d22;color:var(--gold)}
+.dkselbtn.locked{color:var(--dim)}
+.dkselbtn .lock{position:absolute;inset:0;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;background:#00000066}
+/* "≡" — Deck leeren. Rate, dokumentiert: das AA-Symbol an dieser
+   Stelle ist im Referenzvideo nicht in lesbarer Aufloesung ausgewertet
+   (§24.4). Eine Wirkung, die es wirklich gibt (raeume()), ist besser
+   als ein Knopf ohne Funktion. */
+.dkmenu{width:30px;height:30px;border-radius:8px;border:2px solid var(--line);
+  background:var(--panel2);color:var(--dim);
+  display:flex;align-items:center;justify-content:center;font-size:14px}
 
 /* ---------- Tabs + Sortierung + Forge ---------- */
 .tabs{display:flex;align-items:center;gap:6px;margin:4px 0 10px}
@@ -2663,6 +2739,18 @@ span.ico{text-align:center}
   color:#cfe0ee;background:#0b1116cc;border:1px solid #ffffff2e;
   box-shadow:var(--sh-1)}
 .oddsi:active{background:#0b1116}
+/* .dkinfo sieht aus wie .oddsi (gleiche runde Marke, gleiche Groessen-
+   ordnung), ist aber bewusst eine EIGENE Klasse: .oddsi ist die
+   App-Store-Pflichtangabe fuer Lootbox-Quoten (siehe Kommentar oben).
+   Das Battle Deck hat keine Quoten zu offenbaren — dieselbe Klasse zu
+   benutzen wuerde ein Pflichtsymbol vortaeuschen, wo keine Pflicht ist. */
+.dkinfo{position:absolute;top:5px;right:5px;z-index:4;
+  width:24px;height:24px;border-radius:50%;padding:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:900;font-style:italic;line-height:1;
+  color:#cfe0ee;background:#0b1116cc;border:1px solid #ffffff2e;
+  box-shadow:var(--sh-1)}
+.dkinfo:active{background:#0b1116}
 #oddsLayer{position:fixed;inset:0;z-index:285;display:none;
   background:#04070ab8;align-items:center;justify-content:center;padding:18px}
 #oddsLayer.on{display:flex}
@@ -4997,6 +5085,19 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .picktile .pnm{font-size:9.5px;font-weight:900;margin-top:3px}
 .picktile .pcnt{font-size:9px;color:var(--dim);margin-top:1px}
 .picktile.off{opacity:.35}
+/* Ausgewaehlt markieren: eine Ringfarbe statt border-color, weil die
+   Rahmenfarbe schon die Raritaet traegt (Inline-Style je Kachel,
+   openDeckPick) — zwei Bedeutungen auf demselben Kanal waeren nicht
+   mehr zu unterscheiden. */
+.picktile.on{box-shadow:0 0 0 2px var(--gold) inset}
+/* Battle-Deck-Waehler (§24): dieselbe Kachel wie oben, aber mit
+   artBox() statt cardArtHTML() — der Raritaetsrahmen gehoert hier
+   dazu, siehe Kommentar bei #deckPickDlg. `.part` bekommt darum eine
+   eigene Flaeche: `.artbox`/`.frm` sind absolut positioniert und
+   brauchen ein Eltern-Element mit Groesse, sonst haben sie keine. */
+.dkpicktile .part{position:relative;aspect-ratio:3/4;display:block;
+  border-radius:8px;overflow:hidden;margin-bottom:2px}
+.dkpicktile .part .artbox{font-size:19px}
 
 /* ---------- Krieg ---------- */
 .warwait{margin-top:var(--gap);padding:16px var(--pad);border-radius:var(--radius);text-align:center;
@@ -5980,6 +6081,15 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .packbtn,.pity,.mini,.btn,.rico,.rget,.buypass,.pnum,
 .keyart{box-shadow:var(--mat-raised)}
 .reqpanel,.passbar,.pb{box-shadow:var(--mat-well)}
+/* --- BATTLE DECK (§24, 30.07.2026): der Sammlungs-Reiter war mit 80 %
+   ohne Tiefe die schwaechste View im Einzel-Check (Grenze 25 %) — genau
+   dieselbe Bugklasse wie bei Startseite/Clan oben, nur mit dem neuen
+   Editor als Flaeche statt der alten `.deckrow`. Die Deck- und
+   Turmplaetze sind Koerper, die man antippt: erhaben. Die Deck-Wahl-
+   Knoepfe und das Menue zaehlen zu den Knoepfen, nicht zu den Kacheln —
+   sie stehen deshalb hier bei .dkselbtn/.dkmenu und nicht oben bei
+   .tile/.deckslot. */
+.dkheld,.dktower,.dkspell,.dkselbtn,.dkmenu,.dkinfo,.dkult{box-shadow:var(--mat-raised)}
 /* --- Sektionsbanner: ohne Kante klebt ein Banner auf dem Hintergrund. */
 .secribbon{box-shadow:var(--lit-2),var(--unlit),var(--sh-2)}
 /* --- Eine Bewegungssprache fuer alles Anfassbare. --- */
@@ -7180,39 +7290,93 @@ button.pfplate{cursor:pointer}
 
   <!-- ===== VIEW 1: COLLECTION (§7) ===== -->
   <section id="viewCollection" class="view">
-    <h2 class="title">Battle Deck</h2>
-    <div class="deckrow" id="deckRow"></div>
-
-    <div class="tabs">
-      <button class="tab on" id="tabTowers">Türme</button>
-      <button class="tab" id="tabSpells">Spells</button>
-      <button class="tab" id="tabItems">Items</button>
-      <button class="tab" id="tabHeroes">Helden</button>
-      <span class="spacer"></span>
-      <button class="forgebtn" id="btnToForge">⚒ SCHMIEDE</button>
+    <!-- ==================================================================
+     * ZWEITER TAB DER BOTTOM-NAV — ENTSCHEIDUNG (30.07.2026)
+     * ------------------------------------------------------------------
+     * AA legt an genau diese Stelle das Battle Deck (§24). Diese View war
+     * bis heute die Sammlung — die darf laut Auftrag NICHT verwaisen.
+     * Zwei Wege standen offen: einen eigenen Bottom-Nav-Platz fuer die
+     * Sammlung suchen (es gibt keinen freien, und die Leiste hat mit
+     * fuenf Zielen schon AAs volle Zahl, §15.5), oder beide als
+     * GLEICHRANGIGE Reiter EINER View fuehren. Zweiteres gewaehlt:
+     *   - Deck  → der neue Editor (§24, unten)
+     *   - Sammlung → das bisherige Raster (Tuerme/Spells/Items/Helden),
+     *     unveraendert, nur in ein eigenes Panel verschoben.
+     * AAs eigener Bildschirm traegt SEINE Reiter (Towers/Skills/Items,
+     * §24.1-Skizze) UNTER dem Editor als Filter fuer den Kartenwaehler.
+     * Bei uns uebernimmt das schon die Auswahlliste selbst: sie zeigt
+     * pro Platz nur, was zu dessen Zone passt (openDeckPick). Ein
+     * zweites Reiter-Set nur fuer denselben Filter waere Redundanz. -->
+    <div class="tabs" id="dkMainTabs">
+      <button class="tab on" id="dkTabDeck">Deck</button>
+      <button class="tab" id="dkTabColl">Sammlung</button>
     </div>
-    <!-- Sortier-Dropdown (§7: AA hat "By Level" UND "By Rarity", Video 6) -->
-    <div class="tabs">
-      <select class="mini sel" id="selSort" aria-label="Sortierung">
-        <option value="level">Nach Level</option>
-        <option value="tier">Nach Rarität</option>
-      </select>
-      <span class="spacer"></span>
-      <!-- Essenz-Vorrat. Bis zum 29.07.2026 standen hier DREI Zahlen
-           nebeneinander — eine je Sorte. Seit jede Karte ihre eigene
-           Essenz hat, waeren es acht, und acht Zahlen passen nicht in
-           eine Zeile, die schon ein Sortier-Menue traegt. Hier steht
-           deshalb die SUMME; die Aufschluesselung klappt darunter auf.
-           Kein Modal: der Vorrat ist eine Nebenauskunft, kein Vorgang. -->
-      <span class="mini matchip pressable" id="matCount" role="button" tabindex="0"
-        aria-expanded="false" aria-controls="essBank"
-        aria-label="Essenz-Vorrat aufklappen">…</span>
-    </div>
-    <div class="essbank" id="essBank" hidden></div>
 
-    <div class="grid" id="collGrid"></div>
-    <div class="hint" id="collHint"></div>
-    <footer><button id="btnReset">Demo-Zustand zurücksetzen</button></footer>
+    <!-- ===== BATTLE DECK — ausgemessen in AA_UI_REFERENZ.md §24 ===== -->
+    <div id="deckPane">
+      <div class="secribbon" id="dkBand" data-ribbon="ribbon_section_lg">
+        <span class="srt">BATTLE DECK</span>
+        <!-- (i) aus der AA-Skizze (§24.1). KEIN Drop-Raten-Hinweis wie
+             `.oddsi` (App-Store-Pflichtangabe, §Kap. ⓘ DROP-RATEN) — hier
+             gibt es keine Quoten zu offenbaren. Eigene Klasse, eigener
+             Zweck: ein kurzer Hinweis, wie das Deck funktioniert. -->
+        <button class="dkinfo pressable" id="dkInfo" aria-label="Hinweis zum Battle Deck">ⓘ</button>
+      </div>
+
+      <!-- Held links (35,8 % Breite) + Turmraster 3×2 rechts (§24.2).
+           Die Hoehe des Heldenrahmens kommt NICHT aus einem eigenen
+           aspect-ratio, sondern aus dem Grid selbst: er spannt dieselben
+           zwei Zeilen wie das Turmraster (§24.3 „Hoehe = beide
+           Turmreihen zusammen") — exakter als jede feste Zahl. -->
+      <div class="dkboard">
+        <button class="dkheld" id="dkHeld" data-zone="held" data-pos="0"
+          aria-label="Held wählen"></button>
+        <div class="dktowers" id="dkTowers"></div>
+      </div>
+
+      <!-- Spell-Sechsecke UNTER dem Helden, Deck-Wahl unter den Tuermen —
+           beide in EINER Zeile, wie im Beleg (§24.1: „⬡ ⬡ [1][2][3🔒][4🔒]
+           [≡]" steht auf einer Hoehe). -->
+      <div class="dkbottom">
+        <div class="dkspells" id="dkSpells"></div>
+        <div class="dksel" id="dkSel"></div>
+      </div>
+      <div class="hint" id="dkHint"></div>
+    </div>
+
+    <!-- ===== SAMMLUNG (bestehend, unveraendert — jetzt ein Reiter) ===== -->
+    <div id="collPane" style="display:none">
+      <div class="tabs">
+        <button class="tab on" id="tabTowers">Türme</button>
+        <button class="tab" id="tabSpells">Spells</button>
+        <button class="tab" id="tabItems">Items</button>
+        <button class="tab" id="tabHeroes">Helden</button>
+        <span class="spacer"></span>
+        <button class="forgebtn" id="btnToForge">⚒ SCHMIEDE</button>
+      </div>
+      <!-- Sortier-Dropdown (§7: AA hat "By Level" UND "By Rarity", Video 6) -->
+      <div class="tabs">
+        <select class="mini sel" id="selSort" aria-label="Sortierung">
+          <option value="level">Nach Level</option>
+          <option value="tier">Nach Rarität</option>
+        </select>
+        <span class="spacer"></span>
+        <!-- Essenz-Vorrat. Bis zum 29.07.2026 standen hier DREI Zahlen
+             nebeneinander — eine je Sorte. Seit jede Karte ihre eigene
+             Essenz hat, waeren es acht, und acht Zahlen passen nicht in
+             eine Zeile, die schon ein Sortier-Menue traegt. Hier steht
+             deshalb die SUMME; die Aufschluesselung klappt darunter auf.
+             Kein Modal: der Vorrat ist eine Nebenauskunft, kein Vorgang. -->
+        <span class="mini matchip pressable" id="matCount" role="button" tabindex="0"
+          aria-expanded="false" aria-controls="essBank"
+          aria-label="Essenz-Vorrat aufklappen">…</span>
+      </div>
+      <div class="essbank" id="essBank" hidden></div>
+
+      <div class="grid" id="collGrid"></div>
+      <div class="hint" id="collHint"></div>
+      <footer><button id="btnReset">Demo-Zustand zurücksetzen</button></footer>
+    </div>
   </section>
 
   <!-- ===== VIEW 3: FORGE / MERGE (§4.3) ===== -->
@@ -7769,8 +7933,37 @@ button.pfplate{cursor:pointer}
   </div>
 </div>
 
+<!-- ===== BATTLE-DECK: KARTEN-WAEHLER (§24) =====
+     BAUGLEICH mit #reqDlg — dasselbe .modal/.sheet/.bonusbox/.pickgrid,
+     dieselbe Handschrift fuer dieselbe Frage ("waehle eine Karte aus
+     einer Liste"). Der Unterschied ist nur der Inhalt: hier zeigt die
+     Liste ausschliesslich besitzbare Karten der ZONE, die man angetippt
+     hat (openDeckPick), und Kacheln tragen artBox() statt cardArtHTML()
+     — der Raritaetsrahmen gehoert hier dazu, weil das Deck selbst schon
+     die Rahmenfarbe je Platz zeigt. -->
+<div class="modal" id="deckPickDlg">
+  <div class="sheet">
+    <div class="bonusbox">
+      <h3 id="deckPickTitle">Karte wählen</h3>
+      <p id="deckPickSub"></p>
+      <div class="pickgrid" id="deckPickGrid"></div>
+      <div class="forgeactions" style="margin-top:12px">
+        <button class="btn ghost" id="deckPickClear" style="flex:1">Platz leeren</button>
+        <button class="btn ghost" id="deckPickClose" style="flex:1">Schließen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="./arena_telemetry.js"></script>
 <script src="./arena_cards.js"></script>
+<!-- ArenaDeck ist die reine Datenschicht des Battle Deck (§24) — bewusst
+     VOR arena_cards.js geladen? Nein, DANACH: konfig() reicht istTurm/
+     istHeld/istSpell/besitzt erst weiter unten ein, wenn TOWER_IDS/
+     HERO_IDS/SPELL_IDS und AC feststehen. Die Reihenfolge der <script>-
+     Tags selbst ist unkritisch, weil das Modul bis zum ersten konfig()
+     nichts zulaesst (siehe Kopfkommentar arena_deck.js, Abschnitt 9). -->
+<script src="./arena_deck.js"></script>
 <script src="./arena_fortress.js"></script>
 <script src="./arena_rivals.js"></script>
 <script src="./arena_clan.js"></script>
@@ -7899,7 +8092,33 @@ button.pfplate{cursor:pointer}
   var POOL_IDS = CARDS.filter(function (c) { return !c.spell; }).map(function (c) { return c.id; });
   var HERO_IDS = CARDS.filter(function (c) { return c.hero; }).map(function (c) { return c.id; });
   var TOWER_IDS = CARDS.filter(function (c) { return !c.hero && !c.spell; }).map(function (c) { return c.id; });
-  var DECK = ["fire", "water", "nature", "light"];
+  /* ================= Battle Deck (§24) — Anschluss von ArenaDeck ========
+   * Die vier festen Beispiel-IDs ("var DECK = [...]") sind weg. Genau DAS
+   * war die Bauart, vor der arena_deck.js im eigenen Kopfkommentar warnt
+   * ("Wer das in die Oberflaeche schreibt, bekommt dort eine Datenhaltung,
+   * die niemand pruefen kann"): ein zweiter, stiller Stand fuer dieselbe
+   * Frage "was ist ausgeruestet". `deckIds()` liest jetzt IMMER das
+   * tatsaechliche aktive Deck. konfig() reicht genau HIER die Regeln ein,
+   * weil hier — und nur hier — TOWER_IDS/HERO_IDS/SPELL_IDS und AC.owned
+   * schon feststehen; arena_deck.js kennt keins von beiden aus eigener
+   * Kraft (sein Kopfkommentar, "KEINE ABHAENGIGKEIT ZU ArenaCards"). */
+  if (window.ArenaDeck) {
+    ArenaDeck.konfig({
+      istTurm:  function (id) { return TOWER_IDS.indexOf(id) >= 0; },
+      istHeld:  function (id) { return HERO_IDS.indexOf(id) >= 0; },
+      istSpell: function (id) { return SPELL_IDS.indexOf(id) >= 0; },
+      besitzt:  function (id) { return AC.owned(id); },
+    });
+  }
+  // "Ausgeruestet" (Sammlungs-Kachel) = liegt IRGENDWO im aktiven Deck.
+  function deckIds() {
+    if (!window.ArenaDeck) return [];
+    var d = ArenaDeck.aktivesDeck(), out = [];
+    if (d.held) out.push(d.held);
+    d.tuerme.forEach(function (x) { if (x) out.push(x); });
+    d.spells.forEach(function (x) { if (x) out.push(x); });
+    return out;
+  }
 
   /* ================= Hub-Wallet (Gold liegt NICHT in ArenaCards) ======== */
   var GOLD_KEY = "arenaHubGold", GEM_KEY = "arenaHubGems";
@@ -9462,7 +9681,7 @@ button.pfplate{cursor:pointer}
     var mp = v.mergeProgress;
     var dots = "";
     if (!mp.maxed) for (var i = 0; i < mp.need; i++) dots += (i < mp.have ? "●" : "○");
-    var eq = DECK.indexOf(id) >= 0 ? '<div class="eq">AUSGERÜSTET</div>' : "";
+    var eq = deckIds().indexOf(id) >= 0 ? '<div class="eq">AUSGERÜSTET</div>' : "";
     var red = mp.ready && !opts.noRed ? '<div class="reddot"></div>' : "";
     var cnt = opts.count !== undefined ? '<div class="cnt">×' + opts.count + "</div>" : "";
     return '<button class="tile' + (opts.cls ? " " + opts.cls : "") + '" data-id="' + id + '"' +
@@ -9717,13 +9936,6 @@ button.pfplate{cursor:pointer}
   }
   function renderCollection() {
     renderTop();
-    $("deckRow").innerHTML = DECK.map(function (id) {
-      var m = BY_ID[id], v = AC.view(id), t = tierOf(v.tier);
-      return '<button class="deckslot" data-id="' + id + '" style="border-color:' + t.color +
-        ';background:linear-gradient(160deg,' + m.color + '33,#16202a 70%)">' +
-        artBox(id, t.key) +
-        '<div class="lvl">LvL ' + v.lvl + "</div></button>";
-    }).join("");
     $("collGrid").innerHTML = sortedIds().map(function (id) { return tileHTML(id); }).join("");
     hydrateFrames($("viewCollection"));
     var n = mergeableCount();
@@ -9733,7 +9945,6 @@ button.pfplate{cursor:pointer}
     var b = $("navBadge");
     if (n) { b.style.display = ""; b.textContent = n; } else { b.style.display = "none"; }
     bind($("collGrid"), openDetail);
-    bind($("deckRow"), openDetail);
     markPressable($("viewCollection"));
   }
   /* Spell-Raster. Gleiche Kacheln wie die Tuerme, gleiche Detailkarte,
@@ -9763,6 +9974,185 @@ button.pfplate{cursor:pointer}
         el.addEventListener("click", function () { fn(el.getAttribute("data-id"), el); });
       })(els[i]);
     }
+  }
+
+  /* ==================================================================
+   * BATTLE DECK — Ansicht (§24) auf der Datenschicht arena_deck.js
+   * ------------------------------------------------------------------
+   * Diese Funktionen RECHNEN NICHTS. Jede Regel (welche Zone, welcher
+   * Platz, wie viele Decks, welche gesperrt) kommt aus ArenaDeck — genau
+   * wie renderFortress/renderPass keine eigene Progressionsmathematik
+   * haben. Hier steht nur, WIE der Stand aussieht und WOHIN ein Tipp
+   * fuehrt (openDeckPick).
+   * ================================================================== */
+  /* Ein belegter Platz: Artwork + Levelband. Der ornamentale Raritaets-
+     Rahmen (artBox-Parameter `tierKey`) bleibt beim Sechseck WEG: die
+     Rahmen-Grafik ist fuer ein Karten-Seitenverhaeltnis geschnitten
+     (§ Rahmen-Overlays im CSS) und wuerde vom `clip-path` des Sechsecks
+     mitten durch ihr Zierwerk abgeschnitten — genau dieselbe Erwaegung
+     wie beim bestehenden `.pfhexs` (Profil-Fenster), das aus demselben
+     Grund ebenfalls ohne Kartenrahmen auskommt. */
+  function dkSlotHTML(id, hex) {
+    var v = AC.view(id), t = tierOf(v.tier);
+    return artBox(id, hex ? null : t.key) + '<div class="lvl">LvL ' + v.lvl + "</div>";
+  }
+  // Ein leerer Platz: derselbe ic_plus-Rueckfallweg wie ueberall sonst
+  // (ico() traegt Bild UND Emoji uebereinander, DESIGNSYSTEM §7b).
+  function dkLeerHTML() {
+    return '<span class="dkplus">' + ico("ic_plus", "+") + "</span>";
+  }
+  function dkKandidaten(zone) {
+    var liste = zone === "held" ? HERO_IDS : zone === "spells" ? SPELL_IDS : TOWER_IDS;
+    return liste.filter(function (id) { return AC.owned(id); });
+  }
+  var ZONE_LABEL = { held: "Held", tuerme: "Türme", spells: "Spells" };
+
+  function renderDeckBoard() {
+    if (!window.ArenaDeck) return;      // arena_deck.js nicht geladen — Editor bleibt leer statt zu reissen
+    var d = ArenaDeck.aktivesDeck();
+    var an = ArenaDeck.ansicht(undefined, function (id) { return (BY_ID[id] || {}).power || 0; });
+
+    $("dkHeld").innerHTML = (d.held ? dkSlotHTML(d.held) : dkLeerHTML()) +
+      /* Skill-Marke: rein dekorativ, siehe .dkult im CSS-Kommentar
+         (§24.4 — Inhalt der Sechsecke ist noch nicht abgelesen). */
+      '<span class="dkult" aria-hidden="true">⚡</span>';
+
+    var tHtml = "";
+    for (var i = 0; i < ArenaDeck.FORM.tuerme; i++) {
+      var tid = d.tuerme[i];
+      tHtml += '<button class="dktower" data-zone="tuerme" data-pos="' + i +
+        '" aria-label="Turmplatz ' + (i + 1) + (tid ? ", " + BY_ID[tid].name : ", leer") + '">' +
+        (tid ? dkSlotHTML(tid) : dkLeerHTML()) + "</button>";
+    }
+    $("dkTowers").innerHTML = tHtml;
+
+    var sHtml = "";
+    for (var j = 0; j < ArenaDeck.FORM.spells; j++) {
+      var sid = d.spells[j];
+      sHtml += '<button class="dkspell" data-zone="spells" data-pos="' + j +
+        '" aria-label="Spell-Platz ' + (j + 1) + (sid ? ", " + BY_ID[sid].name : ", leer") + '">' +
+        (sid ? dkSlotHTML(sid, true) : dkLeerHTML()) + "</button>";
+    }
+    $("dkSpells").innerHTML = sHtml;
+
+    renderDeckSel();
+    hydrateFrames($("deckPane"));
+    markPressable($("deckPane"));
+    bindDeckSlots();
+
+    var b = an.belegung;
+    $("dkHint").innerHTML = b.voll
+      ? "Deck komplett — <b>" + fmt(an.kraft) + " Kraft</b>."
+      : "Noch <b>" + (b.plaetze - b.belegt) + "</b> Platz/Plätze offen — tippe eine Kachel an, um sie zu belegen.";
+  }
+  function bindDeckSlots() {
+    Array.prototype.forEach.call($("deckPane").querySelectorAll("[data-zone]"), function (el) {
+      el.addEventListener("click", function () {
+        UISfx.tap();
+        openDeckPick(el.getAttribute("data-zone"), +el.getAttribute("data-pos") || 0);
+      });
+    });
+  }
+  /* Vier Knoepfe + Menue (§24.1 "[1][2][3🔒][4🔒] [≡]"). `ArenaDeck.DECKS`
+     und `istFrei` liefern die Zahlen — nichts davon steht hier fest. */
+  function renderDeckSel() {
+    var s = ArenaDeck.get(), html = "";
+    for (var i = 0; i < ArenaDeck.DECKS; i++) {
+      var frei = ArenaDeck.istFrei(i);
+      html += '<button class="dkselbtn' + (i === s.aktiv ? " on" : "") + (frei ? "" : " locked") +
+        '" data-deck="' + i + '" aria-label="Deck ' + (i + 1) + (frei ? "" : " — gesperrt") + '">' +
+        (i + 1) + (frei ? "" : '<span class="lock" aria-hidden="true">🔒</span>') + "</button>";
+    }
+    html += '<button class="dkmenu pressable" id="dkMenu" aria-label="Deck leeren">☰</button>';
+    $("dkSel").innerHTML = html;
+    Array.prototype.forEach.call($("dkSel").querySelectorAll("[data-deck]"), function (b) {
+      b.addEventListener("click", function () { waehleDeck(+b.getAttribute("data-deck")); });
+    });
+    var mb = $("dkMenu");
+    if (mb) mb.addEventListener("click", function () {
+      UISfx.tap(); ArenaDeck.raeume(); UISfx.confirm();
+      toast("Deck geleert."); dkChanged();
+    });
+    markPressable($("dkSel"));
+  }
+  function waehleDeck(i) {
+    var r = ArenaDeck.waehle(i);
+    if (!r.ok) {
+      UISfx.deny();
+      toast(r.grund === "gesperrt" ? "Dieses Deck ist noch gesperrt." : "Geht nicht.");
+      return;
+    }
+    UISfx.confirm();
+    dkChanged();
+  }
+  // Nach jeder Aenderung am Deck: Editor UND — falls gerade offen — die
+  // Sammlung (AUSGERUESTET-Marke) neu zeichnen. Sonst zeigt die Sammlung
+  // einen veralteten Stand, bis man zufaellig den Reiter wechselt.
+  function dkChanged() {
+    renderDeckBoard();
+    if ($("collPane").style.display !== "none") {
+      if ($("tabSpells").classList.contains("on")) renderSpells(); else renderCollection();
+    }
+  }
+  var dkPick = { zone: "tuerme", pos: 0 };
+  function openDeckPick(zone, pos) {
+    dkPick = { zone: zone, pos: pos | 0 };
+    var d = ArenaDeck.aktivesDeck();
+    var aktuelle = zone === "held" ? d.held : d[zone][dkPick.pos];
+    var belegt = ArenaDeck.drin();
+    var kandidaten = dkKandidaten(zone);
+    var titel = { held: "Held wählen", tuerme: "Turm wählen", spells: "Spell wählen" }[zone];
+    $("deckPickTitle").textContent = titel;
+    $("deckPickSub").textContent = kandidaten.length
+      ? "Tippe eine Karte an. Liegt sie schon auf einem anderen Platz, tauschen die beiden."
+      : "Du besitzt noch keine passende Karte für diesen Platz.";
+    $("deckPickGrid").innerHTML = kandidaten.map(function (id) {
+      var m = BY_ID[id], v = AC.view(id), t = tierOf(v.tier);
+      var anders = belegt[id] && id !== aktuelle;
+      return '<button class="picktile dkpicktile pressable' + (id === aktuelle ? " on" : "") +
+        '" data-pick="' + id + '" style="border-color:' + t.color + '">' +
+        '<span class="part">' + artBox(id, t.key) + "</span>" +
+        '<span class="pnm">' + m.name + "</span>" +
+        '<span class="pcnt">' + (anders ? "liegt bei " + ZONE_LABEL[belegt[id]] : "LvL " + v.lvl) +
+        "</span></button>";
+    }).join("");
+    hydrateFrames($("deckPickGrid"));
+    Array.prototype.forEach.call($("deckPickGrid").querySelectorAll("[data-pick]"), function (b) {
+      b.addEventListener("click", function () { dkWaehleKarte(b.getAttribute("data-pick")); });
+    });
+    markPressable($("deckPickGrid"));
+    $("deckPickClear").style.display = aktuelle ? "" : "none";
+    $("deckPickDlg").classList.add("open");
+  }
+  function dkWaehleKarte(id) {
+    var r = ArenaDeck.setze(dkPick.zone, dkPick.pos, id);
+    if (!r.ok) { UISfx.deny(); toast("Geht nicht (" + r.grund + ")."); return; }
+    UISfx.confirm();
+    toast(r.getauscht ? "Getauscht." : "Gesetzt.");
+    $("deckPickDlg").classList.remove("open");
+    dkChanged();
+  }
+  function dkLeerePlatz() {
+    var r = ArenaDeck.setze(dkPick.zone, dkPick.pos, null);
+    if (r.ok) { UISfx.tap(); toast("Platz geleert."); } else { UISfx.deny(); }
+    $("deckPickDlg").classList.remove("open");
+    dkChanged();
+  }
+  /* Reiter ERSTER Ordnung dieser View: Deck | Sammlung (Entscheidung
+     siehe HTML-Kommentar bei #viewCollection). `dkMain` merkt sich die
+     Wahl fuer die Dauer der Sitzung — wer in der Sammlung stoebert und
+     kurz den Helden wechselt, soll nicht bei jedem Tippen auf den
+     zweiten Bottom-Nav-Reiter wieder im Deck landen. */
+  var dkMain = "deck";
+  function setDkMain(which) {
+    dkMain = which === "coll" ? "coll" : "deck";
+    $("dkTabDeck").classList.toggle("on", dkMain === "deck");
+    $("dkTabColl").classList.toggle("on", dkMain === "coll");
+    $("deckPane").style.display = dkMain === "deck" ? "" : "none";
+    $("collPane").style.display = dkMain === "coll" ? "" : "none";
+    if (dkMain === "deck") renderDeckBoard();
+    else if ($("tabSpells").classList.contains("on")) renderSpells();
+    else renderCollection();
   }
 
   /* ================= Turm-Detailkarte (§2) ================= */
@@ -13350,7 +13740,13 @@ button.pfplate{cursor:pointer}
      ein starker Held, ein billiger Turm mit gutem Schaden je Stufe und
      ein Gegnerturm, der die gemeinsame Skala setzt. */
   function demoMatchEnd(win) {
-    var deck = DECK.slice(0, 4);
+    /* Braucht drei Turm-IDs, keine Deck-Positionen — deshalb aus
+       deckIds() nur die Tuerme herausgefiltert. Auf einem frischen Stand
+       (Deck leer) waeren das null Eintraege; der Fallback auf TOWER_IDS
+       haelt die Demo auch dann vorfuehrbar, ohne dass diese Anzeige
+       selbst irgendeine Behauptung ueber das ECHTE Deck macht. */
+    var deck = deckIds().filter(function (id) { return TOWER_IDS.indexOf(id) >= 0; });
+    if (deck.length < 3) deck = TOWER_IDS.slice(0, 3);
     var base = [
       { cardId: deck[0], lvl: 16, tier: "rare",   dmg: 48210, hits: 312, kills: 41,
         count: 3, stars: 2 },
@@ -16644,7 +17040,12 @@ button.pfplate{cursor:pointer}
     }
     setNav(navId);
     if (navId === "navHome") renderHome();
-    if (navId === "navCollection") renderCollection();
+    /* setDkMain() statt direkt renderCollection(): der zweite Bottom-
+       Nav-Reiter fuehrt jetzt auf ZWEI gleichrangige Reiter (Deck und
+       Sammlung, siehe HTML-Kommentar bei #viewCollection) — welcher
+       davon gezeichnet wird, haengt von `dkMain` ab, nicht mehr fest
+       von der Sammlung. */
+    if (navId === "navCollection") setDkMain(dkMain);
     if (navId === "navForge") renderForge();
     if (navId === "navShop") renderShop();
     if (navId === "navFortress") renderFortress();
@@ -17040,6 +17441,22 @@ button.pfplate{cursor:pointer}
   });
   $("reqDlg").addEventListener("click", function (e) {
     if (e.target === $("reqDlg")) $("reqDlg").classList.remove("open");
+  });
+  /* ---------- Battle Deck (§24) ---------- */
+  $("dkTabDeck").addEventListener("click", function () { UISfx.tap(); setDkMain("deck"); });
+  $("dkTabColl").addEventListener("click", function () { UISfx.tap(); setDkMain("coll"); });
+  // Kurzer Hinweis statt einer Drop-Raten-Offenlegung — siehe CSS-
+  // Kommentar bei .dkinfo, warum das NICHT ueber .oddsi laeuft.
+  $("dkInfo").addEventListener("click", function () {
+    UISfx.tap();
+    toast("Ein Deck: 1 Held, 6 Türme, 2 Spells. Tippe einen Platz an, um ihn zu belegen.");
+  });
+  $("deckPickClear").addEventListener("click", dkLeerePlatz);
+  $("deckPickClose").addEventListener("click", function () {
+    $("deckPickDlg").classList.remove("open");
+  });
+  $("deckPickDlg").addEventListener("click", function (e) {
+    if (e.target === $("deckPickDlg")) $("deckPickDlg").classList.remove("open");
   });
   Array.prototype.forEach.call(document.querySelectorAll("[data-clantab]"), function (b) {
     b.addEventListener("click", function () { setClanTab(b.getAttribute("data-clantab")); });
@@ -17615,7 +18032,8 @@ button.pfplate{cursor:pointer}
   /* Asset-Tabelle beim Avatar-Modul anmelden, BEVOR irgendwas rendert:
      ohne sie liefert active() nur Emoji-Fallbacks. */
   if (window.ArenaAvatars) { ArenaAvatars.assets(ASSETS); seedAvatars(); }
-  renderCollection();
+  renderCollection();      // fuellt u.a. den Merge-Marker am Bottom-Nav-Reiter, bevor er je geoeffnet wurde
+  renderDeckBoard();       // Battle Deck ist der Standard-Reiter derselben View — soll beim ersten Oeffnen schon stehen
   renderShop();
   renderPackHeader();
   renderHome();
@@ -17755,7 +18173,19 @@ button.pfplate{cursor:pointer}
                      syncAvatarUnlocks: syncAvatarUnlocks, seedAvatars: seedAvatars,
                      showAvatarCeremony: showAvatarCeremony, avCerStep: avCerStep,
                      avCerQueue: function () { return avCerQueue; },
-                     AV: function () { return window.ArenaAvatars; } };
+                     AV: function () { return window.ArenaAvatars; },
+                     /* Battle Deck (§24) — fuer pruefungen/deck.js. Renderpfade UND
+                        die Schaltstellen liegen offen, aus demselben Grund wie beim
+                        Forge-Block: eine Pruefung muss Zustaende herstellen koennen,
+                        ohne jede Klickfolge nachzuspielen (openReqDlg-Praezedenz). */
+                     ArenaDeck: function () { return window.ArenaDeck; },
+                     renderDeckBoard: renderDeckBoard, renderDeckSel: renderDeckSel,
+                     openDeckPick: openDeckPick, dkWaehleKarte: dkWaehleKarte,
+                     dkLeerePlatz: dkLeerePlatz, waehleDeck: waehleDeck,
+                     setDkMain: setDkMain, dkMain: function () { return dkMain; },
+                     deckIds: deckIds, dkKandidaten: dkKandidaten,
+                     dkPick: function () { return dkPick; },
+                     TOWER_IDS: TOWER_IDS, HERO_IDS: HERO_IDS };
   /* ==================================================================
    * GEGNERSUCHE — die Naht zum echten Match
    * ------------------------------------------------------------------

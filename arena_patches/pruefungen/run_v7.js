@@ -720,7 +720,14 @@ function step(name, ok, info) {
      Hier bleibt nur, was zur Sektions- und Metrik-Pruefung gehoert. */
   await go('navShop');
   await shot('shop');
-  await go('navCollection'); await shot('sammlung');
+  /* Battle-Deck-Umbau (30.07.2026): der zweite Bottom-Nav-Reiter zeigt
+     seither zuerst das Deck (§24) — fuer die Galerie-Aufnahme "sammlung"
+     erst auf den Sammlung-Reiter wechseln, sonst zeigt der Screenshot
+     den falschen Bildschirm unter dem richtigen Namen. */
+  await go('navCollection'); await page.click('#dkTabColl'); await page.waitForTimeout(150);
+  await shot('sammlung');
+  await page.click('#dkTabDeck'); await page.waitForTimeout(150);
+  await shot('battledeck');   // NEU: das Deck selbst gehoert ebenso in die Galerie
   await page.evaluate(() => window.__proto.openDetail('fire'));
   await page.waitForTimeout(420);
   step('Turm-Detailkarte oeffnet',
@@ -2139,14 +2146,26 @@ function step(name, ok, info) {
   step('Die Farbcodierung traegt jetzt die Kante (>= 2 px)',
     pk.length > 0 && pk.every(k => k.kante >= 2), pk.map(k => k.kante).join('/'));
 
-  /* ============ DECKKARTE: DER TURM MUSS LESEN ============ */
+  /* ============ DECKKARTE: DER TURM MUSS LESEN ============
+     ⚠ ANGEPASST (30.07.2026, Battle-Deck-Umbau): `.deckslot` war die
+     alte Vorschau-Kachel (vier feste Beispiel-Karten ohne Zonen, ohne
+     Speicher). Sie ist durch den echten Editor ersetzt (arena_deck.js,
+     §24) — dieselbe Anforderung ("der Rahmen darf den Turm nicht
+     zudecken") gilt jetzt fuer `.dktower`/`.dkheld`, die neuen echten
+     Deck-Plaetze. Ohne belegte Plaetze traegt keiner ein `.frm`
+     (leere Plaetze zeigen nur `+`) — deshalb erst zwei Karten setzen. */
   await go('navCollection');
-  await page.waitForTimeout(600);
+  await page.waitForTimeout(300);
+  await page.evaluate(() => {
+    window.__proto.ArenaDeck().setze('tuerme', 0, 'fire');
+    window.__proto.ArenaDeck().setze('held', 0, 'solara');
+    window.__proto.renderDeckBoard();
+  });
+  await page.waitForTimeout(300);
   const dk = await page.evaluate(() => {
-    const s = [...document.querySelectorAll('.deckslot')].slice(0, 4);
+    const s = [...document.querySelectorAll('.dktower, .dkheld')].filter(e => e.querySelector('.frm'));
     return s.map(e => {
-      const r = e.getBoundingClientRect();
-      const cs = getComputedStyle(e.querySelector('.frm') || e);
+      const cs = getComputedStyle(e.querySelector('.frm'));
       const w = (cs.borderImageWidth || '').split(' ').map(parseFloat);
       const oben = w[0] || 0, seite = w[1] || 0, unten = w[2] !== undefined ? w[2] : oben;
       // Prozent der Elementflaeche, die der Ring bedeckt
@@ -2156,6 +2175,7 @@ function step(name, ok, info) {
   });
   step('Der Ring laesst mindestens 55 % der Deckkarte fuer den Turm',
     dk.length > 0 && dk.every(d => d.anteil >= 55), dk.map(d => d.anteil + ' %').join('/'));
+  await page.evaluate(() => window.__proto.ArenaDeck()._reset());
 
   /* ============ LEERZUSTAENDE (AAs Post-Fenster, IMG_3359) ============
      Vier Ansichten hatten keinen oder einen lieblosen Leerzustand:
@@ -2697,14 +2717,30 @@ function step(name, ok, info) {
   await page.waitForTimeout(350);
   const coll = await page.evaluate(() => ({
     raster: [...document.querySelectorAll('#collGrid [data-id]')].map(e => e.getAttribute('data-id')),
-    deck: [...document.querySelectorAll('#deckRow [data-id]')].map(e => e.getAttribute('data-id')),
   }));
   step('Sammlungsraster enthaelt KEINE Helden',
     !coll.raster.includes('solara') && !coll.raster.includes('magmor'),
     coll.raster.join(','));
   step('Sammlungsraster hat genau die sechs Tuerme', coll.raster.length === 6, coll.raster.length);
-  step('Deck enthaelt keine Helden',
-    !coll.deck.includes('solara') && !coll.deck.includes('magmor'), coll.deck.join(','));
+  /* ⚠ ANGEPASST (30.07.2026, Battle-Deck-Umbau): `#deckRow` war die alte
+     Vorschau-Kachel; sie ist durch den echten Editor ersetzt. Dieselbe
+     Behauptung — "ein Held landet nicht im Turm-Slot" — muss dort
+     gelten, wo jetzt tatsaechlich Karten zugewiesen werden:
+     `ArenaDeck.setze`/die Kandidatenliste des Kartenwaehlers. Ein
+     Schritt, der nur ein leeres, nicht mehr existierendes Element
+     abfragt, wird vacuously wahr — genau die Bugklasse aus dem
+     Pruefungen-README ("ein Schritt, der nicht rot werden kann, ist
+     wertlos"). */
+  const deckZonen = await page.evaluate(() => {
+    const D = window.__proto.ArenaDeck();
+    return {
+      heldAufTurm: D.setze('tuerme', 0, 'solara').ok,
+      kandidatenOhneHeld: window.__proto.dkKandidaten('tuerme').indexOf('solara') < 0 &&
+                          window.__proto.dkKandidaten('tuerme').indexOf('magmor') < 0,
+    };
+  });
+  step('Deck-Turmplaetze nehmen keine Helden an',
+    deckZonen.heldAufTurm === false && deckZonen.kandidatenOhneHeld, JSON.stringify(deckZonen));
 
   await go('navForge');
   await page.waitForTimeout(350);
