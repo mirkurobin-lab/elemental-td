@@ -1,0 +1,68 @@
+{
+  "_hinweis": "Assets, die in ui_assets.json verzeichnet sind, aber NICHT ins Repo gesichert werden konnten, weil die Quelle von der Baumaschine aus nicht erreichbar ist. JEDER Eintrag hier ist eine bewusste, datierte Ausnahme und muss einen Grund tragen. assets_vollstaendig.py meldet sie als WARNUNG statt als Fehler - aber nur die, die hier stehen. Wer einen Eintrag hinzufuegt, sieht ihn im Diff; wer ihn vergisst, bekommt einen roten Balken.",
+  "_regel": "Diese Liste ist kein Ablagefach. Sobald die Quelle wieder erreichbar ist, gehoert der Eintrag geloescht und das Asset gesichert.",
+  "eintraege": {
+    "card_joker": {
+      "seit": "2026-07-29",
+      "grund": "Die Netzpolitik dieser Umgebung sperrt CONNECT auf *.cloudfront.net (gateway 403). Nachgemessen ueber $HTTPS_PROXY/__agentproxy/status: 'connect_rejected - policy denial' fuer d8j0ntlcm91z4.cloudfront.net und d2ol7oe51mr4n9.cloudfront.net. Die 229 aelteren Assets stammen aus der Zeit davor, als der Host noch offen war.",
+      "folge": "Die Live-Vorschau ist NICHT betroffen: der Prototyp laedt das Bild ueber die CDN-Konstante direkt. Betroffen ist nur die Unabhaengigkeit vom CDN fuer dieses eine Asset.",
+      "loesung": "Der Sicherungsschritt muss dorthin wandern, wo das CDN erreichbar ist - in die Sandbox, als Teil der Auslieferung. Solange das nicht umgebaut ist, bleibt der Eintrag hier."
+    },
+    "card_splitter": {
+      "seit": "2026-07-30",
+      "grund": "Die Netzpolitik dieser Umgebung sperrt CONNECT auf *.cloudfront.net (gateway 403). Nachgemessen ueber $HTTPS_PROXY/__agentproxy/status: 'connect_rejected - policy denial' fuer d8j0ntlcm91z4.cloudfront.net und d2ol7oe51mr4n9.cloudfront.net. Die 229 aelteren Assets stammen aus der Zeit davor, als der Host noch offen war.",
+      "folge": "Die Live-Vorschau ist NICHT betroffen: der Prototyp laedt das Bild ueber die CDN-Konstante direkt. Betroffen ist nur die Unabhaengigkeit vom CDN fuer dieses eine Asset.",
+      "loesung": "Der Sicherungsschritt muss dorthin wandern, wo das CDN erreichbar ist - in die Sandbox, als Teil der Auslieferung. Solange das nicht umgebaut ist, bleibt der Eintrag hier.",
+      "was": "Spell-Artwork SPLITTER"
+    },
+    "card_bann": {
+      "seit": "2026-07-30",
+      "grund": "Die Netzpolitik dieser Umgebung sperrt CONNECT auf *.cloudfront.net (gateway 403). Nachgemessen ueber $HTTPS_PROXY/__agentproxy/status: 'connect_rejected - policy denial' fuer d8j0ntlcm91z4.cloudfront.net und d2ol7oe51mr4n9.cloudfront.net. Die 229 aelteren Assets stammen aus der Zeit davor, als der Host noch offen war.",
+      "folge": "Die Live-Vorschau ist NICHT betroffen: der Prototyp laedt das Bild ueber die CDN-Konstante direkt. Betroffen ist nur die Unabhaengigkeit vom CDN fuer dieses eine Asset.",
+      "loesung": "Der Sicherungsschritt muss dorthin wandern, wo das CDN erreichbar ist - in die Sandbox, als Teil der Auslieferung. Solange das nicht umgebaut ist, bleibt der Eintrag hier.",
+      "was": "Spell-Artwork BANN"
+    },
+    "card_bollwerk": {
+      "seit": "2026-07-30",
+      "grund": "Die Netzpolitik dieser Umgebung sperrt CONNECT auf *.cloudfront.net (gateway 403). Nachgemessen ueber $HTTPS_PROXY/__agentproxy/status: 'connect_rejected - policy denial' fuer d8j0ntlcm91z4.cloudfront.net und d2ol7oe51mr4n9.cloudfront.net. Die 229 aelteren Assets stammen aus der Zeit davor, als der Host noch offen war.",
+      "folge": "Die Live-Vorschau ist NICHT betroffen: der Prototyp laedt das Bild ueber die CDN-Konstante direkt. Betroffen ist nur die Unabhaengigkeit vom CDN fuer dieses eine Asset.",
+      "loesung": "Der Sicherungsschritt muss dorthin wandern, wo das CDN erreichbar ist - in die Sandbox, als Teil der Auslieferung. Solange das nicht umgebaut ist, bleibt der Eintrag hier.",
+      "was": "Spell-Artwork BOLLWERK"
+    },
+    "card_fokus": {
+      "seit": "2026-07-30",
+      "grund": "Die Netzpolitik dieser Umgebung sperrt CONNECT auf *.cloudfront.net (gateway 403). Nachgemessen ueber $HTTPS_PROXY/__agentproxy/status: 'connect_rejected - policy denial' fuer d8j0ntlcm91z4.cloudfront.net und d2ol7oe51mr4n9.cloudfront.net. Die 229 aelteren Assets stammen aus der Zeit davor, als der Host noch offen war.",
+      "folge": "Die Live-Vorschau ist NICHT betroffen: der Prototyp laedt das Bild ueber die CDN-Konstante direkt. Betroffen ist nur die Unabhaengigkeit vom CDN fuer dieses eine Asset.",
+      "loesung": "Der Sicherungsschritt muss dorthin wandern, wo das CDN erreichbar ist - in die Sandbox, als Teil der Auslieferung. Solange das nicht umgebaut ist, bleibt der Eintrag hier.",
+      "was": "Spell-Artwork FOKUS"
+    },
+    "ess_arkan": {
+      "seit": "2026-07-30",
+      "grund": "Die Netzpolitik dieser Umgebung sperrt CONNECT auf *.cloudfront.net (gateway 403). Nachgemessen ueber $HTTPS_PROXY/__agentproxy/status: 'connect_rejected - policy denial' fuer d8j0ntlcm91z4.cloudfront.net und d2ol7oe51mr4n9.cloudfront.net. Die 229 aelteren Assets stammen aus der Zeit davor, als der Host noch offen war.",
+      "folge": "Die Live-Vorschau ist NICHT betroffen: der Prototyp laedt das Bild ueber die CDN-Konstante direkt. Betroffen ist nur die Unabhaengigkeit vom CDN fuer dieses eine Asset.",
+      "loesung": "Der Sicherungsschritt muss dorthin wandern, wo das CDN erreichbar ist - in die Sandbox, als Teil der Auslieferung. Solange das nicht umgebaut ist, bleibt der Eintrag hier.",
+      "was": "Icon der Arkan-Essenz"
+    },
+    "ic_offline": {
+      "seit": "2026-07-30",
+      "grund": "Die Netzpolitik dieser Umgebung sperrt CONNECT auf *.cloudfront.net (gateway 403). Nachgemessen ueber $HTTPS_PROXY/__agentproxy/status: 'connect_rejected - policy denial' fuer d8j0ntlcm91z4.cloudfront.net und d2ol7oe51mr4n9.cloudfront.net. Die 229 aelteren Assets stammen aus der Zeit davor, als der Host noch offen war.",
+      "folge": "Die Live-Vorschau ist NICHT betroffen: der Prototyp laedt die Datei ueber die CDN-Konstante direkt. Betroffen ist nur die Unabhaengigkeit vom CDN fuer dieses eine Asset.",
+      "loesung": "Der Sicherungsschritt muss dorthin wandern, wo das CDN erreichbar ist - in die Sandbox, als Teil der Auslieferung. Solange das nicht umgebaut ist, bleibt der Eintrag hier.",
+      "was": "Icon Offline-Ertraege: Sanduhr, in der statt Sand Goldmuenzen rieseln"
+    },
+    "off_banner": {
+      "seit": "2026-07-30",
+      "grund": "Die Netzpolitik dieser Umgebung sperrt CONNECT auf *.cloudfront.net (gateway 403). Nachgemessen ueber $HTTPS_PROXY/__agentproxy/status: 'connect_rejected - policy denial' fuer d8j0ntlcm91z4.cloudfront.net und d2ol7oe51mr4n9.cloudfront.net. Die 229 aelteren Assets stammen aus der Zeit davor, als der Host noch offen war.",
+      "folge": "Die Live-Vorschau ist NICHT betroffen: der Prototyp laedt die Datei ueber die CDN-Konstante direkt. Betroffen ist nur die Unabhaengigkeit vom CDN fuer dieses eine Asset.",
+      "loesung": "Der Sicherungsschritt muss dorthin wandern, wo das CDN erreichbar ist - in die Sandbox, als Teil der Auslieferung. Solange das nicht umgebaut ist, bleibt der Eintrag hier.",
+      "was": "Kopfbild des Offline-Dialogs, 16:9 Bahn-Diorama mit steinschleuderndem Turm; dient zugleich als poster fuer off_loop"
+    },
+    "off_loop": {
+      "seit": "2026-07-30",
+      "grund": "Die Netzpolitik dieser Umgebung sperrt CONNECT auf *.cloudfront.net (gateway 403). Nachgemessen ueber $HTTPS_PROXY/__agentproxy/status: 'connect_rejected - policy denial' fuer d8j0ntlcm91z4.cloudfront.net und d2ol7oe51mr4n9.cloudfront.net. Die 229 aelteren Assets stammen aus der Zeit davor, als der Host noch offen war.",
+      "folge": "Die Live-Vorschau ist NICHT betroffen: der Prototyp laedt die Datei ueber die CDN-Konstante direkt. Betroffen ist nur die Unabhaengigkeit vom CDN fuer dieses eine Asset. Zusaetzlich: fuer ein Video greift der Rueckfall auf Emoji nicht - ohne CDN bleibt der poster stehen, deshalb ist der poster hier Pflicht und nicht Zierde.",
+      "loesung": "Der Sicherungsschritt muss dorthin wandern, wo das CDN erreichbar ist - in die Sandbox, als Teil der Auslieferung. Solange das nicht umgebaut ist, bleibt der Eintrag hier.",
+      "was": "Video 5 s im Kopf des Offline-Dialogs, erzeugt mit Kling 3.0 Turbo aus off_banner als Startbild"
+    }
+  }
+}
