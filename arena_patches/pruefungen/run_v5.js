@@ -495,6 +495,118 @@ function gegen(name, sollFalschSein, info) { step('gegen: ' + name, !sollFalschS
     step('Fusions-Titel bleibt einzeilig auf dem Band',
       titel.zeilen === 1, titel.txt + ' / ' + titel.zeilen + ' Zeile(n)');
     await page.screenshot({ path: SHOTS + '/forge.png', fullPage: true });
+    /* ==================================================================
+     * DIE BESCHRIFTUNG MUSS AUF DER PLATTE ZU SEHEN SEIN
+     * ------------------------------------------------------------------
+     * Befund des Auftraggebers (30.07.2026): „der text ist auf den
+     * buttons nicht lesbar." VERSCHMELZEN und Leeren waren leere
+     * Platten — Beschriftung im DOM, Farbe gesetzt, nichts zu sehen.
+     *
+     * Ursache, am alten Stand gemessen (Einzelheiten weiter unten bei
+     * der Gegenprobe): `.goldtext` setzt `background-clip:text` PLUS
+     * `-webkit-text-fill-color:transparent`. `.btn.up` setzt danach die
+     * Kurzform `background:` und stellt damit background-clip auf
+     * border-box zurueck — die durchsichtige Fuellfarbe aber nicht.
+     * Uebrig bleibt Text ohne Fuellung und ohne Ausstanzen: die Glyphen
+     * malen GAR NICHTS.
+     *
+     * ⚠ NICHT die Textfarbe pruefen. Genau das haette hier nichts
+     * gefunden: `color` war gesetzt (rgb(10,36,4)), der Text trotzdem
+     * unsichtbar, weil `-webkit-text-fill-color` gewinnt. Eine Pruefung
+     * auf „hat eine Farbe" waere gruen gewesen.
+     * Gemessen wird stattdessen, ob die Beschriftung ueberhaupt PIXEL
+     * malt: zwei Aufnahmen desselben Knopfs, einmal mit und einmal ohne
+     * Text. Sind die Bytes gleich, traegt der Text nichts bei — und das
+     * ist unabhaengig davon, WARUM er unsichtbar ist.
+     * ================================================================== */
+    for (const id of ['btnMerge', 'btnClearReq']) {
+      const el = page.locator('#' + id);
+      const kasten = await el.evaluate(e => { const r = e.getBoundingClientRect();
+        return { x: Math.round(r.x), y: Math.round(r.y),
+                 width: Math.round(r.width), height: Math.round(r.height) }; });
+      const mit = (await page.screenshot({ clip: kasten })).toString('base64');
+      const txt = await el.evaluate(e => { const t = e.textContent; e.textContent = ''; return t; });
+      const ohne = (await page.screenshot({ clip: kasten })).toString('base64');
+      await el.evaluate((e, t) => { e.textContent = t; }, txt);
+      step('Beschriftung von ' + id + ' ist auf der Platte sichtbar',
+        mit !== ohne,
+        mit !== ohne ? '„' + txt.trim() + '" malt Pixel'
+          : '„' + txt.trim() + '" aendert kein einziges Pixel — unsichtbar');
+    }
+    /* Gegenprobe: die Messung muss einen unsichtbaren Text auch FINDEN.
+       Dazu wird der alte Zustand nachgestellt — ausgestanzter Text auf
+       der Platte —, und dann MUSS der Vergleich gleich ausfallen. */
+    {
+      const el = page.locator('#btnMerge');
+      const kasten = await el.evaluate(e => { const r = e.getBoundingClientRect();
+        return { x: Math.round(r.x), y: Math.round(r.y),
+                 width: Math.round(r.width), height: Math.round(r.height) }; });
+      /* ⚠ DER ALTE ZUSTAND, GEMESSEN — nicht vermutet.
+         Nachgesehen am Stand vor der Reparatur trug #btnMerge:
+           background-clip : border-box, border-box   (NICHT text)
+           -webkit-text-fill-color : rgba(0, 0, 0, 0)
+           color : rgb(10, 36, 4)
+         `.goldtext` setzt zwar `background-clip:text`, aber `.btn.up`
+         setzt danach die KURZFORM `background:` — und die stellt
+         background-clip auf border-box zurueck. Uebrig bleibt allein die
+         durchsichtige Fuellfarbe: die Glyphen malen GAR NICHTS. Nicht
+         „Platte auf Platte", sondern schlicht nichts.
+         Deshalb wird hier nur die Fuellfarbe durchsichtig gesetzt und
+         alles abgeschaltet, was sonst noch Umrisse malen wuerde
+         (Schatten aus der Reparatur, Filter aus [disabled]).
+         Ein frueherer Anlauf setzte zusaetzlich background-clip:text —
+         damit verschwand die PLATTE mit, der Knopf sah voellig anders
+         aus, und die Gegenprobe verglich zwei unvergleichbare Bilder. */
+      await el.evaluate(e => {
+        e.style.webkitTextFillColor = 'transparent';
+        e.style.color = 'transparent';
+        e.style.textShadow = 'none';
+        e.style.filter = 'none';
+      });
+      const mit = (await page.screenshot({ clip: kasten })).toString('base64');
+      const txt = await el.evaluate(e => { const t = e.textContent; e.textContent = ''; return t; });
+      const ohne = (await page.screenshot({ clip: kasten })).toString('base64');
+      await el.evaluate((e, t) => { e.textContent = t;
+        e.style.webkitTextFillColor = ''; e.style.color = '';
+        e.style.textShadow = ''; e.style.filter = ''; }, txt);
+      step('Gegenprobe: ein ausgestanzter Text wuerde als unsichtbar erkannt',
+        mit === ohne,
+        mit === ohne ? 'transparent gefuellt → kein Pixelunterschied, erkannt'
+          : 'die Messung schlaegt auch bei unsichtbarem Text nicht an');
+    }
+
+    /* ==================================================================
+     * DIE QUELLKARTEN STEHEN AUF IHRER KREISBAHN AUFRECHT
+     * ------------------------------------------------------------------
+     * Befund (30.07.2026): „die tower Karten liegen schraeg waehrend der
+     * fusion." Ursache war `rotate(a * 12)` mit `a` im BOGENMASS — ueber
+     * zwei Runden bis rund 200 Grad.
+     *
+     * ⚠ NICHT zu einem festen Zeitpunkt messen. Die Neigung wuchs mit
+     * dem Bahnwinkel; ein einzelner Blick kurz nach dem Klick haette
+     * kleine Werte gesehen und den Fehler durchgelassen.
+     *
+     * ⚠ UND NICHT MIT waitForTimeout POLLEN. Genau das stand hier
+     * zuerst, und es hat den uebernaechsten Schritt umgebracht: die
+     * Schleife verbrauchte rund 1,1 s Wanduhr, die Zeremonie war beim
+     * Erreichen von „haelt nach dem Umschlag inne" laengst weiter, und
+     * die Werttafel trug schon 5 Zeilen. Die Messung hatte damit
+     * veraendert, was danach gemessen wurde.
+     * Der Rekorder haengt sich stattdessen VOR dem Klick in die
+     * Bildschleife der Seite und schreibt still mit. Er kostet keine
+     * Wanduhr; abgelesen wird er, wenn die Zeremonie ohnehin vorbei ist.
+     * ================================================================== */
+    await page.evaluate(() => {
+      window.__neig = [];
+      (function tick() {
+        document.querySelectorAll('#cerRing .orbcard').forEach(e => {
+          const m = new DOMMatrixReadOnly(getComputedStyle(e).transform);
+          window.__neig.push(Math.abs(Math.atan2(m.b, m.a) * 180 / Math.PI));
+        });
+        window.__neigRaf = requestAnimationFrame(tick);
+      })();
+    });
+
     const goldBefore = (await page.locator('#curGold').textContent()).replace(/\s/g, '');
     await page.click('#btnMerge');
     await page.waitForTimeout(500);
@@ -566,6 +678,19 @@ function gegen(name, sollFalschSein, info) { step('gegen: ' + name, !sollFalschS
         tbl.slice(0, 90));
       const orbs = await page.evaluate(() => document.querySelectorAll('#cerRing .orbcard').length);
       step('Die drei Ausgangskarten sind nach dem Verschmelzen weg', orbs === 0, orbs + ' Orbs');
+      /* Jetzt den Rekorder ablesen — die Kreisbewegung ist vorbei, also
+         steht der Hoechstwert fest, und das Ablesen kostet keine Zeit
+         mehr, die einem spaeteren Schritt fehlen wuerde. */
+      const neig = await page.evaluate(() => {
+        cancelAnimationFrame(window.__neigRaf);
+        const a = window.__neig || [];
+        return { n: a.length, max: a.length ? Math.max.apply(null, a) : -1 };
+      });
+      step('Quellkarten bleiben waehrend der Kreisbewegung aufrecht',
+        neig.n > 0 && neig.max < 0.5,
+        neig.n === 0 ? 'keine .orbcard angetroffen'
+          : neig.n + ' Messpunkte, groesste Neigung ' + neig.max.toFixed(1) +
+            ' Grad (vor der Reparatur: 175,5)');
       step('Ergebniskarte ist enthuellt',
         await page.locator('#cerCard').evaluate(e => e.classList.contains('zeigen') &&
           !e.classList.contains('warten')));

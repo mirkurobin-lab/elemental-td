@@ -2180,6 +2180,31 @@ footer{padding:6px 12px 14px;text-align:center}
 .battlebtn .goldtext{background-image:none;filter:none;
   -webkit-text-fill-color:#3a2b07;color:#3a2b07;
   text-shadow:0 1px 0 #ffffff66}
+/* ⚠ KNOEPFE MIT PLATTE: die Beschriftung braucht eine DECKENDE Fuellung.
+   `.traegt-platte` setzt layer() auf jedes Element, dem es eine
+   Knopfgrafik auflegt.
+
+   Der Fehler dahinter, gemessen (Begruendung ausfuehrlich bei layer()):
+   `.goldtext` faerbt ueber `background-clip:text` und stellt dafuer
+   `-webkit-text-fill-color:transparent`. Die Kurzform `background:` in
+   `.btn.up` setzt background-clip danach auf border-box zurueck — die
+   durchsichtige Fuellfarbe aber nicht, die gehoert nicht zur Kurzform.
+   Ergebnis: die Glyphen malen GAR NICHTS. VERSCHMELZEN und Leeren waren
+   deshalb leere Platten, Beschriftung im DOM, nichts zu sehen.
+
+   Hier bekommt der Text darum eine deckende Farbe statt eines
+   Verlaufs. Die Platten von btn_primary und btn_secondary sind innen
+   hell (Elfenbein bzw. Silber), ein dunkles Braunschwarz traegt auf
+   beiden. Der helle Schlagschatten setzt die Kante gegen die Maserung
+   ab — und er ist zugleich der Grund, warum ein spaeter durchsichtig
+   gefuellter Text hier NICHT mehr voellig verschwinden wuerde.
+
+   ⚠ Die Regel gilt fuer JEDE Platte, nicht nur fuer die drei heutigen
+   Knopfbilder — deshalb haengt sie an der Klasse, die layer() vergibt,
+   und nicht an einzelnen Knopf-IDs. */
+.goldtext.traegt-platte{background-image:none;filter:none;
+  -webkit-text-fill-color:#2a1f06;color:#2a1f06;
+  text-shadow:0 1px 0 #ffffff99}
 /* ⚠ 29.07.2026, vierter Fall derselben Sache — diesmal OHNE .goldtext:
    `#bsToGrid` („Gegner ansehen") traegt seinen Text direkt im Knopf und
    erbte damit die helle Grundschrift (#e8eef3) auf der goldenen Flaeche.
@@ -10111,6 +10136,37 @@ button.pfplate{cursor:pointer}
       el.style.backgroundPosition = pas[1] + ",center";
       el.style.backgroundRepeat = "no-repeat";
     }
+    /* ⚠ „DER TEXT IST AUF DEN BUTTONS NICHT LESBAR" (30.07.2026).
+       Nachgemessen an VERSCHMELZEN und Leeren: beide tragen ihre
+       Beschriftung im DOM, beide haben eine `color` gesetzt — und beide
+       sind leere Platten.
+
+       ⚠ MEINE ERSTE ERKLAERUNG WAR FALSCH. Ich hatte geschrieben, die
+       Glyphen stanzten ueber `background-clip:text` die Platte aus und
+       verschwaenden auf hellem Grund. Am alten Stand GEMESSEN steht auf
+       #btnMerge aber:
+           background-clip        : border-box, border-box   (NICHT text)
+           -webkit-text-fill-color: rgba(0, 0, 0, 0)
+           color                  : rgb(10, 36, 4)
+       `.goldtext` setzt zwar `background-clip:text`. Direkt danach setzt
+       `.btn.up` aber die KURZFORM `background:` — und eine Kurzform
+       stellt alle ihre Bestandteile zurueck, also auch background-clip.
+       Was ueberlebt, ist einzig `-webkit-text-fill-color: transparent`,
+       denn das gehoert nicht zur Kurzform. Die Glyphen malen damit GAR
+       NICHTS: keine Farbe, kein Ausstanzen, nichts. Das ist schlimmer
+       als „hell auf hell" und erklaert, warum auch der Schlagschatten
+       fehlte.
+
+       Dieselbe Kurzform-Falle wie beim Tresorkasten weiter oben, wo
+       `background:` die Hintergrundfarbe auf transparent zurueckstellte.
+       Zwei verschiedene Fehlerbilder, eine Ursache.
+
+       Die Reparatur greift HIER, an der einen Stelle, die weiss, dass
+       eine Platte aufgelegt wird: sie markiert das Element, und das
+       Blatt setzt darauf eine deckende Fuellfarbe. Wer kuenftig
+       irgendeinem Knopf eine Platte gibt, bekommt sie mitgeliefert —
+       statt dass die naechste Warnung wieder ein Einzelfall bleibt. */
+    el.classList.add("traegt-platte");
   }
   var BTN_PASSUNG = {
     /* Schluessel: [background-size, background-position] der Bildebene */
@@ -11936,10 +11992,24 @@ button.pfplate{cursor:pointer}
         var a = winkel + i * (2 * Math.PI / 3);
         var x = Math.cos(a - Math.PI / 2) * rad;
         var y = Math.sin(a - Math.PI / 2) * rad;
-        // Die Neigung laeuft beim Einsaugen auf 0 zurueck: AAs Quellkarten
-        // richten sich auf dem Weg nach innen auf, statt schraeg zu bleiben.
+        /* ⚠ HIER STAND EINE NEIGUNG, UND SIE WAR EIN RECHENFEHLER
+           (30.07.2026). Befund des Auftraggebers: „die tower Karten
+           liegen schraeg waehrend der fusion."
+           Der Ausdruck lautete `rotate(a * 12 * (1 - q))`. `a` ist aber
+           ein BOGENMASS, kein Grad: es laeuft ueber zwei volle Runden bis
+           4π ≈ 12,6 und traegt zusaetzlich den Platzversatz der Karte
+           (bis 2·2π/3 ≈ 4,2). Mal 12 ergibt das bis zu rund 200 Grad —
+           die Karten legten sich also im Lauf der Drehung buchstaeblich
+           hin. Der Kommentar daneben behauptete, die Neigung laufe „auf
+           0 zurueck": das tut sie erst beim Einsaugen, waehrend der
+           ganzen Kreisbewegung davor waechst sie ungebremst.
+           Eine Neigung, die aus dem Bahnwinkel abgeleitet wird, muesste
+           ohnehin in Grad gerechnet werden (a * 180/π) und dann noch
+           gedaempft. Es gibt aber keinen Grund fuer sie: AAs Quellkarten
+           stehen auf ihrer Kreisbahn AUFRECHT. Sie entfaellt deshalb
+           ersatzlos — die Karten kreisen, ohne sich zu drehen. */
         karten[i].style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) +
-          "px) rotate(" + (a * 12 * (1 - q)).toFixed(1) + "deg) scale(" + sk.toFixed(3) + ")";
+          "px) scale(" + sk.toFixed(3) + ")";
         karten[i].style.opacity = q > 0.6 ? String(Math.max(0, (1 - q) / 0.4)) : "1";
       }
       if (t < T2) { CER.raf = requestAnimationFrame(schritt); return; }

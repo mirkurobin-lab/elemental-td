@@ -3378,8 +3378,9 @@ Zwei Regeln, die der Ton mitbringt:
    dann übernimmt wieder der Blip.
 
 Das Video ist **Zugabe, kein Ersatz**: fällt es aus, läuft die CSS-Choreografie unverändert.
-Das ist hier nicht theoretisch — die Datei liegt **nicht im Repo** (siehe unten), der Fall
-„Video fehlt" ist der Regelfall der Prüfung.
+Das ist hier nicht theoretisch — die Baumaschine hat **kein H.264** (`canPlayType` liefert
+für `avc1.42E01E` den leeren String), hier kann also **kein** mp4 spielen. Der Fall „Video
+fehlt" ist damit der Regelfall der Prüfung, nicht der Ausnahmefall.
 
 ### 32.4 Die Datei liegt im Repo — in fünf Teilen hergeholt
 
@@ -3406,3 +3407,78 @@ Prüfmittel und die blockweise Prüfsumme das zweitbilligste. Ohne beides wäre 
 beschädigte Datei ins Repo gewandert, die auf dem Telefon einfach nicht abspielt.
 
 **Aufwand: M** · **Priorität: 1** · erledigt
+
+## §33 Zwei Fehler aus dem Testbild: unleserliche Knöpfe, schräge Karten
+
+Zwei Meldungen aus einem Lauf auf dem Telefon, beide sofort reproduzierbar, beide mit einer
+Ursache, die nicht die naheliegende war.
+
+### 33.1 „Der Text ist auf den Buttons nicht lesbar"
+
+Betroffen: `#btnMerge` („VERSCHMELZEN") und `#btnClearReq` („Leeren") — beides Knöpfe, die
+über `layer()` eine **Metallplatte** als Hintergrund bekommen. Sichtbar war die Platte, die
+Beschriftung war weg. Nicht blass, nicht kontrastarm: **nicht vorhanden**.
+
+Die erste Erklärung war falsch, und das gehört hierher, weil sie plausibel klingt: Ich hatte
+angenommen, `background-clip: text` schneide die Glyphen aus der Platte aus, so dass Schrift
+und Untergrund dasselbe Bild zeigen. Am Bau **vor** der Reparatur gemessen:
+
+```
+getComputedStyle(btnMerge).backgroundClip     → "border-box, border-box"
+getComputedStyle(btnMerge)['-webkit-text-fill-color'] → "rgba(0, 0, 0, 0)"
+```
+
+`background-clip` steht also gar nicht auf `text`. Die Regel `.goldtext` setzt beides zusammen
+— Verlauf plus `background-clip:text` plus `-webkit-text-fill-color:transparent` —, aber
+`.btn.up` schreibt danach die **Kurzform** `background:` und die setzt `background-clip` auf
+den Anfangswert `border-box` zurück. Übrig bleibt eine durchsichtige Füllfarbe ohne den
+Verlauf, aus dem sie ihre Form beziehen sollte: Die Glyphen malen **nichts**.
+
+Das ist zum zweiten Mal in dieser Sitzung dieselbe Falle (§31: `background:` setzte am
+Tresorkopf `background-color` auf `transparent` zurück). **Merksatz:** Eine Kurzform ist keine
+Ergänzung, sie ist ein Reset aller ihrer Unterfelder — auch derer, die man nie erwähnt hat.
+
+Repariert an der Quelle statt an der Stelle: `layer()` markiert jedes Element, dem es eine
+Platte unterlegt, mit `.traegt-platte`; die Regel
+
+```css
+.goldtext.traegt-platte{background-image:none;filter:none;
+  -webkit-text-fill-color:#2a1f06;color:#2a1f06;
+  text-shadow:0 1px 0 #ffffff99}
+```
+
+gibt dort eine deckende dunkle Füllung plus eine helle Kante nach unten. Damit hängt die
+Lesbarkeit nicht mehr daran, in welcher Reihenfolge zufällig welche Kurzform gewinnt.
+
+**Die Gegenprobe war zweimal falsch, bevor sie etwas gemessen hat.** Beim ersten Versuch blieb
+`text-shadow` stehen — der Schatten zeichnete die Umrisse weiter, das Bild änderte sich, der
+Test wäre grün gewesen, ohne dass Schrift zu sehen ist. Beim zweiten kam `background-clip:text`
+dazu, das aber die Platte gleich mit entfernt: verglichen wurden zwei unvergleichbare Bilder.
+Die Fassung, die zählt, setzt nur Füllung und Farbe auf durchsichtig, dazu `text-shadow:none`
+und `filter:none`, und vergleicht dann Ausschnitt-Screenshots mit und ohne Textinhalt.
+
+### 33.2 „Die Tower-Karten liegen schräg während der Fusion"
+
+Im Umlauf der Verschmelzungs-Zeremonie standen die drei Karten gekippt. Ursache im rAF-Takt:
+
+```js
+rotate(" + (a * 12 * (1 - q)).toFixed(1) + "deg)
+```
+
+`a` ist der **Bahnwinkel im Bogenmass** und läuft über zwei volle Umläufe (bis 4π plus
+Kartenversatz). Mal 12 ergibt das Kippwinkel bis über 200° — die Karten überschlagen sich.
+Vermutlich war ein kleiner Neigungseffekt gemeint; gemeint und gemessen liegen hier drei
+Grössenordnungen auseinander. Die Rotation ist ersatzlos entfernt, die Karten laufen jetzt
+aufrecht auf ihrer Bahn (Position und Skalierung bleiben unverändert).
+
+Gemessen wird das mit einem **rAF-Rekorder**, der vor dem Klick installiert wird und die
+Neigung jedes Umlaufkärtchens in jedem Bild mitschreibt; ausgelesen wird nach dem Umlauf.
+Ergebnis: **225 Messpunkte, grösste Neigung 0,0 Grad** — gegen **175,5 Grad** am Bau vor der
+Reparatur.
+
+Der erste Anlauf hatte stattdessen in einer Schleife mit `waitForTimeout` gepollt. Das war
+grün, hat aber **1,1 s Wanduhr verbrannt** und damit den nächsten Schritt („Nach dem Umschlag
+hält die Zeremonie inne") kaputtgemacht: Er sah 5 Tabellenzeilen statt 0. **Merksatz:** Eine
+Messung, die Zeit kostet, misst nicht mehr denselben Ablauf. Aufzeichnen statt abfragen.
+
+**Aufwand: S** · **Priorität: 1** · erledigt
