@@ -271,15 +271,24 @@ const KLASSIERER = (r, g, b) => {
   };
 
   await neuOeffnen("arcane");
-  await seite.waitForTimeout(Math.max(400, (bruchCss || 2200) - 350));
-  const vorher = await deckung();
-  /* Hier — noch VOR dem Bruch — wird festgehalten, dass das Packbild
-     ueberhaupt zu sehen war. Der Wert traegt die Gegenprobe weiter unten,
-     ohne dass dort eine neue Szene gestartet werden muss. */
+  /* ⚠ SOFORT lesen, nicht kurz vor dem Bruch (30.07.2026).
+     Der Wert traegt die Gegenprobe „das Packbild war vor dem Bruch
+     ueberhaupt sichtbar" weiter unten. Er wurde frueher erst nach
+     `bruchCss - 350` ms UND nach einem `deckung()`-Aufruf gelesen — und
+     `deckung()` liest zwei Leinwaende ueber getImageData zurueck, was auf
+     einer ausgelasteten Maschine dauert. Faellt der Bruch in genau dieses
+     Fenster, ist das Pack korrekterweise schon verborgen, und die
+     Gegenprobe meldete „blind": vier Laeufe auf unveraendertem Code gaben
+     25/2, 27/0, 26/1, 25/2.
+     Direkt nach dem Oeffnen ist das Pack garantiert sichtbar und der
+     Bruch garantiert noch nicht passiert — die Aussage ist dieselbe, nur
+     haengt sie nicht mehr an der Tagesform. */
   const vorPack = await seite.evaluate(() => {
     const a = document.getElementById("pkArt");
     return { vis: getComputedStyle(a).visibility, inline: a.style.visibility };
   });
+  await seite.waitForTimeout(Math.max(400, (bruchCss || 2200) - 350));
+  const vorher = await deckung();
   pruef("vor dem Bruch sind beide Leinwaende leer",
     vorher.pkFx.deckt === 0 && vorher.pkFx2.deckt === 0,
     JSON.stringify(vorher));
@@ -413,8 +422,19 @@ const KLASSIERER = (r, g, b) => {
      `#pkFx2` das Material traegt, waere genau das Packbruchstueck
      stehengeblieben — mitten im naechsten Bildschirm. */
   await neuOeffnen("arcane");
-  await seite.waitForTimeout((bruchCss || 2200) + 120);
-  const imFlug = await deckung();
+  /* ⚠ GEPOLLT statt abgepasst (30.07.2026). Hier stand
+     `waitForTimeout(bruchCss + 120)` und danach EIN Abgriff. Der Flug
+     dauert aber nur einen Moment, und wie lange die Maschine bis dorthin
+     braucht, schwankt: auf unveraendertem Code lieferten vier Laeufe
+     hintereinander 25/2, 27/0, 26/1 und 25/2. Rot war dabei die
+     GEGENPROBE weiter unten — sie meldete „blind", weil zum Zeitpunkt des
+     Abgriffs zufaellig nichts auf der Leinwand lag. Eine Gegenprobe, die
+     an der Tagesform der Maschine haengt, entwertet den Schritt, den sie
+     absichern soll.
+     Gemessen wird jetzt der erste Augenblick, in dem wirklich etwas
+     fliegt. Das ist dieselbe Zusage, nur ohne Stoppuhr. */
+  const imFlugW = await warteAufInhalt("pkFx2", (bruchCss || 2200) + 2500);
+  const imFlug = imFlugW.stand;
   /* ⚠ NICHT mit 20 Taps auf die Ebene. Erster Versuch tat genau das und
      die Szene blieb offen: `tipp()` steigt sofort aus, solange das Deck
      noch nicht schwebt (ab 3120 ms) — waehrend der Sprengung sind Taps
@@ -556,10 +576,24 @@ const KLASSIERER = (r, g, b) => {
     a.removeAttribute("src");
     a.style.visibility = "hidden";
   });
-  await seite.waitForTimeout((bruchCss || 2200) + 160);
-  const ohne = await deckung();
+  /* ⚠ UMGESTELLT 30.07.2026 — der Schritt war WACKLIG, und der Grund ist
+     genau die Regel, die in pruefungen/README.md steht: „Keine Pruefung
+     darf an ihrer eigenen Laufzeit haengen."
+     Vorher wartete er `bruchCss + 160` ms und mass DANN einen einzigen
+     Augenblick. Die Stuecke fliegen aber und verblassen wieder — je
+     nachdem, wie schnell die Maschine gerade ist, trifft dieser eine
+     Augenblick den Flug, seinen Anfang oder sein Ende. Drei Laeufe
+     hintereinander lieferten 26/1, 26/1 und 25/2 auf UNVERAENDERTEM Code;
+     das ist keine Aussage ueber das Programm, sondern ueber die Auslastung.
+     Jetzt wird gepollt, wie es dieselbe Datei an zwei anderen Stellen
+     ohnehin schon tut: es zaehlt, DASS ueberhaupt etwas fliegt, nicht ob
+     es zu einer bestimmten Millisekunde fliegt. Die Zusage bleibt
+     unveraendert scharf — ohne Rueckfall bleibt die Leinwand dauerhaft
+     leer und der Poller laeuft in seine Frist. */
+  const ohneFlug = await warteAufInhalt("pkFx2", (bruchCss || 2200) + 2500);
   pruef("ohne Packbild fliegen die Stuecke trotzdem (Rueckfall greift)",
-    ohne.pkFx2.deckt > 2, JSON.stringify(ohne.pkFx2));
+    ohneFlug.da && ohneFlug.stand.pkFx2.deckt > 0.5,
+    JSON.stringify({ nachMs: ohneFlug.nachMs, deckt: ohneFlug.stand.pkFx2.deckt }));
 
   pruef("kein Skriptfehler in der ganzen Pruefung",
     seitenfehler.length === 0, seitenfehler.slice(0, 3).join(" | "));

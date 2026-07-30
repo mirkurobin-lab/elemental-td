@@ -557,9 +557,21 @@ function step(name, ok, info) {
              hoehe: Math.round(e.getBoundingClientRect().height),
              ueberRahmen: !rahmen || (+cs.zIndex > +getComputedStyle(rahmen).zIndex) };
   }));
-  step('Jede Anfrage ist als GRAU (Basis-Kopie) markiert — und man SIEHT es',
-    tierLabels.length >= 3 &&
-    tierLabels.every(x => x.t === 'GRAU' && x.sicht && x.hoehe >= 8 && x.ueberRahmen),
+  /* ⚠ NICHT gegen die Zeichenkette „GRAU" pruefen (30.07.2026 berichtigt).
+     Genau das stand hier — und im Markup stand derselbe Text fest
+     eingetippt. Zwei eingefrorene Kopien derselben Zeichenkette bestaetigen
+     sich gegenseitig und sagen nichts: „Grau" ist der FARBNAME der Stufe,
+     nicht ihr Name, und dem Spieler sagt „Grau" nichts ueber Seltenheit.
+     Gefunden beim Ansehen des Screenshots, nicht beim Messen — die
+     Kachel war strukturell vollstaendig.
+     Geprueft wird jetzt gegen AC.TIERS: die Marke muss den NAMEN der
+     Basisstufe tragen. Wird die Stufe umbenannt, wandert der Schritt mit,
+     statt eine veraltete Zeichenkette zu verteidigen. */
+  const basisName = await page.evaluate(() => window.ArenaCards.tierOf('common').name);
+  step('Jede Anfrage ist als Basis-Kopie markiert — und man SIEHT es',
+    tierLabels.length >= 3 && !!basisName &&
+    tierLabels.every(x => x.t === basisName && x.sicht && x.hoehe >= 8 && x.ueberRahmen),
+    'erwartet „' + basisName + '": ' +
     tierLabels.map(x => x.t + '(' + x.hoehe + 'px' + (x.ueberRahmen ? '' : ', VERDECKT') + ')').join('/'));
   /* NEU 30.07.2026 — die fuenf Teile der AA-Anfragekarte. Gemessen wird
      an einer FREMDEN Anfrage: die eigene traegt statt des SPENDEN-Knopfs

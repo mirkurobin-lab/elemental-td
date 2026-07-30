@@ -16181,7 +16181,18 @@ button.pfplate{cursor:pointer}
           '<button class="anfinfo pressable" data-info="' + r.id + '">ⓘ</button></div>' +
         '<div class="anfkoerper">' +
           '<div class="anfbild" style="color:' + m.color + '">' +
-            artBox(r.cardId, "common") + '<span class="rtier">GRAU</span></div>' +
+            /* ⚠ Hier stand fest eingetippt „GRAU" (30.07.2026 behoben).
+               Zwei Fehler in einem Wort: es war der FARBNAME der Stufe,
+               nicht ihr Name — „Grau" sagt dem Spieler nichts ueber die
+               Seltenheit —, und er stand als Zeichenkette im Markup, ging
+               bei einer Umbenennung der Stufe also nicht mit. Beides faellt
+               nur beim ANSEHEN auf: strukturell war die Kachel vollstaendig,
+               und jede Pruefung, die „traegt die Kachel ein Raritaets-
+               Schild?" fragt, blieb gruen.
+               Gespendet werden ausschliesslich gewoehnliche Kopien — das
+               ist die Aussage, und sie kommt jetzt aus AC.TIERS. */
+            artBox(r.cardId, "common") +
+            '<span class="rtier">' + tierOf("common").name + "</span></div>" +
           '<div class="anfhast' + (habe ? "" : " leer") + '">' +
             '<span class="hk">Du hast</span><b>' + habe + "</b></div>" +
           knopf +
