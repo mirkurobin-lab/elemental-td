@@ -350,6 +350,46 @@ statt ihn auf eine Toleranz aufzuweichen: eine Prüfung, die man passend macht,
 damit sie grün ist, hätte den Konflikt für immer zugedeckt. Sobald die
 Schreibweise entschieden ist, wird der Schritt grün, ohne dass man ihn anfasst.
 
+## Die Gegenprobe hat eine falsche Diagnose entlarvt (30.07.2026)
+
+Befund des Auftraggebers: *„Das Ressourcen Icon ist nicht im Kreis."* Gold saß
+sichtbar anders in seiner Fassung als Trophäe und Gem.
+
+**Erste Erklärung, plausibel und falsch:** `.cur .ico` habe kein `object-fit`,
+das Motiv werde also auf 18×18 gestreckt. Es wurde ein Prüfschritt gebaut
+(„object-fit ist gesetzt"), ein `contain` eingetragen, alles grün.
+
+Dann der Mutationstest: `contain` wieder entfernt — **und die Prüfung blieb
+grün**. Grund: die Basisregel `.ico` setzt `object-fit:contain` ohnehin für
+alle. Der „Fix" war ein No-op, der Prüfschritt konnte nie rot werden.
+
+**Die echte Ursache** fand erst das *Ansehen* des Screenshots bei dreifacher
+Vergrößerung: die dunkle Scheibe ist sehr wohl da. `cur_gold` ist ein satter
+Münzstapel, der seine Bildfläche randlos ausfüllt; `cur_trophy` und `cur_gem`
+sind Einzelobjekte mit rund einem Viertel transparenter Luft. Bei 18 von 24 px
+stößt ein randloses Motiv an die Rundung — das liest sich als „nicht im Kreis".
+Es war eine Eigenschaft des **Assets**, nicht des Stylesheets.
+
+Drei Lehren:
+
+1. **Ein Prüfschritt ohne Gegenprobe kann eine Fehldiagnose zementieren.** Hier
+   hätte er dauerhaft grün behauptet, das Problem sei gelöst.
+2. **Eine plausible Erklärung ist keine Messung.** Dieselbe Falle wie beim
+   Kartensymbol 🂠 im selben Sweep — zweimal am selben Tag.
+3. **Die Regel darf keine Ausnahme für ein Asset sein.** Behoben ist es
+   deshalb an der *Fassung* (`.cur i{padding:4.5px}`, eine Regel für alle drei),
+   nicht mit einem Sonderfall für `c-gold`. Geprüft wird die Anforderung
+   dahinter: *ein randloses Motiv darf den Ring nicht zudecken* — messbar mit
+   einem eigens erzeugten randlosen Testmotiv, und rot, sobald der Rand fehlt.
+
+Die Datei dazu ist **`bildzustand.js`**. Sie schließt den strukturellen blinden
+Fleck aller anderen Prüfungen hier: örtlich ist das CDN nicht erreichbar, jedes
+Icon fällt auf ein Emoji zurück (DESIGNSYSTEM §7b), der Zustand „ein echtes
+`<img>` liegt im Kasten" ist also nie zu sehen. `bildzustand.js` setzt echte
+Bilder als `data:`-URI ein und macht den Live-Zustand örtlich prüfbar. Beide
+Fehler dieses Tages — das Icon und der glitchende Avatar — waren genau von
+dieser Sorte: live sofort sichtbar, hier strukturell unsichtbar.
+
 ## Was hier NICHT liegt
 
 Die Wegwerf-Skripte aus der Arbeit am Prototyp (`diag*.js`, `mess*.js`,

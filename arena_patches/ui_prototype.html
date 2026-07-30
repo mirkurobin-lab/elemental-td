@@ -263,7 +263,35 @@ body.nur-waehrung .apphead .headcol{padding:6px 0}
   box-shadow:var(--mat-sunken)}
 /* 18 von 24 px = 75 %. Darueber stoesst das Motiv an die Rundung,
    darunter schwimmt es in der Fassung. */
-.cur .ico{width:18px;height:18px}
+/* ⚠ Fix vom 30.07.2026 („Das Ressourcen Icon ist nicht im Kreis").
+   Der Befund: Pokal und Kristall sassen sichtbar in ihrer dunklen
+   Scheibe, das Gold-Motiv nicht — es lag randlos auf der Leiste.
+   ERSTE, FALSCHE ERKLAERUNG, hier als Warnung festgehalten: „`.cur .ico`
+   hat kein object-fit, das Motiv wird gestreckt". Stimmt nicht — die
+   Basisregel `.ico` (weiter unten im Blatt) setzt `object-fit:contain`
+   schon fuer alle. Ein `contain` hier obendrauf war ein No-op, und die
+   Gegenprobe der Pruefung hat genau das entlarvt: sie blieb gruen,
+   nachdem der „Fix" wieder entfernt war.
+   DIE ECHTE URSACHE liegt im ASSET, nicht im Blatt. `cur_trophy` und
+   `cur_gem` sind einzelne Objekte mit transparentem Rand; `cur_gold`
+   ist ein satter Muenzstapel, der seine Bildflaeche randlos ausfuellt.
+   Bei `contain` und 18 von 24 px stoesst so ein Motiv an die Rundung
+   und deckt den Ring zu.
+   NACHGESEHEN im Screenshot bei 3-facher Vergroesserung: die Scheibe ist
+   sehr wohl da. Das Muenzmotiv ist nur GROESSER und stoesst an die
+   Rundung, waehrend Pokal und Kristall rund ein Viertel Luft mitbringen.
+   Genau dieser Unterschied liest sich als „nicht im Kreis".
+   DIE LOESUNG ist ein Innenabstand an der FASSUNG statt einer festen
+   Motivgroesse: das Medaillon haelt seinen Rand selbst frei, egal wie
+   das Quellbild beschnitten ist. 4,5 von 24 px lassen auch einem
+   randlosen Zuschnitt einen sichtbaren Ring — und der naechste randlose
+   Zuschnitt ist damit kein neuer Fehler mehr.
+   KEINE Ausnahme fuer `c-gold`: eine Regel fuer alle drei, sonst
+   wandert der Fehler beim naechsten Asset-Tausch nur weiter.
+   Die Anforderung dahinter ist messbar und steht in
+   pruefungen/bildzustand.js: kein Motiv beruehrt den Rand. */
+.cur i{padding:4.5px}
+.cur .ico{width:100%;height:100%}
 .cur span.ico{font-size:14px;line-height:18px}
 /* Waehrungs-Pillen tragen die Identitaetsfarbe ihrer Waehrung: die Zahl
    und der Rand, nicht die ganze Flaeche — sonst kippt die Lesbarkeit. */
@@ -5525,8 +5553,22 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 /* Das 32-px-Portrait der Home-Profilzeile. Additive Regel auf dem
    bestehenden `.avatar i`; die Rahmenfarbe uebernimmt die Kontur, das
    Bild fuellt die Flaeche. 32 px liegt ueber der 20-px-Grenze. */
+/* ⚠ Fix vom 30.07.2026 („Avatar Bild funktioniert nicht ist am
+   glitchen"). `.avatar i` ist ein FLEX-Kasten. Das Emoji und das
+   Portrait lagen beide als normale Flex-KINDER darin — also NEBEN-
+   einander statt uebereinander. Nachgemessen bei 98 px Rahmenbreite:
+   Emoji x=-5 w=34, Bild x=29 w=64. Das Portrait wurde also um ein
+   Drittel zur Seite geschoben und gequetscht, der Platzhalter blieb
+   daneben sichtbar. Genau das liest das Auge als „glitcht".
+   Oertlich unsichtbar, weil ohne CDN gar kein Bild entsteht und das
+   Emoji den Kasten allein hat (DESIGNSYSTEM §7b).
+   Beide liegen jetzt ABSOLUT und deckungsgleich: das Emoji ist der
+   Rueckfall darunter, das Bild deckt es zu, sobald es laedt. */
 .avatar i.avmini{overflow:hidden;padding:0}
-.avatar i.avmini img{width:100%;height:100%;object-fit:cover}
+.avatar i.avmini img{position:absolute;inset:0;z-index:1;
+  width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.avatar i.avmini .avemo{position:absolute;inset:0;z-index:0;
+  display:flex;align-items:center;justify-content:center}
 .avmiss{position:absolute;top:4px;left:4px;font-size:7px;font-weight:900;
   padding:0 3px;border-radius:5px;background:#0b1116cc;color:#8fa0ad;
   border:1px solid #3a4c5c}

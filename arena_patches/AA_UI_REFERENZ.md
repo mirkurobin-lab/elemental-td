@@ -2883,3 +2883,154 @@ erstellen und diese dann dort einzufügen?"* mit **ja** — Bild erzeugen, Bild 
 an Kling geben, Ergebnis als `<video muted loop>` mit dem Startbild als `poster` einhängen.
 Der Poster ist Pflicht: örtlich ist das CDN nicht erreichbar (DESIGNSYSTEM §7b), und auf dem
 Gerät deckt er die Ladezeit ab.
+
+---
+
+## 27. SHOP — vollständig abgelesen (30.07.2026)
+
+> **Quelle:** acht Screenshots des Auftraggebers (IMG_3449–3456), Account **1 200 🏆 / 546 💎 /
+> 39 387 🪙**, also **Arena 5**. Auflösung 1320×2868, alle Zahlen direkt lesbar.
+> Damit ist §8 (aus Videostandbildern geschätzt) **überholt** — siehe die Korrekturbox unten.
+>
+> **Auftrag dazu wörtlich:** *„Bau die Anordnung des Shops genau nach wie es in AA ist wir haben
+> alles muss nur neu positioniert werden. Dort wo das endless Roulette ist muss unser Kristall
+> Tresor hin."*
+
+### 27.1 Abschnittsfolge — verbindlich
+
+Jeder Abschnitt trägt ein **Band** (blaues Ribbon mit gekerbten Enden) als Überschrift.
+
+| # | Band | Inhalt | Raster |
+|---|---|---|---|
+| 1 | **ARENA PACK** | Karussell, Echtgeld, Punktreihe darunter | 1 Karte |
+| 2 | **DAILY DEALS** | Timerzeile + ⓘ + „Refresh"; darunter Angebote | **3 Spalten** |
+| 3 | **ARCANE SUPPLIES CHEST** | breite goldene Karte mit Pity-Zeilen | 1 Karte |
+| 4 | **CHEST** | Explorer (blau) + Mystic (pink) | **2 Spalten** |
+| 5 | **ENDLESS ROULETTE** | Preisband + zwei Knöpfe | 1 Karte |
+| 6 | **GEMS** | sechs Staffeln | **3 × 2** |
+| 7 | **GOLD** | drei Staffeln | **3 × 1** |
+
+**Was AA an dieser Stelle NICHT hat** — beides fliegt bei uns raus:
+
+- **kein Season-Pass-/Battlepass-Banner.** *„Der battledpass der im Shop oben ist kann entfernt
+  werden den brauchen wir an dieser Stelle nicht weil wir ihn schon auf der Battle
+  ansicht (hauptbildschirm) oben verkaufen."*
+- **kein Werbe-Entfernen-Banner.** *„Den Banner Shop braucht es im Shop nicht der ist in AA auch
+  nicht drin."* (§8.1 Pos. 1 führte es noch — in diesen Aufnahmen ist es weg.)
+
+**Position 5 ist bei uns der Kristalltresor.** Die Rollenzuordnung aus §19-Annahme 2
+(Tresor = AAs Roulette-Platz) war richtig gedacht, stand aber an der falschen Stelle im Ablauf.
+
+### 27.2 Preise — alle abgelesen, nichts geschätzt
+
+**GEMS** — orange Kacheln, Name (2 Zeilen) · Trennlinie · Menge · Artwork · Preis:
+
+| Kachel | Gems | Preis | ct je Gem |
+|---|---|---|---|
+| Some Gems | 80 | **Fr. 2** | 2,50 |
+| Pile of Gems | 500 | **Fr. 4** | 0,80 |
+| Heap of Gems | 1 200 | **Fr. 9** | 0,75 |
+| Bag of Gems | 2 500 | **Fr. 18** | 0,72 |
+| Trophy of Gems | 6 500 | **Fr. 40** | 0,62 |
+| Safe of Gems | 14 000 | **Fr. 90** | 0,64 |
+
+Die Kurve fällt monoton — **außer beim letzten Sprung** (0,62 → 0,64). Die teuerste Staffel ist
+also pro Gem minimal *schlechter* als die zweitteuerste. Das ist kein Ablesefehler, beide Werte
+stehen groß da; es ist AAs bewusster Anker: „Trophy" wirkt als bester Wert, „Safe" verkauft die
+Menge. Wer die Zahlen später glättet, macht AAs Trick kaputt.
+
+**GOLD** — grüne Kacheln. Bezahlt wird mit **Gems**, nicht mit Echtgeld:
+
+| Kachel | Gold | Preis |
+|---|---|---|
+| Pile of Gold | 12 000 | **▶ FREE** (Werbevideo, roter Merker) |
+| Bag of Gold | 36 000 | **💎 90** |
+| Trophy of Gold | 144 000 | **💎 288** |
+
+Mengen exakt ×3 je Stufe. Gold je Gem: 400 → 500 — die größere Staffel lohnt sich.
+
+> Unser Gold-Tausch lief schon über Gems (§19-Annahme 7) — diese Aufnahmen **bestätigen**, dass
+> das kein Abweichen von AA war, sondern AAs eigener Aufbau. Die Annahme kann gestrichen werden.
+
+**TRUHEN UND KISTEN:**
+
+| Ware | Preis |
+|---|---|
+| Arcane Supplies Chest **OPEN x1** | 💎 300 |
+| Arcane Supplies Chest **OPEN x10** | 💎 2 680 (10,7 % Rabatt) |
+| Explorer Chest | ▶ Werbung (4 offen) **oder** 💎 80 |
+| Mystic Chest | gratis in 1 d 4 h, sonst 🔑 0/1 |
+| Endless Roulette | ▶ Werbung **oder** 💎 75 |
+
+**Pity, jetzt eindeutig lesbar:** „Get **Epic** in **10** opens" · „Get **Legendary** in **50**
+opens". Die 50 waren in §8.2 als *unsicher* markiert — sie sind **bestätigt**. Mystic Chest hat
+eine eigene Zeile: „Get Epic in **4** opens".
+
+**TAGESANGEBOTE** (Arena 5):
+
+| Ware | Menge | Preis |
+|---|---|---|
+| Gems (Timer 4 h 25 m) | ×30 | **▶ Free**, „Available: 5" |
+| Inferno Rain Greenprint | ×20 | 🪙 **40 000** |
+| Ice Wall Greenprint | ×20 | 🪙 **40 000** |
+| Frostfall (Ecke „70 % OFF") | ×1 | 💎 **30** |
+| Cannon | ×1 | 💎 **300** |
+| Thunder | ×1 | 💎 **100** |
+
+Sechs Posten in **zwei Reihen zu drei**. Der Gratisposten steht **vorne links** und ist als
+einziger farbig (violett) — alle Kaufposten sind grau. Ein Rabattposten trägt ein diagonales
+Eckband. Türme kosten **Gems**, Baupläne **Gold**.
+
+**ARENA PACK:** „Arena 5 Pack", Siegel **„230 % value"**, Inhalt ×800 💎 · ×20 🪙 · ×10 · ×80,
+Preis **~~Fr. 20.70~~ Fr. 9**. Sechs Punkte unter dem Karussell = sechs Angebote.
+
+### 27.3 ⚠ Korrektur an §8
+
+§8 stammt aus Videostandbildern und trug mehrere unsichere Lesungen. Was sich mit den
+Screenshots ändert:
+
+| §8 sagte | Richtig ist |
+|---|---|
+| Gem-Staffeln „80 / ~200 / 2500 / 6500 / 14000", **fünf** Pakete | **sechs**: 80 / 500 / 1 200 / 2 500 / 6 500 / 14 000 |
+| „Heap of Gems 80 = Fr. 3" | **Some** Gems 80 = **Fr. 2**; *Heap* ist die 1 200er für Fr. 9 |
+| „Bag of Gems 2500 = Fr. 40?" | Bag 2 500 = **Fr. 18**; Fr. 40 gehört zu **Trophy 6 500** |
+| Gold-Mengen 10 500 / 31 500 / ~126 000 | **12 000 / 36 000 / 144 000** (andere Arena → skaliert) |
+| Gold-Bundles per Echtgeld | per **Gems** |
+| Pity-Legendary „50, unsicher" | **50, bestätigt**; zusätzlich Epic in 10 |
+| Werbe-Entfernen-Banner auf Platz 1 | in diesen Aufnahmen **nicht vorhanden** |
+
+**Die Skalierungs-Beobachtung aus §8.4/§12.4 bleibt gültig** und wird hier sogar schärfer:
+dieselben Greenprints kosten bei Arena 2 5 400, bei Arena 4 20 000 und bei Arena 5 **40 000**
+Gold. Auch die Gold-Staffeln skalieren (10 500 → 12 000). Die **Echtgeldpreise der Gem-Staffeln
+skalieren nicht** — die sind Store-Preise und stehen fest.
+
+---
+
+## 28. LEVEL-AUF-Fenster (30.07.2026)
+
+> **Quelle:** IMG_3445. **Auftrag:** *„So etwas brauchen wir auch beim levelup. Mit Image usw und
+> Belohnungen natürlich steigend pro Level. Damit man nicht stuck ist mit dem Gold."*
+
+Ein Vollbild-Overlay, das den Hintergrund stark abdunkelt. Von oben nach unten:
+
+| Element | Beschreibung |
+|---|---|
+| **Abzeichen** | großer **Stern mit der Levelzahl**, gefasst in einen goldenen Ring, links und rechts je ein goldener **Flügel**. Sitzt bei ~25 % Höhe, überlappt den Kopf des dahinterliegenden Fensters |
+| **Titel** | „**Reached level 17!**" — groß, weiß, fett, mittig |
+| **Trenner** | dünne Linie mit Rauten links/rechts und dem Wort **REWARDS** in der Mitte |
+| **Belohnungsfeld** | dunkle Fläche, darin die Belohnungskacheln — hier **eine** Kachel: goldgerahmt, Gem-Artwork, Menge **x20** unten rechts |
+| **Abschluss** | „**TAP TO CLOSE**" ganz unten, außerhalb der Fläche |
+
+**Kein ✕.** Geschlossen wird durch Tippen irgendwo — deshalb steht der Hinweis da.
+
+**Was das für uns heißt:**
+
+1. Der Auftrag nennt den Zweck ausdrücklich: *„Damit man nicht stuck ist mit dem Gold."* Die
+   Belohnung muss also **Gold** enthalten, nicht nur Gems — AA gibt hier nur Gems, wir weichen
+   bewusst ab. Das ist dieselbe Begründung wie bei den Offline-Erträgen
+   (`GAMEPLAY_OPTIMIERUNG.md` §10): eine zweite, planbare Goldquelle gegen den Endgame-Engpass.
+2. **Steigend pro Level** — die Belohnung ist eine Kurve über dem Level, keine feste Zahl.
+3. Das Abzeichen braucht ein eigenes Asset (Stern + Ring + Flügel), die Levelzahl wird zur
+   Laufzeit hineingeschrieben, damit ein Bild für alle Level reicht.
+4. Optik „clean wie der Shop" (Auftraggeber) — also dieselbe Bandtypografie, dieselben
+   Kachelrahmen, dieselben Icon-Schlüssel wie im übrigen Spiel.
