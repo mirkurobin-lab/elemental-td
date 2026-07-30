@@ -1001,16 +1001,60 @@ er sinkt mit jeder Stufe. Die Ladenkurve wird dabei nicht abgeschrieben, sondern
 Prüfung mit. Eine abgeschriebene Kurve wäre beim ersten Preiswechsel eine Lüge mit grünem
 Balken.
 
-### Offen — und keine Preisfrage: die Füllzeit
+### Die Füllzeit — entschieden am 30.07.2026: 8 → 30 je Sieg
 
-Bei 2–5 Kristallen je Sieg braucht die oberste Stufe rund **480–686 Siege**. Ein Angebot,
-das kaum je erscheint, ist unabhängig vom Preis wirkungslos. Zwei Wege:
+> „Den Tresor würde ich höher schrauben das pro Sieg 30 Kristalle reinkommen oder meinst du
+> das ist Zuviel/zuwenig?"
 
-1. Der Zuwachs je Sieg steigt mit der Tresorstufe (die Mechanik hat dafür schon eine
-   Arena-Staffelung, sie müsste nur an die Stufe gekoppelt werden).
-2. Die oberen Kapazitäten sinken.
+**Antwort: 30 ist richtig — aber als *oberes* Ende der Staffelung, nicht flach.**
 
-Das ist eine Produktentscheidung. Solange sie offen ist, sind die Stufen 3 und 4 rechnerisch
-korrekt und praktisch unerreichbar.
+Zuerst das, was die Zahl **nicht** tut: Sie ändert **nichts am Gegenwert**. Preis und
+Kapazität je Stufe bleiben, der Tresor kostet weiter 1,27 ct (Stufe 0) bis 0,56 ct (Stufe 4)
+je Kristall. Sie steuert allein, **wie oft das Angebot überhaupt erscheint**.
 
-**Aufwand: S** (erledigt) · **Priorität: 1** · Füllzeit offen
+Gerechnet mit **3–4 Siegen je Sitzung** — die Zahl ist nicht geschätzt, sie steht in
+DESIGN_CLAN §6.2 und trägt dort schon das ±25-Fenster der Rangliste — und zwei Sitzungen
+am Tag:
+
+| Stufe | Kap. | Preis | alt (2–5) | flach 30 | **neu (8–30)** |
+|---|---|---|---|---|---|
+| 0 | 150 | 1,90 | 75 Siege · 11 Tg | 5 Siege · 0,7 Tg | **19 Siege · 2,7 Tg** |
+| 1 | 300 | 2,90 | 100 Siege · 14 Tg | 10 Siege · 1,4 Tg | **21 Siege · 3,1 Tg** |
+| 2 | 600 | 3,90 | 150 Siege · 21 Tg | 20 Siege · 2,9 Tg | **29 Siege · 4,1 Tg** |
+| 3 | 1200 | 6,90 | 300 Siege · 43 Tg | 40 Siege · 5,7 Tg | **50 Siege · 7,1 Tg** |
+| 4 | 2400 | 13,50 | 480 Siege · **69 Tg** | 80 Siege · 11,4 Tg | **80 Siege · 11,4 Tg** |
+
+**Warum der alte Wert zu niedrig war:** ein Angebot, das rechnerisch zweimal im Jahr
+erscheint, ist unabhängig vom Preis wirkungslos. Die Stufen 3 und 4 waren praktisch
+unerreichbar.
+
+**Warum flach 30 zu viel wäre:** Stufe 0 füllt sich dann in **fünf Siegen**, anderthalb
+Sitzungen. Der Spieler steht danach dauerhaft am Anschlag, und dort gilt „jeder weitere Sieg
+verpufft" — die Mechanik, die das Spielen belohnen soll, bestrafte es dann die meiste Zeit.
+Ausgerechnet in Stufe 0 lernt der Spieler aber erst, was der Tresor ist.
+
+**Warum die 30 trotzdem genau dort steht, wo sie zählt:** Die Stufen 0–3 durchläuft man
+**einmal**, in Stufe 4 **lebt** man dauerhaft. 2400 / 30 = 80 Siege, also rund **alle elf
+Tage ein 13,50-Angebot**. Das ist die Taktung, die entscheidet.
+
+Umgesetzt über die Arena-Staffelung, die schon existierte — das war oben Option 1 und musste
+nur gespreizt werden: `WIN_GEMS_MIN = 8`, `WIN_GEMS_MAX = 30` (A1:8 · A2:11 · A3:14 · A4:17 ·
+A5:21 · A6:24 · A7:27 · A8:30). Die Kapazitäten bleiben unangetastet, `tresor.js` bleibt grün.
+
+#### Sieben Stellen hatten die alte Zahl eingefroren
+
+Alle sieben waren rot, ohne dass am Tresor etwas kaputt war:
+
+| Stelle | Was eingefroren war |
+|---|---|
+| `arena_vault.js` ×4 | `gained === 2`, `Math.ceil(148 / 2)`, „→ 82 Gems", `+ 5` |
+| `arena_vault.js` Schrittname | „laufen von 2 (Arena 1) bis 5 (Arena 8)" — die Prüfung las die Quelle, nur der **Name** log. Er wurde grün angezeigt. |
+| `arena_vault.js` `state()` | Badge fest auf 2. Sie war nur 2, weil 10 Siege den Tresor beim alten Zuwachs nicht füllten — eine **ungesagte Annahme**, keine Zusage. |
+| `run_v6.js` | `/\+\d Gems je Sieg/` fror die **Stellenzahl** ein und war rot bei „+17". |
+
+Dazu der **Demo-Seed**: `reportEvent("win", 34)` ergab nur beim alten Zuwachs den Stand
+102/150. Danach war die Demo dauerhaft „VOLL — jeder weitere Sieg verpufft" und zeigte den
+Füllstand gar nicht mehr — im Prototyp wie in jeder Vorführung. Der Seed nennt jetzt das
+**Ziel** (gut zwei Drittel der ersten Stufe) und rechnet die Siege daraus aus.
+
+**Aufwand: S** (erledigt) · **Priorität: 1** · Füllzeit entschieden

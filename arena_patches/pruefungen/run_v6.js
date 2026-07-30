@@ -594,10 +594,19 @@ function step(name, ok, info) {
      nicht ihr Name, und dem Spieler sagt „Grau" nichts ueber Seltenheit.
      Gefunden beim Ansehen des Screenshots, nicht beim Messen — die
      Kachel war strukturell vollstaendig.
-     Geprueft wird jetzt gegen AC.TIERS: die Marke muss den NAMEN der
-     Basisstufe tragen. Wird die Stufe umbenannt, wandert der Schritt mit,
-     statt eine veraltete Zeichenkette zu verteidigen. */
-  const basisName = await page.evaluate(() => window.ArenaCards.tierOf('common').name);
+     Geprueft wird jetzt gegen AC.TIERS: die Marke muss die Basisstufe
+     benennen. Wird die Stufe umbenannt, wandert der Schritt mit, statt
+     eine veraltete Zeichenkette zu verteidigen.
+
+     ⚠ NACHTRAG vom selben Tag: hier stand `.name`, also „Gewöhnlich" —
+     und genau dieses Wort passte nicht in die 46-px-Kachel und wurde zu
+     „Gewöhnlic" abgeschnitten (siehe den Schritt „Kein Text der
+     Clan-Ansicht ist abgeschnitten" weiter unten). Die Kachel traegt
+     deshalb `.colorName`, die Kurzform, die AC.TIERS ohnehin fuehrt.
+     Gemessen wird weiter gegen die QUELLE, nur gegen das Feld, das in
+     den Kasten passt — der Punkt der Berichtigung oben bleibt damit
+     unangetastet. */
+  const basisName = await page.evaluate(() => window.ArenaCards.tierOf('common').colorName);
   step('Jede Anfrage ist als Basis-Kopie markiert — und man SIEHT es',
     tierLabels.length >= 3 && !!basisName &&
     tierLabels.every(x => x.t === basisName && x.sicht && x.hoehe >= 8 && x.ueberRahmen),
@@ -669,6 +678,73 @@ function step(name, ok, info) {
      auf, weil sie plausibel aussieht. */
   step('Keine globale Kontingentleiste mehr in der Ansicht',
     await page.locator('#viewClan .quotabar').count() === 0);
+
+  /* ==================================================================
+   * KEIN TEXT DARF IN SEINEM KASTEN ABGESCHNITTEN SEIN
+   * ------------------------------------------------------------------
+   * Am 30.07.2026 stand auf der Anfragekarte „Gewöhnlic". Ursache war
+   * eine Reparatur vom selben Tag: das Raritaets-Schild hatte fest
+   * „GRAU" im Markup stehen, wurde auf den echten Stufennamen aus
+   * AC.TIERS umgestellt — und „Gewöhnlich" braucht 49 px in einem
+   * 42-px-Kasten, dessen Elternteil abschneidet. Der Kommentar am
+   * Stilblatt hatte die Annahme sogar ausgesprochen („bei 46 px
+   * Kachelbreite passt „GRAU" bequem"); sie wurde gebrochen, ohne
+   * nachzumessen.
+   *
+   * Strukturell war nichts falsch: das Schild war da, sichtbar, mit dem
+   * richtigen Wert aus der richtigen Quelle. Nur eben angeschnitten.
+   * Gesehen habe ich es auf einem Screenshot, keine Pruefung hat es
+   * gemeldet — deshalb dieser Schritt, und zwar bewusst NICHT nur fuer
+   * `.rtier`: gemessen wird JEDER Text der Ansicht gegen seinen Kasten.
+   *
+   * Gemessen wird scrollWidth gegen clientWidth, aber nur dort, wo ein
+   * Vorfahr tatsaechlich abschneidet — sonst laeuft Text einfach ueber
+   * und ist lesbar. 1 px Toleranz gegen Rundung bei gebrochenen
+   * Geraetepixeln.
+   * ================================================================== */
+  const abgeschnitten = await page.evaluate(() => {
+    const schneidetAb = (el) => {
+      for (let p = el.parentElement; p; p = p.parentElement) {
+        const o = getComputedStyle(p);
+        if (/hidden|clip/.test(o.overflowX)) return true;
+        if (p.id === 'viewClan') return false;
+      }
+      return false;
+    };
+    const raus = [];
+    document.querySelectorAll('#viewClan *').forEach(el => {
+      if (el.children.length) return;                       // nur Blaetter
+      const t = (el.textContent || '').trim();
+      if (!t) return;
+      if (!el.getClientRects().length) return;              // unsichtbar zaehlt nicht
+      if (el.scrollWidth <= el.clientWidth + 1) return;
+      if (!schneidetAb(el)) return;                         // laeuft ueber, aber lesbar
+      raus.push(t.slice(0, 24) + ' [' + (el.className || el.tagName) + '] ' +
+                el.clientWidth + '/' + el.scrollWidth + ' px');
+    });
+    return raus;
+  });
+  step('Kein Text der Clan-Ansicht ist in seinem Kasten abgeschnitten',
+    abgeschnitten.length === 0,
+    abgeschnitten.length ? abgeschnitten.slice(0, 4).join(' · ')
+      : 'alle Beschriftungen passen');
+
+  /* GEGENPROBE: die Messung muss einen zu langen Text auch FINDEN.
+     Ohne sie waere der Schritt oben auch dann gruen, wenn die Suche
+     schlicht nichts betrachtet — genau der Fehler, den dieses Projekt
+     wiederholt gemacht hat. */
+  const erkannt = await page.evaluate(() => {
+    const s = document.querySelector('#viewClan .rtier');
+    if (!s) return null;
+    const alt = s.textContent;
+    s.textContent = 'Ausserordentlich Gewöhnlich';
+    const getroffen = s.scrollWidth > s.clientWidth + 1;
+    s.textContent = alt;
+    return getroffen;
+  });
+  step('Gegenprobe: ein zu langer Text wuerde erkannt',
+    erkannt === true,
+    erkannt === null ? 'kein .rtier gefunden' : 'ueberlanger Text schlaegt an');
   /* Der Knopf war als .donbtn 62 px breit; AAs Knopf ist der groesste
      Treffer der Karte. 96 px sind im CSS gesetzt und hier nachgemessen. */
   step('SPENDEN-Knopf ist gross statt fitzelig', teile.knopfTxt.trim() === 'SPENDEN' &&
