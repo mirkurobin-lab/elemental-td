@@ -661,6 +661,7 @@ function gegen(name, sollFalschSein, info) { step('gegen: ' + name, !sollFalschS
     gemFrames: document.querySelectorAll('#gemShop .prodcard.fr-kristall').length,
     goldFrames: document.querySelectorAll('#goldShop .prodcard.fr-gold').length,
     dealFrames: document.querySelectorAll('#dealGrid .prodcard.fr-light').length,
+    dealGratisFrames: document.querySelectorAll('#dealGrid .prodcard.fr-gratis').length,
     frameLayers: document.querySelectorAll('#viewShop .prodcard .pcfrm').length,
     ribbons: document.querySelectorAll('#viewShop .secribbon').length,
     seals: [...document.querySelectorAll('#viewShop .seal')].map(e => e.textContent.trim()),
@@ -725,10 +726,19 @@ function gegen(name, sollFalschSein, info) { step('gegen: ' + name, !sollFalschS
      die richtige FARBE zeichnet, misst pruefungen/shop_raender.js am
      tatsaechlich gerenderten Rand — Klassenzaehlen allein kann das
      nicht, und genau diese Luecke war das Problem. */
+  /* ⚠ SEIT DEM 31.07.2026 GIBT ES EINE VIERTE ROLLE. Der Gratis-Posten
+     der Tagesangebote trug bis dahin `fr-light` wie die fuenf bezahlten
+     daneben — er ist aber der Grund, ueberhaupt in die Sektion zu
+     schauen. Er hat jetzt seine eigene violette Kante (`fr-gratis`).
+     Die Zahl 6 wird deshalb 5 + 1, und der Schritt prueft ausdruecklich
+     BEIDE Haelften: fuenf helle UND genau einen violetten. Nur die
+     Summe zu pruefen wuerde durchgehen lassen, dass die Rolle wieder
+     verschwindet. */
   step('Farbcode-Rahmen: Kristalle, Gold, Angebote je eigene Rolle',
-    shopBlocks.gemFrames === 6 && shopBlocks.goldFrames === 3 && shopBlocks.dealFrames === 6,
+    shopBlocks.gemFrames === 6 && shopBlocks.goldFrames === 3 &&
+    shopBlocks.dealFrames === 5 && shopBlocks.dealGratisFrames === 1,
     shopBlocks.gemFrames + ' Kristall / ' + shopBlocks.goldFrames + ' Gold / ' +
-    shopBlocks.dealFrames + ' hell');
+    shopBlocks.dealFrames + ' hell / ' + shopBlocks.dealGratisFrames + ' gratis');
   step('Jede Produktkarte hat eine eigene Rahmen-Ebene ueber dem Produktbild',
     shopBlocks.frameLayers === shopBlocks.gems + shopBlocks.golds + shopBlocks.deals,
     shopBlocks.frameLayers + ' Rahmen-Ebenen');
