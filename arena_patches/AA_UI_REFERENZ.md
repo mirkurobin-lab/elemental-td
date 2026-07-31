@@ -3838,3 +3838,125 @@ erzeugen. Dann fällt der Restbeschnitt von 15 % weg. ⚠ Wer das tut, muss `asp
 `.diorama` mitändern — sonst beschneidet die Box wieder, nur in die andere Richtung.
 
 **Aufwand: S** · **Priorität: 2** · erledigt, mit benanntem Rest
+
+---
+
+## §38 „Pass alle Icons und Banner an, dass sie richtig fitten"
+
+Ansage (31.07.2026), zusammen mit der Frage nach Schatten, Lichteffekten und
+Klickton. Gemessen wurden **441 sichtbare Bildflächen** über alle 16 Ansichten:
+Seitenverhältnis der Quelle gegen Seitenverhältnis des Kastens, dazu die
+Füllregel. Die Prüfung dazu steht als `pruefungen/passform.js` (6 Schritte).
+
+### 38.1 Das Werkzeug war zuerst falsch — und der Fehler versteckte echte Befunde
+
+Die erste Fassung zog aus einem mehrschichtigen `background` die erste **Datei**,
+aber die erste **Größenangabe**. Liegt ein Verlauf über dem Bild — bei uns der
+Regelfall, siehe `bgArt()` —, gehören die beiden nicht zusammen: gemessen wurde
+die Größe des Verlaufs.
+
+| | erste Fassung | nach dem Ausrichten |
+|---|---|---|
+| gemeldete Dehnungen | 6 (alle falsch) | 1 (echt: `.tile`) |
+| gemeldete Beschnitte | 1 | 11 |
+
+> **Merksatz:** Wer aus zwei parallelen Listen liest, muss aus **beiden denselben
+> Index** nehmen. Ein Treffer in Liste A sagt nichts über Position 0 in Liste B.
+
+### 38.2 Was wirklich nicht gepasst hat
+
+**a) Die Kachelrahmen lagen doppelt auf.** Alle 16 Schmiede-Kacheln trugen
+`frame_*` zweimal: einmal richtig als 9-Slice auf `.frm`, einmal als
+vollflächiger Hintergrund mit `background-size:100% 100%`. Die Rahmen sind 2:3,
+die Kachel ist 3:4 — die zweite Kopie war **10,5 % in die Breite gezogen**. Der
+Kommentar an der Stelle nannte den 9-Slice-Weg selbst als den richtigen und
+verwies auf ein offenes Paket; der Weg existierte längst, nur diese Stelle wurde
+nicht mitgezogen. *Sichtbar ändert sich dadurch nichts* — die verzerrte Kopie lag
+unter dem Artwork. Es fällt eine überflüssige, falsch skalierte Bildebene weg.
+
+**b) Die Aufschriften der Kacheln waren übermalt.** Das ist der eine Befund, den
+man sieht. `.frm` ist ein `border-image` mit `border-image-width:12% 10% 14% 10%`
+— es malt echte **Bänder** an allen vier Kanten: unten rund 13 px, links rund
+7 px auf einer 75×100-Kachel. Genau dort sitzen Raritätsname, Stückzähler und
+Sternpunkte, und alle standen auf `z-index:auto` gegen die 3 des Rahmens.
+
+| | vorher | nachher |
+|---|---|---|
+| Raritätsname („Gewöhnlich", „LvL 44") | vollständig verdeckt | lesbar |
+| Stückzähler | „‹7" statt „×7" | „×7" |
+| Sternpunkte `●○○` | verdeckt | sichtbar |
+
+> ⚠ **Warum keine der bestehenden Prüfungen das gesehen hat.** `.frm` trägt
+> `pointer-events:none`. Ein Treffertest mit `elementFromPoint` meldet an dieser
+> Stelle die Schrift als **oberstes** Element — sichtbar ist sie trotzdem nicht.
+> **Ein Hit-Test beweist Anklickbarkeit, nicht Sichtbarkeit.** Bewiesen wurde es,
+> indem `.frm` ausgeblendet und dasselbe Element erneut fotografiert wurde.
+> Dieselbe Bugklasse war bei der Stufenmarke im Deck schon einmal behoben worden
+> (`z-index:4`) — die Kachel wurde damals nicht mitgezogen.
+
+**c) Das Pass-Banner war das einzige Artwork ohne Abdunkelung.** `background-image`
+trug genau eine Ebene; die graue Unterzeile stand direkt auf den hellsten Punkten
+eines Gold-Violett-Mandalas. Dazu brach die Zeile „Stufe 18/50 · endet in 1 Tag"
+in der **102 px** breiten Textspalte um (sie braucht bei 9 px rund 150 px) und
+schob den Textstapel auf **67 px in einem 69 px hohen Banner**.
+
+Behoben an beiden Enden: ein Band als `::before` (weil `layer()` das Artwork
+zwingend als oberste Hintergrundebene setzt, ist ein Pseudo-Element der einzige
+Weg darüber), und die Zeile bricht nicht mehr um — kürzer gefasst („noch" statt
+„endet in", 7 Zeichen) plus `text-overflow:ellipsis` als Netz.
+
+> **Korrektur an mir selbst:** Ich hatte hier früher gemeldet, der Titel laufe
+> unter die „18 BEREIT"-Pille. Nachgemessen stimmt das **nicht** — er endet 8 px
+> davor. Das dazwischenliegende helle Mandala hat es so aussehen lassen.
+
+**d) `.rico`, 37 Belohnungs-Icons.** Hochformatige Artworks (3:4) in einem
+26×26-Quadrat mit `cover`, mittig — es wurde also gleich viel vom Deckel wie vom
+Boden abgeschnitten. Jetzt `background-position: center 28%`, dieselbe Lösung wie
+bei `.prodcard .pcart img.prodimg`, wo sie samt Begründung schon stand.
+
+### 38.3 Was ausdrücklich NICHT geändert wurde
+
+- **`contain` mit Rand (29 Stellen, bis 25 %).** `contain` schneidet nichts weg,
+  es lässt Rand stehen. Bei einer Bibliothek mit 1:1-, 3:4- und 2:3-Quellen ist
+  das die richtige Füllregel; die Kachel wirkt nur optisch kleiner als ihre
+  quadratischen Nachbarn. Gestaltungsfrage, kein Defekt — steht als **Zahl** im
+  Bericht und macht keinen Lauf rot.
+- **Kulissen (56 Stellen, bis 54 %).** Eine Fläche, über der ein Abdunkelungsband
+  liegt, trägt Text und kein Motiv, das man lesen muss — sie **soll** ihren Kasten
+  füllen. Das Band hat drei Bauformen (Hintergrundschicht, `::before`,
+  Kind-Element wie `.keyart .kshade`); die Prüfung fragt nach der **Wirkung**,
+  nicht nach der Bauart.
+- **`.prodcard`s `cover`.** Dort steht seit dem 30.07. eine gemessene Begründung
+  im Blatt. Eine Entscheidung mit Begründung wird nicht rückgängig gemacht, weil
+  ein neues Werkzeug sie meldet.
+
+> ⚠ **Ein Tor mit 56 Ausnahmen sieht von außen genauso grün aus wie eines, das
+> nichts zu meckern hat.** Deshalb steht in `passform.js` ein Gegenbeweis: er
+> nimmt `.keyart` sein Band weg und prüft, ob dieselbe Fläche danach als
+> Beschnitt gemeldet wird. Fällt der Schritt, ist die Kulissen-Erkennung zu weit
+> geraten und die Suite meldet nichts mehr, egal was passiert.
+
+### 38.4 Schatten, Lichteffekte, Klickton — der Stand, gemessen
+
+| | Messwert |
+|---|---|
+| `box-shadow` / `drop-shadow` / `text-shadow` im Blatt | 355 / 69 / 71 |
+| Innenlichter (`inset`) · Radialverläufe | 64 · 70 |
+| Kästen mit **Schlagschatten** | 287 von 307 (**93,5 %**) |
+| Kästen mit **Lichtkante oder Verlauf** | 298 von 307 (**97,1 %**) |
+| Klickbare Elemente mit Druckschicht `.pressable` | **224 von 224 (100 %)** |
+
+Der Ton ist ein WebAudio-Synth (`UISfx`, keine Dateien) an einer **einzigen**
+delegierten `pointerdown`-Schicht auf `document`, die zugleich `.pressed` setzt
+und Funken wirft. Acht echte Mausklicks lösten 9 `tap()`, 5 `deny()`, 2
+`reward()` und 7 Funkenwolken aus. Semantische Varianten: `tap`, `confirm`,
+`deny`, `reward`, `flip(stufe)`, `legend`.
+
+**Offen, gemessen:** 20 Kästen ohne Schlagschatten, davon 14 verschiedene —
+`gchead` (4×, hat Licht), `binfo` (3×, flach), `slot` (2×), dazu `sidetile`,
+`offerx`, `vorratmore`, `btnReset`, `btnMerge`, die drei Schalter in den
+Einstellungen und `btnDemoLose` / `btnImport`. Und: `UISfx.flip()` wird an einer
+von drei Stellen **ohne Stufe** gerufen — die Paketöffnung klingt dort für
+Gewöhnlich wie für Erhaben.
+
+**Aufwand: M** · **Priorität: 1** · erledigt bis auf die 20 schattenlosen Kästen

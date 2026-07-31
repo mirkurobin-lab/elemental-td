@@ -317,8 +317,14 @@ function gegen(name, sollFalschSein, info) { step('gegen: ' + name, !sollFalschS
       const m = /rgb\((\d+), (\d+), (\d+)\)/.exec(cs.webkitTextFillColor || cs.color);
       return m ? (+m[1] * 0.299 + +m[2] * 0.587 + +m[3] * 0.114) : 255; })(),
   }));
+  /* ⚠ Geprueft wird die AUSSAGE, nicht der Wortlaut. Vorher stand hier
+     /endet in/ — als die Zeile am 31.07.2026 auf „noch 1 Tag" gekuerzt
+     wurde (sie brach sonst in der 102 px breiten Spalte um), meldete
+     der Schritt einen Fehler, obwohl die Restlaufzeit unveraendert da
+     stand. Ein Test, der eine Formulierung einfriert, blockiert genau
+     die Korrekturen, fuer die er da sein sollte. */
   step('Pass-Banner zeigt Saison, Stufe und Restlaufzeit',
-    /SAISON/.test(pb.txt) && /Stufe \d+\/\d+/.test(pb.txt) && /endet in/.test(pb.txt),
+    /SAISON/.test(pb.txt) && /Stufe \d+\/\d+/.test(pb.txt) && /\d+\s*Tage?\b/.test(pb.txt),
     pb.txt.slice(0, 62));
   step('Pass-Banner ist ein Farbkoerper', pb.tinted);
   step('Goldener Knopf im Banner traegt dunkle Schrift', pb.lum < 120, Math.round(pb.lum));
@@ -1687,8 +1693,13 @@ function gegen(name, sollFalschSein, info) { step('gegen: ' + name, !sollFalschS
         const cs = getComputedStyle(e);
         // Nur Elemente mit echter Artwork-Ebene
         if (!/hf_[0-9a-z_-]+\.(png|webp)/i.test(cs.backgroundImage || '')) return;
-        // Rahmen duerfen strecken — das ist die benannte Ausnahme.
-        if (e.classList.contains('rahmen-fuellt')) return;
+        /* ⚠ HIER STAND EINE AUSNAHME FUER `rahmen-fuellt` — „Rahmen duerfen
+           strecken". Sie ist am 31.07.2026 ersatzlos gefallen, weil ihr
+           einziger Nutzer weg ist: die Schmiede-Kacheln trugen den Rahmen
+           doppelt (9-Slice auf .frm PLUS gestreckter Hintergrund), und die
+           gestreckte Kopie war um 10,5 % zu breit. Ein Rahmen muss nicht
+           strecken, er muss 9-slicen. Eine Ausnahme ohne Nutzer stehen zu
+           lassen waere eine offene Tuer fuer denselben Fehler. */
         /* ⚠ GEAENDERTE MESSSTELLE, mit Absicht (26.07.).
            Vorher stand hier `backgroundSize.split(',')[0]` mit der
            Begruendung „die ERSTE Ebene ist das Artwork, layer() setzt es

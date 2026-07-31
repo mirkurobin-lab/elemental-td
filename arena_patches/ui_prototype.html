@@ -825,14 +825,35 @@ select.sel option{background:var(--panel);color:var(--txt)}
 .tile{position:relative;aspect-ratio:3/4;border-radius:8px;border:2px solid #444;
   background:var(--panel2);overflow:hidden;display:flex;align-items:center;justify-content:center}
 .tile .art{font-size:22px;filter:drop-shadow(0 1px 2px #000)}
+/* ⚠ z-index 4 IST DER FIX, NICHT KOSMETIK (gemessen 31.07.2026).
+   Die Aufschriften der Kachel standen alle auf `z-index:auto`, das
+   Rahmen-Overlay `.frm` steht auf 3 — und `.frm` ist ein border-image,
+   das mit `border-image-width:12% 10% 14% 10%` echte BAENDER an allen
+   vier Kanten malt: unten rund 13 px, links rund 7 px auf einer
+   75x100-Kachel.
+   Genau dort liegen die Aufschriften. Ergebnis, im Bild nachgewiesen:
+   die Raritaet („Gewoehnlich") war VOLLSTAENDIG uebermalt, und vom
+   Stueckzaehler blieb statt „x7" ein „<7" stehen, weil das linke Band
+   die halbe Glyphe verdeckte.
+   ⚠ WARUM DIE VORHANDENEN PRUEFUNGEN DAS NICHT GESEHEN HABEN: `.frm`
+   traegt `pointer-events:none`. Ein Treffertest mit elementFromPoint
+   meldet deshalb `.lvl` als OBERSTES Element — sichtbar ist es trotzdem
+   nicht. Hit-Test beweist keine Sichtbarkeit, wenn pointer-events im
+   Spiel sind. Bewiesen wurde es, indem `.frm` ausgeblendet und dasselbe
+   Element erneut fotografiert wurde: dann steht die Schrift da.
+   Derselbe Fehler und dieselbe Loesung wie bei der Stufenmarke im Deck
+   (siehe Kommentar bei `.anfbild`) — die Kachel wurde damals nur nicht
+   mitgezogen. */
 .tile .lvl{position:absolute;left:0;right:0;bottom:0;background:#000a;font-size:9px;
-  text-align:center;font-weight:800;padding:1px 0}
+  text-align:center;font-weight:800;padding:1px 0;z-index:4}
 .tile .eq{position:absolute;left:0;right:0;top:0;background:#48e222cc;color:#04210a;
-  font-size:7.5px;text-align:center;font-weight:900;letter-spacing:.04em;padding:1px 0}
+  font-size:7.5px;text-align:center;font-weight:900;letter-spacing:.04em;padding:1px 0;z-index:4}
 .tile .dots{position:absolute;right:2px;bottom:12px;font-size:8px;letter-spacing:-1px;color:#fff;
-  text-shadow:0 0 3px #000;line-height:1}
+  text-shadow:0 0 3px #000;line-height:1;z-index:4}
+/* `.tile .cnt` bekommt seine 4 bei seiner eigenen Regel weiter unten —
+   dort steht auch sein `position:absolute`, ohne das z-index nichts tut. */
 .tile .reddot{position:absolute;left:2px;top:2px;width:8px;height:8px;border-radius:50%;
-  background:var(--danger);box-shadow:0 0 6px var(--danger);animation:pulse 1.2s infinite;z-index:2}
+  background:var(--danger);box-shadow:0 0 6px var(--danger);animation:pulse 1.2s infinite;z-index:4}
 .tile.dim{opacity:.35}
 @keyframes pulse{50%{transform:scale(1.35)}}
 .hint{font-size:11px;color:var(--dim);margin:10px 2px;line-height:1.5}
@@ -1233,8 +1254,10 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
   display:flex;align-items:center;justify-content:center;font-size:24px;color:#3a4c5c}
 .reqslot.filled{border-style:solid}
 .forgeactions{display:flex;gap:8px;margin-top:10px}
+/* z-index 4: siehe die Begruendung bei `.tile .lvl`. Ohne das verdeckte
+   das linke Band des Rahmen-Overlays die Mal-Glyphe („x7" wurde „<7"). */
 .tile .cnt{position:absolute;left:2px;bottom:12px;background:#000b;border-radius:6px;
-  font-size:8px;font-weight:900;padding:0 3px;line-height:1.3}
+  font-size:8px;font-weight:900;padding:0 3px;line-height:1.3;z-index:4}
 .tile.sel{outline:2px solid #fff;outline-offset:-2px}
 .flash{animation:flash .7s ease-out}
 @keyframes flash{
@@ -5404,9 +5427,25 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
 .rwcell.blocked .rtx,.rwcell.taken .rtx{padding-right:20px}
 .rwcell.taken{opacity:.42}
 .rwcell.blocked{opacity:.6}
+/* ⚠ DER BESCHNITT IST GEMESSEN, NICHT GERATEN (31.07.2026).
+   37 der 85 Belohnungs-Icons tragen ein HOCHFORMATIGES Artwork (Packs
+   und Karten sind 768x1024, also 3:4) in einem 26x26-QUADRAT. Mit
+   `cover` fuellt das Bild die Breite und laeuft oben und unten je 16,7 %
+   ueber — bei mittiger Lage wird also genau so viel vom Deckel wie vom
+   Boden abgeschnitten.
+   `contain` waere die naheliegende Antwort, ist hier aber die falsche:
+   in einer Liste stehen die Icons UNTEREINANDER, und 19,5 px breite
+   Packs neben 26 px breiten Muenzen geben eine ausgefranste Spalte.
+   Deshalb dieselbe Loesung wie bei `.prodcard .pcart img.prodimg`, wo
+   sie schon steht und begruendet ist: `cover` bleibt, aber die Lage
+   rueckt auf 28 % Hoehe — der Schnitt nimmt unten mehr weg als oben,
+   und oben steht bei Pack und Karte das Motiv.
+   Die zweite Ebene (die Farbplatte) bleibt mittig; sie ist ein Verlauf
+   und hat kein Motiv, das verrutschen koennte. */
 .rwcell .rico{flex:0 0 26px;width:26px;height:26px;display:flex;align-items:center;
   justify-content:center;font-size:16px;border-radius:7px;
-  background-repeat:no-repeat;background-position:center;background-size:cover,cover;
+  background-repeat:no-repeat;background-position:center 28%,center;
+  background-size:cover,cover;
   background-image:radial-gradient(circle at 45% 35%,#3a4c5c,#141d26 72%)}
 .rwcell .rtx{flex:1;min-width:0;font-size:10px;font-weight:800;color:#dbe6ef;line-height:1.3}
 .rwcell .rtx small{display:block;font-size:8.5px;color:var(--dim);font-weight:700}
@@ -6546,12 +6585,36 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   background-repeat:no-repeat;background-position:center;background-size:cover,cover;
   background-image:linear-gradient(110deg,#4a2a7a,#2a1b46 55%,#141d2b);
   border:1px solid #a45ef255;box-shadow:0 8px 20px -12px #000,inset 0 0 30px -10px #a45ef255}
-.passbanner .pbs{flex:0 0 auto;font-size:23px}
+/* ⚠ ABDUNKELUNG UNTER DER SCHRIFT — dasselbe Mittel wie bei bgArt(),
+   hier aber als ::before, weil layer() das Artwork als OBERSTE
+   Hintergrundebene einsetzt und ein Verlauf im selben Stapel darunter
+   landen wuerde statt darueber.
+   Warum es noetig ist, gemessen am 31.07.2026: `pass_keyart` ist an
+   dieser Stelle ein helles Gold-Violett-Mandala, und das Banner war das
+   EINZIGE mit Artwork ohne Band — `background-image` trug genau eine
+   Ebene. Die graue Unterzeile stand damit direkt auf den hellsten
+   Bildpunkten.
+   Das Band deckt die Textspalte (links bis 72 %) und laesst die rechte
+   Seite frei, wo Kristalle und Zier sitzen — dieselbe Aufteilung wie
+   bei den sechs Bannern aus §6c. */
+.passbanner::before{content:"";position:absolute;inset:0;z-index:1;
+  pointer-events:none;border-radius:inherit;
+  background:linear-gradient(90deg,#0b1219e6 0%,#0b1219cc 42%,#0b121966 62%,#0b121900 78%)}
+.passbanner .pbs{flex:0 0 auto;font-size:23px;position:relative;z-index:2}
 .passbanner .pbt{flex:1;min-width:0;position:relative;z-index:2}
 .passbanner .pbk{display:block;font-size:8.5px;letter-spacing:.18em;font-weight:900;
   color:#c6b4ee}
-.passbanner .pbn{display:block;font-size:15px;line-height:1.15}
-.passbanner .pbd{display:block;font-size:9px;color:#a9bccb;margin-top:2px}
+.passbanner .pbn{display:block;font-size:15px;line-height:1.1}
+/* ⚠ EINE ZEILE, NICHT ZWEI. Gemessen stand hier „Stufe 18/50 · endet in
+   1 Tag" auf ZWEI Zeilen: die Textspalte ist 102 px breit, die Zeile
+   braucht bei 9 px rund 150 px. Der Umbruch schob den Textstapel auf
+   67 px Hoehe in einem 69 px hohen Banner — die Unterzeile klebte an der
+   Unterkante, und „1 Tag" stand allein.
+   Behoben an BEIDEN Enden: die Zeile bricht nicht mehr um (und kuerzt
+   im Notfall mit Auslassung), und der Text selbst ist kuerzer gefasst
+   („noch" statt „endet in", siehe renderHome). */
+.passbanner .pbd{display:block;font-size:8.5px;color:#c3d2de;margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .passbanner .pbb{flex:0 0 auto;position:relative;z-index:2;border-radius:var(--radius-sm);
   padding:7px 11px;font-size:11px;font-weight:900;
   background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);box-shadow:0 3px 0 #6d551a;
@@ -12587,17 +12650,20 @@ button.pfplate{cursor:pointer}
     var els = $("forgeGrid").querySelectorAll("[data-id]");
     for (var i = 0; i < els.length; i++) {
       (function (el) {
-        // Raritätsrahmen-Asset über den Farbgradienten legen (Fallback bleibt).
-        layer(el, "frame_" + tierOf(el.getAttribute("data-tier")).key);
-        /* Die EINE berechtigte Ausnahme von "Artwork nie strecken": ein
-           RAHMEN muss auf die Kante gezogen werden, sonst fehlt genau
-           der Rand, der ihn zum Rahmen macht. Die Klasse macht die
-           Ausnahme benennbar, damit die Banner-Prüfung sie zulassen kann,
-           ohne die Regel für alles andere aufzugeben. Richtig gelöst wäre
-           das mit border-image (9-Slice) — steht als P3 im
-           DESIGNSYSTEM.md. */
-        el.classList.add("rahmen-fuellt");
-        el.style.backgroundSize = "100% 100%, 100% 100%";
+        /* ⚠ HIER STAND EINE ZWEITE, GESTRECKTE KOPIE DESSELBEN RAHMENS.
+           Gemessen am 31.07.2026: alle 16 Kacheln trugen `frame_*` doppelt
+           — einmal richtig als 9-Slice auf `.frm` (aus artBox() oben, von
+           hydrateFrames() aufgeloest) und einmal als Vollflaechen-
+           Hintergrund mit `background-size:100% 100%`. Die Rahmen sind
+           768x1144 (2:3), die Kachel ist 3:4 — die zweite Kopie war also
+           um 10,5 % in die Breite gezogen, und weil sie UNTER dem Artwork
+           lag, sah man von ihr nur den verzerrten Rest rund um das Bild.
+           Der alte Kommentar nannte den 9-Slice-Weg selbst als den
+           richtigen und verwies auf P3 im DESIGNSYSTEM — der Weg existiert
+           seit §6c, nur diese Stelle wurde nicht mitgezogen.
+           Der Farbverlauf aus dem HTML-Attribut bleibt die Platte; die
+           Klasse `rahmen-fuellt` faellt mit weg, sie war nur die Erlaubnis
+           fuer genau diese Streckung. */
         el.addEventListener("click", function () {
           pickForge(el.getAttribute("data-id"), el.getAttribute("data-tier"));
         });
@@ -21706,8 +21772,11 @@ button.pfplate{cursor:pointer}
       seedPass();
       var st = P.state();
       $("pbName").textContent = "Goldene Fortuna";
+      /* „noch" statt „endet in": dieselbe Aussage, 7 Zeichen kuerzer —
+         und die Zeile hat in der 102 px breiten Textspalte nur fuer
+         rund 19 Zeichen Platz (Begruendung bei `.passbanner .pbd`). */
       $("pbSub").textContent = "Stufe " + st.level + "/" + st.levels +
-        " · endet in " + st.daysLeft + " Tag" + (st.daysLeft === 1 ? "" : "en");
+        " · noch " + st.daysLeft + " Tag" + (st.daysLeft === 1 ? "" : "e");
       $("pbBtn").textContent = st.pending ? st.pending + " BEREIT" : "ÖFFNEN";
       UIBadge.set("pass", st.pending);
       /* AAs Fortschrittsleiste unter dem Banner: der Balken zeigt den Weg

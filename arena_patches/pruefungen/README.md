@@ -4,6 +4,22 @@ Zuletzt vollständig gemessen am **30.07.2026**: 24 Playwright-Suiten laufen hie
 durch. Rot bleibt genau einer — `run_v7.js` „gleiche Drittel" (siehe unten,
 braucht eine Produktentscheidung, kein Code-Fix).
 
+**`passform.js`** (6 Schritte, 31.07.2026) misst über alle 16 Ansichten das
+Seitenverhältnis jeder Quelle gegen das ihres Kastens und dazu die Füllregel —
+441 sichtbare Bildflächen. Drei Befundarten, drei verschiedene Konsequenzen:
+*gedehnt* ist immer ein Fehler, *Beschnitt* nur bei einem Motiv (nicht bei einer
+Kulisse mit Abdunkelungsband), *Rand durch `contain`* ist nur eine Zahl im
+Bericht. Der letzte Schritt ist ein **Gegenbeweis**: er nimmt `.keyart` das Band
+und prüft, ob das Tor dann zuschlägt — ohne ihn wäre nicht zu unterscheiden, ob
+die Suite nichts findet oder nichts mehr finden *kann*.
+
+Ihr wichtigster Schritt heißt „Keine Aufschrift liegt unter einer durchlässigen
+Auflage" und schließt eine Lücke, die **alle** vorherigen Prüfungen hatten:
+`elementFromPoint` meldet ein Element als oberstes, obwohl ein
+`pointer-events:none`-Overlay darüber malt. So blieb monatelang unbemerkt, dass
+der Raritätsname auf jeder Kartenkachel vollständig verdeckt war. **Ein Hit-Test
+beweist Anklickbarkeit, nicht Sichtbarkeit** (Details in `AA_UI_REFERENZ` §38).
+
 Neu hinzugekommen sind `video_rueckfall.js` (11 Schritte) und **`qualitaet.js`**
 (9 Schritte, 30.07.2026). `qualitaet.js` ist der messende Teil des
 CEO-Durchgangs: Trefferflächen ≥ 44 × 44, kein Klick-Diebstahl, kein Überlauf
