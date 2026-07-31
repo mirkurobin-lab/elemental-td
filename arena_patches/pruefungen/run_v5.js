@@ -113,8 +113,27 @@ function gegen(name, sollFalschSein, info) { step('gegen: ' + name, !sollFalschS
   /* AAs Screenshot enthaelt oben 4,4 % iOS-Statusleiste, unsere Seite
      nicht — alle absoluten Y-Werte aus IMG_3344 liegen deshalb um diesen
      Betrag hoeher. AAs 72,0 % entsprechen bei uns 67,6 %. */
-  step('KAMPF-Knopf in AAs Band (statusleistenkorrigiert 64-80 %)',
-    axis.battle > 0.64 && axis.battle < 0.80, Math.round(axis.battle * 100) + '%');
+  /* ⚠ AAs Band (64-80 %) IST UEBERSTIMMT — vom Auftraggeber, am
+     31.07.2026: „kannst du den Battle Butten tiefer platzieren … Das der
+     ganze Bildschirm fülliger aussieht." Unter AAs Knopf lagen bei uns
+     156 px ungenutzt; jetzt sitzt er tiefer und das Arenabild ist
+     groesser (AA_UI_REFERENZ §36).
+     Die Pruefung wird deshalb NICHT geloescht, sondern an die neue
+     Zusage gebunden. Die lautet nicht mehr „AAs Prozentwert", sondern:
+     der Knopf steht im unteren Drittel UND bleibt ueber der Leiste.
+     Der zweite Teil ist der wichtigere — genau daran ist die Aenderung
+     dreimal gescheitert, und auf kurzen Geraeten war er schon VORHER
+     unerreichbar. Gemessen wird er deshalb in Pixeln gegen die Leiste
+     und nicht in Prozent: ein Prozentwert haette den Fehler nie
+     gefunden. */
+  const kampfLage = await page.evaluate(() => {
+    const b = document.getElementById('btnBattle').getBoundingClientRect();
+    const n = document.querySelector('nav.bottom').getBoundingClientRect();
+    return { anteil: b.top / innerHeight, luft: Math.round(n.top - b.bottom) };
+  });
+  step('KAMPF-Knopf steht tief, aber ueber der Leiste',
+    kampfLage.anteil > 0.66 && kampfLage.anteil < 0.92 && kampfLage.luft >= 8,
+    Math.round(kampfLage.anteil * 100) + '% · ' + kampfLage.luft + ' px Luft zur Leiste');
   const pf = await page.locator('#arenaProgFill').evaluate(e => e.style.width);
   step('Fortschrittsbalken gefüllt (>0 %, <100 %)',
     parseFloat(pf) > 0 && parseFloat(pf) < 100, pf);

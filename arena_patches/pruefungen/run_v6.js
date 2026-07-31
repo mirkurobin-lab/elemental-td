@@ -1178,11 +1178,19 @@ function step(name, ok, info) {
     /Ränge \d+–\d+/.test(aNote) && /arena_rivals\.js/.test(aNote),
     aNote.slice(0, 70));
   // Smooth-Scroll zur eigenen Position (gescrollt wird das Dokument)
+  /* ⚠ GEMESSEN WIRD DER SCROLLER, NICHT DAS FENSTER. Bis zum
+     31.07.2026 wuchs #app mit dem Inhalt und es scrollte das DOKUMENT;
+     seit die Huelle auf `height:100dvh` begrenzt ist (§36.3, sonst lag
+     der KAMPF-Knopf auf kurzen Geraeten unerreichbar unter der Leiste),
+     scrollt die ANSICHT. window.scrollY bleibt damit 0 — die Funktion
+     tat weiter das Richtige, die Pruefung sah nur an der falschen
+     Stelle nach. Gefragt wird deshalb beides. */
   const scrolled = await page.evaluate(() => {
-    window.scrollTo(0, 0);
+    const v = document.getElementById('viewBoard');
+    window.scrollTo(0, 0); if (v) v.scrollTop = 0;
     window.__proto.setLbTab('around');
     return new Promise(res => setTimeout(() => res({
-      y: window.scrollY,
+      y: Math.max(window.scrollY, v ? v.scrollTop : 0),
       rect: document.getElementById('lbMe').getBoundingClientRect().top,
     }), 900));
   });
@@ -1290,13 +1298,19 @@ function step(name, ok, info) {
      Viewport (wie ein kleines Geraet im Querformat-Bereich) gehen. */
   await page.setViewportSize({ width: 430, height: 520 });
   await page.waitForTimeout(220);
+  /* Dieselbe Umstellung wie beim Ranglisten-Scroll: gescrollt wird die
+     ANSICHT. Hier war es allerdings ein ECHTER Fehler und nicht nur eine
+     Pruefung, die woanders hinsah — fortParallax las window.scrollY und
+     stand nach der Umstellung still. */
   const par = await page.evaluate(() => new Promise(res => {
-    window.scrollTo(0, 0);
+    const v = document.getElementById('viewFortress');
+    window.scrollTo(0, 0); if (v) v.scrollTop = 0;
     setTimeout(() => {
       const before = document.getElementById('fortBg').style.transform;
+      if (v) { v.scrollTop = 300; v.dispatchEvent(new Event('scroll')); }
       window.scrollTo(0, 300);
       setTimeout(() => res({ before, after: document.getElementById('fortBg').style.transform,
-                             scrolled: window.scrollY }), 260);
+                             scrolled: Math.max(window.scrollY, v ? v.scrollTop : 0) }), 260);
     }, 140);
   }));
   step('Parallax verschiebt den Burg-Layer beim Scrollen',

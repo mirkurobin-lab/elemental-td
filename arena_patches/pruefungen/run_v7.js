@@ -2226,10 +2226,32 @@ function gegen(name, sollFalschSein, info) { step('gegen: ' + name, !sollFalschS
     0.383 * 1.75 >= 0.9,
     'alt: 67 % Fuellung, also ein Drittel leerer Rand');
 
-  step('Arena-Diorama auf AAs 54 % Breite',
-    heim.diorama && nah(heim.diorama.b, 54.3, 3), heim.diorama ? heim.diorama.b + ' %' : '-');
-  step('Arena-Diorama auf AAs 19 % Hoehe',
-    heim.diorama && nah(heim.diorama.h, 19, 3), heim.diorama ? heim.diorama.h + ' %' : '-');
+  /* ⚠ AAs MASSE (54,3 % Breite / 19 % Hoehe) SIND UEBERSTIMMT — vom
+     Auftraggeber am 31.07.2026: „das Arena Image in der Mitte
+     vergrössern … das der ganze Bildschirm fülliger aussieht."
+     Unter dem KAMPF-Knopf lagen 156 px ungenutzt, waehrend das Bild auf
+     236 x 175 gedeckelt war (AA_UI_REFERENZ §36).
+
+     Die beiden Schritte werden deshalb nicht geloescht, sondern an die
+     neue Zusage gebunden. Sie lautet: das Bild ist GROSS, es bleibt im
+     Bild, und es SCHRUMPFT auf kurzen Geraeten, statt den KAMPF-Knopf
+     hinauszuschieben. Der dritte Teil ist der wichtigste — daran ist die
+     Aenderung dreimal gescheitert, und er laesst sich nur pruefen, indem
+     man die Fenstergroesse wirklich aendert. */
+  step('Arena-Diorama fuellt die Mitte (70-92 % Breite)',
+    heim.diorama && heim.diorama.b >= 70 && heim.diorama.b <= 92,
+    heim.diorama ? heim.diorama.b + ' %' : '-');
+  const dioKurz = await page.evaluate(() => {
+    const d = document.getElementById('arenaDiorama').getBoundingClientRect();
+    const k = document.getElementById('btnBattle').getBoundingClientRect();
+    const n = document.querySelector('nav.bottom').getBoundingClientRect();
+    return { h: Math.round(d.height), b: Math.round(d.width),
+             luft: Math.round(n.top - k.bottom), fenster: innerHeight };
+  });
+  step('Arena-Diorama bleibt im Bild und laesst den KAMPF-Knopf frei',
+    dioKurz.luft >= 8 && dioKurz.h >= 100,
+    dioKurz.b + 'x' + dioKurz.h + ' bei ' + dioKurz.fenster + ' px Fenster, ' +
+    dioKurz.luft + ' px Luft unter KAMPF');
   step('Freundes- und Menue-Knopf stehen nebeneinander (AAs Namenszeile)',
     heim.freunde && heim.menuNeben, heim.menuNeben ? 'nebeneinander' : 'getrennt');
 

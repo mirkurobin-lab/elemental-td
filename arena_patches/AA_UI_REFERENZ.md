@@ -3712,3 +3712,69 @@ Tokens (`--fs-1`…`--fs-8`, `--r-1`…`--r-4`) als Ziel für alles Neue.
 > Suchen-und-Ersetzen. Wer sie blind macht, ändert Umbrüche in jeder zweiten Kachel.
 
 **Aufwand: L** · **Priorität: 1** · erledigt (ohne Punkt 5)
+
+## §36 Punkt 5: der tote Raum unter KAMPF — und die vier Riegel davor
+
+Ansage (31.07.2026): *„kannst du den Battle Butten tiefer platzieren und das Arena Image in
+der Mitte vergrössern lass bisschen Abstand zum Battle Button. Das der ganze Bildschirm
+fülliger aussieht."*
+
+### 36.1 Das Ergebnis
+
+| | vorher | nachher |
+|---|---|---|
+| Arena-Bild | 236 × 175 | **366 × 270** |
+| KAMPF-Knopf | y 635–705 | **y 768–838** |
+| Luft zwischen Slots und KAMPF | 30 px | **46 px** |
+| Toter Raum unter KAMPF | **156 px** | 23 px (Abstand zur Leiste) |
+
+Nachgemessen bei **932 / 844 / 740 / 667 px** Fensterhöhe. Auf allen vieren steht der Knopf
+jetzt über der Leiste.
+
+### 36.2 Der Begrenzer war nicht die Höhe
+
+`max-height` stand auf 19,5 vh = 182 px, das Bild kam trotzdem nur auf 175. Es war die
+**Breite der Mittelspalte**: zwei Schienen zu je 17 % ließen der Mitte 256 px, und 92 % davon
+sind 236 — bei 4:3 exakt die gemessenen 175.
+
+Und die Schienen tragen **je eine Kachel**: 70 px Spaltenbreite über 500 px Höhe für einen
+einzigen quadratischen Knopf. Sie liegen jetzt **auf** dem Band statt darin.
+
+> **Abweichung von AA, mit Absicht.** §14.2 misst AAs Aufteilung auf 16,8 / 57,2 / 16,5 %.
+> Der Auftraggeber will es fülliger. Das steht hier, damit ein späterer Abgleich die Differenz
+> nicht für einen Fehler hält. Das Pass-Banner behielt dabei ausdrücklich seine 246 px
+> (`max-width`) — ohne Deckel wäre es auf 410 px gewachsen, und *das* hatte er schon einmal
+> gemeldet („der Banner ist zu groß").
+
+### 36.3 Vier Riegel, jeder einzeln gemessen
+
+Die Änderung war viermal scheinbar fertig und viermal nicht. Jeder Riegel hat dieselbe Form:
+eine Regel, die *irgendwann* richtig war und still verhindert, dass Platz weitergereicht wird.
+
+| # | Riegel | Wirkung |
+|---|---|---|
+| 1 | `#viewHome .hubband{flex:0 0 auto}` | freier Platz blieb unten liegen statt oben zu wirken |
+| 2 | `#viewHome .arenahero{flex:0 0 auto}` (spätere, gleich spezifische Regel schlug die frühere mit `1 1 auto`) | Bühne konnte nicht nachgeben |
+| 3 | `#app{min-height:100vh}` **plus** `overflow:hidden` | Hülle wächst über den Schirm und schneidet den Überstand ab |
+| 4 | `#viewHome.view.active{min-height:100%}` | Ansicht 932 px hoch **ab y 83** → Unterkante bei 1015 |
+
+Riegel 3 und 4 waren **vorbestehende Fehler**, keine Folge dieser Änderung: auf 740 px lag der
+KAMPF-Knopf schon vorher 39 px unter der Leiste — und wegen `overflow:hidden` nicht
+„erscrollbar", sondern **weg**. Die Vergrößerung hat sie nur sichtbar gemacht.
+
+> **Merksatz:** `min-height:100vh` zusammen mit `overflow:hidden` ist keine Absicherung,
+> sondern eine Falle. `min-height` lässt wachsen, `overflow:hidden` schneidet ab — zusammen
+> ergibt das unerreichbare Bedienelemente. Eine App-Hülle braucht `height`, nicht
+> `min-height`, und `dvh` statt `vh`, weil `vh` auf iOS die ein- und ausfahrende
+> Browserleiste nicht mitrechnet.
+
+### 36.4 Zwei eigene Fehlversuche
+
+- **Stufen per Media-Query** (`@media (max-height:820px){ .diorama{max-height:20vh} }`) — das
+  rät Gerätehöhen, statt den vorhandenen Platz zu messen. Wieder entfernt.
+- **`width:auto` + `aspect-ratio`**, damit die Breite aus der Höhe folgt — in einer Spalte mit
+  `align-items:center` schrumpft das auf den Inhalt, und der ist leer: das Bild fiel auf allen
+  vier geprüften Höhen auf sein Minimum von 104 px. Jetzt steht die Breite fest,
+  `aspect-ratio` liefert die natürliche Höhe, `flex-shrink` nimmt sie zurück, wenn es eng wird.
+
+**Aufwand: M** · **Priorität: 1** · erledigt

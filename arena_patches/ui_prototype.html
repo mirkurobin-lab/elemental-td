@@ -224,8 +224,29 @@
 html,body{margin:0;padding:0;background:#05090c;color:var(--txt);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 body{display:flex;flex-direction:column;align-items:center;min-height:100vh}
+/* ==================================================================
+ * ⚠ DIE HUELLE MUSS BEGRENZT SEIN, NICHT NUR MINDESTENS SO GROSS
+ * ------------------------------------------------------------------
+ * Hier stand `min-height:100vh` ZUSAMMEN MIT `overflow:hidden`. Diese
+ * Kombination ist die Ursache eines Fehlers, der schon vor dem
+ * 31.07.2026 bestand und beim Vergroessern des Arenabildes nur sichtbar
+ * wurde: bei `min-height` WAECHST die Huelle mit dem Inhalt ueber den
+ * Schirm hinaus — und `overflow:hidden` schneidet den Ueberstand dann
+ * ab. Auf einem 740-px-Geraet lag der KAMPF-Knopf damit unter der
+ * Bottom-Nav und war nicht erreichbar; nicht „man muss scrollen",
+ * sondern weg. Gemessen: #app 869 px hoch in einem 740-px-Fenster.
+ *
+ * `height:100dvh` begrenzt sie stattdessen. Die Ansichten tragen alle
+ * `overflow-y:auto` — was nicht passt, scrollt jetzt INNERHALB der
+ * Ansicht, und die Bottom-Nav bleibt als Flex-Kind unten stehen.
+ *
+ * dvh statt vh, weil vh auf iOS die ein- und ausfahrende Browserleiste
+ * NICHT mitrechnet: 100vh ist dort groesser als das, was man sieht, und
+ * genau der Ueberstand landet wieder unter der Leiste. `100vh` bleibt
+ * als Rueckfall fuer Browser ohne dvh davor stehen.
+ * ================================================================== */
 #app{width:100%;max-width:430px;background:var(--bg);position:relative;
-  display:flex;flex-direction:column;min-height:100vh;overflow:hidden}
+  display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
 button{font-family:inherit;color:inherit;border:0;background:none;cursor:pointer}
 
 /* ---------- Top-Bar (§1) ---------- */
@@ -2434,9 +2455,9 @@ footer{padding:6px 12px 14px;text-align:center}
    zwischen Kopf und Bottom-Nav. Ohne Scroll liefe die Kampfreihe unter
    die Leiste. Der Deckel auf dem Diorama allein reicht dort nicht. */
 #viewHome.view.active{display:flex;flex-direction:column;overflow-y:auto}
-#viewHome .arenahero{flex:1 1 auto}
+#viewHome .arenahero{flex:1 1 auto;min-height:0}
 #viewHome .arenahero .progwrap{margin-top:auto}
-#viewHome .homerow3{padding-bottom:10px}
+#viewHome .homerow3{padding-bottom:10px;margin-top:auto;padding-top:22px}
 .arenahero{position:relative;min-height:250px;display:flex;flex-direction:column;
   align-items:center;padding:8px 14px 16px;
   background-repeat:no-repeat;background-position:center center;
@@ -2933,8 +2954,12 @@ footer{padding:6px 12px 14px;text-align:center}
    zu hoch, und weil der Titel keinen eigenen Platz brauchte, rutschten
    Trophaeenbalken, Truhen und Kampfreihe 7 Punkte zu tief.
    Der Titel ist deshalb kein Overlay mehr, sondern ein Geschwister. */
+/* min-height:0 in der ganzen Kette: ohne das schrumpft ein Flex-Kind
+   NIE unter seine Inhaltshoehe, und der Restplatz-Ansatz oben liefe ins
+   Leere. Das ist die Voreinstellung, ueber die man in Flexbox einmal
+   stolpert und danach nie wieder. */
 .arenastage{position:relative;width:100%;display:flex;flex-direction:column;
-  align-items:center;gap:0}
+  align-items:center;gap:0;flex:1 1 auto;min-height:0}
 .arenatitle{position:static;display:flex;order:-1;
   flex-direction:column;align-items:center;pointer-events:none;
   margin-bottom:10px}
@@ -2953,13 +2978,66 @@ footer{padding:6px 12px 14px;text-align:center}
    und lief in die Bottom-Nav. AAs Diorama misst 19 % der Hoehe — als
    Deckel geschrieben schrumpft es auf kurzen Geraeten mit, statt zu
    ueberlaufen. */
-.diorama{margin-top:0;width:92%;max-width:300px;aspect-ratio:4/3;max-height:19.5vh;border-radius:18px;
+/* ⚠ VERGROESSERT AM 31.07.2026 auf Ansage: „das Arena Image in der
+   Mitte vergrössern … das der ganze Bildschirm fülliger aussieht."
+   Gemessen war der Begrenzer NICHT die Breite, sondern `max-height:
+   19.5vh` — bei 932 px Fensterhoehe also 182 px, und das Diorama kam
+   auf 236x175. Unter der Kampfreihe lagen dabei 156 px ungenutzt.
+   Jetzt 27vh (251 px) und bis 340 px breit. Der Deckel bleibt in vh und
+   nicht in px: auf einem kurzen Geraet (740 px) waere eine feste Hoehe
+   genau der Fehler, den der Kommentar bei #viewHome beschreibt — die
+   Kampfreihe liefe unter die Leiste. */
+/* ⚠ Die Hoehe kommt aus dem FLEX-RESTPLATZ, nicht aus einem
+   vh-Deckel. Mit `max-height:32vh` war das Bild auf hohen Geraeten
+   richtig und auf kurzen trotzdem zu gross: der Stapel war hoeher als
+   der Schirm, `margin-top:auto` an der Kampfreihe hatte nichts mehr zu
+   verteilen, und der wichtigste Knopf des Spiels lag unter der Leiste
+   (gemessen bei 740 px: 7 px darunter, bei 667 px: 44 px).
+   Stufen per Media-Query waren der zweite Versuch und ebenfalls falsch:
+   sie raten Geraetehoehen, statt den vorhandenen Platz zu messen.
+   Jetzt waechst und schrumpft das Bild mit dem, was uebrig ist —
+   `flex:1 1 auto` gibt die Hoehe, `aspect-ratio` die Breite dazu, und
+   `min-height` haelt es davon ab, zu einem Streifen zu werden. */
+/* ⚠ BREITE AUSDRUECKLICH, HOEHE SCHRUMPFBAR. Der Versuch davor gab
+   dem Bild `width:auto` und liess die Breite aus der Hoehe folgen — in
+   einer Spalte mit `align-items:center` schrumpft das aber auf den
+   Inhalt, und der ist leer: gemessen fiel das Diorama auf allen vier
+   geprueften Geraetehoehen auf sein Minimum von 104 px.
+   Jetzt steht die Breite fest, `aspect-ratio` liefert die natuerliche
+   Hoehe, und `flex-shrink:1` nimmt sie zurueck, wenn der Platz nicht
+   reicht. Auf hohen Geraeten ist das Bild damit so gross wie erlaubt,
+   auf kurzen so gross wie moeglich — und die Kampfreihe bleibt in
+   beiden Faellen ueber der Leiste. */
+.diorama{margin-top:0;flex:0 1 auto;min-height:104px;
+  width:min(88%,380px);aspect-ratio:4/3;max-height:34vh;border-radius:18px;
   background-repeat:no-repeat;background-position:center;background-size:cover,cover;
   background-image:linear-gradient(160deg,#2c3a4b,#131c25);
   border:1px solid #ffffff1f;
   box-shadow:0 18px 30px -10px #000000cc, 0 0 34px -6px #e0b94a3d,
              inset 0 0 0 1px #0e141866;
   transform:perspective(700px) rotateX(4deg);position:relative}
+/* ==================================================================
+ * KURZE GERAETE — der Stapel muss ohne Scrollen auf den Schirm
+ * ------------------------------------------------------------------
+ * ⚠ Das war schon VOR der Vergroesserung kaputt und ist dabei
+ * schlimmer geworden. Gemessen bei 740 px Fensterhoehe (iPhone SE mit
+ * Browserleisten, kleine Androiden):
+ *     vorher    Kampfknopf 39 px UNTER der Leiste
+ *     nachher  102 px darunter
+ * Die Ansicht scrollt zwar, aber der wichtigste Knopf des Spiels darf
+ * nicht erst erscrollt werden muessen.
+ *
+ * Gekuerzt wird dort, wo es am wenigsten weh tut: Diorama, Abstaende,
+ * Slot-Hoehe. Die Reihenfolge ist Absicht — das Diorama ist gross genug,
+ * um Hoehe abzugeben, die Kampfreihe nicht.
+ * ================================================================== */
+@media (max-height:820px){
+  /* Nur noch die AUSSENABSTAENDE, nicht mehr die Bildhoehe — die regelt
+     sich seit dem Restplatz-Ansatz von selbst. */
+  #viewHome .homerow3{padding-top:10px;padding-bottom:6px}
+  .hubband{padding-top:8px}
+  .arenatitle{margin-bottom:4px}
+}
 .diorama::after{content:"";position:absolute;left:12%;right:12%;bottom:-13px;height:14px;
   border-radius:50%;background:radial-gradient(ellipse,#000000a6,#0000);pointer-events:none}
 
@@ -6314,13 +6392,33 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
    damit war die Startseite IMMER sichtbar und lag unter jeder anderen
    Ansicht. Mit `.active` im Selektor gewinnt sie nur im richtigen
    Zustand. */
-#viewHome.view.active{display:flex;flex-direction:column;min-height:100%;padding-bottom:84px}
-#viewHome .hubband{flex:0 0 auto}
+/* ⚠ `min-height:100%` war der letzte Riegel. Es bezieht sich auf die
+   HOEHE DER HUELLE (932 px), nicht auf den Platz, der der Ansicht
+   uebrig bleibt — und der ist um die Kopfzeile kleiner. Die Ansicht war
+   damit 932 px hoch und begann bei y 83: sie ragte 83 px unter den
+   Schirm, und alles, was `margin-top:auto` nach unten schob, landete
+   dort. Gemessen: Unterkante 1015 in einem 932-px-Fenster.
+   `flex:1 1 auto` gibt ihr genau den Rest — mehr braucht sie nicht, und
+   mehr darf sie nicht nehmen. */
+#viewHome.view.active{display:flex;flex-direction:column;min-height:0;padding-bottom:84px}
+/* ⚠ Stand auf `0 0 auto` und war damit der Grund, warum der freie
+   Platz unten liegen blieb statt oben zu wirken (gemessen 149 px
+   zwischen Kampfreihe und Leiste). Jetzt nimmt das Band die Hoehe auf. */
+#viewHome .hubband{flex:1 1 auto;min-height:0}
 /* stretch, nicht flex-start: sonst ist die Mittelspalte nur so hoch wie
    ihr Inhalt und das flex:1 der Arena-Buehne greift ins Leere. Die
    Schienen bleiben oben, weil ihre Kacheln feste Seitenverhaeltnisse
    haben — sie bekommen nur eine hoehere Spalte, keine hoeheren Kacheln. */
-.hubband{display:flex;align-items:stretch;gap:var(--gap);padding:12px 10px 0}
+/* ⚠ `flex:1 1 auto` ist der Grund, warum unten kein Loch mehr bleibt.
+   #viewHome ist eine Flex-Spalte, und `.arenahero` darin trug schon
+   `flex:1 1 auto` — aber das half nichts, solange das BAND selbst nicht
+   waechst. Der freie Platz blieb deshalb ganz unten liegen: gemessen
+   156 px zwischen Kampfreihe und Leiste, auf dem Bildschirm, den man am
+   haeufigsten sieht.
+   Jetzt nimmt das Band den Platz auf und verteilt ihn dort, wo AA ihn
+   auch hat — um das Diorama herum. */
+.hubband{display:flex;align-items:stretch;gap:var(--gap);padding:12px 10px 0;
+  flex:1 1 auto;min-height:0}
 /* Die Mittelspalte schiebt Diorama und Truhen auseinander, wenn Platz da
    ist — sie ist der Ort, an dem AA die Hoehe verteilt. */
 .hubmid{justify-content:flex-start}
@@ -6333,7 +6431,13 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
    bei 82,5 %, die Bottom-Nav beginnt erst bei 91,5 %. Neun Punkte leer.
    Deshalb waechst hier nichts mehr; der Rest sammelt sich unter der
    Kampfreihe. */
-#viewHome .arenahero{flex:0 0 auto;justify-content:flex-start}
+/* ⚠ Stand auf `0 0 auto` und war damit der Riegel, an dem das
+   Schrumpfen haengenblieb: die Buehne konnte nicht nachgeben, also lief
+   der ganze Stapel unten heraus statt sich einzupassen. Die Regel weiter
+   oben (Zeile ~2437) sagte schon `1 1 auto` — diese hier ist gleich
+   spezifisch und steht spaeter, also gewann sie. Gemessen bei 740 px:
+   Kampfreihe 111 px unter der Leiste. */
+#viewHome .arenahero{flex:1 1 auto;min-height:0;justify-content:flex-start}
 /* Nutzerbefund am Nebeneinander-Vergleich (IMG_3356): „unserer muss
    bisschen tiefer". Nachgemessen als Anteil am Band zwischen
    Kopf-Unterkante und Nav-Oberkante — die einzige vergleichbare Zahl,
@@ -6343,8 +6447,43 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
    gehoert darueber. In vh statt px, damit der Anteil auf anderen
    Geraetehoehen haelt. */
 #viewHome .homerow3{flex:0 0 auto;margin-top:2.6vh;margin-bottom:auto}
-.hubrail{flex:0 0 17%;display:flex;flex-direction:column;gap:var(--gap)}
-.hubmid{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--gap)}
+/* ==================================================================
+ * DIE SEITENSCHIENEN LIEGEN AUF, STATT EINE SPALTE ZU BELEGEN
+ * ------------------------------------------------------------------
+ * Ansage (31.07.2026): „das Arena Image in der Mitte vergrössern …
+ * das der ganze Bildschirm fülliger aussieht."
+ *
+ * Der Begrenzer war NICHT die Hoehe — `max-height` stand auf 251 px und
+ * das Bild kam trotzdem nur auf 175. Es war die BREITE der Mittelspalte:
+ * zwei Schienen zu je 17 % plus Abstaende liessen der Mitte 256 px, und
+ * 92 % davon sind 236 px. Bei 4:3 ergibt das genau die gemessenen 175.
+ *
+ * Und die beiden Schienen tragen JE EINE Kachel (Kalender links,
+ * Offline-Ertraege rechts) — 70 px Spaltenbreite ueber 500 px Hoehe fuer
+ * einen einzigen quadratischen Knopf. Sie liegen deshalb jetzt AUF dem
+ * Band statt darin: die Mitte bekommt die volle Breite, die Kacheln
+ * bleiben an ihrem Platz oben in den Ecken.
+ *
+ * ⚠ ABWEICHUNG VON AA, mit Absicht. §14.2 misst AAs Aufteilung auf
+ * 16,8 % / 57,2 % / 16,5 %, und danach war diese Zeile gebaut. Der
+ * Auftraggeber will es fuelliger — das ist seine Entscheidung, und sie
+ * steht hier, damit ein spaeterer Abgleich mit AA die Differenz nicht
+ * fuer einen Fehler haelt.
+ *
+ * Kein Ueberlappen: die Kacheln sind 64 px hoch und sitzen ganz oben,
+ * das Diorama beginnt weit darunter. Nachgemessen bei 932 und 740 px
+ * Fensterhoehe. z-index 3, damit sie ueber dem Banner liegen, falls ein
+ * kuenftiger Inhalt breiter wird als heute.
+ * ================================================================== */
+.hubband{position:relative}
+.hubrail{position:absolute;top:12px;width:64px;z-index:3;
+  display:flex;flex-direction:column;gap:var(--gap)}
+.hubrail.left{left:10px}
+.hubrail.right{right:10px}
+/* min-height:0 auch hier — ohne das haelt die Mittelspalte ihre
+   Inhaltshoehe fest, und alles darunter nutzt nichts. */
+.hubmid{flex:1 1 auto;min-width:0;min-height:0;
+  display:flex;flex-direction:column;gap:var(--gap)}
 /* Die Arena-Buehne hat ihren eigenen Aussenabstand verloren: sie sitzt
    jetzt im Stapel der Mittelspalte und bekommt ihren Abstand von dort. */
 .hubmid .arenahero{padding:2px 0 0}
@@ -6375,7 +6514,15 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
    Breite von der Spalte. AAs Banner ist auch NIEDRIGER als unseres war
    (7,0 % der Bildschirmhoehe gegen unsere 7,2 % bei deutlich groesserer
    Breite) — mit --banner-h-sm statt --banner-h stimmt das Verhaeltnis. */
-.passbanner{position:relative;display:flex;align-items:center;gap:8px;margin:0;width:100%;
+/* ⚠ `max-width` ist hier KEINE Kosmetik. Das Banner ist `width:100%`
+   der Mittelspalte — und die ist seit dem 31.07.2026 vollbreit, weil die
+   Seitenschienen aufliegen statt eine Spalte zu belegen. Ohne Deckel
+   waere das Banner damit auf 410 px gewachsen, und genau das hat der
+   Auftraggeber schon einmal gemeldet („der Banner ist zu gross", §14.2:
+   AA misst 57 % der Breite). Die 246 px sind dieselbe Breite wie vorher,
+   nur jetzt ausdruecklich statt zufaellig. */
+.passbanner{position:relative;display:flex;align-items:center;gap:8px;margin:0 auto;
+  width:100%;max-width:246px;
   min-height:var(--banner-h-sm);padding:0 10px;border-radius:var(--radius);overflow:hidden;
   background-repeat:no-repeat;background-position:center;background-size:cover,cover;
   background-image:linear-gradient(110deg,#4a2a7a,#2a1b46 55%,#141d2b);
@@ -6391,7 +6538,17 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   background:linear-gradient(180deg,#f4e3a6,#e0b94a 55%,#a8842a);box-shadow:0 3px 0 #6d551a;
   -webkit-text-fill-color:#3a2b07;color:#3a2b07}
 /* AA-Reihe: EVENTS | BATTLE (55 % Breite) | CHALLENGES (§14.3) */
-.homerow3{display:flex;gap:var(--gap);align-items:stretch;padding:14px 14px 0}
+/* ⚠ `margin-top:auto` setzt die Kampfreihe ans UNTERE Ende der Spalte
+   — Ansage: „den Battle Button tiefer platzieren … lass bisschen
+   Abstand zum Battle Button."
+   Der Abstand nach oben steht als `margin-top` MINDESTENS 18 px und
+   waechst mit `auto`, wenn Platz da ist; nach unten haelt padding 10 px
+   plus die 88 px Bodenpolster von #viewHome die Leiste frei.
+   ⚠ Kein `position:absolute` und kein fester Abstand: die Reihe muss
+   auf einem kurzen Geraet mitscrollen koennen, sonst liegt sie unter
+   der Bottom-Nav (der Fall, vor dem der Kommentar bei #viewHome warnt). */
+.homerow3{display:flex;gap:var(--gap);align-items:stretch;
+  padding:14px 14px 0;margin-top:auto}
 .homerow3 .sidetile{position:relative;flex:0 0 20%;border-radius:var(--radius);
   border:1px solid #3a4c5c;display:flex;flex-direction:column;align-items:center;
   justify-content:center;gap:3px;padding:8px 4px;
@@ -17189,15 +17346,31 @@ button.pfplate{cursor:pointer}
   }
 
   /* Parallax: der abgedunkelte Burg-Layer laeuft langsamer als der
-     Inhalt. Gescrollt wird das DOKUMENT (#app hat nur min-height:100vh),
-     deshalb haengt der Listener am window. */
+     Inhalt.
+     ⚠ GEAENDERT AM 31.07.2026. Hier stand „gescrollt wird das DOKUMENT
+     (#app hat nur min-height:100vh), deshalb haengt der Listener am
+     window." Das stimmte — und genau diese Bauart von #app war ein
+     Fehler: zusammen mit `overflow:hidden` wuchs die Huelle ueber den
+     Schirm und schnitt den Ueberstand ab, auf kurzen Geraeten lag der
+     KAMPF-Knopf unerreichbar darunter (§36.3). Seit #app auf
+     `height:100dvh` steht, scrollt nicht mehr das Dokument, sondern die
+     ANSICHT — window.scrollY bleibt 0, und der Parallax stand still.
+     Gelesen wird deshalb der scrollTop der Ansicht, und der Listener
+     haengt an ihr. */
   function fortParallax() {
     if (fortLayout !== "banner") return;
-    var bg = $("fortBg");
-    if (!bg || !$("viewFortress").classList.contains("active")) return;
-    bg.style.transform = "translateY(" + (window.scrollY * -0.28).toFixed(1) + "px)";
+    var bg = $("fortBg"), v = $("viewFortress");
+    if (!bg || !v || !v.classList.contains("active")) return;
+    bg.style.transform = "translateY(" + (v.scrollTop * -0.28).toFixed(1) + "px)";
   }
-  window.addEventListener("scroll", fortParallax, { passive: true });
+  (function () {
+    var v = $("viewFortress");
+    if (v) v.addEventListener("scroll", fortParallax, { passive: true });
+    /* Der window-Listener bleibt zusaetzlich stehen: faellt die Huelle
+       eines Tages wieder auf Dokument-Scroll zurueck, laeuft der Effekt
+       weiter, statt still zu versagen. */
+    window.addEventListener("scroll", fortParallax, { passive: true });
+  })();
 
   function renderSkinBar() {
     var sel = $("skinSel"), cur = window.CastleSkins.current();
@@ -18516,10 +18689,14 @@ button.pfplate{cursor:pointer}
     lbScrollToMe();
   }
   /* Smooth-Scroll auf die eigene Zeile.
-     ⚠ NICHT ueber #viewBoard.scrollTop: #app hat nur min-height:100vh und
-     waechst mit dem Inhalt — gescrollt wird also das DOKUMENT, nicht der
-     View-Container. scrollIntoView trifft in beiden Faellen das richtige
-     Element und braucht die Container-Frage gar nicht zu beantworten. */
+     ⚠ `scrollIntoView` ist hier die richtige Wahl, und der Grund hat sich
+     am 31.07.2026 geaendert: frueher wuchs #app mit dem Inhalt und es
+     scrollte das DOKUMENT, seit `height:100dvh` scrollt die ANSICHT.
+     scrollIntoView trifft in BEIDEN Faellen das richtige Element und
+     braucht die Container-Frage gar nicht zu beantworten — deshalb hat
+     diese Funktion die Umstellung ohne Aenderung ueberlebt. Wer sie
+     durch ein handgerechnetes scrollTop ersetzt, faengt sich die Frage
+     wieder ein. */
   function lbScrollToMe() {
     var me = $("lbMe");
     if (!me) return;
