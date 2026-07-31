@@ -1,5 +1,11 @@
 # HANDOFF — Arcane Arena Drop-in-Module
 
+> ⚠ **Dieses Blatt beschreibt die MATCH-Module (Stand 19.07.2026), nicht die Oberfläche.**
+> Wer die **komplette Meta-UI** ins Spiel ziehen will, ist hier falsch und findet alles
+> in **`UI_UEBERGABE.md`** — was zusammengehört, wie man es startet, was geprüft ist und
+> welche acht Regeln beim Einbau nicht gebrochen werden dürfen.
+
+
 **Für die Claude-Session auf dem Mac:** Diese Module in `~/elemental-td/public/arena_pan.html`
 bzw. `~/elemental-td/public/vs.html` integrieren. Sie liegen hier im Repo unter `arena_patches/`
 und sind bewusst **in sich geschlossen** (IIFE, `window.XYZ`-Export, keine Abhängigkeit

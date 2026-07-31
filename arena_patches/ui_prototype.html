@@ -8741,7 +8741,7 @@ button.pfplate{cursor:pointer}
          5. eine Knopfreihe: Anfragen · Freundschaftskampf · Chat
 
        WOHIN IST WAS GEWANDERT — und warum:
-       · Wochenquests + Clantruhen  → #clanHallDlg (Clanhalle)
+       · Wochenquests + Clan-Hort  → #clanHallDlg (Clanhalle)
        · Clankrieg + Ghost-Ziele    → #clanHallDlg
        · Emotes + Aktivitaets-Feed  → #clanHallDlg
        · Clan-Rangliste             → Knopf in der Clanhalle auf #viewBoard
@@ -8925,7 +8925,7 @@ button.pfplate{cursor:pointer}
     <div class="secribbon sm" data-ribbon="ribbon_section_sm"><span class="srt">MATCH-ENDE</span></div>
     <div class="setgrp">
       <div class="setrow" style="display:block">
-        <p class="lbnote">Der Screen, der uns gegen AA gefehlt hat — mit Schadensbilanz
+        <p class="lbnote">Die Bilanz nach dem Match — mit Schadensbilanz
           beider Seiten und Helden. Zwei Beispiel-Matches:</p>
         <div class="setbtns">
           <button class="setbtn pressable" id="btnDemoWin">Sieg ansehen</button>
@@ -9906,7 +9906,7 @@ button.pfplate{cursor:pointer}
 
 <!-- ===== CLANHALLE (30.07.2026) =====
      DER EINE Zugang zu allem, was AAs Clan-Hauptansicht nicht zeigt:
-     Wochenquests + Clantruhen, Clankrieg, Emotes + Aktivitaets-Feed und
+     Wochenquests + Clan-Hort, Clankrieg, Emotes + Aktivitaets-Feed und
      der Sprung in die Clan-Rangliste. Vorher waren das drei Reiter UEBER
      der Ansicht; hier sind es drei Reiter INNERHALB eines Fensters, das
      man bewusst oeffnet. Der Unterschied ist nicht kosmetisch: die
@@ -16534,23 +16534,28 @@ button.pfplate{cursor:pointer}
                        UIOffline.werbungVerfuegbar && UIOffline.werbungVerfuegbar());
     $("werbungNote").innerHTML = werbungAn
       ? "Die erste Gold-Staffel gibt es gegen ein Werbevideo."
-      : "<b>Belohnte Werbung ist noch nicht angebunden.</b> AA gibt drei Posten " +
-        "gegen ein Video aus (erste Gold-Staffel, Explorer-Truhe, Endless Roulette). " +
-        "Solange der Weg fehlt, gibt es die erste Gold-Staffel <b>einmal am Tag " +
-        "gratis</b>, und alles andere kostet Kristalle. Es steht hier kein Knopf, " +
-        "der ein Video verspricht und keines zeigt.";
+      /* ⚠ HIER STAND DER NAME DES VORBILDS — SICHTBAR IM LADEN.
+         Gefunden am 31.07.2026 beim Nachpruefen der eigenen Regeln: drei
+         Stellen der ausgelieferten Oberflaeche nannten „AA" beim Namen,
+         dazu eine „Explorer-Truhe" (deren Produkt, nicht unseres).
+         Eine Notiz fuer das Team gehoert ins Blatt, nicht auf den
+         Bildschirm des Spielers — und der Name des Spiels, das man
+         nachbaut, gehoert dort erst recht nicht hin.
+         Die AUSSAGE bleibt vollstaendig erhalten, denn sie ist der Grund,
+         warum die Zeile ueberhaupt existiert: es gibt keinen Knopf, der
+         ein Video verspricht und keines zeigt. */
+      : "<b>Belohnte Werbung ist noch nicht angebunden.</b> Solange dieser Weg " +
+        "fehlt, gibt es die erste Gold-Staffel <b>einmal am Tag gratis</b>, und " +
+        "alles andere kostet Kristalle. Es steht hier kein Knopf, der ein Video " +
+        "verspricht und keines zeigt.";
     $("iapNote").innerHTML = "<b>Echtgeld ist im Prototyp ein Platzhalter.</b> Arena-Pack, " +
-      "Starter-Pack und die Gem-Pakete zeigen Preise in Fr. wie AAs Store, lösen aber " +
+      "Starter-Pack und die Gem-Pakete zeigen Preise in Fr., lösen aber " +
       "keinen Kauf aus — der Gold-Tausch unten läuft dagegen echt gegen die Demo-Wallet.";
-    $("shopNote").innerHTML = "Sektionsreihenfolge nach AA (§27.1, abgelesen am " +
-      "30.07.2026): Arena-Packs · Tagesangebote · Vorrats-Pack · Booster-Packs · " +
-      "Kristalltresor · Gems · Gold. Pass-Banner und Banner-Shop stehen hier " +
-      "bewusst nicht mehr — AA hat beides an dieser Stelle nicht, und den " +
-      "Season-Pass verkaufen wir auf dem Hauptbildschirm. Die Tagesangebote " +
-      "werden deterministisch aus dem Datum gezogen (FNV-1a wie in " +
-      "arena_daily.js) und wechseln um 00:00 UTC. Die Gold-Preise und die " +
-      "Stückzahlen skalieren im echten Spiel mit dem Fortschritt (§27.3); die " +
-      "Echtgeldpreise der Gem-Staffeln sind Store-Preise und stehen fest.";
+    /* ⚠ AUCH HIER STAND DER NAME DES VORBILDS, SICHTBAR IM LADEN — die
+       Begruendung steht bei `#werbungNote` weiter oben. Eine Quellenangabe
+       fuer das Team gehoert ins Blatt, nicht auf den Bildschirm des Spielers. */
+    $("shopNote").innerHTML = "Sektionsreihenfolge und Preise sind gemessen, nicht " +
+      "geraten. Die Echtgeldpreise der Gem-Staffeln sind Store-Preise und stehen fest.";
 
     Array.prototype.forEach.call($("dealGrid").querySelectorAll("[data-buy]"), function (b) {
       b.addEventListener("click", function () { buyDeal(b.getAttribute("data-buy")); });
@@ -18179,13 +18184,13 @@ button.pfplate{cursor:pointer}
           (q.done ? "  ✅ geschafft" : "  · noch " + fmt(q.missing)) + "</div></div>";
     }).join("");
 
-    html += secribbon("Clantruhen", Math.round(ch.pct * 100) + " %");
+    html += secribbon("Clan-Hort", Math.round(ch.pct * 100) + " %");
     html += '<div class="chestrow">' + CL.CHEST_STEPS.map(function (s) {
       var reached = ch.pct >= s.at - 1e-9;
       return '<div class="chestcard ' + (reached ? "reached" : "locked") +
         '" data-chest="' + s.tier + '">' +
         '<span class="cart">' + s.sym + "</span>" +
-        '<div class="cnm2">' + s.name.replace("-Clantruhe", "") + "</div>" +
+        '<div class="cnm2">' + s.name.replace("-Hort", "") + "</div>" +
         '<div class="cat">ab ' + Math.round(s.at * 100) + " %</div>" +
         '<div class="cin">' + s.pack.toUpperCase() + "-Pack<br>" + fmt(s.gold) + " " +
           ico("cur_gold", "🪙") + " · " + s.material + " " +
@@ -18193,10 +18198,10 @@ button.pfplate{cursor:pointer}
     }).join("") + "</div>";
 
     var btnTxt, dis = "";
-    if (ch.claimed) { btnTxt = "Clantruhe bereits abgeholt"; dis = " disabled"; }
+    if (ch.claimed) { btnTxt = "Clan-Hort bereits abgeholt"; dis = " disabled"; }
     else if (ch.claimable) { btnTxt = ch.step.sym + " " + ch.step.name + " abholen"; }
     else if (ch.step) { btnTxt = "Öffnet Samstag · " + CL.hhmm(ch.opensIn) + " h"; dis = " disabled"; }
-    else { btnTxt = "Noch keine Truhenstufe (ab 50 %)"; dis = " disabled"; }
+    else { btnTxt = "Noch keine Hort-Stufe (ab 50 %)"; dis = " disabled"; }
     html += '<button class="claimbtn pressable" id="btnClaimChest"' + dis + ">" + btnTxt + "</button>";
     html += '<div class="hint">Gesamtfortschritt <b>' + ch.pctText +
       "</b> — das Mittel der drei Balken. Alle 30 Mitglieder bekommen dieselbe Truhe. " +
@@ -19742,8 +19747,8 @@ button.pfplate{cursor:pointer}
             "Upgrade-Material ins Postfach — genug für die ersten Level-Ups deiner Türme.",
       reward: { gold: 5000, material: 30, matType: "fire" } },
     { id: "m_clanchest", from: "Prisma-Orden", ico: "🛡",
-      subject: "Clantruhe der Woche ausgeschüttet",
-      body: "Euer Clan hat die Wochen-Quests zu 91 % erfüllt — die Silber-Clantruhe " +
+      subject: "Clan-Hort der Woche ausgeschüttet",
+      body: "Euer Clan hat die Wochen-Quests zu 91 % erfüllt — der Silber-Hort " +
             "ging an alle 30 Mitglieder. Weiter so am Wochenende im Krieg!",
       reward: { gold: 2500, material: 15, matType: "darkness" } },
     { id: "m_season", from: "Spielleitung", ico: "🎟",

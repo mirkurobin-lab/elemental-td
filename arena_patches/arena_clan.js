@@ -165,11 +165,11 @@
 
   /* ---- Wochen-Truhe (Staffel nach Gesamtfortschritt) ---- */
   var CHEST_STEPS = [
-    { tier: "bronze", at: 0.50, name: "Bronze-Clantruhe", sym: "🥉",
+    { tier: "bronze", at: 0.50, name: "Bronze-Hort", sym: "🥉",
       pack: "bronze", gold: 1500, material: 20 },
-    { tier: "silver", at: 0.80, name: "Silber-Clantruhe", sym: "🥈",
+    { tier: "silver", at: 0.80, name: "Silber-Hort", sym: "🥈",
       pack: "silver", gold: 4000, material: 45 },
-    { tier: "gold", at: 1.00, name: "Gold-Clantruhe", sym: "🥇",
+    { tier: "gold", at: 1.00, name: "Gold-Hort", sym: "🥇",
       pack: "gold", gold: 9000, material: 90 },
   ];
 
@@ -1102,9 +1102,9 @@
     now = nowMs(now);
     var c = chestTier(now);
     if (!c.claimable) {
-      throw new Error(c.claimed ? "Die Clantruhe dieser Woche ist schon abgeholt."
-        : !c.step ? "Der Clan hat noch keine Truhenstufe erreicht (mindestens 50 %)."
-        : "Die Clantruhe öffnet erst am Samstag.");
+      throw new Error(c.claimed ? "Der Clan-Hort dieser Woche ist schon abgeholt."
+        : !c.step ? "Der Clan hat noch keine Hort-Stufe erreicht (mindestens 50 %)."
+        : "Der Clan-Hort öffnet erst am Samstag.");
     }
     var s = get(now), st = c.step;
     s.quests.claimed = true;

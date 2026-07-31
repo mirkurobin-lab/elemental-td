@@ -4303,3 +4303,66 @@ sie wurde als Frage gestellt, nicht als Auftrag. Eine Probe liegt bei; die Umste
 drei Zeilen.
 
 **Aufwand: M** · **Priorität: 1** · Prüfung erledigt, Palette zur Entscheidung
+
+---
+
+## §42 Die Übergabe — und was beim Nachprüfen der eigenen Regeln herausfiel
+
+Ansage (31.07.2026): „Push alles auf GitHub mit dem Vermerk für das Spiel damit die andere
+Session die komplette Ui ziehen kann."
+
+Der Vermerk steht als **`UI_UEBERGABE.md`** und ist von der Wurzel aus verlinkt
+(`README.md`, erster Absatz) sowie aus `HANDOFF.md`, das bis dahin der falsche
+Einstiegspunkt war — es beschreibt die Match-Module vom 19.07., nicht die Oberfläche.
+
+### 42.1 Zwei Funde, weil ich die eigenen Regeln nachgemessen habe statt sie abzuschreiben
+
+Der Vermerk zählt acht Regeln auf, die beim Einbau nicht gebrochen werden dürfen. Beim
+Aufschreiben habe ich jede davon **gegen die laufende Oberfläche** geprüft, nicht gegen
+mein Gedächtnis. Zwei hielten nicht.
+
+**a) „Keine Truhen" — drei sichtbare Stellen.** Der Wochenlohn im Clan hieß
+`Bronze-/Silber-/Gold-Clantruhe`, das Abschnittsband „Clantruhen", der Knopf „Clantruhe
+bereits abgeholt", die Fehlermeldung „Die Clantruhe öffnet erst am Samstag" — und eine
+Postnachricht erzählte von der „Silber-Clantruhe". Das Artwork war längst richtig (die
+Kachel trägt `pack_bronze`, das Zeichen ist eine Medaille), **nur das Wort war es nicht.**
+
+Neu: **Clan-Hort**, mit den Stufen Bronze/Silber/Gold. „Hort" ist ein Vorrat und keine
+Truhe, es kollidiert nicht mit dem „Vorrats-Pack" und passt zum Prisma-Orden.
+
+**b) Der Name des Vorbilds stand dreimal sichtbar im Produkt.**
+
+| Wo | Was dort stand |
+|---|---|
+| Shop-Fußnote | „Sektionsreihenfolge nach AA (§27.1, abgelesen am 30.07.2026)" |
+| Werbe-Hinweis | „AA gibt drei Posten gegen ein Video aus (erste Gold-Staffel, **Explorer-Truhe**, Endless Roulette)" |
+| Ranglisten-Notiz | „Der Screen, der uns gegen AA gefehlt hat …" |
+
+Das sind Notizen für das Team, die in der Oberfläche gelandet sind. Sie gehören ins Blatt.
+Alle drei sind umgeschrieben, **die Aussage jeweils erhalten** — beim Werbe-Hinweis ist das
+der ganze Punkt der Zeile und sie bleibt wörtlich: „Es steht hier kein Knopf, der ein Video
+verspricht und keines zeigt."
+
+> **Merksatz:** Eine Regel, die man aufschreibt, ohne sie zu messen, ist eine Erinnerung —
+> keine Zusicherung. Beide Funde standen seit Wochen im Bild und in keiner Prüfung.
+
+### 42.2 Ein Fehler beim Beheben, offen ausgewiesen
+
+Die erste Korrektur der Shop-Fußnote hat die Datei **kaputtgemacht**: der Ersatz schnitt am
+ersten `;` ab, und das lag mitten in einer mehrzeiligen Zeichenkette. Übrig blieb
+`…§40."; die " + "…";` — ein Syntaxfehler, nach dem `window.__proto` nicht mehr existierte
+und die ganze Oberfläche tot war.
+
+Aufgefallen ist es sofort, weil die nächste Messung mit
+`Cannot read properties of undefined (reading 'show')` abbrach — nicht durch Hinsehen.
+
+> **Merksatz:** Wer eine Anweisung per Textersatz bis zum nächsten `;` ersetzt, muss
+> wissen, ob zwischen Anfang und diesem `;` eine Zeichenkette liegt. Bei mehrzeiligen
+> `"…" + "…"`-Ketten liegt sie fast immer dort.
+
+**Nebenwirkung, die dabei auffiel:** ein Lauf aller 32 Suiten lief zu diesem Zeitpunkt im
+Hintergrund — gegen eine Datei, die sich unter ihm veränderte und zwischendurch kaputt war.
+Sein Ergebnis war wertlos und wurde verworfen, nicht ausgewertet. Ein Prüflauf über einen
+Stand, der sich während des Laufs ändert, misst nichts.
+
+**Aufwand: S** · **Priorität: 1** · erledigt
