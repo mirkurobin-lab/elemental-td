@@ -626,8 +626,8 @@ Zwei Anläufe, beide lehrreich:
 
 | Paket | Inhalt | Stand |
 |---|---|---|
-| P2 | Zustandsmatrix je Knopfklasse: normal / pressed / disabled / loading / selected | `selected`, `loading`, `hover` gibt es **null** mal |
-| — | **Kontrast belastbar messen.** Eine WCAG-Messung über `getComputedStyle` meldete Befunde in 16 von 16 Ansichten — durchweg Artefakte (Verlaufsschrift mit `-webkit-text-fill-color:transparent`, Untergründe die Bilder statt Farben sind). Ein tragfähiger Wert braucht die **gerenderten Pixel**. Siehe `AA_UI_REFERENZ` §34.4 | offen |
+| P2 | Zustandsmatrix je Knopfklasse: normal / pressed / disabled / loading / selected | **erledigt** (§35): `hover` unter `@media (hover:hover) and (pointer:fine)`, `.laedt` als Ladezustand mit `aria-busy`, `.skelett`, Steuerung über `window.UIZustand`. `selected` (58 Regeln) und `disabled` (19) waren schon da — bewusst **nicht** durch eine zweite Fassung ersetzt |
+| — | **Kontrast belastbar messen.** Eine WCAG-Messung über `getComputedStyle` meldete Befunde in 16 von 16 Ansichten — durchweg Artefakte (Verlaufsschrift mit `-webkit-text-fill-color:transparent`, Untergründe die Bilder statt Farben sind). Ein tragfähiger Wert braucht die **gerenderten Pixel**. Siehe `AA_UI_REFERENZ` §34.4 | **teilweise**: `pruefungen/kontrast.js` misst jetzt echte Pixel, bleibt aber ein **Berichtswerkzeug ohne Tor** (`exit 0`). Zwei Befunde wurden gegen die Wirklichkeit als falsch nachgewiesen; die Trennung von Glyphe und Kantenglättung ist ungelöst. Nächster Schritt im Dateikopf notiert |
 | P3 | Fassungen als Assets: 9-Slice-Panel-Platte, Kartenrahmen je Rarität, Bannerplatte | **Kartenrahmen und Bänder erledigt** (§6c). Panel-Platte und `progress_frame` noch offen — beide brauchen erst einen Zuschnitt. |
 | P4 | Bewegungssprache: Overshoot, Squash, Hochzählen, Belohnungs-Choreografie | Tokens stehen, Choreografie fehlt |
 | — | Typo-Leiter: 40 Schriftgrößen auf 8 benannte Stufen | offen |
