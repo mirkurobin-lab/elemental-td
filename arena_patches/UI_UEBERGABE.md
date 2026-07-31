@@ -67,18 +67,21 @@ Die vier, die den Gesamtzustand tragen:
 | `lesbarkeit.js` | jeder Schriftzug gegen seinen **wirklichen** Untergrund (Bild, Verlauf, Farbe), 402 messbar |
 | `klickdurchlauf.js` | drückt **alles** über 16 Fenster (183 Knöpfe) und fragt nur, ob etwas kaputtgeht |
 
-**Stand 31.07.2026:** die oben genannten fünf sowie `deck`, `packoeffnung`, `login_kal`,
-`bildzustand`, `belohnung`, `quoten`, `tresor`, `splash`, `shop_raender`, `avatare`,
-`community`, `essenzen` sind einzeln grün gemessen. Ein Lauf über **alle 32 am Stück**
-war zum Zeitpunkt dieser Übergabe noch nicht abgeschlossen — wer sie braucht, lässt sie
-laufen, statt sich auf diesen Satz zu verlassen.
+**Stand 31.07.2026: 30 der 32 grün, gemessen am fertigen Stand.**
 
-`iconfrei.js` und `sicht.js` laufen in dieser Umgebung **nicht**: sie laden fest von einer
-Vorschau-URL, die der Proxy sperrt. Umgebungsgrenze, kein Befund.
+| | Suiten |
+|---|---|
+| **grün (30)** | `avatare` `belohnung` `bildzustand` `community` `deck` `essenzen` `flug` `guide` `home_menue` `klickdurchlauf` `kontrast` `lesbarkeit` `login_kal` `offline` `packoeffnung` `packsprengung` `passform` `qualitaet` `quoten` `run_friends` `run_shop` `run_v5` `run_v6` `run_v7` `shop_raender` `spells` `splash` `tresor` `video_rueckfall` `assets_lokal` |
+| **läuft hier nicht (2)** | `iconfrei` `sicht` — sie laden fest von `prisma-td-vorschau.higgsfield.app`, das der Proxy dieser Umgebung sperrt. Sie prüfen die **ausgelieferte** Seite und gehören dorthin, wo sie erreichbar ist. Umgebungsgrenze, kein Befund |
 
-> Warum hier keine runde Zahl steht: ein Prüflauf, der über einen Stand läuft, der sich
-> während des Laufs ändert, misst nichts. Genau das ist bei der ersten Fassung dieser
-> Übergabe passiert (§42.2) — das Ergebnis wurde verworfen, nicht ausgewertet.
+Der Durchgang förderte **zwei echte Rote** zutage, beide behoben und in `AA_UI_REFERENZ`
+§42.3 beschrieben: die Clan-Spende wählte ihre Anfrage über eine Schleifenreihenfolge statt
+über eine Regel (das Kontingent stimmte, nur die Wahl war zufällig), und ein Pixel-Schritt
+maß Bilder, die der Browser wegen `loading="lazy"` absichtlich noch nicht geholt hatte.
+
+> ⚠ **Ein Prüflauf über einen Stand, der sich während des Laufs ändert, misst nichts.**
+> Genau das ist bei der ersten Fassung dieser Übergabe passiert (§42.2) — das Ergebnis
+> wurde verworfen, nicht ausgewertet, und der Lauf sauber wiederholt.
 
 ## 4. Regeln, die beim Einbau nicht gebrochen werden dürfen
 
