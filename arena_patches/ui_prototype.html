@@ -3008,8 +3008,27 @@ footer{padding:6px 12px 14px;text-align:center}
    reicht. Auf hohen Geraeten ist das Bild damit so gross wie erlaubt,
    auf kurzen so gross wie moeglich — und die Kampfreihe bleibt in
    beiden Faellen ueber der Leiste. */
+/* ⚠ 3:2, NICHT 4:3 — und der Grund steht in der Quelle, nicht im
+   Geschmack. Alle acht Arenabilder sind 1376x768, also 1,79:1. In einer
+   4:3-Box (1,33) bindet die Hoehe, und dann fallen gemessen 24,4 % der
+   BILDBREITE weg: ein Viertel jedes Artworks war nie zu sehen.
+   Dazu kam ein zweiter Nebeneffekt: bei dreifacher Aufloesung brauchte
+   die 4:3-Box 810 px Hoehe, die Quelle hat 768 — das Bild wurde um
+   5,5 % HOCHskaliert.
+   3:2 (1,5) nimmt beides zurueck, ohne neue Bilder zu brauchen:
+       Beschnitt   24,4 %  ->  16 %
+       dpr 3       1,055x  ->  keine Hochskalierung (732 <= 768)
+       Hoehe       270 px  ->  244 px
+   Die 26 px, die das Bild verliert, gehen an den Abstand zur Kampfreihe
+   und fallen nicht auf. Ein exakter Gleichlauf mit der Quelle (1,79)
+   waere beschnittfrei, haette das Bild aber auf 204 px gedrueckt — das
+   nimmt zu viel von der Vergroesserung zurueck, um die es hier ging.
+
+   ⚠ Wer die Bilder eines Tages als echtes 3:2 oder 4:3 neu erzeugt,
+   aendert HIER das Verhaeltnis mit — sonst beschneidet die Box wieder,
+   nur in die andere Richtung. */
 .diorama{margin-top:0;flex:0 1 auto;min-height:104px;
-  width:min(88%,380px);aspect-ratio:4/3;max-height:34vh;border-radius:18px;
+  width:min(88%,380px);aspect-ratio:3/2;max-height:34vh;border-radius:18px;
   background-repeat:no-repeat;background-position:center;background-size:cover,cover;
   background-image:linear-gradient(160deg,#2c3a4b,#131c25);
   border:1px solid #ffffff1f;

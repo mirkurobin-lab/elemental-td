@@ -3778,3 +3778,63 @@ KAMPF-Knopf schon vorher 39 px unter der Leiste — und wegen `overflow:hidden` 
   `aspect-ratio` liefert die natürliche Höhe, `flex-shrink` nimmt sie zurück, wenn es eng wird.
 
 **Aufwand: M** · **Priorität: 1** · erledigt
+
+
+## §37 „Jedes Arena Bild auf die neue Grösse anpassen" — was die Messung ergab
+
+Ansage (31.07.2026), direkt nach der Vergrösserung aus §36. Die Vermutung dahinter war
+richtig, dass etwas nicht passt — aber die Ursache war eine andere als die Auflösung.
+
+### 37.1 Gemessen
+
+| | Wert |
+|---|---|
+| Quelle, alle 8 Arenabilder | 1376 × 768 (**1,79 : 1**) |
+| Box nach §36 | 366 × 270 (**4 : 3**) |
+| Skalierung bei dpr 2 | 0,703 — überabgetastet, scharf |
+| Skalierung bei dpr 3 | **1,055** — 5,5 % hochskaliert |
+| **Sichtbarer Anteil der Bildbreite** | **75,6 %** |
+
+Die Auflösung war also fast in Ordnung. Das eigentliche Problem: ein 1,79er Bild in einer
+4:3-Box verliert zwangsläufig **ein Viertel seiner Breite** — und das galt schon vor der
+Vergrösserung.
+
+### 37.2 Entschieden: die Box folgt der Quelle, nicht umgekehrt
+
+`aspect-ratio: 3/2` statt `4/3`:
+
+| | vorher | nachher |
+|---|---|---|
+| Sichtbarer Anteil der Breite | 75,6 % | **84,9 %** |
+| Skalierung bei dpr 3 | 1,055 (hoch) | **0,937 (herunter)** |
+| Bildhöhe bei 932 px Fenster | 270 px | 240 px |
+
+Die 30 px gehen an den Abstand zur Kampfreihe; der KAMPF-Knopf steht unverändert 23 px über
+der Leiste (nachgemessen bei 932 / 844 / 740 / 667).
+
+Ein exakter Gleichlauf mit der Quelle (1,79) wäre **beschnittfrei**, hätte das Bild aber auf
+204 px gedrückt — das nimmt zu viel von der Vergrösserung zurück, um die es in §36 ging.
+Die Wahl lag beim Auftraggeber; 3:2 ist der bewusste Mittelweg.
+
+### 37.3 Warum die Bilder NICHT neu erzeugt wurden — eine Umgebungsgrenze
+
+Der technisch sauberste Weg wäre, die acht Artworks per Outpaint auf echtes 4:3 zu erweitern.
+Das wurde für Arena 1 **gemacht und hat funktioniert** (2400 × 1792, 2 Credits) — die Datei
+kommt aber aus dieser Umgebung nicht ins Repo:
+
+- Alle Higgsfield-Hosts sind vom Proxy gesperrt (`CONNECT tunnel failed, 403`).
+  Erreichbar sind nur GitHub und `storage.googleapis.com`.
+- Der Umweg über Base64 durch die Sandbox-Ausgabe ist **unzuverlässig**: die erste 4,9-KB-Probe
+  kam mit korrekter Länge (4940 Byte) und gültigem JPEG-Rahmen an — `FFD8FF` vorn, `FFD9`
+  hinten — und liess sich trotzdem nicht dekodieren (`broken data stream`). Für 8 Bilder à
+  39 KB wären das rund 24 solcher Runden mit Reparaturschleifen.
+
+> **Merksatz:** Länge und Rahmen einer Datei sagen nichts über ihren Inhalt. Wer eine
+> Übertragung nur an der Byte-Zahl prüft, hält eine kaputte Datei für heil — hier hätte nur
+> ein Dekodierversuch oder eine Prüfsumme es gezeigt.
+
+**Offen für eine Sitzung mit CDN-Zugang:** die acht Bilder als echtes 3:2 (oder 4:3) neu
+erzeugen. Dann fällt der Restbeschnitt von 15 % weg. ⚠ Wer das tut, muss `aspect-ratio` bei
+`.diorama` mitändern — sonst beschneidet die Box wieder, nur in die andere Richtung.
+
+**Aufwand: S** · **Priorität: 2** · erledigt, mit benanntem Rest
