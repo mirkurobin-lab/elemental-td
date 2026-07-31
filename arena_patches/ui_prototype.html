@@ -33,6 +33,53 @@
  *     vorbereitet — dort die vorhandenen TEST_*_attack.mp4-Clips einsetzen.
  * ================================================================== -->
 <style>
+/* ==================================================================
+ * DIE MARKENSCHRIFT — jetzt als DATEI, nicht nur als Absicht
+ * ------------------------------------------------------------------
+ * ⚠ BIS ZUM 31.07.2026 STAND `font-family:Cinzel,...` MEHRFACH IM
+ * BLATT, OHNE DASS CINZEL JEMALS GELADEN WURDE. Im ganzen Dokument gab
+ * es null @font-face und null Verweis auf einen Schriftdienst.
+ * Gerendert hat also der jeweils erste Rueckfall:
+ *     iOS      -> Georgia   (Systemschrift)
+ *     Android  -> Times/serif — Georgia gibt es dort nicht
+ *     Web      -> je nach Rechner
+ * Das Markengesicht sah damit auf zwei Plattformen VERSCHIEDEN aus und
+ * auf keiner so, wie es gedacht war. Ein Spiel, das man am Standbild
+ * erkennen soll, kann sich das nicht leisten. Gemessen nach dem Einbau:
+ * dasselbe Testwort ist in Cinzel 618 px breit, in Georgia 597 — es
+ * rendert nachweislich eine andere Schrift, nicht nur ein anderer Name.
+ *
+ * Die Datei: Google Fonts, Cinzel, variable Achse wght. Auf 700-900
+ * beschnitten (nur diese beiden Schnitte benutzt das Blatt) und auf
+ * Latein subsettet — aus 125 468 Byte wurden 39 644. Herkunft, Groesse
+ * und SHA-256 stehen in assets/HERKUNFT.json.
+ *
+ * LIZENZ: SIL Open Font License 1.1. Sie erlaubt die Auslieferung im
+ * Spiel ausdruecklich und VERLANGT, dass ihr Wortlaut mitgeht —
+ * assets/cinzel-OFL.txt. Wer die Schrift entfernt, entfernt die Datei
+ * mit; wer sie behaelt, behaelt beide.
+ *
+ * `font-display:swap`: die Ueberschriften stehen sofort im Rueckfall da
+ * und wechseln, sobald die Schrift liegt. Die Alternative (`block`)
+ * haette LEERE Ueberschriften gezeigt — ein leerer Titel ist schlimmer
+ * als ein Titel im Rueckfall.
+ *
+ * ⚠ Der Pfad ist RELATIV und geht bewusst NICHT ueber ASSETS/ASSET_BASE:
+ * eine @font-face-Regel steht im Blatt, das Blatt wird vor dem Skript
+ * ausgewertet, und ein Schluessel, den erst JS aufloest, waere hier zu
+ * spaet. Die Datei liegt am selben Ort wie alle anderen Assets.
+ *
+ * Der Rueckfall BLEIBT in jeder Regel stehen. Faellt die Datei aus,
+ * sieht es aus wie vorher — nicht schlechter.
+ * ================================================================== */
+@font-face{
+  font-family:"Cinzel";
+  src:url("./assets/cinzel-700-900.woff2") format("woff2");
+  font-weight:700 900;
+  font-style:normal;
+  font-display:swap;
+}
+
 :root{
   --bg:#0e1418; --panel:#16202a; --panel2:#1c2833; --line:#26343f;
   --txt:#e8eef3; --dim:#8fa0ad; --top:#01090b;

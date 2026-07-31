@@ -1,6 +1,6 @@
 {
- "_bytes": 77046137,
- "_dateien": 231,
+ "_bytes": 77940694,
+ "_dateien": 235,
  "_hinweis": "Erzeugt von werkzeuge/assets_sichern.py. Schluessel, Quell-URL, Dateiname, Groesse und SHA-256 je Asset — der Nachweis, dass die Datei im Repo die Datei vom CDN ist.",
  "assets": {
   "arena1": {
@@ -948,6 +948,14 @@
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_195228_6520b371-5cad-4054-8686-e548a33b3656.mp4",
    "sha256": "7fefc0016f19bfd93f40fa7f5d89fcf37098aaaf9478a989fdd8e27b379bb5eb"
   },
+  "merge_fx": {
+   "_hinweis": "Wie pack_arena und nav_shop NICHT von assets_sichern.py geholt: *.cloudfront.net ist aus dieser Umgebung gesperrt (CONNECT 403). Die Datei wurde in der Bild-Sandbox erzeugt (Kling v3.0, 1:1, 5 s, mode pro, sound on), dort auf 192x192 verkleinert, um 1,42 beschleunigt (Aufprall landet damit bei 1,27 s auf dem Umschlag der Zeremonie bei 1,26 s) und die Tiefen auf echtes Schwarz gedrueckt. Uebertragen in fuenf Base64-Teilen ueber die Sandbox-Ausgabe und Stueck fuer Stueck per md5 gegengeprueft; der SHA-256 der zusammengesetzten Datei stimmt mit dem der Sandbox ueberein.",
+   "bytes": 61704,
+   "datei": "merge_fx.mp4",
+   "kleinfassung": true,
+   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/2de19c3f-43d9-4c55-868d-d602b9c2b06c.mp4",
+   "sha256": "1c528f575d1c5d59ef184d348551d0e5a5838e40eb1e8550dbfcbe450622fad1"
+  },
   "nav_cards": {
    "bytes": 65880,
    "datei": "nav_cards.webp",
@@ -1342,6 +1350,20 @@
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133136_11a05067-59c0-4049-a72a-9cdfc1afb81a_min.webp",
    "sha256": "dce256074b52b51e0ddd38ad1e326033a25ba628016f0e5540fef9476ca19979"
   },
+  "schrift_cinzel": {
+   "bytes": 39644,
+   "datei": "cinzel-700-900.woff2",
+   "notiz": "Variable Schrift, Achse wght auf 700-900 beschnitten (nur diese beiden Schnitte benutzt das Blatt) und auf Latein subsettet; danach WOFF2. Aus 125 468 Byte wurden 39 644. Lizenz SIL OFL 1.1, Wortlaut in assets/cinzel-OFL.txt.",
+   "quelle": "https://raw.githubusercontent.com/google/fonts/main/ofl/cinzel/Cinzel%5Bwght%5D.ttf",
+   "sha256": "4b42d1af4ac92902b9b328aca86b20fb0819d0945a47248135cbf02b54e32b4b"
+  },
+  "schrift_cinzel_lizenz": {
+   "bytes": 4383,
+   "datei": "cinzel-OFL.txt",
+   "notiz": "SIL Open Font License 1.1 — die Lizenz VERLANGT, dass sie mitgeliefert wird.",
+   "quelle": "https://raw.githubusercontent.com/google/fonts/main/ofl/cinzel/OFL.txt",
+   "sha256": "f2b3029aba64c378bf0963b62945eee15e564fe4330b934c8f2eb058282b5e83"
+  },
   "shop_gem_t1": {
    "bytes": 23074,
    "datei": "shop_gem_t1.webp",
@@ -1614,14 +1636,6 @@
    "kleinfassung": true,
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133702_949e2b93-321e-4d5f-b64f-c09d5ba099a5_min.webp",
    "sha256": "7ca082527741fe22d3701de0cc6091a3f8387908a8d280f231b0528983cfba59"
-  },
-  "merge_fx": {
-   "_hinweis": "Wie pack_arena und nav_shop NICHT von assets_sichern.py geholt: *.cloudfront.net ist aus dieser Umgebung gesperrt (CONNECT 403). Die Datei wurde in der Bild-Sandbox erzeugt (Kling v3.0, 1:1, 5 s, mode pro, sound on), dort auf 192x192 verkleinert, um 1,42 beschleunigt (Aufprall landet damit bei 1,27 s auf dem Umschlag der Zeremonie bei 1,26 s) und die Tiefen auf echtes Schwarz gedrueckt. Uebertragen in fuenf Base64-Teilen ueber die Sandbox-Ausgabe und Stueck fuer Stueck per md5 gegengeprueft; der SHA-256 der zusammengesetzten Datei stimmt mit dem der Sandbox ueberein.",
-   "bytes": 61704,
-   "datei": "merge_fx.mp4",
-   "kleinfassung": true,
-   "quelle": "https://d2ol7oe51mr4n9.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/2de19c3f-43d9-4c55-868d-d602b9c2b06c.mp4",
-   "sha256": "1c528f575d1c5d59ef184d348551d0e5a5838e40eb1e8550dbfcbe450622fad1"
   }
  }
 }
