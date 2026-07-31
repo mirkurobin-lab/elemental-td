@@ -4143,12 +4143,25 @@ dorthin gewandert, wo sie lesbar ist.
 | AA | bei uns | Platz |
 |---|---|---|
 | (Angebot oben) | Arena-Packs + Angebotsstreifen | **1** |
-| — | Tagesangebote (unsere Ergänzung) | 2 |
+| — | Tagesangebote (unsere Ergänzung) | **2** |
 | ARCANE SUPPLIES CHEST | Vorrats-Pack | 3 |
 | CHEST | Booster-Packs | 4 |
 | **ENDLESS ROULETTE** | **Kristalltresor** | **5** |
 | GEMS | Gem-Pakete | 6 |
 | GOLD | Gold-Tausch | 7 |
+
+> **Die eine Entscheidung, die hier zu treffen war** (getroffen am 31.07.2026, vom
+> Auftraggeber): **Die Tagesangebote bleiben auf Platz 2.**
+>
+> Sie sind der einzige Abschnitt ohne Gegenstück bei AA — er war früher ausdrücklich
+> bestellt worden („mach das System der tagesangebote fertig fuege tower gems gold usw
+> ein", §27.2). Auf die Frage, ob „exakt wie AA" wörtlich gemeint ist und der Abschnitt
+> weiter nach unten oder ganz weg soll, lautet die Antwort: er bleibt, wo er ist.
+>
+> Damit ist die Shop-Achse **abschließend** festgelegt. Wer sie künftig ändert, ändert
+> eine getroffene Entscheidung und nicht einen offenen Punkt. `run_shop.js` und
+> `run_v7.js` frieren die Reihenfolge über `data-sec` 1…7 **und** die Folge der
+> Inhaltscontainer ein — eine Verschiebung wird also rot, nicht still.
 
 Der Tresor sitzt auf AAs Roulette-Platz — **das war bereits so**, und `run_shop.js` prüft
 es seit Längerem ausdrücklich (`tresorSec === '5'`). Dieselbe Rolle, aber ohne
