@@ -4376,6 +4376,27 @@ span.ico{text-align:center}
 .prodcard.wide.hasseal .pcart{margin-top:0}
 
 /* ==================================================================
+ * .sekthinweis — was frueher IM Band stand
+ * ------------------------------------------------------------------
+ * Befund (31.07.2026): „unser Shop ist cluttered". Gezaehlt waren es
+ * neun Baender, und vier davon trugen zusaetzlich eine zweite Zeile im
+ * Zierfeld. Gemessen sass die zweite Zeile 6 px ueber der Unterkante,
+ * also direkt auf der inneren Goldlinie der Bandgrafik.
+ * AAs Baender tragen EIN Wort und sonst nichts (IMG_3450-3455) — die
+ * Zusatzangaben stehen dort IN der Karte („Get Epic in 10 opens" steht
+ * auf der goldenen Flaeche, nicht auf dem blauen Band darueber).
+ * Zwei der vier Zeilen waren gemessen ohnehin Dubletten: der
+ * Vorrats-Block sagt selbst „Garantiert episch in ≤ 20 Öffnungen", der
+ * Tresor-Block sagt selbst „Stufe 1 von 5". Die sind ersatzlos weg.
+ * Die zwei uebrigen tragen echte Information und stehen jetzt als
+ * schmale Zeile UNTER dem Band: der Tagesangebots-Timer und die
+ * Pity-Zusage der Booster-Packs. Letztere ist eine Offenlegung vor dem
+ * Kauf und darf nicht der Aufraeumaktion zum Opfer fallen — sie wandert
+ * nur dorthin, wo sie lesbar ist. */
+.sekthinweis{margin:-4px var(--pad) 8px;text-align:center;
+  font-size:var(--fs-1);font-weight:800;letter-spacing:.02em;color:var(--dim)}
+
+/* ==================================================================
  * SEKTIONS-BAENDER — EINE Machart, die des SHOP-Bandes
  * ------------------------------------------------------------------
  * BEFUND vom Live-Stand (iPhone, 26.07., IMG_3349-3353): ganz oben im
@@ -8425,18 +8446,24 @@ button.pfplate{cursor:pointer}
        nicht, waere keine Ordnung mehr.
        Alle Abstaende/Radien/Hoehen aus der Metrik (§19.2). -->
   <section id="viewShop" class="view">
-    <h2 class="title">Shop</h2>
+    <!-- ⚠ HIER STAND EIN <h2 class="title">Shop</h2>, UND ES MUSSTE WEG
+         (31.07.2026, zum zweiten Mal angeordnet — beim ersten Mal habe
+         ich es uebersehen).
+         Der Grund ist nicht Geschmack: die Bottom-Nav sagt bereits
+         „Shop", der Reiter ist hervorgehoben, und AAs Laden hat an
+         dieser Stelle GAR KEINE Ueberschrift (IMG_3450/3451/3452/3455).
+         Ein Titelband, das nur wiederholt, wo man ohnehin steht, kostet
+         eine volle Bandhoehe ueber dem ersten Angebot — genau das, was
+         „unser Shop ist cluttered" beschreibt.
+         Gezaehlt vorher: NEUN Baender ueber sieben Abschnitten. AA hat
+         fuenf bis sechs, jedes genau einmal. -->
 
-    <!-- Personalisierte Angebotskette — nur nach einem Ereignis sichtbar,
-         nie „einfach so". Ohne data-sec, siehe Kopfkommentar. -->
-    <div class="secribbon" id="offerSec" data-ribbon="ribbon_section_lg"
-         style="display:none"><span class="srt">Nur für dich</span></div>
-    <div id="offerSlot"></div>
-
-    <!-- (1) ARENA PACK — Karussell, Echtgeld, Punktreihe darunter -->
+    <!-- (1) ARENA PACK — Karussell, Echtgeld, Punktreihe darunter.
+             ⚠ STEHT SEIT DEM 31.07.2026 GANZ OBEN: „der Shop startet mit
+             dem Reiter Arena pack". Vorher lag die personalisierte
+             Angebotskette davor. -->
     <div class="secribbon" data-sec="1" data-ribbon="ribbon_section_lg">
-      <span class="srt">Arena-Packs</span>
-      <span class="srx">Echtgeld · Platzhalter</span></div>
+      <span class="srt">Arena-Packs</span></div>
     <!-- AAs Karussell (IMG_3382): EINE Karte im Bild, Pfeile links und
          rechts ausserhalb, Punktleiste darunter. Waagerecht wischbar. -->
     <div class="apkwrap">
@@ -8447,21 +8474,31 @@ button.pfplate{cursor:pointer}
     <div class="apkdots" id="apkDots"></div>
     <div class="iapgrid" id="arenaPackBox"></div>
 
+    <!-- Personalisierte Angebotskette — nur nach einem Ereignis sichtbar,
+         nie „einfach so". Ohne data-sec, weil sie kein fester Abschnitt
+         ist, sondern ein Einschub.
+         ⚠ IHR BAND „Nur für dich" IST AM 31.07.2026 ENTFALLEN. Ein
+         eigenes Abschnittsband fuer einen einzelnen Streifen war eines
+         der neun; AAs Angebot oben traegt auch keines. Die Karte sagt
+         selbst, was sie ist — sie hat Titel, Inhalt, Preis und eine
+         Restlaufzeit. Sichtbar/unsichtbar steuert jetzt der Streifen
+         selbst statt eines Bandes darueber. -->
+    <div id="offerSlot"></div>
+
     <!-- (2) DAILY DEALS — deterministisch aus dem Tagesdatum gezogen,
              siehe zieheTagesangebote(). Der Timer laeuft echt gegen die
              naechste UTC-Tagesgrenze, er ist kein Text mehr.
              AA zeigt sechs Posten in zwei Reihen zu drei (§27.2). -->
     <div class="secribbon" data-sec="2" data-ribbon="ribbon_section_lg">
-      <span class="srt">Tagesangebote</span>
-      <span class="srx" id="dealTimer">—</span></div>
+      <span class="srt">Tagesangebote</span></div>
+    <p class="sekthinweis" id="dealTimer">—</p>
     <div class="prodgrid" id="dealGrid"></div>
 
     <!-- (3) ARCANE SUPPLIES CHEST — bei uns das Vorrats-Pack.
              AAs breite goldene Karte mit den Pity-Zeilen steht VOR dem
              Truhenblock (§27.1 Platz 3), nicht dahinter. -->
     <div class="secribbon" data-sec="3" data-ribbon="ribbon_section_lg">
-      <span class="srt">Vorrats-Pack</span>
-      <span class="srx" id="vorratPity">—</span></div>
+      <span class="srt">Vorrats-Pack</span></div>
     <div class="vorratbox" id="vorratShop"></div>
 
     <!-- (4) CHEST — bei uns die Booster-Packs. AA hat hier zwei Truhen
@@ -8471,8 +8508,8 @@ button.pfplate{cursor:pointer}
              Bronze ist aus dem kaufbaren Angebot raus und lebt als
              Gratis-Tagespack im Band darunter weiter. -->
     <div class="secribbon" data-sec="4" data-ribbon="ribbon_section_lg">
-      <span class="srt">Booster-Packs</span>
-      <span class="srx" id="packPity">…</span></div>
+      <span class="srt">Booster-Packs</span></div>
+    <p class="sekthinweis" id="packPity">…</p>
     <div class="packshop" id="packShop"></div>
     <div id="packFreeBox"></div>
 
@@ -8481,14 +8518,12 @@ button.pfplate{cursor:pointer}
              Gluecksspiel-Optik und ohne Zufall: der Tresor zahlt einen
              vorher sichtbaren Betrag aus. -->
     <div class="secribbon" data-sec="5" data-ribbon="ribbon_section_lg">
-      <span class="srt">Kristalltresor</span>
-      <span class="srx" id="vaultTier">—</span></div>
+      <span class="srt">Kristalltresor</span></div>
     <div class="vaultbox" id="vaultShop"></div>
 
     <!-- (6) GEMS — sechs Staffeln, 3 x 2. Preise nach §27.2. -->
     <div class="secribbon" data-sec="6" data-ribbon="ribbon_section_lg">
-      <span class="srt">Gem-Pakete</span>
-      <span class="srx">Echtgeld · Platzhalter</span></div>
+      <span class="srt">Gem-Pakete</span></div>
     <div class="prodgrid" id="gemShop"></div>
 
     <!-- (7) GOLD — drei Staffeln, 3 x 1, bezahlt mit Gems. Preise nach
@@ -8497,8 +8532,7 @@ button.pfplate{cursor:pointer}
              Die Zeile darunter sagt genau das — sie ist keine Fussnote,
              sondern die Stelle, an der ein fehlender Weg benannt wird. -->
     <div class="secribbon" data-sec="7" data-ribbon="ribbon_section_lg">
-      <span class="srt">Gold-Tausch</span>
-      <span class="srx">Gems → Gold</span></div>
+      <span class="srt">Gold-Tausch</span></div>
     <div class="prodgrid" id="goldShop"></div>
     <p class="iapnote" id="werbungNote">—</p>
 
@@ -16955,8 +16989,12 @@ button.pfplate{cursor:pointer}
        Abdunkelungsband aus bgArt(). Nie als class="ico" — der
        Freistell-Filter (§6h) wuerde die dunkle Bildhaelfte aufloesen. */
     bgArt(box, "pack_vorrat");
-    var pity = $("vorratPity");
-    if (pity) pity.textContent = "Episch ≤" + p.epicIn + " · Legendär ≤" + p.legendaryIn;
+    /* ⚠ HIER STAND EIN ZWEITER SCHREIBER FUER DIESELBE ZAHL. Das
+       Bandfeld `#vorratPity` ist am 31.07.2026 entfallen: der Block
+       darunter sagt die Pity-Zusage laengst selbst, und zwar
+       ausgeschrieben („Garantiert episch in ≤ 20 Öffnungen · Legendär in
+       ≤ 55") statt abgekuerzt. Zwei Anzeigen derselben Zahl heissen zwei
+       Stellen, die auseinanderlaufen koennen. */
 
     Array.prototype.forEach.call(box.querySelectorAll("[data-vorrat]"), function (b) {
       b.addEventListener("click", function () {
@@ -20061,9 +20099,10 @@ button.pfplate{cursor:pointer}
       });
       markPressable(el);
     });
-    var vt = $("vaultTier");
-    if (vt) vt.textContent = "Stufe " + (v.tier + 1) + "/" + (v.tierMax + 1) +
-      " · " + v.opened + "× geöffnet";
+    /* Wie bei `vorratPity`: das Bandfeld `#vaultTier` ist entfallen, der
+       Tresor-Block traegt „Stufe 1 von 5" selbst. Der einzige Teil, den
+       nur das Band hatte, war „0× geöffnet" — eine Zahl ohne Folge fuer
+       den Spieler; sie steht weiterhin in den Analytics. */
   }
   /* ⚠ IAP-PLATZHALTER: bestaetigt, bucht Spielwaehrung, loest KEINE
      Zahlung aus. Die Store-Anbindung gehoert in die App-Huelle. */
@@ -20106,9 +20145,12 @@ button.pfplate{cursor:pointer}
   function renderOffers() {
     var V = VLof(); if (!V) return;
     var act = V.active();
-    var sec = $("offerSec"), slot = $("offerSlot");
-    if (sec) sec.style.display = act.length ? "" : "none";
+    /* Kein Abschnittsband mehr (siehe Markup): der Streifen selbst
+       entscheidet, ob er da ist. `offerSec` gibt es nicht mehr — wer
+       hier ein Band sucht, findet die Begruendung im Markup. */
+    var slot = $("offerSlot");
     if (!slot) return;
+    slot.style.display = act.length ? "" : "none";
     slot.innerHTML = act.map(offerRowHTML).join("");
     Array.prototype.forEach.call(slot.querySelectorAll(".offercard"), function (el) {
       bgArt(el, "bg_offer");

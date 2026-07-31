@@ -2263,13 +2263,27 @@ function step(name, ok, info) {
   await page.click('#navShop');
   await page.waitForTimeout(400);
   const offerUi = await page.evaluate(() => ({
-    sec: getComputedStyle(document.getElementById('offerSec')).display,
+    /* ⚠ GEAENDERTE MESSSTELLE (31.07.2026). Hier stand `offerSec`, das
+       Abschnittsband „Nur für dich". Es ist entfallen — es war eines von
+       neun Baendern in einem Laden, den der Auftraggeber als „cluttered"
+       gemeldet hat, und AAs Angebot oben traegt auch keines.
+       Gemessen wird deshalb der STREIFEN selbst. Das ist ohnehin die
+       richtige Frage: ob der Spieler das Angebot sieht, haengt an der
+       Karte, nicht an der Ueberschrift darueber. */
+    sec: getComputedStyle(document.getElementById('offerSlot')).display,
     cards: document.querySelectorAll('#offerSlot .offercard').length,
     prices: [...document.querySelectorAll('#offerSlot .offerbuy')]
       .map(e => e.textContent.replace(/\s+/g, ' ').trim()),
     timers: [...document.querySelectorAll('#offerSlot .otime')].map(e => e.textContent.trim()),
     vault: !!document.querySelector('#vaultShop .vaultjar'),
-    tier: document.getElementById('vaultTier').textContent.trim(),
+    /* ⚠ GEAENDERTE MESSSTELLE (31.07.2026). `#vaultTier` war das
+       Zusatzfeld IM Abschnittsband und ist entfallen — AAs Baender
+       tragen ein Wort und sonst nichts, die Angaben stehen in der Karte.
+       Der Tresor-Block sagt „Stufe 1 von 5" ohnehin selbst; genau der
+       Text wird jetzt geprueft. Die Zusicherung ist dieselbe: der
+       Spieler sieht seine Tresorstufe. */
+    tier: (document.querySelector('#vaultShop .vaultmeta, #vaultShop') || {}).textContent
+      ? document.getElementById('vaultShop').textContent.replace(/\s+/g, ' ').trim() : '',
   }));
   step('Shop zeigt den Angebots-Abschnitt', offerUi.sec !== 'none' && offerUi.cards === 3,
     offerUi.cards + ' Angebote');
@@ -2277,7 +2291,7 @@ function step(name, ok, info) {
     offerUi.prices.every(p => preisMuster.test(p)) &&
     offerUi.timers.every(t => /noch/.test(t)), offerUi.prices.join(' · '));
   step('Shop hat einen eigenen Tresor-Abschnitt',
-    offerUi.vault && /Stufe \d\/\d/.test(offerUi.tier), offerUi.tier);
+    offerUi.vault && /Stufe \d+ von \d+/.test(offerUi.tier), offerUi.tier.slice(0, 70));
   await page.screenshot({ path: SHOTS + '/shop_vault.png', fullPage: true });
 
   // --- Popup ---

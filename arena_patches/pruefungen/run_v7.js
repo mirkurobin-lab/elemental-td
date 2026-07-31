@@ -1784,9 +1784,20 @@ function gegen(name, sollFalschSein, info) { step('gegen: ' + name, !sollFalschS
           gekuerzt: kinder.some(e => e.scrollWidth > e.clientWidth + 0.5)
         };
       }));
-  step('Sektionsbaender tragen dieselbe Grafik wie der Screen-Titel',
-    !!titelband && band.length > 0 && band.every(b => b.band === titelband),
-    titelband + ' <- ' + [...new Set(band.map(b => b.band))].join(','));
+  /* ⚠ UMFORMULIERT AM 31.07.2026, WEIL DER SHOP SEINEN TITEL VERLOREN
+     HAT. Der Schritt hiess „dieselbe Grafik wie der Screen-Titel" und
+     nahm den Titel als Bezugsgroesse. Im Shop gibt es ihn nicht mehr:
+     das <h2>Shop</h2> ist entfallen, weil die Bottom-Nav bereits „Shop"
+     sagt und AAs Laden an der Stelle keine Ueberschrift hat.
+     Worum es dem Schritt GING, gilt unveraendert: EINE Bandfamilie je
+     Screen. Das ist jetzt die Bedingung — und wo es einen Titel gibt,
+     muss er zu ihr gehoeren. Ein Test, der an einem Element haengt, das
+     aus gutem Grund verschwindet, misst die Bauart statt die Absicht. */
+  const familien = [...new Set(band.map(b => b.band))];
+  step('Eine Bandfamilie je Screen (und der Titel gehoert dazu)',
+    band.length > 0 && familien.length === 1 &&
+    (!titelband || titelband === familien[0]),
+    (titelband || '(kein Titel)') + ' <- ' + familien.join(','));
   step('Bandtext liegt im Polster, nicht im Zierende',
     band.length > 0 && band.every(b => b.luft === null || b.luft >= 0),
     'engste Stelle ' +

@@ -4083,3 +4083,86 @@ auslöst, wäre ein abgehakter Punkt ohne Wirkung.
 `.skelett`, `window.UIZustand`).
 
 **Aufwand: L** · **Priorität: 1** · A–D abgearbeitet, drei Punkte offen benannt
+
+---
+
+## §40 Der Shop nach AAs Achse — neun Bänder auf sieben
+
+Ansage (31.07.2026), mit fünf Aufnahmen aus AAs Laden: „Hast du bereits die
+überschüssigen Banner wie Shop aus dem Shop gelöscht wie ich dir vor langer Zeit
+angeordnet habe? … unser Shop ist cluttered … der Shop startet mit dem Reiter Arena
+pack. Dort wo das Roulett ist im AA Shop kommt unser Kristall Tresor."
+
+**Die ehrliche Antwort auf die erste Frage: nein.** Das `<h2 class="title">Shop</h2>`
+stand noch da. Es war beim ersten Mal übersehen worden.
+
+### 40.1 Gezählt, bevor gebaut wurde
+
+| | vorher | AA | nachher |
+|---|---|---|---|
+| Bänder im Shop | **9** | 5–6 | **7** |
+| davon Titelband | 1 | **0** | 0 |
+| davon mit zweiter Zeile im Zierfeld | 4 | **0** | 0 |
+| Bänder mit dem Wort „Platzhalter" | 2 | — | 0 |
+
+AAs Bänder tragen **ein Wort und sonst nichts** (`ARCANE SUPPLIES CHEST`, `CHEST`,
+`ENDLESS ROULETTE`, `GEMS`, `GOLD`). Die Zusatzangaben stehen dort **in der Karte**:
+„Get Epic in 10 opens" liegt auf der goldenen Fläche, nicht auf dem blauen Band darüber.
+
+### 40.2 Was raus ist, und warum genau das
+
+**Das Titelband „SHOP".** Die Bottom-Nav sagt bereits „Shop" und hebt den Reiter hervor;
+AAs Laden hat an dieser Stelle gar keine Überschrift. Ein Band, das nur wiederholt, wo
+man ohnehin steht, kostet eine volle Bandhöhe über dem ersten Angebot.
+
+**Das Band „Nur für dich".** Ein eigener Abschnittskopf für einen einzelnen Streifen.
+AAs Angebot oben trägt auch keinen. Die Karte sagt selbst, was sie ist — sie hat Titel,
+Inhalt, Preis und Restlaufzeit. Der Streifen ist unter das Arena-Pack-Karussell gerückt,
+weil der Laden mit den Arena-Packs **starten** soll.
+
+**Zwei Untertitel waren gemessen Dubletten.** Der Vorrats-Block sagt selbst „Garantiert
+episch in ≤ 20 Öffnungen · Legendär in ≤ 55", der Tresor-Block sagt selbst „Stufe 1 von
+5". Im Band stand dieselbe Angabe abgekürzt. Zwei Anzeigen derselben Zahl sind zwei
+Stellen, die auseinanderlaufen können — beide Schreiber sind entfallen.
+
+**Zwei Untertitel trugen echte Information und stehen jetzt unter dem Band** (`.sekthinweis`):
+der Tagesangebots-Timer und die **Pity-Zusage der Booster-Packs**. Letztere ist eine
+Offenlegung vor dem Kauf und durfte der Aufräumaktion nicht zum Opfer fallen; sie ist nur
+dorthin gewandert, wo sie lesbar ist.
+
+> **Warum die zweite Zeile im Band überhaupt ein Problem war:** gemessen saß sie **6 px**
+> über der Unterkante — also direkt auf der inneren Goldlinie der Bandgrafik. Die
+> bestehende Prüfung „Bandtext liegt im Polster, nicht im Zierende" stand dabei grün,
+> weil sie **waagerecht** misst (Abstand zu den Zierenden links und rechts). Senkrecht
+> hat sie nie geschaut.
+>
+> **Merksatz:** Eine Prüfung, die eine Achse misst, sagt nichts über die andere.
+
+### 40.3 Die Achse steht — und stand schon
+
+| AA | bei uns | Platz |
+|---|---|---|
+| (Angebot oben) | Arena-Packs + Angebotsstreifen | **1** |
+| — | Tagesangebote (unsere Ergänzung) | 2 |
+| ARCANE SUPPLIES CHEST | Vorrats-Pack | 3 |
+| CHEST | Booster-Packs | 4 |
+| **ENDLESS ROULETTE** | **Kristalltresor** | **5** |
+| GEMS | Gem-Pakete | 6 |
+| GOLD | Gold-Tausch | 7 |
+
+Der Tresor sitzt auf AAs Roulette-Platz — **das war bereits so**, und `run_shop.js` prüft
+es seit Längerem ausdrücklich (`tresorSec === '5'`). Dieselbe Rolle, aber ohne
+Glücksspiel-Optik und ohne Zufall: der Tresor zahlt einen vorher sichtbaren Betrag aus.
+
+### 40.4 Zwei Prüfungen mussten mitziehen
+
+Beide hingen an einem Element, das aus gutem Grund verschwunden ist — und beide messen
+jetzt die **Absicht** statt der Bauart:
+
+- `run_v7`: „Sektionsbänder tragen dieselbe Grafik wie der Screen-Titel" nahm den Titel
+  als Bezugsgröße. Ohne Titel wäre der Schritt für immer rot. Er heißt jetzt „Eine
+  Bandfamilie je Screen (und der Titel gehört dazu)".
+- `run_v6`: las die Tresorstufe aus dem Bandfeld. Sie liest sie jetzt aus dem Block, wo
+  sie ohnehin ausgeschrieben steht.
+
+**Aufwand: M** · **Priorität: 1** · erledigt
