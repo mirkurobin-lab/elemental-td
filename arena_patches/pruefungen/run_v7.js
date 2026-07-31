@@ -187,8 +187,23 @@ function gegen(name, sollFalschSein, info) { step('gegen: ' + name, !sollFalschS
      67,6-78,1 %. Genauer als absolute Werte ist der Anteil am Band
      zwischen Kopf-Unterkante und Nav-Oberkante — der stimmt auf 1,3
      Punkte (AA 74,5 %, wir 73,2 %). */
-  step('KAMPF-Knopf im AA-Band (um AAs Statusleiste korrigiert: 64-80 %)',
-    axis.battle > 0.64 && axis.battle < 0.80, pct(axis.battle));
+  /* ⚠ ZWEITE KOPIE derselben eingefrorenen AA-Zahl (die erste steht in
+     run_v5.js). AAs Band ist vom Auftraggeber ueberstimmt — der Knopf
+     soll TIEFER stehen, weil darunter 156 px ungenutzt lagen
+     (AA_UI_REFERENZ §36). Gebunden wird deshalb an die neue Zusage:
+     tief, aber ueber der Leiste — und der zweite Teil in PIXELN, weil
+     ein Prozentwert den vorbestehenden Fehler auf kurzen Geraeten nie
+     gefunden haette.
+     ⚠ Dass dieselbe Zahl an zwei Stellen eingefroren war, ist der
+     eigentliche Befund: wer eine davon aendert, haelt sich fuer fertig. */
+  const kampfLage7 = await page.evaluate(() => {
+    const b = document.getElementById('btnBattle').getBoundingClientRect();
+    const n = document.querySelector('nav.bottom').getBoundingClientRect();
+    return { anteil: b.top / innerHeight, luft: Math.round(n.top - b.bottom) };
+  });
+  step('KAMPF-Knopf steht tief, aber ueber der Leiste',
+    kampfLage7.anteil > 0.66 && kampfLage7.anteil < 0.92 && kampfLage7.luft >= 8,
+    pct(kampfLage7.anteil) + ' · ' + kampfLage7.luft + ' px Luft zur Leiste');
   const bw = await page.evaluate(() => {
     const b = document.getElementById('btnBattle').getBoundingClientRect();
     const r = document.querySelector('.homerow3').getBoundingClientRect();
