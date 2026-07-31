@@ -633,7 +633,7 @@ Zwei Anläufe, beide lehrreich:
 | — | Typo-Leiter: 40 Schriftgrößen auf 8 benannte Stufen | offen |
 | — | Radien: 31 auf 4 | offen |
 | — | Fehlende Komponenten: Tooltips, gestaltete Scrollbars, Health/Mana-Balken, Damage-Zahlen, Kampagne, Benachrichtigungssystem, Ladezustände | offen |
-| — | **Gold-Produktbilder neu erzeugen.** `shop_gold_t1..t4` messen Farbton 35°, aber nur 0,32–0,39 Sättigung gegen 0,58 beim Währungs-Icon. Bei 108 px lesen sie als graue Münze. Aktuell hebt ein CSS-Sättigungsschub sie an — eine Zwischenlösung, kein Ersatz | offen |
+| — | ~~**Gold-Produktbilder neu erzeugen.**~~ **Zurückgezogen am 31.07.2026: die Messung dahinter war falsch.** Die 0,32–0,39 waren über das *ganze* Bild gemittelt — bei `t2`/`t3` liegt der Farbton-Median dadurch bei 271°/222°, also im violetten Hintergrund. Nur über die Goldpixel gemessen stehen `t1..t4` bei S 0,494–0,601 gegen 0,631 beim Währungs-Icon, also 5–20 % statt 45 %. Der Unterschied ist der **Anteil** (35,4 % Goldpixel bei `cur_gold` gegen 10,5 % bei `t2`), nicht die Sättigung. Der CSS-Schub wurde von 1,45 auf **1,15** korrigiert — 1,45 hob die Goldpixel auf 0,666–0,793 und damit über das Ziel | erledigt, kein neues Asset nötig |
 
 **Regel für alles Neue:** eine Änderung am Design-System ohne begleitenden Check
 ist nicht fertig. Sonst steht in sechs Wochen wieder 89 % ohne Tiefe im Blatt und

@@ -1,6 +1,6 @@
 {
- "_bytes": 77940694,
- "_dateien": 235,
+ "_bytes": 77962656,
+ "_dateien": 237,
  "_hinweis": "Erzeugt von werkzeuge/assets_sichern.py. Schluessel, Quell-URL, Dateiname, Groesse und SHA-256 je Asset — der Nachweis, dass die Datei im Repo die Datei vom CDN ist.",
  "assets": {
   "arena1": {
@@ -1636,6 +1636,14 @@
    "kleinfassung": true,
    "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_133702_949e2b93-321e-4d5f-b64f-c09d5ba099a5_min.webp",
    "sha256": "7ca082527741fe22d3701de0cc6091a3f8387908a8d280f231b0528983cfba59"
+  },
+  "progress_frame_cut": {
+   "bytes": 13890,
+   "datei": "progress_frame_cut.webp",
+   "abgeleitet_von": "progress_frame",
+   "verfahren": "Pillow crop (103,308,1272,461) -> 1169x153, WEBP q92 method6, 31.07.2026",
+   "quelle": "https://d8j0ntlcm91z4.cloudfront.net/user_394kgkln5uRfTYSh1F2BduBnE6w/hf_20260725_095742_a6bc63f3-733e-416b-b018-8358ca597e98_min.webp",
+   "sha256": "42863258789ec2c91eba2da424b1f625fac709c067cc94dea2a9c02f6fa8394d"
   }
  }
 }

@@ -2535,9 +2535,24 @@ footer{padding:6px 12px 14px;text-align:center}
    der Belohnungs-Chip haengt UNTER dem Balken. */
 .progwrap{width:54%;margin:0 auto;padding-bottom:16px;position:relative;
   display:flex;align-items:center;gap:0}
+/* ⚠ 9-SLICE STATT GESTRECKTER BILDFLAECHE (31.07.2026).
+   Hier stand `background-size:100% 240%`. Die Grafik ist 1376x768, der
+   Balken darin 1169x153 — bei `100 %` Breite wird sie auf 221 px
+   gequetscht, also um den Faktor 6,2, waehrend die Hoehe auf 240 %
+   gezogen wird. Die beiden Zierkappen mit den Kristallen werden dabei zu
+   Spliessen. Genau die Bugklasse aus §6b, nur an einem Balken.
+   `border-image-slice:0 10%` schneidet nur SENKRECHT: die Kappen bleiben
+   unverzerrt, die Mitte spannt. Die Randbreite ist die Kappenbreite auf
+   diesem Element — gemessen ist die Kappe 0,76 mal so breit wie der
+   Balken hoch, bei 22 px also 17 px.
+   `fill` behaelt die Mitte der Grafik; sie IST der Balkengrund. */
 .progbar{flex:1;height:22px;border-radius:12px;position:relative;overflow:visible;
-  background-repeat:no-repeat;background-position:center;background-size:100% 240%,100% 100%;
+  background-repeat:no-repeat;background-position:center;background-size:100% 100%;
   background-image:linear-gradient(180deg,#0b1116,#16202a);border:1px solid #e0b94a4d}
+.progbar.balken9{border-style:solid;border-top-width:0;border-bottom-width:0;
+  border-left-width:1px;border-right-width:1px;border-color:transparent;
+  border-image-slice:0 10% fill;border-image-repeat:stretch;
+  border-image-width:0 17px}
 .progbar .pgico{position:absolute;left:-9px;top:50%;transform:translateY(-50%);z-index:3;
   font-style:normal;font-size:15px;display:flex;align-items:center;
   filter:var(--frei) drop-shadow(0 1px 3px #000c)}
@@ -3228,6 +3243,31 @@ footer{padding:6px 12px 14px;text-align:center}
  * `border-image-slice:0 …` heisst: keine waagerechten Schnittlinien, die
  * Mittelzeile spannt die ganze Hoehe.
  * ================================================================== */
+/* ==================================================================
+ * .platte9 — die Panel-Platte als 9-SLICE
+ * ------------------------------------------------------------------
+ * Derselbe Grund wie bei `.band9`, nur an einem Rahmen statt an einem
+ * Band — und hier war der alte Zustand messbar kaputt: `panel.webp` lag
+ * als `background-image` mit `background-size:auto` auf `.reqpanel`.
+ * Eine 1200x896-Grafik in einem 406x256-Kasten zeigt bei `auto` genau
+ * ihr linkes oberes Drittel: linker und oberer Rand da, rechter und
+ * unterer Rand ausserhalb des Kastens. Ein Rahmen ohne zwei Seiten ist
+ * kein Rahmen.
+ * Der Zuschnitt ist aus den Pixeln gemessen (31.07.2026), nicht
+ * geschaetzt: die Zierlinie liegt 54 px vom Bildrand entfernt (auf allen
+ * vier Seiten gleich), das Eckornament reicht weitere 54 px nach innen.
+ * 108 px Zuschnitt sind also 12,1 % der Hoehe und 9,0 % der Breite.
+ * `fill` behaelt die dunkle Mitte der Grafik — anders als bei den
+ * Kartenrahmen ist sie hier gewollt, sie IST die Platte.
+ * Die Randbreite ist wieder KLEINER als der Zuschnitt (siehe `.frm`):
+ * 14 px lassen den Ring schlank, statt auf einem 256 px hohen Panel
+ * 31 px Zier je Seite zu fressen. */
+.platte9{border-style:solid;border-width:1px;
+  border-image-slice:12.1% 9% fill;border-image-repeat:stretch;
+  border-image-width:14px}
+/* Faellt die Grafik aus, traegt der Farbverlauf aus dem Blatt die
+   Flaeche allein — dieselbe Dreizustands-Regel wie beim Band. */
+.platte9.plattefehlt{border-image-source:none}
 .band9{border-style:solid;border-top-width:0;border-bottom-width:0;
   border-left-width:1px;border-right-width:1px;
   border-image-slice:0 22% fill;border-image-repeat:stretch;
@@ -4060,15 +4100,26 @@ span.ico{text-align:center}
    als oben, und oben steht bei einem Turm-Artwork der Kopf. */
 .prodcard .pcart img.prodimg{width:100%;height:100%;object-fit:cover;
   object-position:center 28%}
-/* Die Gold-Produktbilder sind gemessen stumpf: Farbton 35 Grad, aber nur
-   0,32-0,39 Saettigung gegen 0,58 beim Waehrungs-Icon. Bei 108 px liest
-   das als graue Muenze, nicht als Gold — genau der Befund „die Gold-Icons
-   sehen nicht schoen aus". Bis neue Grafiken da sind, hebt ein
-   Saettigungs-Schub sie auf denselben Wert; der Schatten gibt der Muenze
-   ausserdem die Kante zurueck, die sie auf dunklem Grund braucht.
-   ⚠ Das ist eine ZWISCHENLOESUNG, kein Ersatz fuer richtige Assets —
-   vermerkt in DESIGNSYSTEM.md §8. */
-.prodcard.fr-gold .pcart img.prodimg{filter:var(--frei) saturate(1.45) contrast(1.08)
+/* ⚠ DIE ALTE ZAHL WAR FALSCH GEMESSEN, und der Schub war deshalb zu
+   gross. Hier stand: „Farbton 35 Grad, aber nur 0,32-0,39 Saettigung
+   gegen 0,58 beim Waehrungs-Icon". Diese Werte sind ueber das GANZE Bild
+   gemittelt — bei `shop_gold_t2` und `t3` liegt der Farbton-Median
+   dadurch bei 271 Grad bzw. 222 Grad, also im violetten HINTERGRUND. Die
+   Messung beschrieb die Kulisse, nicht die Muenze.
+   Neu gemessen (31.07.2026) nur ueber die Pixel im Goldband (H 25-58,
+   V > 0,25):
+     shop_gold_t1..t4   S = 0,601 / 0,494 / 0,561 / 0,596
+     cur_gold (Ziel)    S = 0,631
+   Der Abstand ist also 5-20 %, nicht 45 %. Der eigentliche Unterschied
+   liegt woanders: `cur_gold` besteht zu 35,4 % aus Goldpixeln, `t2` nur
+   zu 10,5 % — es ist WENIGER Gold im Bild, nicht blasseres.
+   `saturate(1.45)`, exakt nach der Filter-Spezifikation nachgerechnet,
+   hob die Goldpixel auf 0,666-0,793 und schoss damit ueber `cur_gold`
+   hinaus; nebenbei uebersaettigte es den violetten Grund mit (bis 0,77).
+   1,15 landet bei 0,555-0,669 — links und rechts vom Ziel statt darueber.
+   Der Schatten bleibt: er gibt der Muenze auf dunklem Grund die Kante,
+   und das ist unabhaengig von der Saettigung begruendet. */
+.prodcard.fr-gold .pcart img.prodimg{filter:var(--frei) saturate(1.15) contrast(1.08)
   drop-shadow(0 2px 6px #000a)}
 .prodcard .pcart span.prodimg{line-height:1}
 .prodcard.wide{flex-direction:row;align-items:center;gap:var(--gap);padding:var(--pad)}
@@ -6933,6 +6984,30 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   box-shadow:var(--mat-well)}
 .logincell .lgi .ico{width:82%;height:82%;object-fit:contain;
   filter:var(--frei) drop-shadow(0 3px 6px #000c)}
+/* ⚠ DIE DREI PACKS WAREN NICHT ZU UNTERSCHEIDEN. `pack_bronze`,
+   `pack_silver` und `pack_gold` sind dunkle Buchruecken mit einem
+   kleinen Wappen — bei 51 px liest das dreimal als derselbe graue
+   Kasten, und der Kalender verspricht an Tag 3, 5 und 7 optisch
+   dasselbe.
+   Die Raritaet gehoert also an die PLATTE, nicht ins Artwork: die
+   Platte ist gross, flaechig und bei 51 px sofort lesbar, das Wappen
+   ist es nicht. Dieselbe Ueberlegung wie bei den Kartenrahmen — die
+   Farbe traegt die Stufe, das Bild traegt das Motiv.
+   Die Werte sind die Metall-Toene aus dem Farbsatz, nicht neu erfunden:
+   Bronze #c98a52, Silber #c9d2da, Gold #f2c53d (siehe `.cbanner.f-*`). */
+.logincell .lgi.lgpack{border-width:1.5px}
+.logincell .lgi.lgpack-bronze{border-color:#c98a5299;
+  background:linear-gradient(180deg,#33220f,#150c05);
+  box-shadow:var(--mat-well),inset 0 0 18px -6px #c98a5266}
+.logincell .lgi.lgpack-silver{border-color:#c9d2da99;
+  background:linear-gradient(180deg,#26313a,#0d1319);
+  box-shadow:var(--mat-well),inset 0 0 18px -6px #c9d2da66}
+.logincell .lgi.lgpack-gold{border-color:#f2c53d99;
+  background:linear-gradient(180deg,#3a2c0c,#150f03);
+  box-shadow:var(--mat-well),inset 0 0 18px -6px #f2c53d77}
+.logincell .lgi.lgpack-arcane{border-color:#a45ef299;
+  background:linear-gradient(180deg,#2b1a45,#110a1c);
+  box-shadow:var(--mat-well),inset 0 0 18px -6px #a45ef277}
 .logincell .lgn{font-size:9px;font-weight:800;color:#cfe0ec;line-height:1.25;
   margin-top:auto;padding:0 4px}
 .logincell.done{opacity:.5}
@@ -6941,8 +7016,19 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .logincell.today{border-color:var(--gold);box-shadow:0 0 0 1px #f2c53d66,0 0 18px #f2c53d44;
   background:linear-gradient(180deg,#33405a,#1a2333)}
 .logincell.today .lgd{color:var(--gold)}
-.logincell.locked{opacity:.62}
-.logincell.locked .lgi{filter:var(--frei) grayscale(.7)}
+/* ⚠ ZUKUENFTIG IST NICHT DASSELBE WIE ERLEDIGT (gemessen 31.07.2026).
+   Hier stand `opacity:.62` PLUS `grayscale(.7)` — zusammen also fast
+   dieselbe Zuruecknahme wie bei `.done` (.5 + Haken). Das Ergebnis im
+   Bild: der Goldstapel an Tag 4 war grau, und Bronze-, Silber- und
+   Gold-Pack an Tag 3, 5 und 7 waren drei identische dunkle Kaesten.
+   Ein Sieben-Tage-Kalender hat genau EINE Aufgabe: Lust auf Tag 7 zu
+   machen. Wer die Belohnung, fuer die man wiederkommen soll, entfaerbt,
+   nimmt ihm die Aufgabe weg. `.done` darf zuruecktreten — es ist vorbei
+   und traegt seinen Haken. `.locked` kommt noch.
+   0,86 statt 0,62 und kein Graustufen-Filter: die Kachel steht immer
+   noch hinter der heutigen zurueck (die traegt Goldrand und Leuchten),
+   ihr Inhalt bleibt aber lesbar. */
+.logincell.locked{opacity:.86}
 /* Tag 7 ist das Finale: volle Breite, festlicher Rahmen. Dieselbe
    Bauform wie ein Shop-Breitband (.prodcard.wide) — Bildkasten links,
    Text daneben. `aspect-ratio` muss hier wieder weg, sonst waere das
@@ -9915,6 +10001,22 @@ button.pfplate{cursor:pointer}
        auch aussehen, wenn es beim Spieler einmal ausfaellt. */
     card_joker:     CDN + "hf_20260729_140512_e1befded-a35c-4bdf-8e6e-acc068759882.png",
     progress_frame: CDN + "hf_20260725_095742_a6bc63f3-733e-416b-b018-8358ca597e98.png",
+    /* ⚠ ABGELEITET, NICHT NEU ERZEUGT: `progress_frame_cut` ist
+       `progress_frame` auf die Balken-Bounding-Box beschnitten
+       (x 103-1271, y 308-460 → 1169x153, Verhaeltnis 7,64). Gemacht am
+       31.07.2026 lokal mit Pillow, Herkunft und Pruefsumme stehen in
+       assets/HERKUNFT.json.
+       Der Grund ist derselbe wie bei den nachgeschnittenen Baendern
+       (siehe CDNA oben): der eigentliche Balken fuellt nur 20 % der
+       Hoehe seiner Leinwand. Als 9-Slice ueber die volle Leinwand
+       bliebe von ihm auf einem 22 px hohen Element rund 4 px uebrig.
+       ⚠ Der Schluessel zeigt auf den CDN-Pfad des ORIGINALS, weil die
+       zugeschnittene Datei dort nicht liegt — sie ist hier entstanden.
+       Fuer jeden echten Lauf ist das ohne Folgen (die Schleife unten
+       biegt alles auf `assets/` um); nur der Entwicklerschalter
+       `?cdn=1` zeigt fuer diesen einen Schluessel die unbeschnittene
+       Fassung, und dann sitzen die Zierkappen falsch. */
+    progress_frame_cut: CDN + "hf_20260725_095742_a6bc63f3-733e-416b-b018-8358ca597e98.png",
     arena1:         CDN + "hf_20260725_095747_28a90d71-c3ab-4911-afd5-969483bfa22c.png",
     arena2:         CDN + "hf_20260725_095757_8ddd3202-0a7c-4f43-82a7-1d9d6a06d038.png",
     arena3:         CDN + "hf_20260725_095801_d277827e-8704-485f-b0bb-b0f4498a2eba.png",
@@ -10685,6 +10787,19 @@ button.pfplate{cursor:pointer}
      gefaellt, die sieben Baender darunter sind eine andere Familie.
      Die alten Grafiken bleiben in ASSETS registriert; sie sind nicht
      kaputt, sie passen nur nicht mehr zum Titelband. */
+  /* platte(el, key) — die Panel-Platte als 9-Slice. Gegenstueck zu
+     band(); die ausfuehrliche Begruendung steht bei `.platte9` im Blatt.
+     Wichtig: das Artwork geht an `border-image-source` und NICHT an
+     `background-image`. Der Verlauf aus dem Blatt bleibt liegen und
+     traegt die Flaeche, wenn die Grafik fehlt. */
+  function platte(el, key) {
+    if (!el) return;
+    el.classList.add("platte9");
+    el.setAttribute("data-platte", key);
+    if (!ASSETS[key]) { el.classList.add("plattefehlt"); return; }
+    el.classList.remove("plattefehlt");
+    el.style.borderImageSource = 'url("' + ASSETS[key] + '")';
+  }
   var BAND_ALIAS = { ribbon_section_lg: "banner_title", ribbon_section_sm: "banner_title" };
   function band(el, key) {
     if (!el) return;
@@ -10748,6 +10863,46 @@ button.pfplate{cursor:pointer}
       } catch (e) {}
     }
     return {
+      /* ⚠ DER BRUCH WAR STUMM. Das Aufreissen des Packs ist der lauteste
+         Moment der ganzen Zeremonie — Blitz, Beben, Splitter — und hatte
+         als einziger keinen Ton. Er braucht auch einen anderen als alles
+         andere hier: ein Reissen ist RAUSCHEN, kein Ton mit Tonhoehe.
+         `blip()` kann das nicht, deshalb der Puffer.
+         Drei Teile, wie beim echten Aufreissen: ein tiefer Schlag
+         (Sinus 150 -> 48 Hz), das Reissen selbst (gefiltertes Rauschen,
+         Filter faehrt von 3,4 kHz auf 700 Hz herunter) und ein heller
+         Nachschlag 60 ms spaeter, der die Splitter traegt.
+         `wucht` (0..1) skaliert Lautstaerke und Dauer — ein 10er-Zug
+         reisst lauter auf als ein Bronze-Pack. */
+      bruch:   function (wucht) {
+                 var c = ac(); if (!c) return;
+                 var w = Math.max(0, Math.min(1, wucht == null ? 0.6 : wucht));
+                 blip(150, 48, 0.20 + w * 0.12, "sine", 0.05 + w * 0.05);
+                 try {
+                   var d = 0.26 + w * 0.16, t = c.currentTime;
+                   var buf = c.createBuffer(1, Math.ceil(c.sampleRate * d), c.sampleRate);
+                   var dat = buf.getChannelData(0);
+                   /* Abklingendes weisses Rauschen: die Huellkurve steckt
+                      schon im Puffer, damit der Gain-Knoten nur noch die
+                      Gesamtlautstaerke traegt. */
+                   for (var i = 0; i < dat.length; i++) {
+                     var p = i / dat.length;
+                     dat[i] = (Math.random() * 2 - 1) * Math.pow(1 - p, 2.4);
+                   }
+                   var src = c.createBufferSource(); src.buffer = buf;
+                   var f = c.createBiquadFilter(); f.type = "bandpass";
+                   f.frequency.setValueAtTime(3400, t);
+                   f.frequency.exponentialRampToValueAtTime(700, t + d);
+                   f.Q.value = 0.8;
+                   var g = c.createGain();
+                   g.gain.setValueAtTime(0.05 + w * 0.06, t);
+                   src.connect(f); f.connect(g); g.connect(c.destination);
+                   src.start(t); src.stop(t + d + 0.02);
+                 } catch (e) {}
+                 setTimeout(function () {
+                   blip(900 + w * 500, 1500 + w * 700, 0.09, "triangle", 0.03 + w * 0.03);
+                 }, 60);
+               },
       tap:     function () { blip(760, 520, 0.055, "triangle", 0.045); },
       confirm: function () { blip(620, 980, 0.10, "triangle", 0.07);
                              setTimeout(function () { blip(980, 1250, 0.09, "sine", 0.05); }, 80); },
@@ -13959,6 +14114,15 @@ button.pfplate{cursor:pointer}
            Packs. Fehlt sie, bleibt der goldene Grundton stehen — eine
            falsche Farbe waere schlimmer als keine. */
         if (tf && tf.color) c.style.setProperty("--rar", tf.color);
+        /* Die Stufe an der Karte festmachen, nicht nur ihre Farbe.
+           Grund: `deckeAuf()` weiter unten dreht die Karte um und ruft
+           den Ton — und hatte bis zum 31.07.2026 keinen Weg, die
+           Raritaet zu erfahren. `UISfx.flip()` lief dort ohne Argument,
+           also klang eine Erhabene wie eine Gewoehnliche. Die Farbe
+           allein reicht nicht: aus einem CSS-Farbwert die Stufe
+           zurueckzurechnen waere eine Umkehrung, die bei zwei aehnlichen
+           Toenen kippt. */
+        if (tf) c.setAttribute("data-stufe", tf.index | 0);
         c.style.width = (p.b * 100).toFixed(1) + "%";
         /* Zwei Seiten auf einem drehenden Traeger. Die Rueckseite liegt
            oben, bis pkdreh sie wegdreht.
@@ -14015,6 +14179,14 @@ button.pfplate{cursor:pointer}
       bruchTimer = setTimeout(function () {
         bruchTimer = null;
         if (beendet) return;
+        /* Der Knall sitzt HIER und nicht in einem eigenen Timer: er muss
+           mit dem Blitz und den Splittern zusammenfallen, und die starten
+           in genau diesem Rueckruf. Ein zweiter Timer auf dieselbe Zahl
+           waere eine zweite Wahrheit, die beim naechsten Aendern von
+           DAUER auseinanderlaeuft.
+           Die Wucht steigt mit der Kartenzahl: ein 10er-Zug reisst
+           lauter auf als ein Bronze-Pack mit dreien. */
+        if (window.UISfx && UISfx.bruch) UISfx.bruch(Math.min(1, 0.35 + (n | 0) * 0.06));
         /* `art` und nicht ASSETS[...]: die Splitter schneiden aus dem
            Element, das der Spieler gerade sieht. Fehlt das Bild (kein
            CDN), zeichnet das Modul volle Flaechen in der Packfarbe —
@@ -14081,7 +14253,11 @@ button.pfplate{cursor:pointer}
         k.classList.remove("oben");
         k.classList.add("auf");
         offen++;
-        UISfx && UISfx.flip && UISfx.flip();
+        /* Der Ton steigt mit der Raritaet der Karte, die GERADE gedreht
+           wird — dieselbe Regel wie im Belohnungsfenster. `data-stufe`
+           setzt der Aufbau oben; fehlt es, bleibt es beim Grundton. */
+        var stufe = parseInt(k.getAttribute("data-stufe"), 10);
+        UISfx && UISfx.flip && UISfx.flip(isNaN(stufe) ? 0 : stufe);
         /* Nach der Drehung raeumt die Karte das Feld — aber erst DANN,
            sonst sieht man das Ergebnis nie. 420 ms ist die Drehdauer aus
            dem Blatt; sie steht dort und hier, deshalb prueft
@@ -15201,7 +15377,14 @@ button.pfplate{cursor:pointer}
     // Screen-Hintergrund. Der Hero bleibt schlicht dunkelblau.
     ambient($("arenaHero"), 12);          // langsam schwebende Lichtpunkte
     layer($("arenaDiorama"), cur.key);
-    layer($("arenaProg"), "progress_frame");
+    /* 9-Slice statt Bildflaeche — Begruendung bei `.progbar.balken9`.
+       Der Verlauf aus dem Blatt bleibt als Rueckfall liegen. */
+    (function (el) {
+      if (!el) return;
+      el.classList.add("balken9");
+      if (ASSETS.progress_frame_cut)
+        el.style.borderImageSource = 'url("' + ASSETS.progress_frame_cut + '")';
+    })($("arenaProg"));
     layer($("btnBattle"), "btn_primary");
 
     /* ==============================================================
@@ -15460,7 +15643,11 @@ button.pfplate{cursor:pointer}
       pb.style.backgroundPosition = "left -18px center, center";
       pb.style.backgroundRepeat = "no-repeat";
     }
-    layer(document.querySelector(".reqpanel"), "panel");
+    /* 9-Slice statt Bildflaeche: `background-size:auto` zeigte von der
+       1200x896-Grafik nur ihr linkes oberes Drittel — rechter und
+       unterer Rahmenrand lagen ausserhalb des Kastens. Begruendung und
+       gemessener Zuschnitt bei `.platte9`. */
+    platte(document.querySelector(".reqpanel"), "panel");
     // Top-Bar-Pillen: die Kapsel bekommt das Asset, Zahl/Icon bleiben HTML.
     Array.prototype.forEach.call(document.querySelectorAll(".topbar .cur"), function (el) {
       layer(el, "pill_topbar");
@@ -17705,7 +17892,7 @@ button.pfplate{cursor:pointer}
       layer(el, "pack_bronze");
     });
     Array.prototype.forEach.call($("paneQuests").querySelectorAll(".qcard"), function (el) {
-      layer(el, "panel");
+      platte(el, "panel");   // 9-Slice, siehe `.platte9`
     });
     var cb = $("btnClaimChest");
     if (cb) cb.addEventListener("click", claimChest);
@@ -20036,15 +20223,20 @@ button.pfplate{cursor:pointer}
       var cls = "logincell " + (d.done ? "done" : d.state === "today" ? "today"
                 : d.state === "taken" ? "locked" : "locked") +
                 (d.finale ? " finale" : "");
+      /* Die Raritaet des Packs an die PLATTE haengen — Begruendung im
+         Blatt bei `.logincell .lgi.lgpack`. `d.pack` ist der Schluessel
+         ("bronze"/"silver"/"gold"/"arcane"); ohne Pack bleibt die Platte
+         die neutrale. */
+      var lgiCls = "lgi" + (d.pack ? " lgpack lgpack-" + d.pack : "");
       if (d.finale) {
         return '<div class="' + cls + '" data-lgd="' + d.day + '">' +
-          '<span class="lgi">' + loginTileIco(d) + "</span>" +
+          '<span class="' + lgiCls + '">' + loginTileIco(d) + "</span>" +
           '<span class="lgtx"><span class="lgd">TAG ' + d.day + " · FINALE</span>" +
           '<span class="lgn">' + d.name + "</span></span></div>";
       }
       return '<div class="' + cls + '" data-lgd="' + d.day + '">' +
         '<span class="lgd">TAG ' + d.day + "</span>" +
-        '<span class="lgi">' + loginTileIco(d) + "</span>" +
+        '<span class="' + lgiCls + '">' + loginTileIco(d) + "</span>" +
         '<span class="lgn">' + d.name + "</span></div>";
     }).join("");
     var btn = cal.canClaim
