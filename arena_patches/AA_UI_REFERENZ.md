@@ -3668,22 +3668,34 @@ Naht `UIZustand.waehrend(el, promise)`. Letztere ist der Fall, der wirklich zäh
 den Knopf auch bei einem **fehlgeschlagenen** Aufruf wieder frei — genau das vergisst man
 von Hand, und dann bleibt nach einem Netzfehler ein Knopf für immer tot. Nachgemessen.
 
-### 35.5 Kontrast: von 16 Phantomen auf 0 echte Befunde
+### 35.5 Kontrast: ein halber Erfolg, und eine Korrektur an mir selbst
 
-Die alte Messung über `getComputedStyle` meldete Befunde in **16 von 16** Ansichten, „Shop"
-angeblich mit 1,13 : 1. Sie war unbrauchbar: Verlaufsschrift setzt
+Die alte Messung über `getComputedStyle` war nachweislich unbrauchbar: Befunde in **16 von
+16** Ansichten, „Shop" angeblich mit 1,13 : 1. Ursache: Verlaufsschrift setzt
 `-webkit-text-fill-color` durchsichtig, und viele Untergründe sind Bilder statt Farben.
 
-Die neue Messung (`pruefungen/kontrast.js`) fragt die **Pixel**: jeder Textkasten wird
-zweimal aufgenommen — mit Text und ohne — und aus der Differenz die Leuchtdichte der
-Schriftpixel gegen den Untergrund bestimmt. Das kennt weder Verläufe noch Bilder als
-Sonderfall. Ausgewertet wird der **Kern** der Glyphen (5. bzw. 95. Perzentil), weil die
-Kantenglättung jeden Mittelwert Richtung „bestanden" verwässert.
+Die neue Messung fragt die **Pixel** (`pruefungen/kontrast.js`). Vier Fallen wurden dabei
+einzeln nachgemessen und behoben — Text durchsichtig stellen statt entfernen (sonst schrumpft
+jeder inhaltsbreite Knopf), Kandidaten markieren statt wiederfinden (28 → 380 Knoten),
+Untergrund im **Ring** um die Glyphen statt global (über einem halb gefüllten Balken gibt es
+keinen einen Untergrund), Emoji ausschließen.
 
-Ergebnis: **2 echte Befunde** statt 16 Phantomen — beide 9-px-Melde-Abzeichen mit weißer
-Schrift auf `--danger` (2,72 : 1 und 2,94 : 1). `--danger` (#ff5e7e) ist kein Warnrot,
-sondern ein helles Rosa. Neues Token `--melde` (#c62348), neun Stellen, gemessen 5,6 : 1.
-**Danach: 0 Befunde.**
+> **⚠ Korrektur an einer eigenen Aussage.** Zwischendurch meldete diese Messung „**0 Befunde
+> über alle 16 Ansichten**", und das wurde so berichtet. Diese Null stammt aus einer Fassung,
+> die sich anschließend als ebenso unzuverlässig erwiesen hat — sie war **Glück, nicht
+> Richtigkeit**. Zwei Verdachtsfälle wurden gegen die Wirklichkeit geprüft, beide falsch:
+> `Forge/btnMerge` (gemeldet 1,19 : 1 — tatsächlich dunkle Schrift auf heller Platte, im Bild
+> klar lesbar) und `Board/lnm` (gemeldet 1,02 : 1 — `rgb(232,238,243)` auf `rgb(27,39,50)`,
+> **rechnerisch 12,98 : 1**).
+>
+> Die Datei läuft deshalb als **Werkzeug, nicht als Tor**: sie berichtet und beendet sich
+> immer mit 0. Ein rotes Tor, das man ignorieren lernt, ist schlimmer als gar keins.
+> Die Restursache steht im Kopf der Datei, samt dem nächsten Schritt für den, der weitermacht.
+
+**Was unabhängig davon gesichert ist:** die Melde-Abzeichen wurden *nicht* wegen dieser
+Messung geändert, sondern wegen der Farbwerte selbst — weiß auf `--danger` (#ff5e7e) ergibt
+**2,94 : 1**, weiß auf dem neuen `--melde` (#c62348) **5,62 : 1**. Das ist Arithmetik aus zwei
+bekannten Farben und braucht keine Pixel.
 
 ### 35.6 Typo-Leiter: gezählt, bevor geurteilt wurde
 
