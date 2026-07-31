@@ -1321,7 +1321,20 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
 .packbtn{width:100%;border-radius:var(--radius);padding:14px;font-weight:900;font-size:var(--fs-6);
   background:linear-gradient(180deg,#e0a45c,#a0642c);color:#2a1704;margin-bottom:8px;
   box-shadow:0 4px 0 #6b4119}
-.packbtn small{display:block;font-size:var(--fs-3);font-weight:700;opacity:.85;margin-top:3px}
+/* ⚠ 1,15:1 GEMESSEN (31.07.2026, lesbarkeit.js). Der Knopf hat eine
+   BRONZEPLATTE als Farbe (#e0a45c -> #a0642c) und dazu passend dunkle
+   Schrift (#2a1704) — richtig, solange man die Platte sieht. Sieht man
+   aber nicht: `applyAssets()` legt `pack_bronze` als Artwork darueber,
+   und das Pack ist ein dunkler Buchruecken. Die Zusage stand damit als
+   dunkles Braun auf Fast-Schwarz.
+   Die Ueberschrift daneben ist davon nicht betroffen — sie traegt
+   `.goldtext` und leuchtet. Nur die Kleinzeile erbte die Plattenfarbe.
+   Hell mit dunklem Schatten statt dunkel: das traegt auf BEIDEN
+   Untergruenden, auf dem dunklen Artwork wie auf der Bronzeplatte, falls
+   das Bild einmal fehlt. */
+.packbtn small{display:block;font-size:var(--fs-3);font-weight:700;margin-top:3px;
+  color:#fff3d8;-webkit-text-fill-color:#fff3d8;
+  text-shadow:0 1px 2px #000,0 0 6px #000c}
 .packgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
 
 /* ==================================================================
@@ -2436,7 +2449,13 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
 .bonusbtn:active{background:#2f4356}
 .bonusbtn b{display:block;font-size:var(--fs-2);color:var(--gold);letter-spacing:.08em;margin-bottom:3px}
 footer{padding:6px 12px 14px;text-align:center}
-#btnReset{font-size:var(--fs-2);color:#4d5d69;text-decoration:underline}
+/* ⚠ 2,73:1 GEMESSEN. Der Knopf soll leise sein — er setzt den
+   Demo-Zustand zurueck und ist nichts, wonach man sucht. „Leise" darf
+   aber nicht „unlesbar" heissen: #4d5d69 auf #0e1418 ist bei 10 px
+   keine Zurueckhaltung mehr, sondern ein Graustrich.
+   #7d8f9d bringt ihn auf 4,6:1 und laesst ihn immer noch deutlich hinter
+   allem anderen auf dem Bildschirm zurueck. */
+#btnReset{font-size:var(--fs-2);color:#7d8f9d;text-decoration:underline}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;background:#000d;
   border:1px solid var(--line);border-radius:var(--radius-sm);padding:8px 14px;font-size:var(--fs-4);font-weight:700;
   z-index:90;opacity:0;transition:opacity .2s;pointer-events:none}
@@ -6871,6 +6890,17 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   justify-content:center;gap:3px;padding:8px 4px;
   background-repeat:no-repeat;background-position:center -6px;background-size:auto 140%,cover;
   background-image:linear-gradient(160deg,#243342,#141d26)}
+/* ⚠ 2,13:1 GEMESSEN — „EVENTS" stand in Hellgrau auf einem cremefarben
+   beleuchteten Festzelt. Die Kachel traegt ihr Artwork bildfuellend, und
+   die Beschriftung sitzt UNTEN, genau dort, wo bei `hub_events` und
+   `hub_challenges` die hellsten Bildpunkte liegen.
+   Das Band sitzt deshalb unten und laeuft nach oben aus: das Motiv in
+   der oberen Haelfte bleibt unangetastet, die Schrift bekommt ihren
+   Grund. */
+.homerow3 .sidetile::before{content:"";position:absolute;inset:0;pointer-events:none;
+  border-radius:inherit;z-index:0;
+  background:linear-gradient(0deg,#0b1219e6 0%,#0b1219b3 26%,#0b121900 58%)}
+.homerow3 .sidetile>*{position:relative;z-index:1}
 .homerow3 .sidetile .sti{font-size:var(--fs-7);line-height:1}
 .homerow3 .sidetile .sti .ico{width:22px;height:22px}
 .homerow3 .sidetile span.stn{font-size:8px;font-weight:900;letter-spacing:.07em;color:#a9bccb}
@@ -7331,9 +7361,20 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   overflow:hidden;background:linear-gradient(180deg,#1b2732,#131c25)}
 .gchap.locked{opacity:.55}
 .gchap.done{border-color:#7ad14f55}
-.gchead{display:flex;align-items:center;gap:10px;width:100%;padding:10px var(--pad);
+/* ⚠ 1,28:1 GEMESSEN. Das Kapitel-Artwork liegt RECHTS („background-
+   position:right"), und rechts steht auch der Zaehler „0/4" in Gold.
+   Bei den Kapiteln mit hellem Stein traf Gold auf Creme.
+   Dieselbe Antwort wie ueberall sonst im Blatt, wo Schrift auf einem
+   Bild steht: ein Band, das NUR die Textzone abdunkelt und die
+   Bildseite in Ruhe laesst — hier von rechts, weil das Bild dort sitzt.
+   `z-index` ist noetig, weil die Kinder sonst unter dem Band liegen. */
+.gchead{position:relative;display:flex;align-items:center;gap:10px;width:100%;
+  padding:10px var(--pad);
   min-height:var(--banner-h-sm);text-align:left;
   background-repeat:no-repeat;background-position:right -10px center;background-size:auto 150%,cover}
+.gchead::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:linear-gradient(270deg,#0b1219cc 0%,#0b121999 34%,#0b121933 62%,#0b121900 100%)}
+.gchead>*{position:relative;z-index:1}
 .gchead .gcs{font-size:22px;flex:0 0 auto}
 .gchead .gct{flex:1;min-width:0}
 /* ⚠ 29.07.2026: Name und Untertitel sind <span> und liefen deshalb in

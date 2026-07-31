@@ -4,6 +4,20 @@ Zuletzt vollständig gemessen am **30.07.2026**: 24 Playwright-Suiten laufen hie
 durch. Rot bleibt genau einer — `run_v7.js` „gleiche Drittel" (siehe unten,
 braucht eine Produktentscheidung, kein Code-Fix).
 
+**`lesbarkeit.js`** (3 Schritte, 31.07.2026) misst jeden Schriftzug gegen seinen
+**wirklichen** Untergrund — Bild, Verlauf oder Farbe. Der Trick, an dem die zwei
+Vorgängerfassungen gescheitert sind: der Bildschirm wird zweimal fotografiert, einmal
+mit und einmal ohne Schrift. Aus `M = a·S + (1−a)·U` fällt die **Deckung** je Pixel, und
+gewertet wird nur der Strich-Kern (a ≥ 0,9). Kantenglättung wird damit ausgerechnet statt
+weggeschnitten. Erste Auswertung: 402 messbar, vier unter 3:1, **alle vier echt** —
+gegen zwei von zwei falsch bei der Vorgängerfassung.
+
+**`klickdurchlauf.js`** (6 Schritte, 31.07.2026) drückt **alles**, was klickbar aussieht,
+über alle 16 Fenster (183 Knöpfe) und fragt nur, ob dabei etwas kaputtgeht: JS-Fehler,
+hängende Schicht, Sackgasse, gesprengte Bildbreite. Sie findet die Fehler, an die niemand
+gedacht hat, als er die gezielte Prüfung schrieb. Ihr Kopf hält sechs eigene Messfehler
+fest — drei davon haben im ersten Lauf falsche Befunde erzeugt.
+
 **`passform.js`** (6 Schritte, 31.07.2026) misst über alle 16 Ansichten das
 Seitenverhältnis jeder Quelle gegen das ihres Kastens und dazu die Füllregel —
 441 sichtbare Bildflächen. Drei Befundarten, drei verschiedene Konsequenzen:

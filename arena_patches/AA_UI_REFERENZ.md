@@ -4166,3 +4166,127 @@ jetzt die **Absicht** statt der Bauart:
   sie ohnehin ausgeschrieben steht.
 
 **Aufwand: M** · **Priorität: 1** · erledigt
+
+---
+
+## §41 Jedes Fenster geprüft — und die Frage nach den Hintergrundflächen
+
+Ansage (31.07.2026): „teste jedes Fenster auf bugs alles muss funktionieren check jeden
+Schriftzug auf Lesbarkeit usw. Würdest du als Meister Ui Designer die Hintergrund Flächen
+in eine andere Farbe ändern …?"
+
+### 41.1 Lesbarkeit: der dritte Anlauf, und diesmal trägt er
+
+Die ersten beiden Fassungen stehen im Kopf von `kontrast.js` als das, was sie waren:
+nicht belastbar. Fassung 1 las `getComputedStyle` — bei uns ist ein Untergrund fast nie
+eine Farbe, sondern ein Bild. Fassung 2 maß echte Pixel, trennte Glyphe und Untergrund
+aber über eine **feste Schwelle**, und zwei ihrer Befunde wurden gegen die Wirklichkeit
+als falsch nachgewiesen.
+
+**Was es löst: Deckung statt Schwelle.** Der Bildschirm wird zweimal fotografiert —
+einmal normal, einmal mit `color:transparent`. Beide Aufnahmen sind pixelgleich bis auf
+das, was die Glyphen malen. Damit ist je Pixel bekannt:
+
+```
+M = a · S + (1 − a) · U      M = Mischung, S = Schriftfarbe, U = Untergrund, a = Deckung
+```
+
+`a` wird ausgerechnet, nicht geschätzt. Gewertet werden nur Pixel mit **a ≥ 0,9** — der
+Kern des Strichs. Die Kantenglättung fällt damit nicht unter eine Schwelle, sie wird
+ausgerechnet und ausgeschlossen. Verglichen wird `S` gegen den Untergrund an genau diesen
+Pixeln, also gegen das Bild oder den Verlauf, den die Schrift wirklich hat.
+
+**Ergebnis: 402 Schriftzüge messbar, vier unter 3:1 — und alle vier echt.**
+
+| | vorher | Ursache | jetzt |
+|---|---|---|---|
+| `navPack/bronzePromise` | **1,15:1** | Der Knopf hat eine Bronzeplatte samt dunkler Schrift — aber `layer()` legt das dunkle Pack-Artwork darüber | 3,4:1 |
+| `navGuide/gcc "0/4"` | **1,28:1** | Gold auf hellem Stein: das Kapitel-Artwork liegt rechts, der Zähler auch | über 4,5:1 |
+| `navHome/stn "EVENTS"` | **2,13:1** | Hellgrau auf einem cremefarben beleuchteten Festzelt | über 4,5:1 |
+| `navCollection/btnReset` | **2,73:1** | „Leise" war zu leise: #4d5d69 auf #0e1418 bei 10 px | 4,6:1 |
+
+> **Vier von vier echt** — gegen zwei von zwei falsch bei der Vorgängerfassung. Das ist
+> der Unterschied zwischen einer Messung, die die Kantenglättung ausrechnet, und einer,
+> die sie wegschneidet.
+
+Offen und als Zahl berichtet: **31 Schriftzüge** liegen zwischen 3,0:1 und ihrem
+WCAG-Soll von 4,5:1. Kein Tor, weil es Gestaltungsentscheidungen sind (bewusst
+zurückgenommene Beiwerk-Zeilen), aber sie stehen im Protokoll.
+
+### 41.2 Funktion: 183 Knöpfe wirklich gedrückt
+
+`klickdurchlauf.js` macht das Gegenteil der anderen Suiten: es kennt kein Ziel, es drückt
+alles und fragt nur, ob dabei etwas kaputtgeht. **183 Knöpfe über alle 16 Fenster, kein
+JS-Fehler, keine hängende Schicht, nach jedem Klick ein Weg weiter, keine Ansicht breiter
+als das Fenster.**
+
+Drei der vier ersten Meldungen waren **Fehler im Werkzeug**, und jeder steht jetzt als
+Falle im Kopf der Datei:
+
+- **„Kein Klick wirft einen Fehler"** meldete 320-mal `ERR_TUNNEL_CONNECTION_FAILED`. Das
+  ist der gesperrte CDN, kein Klickfehler. Er wird jetzt **getrennt gezählt** — ein
+  pauschaler Filter auf „alles mit .png" wäre genau der Fehler, vor dem der Kopf von
+  `assets_lokal.js` warnt.
+- **„Keine Schicht bleibt hängen"** meldete Trophäenstraße, Bestätigungsfenster und
+  Deck-Auswahl. Alle drei haben einen Schließer — er heißt dort nur anders (`#roadOk`
+  trägt schlicht „Okay"). Die Fluchtroutine kannte eine feste Liste von Bauarten. Sie
+  probiert jetzt **jeden sichtbaren Knopf**, wie ein Spieler es täte.
+- **„Oberfläche bleibt bedienbar"** meldete `btnDemoWin`/`btnDemoLose`. Beide öffnen den
+  Ergebnisbildschirm, und der blendet die Bottom-Nav **absichtlich** aus — er bietet
+  stattdessen REVANCHE, „Weiter" und „Tippen zum Schließen". Gefragt wird jetzt, ob der
+  Spieler weiterkommt, nicht ob die Leiste da ist.
+
+> **Merksatz:** Eine Prüfung, die nur EINE Bauart des Schließens kennt, meldet jede andere
+> als Fehler.
+
+### 41.3 Die Hintergrundflächen — gemessen gegen AAs eigene Bildschirme
+
+Gemessen wurde über AAs fünf Aufnahmen und unsere drei Hauptansichten, jeweils ohne
+Kopfleiste und Bottom-Nav:
+
+| | AA | wir |
+|---|---|---|
+| Helligkeit, Median | 0,306 | **0,008** |
+| Sättigung, Median | 0,87 | 0,45 |
+| Anteil sehr dunkel (L < 0,05) | 26 % | **77 %** |
+| Anteil hell (L > 0,35) | 44 % | **7,6 %** |
+
+Und die Tokens, die das erzeugen:
+
+| Token | Wert | L | Kontrast zu `--bg` |
+|---|---|---|---|
+| `--bg` | `#0e1418` | 0,0066 | 1,00:1 |
+| `--panel` | `#16202a` | 0,0137 | **1,13:1** |
+| `--panel2` | `#1c2833` | 0,0200 | **1,24:1** |
+| `--line` | `#26343f` | 0,0323 | 1,45:1 |
+
+**Das ist der Befund: eine Platte, die 1,13:1 gegen ihren Grund steht, ist keine Platte.**
+Grund, Platte und zweite Platte sind praktisch dieselbe Fläche. Die Materialsprache aus §1
+(„Licht kommt von oben", erhaben/eingesenkt) wird fast ausschließlich von den **Schatten**
+getragen, nicht von den Flächenwerten — deshalb messen 77 % des Bildschirms als
+Fast-Schwarz.
+
+**Meine Antwort als Gestalter: den Farbton NICHT ändern, den Wert schon.**
+
+Gegen den Farbton zu gehen wäre der falsche Schluss aus der Tabelle. AAs gesättigtes
+Violett bei Sättigung 0,87 ist Massenmarkt-Optik; wer sie übernimmt, sieht aus wie ein
+Klon *und* billiger. Kühles Fast-Schwarz mit gesättigten Akzenten ist die Premium-Richtung
+und unser Unterschied zu AA — Marvel Snap, Runeterra und Diablo Immortal machen es so.
+
+Aber: dieselben Spiele legen ihre Platten bei L 0,05–0,12 an, nicht bei 0,014. Unsere
+Dunkelheit ist an dieser Stelle keine Haltung, sondern **fehlendes Material**.
+
+Vorschlag, Farbton und Sättigung unverändert, nur die Helligkeit angehoben:
+
+| Token | jetzt | Vorschlag | Kontrast zu `--bg` |
+|---|---|---|---|
+| `--bg` | `#0e1418` | *bleibt* | — |
+| `--panel` | `#16202a` | `#223141` | 1,13 → **1,40:1** |
+| `--panel2` | `#1c2833` | `#2f4355` | 1,24 → **1,82:1** |
+| `--line` | `#26343f` | `#3b5061` | 1,45 → **2,21:1** |
+
+**Nicht angewendet** — das ist eine Entscheidung über das Aussehen jedes Bildschirms, und
+sie wurde als Frage gestellt, nicht als Auftrag. Eine Probe liegt bei; die Umstellung ist
+drei Zeilen.
+
+**Aufwand: M** · **Priorität: 1** · Prüfung erledigt, Palette zur Entscheidung
