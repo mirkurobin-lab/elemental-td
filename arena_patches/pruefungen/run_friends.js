@@ -223,11 +223,25 @@ function step(name, ok, info) {
        global. Die Zusage dieses Schritts ist unveraendert: eine
        Freundesspende laeuft durch ArenaClan und wird DORT abgerechnet,
        es gibt keinen zweiten Kanal. */
-    const used0 = CL.sendQuota(req.id).used;
+    /* ⚠ DIE PRUEFUNG LAS DIE FALSCHE ANFRAGE (behoben 31.07.2026).
+       Sie nahm `filter(...)[0]` und pruefte dann das Kontingent GENAU
+       dieser Anfrage — waehrend giftCards() sich seine eigene suchte.
+       Hat ein Kamerad mehr als eine offene Anfrage (im Demo-Stand hat
+       `b2` zwei), sind das zwei verschiedene, und der Schritt war rot,
+       obwohl das Kontingent sauber gebucht wurde.
+       Gemessen wird jetzt die Anfrage, die die Spende WIRKLICH benutzt
+       hat — sie steht im Ergebnis (`g.request.id`). Eine Pruefung, die
+       raet, welchen Weg der Code nimmt, misst ihre eigene Annahme. */
+    const alleIds = CL.requests().filter(r => !r.mine && !r.closed)
+      .filter(r => r.ownerId === req.ownerId).map(r => r.id);
+    const vorher = {}; alleIds.forEach(id => { vorher[id] = CL.sendQuota(id).used; });
     const g = FR.giftCards(have.id, 1);
+    const benutzt = (g.request && g.request.id) || req.id;
+    const used0 = vorher[benutzt] !== undefined ? vorher[benutzt] : 0;
     let zuViel = null;
     try { FR.giftCards(have.id, 5); } catch (e) { zuViel = e.message; }
-    return { msg, used0, used1: CL.sendQuota(req.id).used, via: g.via, paid: g.reward.gold,
+    return { msg, used0, benutzt, offene: alleIds.length,
+             used1: CL.sendQuota(benutzt).used, via: g.via, paid: g.reward.gold,
              menge: g.count, zuViel, max: g.quota.max,
              name: g.friendName, card: g.cardName };
   });
@@ -236,7 +250,8 @@ function step(name, ok, info) {
   step('Die Spende an einen Clankameraden verbraucht das Kontingent DIESER Anfrage',
     gift.used1 === gift.used0 + 1 && gift.menge === 1 &&
     gift.via === 'ArenaClan.donateCards',
-    gift.card + ' an ' + gift.name + ' · Kontingent ' + gift.used0 + ' → ' +
+    gift.card + ' an ' + gift.name + ' · Anfrage ' + gift.benutzt +
+    ' (von ' + gift.offene + ' offenen) · Kontingent ' + gift.used0 + ' → ' +
     gift.used1 + '/' + gift.max);
   /* GEGENPROBE: auch ueber die Freundesliste geht nur EINE Karte je
      Sendevorgang — sonst waere sie der Umweg um „nicht direkt 10". */

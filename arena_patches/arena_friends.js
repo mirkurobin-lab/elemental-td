@@ -1006,10 +1006,25 @@
         e.name + " ist nicht in deinem Clan. Karten laufen über die Anfragetafel " +
         "des Clans, damit das Sendekontingent gilt.");
     }
+    /* ⚠ DIE WAHL DER ANFRAGE WAR ZUFAELLIG — behoben am 31.07.2026.
+       Hier stand ein `forEach` ohne Abbruch: von mehreren offenen
+       Anfragen desselben Kameraden blieb die ZULETZT gesehene stehen,
+       also die juengste. Gemessen hat `b2` im Demo-Stand zwei offene
+       Anfragen; die Spende landete auf `…:1`, waehrend jeder, der von
+       aussen zusieht, `…:0` erwartet.
+       Gebucht wurde dabei immer korrekt — es gab kein Schlupfloch, das
+       Kontingent stimmte. Falsch war nur, WELCHE der beiden Anfragen
+       bedient wurde, und das entschied die Reihenfolge einer Schleife
+       statt einer Regel.
+       Die Regel lautet jetzt: die AELTESTE offene Anfrage zuerst. Wer
+       laenger wartet, wird zuerst bedient — dieselbe Ordnung, die die
+       Anfragetafel im Clan ohnehin anzeigt. */
     var req = null;
-    C.requests(now).forEach(function (r) {
-      if (!r.mine && r.ownerId === e.memberId && !r.closed) req = r;
-    });
+    var offene = C.requests(now);
+    for (var qi = 0; qi < offene.length; qi++) {
+      var r0 = offene[qi];
+      if (!r0.mine && r0.ownerId === e.memberId && !r0.closed) { req = r0; break; }
+    }
     if (!req) {
       throw new Error((m.name || e.name) + " hat gerade keine offene Kartenanfrage. " +
         "Spenden laufen über die Anfragetafel des Clans.");

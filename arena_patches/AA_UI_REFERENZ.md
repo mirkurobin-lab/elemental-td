@@ -4366,3 +4366,49 @@ Sein Ergebnis war wertlos und wurde verworfen, nicht ausgewertet. Ein Prüflauf 
 Stand, der sich während des Laufs ändert, misst nichts.
 
 **Aufwand: S** · **Priorität: 1** · erledigt
+
+### 42.3 Der Lauf über alle 32 — und was er zutage förderte
+
+Der saubere Durchgang gegen den fertigen Stand brachte **zwei Rote**. Beide waren echt,
+und beide lagen an einer anderen Stelle als vermutet.
+
+**a) `run_friends`: „Die Spende verbraucht das Kontingent DIESER Anfrage".**
+
+Zuerst die Frage, die vor jeder anderen kommt: **habe ich das verursacht?** Ich hatte am
+selben Tag in `arena_clan.js` umbenannt. Gemessen gegen den Stand von *vor* der
+Umbenennung: derselbe Fehler. Nicht von mir, und seit Längerem rot.
+
+Die Ursache, gemessen statt vermutet: der Kamerad `b2` hat im Demo-Stand **zwei** offene
+Anfragen. Die Prüfung nahm `filter(...)[0]`, `giftCards()` suchte sich seine eigene — mit
+einem `forEach` **ohne Abbruch**, also blieb die *zuletzt* gesehene stehen. Gebucht wurde
+auf `…:1`, geprüft wurde `…:0`.
+
+| | war | ist |
+|---|---|---|
+| `giftCards()` wählt | was die Schleife zuletzt sah (die jüngste Anfrage) | die **älteste** offene — wer länger wartet, wird zuerst bedient |
+| die Prüfung misst | eine Anfrage, die sie selbst geraten hat | die Anfrage, die die Spende **wirklich** benutzt hat (`g.request.id`) |
+
+> **Kein Schlupfloch.** Das Kontingent wurde die ganze Zeit korrekt abgebucht — falsch war
+> nur, *welche* der beiden Anfragen bedient wurde, und das entschied eine Schleifen-
+> reihenfolge statt einer Regel.
+>
+> **Merksatz:** Eine Prüfung, die rät, welchen Weg der Code nimmt, misst ihre eigene
+> Annahme.
+
+**b) `assets_lokal`: „kein leeres Bild in den Hauptansichten".**
+
+Gemeldet waren `shop_gem_t1..t5` mit `naturalWidth 0`. Die Dateien sind einwandfrei — nach
+`scrollIntoView` stehen sie mit 1024 × 1024 da. Sie tragen `loading="lazy"` und lagen
+außerhalb des Sichtfensters, und ein `lazy`-Bild wird dort **per Definition nicht geladen**.
+
+Der Schritt fordert die Bilder der Ansicht jetzt an und wartet ihr Dekodieren ab, bevor er
+Pixel liest. Die Gegenprobe wurde dadurch nicht schwächer, sondern schärfer: **59/59**
+leere Bilder am gesperrten CDN gegen **0** lokal (vorher 13/13).
+
+> **Merksatz:** Ein Pixel-Schritt, der Bilder misst, die der Browser absichtlich noch nicht
+> geholt hat, misst die Ladestrategie und nicht die Dateien.
+
+**Zwei bleiben dauerhaft rot, und zwar zu Recht:** `iconfrei.js` und `sicht.js` laden fest
+von `prisma-td-vorschau.higgsfield.app`, das der Proxy dieser Umgebung sperrt. Das ist eine
+Umgebungsgrenze, kein Befund — sie prüfen die *ausgelieferte* Seite und gehören dorthin,
+wo sie erreichbar ist.

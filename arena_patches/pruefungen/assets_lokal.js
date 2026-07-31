@@ -205,6 +205,26 @@ const TYP = { '.html':'text/html', '.js':'text/javascript', '.json':'application
       window.__proto.show(nav); return true;
     }, n);
     if (!da) continue;
+    /* ⚠ `loading="lazy"` — DIE FALLE, DIE DIESEN SCHRITT ROT MACHTE.
+       Gemessen am 31.07.2026: `shop_gem_t1..t5` meldeten `naturalWidth 0`
+       und wurden als „leeres Bild" gefuehrt. Die Dateien sind in Ordnung
+       — nach `scrollIntoView` stehen sie mit 1024x1024 da. Sie lagen
+       schlicht ausserhalb des Sichtfensters, und ein `lazy`-Bild wird
+       dort per Definition NICHT geladen.
+       Ein Pixel-Schritt, der Bilder misst, die der Browser absichtlich
+       noch nicht geholt hat, misst die Ladestrategie und nicht die
+       Dateien. Deshalb: erst alle Bilder der Ansicht anfordern und ihr
+       Dekodieren abwarten, dann messen.
+       Der Deckel von 3 s ist noetig, weil ein einzelnes haengendes Bild
+       sonst den ganzen Lauf blockiert. */
+    await Promise.race([
+      page.evaluate(() => {
+        const b = [...document.querySelectorAll('.view.active img')];
+        b.forEach(i => { i.loading = 'eager'; });
+        return Promise.all(b.map(i => (i.decode ? i.decode().catch(() => {}) : null)));
+      }),
+      new Promise(r2 => setTimeout(r2, 3000)),
+    ]);
     await page.waitForTimeout(700);
     const r = await pixelnAktiv();
     if (r.leer.length) kaputt.push(n + ': ' + r.leer.slice(0, 5).join(', '));

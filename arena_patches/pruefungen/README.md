@@ -92,7 +92,7 @@ gibt also keine feste Portnummer, die kollidieren kann.
 | `run_v5.js` | 114 | Grundgerüst, Navigation, Sammlung, Festung, Packs |
 | `run_v6.js` | 283 | Clan, Ghost-Clankrieg, Spenden, Rangliste, Post |
 | `run_v7.js` | 337 | Startseite, Banner-Metrik, Pass, Guide, Profil, Avatare, Shop-Maße |
-| `run_friends.js` | 25 | Freundesliste, Anfragen, Suche |
+| `run_friends.js` | 26 | Freundesliste, Anfragen, Suche, Spende über die Anfragetafel |
 | `run_shop.js` | 36 | Tagesangebote, Booster-Packs, Gold, Tresor, Vorrats-Truhe |
 | `avatare.js` | 12 | Fünf zur Wahl, Helden am Besitz, Auswahl im Raster |
 | `login_kal.js` | 9 | Login-Kalender: drei pro Reihe, Tag 7 als Band |
@@ -111,6 +111,9 @@ gibt also keine feste Portnummer, die kollidieren kann.
 | `offline.js` | 46 | Passive Offline-Erträge: Kappung, Abholung, Buchung |
 | `bildzustand.js` | 20 | **Der Zustand mit ECHTEN Assets über HTTP, den örtlich sonst niemand sieht.** Währungsmotiv berührt den Rand nicht (Differenzbild, Kreisring ab 66 % Radius) — *auch ohne den Freistell-Filter*; Portrait in der Kachel wirklich SICHTBAR (Pixel, nicht `elementFromPoint`); Avatarwechsel ändert das Bild wirklich (Quelle **und** Pixel); Kopfleisten-Avatar bleibt in der Leiste. Jeder Schritt mit Gegenprobe |
 | `belohnung.js` | 30 | **Das Belohnungsfenster (§29).** Alle drei Wege — normal abholen, Kristalle, Werbung. Kernfrage: stimmt jede Kachel mit dem ueberein, was WIRKLICH gebucht wurde? Gemessen Sorte fuer Sorte gegen `AC.getMaterials()` — **liest Pixel, braucht den HTTP-Server** |
+| `lesbarkeit.js` | 3 | **Jeder Schriftzug gegen seinen wirklichen Untergrund.** Zwei Aufnahmen, einmal mit und einmal ohne Schrift; aus `M = a·S + (1−a)·U` fällt die Deckung je Pixel, gewertet wird nur der Strich-Kern (a ≥ 0,9). Kantenglättung wird ausgerechnet, nicht weggeschnitten |
+| `klickdurchlauf.js` | 6 | **Drückt alles, was klickbar aussieht** — 183 Knöpfe über 16 Fenster — und fragt nur, ob dabei etwas kaputtgeht: JS-Fehler, hängende Schicht, Sackgasse, gesprengte Bildbreite |
+| `passform.js` | 6 | Seitenverhältnis jeder Bildquelle gegen ihren Kasten (441 Flächen); Aufschriften unter durchlässigen Auflagen |
 | `assets_lokal.js` | 12 | **Liegen die Bilder im Repo, und kommen sie an?** Struktur (löst das Manifest auf `./assets/` auf), Platte (existiert jede Datei), Pixel (`naturalWidth > 0` je Ansicht) — plus die Mutationsprobe, dass `?cdn=1` den Schritt rot macht |
 | `assets_vollstaendig.py` | 4 | Jedes benutzte Asset ist verzeichnet, gesichert UND aktuell |
 
