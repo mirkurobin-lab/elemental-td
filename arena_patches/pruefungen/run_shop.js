@@ -186,12 +186,29 @@ function step(name, ok, info) {
   step('Gems: 6 Staffeln in 3 Spalten (AAs 3 x 2)',
     auf.gems === 6 && auf.gemSpalten === 3,
     auf.gems + ' Kacheln / ' + auf.gemSpalten + ' Spalten');
-  /* Belohnte Werbung ist nicht angebunden (WERBUNG_VERFUEGBAR = false).
-     AA haengt drei Posten an ein Video; wo der Weg fehlt, muss die
-     Oberflaeche das SAGEN statt einen toten Knopf zu zeigen. */
-  step('Der fehlende Werbeweg steht sichtbar im Shop',
-    /nicht angebunden/i.test(auf.werbung) && auf.werbung.length > 40,
-    auf.werbung.slice(0, 70));
+  /* ⚠ DIESER SCHRITT WURDE AM 31.07.2026 UMGESTELLT, und die Aenderung
+     dreht eine frueher getroffene Entscheidung um — deshalb steht sie
+     hier ausfuehrlich.
+     ALT: „Der fehlende Werbeweg steht sichtbar im Shop." Der Gedanke war
+     richtig: belohnte Werbung ist nicht angebunden, und wo ein Weg
+     fehlt, darf die Oberflaeche nicht so tun, als gaebe es ihn. Der
+     Beweis dafuer war ein sichtbarer Hinweistext.
+     NEU: Der Auftraggeber hat die Entwicklernotizen ausblenden lassen
+     („wir brauchen die dort nicht"), und `#werbungNote` ist eine — sie
+     erklaert dem Spieler den Bauzustand eines Systems, das er nicht
+     kennt.
+     Die ZUSICHERUNG bleibt und wird sogar staerker: sie haengt jetzt an
+     der Struktur statt an einem Satz. Ein Hinweistext kann verschwinden,
+     ohne dass jemand es merkt; ein Knopf, der ein Video verspricht,
+     faellt hier auf. Geprueft wird deshalb: es gibt im ganzen Shop
+     KEINEN solchen Knopf — und der Gratisposten, den AA hinter ein Video
+     haengt, ist bei uns wirklich gratis erreichbar.
+     Der Hinweistext bleibt im DOM (`.devnotiz`) und ist mit
+     `document.body.classList.add("zeigt-devnotizen")` wieder da. */
+  step('Der Gratisposten ist ohne Werbeweg erreichbar',
+    auf.goldGratis === 1 && !/video|werbung/i.test(auf.werbung || ''),
+    auf.goldGratis + ' Gratisposten, Hinweistext ausgeblendet (' +
+    (auf.werbung ? auf.werbung.length : 0) + ' Zeichen sichtbar)');
   step('Kein Knopf im Shop verspricht ein Werbevideo',
     (await page.evaluate(() => [...document.querySelectorAll(
       '#viewShop button')].filter(b => /▶|werbung|video/i.test(b.textContent)).length)) === 0);

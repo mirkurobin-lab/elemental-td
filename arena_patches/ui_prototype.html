@@ -4412,6 +4412,34 @@ span.ico{text-align:center}
  * Pity-Zusage der Booster-Packs. Letztere ist eine Offenlegung vor dem
  * Kauf und darf nicht der Aufraeumaktion zum Opfer fallen — sie wandert
  * nur dorthin, wo sie lesbar ist. */
+/* ==================================================================
+ * .devnotiz — Notizen fuer das Team, nicht fuer den Spieler
+ * ------------------------------------------------------------------
+ * Ansage (31.07.2026): „Du kannst die entwicklernotizen jetzt schon
+ * ausblenden wir brauchen die dort nicht."
+ *
+ * AUSGEBLENDET, NICHT GELOESCHT — und das ist der Punkt. Diese Zeilen
+ * sagen, WO die Rechnung liegt („Logik: arena_clan.js, localStorage
+ * arenaClan"), und genau das braucht die naechste Sitzung, die das
+ * System anfasst. Wer sie loescht, muss sie sich beim naechsten Mal aus
+ * dem Quelltext zusammensuchen.
+ * Wieder sichtbar mit EINER Zeile:
+ *     document.body.classList.add("zeigt-devnotizen")
+ *
+ * WAS ALS ENTWICKLERNOTIZ GILT — nach einem pruefbaren Merkmal, nicht
+ * nach Gefuehl: sie nennt eine Quelldatei, einen localStorage-
+ * Schluessel, eine Funktionssignatur, einen Paragraphen der Referenz
+ * oder bezeichnet die Sache als Prototyp/Platzhalter.
+ * Was NICHT darunter faellt und deshalb stehen bleibt: Spielerhinweise
+ * („Noch 9 Plaetze offen"), Zusagen („Enthaelt mindestens eine Gute
+ * Karte"), Ranglisten-Auskunft („Dein Rang: #155") und die Anleitung
+ * zum Spielstand-Export.
+ * Vier Notizen waren GEMISCHT — bei ihnen ist nur der Entwicklerteil
+ * gefallen, der Spielersatz steht weiter da (siehe die Stellen in
+ * renderFortress, renderHeroes, renderEvents, renderMail, renderComm). */
+.devnotiz{display:none}
+body.zeigt-devnotizen .devnotiz{display:revert}
+
 .sekthinweis{margin:-4px var(--pad) 8px;text-align:center;
   font-size:var(--fs-1);font-weight:800;letter-spacing:.02em;color:var(--dim)}
 
@@ -8575,10 +8603,10 @@ button.pfplate{cursor:pointer}
     <div class="secribbon" data-sec="7" data-ribbon="ribbon_section_lg">
       <span class="srt">Gold-Tausch</span></div>
     <div class="prodgrid" id="goldShop"></div>
-    <p class="iapnote" id="werbungNote">—</p>
+    <p class="iapnote devnotiz" id="werbungNote">—</p>
 
-    <p class="iapnote" id="iapNote">—</p>
-    <p class="fortnote" id="shopNote">—</p>
+    <p class="iapnote devnotiz" id="iapNote">—</p>
+    <p class="fortnote devnotiz" id="shopNote">—</p>
   </section>
 
   <!-- ===== VIEW 0: HOME — Status-Arenen (§9.4 / §9.5b) =====
@@ -8792,7 +8820,7 @@ button.pfplate{cursor:pointer}
       <button class="clanbtn pressable" id="btnClanDuel">Freundschaftskampf</button>
       <button class="clanbtn pressable" id="btnClanChat">Chat</button>
     </div>
-    <p class="fortnote" id="clanNote">—</p>
+    <p class="fortnote devnotiz" id="clanNote">—</p>
   </section>
 
   <!-- ===== VIEW F: FREUNDE =====
@@ -8815,7 +8843,7 @@ button.pfplate{cursor:pointer}
     <div class="frpane" id="frPaneList"></div>
     <div class="frpane" id="frPaneReq" style="display:none"></div>
     <div class="frpane" id="frPaneSearch" style="display:none"></div>
-    <p class="frnote" id="frNote">—</p>
+    <p class="frnote devnotiz" id="frNote">—</p>
   </section>
 
   <!-- ===== VIEW L: RANGLISTE =====
@@ -8858,7 +8886,7 @@ button.pfplate{cursor:pointer}
     <button class="buypass pressable" id="btnBuyPass">Pass aktivieren · 950 💚</button>
     <div class="passhead"><span>STUFE</span><span>GRATIS</span><span class="prem">PREMIUM</span></div>
     <div class="passlist" id="passList"></div>
-    <p class="fortnote" id="passNote">—</p>
+    <p class="fortnote devnotiz" id="passNote">—</p>
   </section>
 
   <!-- ===== VIEW H: HELDEN ===== -->
@@ -8925,7 +8953,7 @@ button.pfplate{cursor:pointer}
     <div class="secribbon sm" data-ribbon="ribbon_section_sm"><span class="srt">MATCH-ENDE</span></div>
     <div class="setgrp">
       <div class="setrow" style="display:block">
-        <p class="lbnote">Die Bilanz nach dem Match — mit Schadensbilanz
+        <p class="lbnote devnotiz">Die Bilanz nach dem Match — mit Schadensbilanz
           beider Seiten und Helden. Zwei Beispiel-Matches:</p>
         <div class="setbtns">
           <button class="setbtn pressable" id="btnDemoWin">Sieg ansehen</button>
@@ -9082,7 +9110,7 @@ button.pfplate{cursor:pointer}
     <div class="gpane" id="gpTasks" role="tabpanel" aria-labelledby="grt-tasks">
       <div class="gprog" id="guideProg"></div>
       <div id="guideChapters"></div>
-      <p class="fortnote" id="guideNote">—</p>
+      <p class="fortnote devnotiz" id="guideNote">—</p>
     </div>
 
     <!-- Reiter 2 — HANDBUCH (aufklappbare Erklaerseiten aus
@@ -9381,7 +9409,7 @@ button.pfplate{cursor:pointer}
     <!-- Anschluss-Bloecke (nicht bei AA) -->
     <div id="mePaneResult"></div>
     <div class="metap pressable" id="meTap">Tippen zum Schließen</div>
-    <p class="hint" id="meNote">—</p>
+    <p class="hint devnotiz" id="meNote">—</p>
   </section>
 
   <!-- Gegnersuche: die Sekunden zwischen KAMPF und Match. -->
@@ -9447,7 +9475,7 @@ button.pfplate{cursor:pointer}
     <div class="bannerstack" id="fortBanners"></div>
     <div class="skinbar"><span>Burg-Skin:</span>
       <select class="mini sel" id="skinSel" aria-label="Burg-Skin"></select>
-      <span id="skinNote"></span></div>
+      <span class="devnotiz" id="skinNote"></span></div>
     <p class="fortnote" id="fortNote">—</p>
   </section>
 
@@ -11653,13 +11681,14 @@ button.pfplate{cursor:pointer}
     var offen = SOC_PLATFORMS.filter(function (p) {
       return !String(SOC_LINKS[p.id] || "").trim();
     }).length;
+    /* Gemischte Notiz: dass ein Kanal noch nicht steht, ist Spieler-
+       auskunft — er tippt sonst ins Leere. Woher die Bildmarken kommen
+       (simple-icons, CC0), ist eine Team-Angabe; sie steht in
+       LIZENZEN.md, wo sie hingehoert. */
     $("commNote").textContent = offen
       ? offen + " von " + SOC_PLATFORMS.length + " Kanälen sind noch nicht eingerichtet — " +
-        "diese Zeilen warten sichtbar, statt ins Leere zu führen. Die Bildmarken liegen " +
-        "als Vektor im Dokument (simple-icons, CC0) und sind deshalb auch dann da, wenn " +
-        "kein Bild lädt."
-      : "Alle Kanäle sind verknüpft. Die Bildmarken liegen als Vektor im Dokument " +
-        "(simple-icons, CC0) und sind deshalb auch dann da, wenn kein Bild lädt.";
+        "diese Zeilen warten sichtbar, statt ins Leere zu führen."
+      : "Alle Kanäle sind verknüpft.";
 
     hydrateRibbons($("viewCommunity"));
     markPressable($("viewCommunity"));
@@ -17665,8 +17694,11 @@ button.pfplate{cursor:pointer}
     renderSkinBar();
 
     var g = AF.nextGate();
-    $("fortNote").innerHTML = "Der Bonus pro Stufe SINKT, die Kosten steigen — AAs " +
-      "abnehmender Grenznutzen (§9.9 / §16.3). " + (g
+    /* Gemischte Notiz: der Verweis auf Vorbild und Paragraph ist eine
+     Team-Angabe und faellt (siehe `.devnotiz`), die Aussage ueber die
+     Kurve und das naechste Trophaeen-Tor ist Spielerauskunft und
+     bleibt. */
+  $("fortNote").innerHTML = "Der Bonus pro Stufe sinkt, die Kosten steigen. " + (g
         ? "Nächstes Tor: ab <b>" + fmt(g.trophies) + " 🏆</b> (" + g.label + ")."
         : "Alle Trophäen-Tore offen.") +
       " Jeder Track läuft bis Stufe " + AF.LEVELS_PER_TRACK + ".";
@@ -19647,10 +19679,11 @@ button.pfplate{cursor:pointer}
       });
     });
     var hm = heroMergeableCount();
+    /* Gemischte Notiz: die Regel ist Spielerwissen, die Innenansicht
+       (Kartenbank, HERO_WEIGHT) nicht. */
     $("heroNote").textContent = "Ein Held ist KEIN Turm — er steht nicht im " +
-      "Sammlungsraster und nicht in der Schmiede, sondern nur hier. Technisch laufen " +
-      "beide über dieselbe Kartenbank, also dieselben Merges und Level-Caps; Helden " +
-      "sind nur seltener (HERO_WEIGHT 0.2) und dürfen nicht im Clan verschickt werden. " +
+      "Sammlungsraster und nicht in der Schmiede, sondern nur hier. Helden sind " +
+      "seltener als Türme und dürfen nicht im Clan verschickt werden. " +
       "Antippen öffnet die Detailkarte — dort wird gelevelt und verschmolzen." +
       (hm ? " " + hm + " Held(en) bereit zum Verschmelzen." : "");
     markPressable($("viewHeroes"));
@@ -19727,9 +19760,10 @@ button.pfplate{cursor:pointer}
                       : "Erinnerung gesetzt: " + ev.name);
       });
     });
-    $("evNote").textContent = "Die Event-Fenster liegen fest in der Kalenderwoche " +
-      "(Essenz-Regen Mo–Do, Kristall-Turnier Fr–So) und sind damit ohne Server berechenbar — " +
-      "genau wie die Phasen des Clankriegs.";
+    /* Gemischte Notiz: WANN die Fenster liegen, gehoert dem Spieler.
+       Dass sie ohne Server berechenbar sind, gehoert dem Team. */
+    $("evNote").textContent = "Die Event-Fenster liegen fest in der Kalenderwoche: " +
+      "Essenz-Regen Mo–Do, Kristall-Turnier Fr–So — genau wie die Phasen des Clankriegs.";
     markPressable($("viewEvents"));
   }
 
@@ -19820,8 +19854,10 @@ button.pfplate{cursor:pointer}
         if (st.read.indexOf(id) < 0) { st.read.push(id); mailSave(st); renderMail(); renderHubTiles(); }
       });
     });
+    /* Gemischte Notiz: der rote Punkt ist Spielerwissen, der
+       Speicherschluessel nicht. */
     $("mailNote").textContent = "Ungelesene Nachrichten und nicht abgeholte Belohnungen " +
-      "erzeugen den roten Punkt auf der Home-Kachel. Stand in localStorage „arenaMail“.";
+      "erzeugen den roten Punkt auf der Home-Kachel.";
     UIBadge.set("mail", mailBadgeCount());
     markPressable($("viewMail"));
   }
@@ -19931,8 +19967,11 @@ button.pfplate{cursor:pointer}
       "Logik: arena_cards.js · arena_fortress.js · arena_clan.js · arena_rivals.js<br>" +
       "154 Assets im Stil „Edel &amp; Kristallin“ · alle Texte Deutsch<br>" +
       "Musik &amp; Klaenge: CC0 von OpenGameArt.org — siehe LIZENZEN.md";
-    $("saveNote").textContent = "Der Export enthält ausschließlich die " + SAVE_KEYS.length +
-      " Prototyp-Schlüssel aus dem localStorage — keine Konto- oder Gerätedaten.";
+    /* Gemischte Notiz: die Zusicherung „keine Konto- oder Geraetedaten"
+       ist eine Datenschutz-Aussage und gehoert dem Spieler. Die Zahl der
+       Schluessel und das Wort localStorage gehoeren dem Team. */
+    $("saveNote").textContent = "Der Export enthält nur deinen Spielstand — " +
+      "keine Konto- oder Gerätedaten.";
     markPressable($("viewSettings"));
   }
 

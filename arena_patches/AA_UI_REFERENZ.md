@@ -4412,3 +4412,55 @@ leere Bilder am gesperrten CDN gegen **0** lokal (vorher 13/13).
 von `prisma-td-vorschau.higgsfield.app`, das der Proxy dieser Umgebung sperrt. Das ist eine
 Umgebungsgrenze, kein Befund — sie prüfen die *ausgelieferte* Seite und gehören dorthin,
 wo sie erreichbar ist.
+
+---
+
+## §43 Entwicklernotizen ausgeblendet — nach einem prüfbaren Merkmal
+
+Ansage (31.07.2026): „Du kannst die entwicklernotizen jetzt schon ausblenden wir brauchen
+die dort nicht."
+
+**Ausgeblendet, nicht gelöscht.** Diese Zeilen sagen, *wo die Rechnung liegt* („Logik:
+`arena_clan.js`, localStorage `arenaClan`"), und genau das braucht die nächste Sitzung, die
+das System anfasst. Wieder sichtbar mit einer Zeile:
+
+```js
+document.body.classList.add("zeigt-devnotizen")
+```
+
+### 43.1 Das Merkmal, nach dem entschieden wurde
+
+Der erste Durchlauf meines Suchers meldete **92 sichtbare Notizen** — und das war Unsinn:
+er zählte „Sofort gutgeschrieben", „Hintergrundmusik im Hub" und „Adresse wird nachgetragen"
+mit. Das sind Spielertexte. Ein zu weiter Selektor macht aus einer Aufräumaktion eine
+Rasur.
+
+Gültig ist deshalb ein **prüfbares** Merkmal statt eines Gefühls. Eine Notiz ist eine
+Entwicklernotiz, wenn sie **eine Quelldatei, einen localStorage-Schlüssel, eine
+Funktionssignatur, einen Paragraphen der Referenz nennt oder die Sache als
+Prototyp/Platzhalter bezeichnet.**
+
+| | Notizen |
+|---|---|
+| **ganz ausgeblendet (10)** | `#werbungNote` `#iapNote` `#shopNote` `#skinNote` `#clanNote` `#passNote` `#frNote` `#guideNote` `#meNote` und die `.lbnote` über den Demo-Knöpfen |
+| **getrimmt (6)** — Entwicklerteil raus, Spielersatz bleibt | `#fortNote` (Paragraphenverweis raus, Trophäen-Tor bleibt) · `#heroNote` (`HERO_WEIGHT`, „Kartenbank" raus, die Regel bleibt) · `#evNote` („ohne Server berechenbar" raus, die Fenster bleiben) · `#mailNote` (Speicherschlüssel raus, der rote Punkt bleibt) · `#commNote` (Herkunft der Bildmarken raus — steht in `LIZENZEN.md`) · `#saveNote` (Schlüsselzahl raus, die Datenschutz-Zusage bleibt) |
+| **unangetastet** | `#lbNote` („Dein Rang: #155") · `#dkHint` · `#collHint` · die Schmiede-Anleitung · `#bronzePromise` |
+
+### 43.2 Eine frühere Entscheidung wurde dabei umgedreht
+
+`run_shop.js` hielt einen Schritt namens **„Der fehlende Werbeweg steht sichtbar im Shop"**.
+Der Gedanke war richtig: belohnte Werbung ist nicht angebunden, und wo ein Weg fehlt, darf
+die Oberfläche nicht so tun, als gäbe es ihn. Der Beweis dafür war ein sichtbarer Hinweis —
+und genau der ist jetzt eine Entwicklernotiz.
+
+Die Zusicherung bleibt und wird **stärker**, weil sie von einem Satz auf die Struktur
+umzieht:
+
+| | vorher | jetzt |
+|---|---|---|
+| geprüft wird | ein Text enthält „nicht angebunden" | es gibt **keinen** Knopf im Shop, der ein Video verspricht, und der Gratisposten ist ohne Werbeweg erreichbar |
+
+> Ein Hinweistext kann verschwinden, ohne dass jemand es merkt. Ein Knopf, der ein Video
+> verspricht, fällt in einer Strukturprüfung auf.
+
+**Aufwand: S** · **Priorität: 1** · erledigt
