@@ -3585,3 +3585,118 @@ Ohne diesen Kontrolllauf hätte der Vergleich acht Änderungen gemeldet, die kei
 > **Merksatz:** Ein Bildvergleich ohne Rauschboden misst die Uhr, nicht die Änderung.
 
 **Aufwand: L** · **Priorität: 1** · erledigt
+
+## §35 Der Weg zu AAAA: sechs Punkte, gebaut und nachgemessen
+
+Auftrag (31.07.2026): *„Bau alles nacheinander ausser nummer5"* — auf die Frage, was zu AAAA
+noch fehlt. Punkt 5 (der tote Raum unter KAMPF) bleibt bewusst offen, der Auftraggeber
+entscheidet die Gestaltung selbst.
+
+### 35.0 Vorweg: ein verlorener Container und was er gekostet hat
+
+Mitten in der Arbeit war der lokale Klon plötzlich **auf einem drei Wochen alten Stand**
+(19 403 statt 22 042 Zeilen, `HEAD` auf einem fremden Commit). Der Container war neu
+aufgesetzt worden; die fünf Commits des Tages lagen nur noch auf dem Remote.
+
+Aufgefallen ist es an einem **Phantom-Befund**: die Zierrahmen der Sektionsbanner rendern
+angeblich nicht, `bandfehlt` liegt auf allen fünf. Die Ursache war nicht das Blatt, sondern
+der Stand — der alte Commit kannte die lokale Asset-Auflösung noch nicht.
+
+> **Merksatz:** Wenn eine Messung etwas findet, das *vorher nachweislich funktioniert hat*,
+> ist die erste Frage nicht „was ist kaputt", sondern **„messe ich noch dieselbe Datei"**.
+> Zwei Zahlen hätten es sofort gezeigt: Zeilenzahl und `git rev-parse HEAD`.
+
+Wiederhergestellt über `git fetch` + `reset --hard origin/…`; alles war gepusht, nichts
+verloren. Die Arbeit der letzten halben Stunde musste auf der richtigen Basis wiederholt
+werden.
+
+### 35.1 Die Markenschrift wurde nie geladen
+
+`font-family:Cinzel,Georgia,…` stand seit Wochen im Blatt. `@font-face`: **null**.
+Verweise auf einen Schriftdienst: **null**. Gerendert hat immer der erste Rückfall — iOS
+Georgia, Android Times/serif, Web je nach Rechner. Das Markengesicht sah auf zwei
+Plattformen **verschieden** aus.
+
+Cinzel von Google Fonts, Achse `wght` auf 700–900 beschnitten und auf Latein subsettet:
+**125 468 → 39 644 Byte**. Lizenz SIL OFL 1.1, Wortlaut liegt daneben (die Lizenz verlangt
+das). Gemessen nach dem Einbau: `document.fonts` meldet „loaded", und dasselbe Testwort ist
+in Cinzel **618 px** breit gegen **597 px** in Georgia — es rendert nachweislich eine andere
+Schrift und nicht nur ein anderer Name.
+
+### 35.2 Zwei Wege zum selben Ziel, ungleiche Qualität
+
+Wischen war voll ausgebaut. Tippen war `display:none` → `display:block`. Getippt wird öfter.
+
+Zwei Bewegungen, weil es zwei Arten Wechsel gibt: **seitlich** zwischen den fünf
+Geschwistern der Leiste (Richtung folgt der Anordnung — eine Bewegung, die ihr widerspricht,
+verwirrt mehr als gar keine), **in die Tiefe** für alles, was man aus einer Ansicht heraus
+öffnet. 160 ms, nicht 300: ein Reiterwechsel ist der häufigste Vorgang im Spiel.
+
+Gemessen mit einem rAF-Rekorder über vier Wechsel; dazu zwei Gegenproben — bei
+`prefers-reduced-motion` passiert nichts, und **eine Wischgeste löst die Tipp-Animation
+nicht aus** (sonst lägen zwei Transforms auf demselben Knoten und die Ansicht zuckt).
+
+### 35.3 Der Zielkonflikt der Währungsleiste — gelöst an der Zahl
+
+| | vorher | nachher |
+|---|---|---|
+| Drittel | 102 / 102 / 110 px | **105 / 105 / 105** |
+| Gold bei 1 234 567 | „1 234 567" | „1,2 M" |
+| breiteste mögliche Ausgabe | — | 46 px in 48 px Feld |
+
+`fmtKurz()` gilt **nur für die Kopfleiste**. Preise, Werttafeln und die Schmiede rechnen
+weiter mit `fmt` und zeigen den exakten Wert — eine gerundete Kaufsumme ist ein
+Rechtsproblem, kein Gestaltungsdetail. Schwelle bei 100 000, nicht bei 10 000: wer 45 000
+Gold hat, will die 45 000 sehen.
+
+⚠ Erste Fassung schrieb „Mio." und **lief über** (52 px in einem 48-px-Feld). Die Kürzung
+wäre genau an der Stelle gescheitert, für die es sie gibt. Jetzt „M", passend zum „K".
+
+Damit ist `run_v7` erstmals **349/349** — kein bewusst roter Schritt mehr.
+
+### 35.4 Zustände: gebaut wurde, was es null Mal gab
+
+Gezählt: gedrückt ✓ · gesperrt 19 Regeln · gewählt 58 Stellen · **überfahren 0** · **lädt 0**.
+
+Die beiden gewachsenen Systeme (gesperrt, gewählt) wurden **nicht** angefasst — dieselbe
+Überlegung wie bei der Handlungsfarbe (§34.3): 77 Verwendungen sind kein Ausrutscher, und
+eine zweite konkurrierende Fassung daneben macht es schlechter.
+
+Neu: `:hover` (nur `@media (hover:hover)` — sonst klebt der Zustand auf dem Telefon fest),
+`.laedt` mit Lichtband und abgeschalteten Zeiger-Ereignissen, `.skelett` für Inhalt, und die
+Naht `UIZustand.waehrend(el, promise)`. Letztere ist der Fall, der wirklich zählt: sie gibt
+den Knopf auch bei einem **fehlgeschlagenen** Aufruf wieder frei — genau das vergisst man
+von Hand, und dann bleibt nach einem Netzfehler ein Knopf für immer tot. Nachgemessen.
+
+### 35.5 Kontrast: von 16 Phantomen auf 0 echte Befunde
+
+Die alte Messung über `getComputedStyle` meldete Befunde in **16 von 16** Ansichten, „Shop"
+angeblich mit 1,13 : 1. Sie war unbrauchbar: Verlaufsschrift setzt
+`-webkit-text-fill-color` durchsichtig, und viele Untergründe sind Bilder statt Farben.
+
+Die neue Messung (`pruefungen/kontrast.js`) fragt die **Pixel**: jeder Textkasten wird
+zweimal aufgenommen — mit Text und ohne — und aus der Differenz die Leuchtdichte der
+Schriftpixel gegen den Untergrund bestimmt. Das kennt weder Verläufe noch Bilder als
+Sonderfall. Ausgewertet wird der **Kern** der Glyphen (5. bzw. 95. Perzentil), weil die
+Kantenglättung jeden Mittelwert Richtung „bestanden" verwässert.
+
+Ergebnis: **2 echte Befunde** statt 16 Phantomen — beide 9-px-Melde-Abzeichen mit weißer
+Schrift auf `--danger` (2,72 : 1 und 2,94 : 1). `--danger` (#ff5e7e) ist kein Warnrot,
+sondern ein helles Rosa. Neues Token `--melde` (#c62348), neun Stellen, gemessen 5,6 : 1.
+**Danach: 0 Befunde.**
+
+### 35.6 Typo-Leiter: gezählt, bevor geurteilt wurde
+
+43 Schriftgrößen in 681 Verwendungen, 20 Radien in 267. Aber: **469 der 681 liegen im Band
+8–15 px**. Das ist kein Wildwuchs, das ist das gewachsene Kleinschrift-System — und in einem
+430-px-Fenster sind Halbschritte dort eine Passungsentscheidung.
+
+Angefasst wurden deshalb nur die **Ausreißer** (höchstens zwei Verwendungen), geschnappt auf
+den nächsten häufigen Wert: **43 → 31** Größen, **20 → 17** Radien. Dazu die Leiter als
+Tokens (`--fs-1`…`--fs-8`, `--r-1`…`--r-4`) als Ziel für alles Neue.
+
+> **Offen und ehrlich benannt:** die eigentliche Konsolidierung der 469 Stellen im Band
+> 8–15 px ist ein eigenes Stück Arbeit **mit Nachmessen jedes Kastens** — kein
+> Suchen-und-Ersetzen. Wer sie blind macht, ändert Umbrüche in jeder zweiten Kachel.
+
+**Aufwand: L** · **Priorität: 1** · erledigt (ohne Punkt 5)

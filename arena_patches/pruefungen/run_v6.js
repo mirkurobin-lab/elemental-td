@@ -476,8 +476,17 @@ function step(name, ok, info) {
      Balken da sind und nicht ueberlaufen. */
   step('Drei Koop-Fortschrittsbalken, keiner ueber 100 %',
     bars === 3 && fills.every(f => f >= 0 && f <= 100), fills.map(f => f.toFixed(1) + '%').join(' / '));
+  /* ⚠ ZWEITE KORREKTUR DERSELBEN SACHE (31.07.2026). Die erste Fassung
+     testete den Wochentag statt der Mechanik; repariert wurde sie mit
+     `Date.now() + 3 Tage` — und das ist DERSELBE Fehler, nur verschoben.
+     An einem Freitag landen drei Tage spaeter im MONTAG DER NAECHSTEN
+     Woche, collectFrac faellt zurueck auf ~0,04, und die Bot-Summe
+     rundet wieder auf 0. Gemessen an einem Freitag: packs=0, Schritt
+     rot — ohne dass sich am Programm etwas geaendert haette.
+     Der feste Zeitpunkt muss vom WOCHENANFANG aus gerechnet werden,
+     nicht von heute. ArenaClan.weekStart gibt ihn her. */
   const botMitte = await page.evaluate(() => {
-    const t = Date.now() + 3 * 864e5;            // drei Tage in die Woche
+    const t = window.ArenaClan.weekStart(Date.now()) + 3 * 864e5;   // Donnerstag
     return window.ArenaClan.quests(t).map(q => ({ k: q.key, bots: q.bots }));
   });
   step('Bots tragen ueber die Woche zu JEDEM Quest bei',
@@ -1376,8 +1385,15 @@ function step(name, ok, info) {
     before.gold + ' − ' + before.cost + ' = ' + after.gold);
   step('Banner zeigt die neue Stufe sofort',
     after.lvlText.indexOf('Stufe ' + after.lvl + ' /') === 0, after.lvlText.slice(0, 22));
-  step('Top-Bar-Gold aktualisiert', after.topGold.replace(/\D/g, '') === String(after.gold),
-    after.topGold);
+  /* ⚠ Die Kopfleiste zeigt seit dem 31.07.2026 die KOMPAKTE Zahl
+     („222 K" statt „222 450") — sonst passen drei Zahlen nicht auf eine
+     Mitte, ohne abgeschnitten zu werden (AA_UI_REFERENZ §35.3).
+     Verglichen wird deshalb gegen fmtKurz, also gegen die QUELLE, und
+     nicht gegen die Ziffern des exakten Werts: eine Pruefung, die eine
+     Formatierung nachbaut, bricht beim naechsten Formatwechsel. */
+  step('Top-Bar-Gold aktualisiert',
+    after.topGold.trim() === await page.evaluate(g => window.__proto.fmtKurz(g), after.gold),
+    after.topGold + ' bei ' + after.gold);
   // Kauf-Feedback: Glow-Puls auf dem Banner
   const pulsed = await page.evaluate(() => {
     const b = document.querySelector('#fortBanners [data-banner="hp"]');

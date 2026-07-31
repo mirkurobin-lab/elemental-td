@@ -108,6 +108,47 @@
      Aufnahme fuer Aufnahme). Was es kuenftig aendert: wer die
      Handlungsfarbe verschieben will, fasst eine Zeile an statt 28. */
   --act:#3fa9e8; --act-2:#1c6ea8; --act-sockel:#12496f;
+  /* ⚠ MELDE-ABZEICHEN BRAUCHEN EIN DUNKLERES ROT ALS --danger.
+     Auf gerenderten Pixeln gemessen (31.07.2026): weisse 9-px-Schrift
+     auf --danger (#ff5e7e) ergibt 2,72:1 und 2,94:1 — WCAG AA verlangt
+     bei dieser Groesse 4,5. #ff5e7e ist eben kein Warnrot, sondern ein
+     helles Rosa; als Flaeche unter weisser Schrift ist es zu hell.
+     --melde ist derselbe Farbton, nur tiefer: gemessen 5,6:1.
+     --danger bleibt unveraendert — es traegt anderswo dunkle Schrift
+     und ist dort richtig. Geaendert wird nur die Kombination, die
+     nachweislich durchfaellt. */
+  --melde:#c62348;
+  /* ==================================================================
+   * TYPO-LEITER UND RADIEN — die Zielwerte, gemessen hergeleitet
+   * ------------------------------------------------------------------
+   * Gezaehlt am 31.07.2026 ueber das ganze Blatt: 43 verschiedene
+   * Schriftgroessen in 681 Verwendungen, 20 Radien in 267.
+   *
+   * ⚠ ABER: 469 der 681 Verwendungen liegen im Band 8-15 px. Das ist
+   * kein Wildwuchs, das ist das gewachsene Kleinschrift-System dieser
+   * UI — und in einem 430 px breiten Fenster sind Halbschritte dort
+   * eine legitime Passungsentscheidung, keine Schlamperei. Wer diese
+   * 469 Stellen auf acht Stufen zwingt, aendert Umbrueche in jeder
+   * zweiten Kachel; das ist ein eigenes Stueck Arbeit MIT Nachmessen
+   * jedes Kastens, nicht ein Suchen-und-Ersetzen.
+   *
+   * Angefasst wurden deshalb nur die AUSREISSER — 12 Groessen und
+   * 3 Radien mit hoechstens zwei Verwendungen, geschnappt auf den
+   * naechsten haeufigen Wert. 43 -> 31 Groessen, 20 -> 17 Radien.
+   *
+   * Die Tokens hier sind das ZIEL, an dem sich Neues auszurichten hat.
+   * Wer eine neue Groesse braucht, nimmt eine davon — oder begruendet
+   * im Kommentar, warum keine passt.
+   * ================================================================== */
+  --fs-1:9px;    /* Abzeichen, Kapitaelchen-Etiketten */
+  --fs-2:10px;   /* Nebentext */
+  --fs-3:11px;   /* Standard klein */
+  --fs-4:13px;   /* Fliesstext */
+  --fs-5:15px;   /* betont */
+  --fs-6:19px;   /* kleiner Titel */
+  --fs-7:23px;   /* Titel */
+  --fs-8:30px;   /* Display */
+  --r-1:6px; --r-2:8px; --r-3:12px; --r-4:20px;
   /* ================================================================
    * EINHEITLICHE BANNER-METRIK
    * ----------------------------------------------------------------
@@ -277,7 +318,16 @@ body.nur-waehrung .apphead .headcol{padding:6px 0}
    abgeschnitten. Ein Waehrungsstand, den man falsch liest, ist
    schlimmer als einer, der schmaler steht. `1 1 auto` laesst die
    Felder nach Inhalt wachsen; der Shop verkauft Posten bis 126 000. */
-.cur{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:5px;
+/* ⚠ ZURUECK AUF `1 1 0` (31.07.2026). Es stand auf `1 1 auto`, weil
+   sonst Gold als „12 5…" abgeschnitten wurde — und damit war die
+   Anforderung „Ressourcen Anzahl muss zentriert sein" (IMG_3386) nicht
+   erfuellbar: drei ungleich breite Felder haben drei verschiedene
+   Mitten. Die Pruefung „gleiche Drittel" lief deshalb bewusst rot.
+   Der Zielkonflikt ist jetzt an der richtigen Stelle geloest — nicht
+   im Layout, sondern an der ZAHL (fmtKurz). Damit passt auch der
+   groesste denkbare Betrag in sein Drittel, und die Leiste kann wieder
+   exakt dritteln. */
+.cur{flex:1 1 0;min-width:0;display:flex;align-items:center;gap:5px;
   background:none;border:0;border-left:1px solid transparent;border-radius:0;
   padding:0 4px;
   font-size:14px;font-weight:800;
@@ -427,7 +477,7 @@ body.nur-waehrung .apphead .headcol{padding:6px 0}
 .mmside{width:112px;text-align:center}
 .mmav{position:relative;width:96px;height:96px;margin:0 auto;border-radius:20px;
   overflow:hidden;background:#22303c;border:3px solid #57c8ee;
-  display:flex;align-items:center;justify-content:center;font-size:40px;
+  display:flex;align-items:center;justify-content:center;font-size:44px;
   box-shadow:0 8px 20px #000a,inset 0 2px 0 #ffffff33}
 .mmside.opp .mmav{border-color:#f2665a}
 .mmav img{width:100%;height:100%;object-fit:cover}
@@ -467,6 +517,45 @@ body.nur-waehrung .apphead .headcol{padding:6px 0}
  *      Kartenreihen). Deshalb wird eine Geste, die in einem quer
  *      scrollbaren Element beginnt, gar nicht erst angenommen.
  * ================================================================== */
+/* ==================================================================
+ * DER TAB-WECHSEL — bis 31.07.2026 ein harter Schnitt
+ * ------------------------------------------------------------------
+ * Das Wischen war voll ausgebaut: Drag ohne Transition, Snap mit
+ * eigener Kurve, Federn am Ende der Reihe, Randhinweis. Das TIPPEN auf
+ * die Leiste war `display:none` -> `display:block`. Zwei Wege zum
+ * selben Ziel, einer poliert, einer roh — und getippt wird oefter als
+ * gewischt.
+ *
+ * Zwei Bewegungen, weil es zwei Arten von Wechsel gibt:
+ *   SEITLICH (.vin-l/.vin-r) zwischen den fuenf Geschwistern der
+ *     Bottom-Nav. Die Richtung folgt der Reihenfolge in der Leiste —
+ *     wer von Shop nach Clan tippt, geht nach rechts, und die Ansicht
+ *     kommt von rechts herein. Eine Bewegung, die der Anordnung
+ *     widerspricht, verwirrt mehr als gar keine.
+ *   IN DIE TIEFE (.vin-tief) fuer alles, was man AUS einer Ansicht
+ *     heraus oeffnet (Pass, Helden, Post, Einstellungen ...). Das sind
+ *     keine Geschwister, das ist eine Ebene weiter — also von unten
+ *     herauf statt von der Seite.
+ *
+ * ⚠ Nur opacity und transform. Beides laeuft auf dem Compositor; alles
+ * andere (height, top, filter) kostet auf dem Telefon Layout je Bild.
+ *
+ * ⚠ 160 ms, nicht 300. Ein Reiterwechsel ist keine Zeremonie — er ist
+ * der haeufigste Vorgang im Spiel. Was sich beim ersten Mal huebsch
+ * anfuehlt, ist beim fuenfzigsten Mal Wartezeit.
+ * ================================================================== */
+.view.vin-l{animation:viewInL .16s var(--ease-out) both}
+.view.vin-r{animation:viewInR .16s var(--ease-out) both}
+.view.vin-tief{animation:viewInTief .18s var(--ease-out) both}
+@keyframes viewInL{from{opacity:0;transform:translate3d(-16px,0,0)}
+  to{opacity:1;transform:none}}
+@keyframes viewInR{from{opacity:0;transform:translate3d(16px,0,0)}
+  to{opacity:1;transform:none}}
+@keyframes viewInTief{from{opacity:0;transform:translate3d(0,14px,0) scale(.985)}
+  to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .view.vin-l,.view.vin-r,.view.vin-tief{animation:none}
+}
 .view.swdrag{transition:none;will-change:transform}
 .view.swsnap{transition:transform .22s cubic-bezier(.22,.61,.36,1)}
 /* Am Ende der Reihe gibt es kein Ziel mehr. Statt gar nichts zu tun
@@ -718,7 +807,7 @@ select.sel option{background:var(--panel);color:var(--txt)}
 .tile .lvl{position:absolute;left:0;right:0;bottom:0;background:#000a;font-size:9px;
   text-align:center;font-weight:800;padding:1px 0}
 .tile .eq{position:absolute;left:0;right:0;top:0;background:#48e222cc;color:#04210a;
-  font-size:6.5px;text-align:center;font-weight:900;letter-spacing:.04em;padding:1px 0}
+  font-size:7.5px;text-align:center;font-weight:900;letter-spacing:.04em;padding:1px 0}
 .tile .dots{position:absolute;right:2px;bottom:12px;font-size:8px;letter-spacing:-1px;color:#fff;
   text-shadow:0 0 3px #000;line-height:1}
 .tile .reddot{position:absolute;left:2px;top:2px;width:8px;height:8px;border-radius:50%;
@@ -819,8 +908,8 @@ nav.bottom button.on .navpop{filter:drop-shadow(0 4px 8px #000c) saturate(1.15) 
 .nav-center .navpop{margin:-28px auto 1px;width:56px;height:56px;font-size:30px}
 /* Das Icon des aktiven Reiters waechst mit. Bei AA ist das der
    deutlichste Teil der Geste. */
-nav.bottom button.on .navpop{width:50px;height:50px;font-size:25px}
-nav.bottom button.on.nav-center .navpop{width:62px;height:62px;font-size:32px}
+nav.bottom button.on .navpop{width:50px;height:50px;font-size:24px}
+nav.bottom button.on.nav-center .navpop{width:62px;height:62px;font-size:30px}
 /* Der goldene Strich entfaellt: die Platte selbst markiert jetzt den
    Zustand — breiter, heller, angehoben. Ein zusaetzlicher Strich waere
    die dritte Ansage fuer dieselbe Sache. */
@@ -830,7 +919,7 @@ nav.bottom button.on.nav-center .navpop{width:62px;height:62px;font-size:32px}
    ist (also bei jedem inaktiven Reiter, wo er am wichtigsten ist). */
 nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
   min-width:16px;height:16px;line-height:16px;border-radius:8px;
-  background:var(--danger);color:#fff;font-size:9.5px;font-weight:900;padding:0 4px;
+  background:var(--melde);color:#fff;font-size:9.5px;font-weight:900;padding:0 4px;
   box-shadow:0 1px 3px #000a,inset 0 1px 0 #ffffff3d}
 
 /* ==================================================================
@@ -846,9 +935,9 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
   background:linear-gradient(180deg,var(--act),var(--act-2));
   box-shadow:var(--mat-raised),0 3px 0 var(--act-sockel)}
 .tbmenu{position:relative;font-size:16px;line-height:1}
-.tbmenu span{display:block;width:16px;height:2px;border-radius:1px;background:#eaf6ff}
+.tbmenu span{display:block;width:16px;height:2px;border-radius:2px;background:#eaf6ff}
 .tbmenu .nb2{position:absolute;right:-4px;top:-4px;min-width:15px;height:15px;line-height:15px;
-  border-radius:8px;background:var(--danger);color:#fff;font-size:8.5px;font-weight:900;
+  border-radius:8px;background:var(--melde);color:#fff;font-size:8.5px;font-weight:900;
   text-align:center;padding:0 3px}
 .tbmenu[aria-expanded="true"]{background:linear-gradient(180deg,#5dc0f6,#2d84c4)}
 #tbMenuLayer{position:fixed;inset:0;z-index:55;background:#05090cb8;
@@ -876,7 +965,7 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
   animation:tbmin var(--t-mid) var(--ease-out) backwards}
 /* Der Strich laeuft nach rechts aus: er trennt, ohne einen Kasten zu
    bauen. Ein Rahmen um jede Gruppe waere lauter als die Eintraege. */
-.tbmgrp::after{content:"";flex:1;height:1px;border-radius:1px;
+.tbmgrp::after{content:"";flex:1;height:1px;border-radius:2px;
   background:linear-gradient(90deg,#8fa0ad55,#8fa0ad00)}
 .tbmlist .tbmgrp:first-child{margin-top:0}
 .tbmi{width:232px;display:flex;align-items:center;gap:10px;
@@ -1056,7 +1145,7 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
 .tower{width:44%;position:relative;border-radius:12px;
   background:linear-gradient(180deg,#5d9bf5,#3a6fb0);aspect-ratio:3/4;overflow:hidden;
   display:flex;align-items:center;justify-content:center}
-.tower .big{font-size:54px;filter:drop-shadow(0 3px 6px #0009);margin-bottom:22%}
+.tower .big{font-size:52px;filter:drop-shadow(0 3px 6px #0009);margin-bottom:22%}
 /* Loop-Slot (§2.2): links unten, ~25% Breite, Endlosschleife ohne Steuerung.
    HIER die TEST_*_attack.mp4-Clips einsetzen: <video src="TEST_ember_attack.mp4"> */
 .loop{position:absolute;left:4px;bottom:4px;width:62%;height:34%;border-radius:8px;
@@ -1907,7 +1996,7 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
    winziges Zeichen in der Mitte einer sonst leeren Karte (oertlich immer,
    auf dem Geraet bei jedem Ladefehler). DESIGNSYSTEM §7b. */
 .pkfront .artbox .ico{width:100%;height:100%;display:flex;
-  align-items:center;justify-content:center;font-size:46px;line-height:1}
+  align-items:center;justify-content:center;font-size:44px;line-height:1}
 /* Der Raritaetsrahmen liegt UEBER dem Bild, nicht darunter. */
 .pkfront .frm{position:absolute;inset:0;pointer-events:none}
 /* Das Stufenband nennt die Raritaet im Klartext. Ohne es muss der
@@ -2361,7 +2450,7 @@ footer{padding:6px 12px 14px;text-align:center}
    Gold bei den Kronen, nur mit Schrift. */
 .arenatitle::before{content:"";position:absolute;left:50%;top:-14px;
   transform:translateX(-50%);width:min(300px,86%);height:calc(100% + 26px);
-  border-radius:22px;pointer-events:none;
+  border-radius:20px;pointer-events:none;
   background:radial-gradient(60% 60% at 50% 45%,#070b0fd9 0%,#070b0f8c 55%,#070b0f00 100%)}
 .arenakicker,.arenaname,.arenachip{position:relative}
 /* Bei AA sind beide Titelzeilen GLEICH gross und weiss („Arena 5:" /
@@ -2430,7 +2519,7 @@ footer{padding:6px 12px 14px;text-align:center}
   align-items:center;justify-content:center;gap:3px;font-size:22px;position:relative}
 .eventtile span{font-size:9px;font-weight:900;letter-spacing:.09em;color:#a9bccb}
 .eventtile .nb2{position:absolute;right:-4px;top:-4px;min-width:16px;height:16px;line-height:16px;
-  border-radius:8px;background:var(--danger);color:#fff;font-size:9.5px;font-weight:900;padding:0 4px}
+  border-radius:8px;background:var(--melde);color:#fff;font-size:9.5px;font-weight:900;padding:0 4px}
 .battlebtn{flex:1;min-height:70px;border-radius:14px;font-size:23px;
   background-repeat:no-repeat;background-position:center;
   background-size:100% 175%,100% 100%;
@@ -3389,7 +3478,7 @@ span.ico{text-align:center}
    Der Emoji-Rueckfall liegt an derselben Stelle, sonst springt das
    Motiv, wenn ein Bild fehlt. */
 .belcell .cart,.belcell .cartemo{position:absolute;inset:17%;width:66%;height:66%;
-  border-radius:7px;object-fit:contain;font-size:25px}
+  border-radius:7px;object-fit:contain;font-size:24px}
 /* Menge ueber allem, Glanzpunkt ueber dem Bild — sonst verschwindet
    beides unter einem randlosen Artwork. */
 .belcell::before{z-index:2}
@@ -3470,7 +3559,7 @@ span.ico{text-align:center}
    Nur die Platte darunter wird zurueckgenommen: sie wuerde genau den
    eingesenkten Schatten zudecken, der die Mulde ausmacht. */
 .itemart .artbox{inset:7px;background:none;border-radius:9px}
-.itemart .cartemo{font-size:46px;filter:drop-shadow(0 2px 5px #000)}
+.itemart .cartemo{font-size:44px;filter:drop-shadow(0 2px 5px #000)}
 /* Menge unten rechts IM Artwork — AA schreibt „x1" in die Mulde, nicht
    darunter. Unten rechts, weil das Artwork oben links am dichtesten ist. */
 .itemmenge{position:absolute;right:5px;bottom:5px;background:#000b;border-radius:7px;
@@ -3731,7 +3820,7 @@ span.ico{text-align:center}
 .gemcard.wide .gamt,.goldcard.wide .gamt{flex:1;min-width:0;white-space:nowrap;font-size:18px}
 .gemcard.wide .gbuy,.goldcard.wide .gbuy{width:auto;min-width:118px;margin-top:0;
   padding:9px 14px}
-.gemcard .gart,.goldcard .gart{font-size:29px;line-height:1}
+.gemcard .gart,.goldcard .gart{font-size:30px;line-height:1}
 .gemcard .gnm,.goldcard .gnm{font-size:10.5px;font-weight:800;color:#dbe6ef}
 .gemcard .gamt,.goldcard .gamt{font-size:16px;font-weight:900;line-height:1.1}
 .gemcard .gamt{color:#e6a7f7}
@@ -4456,7 +4545,7 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
    +4,60 % · Lv…" — bei 226 px Textspalte fiel genau die Stufe der Ellipse
    zum Opfer, also die Angabe, die der Auftraggeber ausdrücklich verlangt. */
 .branchhead .brow1{display:flex;align-items:center;gap:6px;min-width:0}
-.branchhead .bnm{flex:1;min-width:0;font-size:13.5px;font-weight:900;line-height:1.15}
+.branchhead .bnm{flex:1;min-width:0;font-size:13px;font-weight:900;line-height:1.15}
 .branchhead .blv{flex:0 0 auto;font-size:9.5px;font-weight:900;color:#c6b4ee;
   letter-spacing:.03em}
 /* ⓘ — der EINZIGE Weg zur ausgeschriebenen Stufenleiter. Bewusst klein und
@@ -4958,7 +5047,7 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
 @keyframes offerpop{0%{transform:scale(.7) translateY(30px);opacity:0}
   100%{transform:scale(1) translateY(0);opacity:1}}
 .offerpop .ohead{position:relative;padding:16px 16px 12px;text-align:center}
-.offerpop .obig{font-size:40px;line-height:1}
+.offerpop .obig{font-size:44px;line-height:1}
 .offerpop .otitle{font-size:22px;line-height:1.15;margin-top:5px}
 .offerpop .owhy{font-size:10.5px;color:#c6b4ee;line-height:1.5;margin-top:7px}
 .offerpop .ogrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:0 16px}
@@ -4975,7 +5064,7 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
 .iapnote{margin-top:9px;font-size:9px;color:#8fa0ad;text-align:center;line-height:1.5}
 
 /* ---------- Taeglicher Loop (Home) ---------- */
-.dailypanel{margin:12px 14px 0;border-radius:15px;border:1px solid var(--line);overflow:hidden;
+.dailypanel{margin:12px 14px 0;border-radius:14px;border:1px solid var(--line);overflow:hidden;
   background:linear-gradient(180deg,#1b2732,#131c25)}
 .dailyhead{display:flex;align-items:center;gap:9px;padding:11px 12px;width:100%;text-align:left}
 .dailyhead .dh1{flex:1;min-width:0}
@@ -5344,7 +5433,7 @@ body.me-open #viewMatchEnd.view{padding-bottom:22px}
 .hubmini .hmi{font-size:19px;line-height:1}
 .hubmini .hmn{font-size:9px;font-weight:900;color:#cfe0ec;letter-spacing:.04em}
 .hubmini .nb2{position:absolute;right:-4px;top:-4px;min-width:16px;height:16px;line-height:16px;
-  border-radius:8px;background:var(--danger);color:#fff;font-size:9px;font-weight:900;
+  border-radius:8px;background:var(--melde);color:#fff;font-size:9px;font-weight:900;
   text-align:center;padding:0 4px}
 
 /* ==================================================================
@@ -5425,7 +5514,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
    Kante laufen. 3 px Abstand liessen unter dem Ring einen dunklen Spalt. */
 .deckslot .artbox{font-size:30px;inset:0;border-radius:8px}
 .reqslot .artbox{font-size:24px;inset:3px}
-.tower .artbox,.tower .big.artbox{inset:0;margin:0;border-radius:12px;font-size:54px}
+.tower .artbox,.tower .big.artbox{inset:0;margin:0;border-radius:12px;font-size:52px}
 .cercard .artbox{inset:3px;border-radius:9px;font-size:52px}
 .pcfront .artbox{inset:0;border-radius:0;font-size:22px}
 /* Kartenvorderseite im Pack: Artwork randlos, Beschriftung als Bauchbinde. */
@@ -5616,7 +5705,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
    abgeschnitten ("EPISCH" → "PISC"), weil das Clan-Wappen eine feste
    Breite und einen Wappen-Zuschnitt mitbringt. */
 .cbanner{position:relative;flex:0 0 60px;width:60px;height:70px;display:flex;
-  align-items:center;justify-content:center;font-size:29px;color:#fff;
+  align-items:center;justify-content:center;font-size:30px;color:#fff;
   filter:drop-shadow(0 2px 3px #000a);
   clip-path:polygon(0 0,100% 0,100% 76%,50% 100%,0 76%)}
 .cbanner .bsym{position:relative;z-index:2;text-shadow:0 2px 4px #0009}
@@ -6131,7 +6220,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .hubtile .hts{font-size:9px;color:#a9bccb;margin-top:2px;white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis}
 .hubtile .nb2{position:absolute;right:-4px;top:-4px;min-width:16px;height:16px;line-height:16px;
-  border-radius:8px;background:var(--danger);color:#fff;font-size:9px;font-weight:900;
+  border-radius:8px;background:var(--melde);color:#fff;font-size:9px;font-weight:900;
   text-align:center;padding:0 4px}
 /* ==================================================================
  * HOME NACH AAs ACHSE (AA_UI_REFERENZ §9.5b + §14.2 + §14.3)
@@ -6174,7 +6263,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   background:conic-gradient(#63b1ee var(--xp,62%),#1d2a35 0);
   display:flex;align-items:center;justify-content:center;position:relative}
 .xpring::after{content:"XP";position:absolute;inset:2px;border-radius:50%;
-  background:#0a1017;font-size:6px;font-weight:900;color:#8fb7d6;
+  background:#0a1017;font-size:7.5px;font-weight:900;color:#8fb7d6;
   display:flex;align-items:center;justify-content:center;letter-spacing:.02em}
 .hubicons{display:flex;gap:5px;flex:0 0 auto}
 /* 21,7 % von 390 px sind 85 px. Das Portrait ist hochformatig (AA misst
@@ -6271,7 +6360,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .railtile .ico{width:100%;height:100%;object-fit:contain}
 .railtile span.ico{font-size:22px}
 .railtile .nb2{position:absolute;right:-4px;top:-4px;min-width:16px;height:16px;
-  line-height:16px;border-radius:8px;background:var(--danger);color:#fff;
+  line-height:16px;border-radius:8px;background:var(--melde);color:#fff;
   font-size:9px;font-weight:900;text-align:center;padding:0 4px;
   box-shadow:0 1px 3px #000a,inset 0 1px 0 #ffffff3d}
 .hubicon{position:relative;width:32px;height:32px;border-radius:var(--radius-sm);
@@ -6279,7 +6368,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   border:1px solid #2b3b47;background:linear-gradient(180deg,#1b2732,#111a21)}
 .hubicon .ico{width:18px;height:18px}
 .hubicon .nb2{position:absolute;right:-4px;top:-4px;min-width:15px;height:15px;line-height:15px;
-  border-radius:8px;background:var(--danger);color:#fff;font-size:8.5px;font-weight:900;
+  border-radius:8px;background:var(--melde);color:#fff;font-size:8.5px;font-weight:900;
   text-align:center;padding:0 3px}
 /* Season-Pass-Banner — AAs „GOLDEN FORTUNE" bei 21 % Hoehe (§9.5b). */
 /* Kein eigener Rand mehr: das Banner sitzt in `.hubmid` und bekommt seine
@@ -6312,7 +6401,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .homerow3 .sidetile .sti .ico{width:22px;height:22px}
 .homerow3 .sidetile span.stn{font-size:8px;font-weight:900;letter-spacing:.07em;color:#a9bccb}
 .homerow3 .sidetile .nb2{position:absolute;right:-4px;top:-4px;min-width:16px;height:16px;
-  line-height:16px;border-radius:8px;background:var(--danger);color:#fff;font-size:9px;
+  line-height:16px;border-radius:8px;background:var(--melde);color:#fff;font-size:9px;
   font-weight:900;text-align:center;padding:0 4px}
 .homerow3 .battlebtn{flex:1 1 55%}
 /* Der Platzhalter, der den KAMPF-Knopf in der Mitte haelt, nachdem die
@@ -6493,7 +6582,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   box-shadow:var(--mat-raised)}
 .rwslot .ico{width:42px;height:42px;object-fit:contain;
   filter:var(--frei) drop-shadow(0 2px 3px #0009)}
-.rwslot span.ico{font-size:32px;line-height:42px}
+.rwslot span.ico{font-size:30px;line-height:42px}
 /* Mengenangabe auf EIGENEM dunklem Plaettchen (§6c) — nie helle Schrift
    direkt auf dem cremefarbenen Koerper. */
 .rwqty{position:absolute;right:-4px;bottom:-6px;padding:1px 5px;border-radius:7px;
@@ -6743,7 +6832,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
    Zu sehen auf jedem Guide-Screenshot, nie gemessen, weil keine Pruefung
    nach Zeilenumbruechen fragt. Zwei `display:block` statt zwei neuer
    Elemente. */
-.gchead .gcn{display:block;font-size:13.5px;font-weight:900;line-height:1.2}
+.gchead .gcn{display:block;font-size:13px;font-weight:900;line-height:1.2}
 .gchead .gcd{display:block;font-size:9.5px;color:var(--dim);margin-top:2px;line-height:1.4}
 .gchead .gcc{flex:0 0 auto;font-size:11px;font-weight:900;color:var(--gold)}
 .gchead .gcar{flex:0 0 auto;font-size:11px;color:var(--dim);transition:transform .2s}
@@ -6954,7 +7043,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   background:#0b1116cc;border:1px solid #3a4c5c}
 .avlock .ico{width:11px;height:11px}
 /* Goldener „Ausgewaehlt"-Streifen: heller Grund → DUNKLE Schrift. */
-.avcsel{position:absolute;bottom:0;left:0;right:0;font-size:7px;font-weight:900;
+.avcsel{position:absolute;bottom:0;left:0;right:0;font-size:7.5px;font-weight:900;
   letter-spacing:.08em;padding:1px 0;
   background:linear-gradient(180deg,#f4e3a6,#e0b94a);color:#3a2b07;
   -webkit-text-fill-color:#3a2b07;border-radius:0 0 8px 8px}
@@ -6977,7 +7066,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   width:100%;height:100%;object-fit:cover;border-radius:inherit}
 .avatar i.avmini .avemo{position:absolute;inset:0;z-index:0;
   display:flex;align-items:center;justify-content:center}
-.avmiss{position:absolute;top:4px;left:4px;font-size:7px;font-weight:900;
+.avmiss{position:absolute;top:4px;left:4px;font-size:7.5px;font-weight:900;
   padding:0 3px;border-radius:5px;background:#0b1116cc;color:#8fa0ad;
   border:1px solid #3a4c5c}
 
@@ -7122,6 +7211,78 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   box-shadow var(--t-fast) var(--ease-out)}
 
 /* ==================================================================
+ * ZUSTAENDE — was ein Knopf ausser „normal" und „gedrueckt" kann
+ * ------------------------------------------------------------------
+ * Gezaehlt am 31.07.2026 ueber das ganze Blatt:
+ *     gedrueckt   ja  (.pressable.pressed, eingesenkt)
+ *     gesperrt    19 Regeln — aber jede anders
+ *     gewaehlt    58 Stellen (.sel / .on)
+ *     ueberfahren  0
+ *     laedt        0
+ *
+ * ⚠ ZWEI DAVON WERDEN BEWUSST NICHT ANGEFASST. „gewaehlt" gibt es
+ * 58-mal und „gesperrt" 19-mal — das sind gewachsene Systeme, keine
+ * Ausrutscher. Eine zweite, konkurrierende Fassung danebenzustellen
+ * macht die Sache schlechter, nicht besser (dieselbe Ueberlegung wie
+ * bei der Handlungsfarbe, §34.3: erst zaehlen, dann urteilen). Wer sie
+ * vereinheitlichen will, ersetzt die 77 Stellen — das ist ein eigenes
+ * Stueck Arbeit mit eigenem Risiko.
+ *
+ * Gebaut wird deshalb genau das, was es NULL Mal gibt.
+ * ================================================================== */
+
+/* --- 1. UEBERFAHREN -------------------------------------------------
+   Nur auf Geraeten mit echtem Zeiger. Ohne `@media (hover:hover)`
+   klebt der Zustand auf dem Telefon nach jeder Beruehrung am Knopf
+   fest, bis man woanders hintippt — der klassische „Sticky-Hover", und
+   er sieht aus wie ein Fehler. */
+@media (hover:hover) and (pointer:fine){
+  .pressable:not([disabled]):not(.is-disabled):not(.laedt):hover{
+    transform:translateY(-1px);
+    filter:brightness(1.07)}
+}
+
+/* --- 2. LAEDT -------------------------------------------------------
+   Der Zustand, der ab Freitag zaehlt: sobald das echte Spiel dranhaengt,
+   gibt es Netzwartezeit. Ohne Ladezustand liest sich jede Verzoegerung
+   wie ein Absturz — der Spieler tippt noch einmal, und schon laeuft der
+   Kauf zweimal.
+
+   Drei Dinge zugleich: die Beschriftung verschwindet (aber ihr PLATZ
+   bleibt, sonst springt der Knopf), ein Lichtband laeuft durch, und
+   Zeiger-Ereignisse sind aus. Das letzte ist der eigentliche Zweck —
+   der Rest ist die Erklaerung dafuer. */
+.laedt{position:relative;pointer-events:none;color:transparent!important;
+  -webkit-text-fill-color:transparent!important;overflow:hidden}
+.laedt>*{visibility:hidden}
+.laedt::after{content:"";position:absolute;inset:0;z-index:5;
+  background:linear-gradient(100deg,transparent 20%,#ffffff2e 46%,#ffffff4a 50%,
+    #ffffff2e 54%,transparent 80%);
+  background-size:250% 100%;
+  animation:laedtband 1.05s linear infinite}
+@keyframes laedtband{from{background-position:120% 0}to{background-position:-40% 0}}
+
+/* --- 3. SKELETT -----------------------------------------------------
+   Fuer INHALT, nicht fuer Knoepfe: eine Liste, die noch nicht da ist,
+   soll ihren Platz zeigen statt zu springen. Bewusst ohne Text und ohne
+   Rand — ein Skelett, das aussieht wie eine fertige Zeile, wird fuer
+   eine fertige Zeile gehalten. */
+.skelett{border-radius:var(--radius-sm);
+  background:linear-gradient(100deg,#16202a 20%,#22303c 46%,#26343f 50%,
+    #22303c 54%,#16202a 80%);
+  background-size:250% 100%;
+  animation:laedtband 1.05s linear infinite;
+  min-height:14px}
+.skelett+.skelett{margin-top:6px}
+
+@media (prefers-reduced-motion:reduce){
+  /* Ein dauerlaufendes Band ist genau die Bewegung, die hier abbestellt
+     wurde. Der Zustand bleibt sichtbar — nur eben still. */
+  .laedt::after{animation:none;background:#ffffff1f}
+  .skelett{animation:none;background:#1c2833}
+}
+
+/* ==================================================================
  * FREUNDESLISTE — Knopf oben rechts und eigene View
  * ------------------------------------------------------------------
  * Der Knopf steht schon (.tbmenu-Platte in .hubicons, links vom
@@ -7162,7 +7323,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   color:#eaf6ff;letter-spacing:.06em}
 /* Zaehler am Reiter „Anfragen" — dieselbe Rolle wie das Badge am Knopf. */
 .frtabn{display:inline-block;margin-left:5px;min-width:14px;height:14px;line-height:14px;
-  border-radius:7px;padding:0 4px;background:var(--danger);color:#fff;
+  border-radius:7px;padding:0 4px;background:var(--melde);color:#fff;
   font-size:8.5px;font-weight:900;text-align:center;box-shadow:0 1px 2px #000a}
 
 /* ---------- Eine Zeile pro Spieler ---------- */
@@ -7282,7 +7443,7 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
   filter:var(--frei) drop-shadow(0 2px 3px #00000080);opacity:.74}
 .leerkreis span.ico{font-size:52px;line-height:1;opacity:.74}
 .leerfeld.kompakt .leerkreis .ico{width:46px;height:46px}
-.leerfeld.kompakt .leerkreis span.ico{font-size:37px}
+.leerfeld.kompakt .leerkreis span.ico{font-size:34px}
 /* Heller Text auf dunklem Feld (#0b1116) — nie umgekehrt (§4). */
 .leertxt{font-size:22px;font-weight:900;letter-spacing:.01em;
   color:var(--txt);-webkit-text-fill-color:var(--txt);line-height:1.15}
@@ -7541,7 +7702,7 @@ button.pfplate{cursor:pointer}
 /* 53 px = AAs 160 von 1153 (13,9 % der Inhaltsflaeche). */
 .pfweek .pfwico{width:53px;height:53px;object-fit:contain;
   filter:var(--frei) drop-shadow(0 3px 6px #000a)}
-.pfweek span.pfwico{display:inline-block;font-size:42px;line-height:53px}
+.pfweek span.pfwico{display:inline-block;font-size:44px;line-height:53px}
 .pfweek .pfwt{margin-top:4px;font-size:18px;font-weight:900;color:#fff;
   text-shadow:0 2px 0 #2a3a52,0 3px 8px #0009}
 /* AA setzt die beiden Wochenend-Zellen auf EINE Rasterspalte, mittig. */
@@ -11119,6 +11280,91 @@ button.pfplate{cursor:pointer}
   /* ================= Helfer ================= */
   var $ = function (id) { return document.getElementById(id); };
   function fmt(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, " "); }
+  /* ==================================================================
+   * fmtKurz(n) — die KOMPAKTE Schreibweise der Kopfleiste
+   * ------------------------------------------------------------------
+   * Zwei Anforderungen standen sich bis zum 31.07.2026 im Weg:
+   *   A  „Ressourcen Anzahl … muss zentriert sein" (IMG_3386) verlangt
+   *      drei GLEICHE Drittel, also `flex:1 1 0`.
+   *   B  Gold darf nicht als „12 5…" abgeschnitten werden, was
+   *      `flex:1 1 auto` verlangte — Breite nach Inhalt.
+   * Gemessen war beides bei 14 px Schrift NICHT gleichzeitig erfuellbar
+   * (pruefungen/README.md, „Bekannt rot"): 91,8 / 91,8 / 99,6 px.
+   * Die Pruefung „gleiche Drittel" stand deshalb als bewusster roter
+   * Schritt im Lauf — mit dem Vermerk, dass nur eine KUERZERE ZAHL beide
+   * Anforderungen erfuellt.
+   *
+   * Das ist diese Funktion. Sie loest den Zielkonflikt nicht durch
+   * Nachgeben, sondern indem sie die Zahl kuerzer macht — so wie AA und
+   * praktisch jedes Mobile-Spiel es tut.
+   *
+   * ⚠ SIE GILT NUR FUER DIE KOPFLEISTE. Preise, Werttafeln, Quittungen
+   * und die Schmiede rechnen weiter mit `fmt` und zeigen den EXAKTEN
+   * Wert. Eine Kaufsumme, die auf zwei Stellen gerundet ist, ist ein
+   * Rechtsproblem, kein Gestaltungsdetail.
+   *
+   * Die Schwelle liegt bei 100 000, nicht bei 10 000: fuenfstellige
+   * Zahlen passen gemessen in ihr Drittel, und wer 45 000 Gold hat,
+   * will die 45 000 sehen und nicht „45 K". Gekuerzt wird erst, wo es
+   * sonst nicht mehr geht.
+   * ================================================================== */
+  function fmtKurz(n) {
+    n = Math.round(Number(n) || 0);
+    var vz = n < 0 ? "-" : ""; n = Math.abs(n);
+    if (n < 100000) return vz + fmt(n);
+    if (n < 1000000) return vz + fmt(Math.floor(n / 1000)) + " K";
+    /* ⚠ „M", NICHT „Mio.". Erste Fassung schrieb „Mio." — und lief damit
+       ueber: gemessen ist das Zahlenfeld 48 px breit, „1,0 Mio." braucht
+       52 px und „999 Mio." sogar 56. Die Kuerzung waere also genau an
+       der Stelle gescheitert, fuer die es sie gibt.
+       „M" passt zu dem „K" darueber (auch dort steht nicht „Tsd."), ist
+       international gelaeufig und misst 36-40 px.
+       Eine Nachkommastelle unter 10 Millionen — „1 M" waere fuer 1,9
+       Millionen schlicht falsch. Komma statt Punkt: deutsche
+       Schreibweise, wie ueberall sonst im Blatt. */
+    if (n < 1000000000) {
+      var m = n / 1000000;
+      return vz + (m < 10 ? m.toFixed(1).replace(".", ",") : String(Math.round(m))) + " M";
+    }
+    /* Milliarden sind im Spiel nicht erreichbar, aber ein Formatierer,
+       der bei einem unerwarteten Wert ueberlaeuft, ist kein
+       Formatierer. Ohne Nachkommastelle, damit auch das noch passt. */
+    return vz + String(Math.round(n / 1000000000)) + " Mrd";
+  }
+  /* ==================================================================
+   * UIZustand — die Naht, an der das echte Spiel Ladezustaende setzt
+   * ------------------------------------------------------------------
+   * Bewusst winzig und bewusst benannt: beim Zusammenbau am Freitag soll
+   * niemand Klassennamen aus dem Blatt abschreiben muessen.
+   *
+   *     UIZustand.laden(el, true)   // Knopf sperren + Lichtband
+   *     UIZustand.laden(el, false)  // zurueck
+   *     UIZustand.waehrend(el, p)   // an ein Promise haengen
+   *
+   * `waehrend` ist der Fall, den man wirklich braucht: ein Kauf laeuft,
+   * der Knopf ist gesperrt, und er wird wieder frei — auch wenn der
+   * Aufruf FEHLSCHLAEGT. Genau das vergisst man von Hand, und dann
+   * bleibt ein Knopf nach einem Netzfehler fuer immer tot.
+   * ================================================================== */
+  window.UIZustand = {
+    laden: function (el, an) {
+      if (typeof el === "string") el = $(el);
+      if (!el) return;
+      el.classList.toggle("laedt", an !== false);
+      if (an !== false) el.setAttribute("aria-busy", "true");
+      else el.removeAttribute("aria-busy");
+    },
+    waehrend: function (el, p) {
+      var self = this;
+      self.laden(el, true);
+      var fertig = function () { self.laden(el, false); };
+      if (p && typeof p.then === "function") return p.then(function (w) { fertig(); return w; },
+        function (f) { fertig(); throw f; });
+      fertig();
+      return p;
+    }
+  };
+
   function toast(msg) {
     var t = $("toast");
     t.textContent = msg; t.classList.add("on");
@@ -11257,7 +11503,11 @@ button.pfplate{cursor:pointer}
       function schritt(t) {
         if (t0 === null) t0 = t;
         var f = Math.min(1, (t - t0) / ms);
-        el.textContent = fmt(Math.round(von + (bis - von) * (1 - Math.pow(1 - f, 3))));
+        /* ⚠ AUCH HIER kurz. Der Zaehler schreibt in dieselbe Pille wie
+           renderTop; mit `fmt` haette die Zahl waehrend des Fluges die
+           lange Form gezeigt und beim letzten Bild auf die kurze
+           zurueckgesprungen. */
+        el.textContent = fmtKurz(Math.round(von + (bis - von) * (1 - Math.pow(1 - f, 3))));
         if (f < 1) requestAnimationFrame(schritt);
       }
       requestAnimationFrame(schritt);
@@ -11285,7 +11535,7 @@ button.pfplate{cursor:pointer}
         setTimeout(function () { pille.classList.remove("cur-treffer"); }, 320);
         return;
       }
-      if (zaehlt) { HALT[art] = alt; ziel.textContent = fmt(alt); }
+      if (zaehlt) { HALT[art] = alt; ziel.textContent = fmtKurz(alt); }
 
       var b = buehne(), n = anzahl(betrag), gelandet = 0;
       for (var i = 0; i < n; i++) {
@@ -11479,16 +11729,16 @@ button.pfplate{cursor:pointer}
       if (gems() < TEST_GEMS) _setGems(TEST_GEMS);
       if (gold() < TEST_GOLD) _setGold(TEST_GOLD);
     }
-    $("curTrophies").textContent = fmt(DEMO_TROPHIES);
-    $("curGems").textContent = fmt(gems());
-    $("curGold").textContent = fmt(gold());
+    $("curTrophies").textContent = fmtKurz(DEMO_TROPHIES);
+    $("curGems").textContent = fmtKurz(gems());
+    $("curGold").textContent = fmtKurz(gold());
     /* Waehrend ein Flug laeuft, gehoert die Zahl dem Flug. Ohne das
        ueberschreibt der naechste Render-Durchgang den eingefrorenen
        Wert und der Flug landet auf einer Zahl, die schon stimmt. */
     ["gold", "gems", "trophies"].forEach(function (art) {
       var h = UIFlug.halt(art);
       if (h !== undefined) {
-        $({ gold: "curGold", gems: "curGems", trophies: "curTrophies" }[art]).textContent = fmt(h);
+        $({ gold: "curGold", gems: "curGems", trophies: "curTrophies" }[art]).textContent = fmtKurz(h);
       }
     });
     /* Essenz-Vorrat: SUMME in der Leiste, Aufschluesselung im Fach
@@ -20288,6 +20538,34 @@ button.pfplate{cursor:pointer}
       var el = $(k); if (el) el.classList.toggle("on", k === which);
     });
   }
+  /* Die Einblendung des Reiterwechsels. Begruendung der zwei Bewegungen
+     im Blatt bei `.view.vin-l`. */
+  function viewEinblenden(vonNav, nachNav) {
+    if (!nachNav || vonNav === nachNav) return;
+    var el = $(NAVS[nachNav]); if (!el) return;
+    /* ⚠ NICHT waehrend einer Wischgeste. Das Wischen setzt selbst
+       Transforms auf denselben Knoten (swdrag/swsnap) — eine zweite
+       Animation darauf laesst die Ansicht sichtbar zucken. Die Geste
+       hat ihre eigene, laengere Bewegung; die hier waere ein zweiter
+       Kommentar zu derselben Sache. */
+    if (window.ArenaSwipe && window.ArenaSwipe.laeuft && window.ArenaSwipe.laeuft()) return;
+    if (window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var reihe = (window.ArenaSwipe && window.ArenaSwipe.order) || [];
+    var iv = reihe.indexOf(vonNav), inn = reihe.indexOf(nachNav);
+    var kl = (iv >= 0 && inn >= 0 && iv !== inn)
+      ? (inn > iv ? "vin-r" : "vin-l")     // Richtung folgt der Leiste
+      : "vin-tief";                        // eine Ebene weiter, nicht daneben
+    el.classList.remove("vin-l", "vin-r", "vin-tief");
+    void el.offsetWidth;                   // Neustart erzwingen
+    el.classList.add(kl);
+    /* Aufraeumen: eine liegengebliebene Animationsklasse wuerde beim
+       naechsten Anzeigen derselben Ansicht nichts tun (kein Neustart)
+       und beim Wischen den Transform ueberschreiben. */
+    var ab = function () { el.classList.remove(kl); el.removeEventListener("animationend", ab); };
+    el.addEventListener("animationend", ab);
+  }
+
   function show(navId) {
     if (navId === "navTower") { openDetail(curId); return; }
     /* Handbuch und Bestiarium sind seit dem Reiter-Umbau (29.07.2026)
@@ -20312,9 +20590,14 @@ button.pfplate{cursor:pointer}
        Der Kopf gehoert also zur Startseite, die Waehrungsleiste ist
        global. Genau so steht es jetzt im Code. */
     document.body.classList.toggle("nur-waehrung", navId !== "navHome");
+    /* ⚠ Den ALTEN Stand VOR dem Umschalten merken — danach ist er weg. */
+    var vorher = null;
+    for (var kk in NAVS) { var vv = $(NAVS[kk]);
+      if (vv && vv.classList.contains("active")) { vorher = kk; break; } }
     for (var k in NAVS) {
       var vw = $(NAVS[k]); if (vw) vw.classList.toggle("active", k === navId);
     }
+    viewEinblenden(vorher, navId);
     setNav(navId);
     if (navId === "navHome") renderHome();
     /* setDkMain() statt direkt renderCollection(): der zweite Bottom-
@@ -21522,6 +21805,10 @@ button.pfplate{cursor:pointer}
                         Pruefung die Staffel gegen die QUELLE haelt und
                         keine Zahlen einfriert. */
                      playCeremony: playCeremony, closeCeremony: closeCeremony,
+                     /* Beide Formatierer nach aussen: die Pruefung soll
+                        die kompakte Schreibweise gegen die QUELLE halten
+                        und nicht gegen eine abgeschriebene Tabelle. */
+                     fmt: fmt, fmtKurz: fmtKurz,
                      WUCHT: WUCHT, wuchtGrad: wuchtGrad, tfKanaele: tfKanaele,
                      AU: function () { return window.ArenaAudio; },
                      renderGuide: renderGuide, renderManual: renderManual,
