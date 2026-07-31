@@ -1599,9 +1599,26 @@ nav.bottom .nb{position:absolute;top:-3px;right:4px;z-index:3;
   .nav-neu::before{display:none}
   .nav-treffer,.nav-neu{animation:none}
 }
-.cur-treffer{animation:curtreffer 340ms var(--ease-overshoot)}
+/* ⚠ SQUASH & STRETCH — das letzte fehlende Stueck der Bewegungssprache
+   (P4, 31.07.2026). Hier stand `scale(1.17)`, also GLEICHFOERMIGES
+   Wachsen. Eine Pille, die beim Einschlag einer Muenze rundum groesser
+   wird, liest sich als „hebt sich", nicht als „bekommt etwas ab".
+   Ein Einschlag von oben staucht: erst breiter und flacher (1,15 / 0,86),
+   dann ueber die Ruhelage hinaus schmaler und hoeher (0,97 / 1,07), dann
+   zurueck. Die Summe der beiden Achsen bleibt dabei nahe 2 — das ist die
+   Regel, die Squash von blossem Zerren unterscheidet: das Volumen darf
+   nicht sichtbar wachsen.
+   `transform-origin:center bottom` ist nicht Kosmetik, sondern die
+   Richtung: die Pille steht auf ihrer Unterkante, also wird sie nach
+   UNTEN gestaucht und nicht um ihre Mitte. */
+.cur-treffer{animation:curtreffer 340ms var(--ease-out);
+  transform-origin:center bottom}
 @keyframes curtreffer{
-  0%{transform:scale(1)} 38%{transform:scale(1.17)} 100%{transform:scale(1)}
+  0%  {transform:scale(1,1)}
+  22% {transform:scale(1.15,.86)}
+  55% {transform:scale(.97,1.07)}
+  78% {transform:scale(1.02,.98)}
+  100%{transform:scale(1,1)}
 }
 @media (prefers-reduced-motion:reduce){
   .flug{display:none}
@@ -3659,6 +3676,55 @@ span.ico{text-align:center}
    ist noetig: bei acht Essenz-Sorten plus Gold plus Karten passt das
    Raster nicht mehr auf ein Handy-Blatt. Ohne feste Hoehe waechst das
    Blatt sonst aus dem Bild heraus. */
+/* ==================================================================
+ * GESTALTETE SCROLLBALKEN (P4-Restposten, 31.07.2026)
+ * ------------------------------------------------------------------
+ * Zwanzig senkrechte Scrollkaesten liefen bis hierher mit dem
+ * Systembalken. Auf dem Telefon faellt das kaum auf — er liegt als
+ * Overlay ueber dem Inhalt und blendet sich aus. Auf dem Schreibtisch,
+ * wo dieser Prototyp abgenommen wird, steht dagegen ein breiter grauer
+ * Streifen neben jedem Fenster, und der gehoert keiner Marke.
+ * ⚠ Die zwei WAAGERECHTEN Schienen (`.apkrail`, `.grail`) blenden ihren
+ * Balken bewusst ganz aus und behalten das: sie sind Karussells mit
+ * Schnappen und Punkten darunter: dort ist der Balken doppelte Auskunft.
+ * Deshalb steht diese Regel auf den senkrechten Kaesten und nicht auf
+ * allem, was scrollt.
+ * `scrollbar-gutter` bleibt bewusst WEG: es reserviert dauerhaft Platz,
+ * und die Kaesten hier sind auf ihre Breite gemessen. */
+.belscroll,.dkscroll,#passList,#roadScroll,.gcbody,.lbbody,.mlist,.frlist,
+.setbody,.evlist,.chatbody{
+  scrollbar-width:thin;scrollbar-color:#3a4c5c00 transparent}
+.belscroll:hover,.dkscroll:hover,#passList:hover,#roadScroll:hover,.gcbody:hover,
+.lbbody:hover,.mlist:hover,.frlist:hover,.setbody:hover,.evlist:hover,.chatbody:hover{
+  scrollbar-color:#3a4c5c transparent}
+.belscroll::-webkit-scrollbar,.dkscroll::-webkit-scrollbar,#passList::-webkit-scrollbar,
+#roadScroll::-webkit-scrollbar,.gcbody::-webkit-scrollbar,.lbbody::-webkit-scrollbar,
+.mlist::-webkit-scrollbar,.frlist::-webkit-scrollbar,.setbody::-webkit-scrollbar,
+.evlist::-webkit-scrollbar,.chatbody::-webkit-scrollbar{width:6px;height:6px}
+.belscroll::-webkit-scrollbar-track,.dkscroll::-webkit-scrollbar-track,
+#passList::-webkit-scrollbar-track,#roadScroll::-webkit-scrollbar-track,
+.gcbody::-webkit-scrollbar-track,.lbbody::-webkit-scrollbar-track,
+.mlist::-webkit-scrollbar-track,.frlist::-webkit-scrollbar-track,
+.setbody::-webkit-scrollbar-track,.evlist::-webkit-scrollbar-track,
+.chatbody::-webkit-scrollbar-track{background:transparent}
+/* Der Griff traegt die Markenkante, nicht die Markenfarbe: ein goldener
+   Balken neben jedem Fenster waere ein zweiter Blickfang neben dem
+   Inhalt. Er wird erst beim Zeigen sichtbar — auf Touch also nie, dort
+   uebernimmt weiterhin der Overlay-Balken des Systems. */
+.belscroll::-webkit-scrollbar-thumb,.dkscroll::-webkit-scrollbar-thumb,
+#passList::-webkit-scrollbar-thumb,#roadScroll::-webkit-scrollbar-thumb,
+.gcbody::-webkit-scrollbar-thumb,.lbbody::-webkit-scrollbar-thumb,
+.mlist::-webkit-scrollbar-thumb,.frlist::-webkit-scrollbar-thumb,
+.setbody::-webkit-scrollbar-thumb,.evlist::-webkit-scrollbar-thumb,
+.chatbody::-webkit-scrollbar-thumb{
+  background:#3a4c5c00;border-radius:var(--radius-2xs);
+  transition:background var(--t-mid) var(--ease-out)}
+.belscroll:hover::-webkit-scrollbar-thumb,.dkscroll:hover::-webkit-scrollbar-thumb,
+#passList:hover::-webkit-scrollbar-thumb,#roadScroll:hover::-webkit-scrollbar-thumb,
+.gcbody:hover::-webkit-scrollbar-thumb,.lbbody:hover::-webkit-scrollbar-thumb,
+.mlist:hover::-webkit-scrollbar-thumb,.frlist:hover::-webkit-scrollbar-thumb,
+.setbody:hover::-webkit-scrollbar-thumb,.evlist:hover::-webkit-scrollbar-thumb,
+.chatbody:hover::-webkit-scrollbar-thumb{background:#3a4c5c}
 .belscroll{max-height:266px;overflow-y:auto;border-radius:var(--radius-sm);padding:10px;
   background:#0b121ab8;border:1px solid #ffffff12}
 .belgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
@@ -3710,10 +3776,15 @@ span.ico{text-align:center}
    auch. Er gehoert zum Bildschirm, nicht zum Fenster. */
 .belhint{font-size:var(--fs-4);font-weight:900;letter-spacing:.13em;color:#ffffffb0;
   text-shadow:0 1px 4px #000;animation:belhint 1.9s ease-in-out infinite}
+/* Dieselbe Regel wie bei `curtreffer`: die Kachel FAELLT herein (9 px
+   von oben), also staucht sie beim Aufsetzen und federt zurueck. Vorher
+   war der Ueberschwung gleichfoermig — sichtbar war eine Kachel, die
+   kurz zu gross ist, nicht eine, die landet. */
 @keyframes belpop{
-  0%  {opacity:0;transform:scale(.42) translateY(9px)}
-  62% {opacity:1;transform:scale(1.09) translateY(0)}
-  100%{opacity:1;transform:scale(1)}}
+  0%  {opacity:0;transform:scale(.42,.42) translateY(9px)}
+  58% {opacity:1;transform:scale(1.12,.92) translateY(0)}
+  78% {opacity:1;transform:scale(.98,1.05)}
+  100%{opacity:1;transform:scale(1,1)}}
 @keyframes belhint{0%,100%{opacity:.5}50%{opacity:1}}
 /* Wer Bewegung abbestellt hat, bekommt denselben Inhalt ohne Flug.
    Die Kacheln muessen dann SOFORT sichtbar sein — eine Animation, die
@@ -7769,7 +7840,18 @@ video.cvid{position:absolute;inset:0;z-index:2;display:block;width:100%;height:1
 .frfav{color:var(--gold);font-size:var(--fs-3)}
 .frtag{flex:0 0 auto;font-size:8px;font-weight:900;letter-spacing:.06em;padding:1px 5px;
   border-radius:var(--radius-xs);background:#1c6ea8;color:#eaf6ff;box-shadow:var(--lit),var(--unlit)}
-.frsub{font-size:var(--fs-2);color:var(--dim);margin-top:2px;
+/* ⚠ BLEIBT AUF 9 px UND WANDERT NICHT AUF DIE 10er-STUFE. Diese Zeile
+   war die EINE Stelle, an der die Schrift-Leiter vom 31.07.2026 wirklich
+   weh getan hat: mit 10 px braucht „Prisma-Zitadelle · zuletzt vor 2 h"
+   223 px in einem 217 px breiten Kasten und wird abgeschnitten
+   (gefunden von qualitaet.js, nicht von meiner eigenen Vorher/Nachher-
+   Messung — die sah den Range-Kasten, den der kappende Vorfahr schon
+   begrenzt hatte, und meldete deshalb keinen Ueberlauf).
+   Der Kasten laesst sich nicht verbreitern: rechts daneben stehen
+   Trophaeenzahl und Knopf, beide mit gemessener Breite. Also bleibt die
+   Schrift. Eine Leiter, die einen Text abschneidet, ist an dieser Stelle
+   die schlechtere Ordnung. */
+.frsub{font-size:var(--fs-1);color:var(--dim);margin-top:2px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .frcodesm{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.04em}
 /* Gold auf DUNKLER Flaeche — das ist die erlaubte Richtung (§4). */

@@ -3960,3 +3960,126 @@ von drei Stellen **ohne Stufe** gerufen — die Paketöffnung klingt dort für
 Gewöhnlich wie für Erhaben.
 
 **Aufwand: M** · **Priorität: 1** · erledigt bis auf die 20 schattenlosen Kästen
+
+---
+
+## §39 Die offene Liste, A bis D abgearbeitet
+
+Ansage (31.07.2026): „Arbeite alle die Punkte die du nach Reihenfolge gelistet hast
+nacheinander ab. Von A1 bis D." Vier Punkte der Liste haben sich beim Nachmessen als
+**gegenstandslos** herausgestellt — sie stehen hier mit derselben Ausführlichkeit wie
+die gebauten, weil ein zurückgezogener Befund genauso viel wert ist wie ein behobener.
+
+### 39.1 Was gebaut wurde
+
+| | Was | Beleg |
+|---|---|---|
+| A2 | **Der Ton der Paketöffnung kannte die Rarität nicht.** `UISfx.flip()` lief ohne Argument — eine Erhabene klang wie eine Gewöhnliche. Die Stufe hängt jetzt als `data-stufe` an der Karte | 3 Aufrufstellen, eine war falsch |
+| A3 | **Der Bruch war stumm.** Der lauteste Moment der Zeremonie — Blitz, Beben, Splitter — hatte als einziger keinen Ton. Neu `UISfx.bruch()`: tiefer Schlag + gefiltertes Rauschen + heller Nachschlag, Wucht steigt mit der Kartenzahl | ein Reißen ist Rauschen, kein Ton mit Tonhöhe — deshalb `AudioBuffer` statt `blip()` |
+| B8 | **Der Login-Kalender entwertete seine eigene Werbung.** `locked` (= künftig) trug `opacity .62` **plus** `grayscale(.7)`, also fast dieselbe Zurücknahme wie `done` (= erledigt). Tag 4 zeigte graues Gold, Tag 3/5/7 drei identische dunkle Kästen | jetzt `.86` ohne Graustufen; die Rarität sitzt an der **Platte**, weil bei 51 px eine Fläche lesbar ist und ein Wappen nicht |
+| B9 | **Panel-Platte und Fortschrittsrahmen als 9-Slice.** `panel.webp` lag mit `background-size:auto` auf `.reqpanel` — eine 1200×896-Grafik in einem 406er Kasten zeigt ihr linkes oberes Drittel, also einen Rahmen ohne zwei Seiten | Zuschnitt aus den Pixeln: 54 px Rand + 54 px Eckzier = **108 px** |
+| B9 | `progress_frame` ist waagerecht: der Balken füllt nur 20 % der Höhe seiner Leinwand, bei `100 %` Breite wird er um **Faktor 6,2** gequetscht und die Kristallkappen werden Spließen | neu `progress_frame_cut` (lokal beschnitten, 1169×153), Zuschnitt `0 10 %` |
+| C10 | **Der Gratis-Posten sah aus wie die fünf bezahlten daneben.** Eigene violette Kante — die Farbe ist im Regal sonst nicht vergeben (Grün = Kristalle, Orange = Gold, Silber = neutral) | + Rabattband, siehe 39.3 |
+| D13 | **Radien: 17 Werte in 267 Verwendungen auf sechs benannte Stufen** | größter Sprung 2 px; ein Radius ändert nie die Kastengröße |
+| D12 | **Schrift: 31 Größen in 682 Verwendungen.** Die sechs halben Stufen sind in die ganze Zahl darüber gewandert (170 Verwendungen), danach neun Stufen benannt (504 Verwendungen, ohne Rundung) | siehe 39.2 |
+| D14 | **Squash & Stretch** — das letzte fehlende Stück der Bewegungssprache | siehe 39.4 |
+| D15 | **Gestaltete Scrollbalken** für die 20 senkrechten Scrollkästen | die zwei waagerechten Karussells behalten ihren ausgeblendeten Balken |
+
+### 39.2 Die Schrift-Leiter: warum sie gemessen und nicht geglaubt wurde
+
+Ein Radius ändert nie die Kastengröße — eine Schriftgröße lässt **jeden Text neu
+umfließen**. Deshalb wurde die Umstellung gegen eine Messung gefahren: 1 529
+Textelemente über alle 16 Ansichten, vorher und nachher, je Element Zeilenzahl und
+Überlauf. **Grundrauschen zweier identischer Läufe: 0 Abweichungen.**
+
+Richtung **nach oben**, nicht nach unten: das untere Ende dieser Leiter liegt schon an
+der Lesbarkeitsgrenze — der Kommentar bei `.anfbild` hält fest, dass 6,5 px „keine
+Schrift mehr, sondern ein Strich" war.
+
+| | Ergebnis |
+|---|---|
+| neue Überläufe | **0** |
+| Fließtexte mit einer Zeile mehr | 6 (alle in mitwachsenden Kästen) |
+| echte Funde | **2** |
+
+Die zwei echten Funde:
+1. **Die Mengenangabe im Arena-Pack brach auf zwei Zeilen** („5 000" → „5" / „000").
+   Sie steht absolut in der Ecke eines 10,5-%-Kastens und hatte nie eine verlässliche
+   Breite; die Leiter hat den Umbruch ausgelöst, nicht verursacht. Behoben mit `nowrap`.
+2. **`.frsub` wurde abgeschnitten** — „Prisma-Zitadelle · zuletzt vor 2 h" braucht bei
+   10 px 223 px in einem 217 px breiten Kasten. Diese Zeile bleibt auf 9 px.
+
+> ⚠ **Fund 2 hat meine eigene Messung NICHT gefunden**, sondern `qualitaet.js`. Der
+> Grund ist lehrreich: mein Prüfer verglich den Range-Kasten des Textes mit dem Kasten
+> des Elements — aber ein kappender Vorfahr **begrenzt den Range-Kasten bereits**. Wo
+> `overflow:hidden` steht, kann ein Überlauf per Definition nicht als Überlauf sichtbar
+> werden. Ein Prüfer, der nur „ragt es heraus" fragt, ist bei genau den Kästen blind,
+> die kappen. `qualitaet.js` fragt stattdessen „ist der Text breiter als sein Kasten"
+> und sieht es deshalb.
+>
+> **Merksatz:** Wer Überlauf misst, misst nichts, wo abgeschnitten wird.
+
+### 39.3 Rabatte: die Zahl wird gerechnet, oder es gibt sie nicht
+
+Bei den Tagesangeboten fehlte ein „70 % OFF"-Band. Die Zahl stammte aus AAs Screenshot,
+nicht aus unseren Preisen — und ein Band ohne Bezugspreis ist keine Zierde, sondern eine
+falsche Preisaussage. Gebaut wurde deshalb `dealRabatt()`: ein Band erscheint **nur**,
+wo dieselbe Ware im Dauerregal wirklich teurer ist. Heute sind das zwei Gold-Staffeln
+mit je **−17 %** (75 statt 90, 240 statt 288 Kristalle).
+
+Dieselbe Regel hat beim Arena-Pack-Karussell etwas aufgedeckt, das dort schon stand:
+
+> Der durchgestrichene Preis daneben war **rückwärts aus dem Wert-Siegel gerechnet**
+> (`preis * (100 + wert) / 100`). Für Arena 1 kam so „Fr. 8.–" heraus, rot
+> durchgestrichen — eine Zahl, zu der dieses Produkt **nie angeboten wurde**. Ein
+> durchgestrichener Preis behauptet einen früheren oder sonst geltenden Preis; wo es den
+> nicht gibt, ist die Angabe falsch, unabhängig davon, wie gut die Wertrechnung dahinter
+> ist. Bei einem Laden mit Echtgeldkauf ist das außerdem genau die Stelle, auf die
+> Apple 3.1.1, Google Play und die Preisbekanntgabeverordnung sehen. **Entfernt.**
+>
+> Das Wert-Siegel bleibt: „+X % Wert" vergleicht den Inhalt mit unseren **eigenen**
+> Einzelpreisen (`packWert()` rechnet ihn aus `GOLD_PACKS` und den Gem-Staffeln). Diese
+> Aussage ist belegbar, die andere war es nicht.
+
+### 39.4 Squash & Stretch
+
+Alle Pops im Blatt waren **gleichförmige** Skalierung. Eine Pille, die beim Einschlag
+einer Münze rundum größer wird, liest sich als „hebt sich", nicht als „bekommt etwas ab".
+Ein Einschlag von oben staucht: erst breiter und flacher (1,15 / 0,86), dann über die
+Ruhelage hinaus schmaler und höher (0,97 / 1,07), dann zurück. Die Summe der beiden
+Achsen bleibt dabei nahe 2 — **das** ist die Regel, die Squash von bloßem Zerren
+unterscheidet: das Volumen darf nicht sichtbar wachsen.
+
+Betroffen: `curtreffer` (die Währungspille) und `belpop` (die Belohnungskachel, die von
+oben hereinfällt). Count-up (`zaehlHoch`) und die gestaffelte Belohnungs-Choreografie
+(70 ms, synchron zum Ton) waren bereits gebaut.
+
+### 39.5 Vier Punkte zurückgezogen — mit Begründung
+
+| | Warum die Meldung falsch war |
+|---|---|
+| **A4** Login-Kalender vor dem Hub | Keine Panne, sondern eine dokumentierte Entscheidung nach AA („ein Bildschirm = ein Ziel"). Unverändert gelassen |
+| **B6** `pack_arena.webp` 448×600 | Die Datei wird nirgends größer als **82 px** dargestellt, braucht bei dpr 3 also 246 px. Ich hatte sie gegen ihre Geschwister verglichen statt gegen ihren Einsatz. Über alle 216 Bilddateien gemessen ist **kein** Asset nennenswert unteraufgelöst |
+| **B7** Gold-Bilder zu blass | Die 0,32–0,39 Sättigung waren über das **ganze** Bild gemittelt — bei `t2`/`t3` liegt der Farbton-Median dadurch bei 271°/222°, also im violetten Hintergrund. Nur über die Goldpixel: 0,494–0,601 gegen 0,631 beim Währungs-Icon. Der echte Unterschied ist der **Anteil** (35,4 % gegen 10,5 %), nicht die Sättigung. `saturate(1.45)` hob sie auf 0,666–0,793 und schoss über das Ziel — jetzt 1,15, kein neues Asset nötig |
+| **C11** Arena-Preisleiter fehlt | Sie steht seit Langem: acht Stufen, Fr. 3.– bis Fr. 69.– |
+
+> **Merksatz aus B7:** Ein Mittelwert über ein ganzes Bild beschreibt die Fläche, die am
+> meisten Platz einnimmt — und das ist fast immer der Hintergrund, nicht das Motiv.
+
+### 39.6 Was aus D bewusst NICHT gebaut wurde
+
+`DESIGNSYSTEM.md` §8 führt unter „fehlende Komponenten" auch **Health-/Mana-Balken,
+Damage-Zahlen und Kampagne**. Die gehören in den **Kampfbildschirm**, und der ist nicht
+Teil dieser Datei — `ui_prototype.html` ist die Meta-UI (Hub, Shop, Sammlung, Clan). Sie
+hier zu bauen hieße, in einen Bildschirm zu bauen, den es noch nicht gibt.
+
+**Tooltips** stehen ebenfalls dort und werden bewusst nicht gebaut: ein Tooltip hängt am
+Zeigen, und auf einem Telefon gibt es kein Zeigen. Das richtige Muster für dieselbe
+Aufgabe ist das Antippen eines ⓘ, und das ist an vier Stellen gebaut (`.oddsi`,
+`.binfo`, `.anfinfo`, `.dkinfo`). Eine Komponente zu bauen, die auf dem Zielgerät nie
+auslöst, wäre ein abgehakter Punkt ohne Wirkung.
+
+**Ladezustände** stehen in derselben Liste und sind seit §35 gebaut (`.laedt`,
+`.skelett`, `window.UIZustand`).
+
+**Aufwand: L** · **Priorität: 1** · A–D abgearbeitet, drei Punkte offen benannt
