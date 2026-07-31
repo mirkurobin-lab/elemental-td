@@ -8,7 +8,7 @@
 > 238 lokale Assets, kein Build und kein Server.
 >
 > **Wer die UI ins Spiel zieht, liest zuerst `arena_patches/UI_UEBERGABE.md`.** Dort
-> steht, was zusammengehört, wie man es startet, was die 32 Playwright-Suiten abdecken,
+> steht, was zusammengehört, wie man es startet, was die Playwright-Suiten abdecken (30 von 32 grün — zwei brauchen eine erreichbare Vorschau-URL),
 > **neun Regeln, die beim Einbau nicht gebrochen werden dürfen**, und was offen bleibt.
 >
 > Wahrheitsquelle für jede Gestaltungsfrage ist `arena_patches/AA_UI_REFERENZ.md`.

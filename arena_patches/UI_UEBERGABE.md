@@ -128,7 +128,7 @@ Jede davon ist einmal teuer gewesen. Die Begründungen stehen ausführlich in
 
 | Blatt | Inhalt |
 |---|---|
-| `AA_UI_REFERENZ.md` | **Wahrheitsquelle.** Jede Messung gegen das Vorbild, jede Entscheidung, jeder Irrtum mit Begründung. §34–§41 sind der Stand dieser Woche |
+| `AA_UI_REFERENZ.md` | **Wahrheitsquelle.** Jede Messung gegen das Vorbild, jede Entscheidung, jeder Irrtum mit Begründung. §34–§42 sind der Stand dieser Woche |
 | `DESIGNSYSTEM.md` | Material, Schatten, Maße, Farbe, Bewegung, Icons — und §8, was offen ist |
 | `pruefungen/README.md` | alle 32 Suiten einzeln, mit dem, was jede hält |
 | `DESIGN_MONETARISIERUNG.md` | Preise, Währungsregeln, IAP-Platzhalter |
