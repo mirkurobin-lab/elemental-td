@@ -120,7 +120,6 @@ Jede davon ist einmal teuer gewesen. Die Begründungen stehen ausführlich in
 | **9 Assets fehlen lokal** | `card_bann` `card_bollwerk` `card_fokus` `card_joker` `card_splitter` `ess_arkan` `ic_offline` `off_banner` `off_loop` — sie stehen in `NUR_CDN` und der Proxy sperrt den CDN (403). Sichtbare Folge: die Spell-Karten zeigen ihr Emoji statt des Artworks | braucht eine Sitzung mit CDN-Zugang |
 | **Arena-Artworks als echtes 3:2** | die acht Bilder sind 1,79 : 1 in einer 3 : 2-Box, es bleiben 15 % Beschnitt (§37) | dieselbe Sperre |
 | **Plattenwerte** | `--panel` steht 1,13 : 1 gegen `--bg` — Grund, Platte und zweite Platte sind praktisch dieselbe Fläche. Vorschlag samt Messung in §41.3 | **Entscheidung des Auftraggebers**, nicht angewendet |
-| **Entwicklernotizen** | mehrere Ansichten tragen sichtbare Hinweise („Logik: arena_matchend.js — …") | für die Auslieferung ausblenden, nicht löschen — sie sagen, wo die Rechnung liegt |
 | **Benachrichtigungssystem** | einzige noch offene Komponente aus `DESIGNSYSTEM.md` §8 | — |
 | **31 Schriftzüge** | zwischen 3,0 : 1 und ihrem WCAG-Soll von 4,5 : 1 | bewusst zurückgenommenes Beiwerk, im Protokoll von `lesbarkeit.js` |
 
